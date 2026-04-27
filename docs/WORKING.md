@@ -32,12 +32,13 @@ docs_ssot: docs/halo-swing-development-plan.md
 ## Current State
 
 ```yaml
-status: docs_ready_code_not_started
+status: p0_plan_review_in_progress
 last_completed:
   - GitHub repo created and pushed
   - development plan moved to docs as SSOT
   - CONTEXT.md created
   - WORKING.md converted to LLM handoff format
+  - harness engineering and virtual team gates documented
 not_started:
   - Python MCP project scaffold
   - MCP health_check tool
@@ -49,13 +50,13 @@ not_started:
 ## Active Task
 
 ```yaml
-doing: P1 MCP server MVP scaffold
-next_atomic_step: create Python project skeleton and health_check MCP tool
+doing: P0 project initialization plan review only
+next_atomic_step: review Phase 0 plan by Dev/QC/CTO/Docs Gardener before implementation
 success_criteria:
-  - project has runnable MCP server entrypoint
-  - health_check returns project/version/status
-  - README or docs mention how to run locally
-  - tests or a local smoke command verify the entrypoint
+  - each virtual team has a concrete Phase 0 checklist
+  - cross-check risks and improvements are written down
+  - no code implementation is performed during this review step
+  - next implementation slice is clearly bounded
 ```
 
 ## Implementation Constraints
@@ -102,8 +103,8 @@ P0_docs:
     - docs/WORKING.md
     - docs/halo-swing-development-plan.md
 
-P1_mcp_mvp:
-  status: next
+P0_project_initialization:
+  status: planning_review
   tasks:
     - Python package scaffold
     - MCP server entrypoint
@@ -111,7 +112,7 @@ P1_mcp_mvp:
     - health_check tool
     - basic smoke test and CLI/test harness
 
-P2_market_data:
+P1_market_data:
   status: pending
   tasks:
     - OHLCV adapter
@@ -119,21 +120,21 @@ P2_market_data:
     - RSI/DMI/ADX/MA/ATR
     - feature_store schema
 
-P3_swing_engine:
+P2_swing_engine:
   status: pending
   tasks:
     - score_leverage_swing
     - generate_trade_guide
     - BUY_2X/BUY_3X/WAIT/TRIM/EXIT/STOP
 
-P4_macro_news_events:
+P3_macro_news_events:
   status: pending
   tasks:
     - VIX/VXN/DXY/rates/oil
     - FOMC/CPI/PCE/NFP/earnings calendar
     - Fed/Treasury/White House/EIA news evidence cards
 
-P5_feedback:
+P4_feedback:
   status: pending
   tasks:
     - signal_ledger
@@ -142,12 +143,107 @@ P5_feedback:
     - score calibration
     - champion/challenger
 
-P6_hermes:
+P5_hermes:
   status: pending
   tasks:
     - Hermes MCP config example
     - cron prompts
     - Telegram report format
+```
+
+## P0 Planning Review
+
+```yaml
+scope:
+  phase: P0_project_initialization
+  source: docs/halo-swing-development-plan.md#phase-0-프로젝트-초기화
+  mode: planning_only_no_code
+
+dev_plan:
+  objective: create the smallest runnable MCP server foundation
+  implementation_steps:
+    - choose Python package layout: src/halo_swing_mcp
+    - create pyproject.toml with uv-compatible scripts
+    - create server entrypoint for stdio MCP
+    - create config/env loader with .env.example
+    - create health_check tool returning name/version/status/capabilities
+    - create CLI/test harness able to call health_check without Hermes
+    - create tests/fixtures and tests/golden directories
+  dev_exit_criteria:
+    - uv run market-swing-mcp starts without crashing
+    - health_check callable from MCP server path
+    - health_check callable from local harness path
+
+qc_plan:
+  objective: make Phase 0 reproducible before live integrations exist
+  validation_steps:
+    - unit test health_check schema
+    - CLI harness smoke test with deterministic output
+    - verify no network access is required for P0 tests
+    - verify .env.example contains placeholders only
+    - verify import/package entrypoint from clean checkout
+  qc_exit_criteria:
+    - pytest passes for P0 tests
+    - smoke command documented and repeatable
+    - fixture/golden directories exist even if minimal
+
+cto_plan:
+  objective: prevent early architecture drift
+  review_points:
+    - MCP boundary is thin and tool-oriented, not a monolithic agent
+    - no trading/order connector is introduced in P0
+    - dependencies are minimal and justified
+    - config does not assume paid data providers
+    - package layout leaves room for data/engines/tools/storage layers from SSOT
+    - harness path is first-class, not an afterthought
+  cto_exit_criteria:
+    - P0 does not make irreversible choices about data vendors or broker APIs
+    - P0 keeps future Hermes integration stdio-friendly
+    - P0 has no hidden live-network requirement
+
+docs_gardener_plan:
+  objective: keep docs aligned while code skeleton appears
+  doc_steps:
+    - update README with local run and smoke commands
+    - update WORKING status from planning_review to implementation_ready
+    - update SSOT only if package layout or phase boundary changes
+    - keep all new project docs under docs/
+    - do not duplicate the full development plan elsewhere
+  docs_exit_criteria:
+    - new commands in README match actual scripts
+    - WORKING next_atomic_step points to the first implementation action
+```
+
+## P0 Cross-Check Findings
+
+```yaml
+dev_to_qc:
+  finding: P0 must define a harness command before adding market data tools.
+  improvement: add a tiny CLI runner or pytest helper that calls tool functions directly.
+
+qc_to_dev:
+  finding: health_check needs a stable output schema for golden testing.
+  improvement: freeze fields now: project, version, status, mcp_server, capabilities.
+
+cto_to_dev:
+  finding: choosing an MCP library is the only meaningful P0 technical decision.
+  improvement: select the smallest stdio-compatible Python MCP stack; avoid broader agent frameworks in MCP server code.
+
+cto_to_qc:
+  finding: live-network tests in P0 would create false instability.
+  improvement: mark all P0 tests offline-only; live tests begin in later data phases as smoke.
+
+docs_to_all:
+  finding: Phase numbering in WORKING previously differed from SSOT.
+  improvement: align WORKING names with SSOT phase names, using P0_project_initialization for the next slice.
+
+overall_recommendation:
+  verdict: P0 plan is implementable after one decision.
+  blocking_decision: choose MCP Python stack and exact script names before code starts.
+  non_blocking_improvements:
+    - add harness directory convention to implementation slice
+    - add golden fixture naming convention
+    - update README immediately when scripts are created
 ```
 
 ## Open Decisions
@@ -177,7 +273,7 @@ database:
 ## Recent Commits
 
 ```text
+596c4c8 Document virtual team gates
+8b25fb6 Add harness engineering context
 73c237e Simplify working handoff doc
-338a6a1 Organize project docs
-94ab5cc Merge remote-tracking branch 'origin/main'
 ```
