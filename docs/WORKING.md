@@ -212,6 +212,62 @@ docs_gardener_plan:
   docs_exit_criteria:
     - new commands in README match actual scripts
     - WORKING next_atomic_step points to the first implementation action
+
+p0_go_no_go:
+  current_cto_call: conditional_go_for_p1_after_blocking_decision
+  blocking_decision_before_p1:
+    - choose MCP Python stack
+    - freeze script names for server and harness
+  go_conditions:
+    dev:
+      - P1 scope is limited to scaffold, stdio MCP entrypoint, health_check, harness, offline tests
+      - package layout follows SSOT layers or leaves room for them
+      - no market/news/scoring feature is pulled into P1
+    qc:
+      - P1 tests are offline-only
+      - health_check output schema is stable enough for golden test
+      - harness command is defined before implementation starts
+    cto:
+      - MCP server remains a thin tool server
+      - no broker/exchange/order connector
+      - no irreversible vendor choice
+      - dependencies remain minimal
+    docs_gardener:
+      - README will be updated with actual commands during P1
+      - WORKING will move from planning_review to implementation_ready only after the blocking decision
+      - SSOT will be updated if stack choice changes architecture
+  no_go_conditions:
+    dev:
+      - P1 includes market data collection, scoring, LLM calls, DB feature schema, or trading connectors
+      - server cannot run without Hermes
+      - health_check cannot be called through a local harness
+    qc:
+      - P1 depends on live network/API keys
+      - no fixture/golden directory convention exists
+      - no repeatable smoke command is defined
+    cto:
+      - MCP code starts to become an autonomous agent instead of tool server
+      - paid data provider or broker API is hardcoded
+      - automatic trading path appears before explicit future approval
+    docs_gardener:
+      - docs are created outside docs/
+      - README commands drift from actual scripts
+      - WORKING and SSOT phase names diverge
+  p1_scope_guardrail:
+    allowed:
+      - Python/uv scaffold
+      - stdio-compatible MCP server entrypoint
+      - config/env loader
+      - health_check tool
+      - CLI/test harness for health_check
+      - offline pytest/golden fixture skeleton
+    forbidden:
+      - market data adapters
+      - news collectors
+      - LLM prompts
+      - scoring logic
+      - DB migrations beyond minimal skeleton if needed
+      - order execution or broker/exchange integration
 ```
 
 ## P0 Cross-Check Findings
