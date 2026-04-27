@@ -83,6 +83,17 @@ Halo Swing MCP
 - market data, indicator, scoring, labeling, report 각각에 golden fixture를 둔다.
 - 하네스는 구현 편의가 아니라 다음 LLM이 안전하게 수정하기 위한 작업 발판이다.
 
+### Virtual Team Gates
+
+Codex에 지속형 멀티에이전트 개발팀이 없더라도, 작업은 아래 역할 게이트를 통과한 것으로 기록한다.
+
+- Dev: 기능 구현, 최소 하네스, 단위 테스트를 만든다.
+- QC: fixture/golden/live-smoke를 분리해 재현성과 회귀를 확인한다.
+- CTO: 아키텍처, 과최적화, 리스크 예산, 자동주문 범위 침범 여부를 본다.
+- Docs Gardener: SSOT, CONTEXT, WORKING이 현재 구현과 어긋나지 않게 정리한다.
+
+역할은 실제 별도 에이전트일 필요는 없다. 한 LLM 세션에서 수행하더라도 산출물과 체크는 분리한다.
+
 ## 4. What To Read Before Work
 
 작업 시작 전 최소 확인 순서:
@@ -147,6 +158,7 @@ BLOCK
 - SSOT 내용을 중복 복제하지 않았는가?
 - 계산 로직을 LLM에게 맡기지 않았는가?
 - 새 기능을 검증할 실행 하네스나 fixture가 있는가?
+- Dev/QC/CTO/Docs Gardener 관점의 gate가 분리되어 있는가?
 - 매수 신호에 손절/익절 조건이 포함되는가?
 - 신호 기록과 사후 라벨링 경로가 있는가?
 - 레버리지 ETF의 일일 리셋/변동성 drag를 고려했는가?

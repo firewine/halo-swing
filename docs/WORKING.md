@@ -79,6 +79,13 @@ harness_engineering:
   - prefer deterministic golden fixtures before live API tests
   - build harnesses as scaffolding for future LLM edits, not as afterthoughts
 
+virtual_team_gates:
+  - Dev: implementation plus minimum harness
+  - QC: fixture/golden tests plus live smoke separation
+  - CTO: architecture/risk/overfitting/scope review
+  - Docs Gardener: keep SSOT/CONTEXT/WORKING aligned
+  - roles may be simulated in one Codex session, but outputs/checks must stay separate
+
 docs:
   - keep all docs under docs/
   - update SSOT first when architecture/scope changes
