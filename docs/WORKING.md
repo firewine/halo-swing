@@ -73,6 +73,12 @@ architecture:
   - numeric indicators must be calculated in code
   - LLM may interpret evidence and write explanations, but must not be the numeric calculator
 
+harness_engineering:
+  - every new MCP tool should have a direct CLI/test harness where practical
+  - external data and LLM outputs should be replayable through fixtures
+  - prefer deterministic golden fixtures before live API tests
+  - build harnesses as scaffolding for future LLM edits, not as afterthoughts
+
 docs:
   - keep all docs under docs/
   - update SSOT first when architecture/scope changes
@@ -96,7 +102,7 @@ P1_mcp_mvp:
     - MCP server entrypoint
     - config/env loader
     - health_check tool
-    - basic smoke test
+    - basic smoke test and CLI/test harness
 
 P2_market_data:
   status: pending
@@ -148,6 +154,10 @@ mcp_library:
   decision_needed: true
   current_bias: choose the smallest Python MCP stack compatible with Hermes stdio
 
+harness_shape:
+  decision_needed: true
+  current_bias: pytest golden fixtures plus a small CLI runner for selected MCP tools
+
 package_manager:
   decision_needed: true
   current_bias: uv
@@ -160,7 +170,7 @@ database:
 ## Recent Commits
 
 ```text
+73c237e Simplify working handoff doc
 338a6a1 Organize project docs
 94ab5cc Merge remote-tracking branch 'origin/main'
-7913fc3 Initial Halo Swing project plan
 ```

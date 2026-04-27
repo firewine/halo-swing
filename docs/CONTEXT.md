@@ -75,6 +75,14 @@ Halo Swing MCP
 - 스코어 변경은 Champion/Challenger 방식으로 검증한다.
 - 자동 개선안은 제안까지만 하고, 실사용 반영은 검증 후 한다.
 
+### Harness Engineering
+
+- 새 기능은 가능한 한 작은 실행 하네스와 함께 만든다.
+- 각 MCP 도구는 Hermes 없이도 CLI/test에서 단독 실행 가능해야 한다.
+- 외부 API, 뉴스, LLM 응답은 fixture/replay 모드로 고정 재현할 수 있어야 한다.
+- market data, indicator, scoring, labeling, report 각각에 golden fixture를 둔다.
+- 하네스는 구현 편의가 아니라 다음 LLM이 안전하게 수정하기 위한 작업 발판이다.
+
 ## 4. What To Read Before Work
 
 작업 시작 전 최소 확인 순서:
@@ -138,6 +146,7 @@ BLOCK
 - 문서가 `docs/` 밖에 생기지 않았는가?
 - SSOT 내용을 중복 복제하지 않았는가?
 - 계산 로직을 LLM에게 맡기지 않았는가?
+- 새 기능을 검증할 실행 하네스나 fixture가 있는가?
 - 매수 신호에 손절/익절 조건이 포함되는가?
 - 신호 기록과 사후 라벨링 경로가 있는가?
 - 레버리지 ETF의 일일 리셋/변동성 drag를 고려했는가?

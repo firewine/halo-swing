@@ -62,6 +62,52 @@ Market Swing MCP Server:
 5. 신호는 반드시 기록하고, 일정 시간이 지난 뒤 실제 결과로 채점한다.
 6. 스코어링 변경은 즉시 실전 반영하지 않고 Champion/Challenger 방식으로 검증한다.
 7. 자동 주문은 MVP 범위에서 제외한다.
+8. 새 기능은 단독 실행 가능한 하네스와 fixture를 우선 설계한다.
+
+### 2.2.1 하네스 엔지니어링 원칙
+
+Halo Swing은 외부 데이터, LLM 해석, 지표 계산, 스코어링이 결합되는 시스템이다. 따라서 기능을 바로 큰 에이전트 흐름에 붙이지 않고, 각 모듈을 작고 재현 가능한 실행 하네스로 감싼다.
+
+```text
+목표:
+- 다음 LLM/Codex 세션이 안전하게 수정할 수 있는 작업 발판 제공
+- live API 없이도 주요 판단 로직 재현
+- 스코어링 변경 전후 결과 비교
+- LLM prompt/output 변경의 회귀 탐지
+```
+
+필수 하네스:
+
+```text
+1. tool harness
+   - 각 MCP tool을 Hermes 없이 직접 실행
+   - 입력 JSON fixture -> 출력 JSON golden 비교
+
+2. data harness
+   - market/news/macro 수집기를 live/replay 모드로 분리
+   - 외부 API 장애 시 fixture로 테스트 가능
+
+3. indicator harness
+   - OHLCV fixture -> RSI/DMI/ADX/MA/ATR expected output
+
+4. scoring harness
+   - feature fixture -> score/action/stop/take-profit expected output
+
+5. labeling harness
+   - price path fixture -> triple barrier outcome/MFE/MAE expected output
+
+6. report harness
+   - MCP structured output -> Hermes-facing report snapshot
+```
+
+원칙:
+
+```text
+- live API 테스트는 smoke로만 사용한다.
+- 핵심 로직 검증은 deterministic fixture를 우선한다.
+- LLM 출력은 가능하면 schema로 고정하고 snapshot/golden test를 둔다.
+- 하네스가 없는 기능은 완료로 보지 않는다.
+```
 
 ### 2.3 주요 질문
 
@@ -442,6 +488,8 @@ notes
 5. SQLite DB와 migration 구조 생성
 6. 공통 schema 정의
 7. 기본 health check 도구 작성
+8. MCP tool 직접 실행용 CLI/test harness 작성
+9. fixture/golden test 디렉터리 생성
 ```
 
 완료 기준:
@@ -450,6 +498,8 @@ notes
 - `uv run market-swing-mcp` 실행 가능
 - Hermes MCP config에 등록 가능
 - `health_check` 호출 시 정상 응답
+- `health_check`를 Hermes 없이 CLI/test harness로 검증 가능
+- `tests/fixtures/`와 golden output 구조 존재
 ```
 
 초기 Hermes 설정 예시:
@@ -495,6 +545,7 @@ mcp_servers:
 7. ATR 계산
 8. gap, previous swing high/low 탐지
 9. feature_store 저장
+10. OHLCV fixture 기반 indicator harness 작성
 ```
 
 주의:
@@ -511,6 +562,7 @@ mcp_servers:
 - `calculate_indicators("QQQ", "1d")` 정상 응답
 - `get_market_snapshot(["QQQ", "SPY", "SMH", "BTC"])` 정상 응답
 - 지표 계산 테스트 통과
+- fixture 기반 indicator golden test 통과
 ```
 
 ### Phase 2 상세 계획: 레버리지 ETF 스윙 판단 엔진
