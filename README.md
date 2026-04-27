@@ -28,4 +28,3 @@ The system should answer:
 ## Development Plan
 
 See [hermes-market-swing-mcp-development-plan.md](./hermes-market-swing-mcp-development-plan.md).
-
