@@ -119,6 +119,12 @@ Dev:
 - 최소 실행 하네스
 - 단위 테스트 또는 smoke command
 
+DevOps:
+- 로컬 개발 환경과 의존성 관리
+- MCP 서버 실행 명령과 smoke command 관리
+- Hermes MCP config 예시와 운영 가이드 관리
+- secrets/.env 취급 원칙 확인
+
 QC:
 - fixture/golden test
 - replay/live smoke 분리
@@ -138,7 +144,7 @@ Docs Gardener:
 완료 정의:
 
 ```text
-작업 완료 = 코드가 돌아감 + 하네스가 있음 + QC 재현 가능 + CTO 관점 리스크 확인 + 문서 상태 최신
+작업 완료 = 코드가 돌아감 + DevOps 실행 경로가 있음 + 하네스가 있음 + QC 재현 가능 + CTO 관점 리스크 확인 + 문서 상태 최신
 ```
 
 ### 2.3 주요 질문
@@ -172,6 +178,8 @@ flowchart TD
     M --> R["Risk & Position Guide Engine"]
     M --> L["Signal Ledger"]
     M --> E["Evaluation & Feedback Pipeline"]
+    M --> CFG["Strategy Config Registry"]
+    M --> W["Runtime Watchdog & Checkpoints"]
 
     D --> DB[("SQLite/PostgreSQL")]
     F --> DB
@@ -180,6 +188,8 @@ flowchart TD
     R --> DB
     L --> DB
     E --> DB
+    CFG --> DB
+    W --> DB
 
     M --> H
     H --> O["Final Report: BUY_2X / BUY_3X / WAIT / TRIM / EXIT / STOP"]
@@ -221,10 +231,15 @@ market_swing_mcp/
     storage/
       db.py
       migrations/
+    runtime/
+      checkpoints.py
+      watchdog.py
+      journal.py
     reports/
       templates.py
   tests/
-  pyproject.toml
+  requirements.txt
+  .env.example
   README.md
 ```
 
@@ -246,6 +261,96 @@ market_swing_mcp/
 | `evaluate_score_performance` | 스코어링 성능 리포트 |
 | `suggest_weight_update` | 가중치/임계값 개선 후보 제안 |
 | `compare_champion_challenger` | 현행 모델과 후보 모델 비교 |
+
+### 3.3.1 설정, 상태, 감시 원칙
+
+스코어링 가중치와 임계값은 코드에 하드코딩하지 않는다. 초기에는 JSON 파일로 시작하고, 운영 이력이 쌓이면 DB의 `strategy_config`/`model_registry`와 연결한다.
+
+```text
+원칙:
+- 모든 신호는 config_version과 config_hash를 가진다.
+- feedback pipeline은 active 설정을 직접 덮어쓰지 않고 candidate/challenger만 만든다.
+- active 설정 변경은 명시적 승인 또는 별도 promotion 절차를 거친다.
+- JSON 설정은 schema validation, bounds check, sum check를 통과해야 한다.
+- 런타임 checkpoint와 재현용 입력 snapshot은 분리해서 저장한다.
+- 메모리 덤프, logs, checkpoint, runtime artifact는 git에 커밋하지 않는다.
+```
+
+초기 JSON 설정 예시:
+
+```json
+{
+  "config_id": "leverage_swing_default",
+  "version": "0.1.0",
+  "status": "champion",
+  "target_universe": ["TQQQ", "QLD", "UPRO", "SSO", "SOXL", "BTC"],
+  "weights": {
+    "trend": 0.25,
+    "momentum": 0.20,
+    "volatility": 0.20,
+    "macro": 0.15,
+    "event_risk": 0.10,
+    "theme": 0.10
+  },
+  "thresholds": {
+    "buy_3x": 0.68,
+    "buy_2x": 0.52,
+    "block": 0.30
+  },
+  "risk": {
+    "max_3x_event_risk": 0.35,
+    "time_barrier_days": 10
+  }
+}
+```
+
+watchdog는 장기 실행 안정성을 위한 내부 감시 레이어다.
+
+```text
+감시 대상:
+- memory_rss_mb 또는 프로세스 메모리 사용량
+- run queue length / stale job
+- 반복 예외와 재시도 폭증
+- null/NaN/Inf 비율 증가
+- 비정상적으로 큰 evidence bundle 또는 feature payload
+- config hash mismatch
+- checkpoint 지연 또는 실패
+
+동작:
+- warning event 기록
+- 현재 run journal에 상태 추가
+- 필요 시 checkpoint 저장
+- hard limit 초과 시 신규 live 작업 차단 또는 graceful shutdown 요청
+```
+
+24/7 운영 안정성은 내부 watchdog와 외부 supervisor를 함께 사용한다. MCP 서버는 가능한 한 얇고 재시작 가능한 프로세스로 유지하고, 장시간 작업은 run journal/checkpoint로 복구 가능하게 만든다.
+
+```text
+필수 운영 가드레일:
+- process supervisor: launchd/systemd/Hermes runner 등에서 restart policy와 crash-loop backoff 설정
+- liveness/readiness: health_check와 runtime status를 분리
+- memory budget: soft/hard RSS limit, cache TTL, max in-memory artifact size
+- bounded queue: max queue length, stale job timeout, duplicate run lock
+- timeout: live API, browser/news/PDF parsing, chart rendering, LLM call 각각에 deadline 설정
+- retry policy: exponential backoff + jitter, max retry, provider별 rate limit
+- circuit breaker: 외부 API 장애/429/5xx가 반복되면 live call을 임시 차단하고 replay/cache로 degraded mode
+- idempotency: cron/report/labeling job은 run_id와 idempotency key로 중복 실행 방지
+- atomic persistence: checkpoint와 JSON config는 temp file 작성 후 rename 또는 DB transaction 사용
+- disk retention: logs/state/checkpoints/artifacts TTL과 최대 용량 제한
+- alerting: critical watchdog_event는 Telegram 또는 운영 채널로 알림
+- graceful degradation: 데이터 일부 장애 시 BUY 신호를 강제하지 않고 WAIT/BLOCK 또는 stale-data warning 출력
+```
+
+메모리 오버플로우 방지를 위한 기본 설계:
+
+```text
+- 뉴스/문서/차트 artifact는 메모리에 오래 들고 있지 않고 file/ref 기반으로 전달
+- 대형 PDF/뉴스 번들은 chunk 단위 처리
+- LLM/Hermes로 넘기는 context는 evidence card summary 중심으로 제한
+- cache는 LRU/TTL과 max_items/max_bytes를 함께 둠
+- job 종료 후 큰 객체와 임시 파일을 명시적으로 정리
+- watchdog가 memory_rss_mb 증가 추세를 감시하고 soft limit에서는 checkpoint, hard limit에서는 신규 작업 차단
+```
 
 ### 3.4 저장소 모델
 
@@ -292,6 +397,8 @@ raw_features_json
 id
 timestamp
 model_version
+config_version
+config_hash
 asset
 underlying
 action
@@ -342,6 +449,73 @@ weights_json
 thresholds_json
 feature_set_hash
 notes
+```
+
+#### `strategy_config`
+
+가중치와 임계값 설정을 버전 관리한다. 초기 JSON 파일과 DB 레코드가 같은 hash를 갖도록 관리한다.
+
+```text
+config_id
+version
+status              champion / challenger / archived
+created_at
+promoted_at
+config_hash
+target_universe_json
+weights_json
+thresholds_json
+risk_json
+validation_status
+notes
+```
+
+#### `run_journal`
+
+각 실행 단위의 입력, 출력, 오류, 사용 설정을 기록한다.
+
+```text
+run_id
+started_at
+finished_at
+run_type            scheduled_report / user_question / labeling / evaluation
+status              started / succeeded / failed / cancelled
+config_hash
+input_refs_json
+output_refs_json
+error_json
+watchdog_summary_json
+```
+
+#### `state_checkpoint`
+
+장기 실행 작업의 복구 가능한 중간 상태를 저장한다.
+
+```text
+checkpoint_id
+run_id
+created_at
+checkpoint_type     graceful_shutdown / periodic / before_live_call / before_report
+state_ref
+state_hash
+size_bytes
+ttl_expires_at
+```
+
+#### `watchdog_event`
+
+메모리 한계, 반복 오류, 비정상 값 등을 감시한 결과를 저장한다.
+
+```text
+event_id
+run_id
+timestamp
+severity            info / warning / critical
+metric_name
+metric_value
+threshold_value
+action_taken
+details_json
 ```
 
 #### `position_journal`
@@ -404,6 +578,7 @@ notes
 ```text
 - score_leverage_swing
 - generate_trade_guide
+- strategy_config JSON 로드/검증
 - BUY_2X / BUY_3X / WAIT / TRIM / EXIT / STOP 판단
 - QQQ/SPY/SOX 기준 진입/손절/익절 조건 생성
 ```
@@ -448,6 +623,8 @@ notes
 - triple barrier labeling
 - MFE/MAE 계산
 - stop/take-profit/time-exit 판정
+- 신호별 config_version/config_hash 추적
+- run_journal 기록
 ```
 
 ### Phase 6. 스코어링 피드백 파이프라인
@@ -463,6 +640,7 @@ notes
 - ablation test
 - suggest_weight_update
 - compare_champion_challenger
+- strategy_config challenger 후보 생성
 ```
 
 ### Phase 7. Hermes 통합
@@ -476,6 +654,8 @@ notes
 - 미국장 전/중/후 cron prompt
 - 텔레그램 리포트 포맷
 - 보유 포지션 리뷰 프롬프트
+- periodic checkpoint
+- runtime watchdog
 ```
 
 ### Phase 8. 멀티모달 판단 확장
@@ -514,54 +694,53 @@ notes
 
 ```text
 1. `market_swing_mcp` 프로젝트 생성
-2. `pyproject.toml` 작성
+2. `.venv` 기반 `requirements.txt` 작성
 3. MCP 서버 실행 명령 정의
 4. `.env.example` 작성
-5. SQLite DB와 migration 구조 생성
-6. 공통 schema 정의
-7. 기본 health check 도구 작성
-8. MCP tool 직접 실행용 CLI/test harness 작성
-9. fixture/golden test 디렉터리 생성
+5. 기본 health check 도구 작성
+6. MCP tool 직접 실행용 CLI/test harness 작성
+7. fixture/golden test 디렉터리 생성
+8. DevOps 개발환경/Hermes 설정 가이드 작성
+9. P1 storage/schema 설계 범위 확정
 ```
 
 완료 기준:
 
 ```text
-- `uv run market-swing-mcp` 실행 가능
+- `.venv` 기반 MCP 서버 명령 실행 가능
 - Hermes MCP config에 등록 가능
 - `health_check` 호출 시 정상 응답
 - `health_check`를 Hermes 없이 CLI/test harness로 검증 가능
 - `tests/fixtures/`와 golden output 구조 존재
+- DevOps 가이드에 로컬 설치, smoke, Hermes MCP 설정 절차가 존재
+- SQLite/schema는 P1에서 feature_store, signal_ledger, strategy_config, runtime observability를 함께 보고 설계
 ```
 
-초기 Hermes 설정 예시:
+P0 storage/schema 범위:
+
+```text
+P0에서는 SQLite skeleton과 도메인 스키마를 만들지 않는다.
+P1 시작 시 storage/schema architecture review를 먼저 수행한다.
+이때 feature_store, signal_ledger, label_store, strategy_config, run_journal, checkpoint, watchdog_event를 함께 검토한다.
+```
+
+Phase 0 Hermes 설정 예시:
 
 ```yaml
 mcp_servers:
   market_swing:
     type: stdio
-    command: "uv"
-    args: ["run", "market-swing-mcp"]
+    command: "./.venv/bin/python"
+    args: ["-m", "halo_swing_mcp.server"]
     env:
-      FRED_API_KEY: "${FRED_API_KEY}"
-      NEWS_API_KEY: "${NEWS_API_KEY}"
+      PYTHONPATH: "src"
     tools:
       include:
-        - get_market_snapshot
-        - get_macro_snapshot
-        - get_event_calendar
-        - get_news_bundle
-        - calculate_indicators
-        - render_chart
-        - score_leverage_swing
-        - generate_trade_guide
-        - evaluate_position
-        - record_signal
-        - label_signal_outcome
-        - evaluate_score_performance
-        - compare_champion_challenger
+        - health_check
     resources: false
 ```
+
+시장/매크로/뉴스 API key와 추가 도구 등록은 해당 phase 구현 후 DevOps 가이드와 함께 확장한다.
 
 ### Phase 1 상세 계획: 시장 데이터와 지표 엔진
 
@@ -608,9 +787,11 @@ mcp_servers:
 4. breadth_score 계산
 5. theme_score 계산
 6. event_risk_score 결합
-7. 최종 swing_score 생성
-8. 2배/3배 선택 로직 작성
-9. 진입/손절/익절 가이드 생성
+7. strategy_config JSON schema validation
+8. config_hash 생성과 score output 연결
+9. 최종 swing_score 생성
+10. 2배/3배 선택 로직 작성
+11. 진입/손절/익절 가이드 생성
 ```
 
 초기 룰:
@@ -639,6 +820,8 @@ BLOCK:
 {
   "asset": "TQQQ",
   "underlying": "QQQ",
+  "config_version": "0.1.0",
+  "config_hash": "sha256:...",
   "action": "BUY_2X",
   "score": 0.52,
   "p_take_profit": null,
@@ -655,6 +838,7 @@ BLOCK:
 - QLD/TQQQ/SSO/UPRO/SOXL에 대한 기본 가이드 생성
 - 손절/익절 조건이 반드시 포함됨
 - 신호 이유와 약점이 함께 반환됨
+- 어떤 strategy_config로 나온 신호인지 재현 가능함
 ```
 
 ### Phase 3 상세 계획: 매크로/이벤트 필터
@@ -742,10 +926,12 @@ Evidence Card 스키마:
 ```text
 1. record_signal 구현
 2. 신호 발생 당시 feature snapshot 저장
-3. triple barrier labeler 구현
-4. MFE/MAE 계산
-5. 1/3/5/10일 결과 업데이트
-6. label_store 저장
+3. signal_ledger에 config_version/config_hash 저장
+4. run_journal 저장
+5. triple barrier labeler 구현
+6. MFE/MAE 계산
+7. 1/3/5/10일 결과 업데이트
+8. label_store 저장
 ```
 
 라벨 종류:
@@ -763,6 +949,7 @@ INVALIDATED_BY_EVENT
 ```text
 - 과거 신호 하나를 넣고 outcome 자동 계산 가능
 - stop/take-profit/time barrier 중 무엇이 먼저 맞았는지 계산 가능
+- 신호와 실행 기록이 config_hash로 재현 가능
 ```
 
 ### Phase 6 상세 계획: 스코어링 피드백 파이프라인
@@ -775,7 +962,9 @@ INVALIDATED_BY_EVENT
 3. component attribution 계산
 4. ablation test 구현
 5. Champion/Challenger 평가
-6. 개선 후보 생성
+6. 개선 후보 strategy_config JSON 생성
+7. config validation과 bounds check
+8. promotion report 생성
 ```
 
 리포트 예시:
@@ -804,6 +993,7 @@ INVALIDATED_BY_EVENT
 - `evaluate_score_performance(days=90)` 리포트 생성
 - `suggest_weight_update()`가 후보를 생성
 - 후보는 challenger로만 등록되고 champion은 자동 변경되지 않음
+- 후보 JSON은 validation을 통과해야 하며 active 설정을 직접 덮어쓰지 않음
 ```
 
 ### Phase 7 상세 계획: Hermes 통합
@@ -817,6 +1007,8 @@ INVALIDATED_BY_EVENT
 4. 미국장 중 위험감시 cron 작성
 5. 미국장 마감 후 리뷰 cron 작성
 6. 포지션 리뷰 프롬프트 작성
+7. run journal과 checkpoint 저장 주기 설정
+8. watchdog memory/error/stale-job 감시 설정
 ```
 
 크론 예시:
@@ -834,6 +1026,7 @@ Include BUY_2X/BUY_3X/WAIT, stop conditions, take-profit conditions, and key ris
 - 텔레그램으로 장전 리포트 수신
 - 수동 질문 "오늘 TQQQ 살 자리야?"에 응답
 - 보유 포지션 리뷰 가능
+- 장기 실행 중 checkpoint/watchdog event가 기록됨
 ```
 
 ### Phase 8 상세 계획: 멀티모달 확장

@@ -1,0 +1,10 @@
+{
+  "capabilities": [
+    "health_check"
+  ],
+  "live_data_required": false,
+  "mcp_server": "halo_swing_mcp",
+  "project": "halo-swing",
+  "status": "ok",
+  "version": "0.1.0"
+}

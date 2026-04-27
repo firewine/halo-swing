@@ -31,4 +31,26 @@ All project documents live under [`docs/`](./docs/).
 
 - [CONTEXT.md](./docs/CONTEXT.md): short project context for new chats and agents
 - [WORKING.md](./docs/WORKING.md): current work tracker
+- [devops-setup-guide.md](./docs/devops-setup-guide.md): local environment and Hermes MCP setup guide
 - [halo-swing-development-plan.md](./docs/halo-swing-development-plan.md): SSOT development plan
+
+## Local Environment
+
+```bash
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+## P0 Smoke Commands
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m pytest
+PYTHONPATH=src ./.venv/bin/python -m ruff check .
+```
+
+The MCP server entrypoint is available at:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.server
+```

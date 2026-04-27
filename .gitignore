@@ -19,3 +19,6 @@ htmlcov/
 data/
 artifacts/
 reports/
+state/
+checkpoints/
+logs/

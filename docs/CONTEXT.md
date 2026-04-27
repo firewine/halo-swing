@@ -1,8 +1,8 @@
 # Halo Swing Development Context
 
-> 역할: 새 대화와 개발 작업 시작 시 항상 먼저 읽는 짧은 핵심 컨텍스트  
-> 대상: 사용자, 개발자, Hermes Agent, Codex, QA  
-> 업데이트: 프로젝트 정의나 운영 원칙이 바뀔 때만  
+> 역할: 새 대화와 개발 작업 시작 시 항상 먼저 읽는 짧은 핵심 컨텍스트
+> 대상: 사용자, 개발자, DevOps, Hermes Agent, Codex, QA
+> 업데이트: 프로젝트 정의나 운영 원칙이 바뀔 때만
 > 버전: v0.1 (2026-04-27)
 
 ## 목적
@@ -74,6 +74,19 @@ Halo Swing MCP
 - 신호는 Triple Barrier 방식으로 사후 라벨링한다.
 - 스코어 변경은 Champion/Challenger 방식으로 검증한다.
 - 자동 개선안은 제안까지만 하고, 실사용 반영은 검증 후 한다.
+- 모든 신호는 어떤 가중치/임계값 설정으로 생성됐는지 추적 가능해야 한다.
+- 가중치 JSON은 버전과 해시를 갖고, feedback pipeline은 active 설정을 자동 덮어쓰지 않는다.
+
+### Runtime State
+
+- 장기 실행 프로세스는 run journal, checkpoint, watchdog event를 남긴다.
+- 메모리 덤프와 runtime artifact는 git에 커밋하지 않는다.
+- watchdog는 메모리 한계, 큐 적체, 반복 오류, 비정상 값 증가를 감시한다.
+- 복구 가능한 상태와 재현용 입력 snapshot은 구분해서 저장한다.
+- 24/7 운영은 내부 watchdog만 믿지 않고 외부 supervisor/restart 정책도 둔다.
+- 모든 live 작업은 timeout, retry limit, circuit breaker, idempotency key를 가져야 한다.
+- 큐, 캐시, evidence bundle, 로그, checkpoint는 크기와 보존 기간을 제한한다.
+- 오류가 반복되면 자동 매수/리포트 생성을 계속 밀어붙이지 않고 degraded mode로 전환한다.
 
 ### Harness Engineering
 
@@ -88,6 +101,7 @@ Halo Swing MCP
 Codex에 지속형 멀티에이전트 개발팀이 없더라도, 작업은 아래 역할 게이트를 통과한 것으로 기록한다.
 
 - Dev: 기능 구현, 최소 하네스, 단위 테스트를 만든다.
+- DevOps: 개발 환경, 의존성, 실행 명령, Hermes MCP 연결 설정을 관리한다.
 - QC: fixture/golden/live-smoke를 분리해 재현성과 회귀를 확인한다.
 - CTO: 아키텍처, 과최적화, 리스크 예산, 자동주문 범위 침범 여부를 본다.
 - Docs Gardener: SSOT, CONTEXT, WORKING이 현재 구현과 어긋나지 않게 정리한다.
@@ -113,6 +127,9 @@ docs/
 
   WORKING.md
     - 현재 DOING 1개, RESUME, 우선순위, 최근 완료
+
+  devops-setup-guide.md
+    - 로컬 개발환경, 의존성 설치, Hermes MCP 연결 설정
 
   halo-swing-development-plan.md
     - SSOT 개발 계획서
@@ -158,8 +175,11 @@ BLOCK
 - SSOT 내용을 중복 복제하지 않았는가?
 - 계산 로직을 LLM에게 맡기지 않았는가?
 - 새 기능을 검증할 실행 하네스나 fixture가 있는가?
-- Dev/QC/CTO/Docs Gardener 관점의 gate가 분리되어 있는가?
+- Dev/DevOps/QC/CTO/Docs Gardener 관점의 gate가 분리되어 있는가?
+- 로컬 실행 명령과 Hermes 설정이 DevOps 가이드에 반영되어 있는가?
 - 매수 신호에 손절/익절 조건이 포함되는가?
 - 신호 기록과 사후 라벨링 경로가 있는가?
+- 가중치/임계값 설정의 version/hash가 신호와 연결되는가?
+- 장기 실행 시 checkpoint와 watchdog 기준이 있는가?
 - 레버리지 ETF의 일일 리셋/변동성 drag를 고려했는가?
 - 자동 주문이 MVP 범위를 침범하지 않았는가?
