@@ -25,6 +25,10 @@ The system should answer:
 - Did prior signals with similar conditions actually work?
 ```
 
-## Development Plan
+## Documentation
 
-See [hermes-market-swing-mcp-development-plan.md](./hermes-market-swing-mcp-development-plan.md).
+All project documents live under [`docs/`](./docs/).
+
+- [CONTEXT.md](./docs/CONTEXT.md): short project context for new chats and agents
+- [WORKING.md](./docs/WORKING.md): current work tracker
+- [halo-swing-development-plan.md](./docs/halo-swing-development-plan.md): SSOT development plan
