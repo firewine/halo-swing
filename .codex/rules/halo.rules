@@ -1,0 +1,48 @@
+prefix_rule(
+    pattern = ["git", "add", "."],
+    decision = "forbidden",
+    justification = "Use explicit file paths instead of git add .",
+    match = ["git add ."],
+)
+
+prefix_rule(
+    pattern = ["git", "add", "-A"],
+    decision = "forbidden",
+    justification = "Use explicit file paths instead of git add -A",
+    match = ["git add -A"],
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing changes requires explicit human approval.",
+    match = ["git push", "git push origin main"],
+)
+
+prefix_rule(
+    pattern = ["rm"],
+    decision = "prompt",
+    justification = "File deletion requires review in this project.",
+    match = ["rm foo.py", "rm -rf build"],
+)
+
+prefix_rule(
+    pattern = ["python", "-m", "pip", "install"],
+    decision = "prompt",
+    justification = "Dependency changes require approval and a separate task.",
+    match = ["python -m pip install requests"],
+)
+
+prefix_rule(
+    pattern = ["pip", "install"],
+    decision = "prompt",
+    justification = "Dependency changes require approval and a separate task.",
+    match = ["pip install requests"],
+)
+
+prefix_rule(
+    pattern = ["sqlite3"],
+    decision = "forbidden",
+    justification = "SQLite shell work is blocked until MIGRATION_GO.",
+    match = ["sqlite3 halo.db"],
+)

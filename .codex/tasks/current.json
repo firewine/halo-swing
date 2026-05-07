@@ -1,0 +1,60 @@
+{
+  "gate_id": "P1_DTO_CONTRACT_TESTS",
+  "mode": "implement",
+  "review_tier": "S1_small",
+  "source_gate_packet": "docs/gates/P1_DTO_CONTRACT_TESTS.md",
+  "next_atomic_step": "create tests/test_contracts.py exactly from the approved DTO contract work order",
+  "allowed_edit_paths": [
+    "tests/test_contracts.py",
+    "docs/WORKING.md"
+  ],
+  "read_only_context": [
+    "AGENTS.md",
+    "docs/WORKING.md",
+    "docs/gates/P1_DTO_CONTRACT_TESTS.md",
+    "docs/CONTEXT.md",
+    "docs/halo-swing-development-plan.md#3.20",
+    "src/halo_swing_mcp/contracts.py",
+    "tests/golden/latest_signal_report.json",
+    "tests/golden/latest_signal_report_degraded.json",
+    "tests/golden/signal_replay_bundle.json",
+    "tests/golden/storage_health.json"
+  ],
+  "blocked_path_prefixes": [
+    "src/halo_swing_mcp/storage/",
+    "src/halo_swing_mcp/adapters/",
+    "src/halo_swing_mcp/scoring/",
+    "migrations/",
+    "data/",
+    "artifacts/",
+    "state/"
+  ],
+  "blocked_exact_paths": [
+    "requirements.txt",
+    "src/halo_swing_mcp/server.py",
+    "src/halo_swing_mcp/config.py"
+  ],
+  "required_commands": [
+    "PYTHONPATH=src ./.venv/bin/python -m pytest",
+    "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
+  ],
+  "post_implementation_review": {
+    "roles": [
+      "be",
+      "qc",
+      "devops",
+      "docs-gardener",
+      "cto"
+    ],
+    "rounds": 1,
+    "read_only": true
+  },
+  "done_means": [
+    "tests/test_contracts.py exists",
+    "all required verification passes",
+    "no blocked paths changed",
+    "WORKING.md records result only"
+  ],
+  "next_state_after_success": "DTO_CONTRACT_SLICE_SIGNOFF"
+}

@@ -1,0 +1,27 @@
+{
+  "signal_id": "sig_demo_20260429_tqqq_002",
+  "created_at": "2026-04-29T13:30:00Z",
+  "asset": "TQQQ",
+  "underlying": "QQQ",
+  "timeframe": "swing_3d_10d",
+  "action": "WAIT",
+  "action_label": "Wait",
+  "final_score": 0.21,
+  "confidence": 0.38,
+  "entry_summary": "Entry is deferred until stale macro inputs and mixed breadth resolve.",
+  "stop_summary": "Stop guidance is provisional because the setup is not active.",
+  "take_profit_summary": "Take-profit guidance is withheld until a confirmed entry signal appears.",
+  "invalidation_summary": "Setup invalidates if stale data persists or QQQ loses the support trigger.",
+  "risk_summary": "Risk is elevated because freshness warnings reduce confidence in the current read.",
+  "data_freshness_status": "PARTIAL",
+  "degraded_mode": true,
+  "data_warnings": [
+    "Macro event calendar input is older than the accepted freshness window.",
+    "News evidence coverage is incomplete for the current evaluation window."
+  ],
+  "config_hash": "cfg_demo_sha256_001",
+  "reason_summary": "Technical support is not enough to overcome incomplete macro and evidence inputs.",
+  "evidence_summary": "Market data is available, but policy/news evidence is incomplete.",
+  "label_status": null,
+  "chart_ref": null
+}
