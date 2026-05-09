@@ -16,7 +16,9 @@
     "suggest_weight_update",
     "compare_champion_challenger",
     "get_audit_log",
-    "get_audit_summary"
+    "get_audit_summary",
+    "preview_btc_order",
+    "execute_btc_order"
   ],
   "live_data_required": false,
   "mcp_server": "halo_swing_mcp",

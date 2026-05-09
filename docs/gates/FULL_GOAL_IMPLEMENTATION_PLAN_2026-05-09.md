@@ -358,19 +358,42 @@ Decision needed:
 
 ### Stage G. Broker / Order Preview
 
-Status: blocked by default.
+Status: BTC-only Binance Spot scope approved; guarded implementation started.
 
 Tasks:
 
-1. Read-only portfolio sync.
-2. Order preview only.
-3. Approval-required execution only.
+1. Read-only portfolio sync. Not started.
+2. Order preview only. BTCUSDT Binance Spot preview implemented.
+3. Approval-required execution only. BTCUSDT execution path implemented with default block guards.
+
+Scope decision recorded on 2026-05-09:
+
+- Automatic trading scope is BTC only.
+- Exchange/API is Binance Spot API.
+- Initial symbol is `BTCUSDT`.
+- Non-BTC symbols are rejected by code.
+
+Implementation record:
+
+- Added `src/halo_swing_mcp/binance_btc.py`.
+- Added `preview_btc_order` tool.
+- Added `execute_btc_order` tool.
+- Added BTC-only validation, confirmation guard, live-trading env flag guard, credential guard, testnet default, and Binance HMAC SHA256 signing helper.
+- No live order is submitted unless `confirm` is `CONFIRM_BTC_BINANCE_ORDER`, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, and Binance credentials are configured.
+
+Verification:
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 45 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl -> passed
+```
 
 Decision needed:
 
-- Explicit approval to enter broker integration scope.
-- Broker/exchange choice.
-- Read-only API key policy.
+- Binance key location and naming policy.
+- Whether first connected execution should target Binance Spot testnet only.
+- Per-order maximum quote size and daily max loss limits.
 
 ## 6. Immediate Next Action
 

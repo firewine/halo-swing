@@ -3607,3 +3607,71 @@ decision_needed_before_live:
   - API key configuration policy
   - timeout/retry/circuit-breaker policy
 ```
+
+## 3.25 BTC-Only Binance Auto-Trading Scope Record - 2026-05-09
+
+### A. 결정
+
+자동거래 범위는 BTC 전용으로 제한한다. 거래소/API는 Binance Spot API를 사용한다.
+
+```text
+approved_scope:
+  exchange: binance_spot
+  symbol: BTCUSDT
+  automatic_trading_assets:
+    - BTC
+blocked:
+  - non-BTC automatic trading
+  - futures/leverage broker execution
+  - non-Binance execution
+```
+
+### B. 구현 결과
+
+```text
+status: guarded_preview_and_execution_path_verified
+implemented:
+  - src/halo_swing_mcp/binance_btc.py
+  - preview_btc_order tool
+  - execute_btc_order tool
+  - BTCUSDT-only validation
+  - Binance HMAC SHA256 signed order query helper
+  - default testnet mode
+  - default live trading disabled mode
+```
+
+### C. 실행 가드
+
+`execute_btc_order`는 다음 조건을 모두 만족하지 않으면 주문을 제출하지 않고 `blocked` payload를 반환한다.
+
+```text
+required_for_submission:
+  - symbol is BTCUSDT
+  - confirm is CONFIRM_BTC_BINANCE_ORDER
+  - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true
+  - HALO_SWING_BINANCE_API_KEY is configured
+  - HALO_SWING_BINANCE_API_SECRET is configured
+defaults:
+  - HALO_SWING_BINANCE_TESTNET=true
+```
+
+### D. 감사 가능성
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 45 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl -> passed
+```
+
+### E. 남은 결정
+
+실제 Binance 연결 주문 제출 전 다음 결정이 필요하다.
+
+```text
+decision_needed:
+  - Binance API key 저장/환경변수 정책
+  - 첫 연결 실행을 testnet only로 제한할지 여부
+  - 주문당 최대 USDT 금액
+  - 일일 최대 손실/주문 횟수 제한
+```

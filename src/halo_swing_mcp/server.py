@@ -293,6 +293,85 @@ def compare_champion_challenger() -> dict[str, Any]:
     )
 
 
+@mcp.tool()
+def preview_btc_order(
+    side: str = "BUY",
+    order_type: str = "MARKET",
+    quantity: str | None = None,
+    quote_order_qty: str | None = None,
+    price: str | None = None,
+    time_in_force: str | None = None,
+    client_order_id: str | None = None,
+) -> dict[str, Any]:
+    """Preview a BTCUSDT Binance Spot order without submitting it."""
+
+    return _audited_tool_call(
+        "preview_btc_order",
+        {
+            "side": side,
+            "order_type": order_type,
+            "quantity": quantity,
+            "quote_order_qty": quote_order_qty,
+            "price": price,
+            "time_in_force": time_in_force,
+            "client_order_id": client_order_id,
+        },
+        call_tool(
+            "preview_btc_order",
+            {
+                "side": side,
+                "order_type": order_type,
+                "quantity": quantity,
+                "quote_order_qty": quote_order_qty,
+                "price": price,
+                "time_in_force": time_in_force,
+                "client_order_id": client_order_id,
+            },
+        ),
+    )
+
+
+@mcp.tool()
+def execute_btc_order(
+    side: str = "BUY",
+    order_type: str = "MARKET",
+    quantity: str | None = None,
+    quote_order_qty: str | None = None,
+    price: str | None = None,
+    time_in_force: str | None = None,
+    client_order_id: str | None = None,
+    confirm: str | None = None,
+) -> dict[str, Any]:
+    """Submit a BTCUSDT Binance Spot order only when live guards pass."""
+
+    return _audited_tool_call(
+        "execute_btc_order",
+        {
+            "side": side,
+            "order_type": order_type,
+            "quantity": quantity,
+            "quote_order_qty": quote_order_qty,
+            "price": price,
+            "time_in_force": time_in_force,
+            "client_order_id": client_order_id,
+            "confirm": confirm,
+        },
+        call_tool(
+            "execute_btc_order",
+            {
+                "side": side,
+                "order_type": order_type,
+                "quantity": quantity,
+                "quote_order_qty": quote_order_qty,
+                "price": price,
+                "time_in_force": time_in_force,
+                "client_order_id": client_order_id,
+                "confirm": confirm,
+            },
+        ),
+    )
+
+
 def main() -> None:
     mcp.run("stdio")
 

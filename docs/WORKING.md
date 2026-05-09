@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: REPLAY_PROVIDER_INTERFACE_VERIFIED
-gate_id: FULL_GOAL_STAGE_B_REPLAY_PROVIDER
+status: BTC_BINANCE_GUARDED_EXECUTION_PATH_VERIFIED
+gate_id: FULL_GOAL_STAGE_G_BTC_BINANCE
 review_tier: S2_medium
 
-next_atomic_step: await user decision for Stage C repository gate or live provider source selection
+next_atomic_step: await user decision for Binance credential policy, testnet-only first execution, and risk limits
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -52,16 +52,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - MarketDataProvider protocol exists
-  - ReplayMarketDataProvider is the default data source
-  - market, macro, event, news, indicator, and chart data reads go through provider boundary
-  - public tool functions and payload shapes remain stable
-  - provider contract tests cover replay-only behavior
+  - BTC-only Binance Spot scope is recorded
+  - preview_btc_order tool exists
+  - execute_btc_order tool exists
+  - non-BTC Binance order intents are rejected
+  - execute path is blocked without confirmation, live-trading env flag, and credentials
+  - Binance HMAC SHA256 signing helper is tested
   - tests and lint pass offline
-  - no dependency, broker, live API, order execution, DB/data artifact changes are added
-  - gate packet, SSOT, and WORKING reflect Stage B status
+  - no dependency, non-BTC broker, DB/data artifact changes are added
+  - gate packet, SSOT, and WORKING reflect BTC Binance status
 
-next_state_after_success: REPLAY_PROVIDER_INTERFACE_VERIFIED
+next_state_after_success: BTC_BINANCE_GUARDED_EXECUTION_PATH_VERIFIED
 ```
 
 Previous completed directive:
@@ -195,6 +196,22 @@ replay_provider_interface:
   pattern_decision:
     changed: false
     note: public tool functions and payload shapes preserved; fixture access moved behind provider boundary
+
+btc_binance_guarded_execution:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/binance_btc.py
+    - preview_btc_order tool
+    - execute_btc_order tool
+    - BTCUSDT-only validation
+    - confirmation guard
+    - live-trading env flag guard
+    - Binance credential guard
+    - tests/test_binance_btc.py
+  pattern_decision:
+    changed: false
+    note: broker scope added as isolated BTC-only module and registry tools; existing market/scoring patterns preserved
 ```
 
 ## 4. ACTIVE_REVIEW_SUMMARY
@@ -394,6 +411,33 @@ replay_provider_interface_final:
   repo_runtime_artifacts_added: false
   dependency_changes: false
   live_api_or_broker_added: false
+
+btc_binance_guarded_execution_final:
+  status: passed
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - tests/golden/health_check.json
+    - tests/test_binance_btc.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "45 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl
+      result: passed
+  design_pattern_change:
+    required: false
+    note: isolated BTC-only Binance module added behind existing tool registry and server wrapper facade
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_order_submission_default: blocked
 ```
 
 ## 6. HARNESS_PROMOTION_RULE
