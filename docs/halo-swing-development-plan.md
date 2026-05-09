@@ -3521,3 +3521,45 @@ score < -0.10:
 - FOMC/CPI/NFP 이벤트가 가까우면 3X 금지
 - 2X 우선, 3X는 변동성 추가 하락 확인 후
 ```
+
+## 3.23 Full Goal Stage A Foundation Record - 2026-05-09
+
+### A. 목적
+
+전체 목표 구현을 시작하기 전에 서버, CLI, health metadata가 서로 다른 도구 목록을 가지지 않도록 공용 레지스트리를 추가했다.
+
+### B. 구현 결과
+
+```text
+status: verified
+gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+implemented:
+  - src/halo_swing_mcp/tool_registry.py
+  - registry-backed health_check
+  - registry-backed CLI harness calls
+  - registry-backed MCP server wrapper bodies
+  - tests/test_tool_registry.py
+```
+
+기존 디자인 패턴은 변경하지 않았다. FastMCP 공개 래퍼 함수와 시그니처는 그대로 유지하고, 내부 payload 호출만 공용 레지스트리를 통해 실행하도록 정리했다.
+
+### C. 감사 가능성
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 36 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --audit-log-path /private/tmp/halo_swing_registry_verify.jsonl -> passed
+```
+
+### D. 경계 조건
+
+```text
+not_added:
+  - live data dependencies
+  - broker/order execution
+  - database migrations
+  - committed runtime state, data, artifacts, or logs
+```
+
+다음 단계는 Stage B replay provider interface 또는 Stage C repository contract 중 하나를 선택해 진행한다. live API, DB migration, Hermes/Telegram, broker scope는 별도 승인 전까지 blocked 상태로 유지한다.

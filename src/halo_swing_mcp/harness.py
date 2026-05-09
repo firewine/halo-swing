@@ -6,63 +6,14 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
-from typing import Any, Callable
 
 from halo_swing_mcp.audit import append_tool_audit_event
-from halo_swing_mcp.tools.audit_tools import get_audit_log, get_audit_summary
-from halo_swing_mcp.tools.health import health_check
-from halo_swing_mcp.tools.market import (
-    calculate_indicators,
-    get_event_calendar,
-    get_macro_snapshot,
-    get_market_snapshot,
-    get_news_bundle,
-    render_chart,
-)
-from halo_swing_mcp.tools.recording import (
-    evaluate_recorded_score_performance,
-    label_signal_outcome,
-    record_signal,
-)
-from halo_swing_mcp.tools.scoring import (
-    compare_champion_challenger,
-    evaluate_position,
-    generate_trade_guide,
-    score_leverage_swing,
-    suggest_weight_update,
-)
-
-Command = Callable[[dict[str, Any]], dict[str, Any]]
-
-
-def _with_kwargs(function: Callable[..., dict[str, Any]]) -> Command:
-    return lambda payload: function(**payload)
-
-
-COMMANDS: dict[str, Command] = {
-    "health_check": lambda _payload: health_check(),
-    "get_audit_log": _with_kwargs(get_audit_log),
-    "get_audit_summary": _with_kwargs(get_audit_summary),
-    "get_market_snapshot": _with_kwargs(get_market_snapshot),
-    "get_macro_snapshot": _with_kwargs(get_macro_snapshot),
-    "get_event_calendar": _with_kwargs(get_event_calendar),
-    "get_news_bundle": _with_kwargs(get_news_bundle),
-    "calculate_indicators": _with_kwargs(calculate_indicators),
-    "render_chart": _with_kwargs(render_chart),
-    "score_leverage_swing": _with_kwargs(score_leverage_swing),
-    "generate_trade_guide": _with_kwargs(generate_trade_guide),
-    "evaluate_position": _with_kwargs(evaluate_position),
-    "record_signal": _with_kwargs(record_signal),
-    "label_signal_outcome": _with_kwargs(label_signal_outcome),
-    "evaluate_score_performance": _with_kwargs(evaluate_recorded_score_performance),
-    "suggest_weight_update": lambda _payload: suggest_weight_update(),
-    "compare_champion_challenger": lambda _payload: compare_champion_challenger(),
-}
+from halo_swing_mcp.tool_registry import call_tool, tool_names
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Halo Swing MCP tool harness")
-    parser.add_argument("command", choices=sorted(COMMANDS))
+    parser.add_argument("command", choices=tool_names())
     parser.add_argument(
         "--input-json",
         default="{}",
@@ -98,7 +49,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("input payload must be a JSON object")
 
     try:
-        payload = COMMANDS[args.command](input_payload)
+        payload = call_tool(args.command, input_payload)
     except Exception as exc:
         if not args.no_audit:
             append_tool_audit_event(

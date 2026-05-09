@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: AUDIT_WEB_VIEWER_VERIFIED
-gate_id: AUDIT_WEB_VIEWER
+status: TOOL_REGISTRY_FOUNDATION_VERIFIED
+gate_id: FULL_GOAL_STAGE_A_TOOL_REGISTRY
 review_tier: S2_medium
 
-next_atomic_step: none; audit logging and web viewer verified
+next_atomic_step: await user decision for Stage B replay provider or Stage C repository gate
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -50,23 +50,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.audit_web local smoke
-  - CLI smoke for representative MVP tools
 
 done_means:
-  - all CONTEXT initial MCP tools are registered in health_check and server
-  - audit events are appended for CLI harness and MCP server tool calls
-  - audit details redact likely secret-bearing keys
-  - audit events can be read through get_audit_log and summarized through get_audit_summary
-  - audit log web viewer serves HTML plus /api/events and /api/summary
-  - deterministic fixture/replay path exists for market, macro, events, news
-  - indicator, scoring, guide, position, ledger, labeling, feedback, chart tools work through harness
-  - tests cover DTO contracts, MVP tool invariants, and audit/web payloads
+  - shared tool registry exists as canonical tool metadata source
+  - health_check, CLI harness, and server wrappers use registry-backed calls
+  - public FastMCP wrapper function names and signatures remain available
+  - architecture boundary tests prevent default live API, DB, and broker imports
+  - tests and lint pass offline
   - no dependency, broker, live API, order execution, DB/data artifact changes are added
-  - README, DevOps guide, SSOT, and WORKING reflect audit/web status
+  - gate packet, SSOT, and WORKING reflect Stage A status
 
-next_state_after_success: AUDIT_WEB_VIEWER_VERIFIED
+next_state_after_success: TOOL_REGISTRY_FOUNDATION_VERIFIED
 ```
 
 Previous completed directive:
@@ -101,6 +95,7 @@ read_only_context:
 
 implementation_rule:
   - keep reusable module boundaries
+  - preserve existing design patterns unless user approves a pattern change
   - keep default execution offline and deterministic
   - keep audit logging as a reusable cross-cutting module
   - keep web viewer local-only by default
@@ -172,6 +167,19 @@ audit_web:
       - /
       - /api/events
       - /api/summary
+
+tool_registry_foundation:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/tool_registry.py
+    - registry-backed health_check
+    - registry-backed CLI harness
+    - registry-backed MCP server wrapper bodies
+    - tests/test_tool_registry.py
+  pattern_decision:
+    changed: false
+    note: existing public FastMCP wrapper facade preserved; shared registry added behind it
 ```
 
 ## 4. ACTIVE_REVIEW_SUMMARY
@@ -316,6 +324,32 @@ audit_web_final:
       result: running at http://127.0.0.1:8765
     - command: GET http://127.0.0.1:8765/api/summary
       result: passed
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+
+tool_registry_foundation_final:
+  status: passed
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/harness.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/health.py
+    - tests/test_tool_registry.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "36 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --audit-log-path /private/tmp/halo_swing_registry_verify.jsonl
+      result: passed
+  design_pattern_change:
+    required: false
+    note: public server wrapper facade and offline deterministic tool modules remain intact
   blocked_paths_changed: false
   repo_runtime_artifacts_added: false
   dependency_changes: false
