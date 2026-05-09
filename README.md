@@ -41,16 +41,62 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-## P0 Smoke Commands
+## Offline MVP Smoke Commands
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}'
 PYTHONPATH=src ./.venv/bin/python -m pytest
 PYTHONPATH=src ./.venv/bin/python -m ruff check .
 ```
+
+The offline MVP exposes fixture-backed versions of the core MCP tools:
+
+```text
+get_market_snapshot
+get_macro_snapshot
+get_event_calendar
+get_news_bundle
+calculate_indicators
+render_chart
+score_leverage_swing
+generate_trade_guide
+evaluate_position
+record_signal
+label_signal_outcome
+evaluate_score_performance
+suggest_weight_update
+compare_champion_challenger
+get_audit_log
+get_audit_summary
+```
+
+All default tests are offline and require no market data API keys. Runtime
+ledger and chart artifacts are written only when those tools are called and
+should stay under ignored runtime locations such as `state/` or `artifacts/`.
 
 The MCP server entrypoint is available at:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.server
 ```
+
+## Audit Log Viewer
+
+Tool calls are written as redacted JSONL audit events when invoked through the
+CLI harness or MCP server. Use an ignored runtime path for local logs:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --audit-log-path state/audit_log.jsonl
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log --input-json '{"audit_log_path":"state/audit_log.jsonl","limit":50}' --audit-log-path state/audit_log.jsonl
+```
+
+Start the local web viewer:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.audit_web --host 127.0.0.1 --port 8765 --audit-log-path state/audit_log.jsonl
+```
+
+Open `http://127.0.0.1:8765` to inspect events, filters, and summaries. The
+viewer also exposes `/api/events` and `/api/summary` for automated checks.

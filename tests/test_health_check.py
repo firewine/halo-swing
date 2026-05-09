@@ -24,12 +24,19 @@ def test_mcp_server_imports_with_registered_tool() -> None:
     assert mcp.name == "halo_swing_mcp"
 
 
-def test_harness_health_check_matches_golden() -> None:
+def test_harness_health_check_matches_golden(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT / "src")
 
     result = subprocess.run(
-        [sys.executable, "-m", "halo_swing_mcp.harness", "health_check"],
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "health_check",
+            "--audit-log-path",
+            str(tmp_path / "audit.jsonl"),
+        ],
         check=True,
         cwd=ROOT,
         env=env,

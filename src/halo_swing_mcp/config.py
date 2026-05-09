@@ -8,13 +8,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Local runtime settings.
 
-    P0 keeps health_check deterministic; these settings are scaffolding for later
-    live integrations and Hermes registration.
+    Offline MVP keeps tools deterministic by default. Runtime paths point at
+    ignored local artifact locations and must not be committed.
     """
 
     environment: str = "local"
     log_level: str = "INFO"
-    database_url: str = "sqlite:///data/halo_swing.sqlite3"
+    ledger_path: str = "state/signal_ledger.jsonl"
+    audit_log_path: str = "state/audit_log.jsonl"
+    artifact_dir: str = "artifacts"
+    database_url: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

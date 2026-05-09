@@ -13,12 +13,14 @@ class StrictBaseModel(BaseModel):
 
 
 class TradeAction(StrEnum):
+    BUY_WATCH = "BUY_WATCH"
     BUY_2X = "BUY_2X"
     BUY_3X = "BUY_3X"
     WAIT = "WAIT"
     TRIM = "TRIM"
     EXIT = "EXIT"
     STOP = "STOP"
+    BLOCK = "BLOCK"
 
 
 class DataFreshnessStatus(StrEnum):
@@ -45,6 +47,14 @@ class ArtifactRefType(StrEnum):
 class ReplayErrorCode(StrEnum):
     MISSING_REQUIRED_LINK = "MISSING_REQUIRED_LINK"
     INCOMPLETE_REPLAY_BUNDLE = "INCOMPLETE_REPLAY_BUNDLE"
+
+
+class LabelOutcome(StrEnum):
+    TAKE_PROFIT_FIRST = "TAKE_PROFIT_FIRST"
+    STOP_LOSS_FIRST = "STOP_LOSS_FIRST"
+    TIME_EXIT = "TIME_EXIT"
+    NO_DATA = "NO_DATA"
+    INVALIDATED_BY_EVENT = "INVALIDATED_BY_EVENT"
 
 
 class ArtifactRef(StrictBaseModel):
@@ -110,6 +120,7 @@ __all__ = [
     "ArtifactRefType",
     "DataFreshnessStatus",
     "LatestSignalReport",
+    "LabelOutcome",
     "ReplayErrorCode",
     "ReplayMissingLinkError",
     "SignalReplayBundle",

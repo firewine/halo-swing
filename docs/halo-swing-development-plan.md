@@ -2421,6 +2421,114 @@ hard_limits:
 - no DB files or data directory creation
 ```
 
+### 3.21 Offline MVP Tool Implementation Record
+
+> 상태: implemented. 사용자 지시로 P0/P1 이후의 핵심 MCP 판단 경로를
+> live API 없이 재현 가능한 offline MVP로 먼저 연결했다.
+
+구현 범위:
+
+```text
+- deterministic fixture market/macro/event/news source
+- pure Python RSI, DMI/ADX, MA, ATR, gap/support/resistance calculation
+- strategy_config JSON, version, config_hash, champion/challenger separation
+- leverage swing scoring for QLD/TQQQ/SSO/UPRO/SOXL/BTC universe
+- trade guide with entry, stop, take-profit, invalidation, risk summary
+- position review action: WAIT/TRIM/EXIT/STOP
+- local JSONL signal ledger runtime adapter
+- triple barrier outcome labeling with MFE/MAE/realized_R
+- score performance and champion/challenger comparison
+- dependency-free PNG chart renderer
+- FastMCP tool registration and parameterized CLI harness
+```
+
+Reusable design boundaries:
+
+```text
+fixtures.py       deterministic replay source
+indicators.py     calculation engine with no MCP/Hermes dependency
+strategy.py       config hashing and validation
+tools/market.py   market, macro, events, news, chart tool facade
+tools/scoring.py  score, guide, position, feedback tool facade
+tools/recording.py runtime ledger and labeler facade
+harness.py        generic JSON-input CLI command runner
+```
+
+운영 제한:
+
+```text
+- default mode is fixture/replay; live API adapters are not implemented yet
+- automatic order execution remains out of MVP scope
+- SQLite migrations and repository persistence remain a later hardening path
+- runtime ledgers/charts are ignored artifacts and must not be committed
+```
+
+검증 기준:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m pytest
+PYTHONPATH=src ./.venv/bin/python -m ruff check .
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
+```
+
+### 3.22 Audit Log And Web Viewer Record
+
+> 상태: implemented. 감사 가능성을 위해 tool execution audit를 runtime
+> JSONL로 남기고, 로컬 웹 UI에서 조회할 수 있게 했다.
+
+설계:
+
+```text
+audit.py             append-only audit JSONL, redaction, filtering, summary
+tools/audit_tools.py MCP/CLI read tools: get_audit_log, get_audit_summary
+harness.py           every CLI command writes success/failure audit events
+server.py            MCP tool wrappers write success audit events
+audit_web.py         local HTTP UI and JSON API for audit events
+tests/test_audit.py  redaction, filtering, harness audit, web payload coverage
+```
+
+Audit event contract:
+
+```text
+schema_version
+event_id
+occurred_at
+actor
+action
+resource_type
+resource_id
+outcome
+correlation_id
+details
+```
+
+Security and operations:
+
+```text
+- details are recursively redacted for api_key, authorization, cookie,
+  credential, password, secret, and token fields
+- runtime audit logs belong under ignored paths such as state/audit_log.jsonl
+- tests use tmp_path or /private/tmp and must not create repo state artifacts
+- web viewer is local-only by default: 127.0.0.1
+- audit logging does not add dependencies, live APIs, broker code, or DB schema
+```
+
+Web viewer command:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.audit_web --host 127.0.0.1 --port 8765 --audit-log-path state/audit_log.jsonl
+```
+
+JSON API:
+
+```text
+GET /api/events?limit=100&resource_id=score_leverage_swing&outcome=success
+GET /api/summary
+```
+
 ## 4. 개발 순서
 
 ### Phase 0. 프로젝트 초기화

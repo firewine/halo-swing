@@ -11,10 +11,12 @@ runtime: Python 3.11
 environment: .venv
 dependencies: requirements.txt
 mcp_stack: official MCP Python SDK / FastMCP
-server_status: implemented
-harness_status: implemented
-storage_schema_status: deferred_to_p1
-live_network_tests: disabled for P0
+server_status: offline_mvp_tools_implemented
+harness_status: parameterized_cli_harness_implemented
+storage_schema_status: runtime_jsonl_ledger_for_offline_mvp
+audit_log_status: runtime_jsonl_with_local_web_viewer
+live_network_tests: disabled
+default_data_mode: fixture
 ```
 
 ## Local Setup
@@ -53,17 +55,49 @@ commit_forbidden:
 
 `.gitignore` must continue to exclude `.venv/`, local `.env` files, local data, artifacts, reports, state dumps, checkpoints, and logs.
 
-## P0 Server And Harness Commands
+## Offline MVP Server And Harness Commands
 
-Verified P0 smoke commands:
+Verified offline smoke commands:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ","BTC"]}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_summary --input-json '{"audit_log_path":"state/audit_log.jsonl"}' --audit-log-path state/audit_log.jsonl
 PYTHONPATH=src ./.venv/bin/python -m pytest
 PYTHONPATH=src ./.venv/bin/python -m ruff check .
 ```
 
-SQLite/schema commands are intentionally absent in P0. P1 starts with storage/schema architecture review before migrations or DB smoke commands are added.
+`record_signal` writes a local JSONL runtime ledger. Use an ignored or temporary
+path during development:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
+```
+
+SQLite/schema commands remain absent from the offline MVP. The current ledger is
+a reusable JSONL runtime adapter; migrations and repository persistence can be a
+later implementation behind the same tool contracts.
+
+Audit log viewer:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.audit_web --host 127.0.0.1 --port 8765 --audit-log-path state/audit_log.jsonl
+```
+
+Open `http://127.0.0.1:8765`. JSON APIs are available at:
+
+```text
+/api/events?limit=100&resource_id=score_leverage_swing&outcome=success
+/api/summary
+```
+
+Audit events are append-only JSONL records with redacted sensitive keys such as
+`api_key`, `authorization`, `password`, `secret`, and `token`.
 
 MCP stdio server command:
 
@@ -83,16 +117,33 @@ Current P0 target shape:
 mcp_servers:
   halo_swing:
     type: stdio
-    command: "/Users/june/Documents/New project 2/.venv/bin/python"
+    command: "<repo>/.venv/bin/python"
     args: ["-m", "halo_swing_mcp.server"]
     env:
-      PYTHONPATH: "/Users/june/Documents/New project 2/src"
+      PYTHONPATH: "<repo>/src"
     tools:
       include:
         - health_check
+        - get_market_snapshot
+        - get_macro_snapshot
+        - get_event_calendar
+        - get_news_bundle
+        - calculate_indicators
+        - render_chart
+        - score_leverage_swing
+        - generate_trade_guide
+        - evaluate_position
+        - record_signal
+        - label_signal_outcome
+        - evaluate_score_performance
+        - suggest_weight_update
+        - compare_champion_challenger
+        - get_audit_log
+        - get_audit_summary
 ```
 
-Later phases may add API keys to `env`, but P0 must not require them.
+Replace `<repo>` with the repository root. Later live-data phases may add API
+keys to `env`, but the offline MVP tools must not require them.
 
 ## DevOps Gate Checklist
 
