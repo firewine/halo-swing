@@ -7,6 +7,16 @@ from typing import Any, Callable
 
 from halo_swing_mcp import MCP_SERVER_NAME, PROJECT_NAME, __version__
 from halo_swing_mcp.binance_btc import execute_btc_order, preview_btc_order
+from halo_swing_mcp.risk_settings import (
+    get_btc_risk_settings,
+    get_btc_risk_status,
+    reset_btc_daily_risk_state,
+    update_btc_risk_settings,
+)
+from halo_swing_mcp.secret_store import (
+    get_binance_credentials_status,
+    save_binance_credentials,
+)
 from halo_swing_mcp.tools.audit_tools import get_audit_log, get_audit_summary
 from halo_swing_mcp.tools.market import (
     calculate_indicators,
@@ -85,8 +95,30 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
     ),
     ToolSpec("get_audit_log", get_audit_log, "Return recent audit events."),
     ToolSpec("get_audit_summary", get_audit_summary, "Return audit event summary."),
-    ToolSpec("preview_btc_order", preview_btc_order, "Preview BTCUSDT Binance order."),
-    ToolSpec("execute_btc_order", execute_btc_order, "Submit guarded BTCUSDT order."),
+    ToolSpec("get_btc_risk_settings", get_btc_risk_settings, "Return BTC risk settings."),
+    ToolSpec(
+        "update_btc_risk_settings",
+        update_btc_risk_settings,
+        "Update BTC risk settings.",
+    ),
+    ToolSpec("get_btc_risk_status", get_btc_risk_status, "Return BTC risk status."),
+    ToolSpec(
+        "reset_btc_daily_risk_state",
+        reset_btc_daily_risk_state,
+        "Reset BTC daily risk counters.",
+    ),
+    ToolSpec(
+        "save_binance_credentials",
+        save_binance_credentials,
+        "Encrypt and save Binance API credentials.",
+    ),
+    ToolSpec(
+        "get_binance_credentials_status",
+        get_binance_credentials_status,
+        "Return encrypted Binance credential status.",
+    ),
+    ToolSpec("preview_btc_order", preview_btc_order, "Preview BTCUSD_PERP COIN-M order."),
+    ToolSpec("execute_btc_order", execute_btc_order, "Submit guarded BTCUSD_PERP order."),
 )
 
 TOOL_REGISTRY: dict[str, ToolSpec] = {spec.name: spec for spec in TOOL_SPECS}

@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BTC_BINANCE_GUARDED_EXECUTION_PATH_VERIFIED
+status: BTC_COINM_ADMIN_ENCRYPTED_CREDENTIALS_VERIFIED
 gate_id: FULL_GOAL_STAGE_G_BTC_BINANCE
 review_tier: S2_medium
 
-next_atomic_step: await user decision for Binance credential policy, testnet-only first execution, and risk limits
+next_atomic_step: await user decision for testnet-only first execution and operational passphrase handling
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -43,8 +43,7 @@ blocked_path_prefixes:
   - artifacts/
   - state/
 
-blocked_exact_paths:
-  - requirements.txt
+blocked_exact_paths: []
 
 required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -52,17 +51,20 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - BTC-only Binance Spot scope is recorded
+  - BTC-only Binance COIN-M Futures scope is recorded
   - preview_btc_order tool exists
   - execute_btc_order tool exists
+  - local trading admin page exists
+  - Binance API credentials are encrypted at rest in local state
+  - per-order notional, daily order count, and daily loss limits are configurable
   - non-BTC Binance order intents are rejected
-  - execute path is blocked without confirmation, live-trading env flag, and credentials
+  - execute path is blocked without confirmation, live-trading env flag, risk pass, encrypted credentials, and passphrase
   - Binance HMAC SHA256 signing helper is tested
   - tests and lint pass offline
-  - no dependency, non-BTC broker, DB/data artifact changes are added
+  - no non-BTC broker, DB/data artifact changes are added
   - gate packet, SSOT, and WORKING reflect BTC Binance status
 
-next_state_after_success: BTC_BINANCE_GUARDED_EXECUTION_PATH_VERIFIED
+next_state_after_success: BTC_COINM_ADMIN_ENCRYPTED_CREDENTIALS_VERIFIED
 ```
 
 Previous completed directive:
@@ -101,8 +103,8 @@ implementation_rule:
   - keep default execution offline and deterministic
   - keep audit logging as a reusable cross-cutting module
   - keep web viewer local-only by default
-  - do not implement automatic order execution
-  - do not add live API dependencies or secrets
+  - BTC automatic order execution must stay Binance COIN-M only
+  - do not persist plaintext secrets
   - verify through tests and CLI harness
 ```
 
@@ -202,12 +204,19 @@ btc_binance_guarded_execution:
   gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
   implemented:
     - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/risk_settings.py
+    - src/halo_swing_mcp/secret_store.py
+    - src/halo_swing_mcp/trading_admin_web.py
     - preview_btc_order tool
     - execute_btc_order tool
-    - BTCUSDT-only validation
+    - BTCUSD_PERP-only validation
+    - encrypted Binance credential storage
+    - configurable BTC risk settings
+    - local-only trading admin page
     - confirmation guard
     - live-trading env flag guard
-    - Binance credential guard
+    - encrypted Binance credential guard
+    - risk limit guard
     - tests/test_binance_btc.py
   pattern_decision:
     changed: false
@@ -415,28 +424,37 @@ replay_provider_interface_final:
 btc_binance_guarded_execution_final:
   status: passed
   changed_files:
+    - .env.example
     - docs/WORKING.md
+    - docs/devops-setup-guide.md
     - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
     - docs/halo-swing-development-plan.md
     - src/halo_swing_mcp/binance_btc.py
     - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/risk_settings.py
+    - src/halo_swing_mcp/secret_store.py
     - src/halo_swing_mcp/server.py
     - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/trading_admin_web.py
     - tests/golden/health_check.json
     - tests/test_binance_btc.py
   verification:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "45 passed"
+      result: "50 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_credentials.enc.json"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl
+      result: passed
+    - command: GET http://127.0.0.1:8766/api/status
       result: passed
   design_pattern_change:
     required: false
-    note: isolated BTC-only Binance module added behind existing tool registry and server wrapper facade
+    note: isolated BTC-only Binance COIN-M modules and local admin page added behind existing tool registry and server wrapper facade
   blocked_paths_changed: false
   repo_runtime_artifacts_added: false
-  dependency_changes: false
+  dependency_changes: cryptography made explicit for encrypted credential storage
   live_order_submission_default: blocked
 ```
 

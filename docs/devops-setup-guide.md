@@ -15,6 +15,7 @@ server_status: offline_mvp_tools_implemented
 harness_status: parameterized_cli_harness_implemented
 storage_schema_status: runtime_jsonl_ledger_for_offline_mvp
 audit_log_status: runtime_jsonl_with_local_web_viewer
+trading_admin_status: local_only_btc_coin_m_settings_and_encrypted_credentials
 live_network_tests: disabled
 default_data_mode: fixture
 ```
@@ -66,6 +67,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_summary --input-json '{"audit_log_path":"state/audit_log.jsonl"}' --audit-log-path state/audit_log.jsonl
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_btc_risk_status
 PYTHONPATH=src ./.venv/bin/python -m pytest
 PYTHONPATH=src ./.venv/bin/python -m ruff check .
 ```
@@ -97,7 +100,34 @@ Open `http://127.0.0.1:8765`. JSON APIs are available at:
 ```
 
 Audit events are append-only JSONL records with redacted sensitive keys such as
-`api_key`, `authorization`, `password`, `secret`, and `token`.
+`api_key`, `authorization`, `password`, `passphrase`, `secret`, and `token`.
+
+BTC COIN-M trading admin:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.trading_admin_web --host 127.0.0.1 --port 8766
+```
+
+Open `http://127.0.0.1:8766`. The admin page is local-only and manages:
+
+```text
+- encrypted Binance COIN-M API credentials
+- max_notional_usd_per_order
+- max_daily_order_count
+- max_daily_loss_usd
+- coinm_contract_size_usd
+- daily counter reset
+```
+
+Credential storage:
+
+```yaml
+path: state/binance_credentials.enc.json
+algorithm: Fernet
+kdf: PBKDF2HMAC-SHA256
+iterations: 390000
+commit_policy: forbidden
+```
 
 MCP stdio server command:
 
@@ -140,6 +170,14 @@ mcp_servers:
         - compare_champion_challenger
         - get_audit_log
         - get_audit_summary
+        - get_btc_risk_settings
+        - update_btc_risk_settings
+        - get_btc_risk_status
+        - reset_btc_daily_risk_state
+        - save_binance_credentials
+        - get_binance_credentials_status
+        - preview_btc_order
+        - execute_btc_order
 ```
 
 Replace `<repo>` with the repository root. Later live-data phases may add API

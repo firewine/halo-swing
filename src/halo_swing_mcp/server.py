@@ -294,40 +294,145 @@ def compare_champion_challenger() -> dict[str, Any]:
 
 
 @mcp.tool()
+def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
+    """Return BTC COIN-M risk settings."""
+
+    return _audited_tool_call(
+        "get_btc_risk_settings",
+        {"settings_path": settings_path},
+        call_tool("get_btc_risk_settings", {"settings_path": settings_path}),
+    )
+
+
+@mcp.tool()
+def update_btc_risk_settings(
+    max_notional_usd_per_order: float | None = None,
+    max_daily_order_count: int | None = None,
+    max_daily_loss_usd: float | None = None,
+    coinm_contract_size_usd: float | None = None,
+    settings_path: str | None = None,
+) -> dict[str, Any]:
+    """Update BTC COIN-M risk settings."""
+
+    payload = {
+        "max_notional_usd_per_order": max_notional_usd_per_order,
+        "max_daily_order_count": max_daily_order_count,
+        "max_daily_loss_usd": max_daily_loss_usd,
+        "coinm_contract_size_usd": coinm_contract_size_usd,
+        "settings_path": settings_path,
+    }
+    return _audited_tool_call(
+        "update_btc_risk_settings",
+        payload,
+        call_tool("update_btc_risk_settings", payload),
+    )
+
+
+@mcp.tool()
+def get_btc_risk_status(
+    settings_path: str | None = None,
+    state_path: str | None = None,
+) -> dict[str, Any]:
+    """Return BTC COIN-M risk settings and daily counters."""
+
+    payload = {"settings_path": settings_path, "state_path": state_path}
+    return _audited_tool_call(
+        "get_btc_risk_status",
+        payload,
+        call_tool("get_btc_risk_status", payload),
+    )
+
+
+@mcp.tool()
+def reset_btc_daily_risk_state(
+    daily_realized_loss_usd: float = 0.0,
+    daily_order_count: int = 0,
+    state_path: str | None = None,
+) -> dict[str, Any]:
+    """Reset BTC COIN-M daily risk counters."""
+
+    payload = {
+        "daily_realized_loss_usd": daily_realized_loss_usd,
+        "daily_order_count": daily_order_count,
+        "state_path": state_path,
+    }
+    return _audited_tool_call(
+        "reset_btc_daily_risk_state",
+        payload,
+        call_tool("reset_btc_daily_risk_state", payload),
+    )
+
+
+@mcp.tool()
+def save_binance_credentials(
+    api_key: str,
+    api_secret: str,
+    passphrase: str,
+    credentials_path: str | None = None,
+) -> dict[str, Any]:
+    """Encrypt and save Binance COIN-M API credentials locally."""
+
+    payload = {
+        "api_key": api_key,
+        "api_secret": api_secret,
+        "passphrase": passphrase,
+        "credentials_path": credentials_path,
+    }
+    return _audited_tool_call(
+        "save_binance_credentials",
+        payload,
+        call_tool("save_binance_credentials", payload),
+    )
+
+
+@mcp.tool()
+def get_binance_credentials_status(
+    credentials_path: str | None = None,
+) -> dict[str, Any]:
+    """Return encrypted Binance credential status without exposing secrets."""
+
+    payload = {"credentials_path": credentials_path}
+    return _audited_tool_call(
+        "get_binance_credentials_status",
+        payload,
+        call_tool("get_binance_credentials_status", payload),
+    )
+
+
+@mcp.tool()
 def preview_btc_order(
     side: str = "BUY",
     order_type: str = "MARKET",
-    quantity: str | None = None,
-    quote_order_qty: str | None = None,
+    quantity: str = "1",
     price: str | None = None,
     time_in_force: str | None = None,
+    position_side: str | None = None,
+    reduce_only: bool = False,
     client_order_id: str | None = None,
+    settings_path: str | None = None,
+    state_path: str | None = None,
+    credentials_path: str | None = None,
 ) -> dict[str, Any]:
-    """Preview a BTCUSDT Binance Spot order without submitting it."""
+    """Preview a BTCUSD_PERP Binance COIN-M order without submitting it."""
+
+    payload = {
+        "side": side,
+        "order_type": order_type,
+        "quantity": quantity,
+        "price": price,
+        "time_in_force": time_in_force,
+        "position_side": position_side,
+        "reduce_only": reduce_only,
+        "client_order_id": client_order_id,
+        "settings_path": settings_path,
+        "state_path": state_path,
+        "credentials_path": credentials_path,
+    }
 
     return _audited_tool_call(
         "preview_btc_order",
-        {
-            "side": side,
-            "order_type": order_type,
-            "quantity": quantity,
-            "quote_order_qty": quote_order_qty,
-            "price": price,
-            "time_in_force": time_in_force,
-            "client_order_id": client_order_id,
-        },
-        call_tool(
-            "preview_btc_order",
-            {
-                "side": side,
-                "order_type": order_type,
-                "quantity": quantity,
-                "quote_order_qty": quote_order_qty,
-                "price": price,
-                "time_in_force": time_in_force,
-                "client_order_id": client_order_id,
-            },
-        ),
+        payload,
+        call_tool("preview_btc_order", payload),
     )
 
 
@@ -335,40 +440,40 @@ def preview_btc_order(
 def execute_btc_order(
     side: str = "BUY",
     order_type: str = "MARKET",
-    quantity: str | None = None,
-    quote_order_qty: str | None = None,
+    quantity: str = "1",
     price: str | None = None,
     time_in_force: str | None = None,
+    position_side: str | None = None,
+    reduce_only: bool = False,
     client_order_id: str | None = None,
     confirm: str | None = None,
+    credential_passphrase: str | None = None,
+    credentials_path: str | None = None,
+    settings_path: str | None = None,
+    state_path: str | None = None,
 ) -> dict[str, Any]:
-    """Submit a BTCUSDT Binance Spot order only when live guards pass."""
+    """Submit a BTCUSD_PERP Binance COIN-M order only when live guards pass."""
+
+    payload = {
+        "side": side,
+        "order_type": order_type,
+        "quantity": quantity,
+        "price": price,
+        "time_in_force": time_in_force,
+        "position_side": position_side,
+        "reduce_only": reduce_only,
+        "client_order_id": client_order_id,
+        "confirm": confirm,
+        "credential_passphrase": credential_passphrase,
+        "credentials_path": credentials_path,
+        "settings_path": settings_path,
+        "state_path": state_path,
+    }
 
     return _audited_tool_call(
         "execute_btc_order",
-        {
-            "side": side,
-            "order_type": order_type,
-            "quantity": quantity,
-            "quote_order_qty": quote_order_qty,
-            "price": price,
-            "time_in_force": time_in_force,
-            "client_order_id": client_order_id,
-            "confirm": confirm,
-        },
-        call_tool(
-            "execute_btc_order",
-            {
-                "side": side,
-                "order_type": order_type,
-                "quantity": quantity,
-                "quote_order_qty": quote_order_qty,
-                "price": price,
-                "time_in_force": time_in_force,
-                "client_order_id": client_order_id,
-                "confirm": confirm,
-            },
-        ),
+        payload,
+        call_tool("execute_btc_order", payload),
     )
 
 

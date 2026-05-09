@@ -21,6 +21,7 @@ SENSITIVE_KEY_PARTS = (
     "cookie",
     "credential",
     "password",
+    "passphrase",
     "secret",
     "token",
 )

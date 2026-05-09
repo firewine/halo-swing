@@ -17,6 +17,12 @@
     "compare_champion_challenger",
     "get_audit_log",
     "get_audit_summary",
+    "get_btc_risk_settings",
+    "update_btc_risk_settings",
+    "get_btc_risk_status",
+    "reset_btc_daily_risk_state",
+    "save_binance_credentials",
+    "get_binance_credentials_status",
     "preview_btc_order",
     "execute_btc_order"
   ],

@@ -29,6 +29,7 @@ def test_audit_event_redacts_sensitive_details(tmp_path: Path) -> None:
             "input": {
                 "asset": "TQQQ",
                 "api_key": "secret-value",
+                "passphrase": "local-passphrase",
                 "nested": {"authorization": "Bearer token"},
             }
         },
@@ -38,6 +39,7 @@ def test_audit_event_redacts_sensitive_details(tmp_path: Path) -> None:
 
     assert event["event_id"].startswith("aud_")
     assert events[0]["details"]["input"]["api_key"] == "[REDACTED]"
+    assert events[0]["details"]["input"]["passphrase"] == "[REDACTED]"
     assert events[0]["details"]["input"]["nested"]["authorization"] == "[REDACTED]"
 
 

@@ -3612,17 +3612,18 @@ decision_needed_before_live:
 
 ### A. 결정
 
-자동거래 범위는 BTC 전용으로 제한한다. 거래소/API는 Binance Spot API를 사용한다.
+자동거래 범위는 BTC 전용으로 제한한다. 거래소/API는 Binance COIN-M Futures API를 사용한다.
 
 ```text
 approved_scope:
-  exchange: binance_spot
-  symbol: BTCUSDT
+  exchange: binance_coin_m_futures
+  symbol: BTCUSD_PERP
   automatic_trading_assets:
     - BTC
 blocked:
   - non-BTC automatic trading
-  - futures/leverage broker execution
+  - Binance Spot order execution
+  - USDⓈ-M futures order execution
   - non-Binance execution
 ```
 
@@ -3634,7 +3635,7 @@ implemented:
   - src/halo_swing_mcp/binance_btc.py
   - preview_btc_order tool
   - execute_btc_order tool
-  - BTCUSDT-only validation
+  - BTCUSD_PERP-only validation
   - Binance HMAC SHA256 signed order query helper
   - default testnet mode
   - default live trading disabled mode
@@ -3646,11 +3647,11 @@ implemented:
 
 ```text
 required_for_submission:
-  - symbol is BTCUSDT
-  - confirm is CONFIRM_BTC_BINANCE_ORDER
+  - symbol is BTCUSD_PERP
+  - confirm is CONFIRM_BTC_BINANCE_COINM_ORDER
   - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true
-  - HALO_SWING_BINANCE_API_KEY is configured
-  - HALO_SWING_BINANCE_API_SECRET is configured
+  - encrypted Binance credentials are configured locally
+  - credential_passphrase is provided at execution time
 defaults:
   - HALO_SWING_BINANCE_TESTNET=true
 ```
@@ -3659,9 +3660,9 @@ defaults:
 
 ```text
 verification:
-  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 45 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 50 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
 ```
 
 ### E. 남은 결정
@@ -3670,8 +3671,73 @@ verification:
 
 ```text
 decision_needed:
-  - Binance API key 저장/환경변수 정책
   - 첫 연결 실행을 testnet only로 제한할지 여부
-  - 주문당 최대 USDT 금액
-  - 일일 최대 손실/주문 횟수 제한
+  - 운영 전 passphrase 운용 절차
+```
+
+## 3.26 BTC COIN-M Admin And Encrypted Credential Record - 2026-05-09
+
+### A. 결정
+
+Binance 거래 API key는 관리 페이지에서 입력하고, local state 파일에 암호화해서 저장한다. repository에는 credential 파일을 커밋하지 않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - src/halo_swing_mcp/secret_store.py
+  - src/halo_swing_mcp/risk_settings.py
+  - src/halo_swing_mcp/trading_admin_web.py
+  - encrypted Binance credential save/status tools
+  - BTC risk settings/status/reset tools
+  - local-only trading admin page
+  - passphrase audit redaction
+```
+
+### C. 암호화 방식
+
+```text
+credential_file: state/binance_credentials.enc.json
+algorithm: Fernet
+kdf: PBKDF2HMAC-SHA256
+iterations: 390000
+secret_display_policy:
+  - API secret is never returned
+  - API key is returned only as a masked hint
+  - passphrase is never persisted
+```
+
+### D. 관리 페이지
+
+```text
+command:
+  PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.trading_admin_web --host 127.0.0.1 --port 8766
+
+url:
+  http://127.0.0.1:8766
+
+local_only:
+  true
+```
+
+관리 페이지에서 설정할 수 있는 항목:
+
+```text
+- Binance COIN-M API key / secret encrypted local storage
+- max_notional_usd_per_order
+- max_daily_order_count
+- max_daily_loss_usd
+- coinm_contract_size_usd
+- daily counter reset
+```
+
+### E. 감사 가능성
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 50 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_credentials.enc.json"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
+  - GET http://127.0.0.1:8766/api/status -> passed
 ```

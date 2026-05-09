@@ -2,7 +2,7 @@
 
 Halo Swing is a personal market-swing decision system designed to run as a Hermes Agent MCP server.
 
-The first goal is not automatic trading. The system collects market, macro, event, policy, geopolitical, and technical evidence, then produces swing guides for BTC and 2x/3x long index products such as QLD, TQQQ, SSO, UPRO, and SOXL.
+The system collects market, macro, event, policy, geopolitical, and technical evidence, then produces swing guides for BTC and 2x/3x long index products such as QLD, TQQQ, SSO, UPRO, and SOXL. Automatic order execution is restricted to BTC COIN-M futures only and is guarded by local risk settings, encrypted credentials, and explicit confirmation.
 
 ## Core Idea
 
@@ -70,6 +70,14 @@ suggest_weight_update
 compare_champion_challenger
 get_audit_log
 get_audit_summary
+get_btc_risk_settings
+update_btc_risk_settings
+get_btc_risk_status
+reset_btc_daily_risk_state
+save_binance_credentials
+get_binance_credentials_status
+preview_btc_order
+execute_btc_order
 ```
 
 All default tests are offline and require no market data API keys. Runtime
@@ -100,3 +108,15 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.audit_web --host 127.0.0.1 -
 
 Open `http://127.0.0.1:8765` to inspect events, filters, and summaries. The
 viewer also exposes `/api/events` and `/api/summary` for automated checks.
+
+## BTC COIN-M Trading Admin
+
+Start the local-only management page:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.trading_admin_web --host 127.0.0.1 --port 8766
+```
+
+Open `http://127.0.0.1:8766` to set Binance COIN-M API credentials and BTC risk
+limits. Credentials are encrypted into `state/binance_credentials.enc.json`;
+plaintext API keys, API secrets, and passphrases are not committed.

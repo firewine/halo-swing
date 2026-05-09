@@ -358,50 +358,60 @@ Decision needed:
 
 ### Stage G. Broker / Order Preview
 
-Status: BTC-only Binance Spot scope approved; guarded implementation started.
+Status: BTC-only Binance COIN-M Futures scope approved; guarded implementation and local admin verified.
 
 Tasks:
 
 1. Read-only portfolio sync. Not started.
-2. Order preview only. BTCUSDT Binance Spot preview implemented.
-3. Approval-required execution only. BTCUSDT execution path implemented with default block guards.
+2. Order preview only. BTCUSD_PERP Binance COIN-M preview implemented.
+3. Approval-required execution only. BTCUSD_PERP execution path implemented with default block guards.
 
 Scope decision recorded on 2026-05-09:
 
 - Automatic trading scope is BTC only.
-- Exchange/API is Binance Spot API.
-- Initial symbol is `BTCUSDT`.
+- Exchange/API is Binance COIN-M Futures API.
+- Initial symbol is `BTCUSD_PERP`.
 - Non-BTC symbols are rejected by code.
+- Binance trading API credentials are entered through a local admin page and saved encrypted in local state.
+- Per-order notional, daily order count, and daily loss limits are configurable.
 
 Implementation record:
 
 - Added `src/halo_swing_mcp/binance_btc.py`.
+- Added `src/halo_swing_mcp/secret_store.py`.
+- Added `src/halo_swing_mcp/risk_settings.py`.
+- Added `src/halo_swing_mcp/trading_admin_web.py`.
 - Added `preview_btc_order` tool.
 - Added `execute_btc_order` tool.
-- Added BTC-only validation, confirmation guard, live-trading env flag guard, credential guard, testnet default, and Binance HMAC SHA256 signing helper.
-- No live order is submitted unless `confirm` is `CONFIRM_BTC_BINANCE_ORDER`, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, and Binance credentials are configured.
+- Added BTC-only COIN-M validation, confirmation guard, live-trading env flag guard, encrypted credential guard, risk limit guard, testnet default, and Binance HMAC SHA256 signing helper.
+- Added local-only trading admin page for encrypted credentials and BTC risk settings.
+- No live order is submitted unless `confirm` is `CONFIRM_BTC_BINANCE_COINM_ORDER`, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, encrypted credentials are configured, and `credential_passphrase` is provided.
 
 Verification:
 
 ```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 45 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 50 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quote_order_qty":"25"}' --audit-log-path /private/tmp/halo_swing_binance_btc_verify.jsonl -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_credentials.enc.json"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
+GET http://127.0.0.1:8766/api/status -> passed
 ```
 
 Decision needed:
 
-- Binance key location and naming policy.
-- Whether first connected execution should target Binance Spot testnet only.
-- Per-order maximum quote size and daily max loss limits.
+- Whether first connected execution should remain testnet only.
+- Operational passphrase handling for unattended runs.
 
 ## 6. Immediate Next Action
 
-Stage A is complete. Choose the next gate:
+Current completed gates: Stage A, Stage B replay provider, Stage G BTC COIN-M guarded path and admin.
+
+Choose the next gate:
 
 ```text
 Option 1: Stage B replay provider interface.
 Option 2: Stage C repository contract.
+Option 3: Stage G testnet connectivity smoke.
 ```
 
-Stage B replay-only implementation does not require live APIs, secrets, DB migrations, Hermes setup, broker setup, or user credentials. Live adapters remain blocked until source/API-key decisions are recorded.
+Stage G live submission remains blocked until testnet-only policy and passphrase handling are recorded.

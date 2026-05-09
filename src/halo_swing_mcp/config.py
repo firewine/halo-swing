@@ -18,11 +18,12 @@ class Settings(BaseSettings):
     audit_log_path: str = "state/audit_log.jsonl"
     artifact_dir: str = "artifacts"
     database_url: str | None = None
-    binance_api_key: str | None = None
-    binance_api_secret: str | None = None
     binance_testnet: bool = True
     binance_enable_live_trading: bool = False
     binance_recv_window_ms: int = 5000
+    binance_credentials_path: str = "state/binance_credentials.enc.json"
+    btc_risk_settings_path: str = "state/btc_risk_settings.json"
+    btc_risk_state_path: str = "state/btc_risk_state.json"
 
     model_config = SettingsConfigDict(
         env_file=".env",
