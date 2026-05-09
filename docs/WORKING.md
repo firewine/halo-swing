@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TOOL_REGISTRY_FOUNDATION_VERIFIED
-gate_id: FULL_GOAL_STAGE_A_TOOL_REGISTRY
+status: REPLAY_PROVIDER_INTERFACE_VERIFIED
+gate_id: FULL_GOAL_STAGE_B_REPLAY_PROVIDER
 review_tier: S2_medium
 
-next_atomic_step: await user decision for Stage B replay provider or Stage C repository gate
+next_atomic_step: await user decision for Stage C repository gate or live provider source selection
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -52,15 +52,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - shared tool registry exists as canonical tool metadata source
-  - health_check, CLI harness, and server wrappers use registry-backed calls
-  - public FastMCP wrapper function names and signatures remain available
-  - architecture boundary tests prevent default live API, DB, and broker imports
+  - MarketDataProvider protocol exists
+  - ReplayMarketDataProvider is the default data source
+  - market, macro, event, news, indicator, and chart data reads go through provider boundary
+  - public tool functions and payload shapes remain stable
+  - provider contract tests cover replay-only behavior
   - tests and lint pass offline
   - no dependency, broker, live API, order execution, DB/data artifact changes are added
-  - gate packet, SSOT, and WORKING reflect Stage A status
+  - gate packet, SSOT, and WORKING reflect Stage B status
 
-next_state_after_success: TOOL_REGISTRY_FOUNDATION_VERIFIED
+next_state_after_success: REPLAY_PROVIDER_INTERFACE_VERIFIED
 ```
 
 Previous completed directive:
@@ -180,6 +181,20 @@ tool_registry_foundation:
   pattern_decision:
     changed: false
     note: existing public FastMCP wrapper facade preserved; shared registry added behind it
+
+replay_provider_interface:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/providers.py
+    - MarketDataProvider protocol
+    - ReplayMarketDataProvider default source
+    - provider-backed market tools
+    - provider-backed indicator and chart data reads
+    - tests/test_providers.py
+  pattern_decision:
+    changed: false
+    note: public tool functions and payload shapes preserved; fixture access moved behind provider boundary
 ```
 
 ## 4. ACTIVE_REVIEW_SUMMARY
@@ -350,6 +365,31 @@ tool_registry_foundation_final:
   design_pattern_change:
     required: false
     note: public server wrapper facade and offline deterministic tool modules remain intact
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+
+replay_provider_interface_final:
+  status: passed
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/indicators.py
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "38 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ"]}' --audit-log-path /private/tmp/halo_swing_provider_verify.jsonl
+      result: passed
+  design_pattern_change:
+    required: false
+    note: provider boundary added behind existing tool facade
   blocked_paths_changed: false
   repo_runtime_artifacts_added: false
   dependency_changes: false

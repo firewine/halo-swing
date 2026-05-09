@@ -3563,3 +3563,47 @@ not_added:
 ```
 
 다음 단계는 Stage B replay provider interface 또는 Stage C repository contract 중 하나를 선택해 진행한다. live API, DB migration, Hermes/Telegram, broker scope는 별도 승인 전까지 blocked 상태로 유지한다.
+
+## 3.24 Full Goal Stage B Replay Provider Record - 2026-05-09
+
+### A. 목적
+
+live adapter를 추가하기 전에 deterministic fixture/replay 데이터 접근을 provider 경계 뒤로 이동했다. 이 단계는 live API, credential, dependency, broker, DB 변경 없이 진행했다.
+
+### B. 구현 결과
+
+```text
+status: verified
+gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+implemented:
+  - src/halo_swing_mcp/providers.py
+  - MarketDataProvider protocol
+  - ReplayMarketDataProvider
+  - provider-backed market snapshot, macro snapshot, event calendar, news bundle
+  - provider-backed indicator and chart data reads
+  - tests/test_providers.py
+```
+
+기존 디자인 패턴은 변경하지 않았다. public tool 함수와 payload shape는 유지하고, fixture 데이터 접근만 provider boundary 뒤로 이동했다.
+
+### C. 감사 가능성
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ"]}' --audit-log-path /private/tmp/halo_swing_provider_verify.jsonl -> passed
+```
+
+### D. 남은 결정
+
+live provider 구현은 아직 blocked 상태다.
+
+```text
+decision_needed_before_live:
+  - OHLCV provider source
+  - macro data source
+  - news/feed source
+  - API key configuration policy
+  - timeout/retry/circuit-breaker policy
+```

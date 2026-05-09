@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from halo_swing_mcp.fixtures import generate_ohlcv, resolve_asset
+from halo_swing_mcp.providers import get_market_data_provider
 
 
 def _round(value: float | None, digits: int = 4) -> float | None:
@@ -140,10 +140,11 @@ def calculate_indicator_payload(
 ) -> dict[str, Any]:
     """Calculate deterministic indicators from OHLCV bars."""
 
+    provider = get_market_data_provider()
     normalized = symbol.upper()
-    underlying, leverage = resolve_asset(normalized)
+    underlying, leverage = provider.resolve_asset(normalized)
     indicator_symbol = underlying if leverage > 1 else normalized
-    bars = list(generate_ohlcv(indicator_symbol, periods))
+    bars = list(provider.ohlcv(indicator_symbol, periods))
     closes = [float(bar["close"]) for bar in bars]
     latest_close = closes[-1]
     previous_close = closes[-2]
@@ -170,8 +171,8 @@ def calculate_indicator_payload(
         "symbol": normalized,
         "indicator_symbol": indicator_symbol,
         "timeframe": timeframe,
-        "data_mode": "fixture",
-        "live_data_required": False,
+        "data_mode": provider.data_mode,
+        "live_data_required": provider.live_data_required,
         "latest_bar": bars[-1],
         "change_pct_1d": _round((latest_close / previous_close - 1) * 100),
         "rsi_14": _round(rsi(closes, 14)),

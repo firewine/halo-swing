@@ -265,14 +265,30 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --audit
 
 ### Stage B. Provider Interface
 
-Status: approved to plan, implementation can proceed if replay-only.
+Status: replay-only interface implemented and verified.
 
 Tasks:
 
-1. Introduce replay provider interface for market/macro/events/news.
-2. Move fixture data behind provider methods.
-3. Keep current tool outputs stable.
-4. Add provider contract tests.
+1. Introduce replay provider interface for market/macro/events/news. Done.
+2. Move fixture data behind provider methods. Done.
+3. Keep current tool outputs stable. Done.
+4. Add provider contract tests. Done.
+
+Implementation record:
+
+- Added `src/halo_swing_mcp/providers.py`.
+- Added `MarketDataProvider` protocol and `ReplayMarketDataProvider`.
+- Routed market snapshot, macro snapshot, event calendar, news bundle, indicator, and chart data reads through the default replay provider.
+- Kept scoring rules and public tool payload contracts unchanged.
+- Added provider contract coverage in `tests/test_providers.py`.
+
+Verification:
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 38 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ"]}' --audit-log-path /private/tmp/halo_swing_provider_verify.jsonl -> passed
+```
 
 Decision needed before live implementation:
 

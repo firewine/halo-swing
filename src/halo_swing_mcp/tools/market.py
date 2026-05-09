@@ -7,27 +7,20 @@ import zlib
 from pathlib import Path
 from typing import Any
 
-from halo_swing_mcp.fixtures import (
-    AS_OF,
-    MACRO_FIXTURE,
-    NEWS_FIXTURES,
-    events_within_days,
-    generate_ohlcv,
-    resolve_asset,
-    supported_assets,
-)
 from halo_swing_mcp.indicators import calculate_indicator_payload
+from halo_swing_mcp.providers import get_market_data_provider
 
 
 def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
     """Return deterministic market trend snapshots for supported assets."""
 
+    provider = get_market_data_provider()
     requested = [symbol.upper() for symbol in (symbols or ["QQQ", "SPY", "SMH", "BTC"])]
     snapshots: list[dict[str, Any]] = []
     for symbol in requested:
         indicators = calculate_indicator_payload(symbol)
-        underlying, leverage = resolve_asset(symbol)
-        asset_bars = generate_ohlcv(symbol, 220)
+        underlying, leverage = provider.resolve_asset(symbol)
+        asset_bars = provider.ohlcv(symbol, 220)
         latest_asset_close = asset_bars[-1]["close"]
         previous_asset_close = asset_bars[-2]["close"]
         snapshots.append(
@@ -51,10 +44,10 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         )
 
     return {
-        "as_of": AS_OF,
-        "data_mode": "fixture",
-        "live_data_required": False,
-        "supported_assets": supported_assets(),
+        "as_of": provider.as_of,
+        "data_mode": provider.data_mode,
+        "live_data_required": provider.live_data_required,
+        "supported_assets": provider.supported_assets(),
         "snapshots": snapshots,
     }
 
@@ -62,19 +55,20 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
 def get_macro_snapshot() -> dict[str, Any]:
     """Return deterministic macro state."""
 
-    return dict(MACRO_FIXTURE)
+    return get_market_data_provider().macro_snapshot()
 
 
 def get_event_calendar(days: int = 14) -> dict[str, Any]:
     """Return deterministic event risk calendar."""
 
-    events = events_within_days(days)
+    provider = get_market_data_provider()
+    events = provider.event_calendar(days)
     highest_risk = max((event["risk_score"] for event in events), default=0.0)
     return {
-        "as_of": AS_OF,
+        "as_of": provider.as_of,
         "days": days,
-        "data_mode": "fixture",
-        "live_data_required": False,
+        "data_mode": provider.data_mode,
+        "live_data_required": provider.live_data_required,
         "highest_event_risk": round(highest_risk, 4),
         "events": events,
     }
@@ -83,26 +77,17 @@ def get_event_calendar(days: int = 14) -> dict[str, Any]:
 def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
     """Return deterministic evidence cards for a report topic."""
 
-    normalized = topic.lower()
-    if normalized in {"all", "*"}:
-        cards = [dict(card) for card in NEWS_FIXTURES]
-    else:
-        cards = [
-            dict(card)
-            for card in NEWS_FIXTURES
-            if normalized in card["category"] or normalized in card["source"]
-        ]
-        if not cards:
-            cards = [dict(card) for card in NEWS_FIXTURES]
+    provider = get_market_data_provider()
+    cards = provider.news_cards(topic)
 
     average_strength = (
         sum(float(card["strength"]) for card in cards) / len(cards) if cards else 0.0
     )
     return {
-        "as_of": AS_OF,
+        "as_of": provider.as_of,
         "topic": topic,
-        "data_mode": "fixture",
-        "live_data_required": False,
+        "data_mode": provider.data_mode,
+        "live_data_required": provider.live_data_required,
         "average_strength": round(average_strength, 4),
         "evidence_cards": cards,
     }
@@ -125,13 +110,14 @@ def render_chart(
     directory = Path(output_dir) if output_dir else Path("artifacts") / "charts"
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / f"{normalized}_{timeframe}.png"
-    bars = list(generate_ohlcv(normalized, 90))
+    provider = get_market_data_provider()
+    bars = list(provider.ohlcv(normalized, 90))
     closes = [float(bar["close"]) for bar in bars[-60:]]
     _write_line_chart_png(path, closes)
     artifact_ref = str(path) if output_dir else str(Path("artifacts") / "charts" / path.name)
 
     return {
-        "as_of": AS_OF,
+        "as_of": provider.as_of,
         "symbol": normalized,
         "timeframe": timeframe,
         "format": "png",
@@ -144,7 +130,7 @@ def render_chart(
                 "renderer": "stdlib_png",
             },
         },
-        "live_data_required": False,
+        "live_data_required": provider.live_data_required,
     }
 
 
