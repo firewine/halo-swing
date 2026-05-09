@@ -6,7 +6,12 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from halo_swing_mcp import MCP_SERVER_NAME, PROJECT_NAME, __version__
-from halo_swing_mcp.binance_btc import execute_btc_order, preview_btc_order
+from halo_swing_mcp.binance_btc import (
+    check_binance_coinm_connectivity,
+    execute_btc_order,
+    get_binance_coinm_account_snapshot,
+    preview_btc_order,
+)
 from halo_swing_mcp.risk_settings import (
     get_btc_risk_settings,
     get_btc_risk_status,
@@ -116,6 +121,16 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_binance_credentials_status",
         get_binance_credentials_status,
         "Return encrypted Binance credential status.",
+    ),
+    ToolSpec(
+        "check_binance_coinm_connectivity",
+        check_binance_coinm_connectivity,
+        "Read Binance COIN-M server time and BTCUSD_PERP metadata.",
+    ),
+    ToolSpec(
+        "get_binance_coinm_account_snapshot",
+        get_binance_coinm_account_snapshot,
+        "Read Binance COIN-M balance and BTC position.",
     ),
     ToolSpec("preview_btc_order", preview_btc_order, "Preview BTCUSD_PERP COIN-M order."),
     ToolSpec("execute_btc_order", execute_btc_order, "Submit guarded BTCUSD_PERP order."),

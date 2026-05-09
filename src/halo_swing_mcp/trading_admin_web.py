@@ -10,6 +10,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
 
+from halo_swing_mcp.binance_btc import (
+    check_binance_coinm_connectivity,
+    get_binance_coinm_account_snapshot,
+    preview_btc_order,
+)
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.risk_settings import (
     get_btc_risk_status,
     reset_btc_daily_risk_state,
@@ -155,12 +161,31 @@ HTML = """<!doctype html>
         </form>
         <div class="message" id="riskMessage"></div>
       </section>
+      <section>
+        <h2>Order Preview</h2>
+        <form id="previewForm">
+          <label>Side<input name="side" value="BUY" required></label>
+          <label>Contracts<input name="quantity" type="number" step="1" min="1" value="1" required></label>
+          <label>Position Side<input name="position_side" placeholder="BOTH / LONG / SHORT"></label>
+          <button type="submit">Preview Order</button>
+        </form>
+        <div class="message" id="previewMessage"></div>
+      </section>
     </div>
     <div class="stack">
       <section>
         <h2>Status</h2>
         <div class="status" id="status"></div>
+        <button class="secondary" id="checkConnectivity" type="button">Check Binance Public</button>
         <button class="secondary" id="resetState" type="button">Reset Daily Counters</button>
+      </section>
+      <section>
+        <h2>Read-Only Account</h2>
+        <form id="accountForm">
+          <label>Credential Passphrase<input name="credential_passphrase" type="password" autocomplete="current-password" required></label>
+          <button type="submit">Read Account Snapshot</button>
+        </form>
+        <div class="message" id="accountMessage"></div>
       </section>
       <section>
         <h2>Payload</h2>
@@ -175,6 +200,10 @@ HTML = """<!doctype html>
     const credentialsForm = document.querySelector("#credentialsForm");
     const riskMessage = document.querySelector("#riskMessage");
     const credentialsMessage = document.querySelector("#credentialsMessage");
+    const accountForm = document.querySelector("#accountForm");
+    const accountMessage = document.querySelector("#accountMessage");
+    const previewForm = document.querySelector("#previewForm");
+    const previewMessage = document.querySelector("#previewMessage");
 
     function escapeHtml(value) {
       return value.replace(/[&<>"']/g, (char) => ({
@@ -220,6 +249,8 @@ HTML = """<!doctype html>
       statusEl.innerHTML = [
         metric("credentials", payload.credentials.configured ? "configured" : "missing"),
         metric("api key", payload.credentials.api_key_hint || "none"),
+        metric("environment", payload.execution.testnet ? "testnet" : "live"),
+        metric("execution policy", payload.execution.force_testnet_execution ? "testnet only" : "env selected"),
         metric("remaining orders", payload.risk.remaining_daily_order_count),
         metric("remaining loss", payload.risk.remaining_daily_loss_usd)
       ].join("");
@@ -253,6 +284,38 @@ HTML = """<!doctype html>
       }
     });
 
+    previewForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      previewMessage.textContent = "";
+      try {
+        const payload = await postJson("/api/order-preview", formObject(previewForm));
+        payloadEl.textContent = JSON.stringify(payload, null, 2);
+      } catch (error) {
+        previewMessage.textContent = error.message;
+      }
+    });
+
+    accountForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      accountMessage.textContent = "";
+      try {
+        const payload = await postJson("/api/account-snapshot", formObject(accountForm));
+        accountForm.reset();
+        payloadEl.textContent = JSON.stringify(payload, null, 2);
+      } catch (error) {
+        accountMessage.textContent = error.message;
+      }
+    });
+
+    document.querySelector("#checkConnectivity").addEventListener("click", async () => {
+      try {
+        const payload = await postJson("/api/connectivity", {});
+        payloadEl.textContent = JSON.stringify(payload, null, 2);
+      } catch (error) {
+        payloadEl.textContent = JSON.stringify({error: error.message}, null, 2);
+      }
+    });
+
     document.querySelector("#resetState").addEventListener("click", async () => {
       const payload = await postJson("/api/risk-state/reset", {});
       payloadEl.textContent = JSON.stringify(payload, null, 2);
@@ -272,6 +335,11 @@ def admin_status_payload() -> dict[str, Any]:
     return {
         "credentials": get_binance_credentials_status(),
         "risk": get_btc_risk_status(),
+        "execution": {
+            "testnet": get_settings().binance_testnet,
+            "force_testnet_execution": get_settings().binance_force_testnet_execution,
+            "live_trading_enabled": get_settings().binance_enable_live_trading,
+        },
     }
 
 
@@ -302,6 +370,29 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                         passphrase=str(payload.get("passphrase", "")),
                     )
                     self._send_json(HTTPStatus.OK, result)
+                    return
+                if parsed.path == "/api/connectivity":
+                    self._send_json(HTTPStatus.OK, check_binance_coinm_connectivity())
+                    return
+                if parsed.path == "/api/account-snapshot":
+                    self._send_json(
+                        HTTPStatus.OK,
+                        get_binance_coinm_account_snapshot(
+                            credential_passphrase=str(
+                                payload.get("credential_passphrase", "")
+                            )
+                        ),
+                    )
+                    return
+                if parsed.path == "/api/order-preview":
+                    self._send_json(
+                        HTTPStatus.OK,
+                        preview_btc_order(
+                            side=str(payload.get("side", "BUY")),
+                            quantity=str(payload.get("quantity", "1")),
+                            position_side=_optional_str(payload.get("position_side")),
+                        ),
+                    )
                     return
                 if parsed.path == "/api/risk-settings":
                     result = update_btc_risk_settings(
@@ -394,6 +485,12 @@ def _optional_int(value: Any) -> int | None:
     if value in {None, ""}:
         return None
     return int(value)
+
+
+def _optional_str(value: Any) -> str | None:
+    if value in {None, ""}:
+        return None
+    return str(value)
 
 
 if __name__ == "__main__":

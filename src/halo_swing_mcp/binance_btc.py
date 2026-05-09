@@ -30,6 +30,10 @@ ALLOWED_POSITION_SIDES = {"BOTH", "LONG", "SHORT"}
 MAINNET_BASE_URL = "https://dapi.binance.com"
 TESTNET_BASE_URL = "https://testnet.binancefuture.com"
 ORDER_PATH = "/dapi/v1/order"
+BALANCE_PATH = "/dapi/v1/balance"
+EXCHANGE_INFO_PATH = "/dapi/v1/exchangeInfo"
+POSITION_RISK_PATH = "/dapi/v1/positionRisk"
+SERVER_TIME_PATH = "/dapi/v1/time"
 LIVE_CONFIRMATION = "CONFIRM_BTC_BINANCE_COINM_ORDER"
 
 
@@ -138,6 +142,7 @@ def preview_btc_order(
         "reduce_only": intent.reduce_only,
         "client_order_id": intent.client_order_id,
         "testnet": settings.binance_testnet,
+        "force_testnet_execution": settings.binance_force_testnet_execution,
         "live_trading_enabled": settings.binance_enable_live_trading,
         "live_data_required": False,
         "risk": risk,
@@ -147,6 +152,7 @@ def preview_btc_order(
             "coin_m_futures_only": True,
             "requires_env_flag": "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true",
             "requires_confirmation": LIVE_CONFIRMATION,
+            "passphrase_policy": "manual_input_only",
         },
     }
 
@@ -212,6 +218,12 @@ def execute_btc_order(
             "status": "blocked",
             "blocked_reason": "live_trading_disabled",
         }
+    if settings.binance_force_testnet_execution and not settings.binance_testnet:
+        return {
+            **preview,
+            "status": "blocked",
+            "blocked_reason": "testnet_only_policy",
+        }
     if not credential_passphrase:
         return {
             **preview,
@@ -247,6 +259,79 @@ def execute_btc_order(
     }
 
 
+def check_binance_coinm_connectivity() -> dict[str, Any]:
+    """Read Binance COIN-M server time and BTCUSD_PERP symbol metadata."""
+
+    settings = get_settings()
+    base_url = _base_url()
+    server_time = _public_get(base_url, SERVER_TIME_PATH)
+    exchange_info = _public_get(base_url, EXCHANGE_INFO_PATH)
+    symbol_info = _symbol_info(exchange_info, ALLOWED_SYMBOL)
+    return {
+        "status": "ok",
+        "exchange": "binance_coin_m_futures",
+        "testnet": settings.binance_testnet,
+        "base_url": base_url,
+        "server_time": server_time,
+        "symbol": ALLOWED_SYMBOL,
+        "symbol_info": symbol_info,
+        "live_data_required": True,
+    }
+
+
+def get_binance_coinm_account_snapshot(
+    credential_passphrase: str | None = None,
+    credentials_path: str | None = None,
+) -> dict[str, Any]:
+    """Read BTC COIN-M account balance and position without placing orders."""
+
+    if not credential_passphrase:
+        return {
+            "status": "blocked",
+            "blocked_reason": "missing_credential_passphrase",
+            "credentials": get_binance_credentials_status(credentials_path),
+            "live_data_required": False,
+        }
+
+    settings = get_settings()
+    credentials = load_binance_credentials(
+        credential_passphrase,
+        credentials_path=credentials_path,
+    )
+    base_url = _base_url()
+    balance = _signed_get(
+        base_url=base_url,
+        path=BALANCE_PATH,
+        params={},
+        api_key=credentials.api_key,
+        api_secret=credentials.api_secret,
+        recv_window_ms=settings.binance_recv_window_ms,
+    )
+    positions = _signed_get(
+        base_url=base_url,
+        path=POSITION_RISK_PATH,
+        params={"pair": "BTCUSD"},
+        api_key=credentials.api_key,
+        api_secret=credentials.api_secret,
+        recv_window_ms=settings.binance_recv_window_ms,
+    )
+    btc_positions = [
+        position
+        for position in positions
+        if isinstance(position, dict) and position.get("symbol") == ALLOWED_SYMBOL
+    ]
+    return {
+        "status": "ok",
+        "exchange": "binance_coin_m_futures",
+        "testnet": settings.binance_testnet,
+        "base_url": base_url,
+        "credentials": get_binance_credentials_status(credentials_path),
+        "balance": balance,
+        "positions": btc_positions,
+        "live_data_required": True,
+    }
+
+
 def estimate_notional_usd(
     intent: BinanceOrderIntent,
     settings_path: str | None = None,
@@ -265,6 +350,24 @@ def signed_order_query(
 
     params = intent.request_params(timestamp_ms, recv_window_ms)
     query = parse.urlencode(params)
+    signature = hmac.new(api_secret.encode(), query.encode(), hashlib.sha256).hexdigest()
+    return f"{query}&signature={signature}"
+
+
+def signed_read_query(
+    params: dict[str, str],
+    api_secret: str,
+    timestamp_ms: int,
+    recv_window_ms: int = 5000,
+) -> str:
+    """Return a signed USER_DATA query string for read-only requests."""
+
+    request_params = {
+        **params,
+        "timestamp": str(timestamp_ms),
+        "recvWindow": str(recv_window_ms),
+    }
+    query = parse.urlencode(request_params)
     signature = hmac.new(api_secret.encode(), query.encode(), hashlib.sha256).hexdigest()
     return f"{query}&signature={signature}"
 
@@ -298,6 +401,63 @@ def _positive_decimal(value: str) -> Decimal:
         return Decimal(str(value))
     except InvalidOperation as exc:
         raise ValueError(f"invalid decimal value: {value}") from exc
+
+
+def _base_url() -> str:
+    return TESTNET_BASE_URL if get_settings().binance_testnet else MAINNET_BASE_URL
+
+
+def _public_get(base_url: str, path: str) -> dict[str, Any]:
+    http_request = request.Request(f"{base_url}{path}", method="GET")
+    with request.urlopen(http_request, timeout=10) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def _symbol_info(exchange_info: dict[str, Any], symbol: str) -> dict[str, Any]:
+    for item in exchange_info.get("symbols", []):
+        if isinstance(item, dict) and item.get("symbol") == symbol:
+            return {
+                "symbol": item.get("symbol"),
+                "pair": item.get("pair"),
+                "contractType": item.get("contractType"),
+                "contractStatus": item.get("contractStatus"),
+                "contractSize": item.get("contractSize"),
+                "baseAsset": item.get("baseAsset"),
+                "quoteAsset": item.get("quoteAsset"),
+                "marginAsset": item.get("marginAsset"),
+                "orderTypes": item.get("orderTypes"),
+                "timeInForce": item.get("timeInForce"),
+                "filters": item.get("filters"),
+            }
+    raise RuntimeError(f"Binance COIN-M symbol not found: {symbol}")
+
+
+def _signed_get(
+    *,
+    base_url: str,
+    path: str,
+    params: dict[str, str],
+    api_key: str,
+    api_secret: str,
+    recv_window_ms: int,
+) -> Any:
+    query = signed_read_query(
+        params=params,
+        api_secret=api_secret,
+        timestamp_ms=int(time.time() * 1000),
+        recv_window_ms=recv_window_ms,
+    )
+    http_request = request.Request(
+        f"{base_url}{path}?{query}",
+        headers={"X-MBX-APIKEY": api_key},
+        method="GET",
+    )
+    try:
+        with request.urlopen(http_request, timeout=10) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except error.HTTPError as exc:
+        payload = exc.read().decode("utf-8")
+        raise RuntimeError(f"Binance COIN-M read request failed: {exc.code} {payload}") from exc
 
 
 def _signed_post(

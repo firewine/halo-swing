@@ -400,6 +400,31 @@ def get_binance_credentials_status(
 
 
 @mcp.tool()
+def check_binance_coinm_connectivity() -> dict[str, Any]:
+    """Read Binance COIN-M server time and BTCUSD_PERP metadata."""
+
+    return _call_registered_tool("check_binance_coinm_connectivity")
+
+
+@mcp.tool()
+def get_binance_coinm_account_snapshot(
+    credential_passphrase: str | None = None,
+    credentials_path: str | None = None,
+) -> dict[str, Any]:
+    """Read Binance COIN-M balance and BTC position without placing orders."""
+
+    payload = {
+        "credential_passphrase": credential_passphrase,
+        "credentials_path": credentials_path,
+    }
+    return _audited_tool_call(
+        "get_binance_coinm_account_snapshot",
+        payload,
+        call_tool("get_binance_coinm_account_snapshot", payload),
+    )
+
+
+@mcp.tool()
 def preview_btc_order(
     side: str = "BUY",
     order_type: str = "MARKET",

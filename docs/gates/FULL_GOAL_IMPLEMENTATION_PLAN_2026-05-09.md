@@ -385,6 +385,9 @@ Implementation record:
 - Added `execute_btc_order` tool.
 - Added BTC-only COIN-M validation, confirmation guard, live-trading env flag guard, encrypted credential guard, risk limit guard, testnet default, and Binance HMAC SHA256 signing helper.
 - Added local-only trading admin page for encrypted credentials and BTC risk settings.
+- Added read-only Binance COIN-M connectivity and account snapshot tools.
+- Added management page controls for public connectivity check, read-only account snapshot, and order preview.
+- Added testnet-only execution policy guard with `HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true`.
 - No live order is submitted unless `confirm` is `CONFIRM_BTC_BINANCE_COINM_ORDER`, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, encrypted credentials are configured, and `credential_passphrase` is provided.
 
 Verification:
@@ -397,9 +400,19 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credent
 GET http://127.0.0.1:8766/api/status -> passed
 ```
 
+Follow-up implementation record:
+
+```text
+implemented_not_live_smoked:
+  - check_binance_coinm_connectivity
+  - get_binance_coinm_account_snapshot
+  - management page order preview form
+  - management page read-only account form
+  - testnet-only execution policy guard
+```
+
 Decision needed:
 
-- Whether first connected execution should remain testnet only.
 - Operational passphrase handling for unattended runs.
 
 ## 6. Immediate Next Action

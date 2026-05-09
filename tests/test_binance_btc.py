@@ -11,6 +11,7 @@ from halo_swing_mcp.binance_btc import (
     BinanceOrderIntent,
     execute_btc_order,
     preview_btc_order,
+    signed_read_query,
     signed_order_query,
 )
 from halo_swing_mcp.config import get_settings
@@ -125,6 +126,22 @@ def test_signed_order_query_uses_coin_m_hmac_sha256_signature() -> None:
     assert parse.parse_qs(query)["signature"] == [expected_signature]
 
 
+def test_signed_read_query_uses_hmac_sha256_signature() -> None:
+    query = signed_read_query(
+        {"pair": "BTCUSD"},
+        api_secret="secret",
+        timestamp_ms=1234567890,
+    )
+    unsigned = query.rsplit("&signature=", maxsplit=1)[0]
+    expected_signature = hmac.new(
+        b"secret",
+        unsigned.encode(),
+        hashlib.sha256,
+    ).hexdigest()
+
+    assert parse.parse_qs(query)["signature"] == [expected_signature]
+
+
 def test_encrypted_binance_credentials_round_trip(tmp_path: Path) -> None:
     credentials_path = tmp_path / "binance_credentials.enc.json"
     status = save_binance_credentials(
@@ -174,10 +191,12 @@ def test_binance_btc_tools_are_registry_backed(tmp_path: Path) -> None:
             "credentials_path": str(credentials_path),
         },
     )
+    account = call_tool("get_binance_coinm_account_snapshot")
 
     assert preview["status"] == "preview"
     assert blocked["status"] == "blocked"
     assert status["configured"] is True
+    assert account["blocked_reason"] == "missing_credential_passphrase"
 
 
 def test_trading_admin_status_is_secret_safe(tmp_path: Path, monkeypatch) -> None:

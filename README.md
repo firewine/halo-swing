@@ -76,6 +76,8 @@ get_btc_risk_status
 reset_btc_daily_risk_state
 save_binance_credentials
 get_binance_credentials_status
+check_binance_coinm_connectivity
+get_binance_coinm_account_snapshot
 preview_btc_order
 execute_btc_order
 ```
@@ -117,6 +119,7 @@ Start the local-only management page:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.trading_admin_web --host 127.0.0.1 --port 8766
 ```
 
-Open `http://127.0.0.1:8766` to set Binance COIN-M API credentials and BTC risk
-limits. Credentials are encrypted into `state/binance_credentials.enc.json`;
+Open `http://127.0.0.1:8766` to set Binance COIN-M API credentials, BTC risk
+limits, run public connectivity checks, read account/position snapshots, and
+preview orders. Credentials are encrypted into `state/binance_credentials.enc.json`;
 plaintext API keys, API secrets, and passphrases are not committed.

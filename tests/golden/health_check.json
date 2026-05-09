@@ -23,6 +23,8 @@
     "reset_btc_daily_risk_state",
     "save_binance_credentials",
     "get_binance_credentials_status",
+    "check_binance_coinm_connectivity",
+    "get_binance_coinm_account_snapshot",
     "preview_btc_order",
     "execute_btc_order"
   ],

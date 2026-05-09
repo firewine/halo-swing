@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BTC_COINM_ADMIN_ENCRYPTED_CREDENTIALS_VERIFIED
+status: BTC_COINM_READ_ONLY_FLOW_IMPLEMENTED
 gate_id: FULL_GOAL_STAGE_G_BTC_BINANCE
 review_tier: S2_medium
 
-next_atomic_step: await user decision for testnet-only first execution and operational passphrase handling
+next_atomic_step: run deferred tests and Binance testnet read-only smoke when user requests verification
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -57,6 +57,9 @@ done_means:
   - local trading admin page exists
   - Binance API credentials are encrypted at rest in local state
   - per-order notional, daily order count, and daily loss limits are configurable
+  - Binance COIN-M public connectivity and read-only account snapshot tools exist
+  - management page exposes connectivity check, account snapshot, and order preview
+  - first connected execution is guarded by testnet-only policy by default
   - non-BTC Binance order intents are rejected
   - execute path is blocked without confirmation, live-trading env flag, risk pass, encrypted credentials, and passphrase
   - Binance HMAC SHA256 signing helper is tested
@@ -64,7 +67,7 @@ done_means:
   - no non-BTC broker, DB/data artifact changes are added
   - gate packet, SSOT, and WORKING reflect BTC Binance status
 
-next_state_after_success: BTC_COINM_ADMIN_ENCRYPTED_CREDENTIALS_VERIFIED
+next_state_after_success: BTC_COINM_READ_ONLY_FLOW_IMPLEMENTED
 ```
 
 Previous completed directive:
@@ -213,6 +216,10 @@ btc_binance_guarded_execution:
     - encrypted Binance credential storage
     - configurable BTC risk settings
     - local-only trading admin page
+    - check_binance_coinm_connectivity tool
+    - get_binance_coinm_account_snapshot tool
+    - management page order preview and read-only account panels
+    - testnet-only execution policy guard
     - confirmation guard
     - live-trading env flag guard
     - encrypted Binance credential guard
@@ -456,6 +463,14 @@ btc_binance_guarded_execution_final:
   repo_runtime_artifacts_added: false
   dependency_changes: cryptography made explicit for encrypted credential storage
   live_order_submission_default: blocked
+  deferred_by_user:
+    - full pytest rerun after read-only flow additions
+    - Binance network smoke
+  static_verification_after_read_only_flow:
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m compileall -q src
+      result: passed
 ```
 
 ## 6. HARNESS_PROMOTION_RULE

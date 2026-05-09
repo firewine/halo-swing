@@ -116,6 +116,9 @@ Open `http://127.0.0.1:8766`. The admin page is local-only and manages:
 - max_daily_order_count
 - max_daily_loss_usd
 - coinm_contract_size_usd
+- Binance public connectivity check
+- read-only account and BTC position snapshot
+- BTC COIN-M order preview
 - daily counter reset
 ```
 
@@ -176,6 +179,8 @@ mcp_servers:
         - reset_btc_daily_risk_state
         - save_binance_credentials
         - get_binance_credentials_status
+        - check_binance_coinm_connectivity
+        - get_binance_coinm_account_snapshot
         - preview_btc_order
         - execute_btc_order
 ```

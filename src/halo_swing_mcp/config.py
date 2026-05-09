@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     artifact_dir: str = "artifacts"
     database_url: str | None = None
     binance_testnet: bool = True
+    binance_force_testnet_execution: bool = True
     binance_enable_live_trading: bool = False
     binance_recv_window_ms: int = 5000
     binance_credentials_path: str = "state/binance_credentials.enc.json"

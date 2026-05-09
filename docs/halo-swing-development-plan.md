@@ -3741,3 +3741,64 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_credentials.enc.json"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
   - GET http://127.0.0.1:8766/api/status -> passed
 ```
+
+## 3.27 BTC COIN-M Read-Only Connection And Safety Flow Record - 2026-05-09
+
+### A. 운영 정책
+
+```text
+policy:
+  first_connected_execution: testnet_only
+  passphrase_handling: manual_input_only
+  passphrase_persistence: forbidden
+  live_order_submission_default: blocked
+```
+
+`HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true`가 기본값이다. 이 값이 켜진 상태에서 `HALO_SWING_BINANCE_TESTNET=false`이면 `execute_btc_order`는 `testnet_only_policy`로 차단된다.
+
+### B. 구현 결과
+
+```text
+status: implemented_not_live_smoked
+implemented:
+  - check_binance_coinm_connectivity tool
+  - get_binance_coinm_account_snapshot tool
+  - Binance COIN-M public server time call
+  - BTCUSD_PERP exchangeInfo symbol lookup
+  - signed read-only balance query
+  - signed read-only BTCUSD position query
+  - management page connectivity button
+  - management page read-only account snapshot form
+  - management page order preview form
+```
+
+### C. Binance COIN-M endpoints
+
+```text
+public:
+  - GET /dapi/v1/time
+  - GET /dapi/v1/exchangeInfo
+signed_read_only:
+  - GET /dapi/v1/balance
+  - GET /dapi/v1/positionRisk?pair=BTCUSD
+trade:
+  - POST /dapi/v1/order
+```
+
+### D. 남은 검증
+
+사용자 요청에 따라 full test/live smoke는 다음 검증 단계에서 진행한다.
+
+```text
+not_run_now:
+  - pytest
+  - Binance live/testnet network smoke
+run_now:
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m compileall -q src -> passed
+needed_later:
+  - check_binance_coinm_connectivity with network
+  - get_binance_coinm_account_snapshot with testnet credentials
+  - preview form browser check
+  - testnet-only blocked execution check
+```
