@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: HARNESS_INPUT_SOURCE_CONFLICT_FAILURE_AUDIT_VERIFIED
-gate_id: HARNESS_INPUT_SOURCE_CONFLICT_FAILURE_AUDIT
+status: HARNESS_INPUT_FILE_ARGUMENT_FAILURE_AUDIT_VERIFIED
+gate_id: HARNESS_INPUT_FILE_ARGUMENT_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -214,6 +214,7 @@ done_means:
   - harness malformed input-json and input-file JSON failures exit nonzero, emit no stdout payload, and record failure audit events without serializing raw malformed input
   - harness unreadable or undecodable input-file failures exit nonzero, emit no stdout payload, and record failure audit events without attempting tool dispatch
   - harness conflicting input-json and input-file sources exit nonzero, emit no stdout payload, and record failure audit events without serializing raw input-json text
+  - harness blank or control-character input-file arguments exit nonzero, emit no stdout payload, and record failure audit events without serializing raw input-file text
   - Phase 6 performance report includes explicit score_calibration section
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
@@ -493,13 +494,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.432
-gate_packet: docs/halo-swing-development-plan.md#3.432
+portable_mirror: docs/halo-swing-development-plan.md#3.433
+gate_packet: docs/halo-swing-development-plan.md#3.433
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.432
+  - docs/halo-swing-development-plan.md#3.433
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -807,14 +808,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.432 Harness Input Source Conflict Failure Audit is verified. The CLI
-harness now rejects simultaneous `--input-json` and `--input-file` sources before
-file reads or tool dispatch, records only conflict/source metadata, and avoids
-serializing raw input-json text. Focused regression passed with 1 test,
-`tests/test_tool_registry.py` passed with 23 tests, `tests/test_audit.py` passed
-with 27 tests, and full pytest passed with 562 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.433 Harness Input File Argument Failure Audit is verified. The CLI
+harness now rejects blank or control-character `--input-file` arguments before
+file reads, conflict handling, or tool dispatch, records only safe input-file
+provided metadata, and avoids serializing raw invalid path text. Focused
+regression passed with 2 tests, `tests/test_tool_registry.py` passed with 25
+tests, `tests/test_audit.py` passed with 27 tests, and full pytest passed with
+564 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13226,6 +13227,57 @@ blocked_scope_unchanged:
     - migration or repository persistence
     - order submission
 
+harness_input_file_argument_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/harness.py
+    - tests/test_tool_registry.py
+  implementation:
+    - harness now rejects blank input_file arguments before file reads, input-source conflict handling, or tool dispatch
+    - harness now rejects input_file arguments containing ASCII control characters before file reads, input-source conflict handling, or tool dispatch
+    - input-file argument failure audits record input_source=input_file and input_file_provided without serializing raw invalid path text
+    - harness coverage verifies blank and control-character input-file failures exit nonzero, emit no stdout payload, and record failure audits without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_blank_input_file_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_input_file_control_character_with_failure_audit -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "25 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "564 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
 harness_input_source_conflict_failure_audit:
   status: verified
   changed_files:
@@ -18624,5 +18676,5 @@ archived_sources:
 
 active_source_of_execution:
   - CURRENT_DIRECTIVE
-  - docs/halo-swing-development-plan.md#3.431
+  - docs/halo-swing-development-plan.md#3.433
 ```

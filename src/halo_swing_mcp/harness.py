@@ -38,6 +38,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.input_file is not None:
+        input_file_error = _validate_input_file_argument(args.input_file)
+        if input_file_error is not None:
+            if not args.no_audit:
+                append_tool_audit_event(
+                    command_name=args.command,
+                    input_payload={
+                        "input_source": "input_file",
+                        "input_file_provided": True,
+                    },
+                    result=None,
+                    outcome="failure",
+                    actor="harness",
+                    audit_log_path=args.audit_log_path,
+                    error=repr(input_file_error),
+                )
+            raise input_file_error
+
     if args.input_file and args.input_json is not None:
         error = ValueError("input-json and input-file are mutually exclusive")
         if not args.no_audit:
@@ -57,7 +75,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise error
 
     try:
-        if args.input_file:
+        if args.input_file is not None:
             with open(args.input_file, encoding="utf-8") as handle:
                 input_payload = json.load(handle)
         else:
@@ -139,6 +157,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
+
+
+def _validate_input_file_argument(input_file: str) -> ValueError | None:
+    if not input_file.strip():
+        return ValueError("input-file must be a nonempty string")
+    if any(ord(character) < 32 for character in input_file):
+        return ValueError("input-file must not contain control characters")
+    return None
 
 
 if __name__ == "__main__":

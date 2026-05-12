@@ -9302,6 +9302,63 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.433 Harness Input File Argument Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+The harness now audits unreadable files and input-source conflicts. The raw
+`--input-file` argument itself still needed validation before file reads: blank
+values could behave like an omitted file, and control-character paths could flow
+into failure handling. This slice rejects invalid input-file arguments before
+file reads, conflict handling, or tool dispatch while recording only safe
+provided-source metadata.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness now rejects blank input_file arguments before file reads, input-source conflict handling, or tool dispatch
+  - harness now rejects input_file arguments containing ASCII control characters before file reads, input-source conflict handling, or tool dispatch
+  - input-file argument failure audits record input_source=input_file and input_file_provided without serializing raw invalid path text
+  - harness coverage verifies blank and control-character input-file failures exit nonzero and emit no stdout payload
+  - harness coverage verifies failure audits record resource_id, failure outcome, safe input-file metadata, and public error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_blank_input_file_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_input_file_control_character_with_failure_audit -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 25 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 564 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.432 Harness Input Source Conflict Failure Audit Record - 2026-05-12
 
 ### A. 목적
