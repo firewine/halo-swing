@@ -2059,7 +2059,7 @@ phase_6_feedback_tool_manifest:
   verification:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
       result: "22 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+    - command: ./.venv/bin/ruff check tests/test_mvp_tools.py
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
       result: passed, suggest_weight_update advertised
@@ -2067,7 +2067,7 @@ phase_6_feedback_tool_manifest:
       result: passed, challenger_config.v1 present
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "98 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+    - command: ./.venv/bin/ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
       result: passed, status blocked as expected with environment gates unchanged
@@ -13196,17 +13196,17 @@ scoring_tool_remaining_identity_control_character_audit:
   verification:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_scoring_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q
       result: "7 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+    - command: ./.venv/bin/ruff check tests/test_mvp_tools.py
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
       result: "168 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+    - command: ./.venv/bin/ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
       result: "533 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_425_audit.jsonl
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
       result: "passed, status blocked as expected"
     - command: git diff --check
       result: passed

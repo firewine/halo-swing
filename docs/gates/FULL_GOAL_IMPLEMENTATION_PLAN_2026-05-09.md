@@ -4029,9 +4029,9 @@ git status --short --ignored state -> ignored local state/ only
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_score_performance_includes_attribution_and_ablation tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit -q -> 3 passed, evaluate_score_performance invalid days failure-audit coverage enforced
-PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 109 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+./.venv/bin/ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 444 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_380_audit.jsonl -> passed, status blocked as expected

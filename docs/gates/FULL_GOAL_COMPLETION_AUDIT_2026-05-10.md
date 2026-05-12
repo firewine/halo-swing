@@ -540,11 +540,11 @@ PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 22 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, suggest_weight_update advertised
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit -> passed, challenger_config.v1 present
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 98 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+./.venv/bin/ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_runtime_guard.py -q -> 28 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_runtime_guard.py -> passed
@@ -4177,7 +4177,7 @@ PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 168 pa
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 533 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_425_audit.jsonl -> passed, status blocked as expected
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
 git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
