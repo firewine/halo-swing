@@ -1,8 +1,13 @@
 import ast
 import inspect
 import json
+import subprocess
+import sys
 from pathlib import Path
 
+import pytest
+
+from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp import server
 from halo_swing_mcp.harness import build_parser
 from halo_swing_mcp.tool_registry import TOOL_REGISTRY, TOOL_SPECS, call_tool, tool_names
@@ -169,6 +174,68 @@ def test_server_mcp_tool_wrapper_parameters_match_registered_functions() -> None
 def test_registry_calls_registered_payloads() -> None:
     assert call_tool("health_check") == health_check()
     assert call_tool("get_market_snapshot", {"symbols": ["QQQ"]})["snapshots"]
+
+
+def test_registry_rejects_unexpected_payload_keys_before_dispatch() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        call_tool(
+            "evaluate_score_performance",
+            {"signals": [], "extra": True},
+        )
+
+    error = str(exc_info.value)
+    assert error == "evaluate_score_performance got unexpected input field: extra"
+    assert "evaluate_recorded_score_performance" not in error
+    assert "unexpected keyword argument" not in error
+
+
+def test_registry_rejects_non_object_payloads_before_dispatch() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        call_tool("score_leverage_swing", ["bad"])  # type: ignore[arg-type]
+
+    assert str(exc_info.value) == "score_leverage_swing input payload must be an object"
+
+
+def test_registry_keeps_var_keyword_tools_permissive() -> None:
+    assert call_tool("health_check", {"ignored": True}) == health_check()
+
+
+def test_harness_rejects_unexpected_payload_key_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"signals": [], "extra": True}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "evaluate_score_performance",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "evaluate_score_performance got unexpected input field: extra"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert "evaluate_recorded_score_performance" not in result.stderr
+    assert "unexpected keyword argument" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "evaluate_score_performance"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
 
 
 def test_default_source_does_not_import_live_db_or_broker_clients() -> None:

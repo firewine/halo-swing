@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -76,7 +77,41 @@ class ToolSpec:
     live_data_required: bool = False
 
     def call(self, payload: dict[str, Any] | None = None) -> dict[str, Any]:
-        return self.function(**(payload or {}))
+        if payload is None:
+            input_payload: dict[str, Any] = {}
+        elif not isinstance(payload, dict):
+            raise ValueError(f"{self.name} input payload must be an object")
+        else:
+            input_payload = payload
+
+        accepted_keys = self._accepted_payload_keys()
+        if accepted_keys is not None:
+            unexpected_keys = sorted(set(input_payload) - accepted_keys)
+            if unexpected_keys:
+                field_label = "field" if len(unexpected_keys) == 1 else "fields"
+                raise ValueError(
+                    f"{self.name} got unexpected input {field_label}: "
+                    f"{', '.join(unexpected_keys)}"
+                )
+
+        return self.function(**input_payload)
+
+    def _accepted_payload_keys(self) -> set[str] | None:
+        parameters = inspect.signature(self.function).parameters
+        if any(
+            parameter.kind == inspect.Parameter.VAR_KEYWORD
+            for parameter in parameters.values()
+        ):
+            return None
+        accepted_kinds = {
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        }
+        return {
+            name
+            for name, parameter in parameters.items()
+            if parameter.kind in accepted_kinds
+        }
 
 
 TOOL_SPECS: tuple[ToolSpec, ...] = (

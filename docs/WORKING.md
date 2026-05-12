@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: SCORE_PERFORMANCE_SIGNALS_FAILURE_AUDIT_VERIFIED
-gate_id: SCORE_PERFORMANCE_SIGNALS_FAILURE_AUDIT
+status: PUBLIC_TOOL_BOUNDARY_FAILURE_AUDIT_VERIFIED
+gate_id: PUBLIC_TOOL_BOUNDARY_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -204,6 +204,10 @@ done_means:
   - evaluate_score_performance registry wrapper routes explicit caller-supplied signals through the provided-signal scoring validator before ledger or fixture fallback
   - harness evaluate_score_performance invalid signals failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - harness evaluate_score_performance invalid caller-supplied signals failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance remaining score metric, realized_r, age_days_ago, and component score value failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - shared ToolSpec registry rejects non-object payloads before dispatch
+  - shared ToolSpec registry rejects unexpected payload keys before dispatch with public tool names instead of internal Python TypeError text
+  - harness unexpected payload-key failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - Phase 6 performance report includes explicit score_calibration section
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
@@ -483,13 +487,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.427
-gate_packet: docs/halo-swing-development-plan.md#3.427
+portable_mirror: docs/halo-swing-development-plan.md#3.428
+gate_packet: docs/halo-swing-development-plan.md#3.428
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.427
+  - docs/halo-swing-development-plan.md#3.428
+  - src/halo_swing_mcp/tool_registry.py
+  - tests/test_tool_registry.py
   - src/halo_swing_mcp/tools/recording.py
   - src/halo_swing_mcp/server.py
   - src/halo_swing_mcp/tools/scoring.py
@@ -794,13 +800,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.427 Score Performance Provided Signals Harness Failure Audit is
-verified. The public `evaluate_score_performance` registry wrapper now accepts
-explicit `signals` payloads and routes them through the existing provided-signal
-scoring validator before ledger or fixture fallback. Focused regression passed
-with 17 tests, `tests/test_mvp_tools.py` passed with 179 tests, and full pytest
-passed with 544 tests. Ruff, health_check, get_integration_readiness, diff
-whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.428 Public Tool Boundary Failure Audit is verified. Harness coverage
+now includes the remaining caller-supplied signal validation cases, and the
+shared ToolSpec registry rejects non-object payloads and unexpected input keys
+before dispatching to implementation functions. Focused regression passed with
+25 tests, `tests/test_mvp_tools.py tests/test_tool_registry.py` passed with 196
+tests, and full pytest passed with 552 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13212,6 +13219,60 @@ blocked_scope_unchanged:
     - migration or repository persistence
     - order submission
 
+public_tool_boundary_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tool_registry.py
+    - tests/test_mvp_tools.py
+    - tests/test_tool_registry.py
+  implementation:
+    - ToolSpec.call now rejects non-object payloads before dispatch so direct registry callers receive a public ValueError instead of Python call mechanics
+    - ToolSpec.call now rejects unexpected payload keys for fixed-signature tools while preserving permissive **kwargs behavior for health_check
+    - harness coverage verifies unexpected evaluate_score_performance keys exit nonzero, emit no stdout payload, and record failure audits without output_summary or internal implementation names
+    - harness coverage now verifies boolean final_score failures exit nonzero before performance math
+    - harness coverage now verifies nonfinite realized_r failures exit nonzero before performance math
+    - harness coverage now verifies negative age_days_ago failures exit nonzero before evaluation window metadata
+    - harness coverage now verifies nonnumeric component score values fail before attribution or ablation calculations
+    - harness coverage verifies failure audits preserve original input, resource_id, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_signals_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_score_performance_signals_with_failure_audit tests/test_tool_registry.py::test_registry_rejects_unexpected_payload_keys_before_dispatch tests/test_tool_registry.py::test_registry_rejects_non_object_payloads_before_dispatch tests/test_tool_registry.py::test_registry_keeps_var_keyword_tools_permissive tests/test_tool_registry.py::test_harness_rejects_unexpected_payload_key_with_failure_audit -q
+      result: "25 passed"
+    - command: ./.venv/bin/ruff check src/halo_swing_mcp/tool_registry.py tests/test_tool_registry.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_tool_registry.py -q
+      result: "196 passed"
+    - command: ./.venv/bin/ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "552 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
 score_performance_signals_failure_audit:
   status: verified
   changed_files:
@@ -18349,5 +18410,5 @@ archived_sources:
 
 active_source_of_execution:
   - CURRENT_DIRECTIVE
-  - docs/halo-swing-development-plan.md#3.427
+  - docs/halo-swing-development-plan.md#3.428
 ```

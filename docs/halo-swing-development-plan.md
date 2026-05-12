@@ -9302,6 +9302,66 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.428 Public Tool Boundary Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`evaluate_score_performance` direct validation covered boolean score metrics,
+nonfinite realized-R, negative `age_days_ago`, and nonnumeric component score
+values. The harness failure-audit boundary covered the broader provided-signals
+input classes but not those remaining representative row-field failures. This
+slice closes that CLI/audit matrix and hardens the shared tool registry so
+unexpected payload keys fail with public tool names instead of internal Python
+`TypeError` text.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - ToolSpec.call now rejects non-object payloads before implementation dispatch
+  - ToolSpec.call now rejects unexpected payload keys for fixed-signature tools while preserving **kwargs behavior for health_check
+  - harness coverage verifies unexpected evaluate_score_performance keys exit nonzero and do not expose internal implementation names
+  - harness coverage verifies boolean final_score failures exit nonzero before performance math
+  - harness coverage verifies nonfinite realized_r failures exit nonzero before performance math
+  - harness coverage verifies negative age_days_ago failures exit nonzero before evaluation window metadata
+  - harness coverage verifies nonnumeric component score values fail before attribution or ablation calculations
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_signals_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_score_performance_signals_with_failure_audit tests/test_tool_registry.py::test_registry_rejects_unexpected_payload_keys_before_dispatch tests/test_tool_registry.py::test_registry_rejects_non_object_payloads_before_dispatch tests/test_tool_registry.py::test_registry_keeps_var_keyword_tools_permissive tests/test_tool_registry.py::test_harness_rejects_unexpected_payload_key_with_failure_audit -q -> 25 passed
+  - ./.venv/bin/ruff check src/halo_swing_mcp/tool_registry.py tests/test_tool_registry.py tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_tool_registry.py -q -> 196 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 552 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.427 Score Performance Provided Signals Harness Failure Audit Record - 2026-05-12
 
 ### A. 목적
