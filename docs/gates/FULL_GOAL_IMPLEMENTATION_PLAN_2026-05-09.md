@@ -3999,9 +3999,9 @@ git status --short --ignored state -> ignored local state/ only
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_market_snapshot_rejects_invalid_symbols_container tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_symbol_control_character tests/test_mvp_tools.py::test_harness_rejects_invalid_market_symbols_container_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_indicator_symbol_control_character_with_failure_audit -q -> 12 passed, market snapshot symbols container contract coverage enforced
-PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 107 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+./.venv/bin/ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 442 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_378_audit.jsonl -> passed, status blocked as expected
@@ -4014,9 +4014,9 @@ git status --short --ignored state -> ignored local state/ only
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_event_calendar_rejects_invalid_days_identity tests/test_mvp_tools.py::test_harness_rejects_invalid_event_calendar_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_news_topic_control_character_with_failure_audit -q -> 10 passed, event calendar invalid days failure-audit coverage enforced
-PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 108 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+./.venv/bin/ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 443 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_379_audit.jsonl -> passed, status blocked as expected
@@ -4695,6 +4695,21 @@ PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 530 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_424_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.425 Scoring Tool Remaining Identity Control Character Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_scoring_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q -> 7 passed, scoring tool remaining identity control-character coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 168 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 533 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
 git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only

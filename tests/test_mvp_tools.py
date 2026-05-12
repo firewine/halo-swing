@@ -3602,6 +3602,63 @@ def test_harness_rejects_scoring_asset_control_character_with_failure_audit(
     assert "asset must not contain control characters" in event["details"]["error"]
 
 
+@pytest.mark.parametrize(
+    ("tool_name", "input_payload", "expected_error"),
+    [
+        (
+            "score_leverage_swing",
+            {"asset": "TQQQ", "timeframe": "swing_3d_10d\n"},
+            "timeframe must not contain control characters",
+        ),
+        (
+            "generate_trade_guide",
+            {"asset": "TQQQ\n"},
+            "asset must not contain control characters",
+        ),
+        (
+            "evaluate_position",
+            {"asset": "TQQQ\n"},
+            "asset must not contain control characters",
+        ),
+    ],
+)
+def test_harness_rejects_remaining_scoring_identity_control_characters_with_failure_audit(
+    tmp_path: Path,
+    tool_name: str,
+    input_payload: dict[str, object],
+    expected_error: str,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            tool_name,
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == tool_name
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:

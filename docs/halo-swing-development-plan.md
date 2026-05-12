@@ -6838,11 +6838,11 @@ not_added:
 ```text
 verification:
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 22 passed
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+  - ./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, suggest_weight_update advertised
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit -> passed, challenger_config.v1 present
   - PYTHONPATH=src ./.venv/bin/python -m pytest -> 98 passed
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - ./.venv/bin/ruff check . -> passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 ```
 
@@ -9299,6 +9299,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
   - git diff --check -> passed
   - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.425 Scoring Tool Remaining Identity Control Character Audit Record - 2026-05-12
+
+### A. 목적
+
+`score_leverage_swing`, `generate_trade_guide`, and `evaluate_position` already
+reject ASCII control characters in public identity fields. Previous harness
+failure-audit coverage covered scoring asset control characters and trade-guide
+timeframe control characters. This slice closes the remaining harness matrix so
+score timeframe, trade-guide asset, and evaluate-position asset control
+characters cannot produce stdout payloads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because scoring identity normalization already rejects ASCII control characters at the public boundary
+  - harness coverage verifies score_leverage_swing timeframe control-character failures exit nonzero before scoring payload emission
+  - harness coverage verifies generate_trade_guide asset control-character failures exit nonzero before guide construction
+  - harness coverage verifies evaluate_position asset control-character failures exit nonzero before position-state calculation
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_scoring_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q -> 7 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 168 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 533 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
   - git status --short --ignored state -> ignored local state/ only
 ```
 
