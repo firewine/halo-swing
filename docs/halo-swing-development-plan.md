@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.426 Position Numeric Remaining Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`evaluate_position` already rejects invalid `entry_price`, `current_price`, and
+`size` inputs before PnL and position-state calculations. Direct coverage covered
+multiple invalid numeric shapes, while the harness failure-audit boundary only
+covered one `current_price=0` case. This slice closes the remaining representative
+CLI failure cases so malformed numeric inputs cannot produce stdout payloads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because evaluate_position already rejects invalid numeric values at the public boundary
+  - harness coverage verifies entry_price=0 and entry_price=false failures exit nonzero before PnL or position-state calculation
+  - harness coverage verifies current_price=false exits nonzero before PnL or position-state calculation
+  - harness coverage verifies size="3" and size=-1 failures exit nonzero before position-state calculation
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_position_rejects_invalid_numeric_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_position_numeric_input_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_position_numeric_inputs_with_failure_audit -q -> 7 passed
+  - ./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 173 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 538 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.425 Scoring Tool Remaining Identity Control Character Audit Record - 2026-05-12
 
 ### A. 목적

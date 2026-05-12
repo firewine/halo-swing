@@ -3465,6 +3465,67 @@ def test_harness_rejects_invalid_position_numeric_input_with_failure_audit(
     )
 
 
+@pytest.mark.parametrize(
+    ("input_payload", "expected_error"),
+    [
+        (
+            {"asset": "TQQQ", "entry_price": 0},
+            "entry_price must be a positive finite number",
+        ),
+        (
+            {"asset": "TQQQ", "entry_price": False},
+            "entry_price must be a positive finite number",
+        ),
+        (
+            {"asset": "TQQQ", "current_price": False},
+            "current_price must be a positive finite number",
+        ),
+        (
+            {"asset": "TQQQ", "size": "3"},
+            "size must be a positive finite number",
+        ),
+        (
+            {"asset": "TQQQ", "size": -1},
+            "size must be a positive finite number",
+        ),
+    ],
+)
+def test_harness_rejects_remaining_position_numeric_inputs_with_failure_audit(
+    tmp_path: Path,
+    input_payload: dict[str, object],
+    expected_error: str,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "evaluate_position",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "evaluate_position"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_harness_rejects_blank_scoring_asset_with_failure_audit(
     tmp_path: Path,
 ) -> None:

@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: SCORING_TOOL_REMAINING_IDENTITY_CONTROL_CHARACTER_AUDIT_VERIFIED
-gate_id: SCORING_TOOL_REMAINING_IDENTITY_CONTROL_CHARACTER_AUDIT
+status: POSITION_NUMERIC_REMAINING_FAILURE_AUDIT_VERIFIED
+gate_id: POSITION_NUMERIC_REMAINING_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -139,6 +139,7 @@ done_means:
   - generate_trade_guide exposes trade_guide.v1 with time_exit_conditions and no-order-submission guards
   - evaluate_position exposes position_management.v1 with WAIT/TRIM/EXIT/STOP and no-order-submission guards
   - evaluate_position validates entry_price, current_price, and size as optional positive finite numbers before PnL or position-state calculations
+  - harness evaluate_position remaining entry_price, current_price, and size numeric failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - get_macro_snapshot exposes macro_filter_contract and macro_filter_summary contracts
   - score_leverage_swing honors macro filter block flags
   - score_leverage_swing exposes pullback and breadth component scores
@@ -478,13 +479,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.425
-gate_packet: docs/halo-swing-development-plan.md#3.425
+portable_mirror: docs/halo-swing-development-plan.md#3.426
+gate_packet: docs/halo-swing-development-plan.md#3.426
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.425
+  - docs/halo-swing-development-plan.md#3.426
   - src/halo_swing_mcp/tools/scoring.py
   - tests/test_mvp_tools.py
 
@@ -13191,6 +13192,55 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+position_numeric_remaining_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - tests-only slice; no source code change was needed because evaluate_position already rejects invalid numeric inputs at the public boundary
+    - harness coverage now verifies entry_price=0 and entry_price=false failures exit nonzero before PnL or position-state calculation
+    - harness coverage now verifies current_price=false failures exit nonzero before PnL or position-state calculation
+    - harness coverage now verifies size="3" and size=-1 failures exit nonzero before position-state calculation
+    - harness coverage verifies failure audits preserve original input, resource_id, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_position_rejects_invalid_numeric_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_position_numeric_input_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_position_numeric_inputs_with_failure_audit -q
+      result: "7 passed"
+    - command: ./.venv/bin/ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "173 passed"
+    - command: ./.venv/bin/ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "538 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading
