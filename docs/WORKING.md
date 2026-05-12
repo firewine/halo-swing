@@ -13199,11 +13199,11 @@ position_review_report_numeric_input_failure_audit:
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_418_audit.jsonl
       result: "passed, status blocked as expected"
     - command: git diff --check
-      result: pending_final_audit
+      result: passed
     - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
-      result: pending_final_audit
+      result: "passed, no blocked-path changes"
     - command: git status --short --ignored state
-      result: pending_final_audit
+      result: "ignored local state/ only"
   blocked_scope_unchanged:
     - runtime scheduler
     - audit event secret re-exposure

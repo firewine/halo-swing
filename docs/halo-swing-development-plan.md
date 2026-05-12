@@ -9353,9 +9353,9 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 499 passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_418_audit.jsonl -> passed, status blocked as expected
-  - git diff --check -> pending_final_audit
-  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> pending_final_audit
-  - git status --short --ignored state -> pending_final_audit
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
 ```
 
 ## 3.417 Latest Report Extra Evidence Cards Type Failure Audit Record - 2026-05-12

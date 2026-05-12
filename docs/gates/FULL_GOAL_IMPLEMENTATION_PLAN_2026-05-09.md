@@ -4594,3 +4594,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.418 Position Review Report Numeric Input Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_rejects_invalid_numeric_inputs_before_position_evaluation tests/test_reporting.py::test_harness_rejects_position_review_numeric_inputs_with_failure_audit -q -> 9 passed, position review report numeric input failure-audit coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 205 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 499 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_418_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
