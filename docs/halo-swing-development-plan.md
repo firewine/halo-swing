@@ -9302,6 +9302,119 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.420 Cron Prompt Type Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`generate_cron_prompt_pack(asset/timeframe/include_position_review=...)`
+already rejects non-string identity values and non-boolean
+`include_position_review` values before prompt construction. Previous harness
+coverage covered blank/control-character identities and one truthy string boolean
+case. This slice adds the remaining public harness failure-audit coverage for
+type failures that could otherwise be hidden behind Python truthiness or prompt
+generation.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because generate_cron_prompt_pack already rejects the invalid values at the public boundary
+  - harness coverage verifies asset=123 exits nonzero before prompt payload construction
+  - harness coverage verifies timeframe=123 exits nonzero before prompt payload construction
+  - harness coverage verifies include_position_review=0 and include_position_review=null exit nonzero before truthiness can alter prompt composition
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_non_bool_include_position_review tests/test_reporting.py::test_harness_rejects_cron_prompt_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_non_bool_include_position_review_with_failure_audit tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_position_review_with_failure_audit -q -> 14 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 212 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 517 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_420_audit.jsonl -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.419 Latest Report Identity Type Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`generate_latest_signal_report(asset/timeframe/report_intent=...)` already
+validated blank and non-string identity values before scoring, chart rendering,
+or report contract lookup. Previous harness coverage emphasized blank and
+control-character failures. This slice adds public harness failure-audit coverage
+for non-string identity values so CLI/MCP boundary behavior matches direct tool
+coverage.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because generate_latest_signal_report already rejects non-string asset, timeframe, and report_intent values
+  - harness coverage verifies asset=123 exits nonzero before chart artifact creation
+  - harness coverage verifies timeframe=123 exits nonzero before chart artifact creation
+  - harness coverage verifies report_intent=123 exits nonzero before report contract lookup or payload construction
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_invalid_report_intent_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_harness_rejects_report_intent_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_timeframe_type_with_failure_audit -q -> 12 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 208 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 502 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_419_audit.jsonl -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.418 Position Review Report Numeric Input Failure Audit Record - 2026-05-12
 
 ### A. 목적

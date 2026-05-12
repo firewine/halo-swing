@@ -23,8 +23,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: POSITION_REVIEW_REPORT_NUMERIC_INPUT_FAILURE_AUDIT_VERIFIED
-gate_id: POSITION_REVIEW_REPORT_NUMERIC_INPUT_FAILURE_AUDIT
+status: CRON_PROMPT_TYPE_FAILURE_AUDIT_VERIFIED
+gate_id: CRON_PROMPT_TYPE_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -202,7 +202,9 @@ done_means:
   - report contract guard verifies report_intent_contract key schema exactly matches name/schedule_hint/decision_focus/required_sections
   - report contract guard verifies report_intent_contract values exactly match the REPORT_INTENTS registry
   - generate_latest_signal_report normalizes report_intent by type check, control-character rejection, trim, and lowercase before report contract lookup
+  - harness generate_latest_signal_report non-string report_intent failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - generate_latest_signal_report, generate_position_review_report, and generate_cron_prompt_pack reject ASCII control characters in asset, timeframe, and chart_timeframe identity fields before scoring, chart rendering, prompt construction, or report construction
+  - harness generate_latest_signal_report non-string asset and timeframe failures exit nonzero, emit no stdout payload, create no chart artifacts, and record failure audit events without output_summary
   - generate_latest_signal_report rejects unsupported report_intent values at the public boundary with allowed registry evidence
   - harness generate_latest_signal_report rejects unsupported report_intent values with failure audit evidence and no output summary
   - report contract guard verifies Telegram required_sections match the selected report intent
@@ -222,6 +224,8 @@ done_means:
   - generate_cron_prompt_pack returns guarded Hermes prompt templates without adding a scheduler
   - generate_cron_prompt_pack aligns report prompt input_json and expected_sections with report intent contracts
   - generate_cron_prompt_pack trims and uppercases asset identity before emitting prompt input_json, text, and idempotency keys
+  - harness generate_cron_prompt_pack non-string asset and timeframe failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness generate_cron_prompt_pack numeric and null include_position_review failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - generate_cron_prompt_pack rejects blank asset identity before emitting empty prompt input_json or idempotency keys
   - generate_cron_prompt_pack trims timeframe identity and rejects blank/non-string timeframe values before emitting prompt input_json
   - generate_cron_prompt_pack rejects non-boolean include_position_review values before truthiness can alter prompt composition
@@ -448,13 +452,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.418
-gate_packet: docs/halo-swing-development-plan.md#3.418
+portable_mirror: docs/halo-swing-development-plan.md#3.420
+gate_packet: docs/halo-swing-development-plan.md#3.420
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.418
+  - docs/halo-swing-development-plan.md#3.420
   - src/halo_swing_mcp/tools/recording.py
   - src/halo_swing_mcp/tools/scoring.py
   - tests/test_mvp_tools.py
@@ -13162,6 +13166,104 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+cron_prompt_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - tests-only slice; no source code change was needed because generate_cron_prompt_pack already rejects non-string asset/timeframe and non-boolean include_position_review values before prompt construction
+    - harness coverage now verifies non-string asset failures exit nonzero before prompt payload construction
+    - harness coverage now verifies non-string timeframe failures exit nonzero before prompt payload construction
+    - harness coverage now verifies numeric and null include_position_review failures exit nonzero before Python truthiness can alter prompt composition
+    - harness coverage verifies failure audits preserve original input, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_non_bool_include_position_review tests/test_reporting.py::test_harness_rejects_cron_prompt_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_non_bool_include_position_review_with_failure_audit tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_position_review_with_failure_audit -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "212 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "517 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_420_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+latest_report_identity_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - tests-only slice; no source code change was needed because generate_latest_signal_report already rejects non-string asset, timeframe, and report_intent values at the public boundary
+    - harness coverage now verifies non-string asset failures exit nonzero before chart artifact creation
+    - harness coverage now verifies non-string timeframe failures exit nonzero before chart artifact creation
+    - harness coverage now verifies non-string report_intent failures exit nonzero before report contract lookup or payload construction
+    - harness coverage verifies failure audits preserve original input, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_invalid_report_intent_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_harness_rejects_report_intent_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_timeframe_type_with_failure_audit -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "208 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "502 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_419_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

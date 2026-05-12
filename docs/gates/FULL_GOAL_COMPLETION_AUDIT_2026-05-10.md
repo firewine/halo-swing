@@ -4078,7 +4078,37 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 77. Next Concrete Actions
+## 77. 3.419 Latest Report Identity Type Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_invalid_report_intent_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_harness_rejects_report_intent_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_timeframe_type_with_failure_audit -q -> 12 passed, latest report identity type failure-audit coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 208 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 502 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_419_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 78. 3.420 Cron Prompt Type Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_non_bool_include_position_review tests/test_reporting.py::test_harness_rejects_cron_prompt_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_non_bool_include_position_review_with_failure_audit tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_position_review_with_failure_audit -q -> 14 passed, cron prompt type failure-audit coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 212 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 517 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_420_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 79. Next Concrete Actions
 
 Choose one of:
 

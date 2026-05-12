@@ -11507,6 +11507,41 @@ def test_harness_rejects_invalid_report_intent_with_failure_audit(
     assert "report_intent must be a nonempty string" in event["details"]["error"]
 
 
+def test_harness_rejects_report_intent_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"asset": "TQQQ", "report_intent": 123}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "report_intent must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "report_intent must be a nonempty string" in event["details"]["error"]
+
+
 def test_harness_rejects_report_intent_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
@@ -11551,6 +11586,47 @@ def test_harness_rejects_blank_latest_report_asset_with_failure_audit(
     chart_dir = tmp_path / "chart"
     input_payload = {
         "asset": "   ",
+        "include_chart": True,
+        "chart_output_dir": str(chart_dir),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "asset must be a nonempty string" in result.stderr
+    assert not chart_dir.exists()
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "asset must be a nonempty string" in event["details"]["error"]
+
+
+def test_harness_rejects_latest_report_asset_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    chart_dir = tmp_path / "chart"
+    input_payload = {
+        "asset": 123,
         "include_chart": True,
         "chart_output_dir": str(chart_dir),
     }
@@ -11668,6 +11744,48 @@ def test_harness_rejects_blank_latest_report_timeframe_with_failure_audit(
     assert "timeframe must be a nonempty string" in event["details"]["error"]
 
 
+def test_harness_rejects_latest_report_timeframe_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    chart_dir = tmp_path / "chart"
+    input_payload = {
+        "asset": "TQQQ",
+        "timeframe": 123,
+        "include_chart": True,
+        "chart_output_dir": str(chart_dir),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "timeframe must be a nonempty string" in result.stderr
+    assert not chart_dir.exists()
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "timeframe must be a nonempty string" in event["details"]["error"]
+
+
 def test_harness_rejects_latest_report_timeframe_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
@@ -11715,6 +11833,41 @@ def test_harness_rejects_blank_cron_prompt_asset_with_failure_audit(
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
     input_payload = {"asset": "   "}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_cron_prompt_pack",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "asset must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_cron_prompt_pack"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "asset must be a nonempty string" in event["details"]["error"]
+
+
+def test_harness_rejects_cron_prompt_asset_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"asset": 123}
     result = subprocess.run(
         [
             sys.executable,
@@ -11815,6 +11968,41 @@ def test_harness_rejects_blank_cron_prompt_timeframe_with_failure_audit(
     assert "timeframe must be a nonempty string" in event["details"]["error"]
 
 
+def test_harness_rejects_cron_prompt_timeframe_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"asset": "TQQQ", "timeframe": 123}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_cron_prompt_pack",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "timeframe must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_cron_prompt_pack"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "timeframe must be a nonempty string" in event["details"]["error"]
+
+
 def test_harness_rejects_cron_prompt_timeframe_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
@@ -11855,6 +12043,46 @@ def test_harness_rejects_non_bool_include_position_review_with_failure_audit(
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
     input_payload = {"asset": "TQQQ", "include_position_review": "false"}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_cron_prompt_pack",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "include_position_review must be a boolean" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_cron_prompt_pack"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "include_position_review must be a boolean" in event["details"]["error"]
+
+
+@pytest.mark.parametrize("include_position_review", [0, None])
+def test_harness_rejects_remaining_non_bool_include_position_review_with_failure_audit(
+    tmp_path: Path,
+    include_position_review: object,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {
+        "asset": "TQQQ",
+        "include_position_review": include_position_review,
+    }
     result = subprocess.run(
         [
             sys.executable,
