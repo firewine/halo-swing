@@ -4639,3 +4639,48 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.422 Latest Report Chart Input Type Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_non_bool_include_chart tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_harness_rejects_non_bool_include_chart_with_failure_audit tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_chart_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_output_dir_type_with_failure_audit -q -> 19 passed, latest report chart input type failure-audit coverage enforced
+./.venv/bin/ruff check tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 218 passed
+./.venv/bin/ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 523 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.421 Score Performance Provided Signals Input Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_marks_unsupported_long_fixture_window tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals -q -> 12 passed, score performance provided signals input coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 160 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 517 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_421_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.422 Latest Report Chart Input Type Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_chart_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_output_dir_type_with_failure_audit -q -> 6 passed, latest report chart input type failure-audit coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 218 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 523 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_421_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

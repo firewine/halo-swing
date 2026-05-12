@@ -9302,6 +9302,115 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.422 Latest Report Chart Input Type Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`generate_latest_signal_report(include_chart/chart_timeframe/chart_output_dir=...)`
+already rejects non-boolean chart toggles and non-string chart fields before chart
+rendering. Previous harness coverage covered a truthy string `include_chart`,
+blank/control-character `chart_timeframe`, and blank/control-character
+`chart_output_dir`. This slice closes the remaining type-shaped harness failure
+audit cases so JSON numeric/null/list/boolean values cannot reach chart artifact
+creation or produce a stdout payload.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because reporting input normalization already rejects the invalid values at the public boundary
+  - harness coverage verifies include_chart=0, include_chart=1, and include_chart=null exit nonzero before chart artifact creation
+  - harness coverage verifies chart_timeframe=123 exits nonzero before chart rendering
+  - harness coverage verifies chart_output_dir=[] and chart_output_dir=false exit nonzero before artifact directory creation
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_non_bool_include_chart tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_harness_rejects_non_bool_include_chart_with_failure_audit tests/test_reporting.py::test_harness_rejects_remaining_non_bool_include_chart_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_timeframe_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_output_dir_type_with_failure_audit -q -> 19 passed
+  - ./.venv/bin/ruff check tests/test_reporting.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 218 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 523 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+```
+
+## 3.421 Score Performance Provided Signals Input Audit Record - 2026-05-12
+
+### A. 목적
+
+`evaluate_score_performance(signals=...)`는 Phase 6 피드백 파이프라인의
+계산 핵심이다. 기존 구현은 `signals or fixture` truthiness로 샘플을 선택해
+caller가 빈 리스트를 넘겨도 fixture replay로 조용히 대체했다. 또한 malformed
+provided signal row가 score bin, calibration, attribution, OOS, walk-forward,
+overfit math 내부까지 들어갈 수 있었다. 이번 slice는 `signals=None`만 fixture
+fallback으로 유지하고, caller-provided sample은 명시적으로 검증한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - evaluate_score_performance now uses fixture replay only when signals=None
+  - empty caller-supplied signals remain sample_size 0 with sample_source=provided_signals
+  - malformed signal containers and non-object items fail before performance math
+  - final_score, outcome, realized_r, optional age_days_ago, and optional component_scores values are validated before score bins, calibration, attribution, ablation, OOS, walk-forward, or overfit calculations
+  - direct coverage verifies empty provided samples do not fallback to fixture replay
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - repository persistence
+  - live data adapter
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - migration
+  - credential storage
+  - Binance network call
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_marks_unsupported_long_fixture_window tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals -q -> 12 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 160 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 517 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_421_audit.jsonl -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.420 Cron Prompt Type Failure Audit Record - 2026-05-12
 
 ### A. 목적

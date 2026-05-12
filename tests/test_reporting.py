@@ -12154,6 +12154,49 @@ def test_harness_rejects_non_bool_include_chart_with_failure_audit(
     assert "include_chart must be a boolean" in event["details"]["error"]
 
 
+@pytest.mark.parametrize("include_chart", [0, 1, None])
+def test_harness_rejects_remaining_non_bool_include_chart_with_failure_audit(
+    tmp_path: Path,
+    include_chart,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    chart_dir = tmp_path / "charts"
+    input_payload = {
+        "asset": "TQQQ",
+        "include_chart": include_chart,
+        "chart_output_dir": str(chart_dir),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "include_chart must be a boolean" in result.stderr
+    assert not chart_dir.exists()
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "include_chart must be a boolean" in event["details"]["error"]
+
+
 def test_harness_rejects_invalid_extra_evidence_cards_container_with_failure_audit(
     tmp_path: Path,
 ) -> None:
@@ -12326,6 +12369,48 @@ def test_harness_rejects_chart_timeframe_control_character_with_failure_audit(
     ]
 
 
+def test_harness_rejects_chart_timeframe_type_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    chart_dir = tmp_path / "charts"
+    input_payload = {
+        "asset": "TQQQ",
+        "include_chart": True,
+        "chart_timeframe": 123,
+        "chart_output_dir": str(chart_dir),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "chart_timeframe must be a nonempty string" in result.stderr
+    assert not chart_dir.exists()
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "chart_timeframe must be a nonempty string" in event["details"]["error"]
+
+
 def test_harness_rejects_blank_chart_output_dir_with_failure_audit(
     tmp_path: Path,
 ) -> None:
@@ -12357,6 +12442,49 @@ def test_harness_rejects_blank_chart_output_dir_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "chart_output_dir must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_latest_signal_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "chart_output_dir must be a nonempty string" in event["details"]["error"]
+
+
+@pytest.mark.parametrize("chart_output_dir", [[], False])
+def test_harness_rejects_chart_output_dir_type_with_failure_audit(
+    tmp_path: Path,
+    chart_output_dir,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    chart_dir = tmp_path / "charts"
+    input_payload = {
+        "asset": "TQQQ",
+        "include_chart": True,
+        "chart_output_dir": chart_output_dir,
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_latest_signal_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "chart_output_dir must be a nonempty string" in result.stderr
+    assert not chart_dir.exists()
     assert event["actor"] == "harness"
     assert event["resource_id"] == "generate_latest_signal_report"
     assert event["outcome"] == "failure"

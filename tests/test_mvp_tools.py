@@ -1334,6 +1334,107 @@ def test_score_performance_marks_unsupported_long_fixture_window() -> None:
     assert window["network_call"] is False
 
 
+def test_score_performance_treats_empty_provided_signals_as_empty_sample() -> None:
+    payload = evaluate_score_performance(signals=[], days=90)
+    window = payload["evaluation_window"]
+
+    assert payload["sample_size"] == 0
+    assert payload["avg_realized_r"] == 0.0
+    assert window["sample_source"] == "provided_signals"
+    assert window["fixture_replay_default"] is False
+    assert window["coverage_status"] == "provided_signals_not_fixture_windowed"
+    assert window["requested_window_supported"] is None
+    assert payload["score_calibration"]["available"] is False
+    assert payload["component_attribution"]["available"] is False
+    assert payload["ablation_report"]["available"] is False
+    assert payload["out_of_sample_report"]["ready"] is False
+    assert payload["walk_forward_report"]["ready"] is False
+    assert payload["overfit_guard"]["status"] == "watch"
+
+
+@pytest.mark.parametrize(
+    ("signals", "message"),
+    [
+        ("bad", "signals must be a list of objects"),
+        ([1], "signals items must be objects"),
+        (
+            [{"outcome": "TAKE_PROFIT_FIRST", "realized_r": 0.5}],
+            "signals.final_score must be a finite number",
+        ),
+        (
+            [
+                {
+                    "final_score": True,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                }
+            ],
+            "signals.final_score must be a finite number",
+        ),
+        (
+            [
+                {
+                    "final_score": 1.5,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                }
+            ],
+            "signals.final_score must be between 0 and 1",
+        ),
+        (
+            [{"final_score": 0.6, "outcome": "", "realized_r": 0.5}],
+            "signals.outcome must be a nonempty string",
+        ),
+        (
+            [
+                {
+                    "final_score": 0.6,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": float("nan"),
+                }
+            ],
+            "signals.realized_r must be a finite number",
+        ),
+        (
+            [
+                {
+                    "final_score": 0.6,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                    "age_days_ago": -1,
+                }
+            ],
+            "signals.age_days_ago must be a nonnegative integer",
+        ),
+        (
+            [
+                {
+                    "final_score": 0.6,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                    "component_scores": [],
+                }
+            ],
+            "signals.component_scores must be an object",
+        ),
+        (
+            [
+                {
+                    "final_score": 0.6,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                    "component_scores": {"trend": "high"},
+                }
+            ],
+            "signals.component_scores values must be a finite number",
+        ),
+    ],
+)
+def test_score_performance_rejects_invalid_provided_signals(signals, message) -> None:
+    with pytest.raises(ValueError, match=message):
+        evaluate_score_performance(signals=signals)
+
+
 def test_harness_executes_parameterized_tool(tmp_path: Path) -> None:
     audit_path = tmp_path / "audit.jsonl"
     result = subprocess.run(

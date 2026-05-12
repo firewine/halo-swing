@@ -373,8 +373,13 @@ def evaluate_score_performance(
 ) -> dict[str, Any]:
     """Evaluate score calibration, attribution, and deterministic ablation."""
 
-    sample = signals or _demo_signal_outcomes(days=days)
-    sample_source = "provided_signals" if signals is not None else "fixture_replay"
+    normalized_days = _normalize_performance_days(days)
+    if signals is None:
+        sample = _demo_signal_outcomes(days=normalized_days)
+        sample_source = "fixture_replay"
+    else:
+        sample = _normalize_performance_signals(signals)
+        sample_source = "provided_signals"
     bins: dict[str, dict[str, float]] = {
         "0.00-0.35": {"count": 0, "take_profit_first": 0, "realized_r": 0.0},
         "0.35-0.52": {"count": 0, "take_profit_first": 0, "realized_r": 0.0},
@@ -408,7 +413,11 @@ def evaluate_score_performance(
     out_of_sample_report = _out_of_sample_report(sample)
     walk_forward_report = _walk_forward_report(sample)
     overfit_guard = _overfit_guard(sample, out_of_sample_report, walk_forward_report)
-    evaluation_window = _evaluation_window_metadata(sample, days, sample_source)
+    evaluation_window = _evaluation_window_metadata(
+        sample,
+        normalized_days,
+        sample_source,
+    )
 
     return {
         "as_of": AS_OF,
@@ -429,6 +438,80 @@ def evaluate_score_performance(
         ),
         "live_data_required": False,
     }
+
+
+def _normalize_performance_days(days: int) -> int:
+    if not isinstance(days, int) or isinstance(days, bool) or days <= 0:
+        raise ValueError("days must be a positive integer")
+    return days
+
+
+def _normalize_performance_signals(signals: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not isinstance(signals, list):
+        raise ValueError("signals must be a list of objects")
+
+    normalized: list[dict[str, Any]] = []
+    for item in signals:
+        if not isinstance(item, dict):
+            raise ValueError("signals items must be objects")
+        row = dict(item)
+        row["final_score"] = _normalize_score_metric(row.get("final_score"))
+        row["outcome"] = _normalize_outcome_metric(row.get("outcome"))
+        row["realized_r"] = _normalize_realized_r_metric(row.get("realized_r"))
+        if "age_days_ago" in row:
+            row["age_days_ago"] = _normalize_age_days_metric(row["age_days_ago"])
+        if row.get("component_scores") is not None:
+            row["component_scores"] = _normalize_component_scores_metric(
+                row["component_scores"]
+            )
+        normalized.append(row)
+    return normalized
+
+
+def _normalize_score_metric(value: Any) -> float:
+    score = _normalize_finite_metric(value, "signals.final_score")
+    if score < 0.0 or score > 1.0:
+        raise ValueError("signals.final_score must be between 0 and 1")
+    return score
+
+
+def _normalize_realized_r_metric(value: Any) -> float:
+    return _normalize_finite_metric(value, "signals.realized_r")
+
+
+def _normalize_finite_metric(value: Any, field_name: str) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise ValueError(f"{field_name} must be a finite number")
+    normalized = float(value)
+    if not math.isfinite(normalized):
+        raise ValueError(f"{field_name} must be a finite number")
+    return normalized
+
+
+def _normalize_outcome_metric(value: Any) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("signals.outcome must be a nonempty string")
+    return value.strip()
+
+
+def _normalize_age_days_metric(value: Any) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise ValueError("signals.age_days_ago must be a nonnegative integer")
+    return value
+
+
+def _normalize_component_scores_metric(value: Any) -> dict[str, float]:
+    if not isinstance(value, dict):
+        raise ValueError("signals.component_scores must be an object")
+    normalized: dict[str, float] = {}
+    for name, score in value.items():
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("signals.component_scores keys must be nonempty strings")
+        normalized[name] = _normalize_finite_metric(
+            score,
+            "signals.component_scores values",
+        )
+    return normalized
 
 
 def suggest_weight_update() -> dict[str, Any]:
