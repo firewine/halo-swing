@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.427 Score Performance Provided Signals Harness Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`evaluate_score_performance` already validates provided signal rows in the
+deterministic scoring evaluator. The public MCP/harness wrapper, however, only
+accepted recorded-ledger inputs, so invalid `signals` payloads reached a generic
+unexpected-keyword failure instead of the scoring validator. This slice aligns the
+public wrapper with the direct evaluator so provided-signal validation failures
+produce the intended harness failure audit contract.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - evaluate_recorded_score_performance now accepts optional provided signals and delegates them to the deterministic score performance evaluator after public input validation
+  - MCP server evaluate_score_performance now forwards provided signals through the shared tool registry so server and harness contracts stay aligned
+  - harness coverage verifies invalid signals exit nonzero and emit no stdout payload
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_signals_with_failure_audit -q -> 17 passed
+  - ./.venv/bin/ruff check src/halo_swing_mcp/server.py src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 179 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 544 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.426 Position Numeric Remaining Failure Audit Record - 2026-05-12
 
 ### A. 목적

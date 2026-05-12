@@ -4729,3 +4729,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.427 Score Performance Provided Signals Harness Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_signals_with_failure_audit -q -> 17 passed, score performance provided signals harness failure-audit coverage enforced
+./.venv/bin/ruff check src/halo_swing_mcp/server.py src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 179 passed
+./.venv/bin/ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 544 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

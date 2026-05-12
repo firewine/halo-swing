@@ -210,11 +210,15 @@ def label_signal_outcome(
 def evaluate_recorded_score_performance(
     ledger_path: str | None = None,
     days: int = 90,
+    signals: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Evaluate recorded ledger signals, falling back to fixture samples."""
 
     normalized_days = _normalize_positive_integer(days, "days")
     normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    if signals is not None:
+        return evaluate_score_performance(signals=signals, days=normalized_days)
+
     repository = get_signal_ledger_repository(normalized_ledger_path)
     records = repository.list_records()
     if not records:

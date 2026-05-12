@@ -1435,6 +1435,73 @@ def test_score_performance_rejects_invalid_provided_signals(signals, message) ->
         evaluate_score_performance(signals=signals)
 
 
+@pytest.mark.parametrize(
+    ("signals", "expected_error"),
+    [
+        ("bad", "signals must be a list of objects"),
+        ([1], "signals items must be objects"),
+        (
+            [{"outcome": "TAKE_PROFIT_FIRST", "realized_r": 0.5}],
+            "signals.final_score must be a finite number",
+        ),
+        (
+            [{"final_score": 1.5, "outcome": "TAKE_PROFIT_FIRST", "realized_r": 0.5}],
+            "signals.final_score must be between 0 and 1",
+        ),
+        (
+            [{"final_score": 0.6, "outcome": "", "realized_r": 0.5}],
+            "signals.outcome must be a nonempty string",
+        ),
+        (
+            [
+                {
+                    "final_score": 0.6,
+                    "outcome": "TAKE_PROFIT_FIRST",
+                    "realized_r": 0.5,
+                    "component_scores": [],
+                }
+            ],
+            "signals.component_scores must be an object",
+        ),
+    ],
+)
+def test_harness_rejects_invalid_score_performance_signals_with_failure_audit(
+    tmp_path: Path,
+    signals: object,
+    expected_error: str,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"signals": signals}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "evaluate_score_performance",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "evaluate_score_performance"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_harness_executes_parameterized_tool(tmp_path: Path) -> None:
     audit_path = tmp_path / "audit.jsonl"
     result = subprocess.run(

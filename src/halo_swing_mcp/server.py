@@ -370,13 +370,17 @@ def label_signal_outcome(
 def evaluate_score_performance(
     ledger_path: str | None = None,
     days: int = 90,
+    signals: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Evaluate score calibration and realized-R performance."""
 
     return _audited_tool_call(
         "evaluate_score_performance",
-        {"ledger_path": ledger_path, "days": days},
-        call_tool("evaluate_score_performance", {"ledger_path": ledger_path, "days": days}),
+        {"ledger_path": ledger_path, "days": days, "signals": signals},
+        call_tool(
+            "evaluate_score_performance",
+            {"ledger_path": ledger_path, "days": days, "signals": signals},
+        ),
     )
 
 

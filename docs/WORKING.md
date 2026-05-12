@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: POSITION_NUMERIC_REMAINING_FAILURE_AUDIT_VERIFIED
-gate_id: POSITION_NUMERIC_REMAINING_FAILURE_AUDIT
+status: SCORE_PERFORMANCE_SIGNALS_FAILURE_AUDIT_VERIFIED
+gate_id: SCORE_PERFORMANCE_SIGNALS_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -136,6 +136,7 @@ done_means:
   - harness score_leverage_swing, generate_trade_guide, and evaluate_position non-string identity type failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - score_leverage_swing, generate_trade_guide, and evaluate_position reject ASCII control characters in asset/timeframe identity before scoring, guide construction, or position evaluation
   - harness score_leverage_swing, generate_trade_guide, and evaluate_position remaining control-character identity failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - evaluate_score_performance public wrapper accepts provided signals and rejects invalid signal rows through the harness with failure audit events and no stdout payload
   - generate_trade_guide exposes trade_guide.v1 with time_exit_conditions and no-order-submission guards
   - evaluate_position exposes position_management.v1 with WAIT/TRIM/EXIT/STOP and no-order-submission guards
   - evaluate_position validates entry_price, current_price, and size as optional positive finite numbers before PnL or position-state calculations
@@ -200,6 +201,9 @@ done_means:
   - harness evaluate_score_performance bool, negative, and string days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - evaluate_score_performance treats only signals=None as fixture fallback and preserves empty caller-supplied signals as an empty provided sample
   - evaluate_score_performance validates caller-supplied signal containers, item objects, score/outcome/realized_r fields, optional age, and optional component_scores before performance math
+  - evaluate_score_performance registry wrapper routes explicit caller-supplied signals through the provided-signal scoring validator before ledger or fixture fallback
+  - harness evaluate_score_performance invalid signals failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance invalid caller-supplied signals failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - Phase 6 performance report includes explicit score_calibration section
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
@@ -479,13 +483,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.426
-gate_packet: docs/halo-swing-development-plan.md#3.426
+portable_mirror: docs/halo-swing-development-plan.md#3.427
+gate_packet: docs/halo-swing-development-plan.md#3.427
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.426
+  - docs/halo-swing-development-plan.md#3.427
+  - src/halo_swing_mcp/tools/recording.py
+  - src/halo_swing_mcp/server.py
   - src/halo_swing_mcp/tools/scoring.py
   - tests/test_mvp_tools.py
 
@@ -787,6 +793,14 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: 3.427 Score Performance Provided Signals Harness Failure Audit is
+verified. The public `evaluate_score_performance` registry wrapper now accepts
+explicit `signals` payloads and routes them through the existing provided-signal
+scoring validator before ledger or fixture fallback. Focused regression passed
+with 17 tests, `tests/test_mvp_tools.py` passed with 179 tests, and full pytest
+passed with 544 tests. Ruff, health_check, get_integration_readiness, diff
+whitespace, blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13198,6 +13212,56 @@ blocked_scope_unchanged:
     - migration or repository persistence
     - order submission
 
+score_performance_signals_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_recorded_score_performance now accepts optional provided signals and delegates them to the deterministic score performance evaluator after public input validation
+    - MCP server evaluate_score_performance now forwards provided signals through the shared tool registry so server and harness contracts stay aligned
+    - harness coverage verifies invalid provided signals exit nonzero, emit no stdout payload, and record failure audits without output_summary
+    - harness coverage verifies invalid signals preserve original input, resource_id, failure outcome, and public validation error text
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_performance_treats_empty_provided_signals_as_empty_sample tests/test_mvp_tools.py::test_score_performance_rejects_invalid_provided_signals tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_signals_with_failure_audit -q
+      result: "17 passed"
+    - command: ./.venv/bin/ruff check src/halo_swing_mcp/server.py src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "179 passed"
+    - command: ./.venv/bin/ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "544 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
 position_numeric_remaining_failure_audit:
   status: verified
   changed_files:
@@ -18285,5 +18349,5 @@ archived_sources:
 
 active_source_of_execution:
   - CURRENT_DIRECTIVE
-  - docs/halo-swing-development-plan.md#3.374
+  - docs/halo-swing-development-plan.md#3.427
 ```
