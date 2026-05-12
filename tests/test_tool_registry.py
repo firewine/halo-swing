@@ -372,6 +372,85 @@ def test_harness_rejects_non_object_input_file_with_failure_audit(
     assert expected_error in event["details"]["error"]
 
 
+def test_harness_rejects_invalid_input_json_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    malformed_input = '{"asset":'
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-json",
+            malformed_input,
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input payload must be valid JSON"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {"input_source": "input_json"}
+    assert malformed_input not in json.dumps(event["details"])
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_invalid_input_file_json_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = tmp_path / "input.json"
+    malformed_input = '{"asset":'
+    input_file.write_text(malformed_input, encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            str(input_file),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input payload must be valid JSON"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {
+        "input_source": "input_file",
+        "input_file": str(input_file),
+    }
+    assert malformed_input not in json.dumps(event["details"])
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_default_source_does_not_import_live_db_or_broker_clients() -> None:
     imported_modules: set[str] = set()
 

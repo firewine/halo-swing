@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.430 Harness Invalid JSON Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+The harness already audits public tool failures after JSON payloads are parsed.
+Malformed `--input-json` and malformed `--input-file` content failed during JSON
+parsing before that audit path. This slice converts JSON parse failures into
+public `ValueError` failures and records safe input-source metadata without
+serializing raw malformed JSON text.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness JSON parsing now converts malformed input_json and input_file JSON into public ValueError failures before tool dispatch
+  - malformed input-json failure audits record input_source=input_json without serializing raw malformed text
+  - malformed input-file failure audits record input_source=input_file and input_file path without serializing raw malformed text
+  - harness coverage verifies both malformed JSON paths exit nonzero, emit no stdout payload, and record failure audits without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_invalid_input_json_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_invalid_input_file_json_with_failure_audit -q -> 2 passed
+  - ./.venv/bin/ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 20 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 559 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.429 Public Tool Input Boundary Failure Audit Record - 2026-05-12
 
 ### A. 목적

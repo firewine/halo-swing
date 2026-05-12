@@ -39,11 +39,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    if args.input_file:
-        with open(args.input_file, encoding="utf-8") as handle:
-            input_payload = json.load(handle)
-    else:
-        input_payload = json.loads(args.input_json)
+    try:
+        if args.input_file:
+            with open(args.input_file, encoding="utf-8") as handle:
+                input_payload = json.load(handle)
+        else:
+            input_payload = json.loads(args.input_json)
+    except json.JSONDecodeError as exc:
+        error = ValueError("input payload must be valid JSON")
+        if not args.no_audit:
+            input_payload = (
+                {"input_source": "input_file", "input_file": args.input_file}
+                if args.input_file
+                else {"input_source": "input_json"}
+            )
+            append_tool_audit_event(
+                command_name=args.command,
+                input_payload=input_payload,
+                result=None,
+                outcome="failure",
+                actor="harness",
+                audit_log_path=args.audit_log_path,
+                error=repr(error),
+            )
+        raise error from exc
 
     if not isinstance(input_payload, dict):
         error = ValueError("input payload must be a JSON object")

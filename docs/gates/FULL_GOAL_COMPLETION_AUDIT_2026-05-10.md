@@ -4244,7 +4244,23 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 88. Next Concrete Actions
+## 88. 3.430 Harness Invalid JSON Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_invalid_input_json_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_invalid_input_file_json_with_failure_audit -q -> 2 passed, harness invalid JSON failure-audit coverage enforced
+./.venv/bin/ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 20 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+./.venv/bin/ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 559 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 89. Next Concrete Actions
 
 Choose one of:
 
