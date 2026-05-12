@@ -168,7 +168,7 @@ def audit_summary(audit_log_path: str | None = None) -> dict[str, Any]:
 def tool_audit_details(
     *,
     command_name: str,
-    input_payload: dict[str, Any],
+    input_payload: Any,
     result: dict[str, Any] | None = None,
     error: str | None = None,
 ) -> dict[str, Any]:
@@ -188,7 +188,7 @@ def tool_audit_details(
 def append_tool_audit_event(
     *,
     command_name: str,
-    input_payload: dict[str, Any],
+    input_payload: Any,
     result: dict[str, Any] | None,
     outcome: str,
     actor: str,
@@ -247,7 +247,7 @@ def _result_summary(result: dict[str, Any]) -> dict[str, Any]:
 
 def _correlation_id(
     result: dict[str, Any] | None,
-    input_payload: dict[str, Any],
+    input_payload: Any,
 ) -> str | None:
     if result:
         for key in ("signal_id", "run_id", "correlation_id"):
@@ -258,9 +258,10 @@ def _correlation_id(
             for key in ("signal_id", "run_id"):
                 if key in signal and signal[key] is not None:
                     return str(signal[key])
-    for key in ("signal_id", "run_id", "correlation_id"):
-        if key in input_payload and input_payload[key] is not None:
-            return str(input_payload[key])
+    if isinstance(input_payload, dict):
+        for key in ("signal_id", "run_id", "correlation_id"):
+            if key in input_payload and input_payload[key] is not None:
+                return str(input_payload[key])
     return None
 
 

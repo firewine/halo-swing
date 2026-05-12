@@ -46,7 +46,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         input_payload = json.loads(args.input_json)
 
     if not isinstance(input_payload, dict):
-        parser.error("input payload must be a JSON object")
+        error = ValueError("input payload must be a JSON object")
+        if not args.no_audit:
+            append_tool_audit_event(
+                command_name=args.command,
+                input_payload=input_payload,
+                result=None,
+                outcome="failure",
+                actor="harness",
+                audit_log_path=args.audit_log_path,
+                error=repr(error),
+            )
+        raise error
 
     try:
         payload = call_tool(args.command, input_payload)

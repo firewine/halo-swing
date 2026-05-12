@@ -189,6 +189,27 @@ def test_registry_rejects_unexpected_payload_keys_before_dispatch() -> None:
     assert "unexpected keyword argument" not in error
 
 
+def test_registry_rejects_missing_required_payload_keys_before_dispatch() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        call_tool("create_document_evidence_card", {"summary": "Plain PDF summary."})
+
+    error = str(exc_info.value)
+    assert error == "create_document_evidence_card missing required input field: artifact_ref"
+    assert "create_document_evidence_card()" not in error
+    assert "missing 1 required positional argument" not in error
+
+
+def test_registry_rejects_multiple_missing_required_payload_keys_in_signature_order() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        call_tool("save_binance_credentials", {})
+
+    assert (
+        str(exc_info.value)
+        == "save_binance_credentials missing required input fields: "
+        "api_key, api_secret, passphrase"
+    )
+
+
 def test_registry_rejects_non_object_payloads_before_dispatch() -> None:
     with pytest.raises(ValueError) as exc_info:
         call_tool("score_leverage_swing", ["bad"])  # type: ignore[arg-type]
@@ -232,6 +253,119 @@ def test_harness_rejects_unexpected_payload_key_with_failure_audit(
     assert "unexpected keyword argument" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "evaluate_score_performance"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_missing_required_payload_key_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"summary": "Plain PDF summary."}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "create_document_evidence_card",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = (
+        "create_document_evidence_card missing required input field: artifact_ref"
+    )
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert "missing 1 required positional argument" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "create_document_evidence_card"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_non_object_input_json_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = ["bad"]
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input payload must be a JSON object"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_non_object_input_file_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = tmp_path / "input.json"
+    input_payload = ["bad"]
+    input_file.write_text(json.dumps(input_payload), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            str(input_file),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input payload must be a JSON object"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
     assert event["outcome"] == "failure"
     assert event["details"]["input"] == input_payload
     assert "output_summary" not in event["details"]

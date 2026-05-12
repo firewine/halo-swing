@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: PUBLIC_TOOL_BOUNDARY_FAILURE_AUDIT_VERIFIED
-gate_id: PUBLIC_TOOL_BOUNDARY_FAILURE_AUDIT
+status: PUBLIC_TOOL_INPUT_BOUNDARY_FAILURE_AUDIT_VERIFIED
+gate_id: PUBLIC_TOOL_INPUT_BOUNDARY_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -208,6 +208,9 @@ done_means:
   - shared ToolSpec registry rejects non-object payloads before dispatch
   - shared ToolSpec registry rejects unexpected payload keys before dispatch with public tool names instead of internal Python TypeError text
   - harness unexpected payload-key failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - shared ToolSpec registry rejects missing required payload keys before dispatch with public tool names instead of internal Python TypeError text
+  - harness missing required payload-key failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness non-object input-json and input-file failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - Phase 6 performance report includes explicit score_calibration section
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
@@ -487,13 +490,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.428
-gate_packet: docs/halo-swing-development-plan.md#3.428
+portable_mirror: docs/halo-swing-development-plan.md#3.429
+gate_packet: docs/halo-swing-development-plan.md#3.429
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.428
+  - docs/halo-swing-development-plan.md#3.429
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
   - src/halo_swing_mcp/tools/recording.py
@@ -800,14 +803,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.428 Public Tool Boundary Failure Audit is verified. Harness coverage
-now includes the remaining caller-supplied signal validation cases, and the
-shared ToolSpec registry rejects non-object payloads and unexpected input keys
-before dispatching to implementation functions. Focused regression passed with
-25 tests, `tests/test_mvp_tools.py tests/test_tool_registry.py` passed with 196
-tests, and full pytest passed with 552 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.429 Public Tool Input Boundary Failure Audit is verified. The shared
+ToolSpec registry now rejects missing required payload keys before dispatching to
+implementation functions, so required public fields fail with public tool names
+instead of raw Python missing-argument TypeError text. The harness also records
+failure audits for non-object `--input-json` and `--input-file` payloads. Focused
+regression passed with 5 tests, `tests/test_tool_registry.py` passed with 18
+tests, `tests/test_audit.py` passed with 27 tests, and full pytest passed with
+557 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13219,6 +13223,62 @@ blocked_scope_unchanged:
     - migration or repository persistence
     - order submission
 
+public_tool_input_boundary_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/audit.py
+    - src/halo_swing_mcp/harness.py
+    - src/halo_swing_mcp/tool_registry.py
+    - tests/test_tool_registry.py
+  implementation:
+    - ToolSpec.call now rejects missing required payload keys before dispatch so direct registry callers receive a public ValueError instead of raw Python missing-argument TypeError text
+    - missing required input messages preserve fixed-signature tool parameter order for operator clarity
+    - append_tool_audit_event now accepts non-object input payloads so shape failures can still be audited
+    - harness input-json and input-file non-object payloads now fail with audit events instead of unaudited argparse errors
+    - harness coverage verifies omitted create_document_evidence_card artifact_ref exits nonzero, emits no stdout payload, and records a failure audit without output_summary
+    - harness coverage verifies non-object input-json and input-file payloads exit nonzero, emit no stdout payload, and record the raw input payload in failure audits
+    - registry coverage verifies omitted save_binance_credentials api_key, api_secret, and passphrase fail before any credential write path
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_registry_rejects_missing_required_payload_keys_before_dispatch tests/test_tool_registry.py::test_registry_rejects_multiple_missing_required_payload_keys_in_signature_order tests/test_tool_registry.py::test_harness_rejects_missing_required_payload_key_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_non_object_input_json_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_non_object_input_file_with_failure_audit -q
+      result: "5 passed"
+    - command: ./.venv/bin/ruff check src/halo_swing_mcp/audit.py src/halo_swing_mcp/harness.py src/halo_swing_mcp/tool_registry.py tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "27 passed"
+    - command: ./.venv/bin/ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "557 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
 public_tool_boundary_failure_audit:
   status: verified
   changed_files:
@@ -18410,5 +18470,5 @@ archived_sources:
 
 active_source_of_execution:
   - CURRENT_DIRECTIVE
-  - docs/halo-swing-development-plan.md#3.428
+  - docs/halo-swing-development-plan.md#3.429
 ```

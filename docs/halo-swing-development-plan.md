@@ -9302,6 +9302,67 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.429 Public Tool Input Boundary Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+The shared registry now rejects non-object payloads and unexpected input keys
+before dispatch. Tools with required public inputs still depended on Python
+function-call mechanics when callers omitted a required key, which could surface
+raw missing-argument `TypeError` text. This slice makes missing required inputs a
+public tool-boundary validation failure with deterministic harness audit output.
+It also makes non-object harness `--input-json` and `--input-file` payloads
+auditable instead of exiting through unaudited argparse errors.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - ToolSpec.call now rejects missing required payload keys before implementation dispatch
+  - missing required input messages preserve fixed-signature tool parameter order
+  - append_tool_audit_event now accepts non-object input payloads so shape failures can still be audited
+  - direct registry coverage verifies create_document_evidence_card missing artifact_ref fails with a public ValueError
+  - direct registry coverage verifies save_binance_credentials missing api_key, api_secret, and passphrase fails before credential writes
+  - harness coverage verifies create_document_evidence_card missing artifact_ref exits nonzero and emits no stdout payload
+  - harness coverage verifies non-object input-json and input-file payloads exit nonzero and preserve raw input in failure audits
+  - harness coverage verifies failure audits record original input, resource_id, failure outcome, and public error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_registry_rejects_missing_required_payload_keys_before_dispatch tests/test_tool_registry.py::test_registry_rejects_multiple_missing_required_payload_keys_in_signature_order tests/test_tool_registry.py::test_harness_rejects_missing_required_payload_key_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_non_object_input_json_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_non_object_input_file_with_failure_audit -q -> 5 passed
+  - ./.venv/bin/ruff check src/halo_swing_mcp/audit.py src/halo_swing_mcp/harness.py src/halo_swing_mcp/tool_registry.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 18 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 557 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.428 Public Tool Boundary Failure Audit Record - 2026-05-12
 
 ### A. 목적

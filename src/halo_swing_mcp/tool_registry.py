@@ -84,6 +84,16 @@ class ToolSpec:
         else:
             input_payload = payload
 
+        missing_keys = [
+            key for key in self._required_payload_keys() if key not in input_payload
+        ]
+        if missing_keys:
+            field_label = "field" if len(missing_keys) == 1 else "fields"
+            raise ValueError(
+                f"{self.name} missing required input {field_label}: "
+                f"{', '.join(missing_keys)}"
+            )
+
         accepted_keys = self._accepted_payload_keys()
         if accepted_keys is not None:
             unexpected_keys = sorted(set(input_payload) - accepted_keys)
@@ -112,6 +122,18 @@ class ToolSpec:
             for name, parameter in parameters.items()
             if parameter.kind in accepted_kinds
         }
+
+    def _required_payload_keys(self) -> list[str]:
+        accepted_kinds = {
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        }
+        return [
+            name
+            for name, parameter in inspect.signature(self.function).parameters.items()
+            if parameter.kind in accepted_kinds
+            and parameter.default is inspect.Parameter.empty
+        ]
 
 
 TOOL_SPECS: tuple[ToolSpec, ...] = (
