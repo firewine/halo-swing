@@ -4704,9 +4704,9 @@ git status --short --ignored state -> ignored local state/ only
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_remaining_scoring_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q -> 7 passed, scoring tool remaining identity control-character coverage enforced
-PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+./.venv/bin/ruff check tests/test_mvp_tools.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 168 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+./.venv/bin/ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 533 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected

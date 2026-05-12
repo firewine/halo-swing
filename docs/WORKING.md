@@ -12,9 +12,28 @@ Instruction priority inside this file:
 1. `CURRENT_DIRECTIVE`
 2. `CURRENT_TASK_CONTRACT`
 3. `CURRENT_GATE_STATE`
-4. `LATEST_VERIFICATION`
+4. `LATEST_VERIFICATION_SUMMARY` or the top summary of `LATEST_VERIFICATION`
 5. `ACTIVE_REVIEW_SUMMARY`
 6. `ARCHIVED_REVIEW_LEDGER`
+
+## 0.1 Context Loading Rule
+
+For normal implementation, review, or gate analysis, use only:
+
+1. `CURRENT_DIRECTIVE`
+2. `CURRENT_TASK_CONTRACT`
+3. `CURRENT_GATE_STATE`
+4. the short summary at the top of `LATEST_VERIFICATION`
+
+Do not scan, execute, or derive new work from completed phase logs, done ledgers,
+prior verification logs, or `ARCHIVED_REVIEW_LEDGER` by default.
+
+Archived and completed sections are historical evidence only. Use them only when
+the user explicitly asks for historical audit, regression tracing, completion
+evidence, or stale-context cleanup.
+
+If current task-local sections and archived/completed sections conflict, the
+current task-local sections win.
 
 Archived review sections are historical context only. Do not execute archived
 `planning_only_no_code`, prior gate-plan, cross-check, or CTO synthesis blocks.
