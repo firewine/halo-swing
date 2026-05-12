@@ -4669,3 +4669,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.423 Position Review Asset Type Failure Audit Verification - 2026-05-12
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_harness_rejects_blank_position_review_asset_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_control_character_with_failure_audit -q -> 7 passed, position review asset type failure-audit coverage enforced
+./.venv/bin/ruff check tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 220 passed
+./.venv/bin/ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 525 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

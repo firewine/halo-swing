@@ -23,8 +23,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LATEST_REPORT_CHART_INPUT_TYPE_FAILURE_AUDIT_VERIFIED
-gate_id: LATEST_REPORT_CHART_INPUT_TYPE_FAILURE_AUDIT
+status: POSITION_REVIEW_ASSET_TYPE_FAILURE_AUDIT_VERIFIED
+gate_id: POSITION_REVIEW_ASSET_TYPE_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -277,6 +277,7 @@ done_means:
   - position review guard verifies position_review_contract declares no order submission side effect
   - position review guard verifies generated section order exactly matches the position review contract
   - generate_position_review_report trims/uppercases asset identity and rejects blank/non-string asset values before evaluating position state
+  - harness generate_position_review_report null and numeric asset failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - position review guard verifies prompt_contract must_include exactly matches the expected position review terms
   - position review guard verifies prompt_contract key schema exactly matches the expected schema
   - position review guard verifies prompt_contract numeric_authority and llm_role identity values
@@ -456,13 +457,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.422
-gate_packet: docs/halo-swing-development-plan.md#3.422
+portable_mirror: docs/halo-swing-development-plan.md#3.423
+gate_packet: docs/halo-swing-development-plan.md#3.423
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.422
+  - docs/halo-swing-development-plan.md#3.423
   - src/halo_swing_mcp/tools/reporting.py
   - tests/test_reporting.py
 
@@ -13169,6 +13170,47 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+position_review_asset_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - tests-only slice; no source code change was needed because generate_position_review_report already rejects non-string asset values before position evaluation
+    - harness coverage now verifies asset=null and asset=123 failures exit nonzero before position review payload construction
+    - harness coverage verifies failure audits preserve original input, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_harness_rejects_blank_position_review_asset_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_control_character_with_failure_audit -q
+      result: "7 passed"
+    - command: ./.venv/bin/ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "220 passed"
+    - command: ./.venv/bin/ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "525 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.423 Position Review Asset Type Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`generate_position_review_report(asset=...)` already rejects blank and non-string
+asset values before position evaluation. Previous harness failure-audit coverage
+covered blank and control-character asset inputs, while direct coverage covered
+`None` and numeric asset values. This slice closes the CLI boundary gap so JSON
+`null` and numeric asset values cannot produce a stdout payload or a position
+review report.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because reporting asset normalization already rejects the invalid values at the public boundary
+  - harness coverage verifies asset=null exits nonzero before position review payload construction
+  - harness coverage verifies asset=123 exits nonzero before position review payload construction
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_harness_rejects_blank_position_review_asset_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_type_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_control_character_with_failure_audit -q -> 7 passed
+  - ./.venv/bin/ruff check tests/test_reporting.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 220 passed
+  - ./.venv/bin/ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 525 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.422 Latest Report Chart Input Type Failure Audit Record - 2026-05-12
 
 ### A. 목적

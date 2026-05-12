@@ -11313,6 +11313,48 @@ def test_harness_rejects_blank_position_review_asset_with_failure_audit(
     assert "asset must be a nonempty string" in event["details"]["error"]
 
 
+@pytest.mark.parametrize("asset", [None, 123])
+def test_harness_rejects_position_review_asset_type_with_failure_audit(
+    tmp_path: Path,
+    asset,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {
+        "asset": asset,
+        "entry_price": 100,
+        "current_price": 114,
+        "size": 3,
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "generate_position_review_report",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "asset must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "generate_position_review_report"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "asset must be a nonempty string" in event["details"]["error"]
+
+
 def test_harness_rejects_position_review_asset_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
