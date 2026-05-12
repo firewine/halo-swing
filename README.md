@@ -45,8 +45,19 @@ python -m pip install -r requirements.txt
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"4h"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness create_document_evidence_card --input-json '{"summary":"FOMC minutes summary says policy remains restrictive but stable.","artifact_ref":"artifact://documents/fomc-minutes-summary.pdf","asset_scope":["QQQ","TQQQ"]}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"artifacts/charts"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"state/runtime_checkpoints.jsonl","audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":"BTC","balance":"0.25","availableBalance":"0.2"}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":"3","entryPrice":"90000","markPrice":"92000"}]}'
 PYTHONPATH=src ./.venv/bin/python -m pytest
 PYTHONPATH=src ./.venv/bin/python -m ruff check .
 ```
@@ -58,6 +69,7 @@ get_market_snapshot
 get_macro_snapshot
 get_event_calendar
 get_news_bundle
+create_document_evidence_card
 calculate_indicators
 render_chart
 score_leverage_swing
@@ -68,8 +80,14 @@ label_signal_outcome
 evaluate_score_performance
 suggest_weight_update
 compare_champion_challenger
+generate_latest_signal_report
+generate_position_review_report
+generate_cron_prompt_pack
+get_integration_readiness
 get_audit_log
 get_audit_summary
+get_runtime_status
+record_runtime_checkpoint
 get_btc_risk_settings
 update_btc_risk_settings
 get_btc_risk_status
@@ -78,13 +96,95 @@ save_binance_credentials
 get_binance_credentials_status
 check_binance_coinm_connectivity
 get_binance_coinm_account_snapshot
+normalize_binance_coinm_account_snapshot
 preview_btc_order
 execute_btc_order
 ```
 
 All default tests are offline and require no market data API keys. Runtime
-ledger and chart artifacts are written only when those tools are called and
-should stay under ignored runtime locations such as `state/` or `artifacts/`.
+ledger, runtime checkpoint, and chart artifacts are written only when those
+tools are called and should stay under ignored runtime locations such as
+`state/` or `artifacts/`.
+Fixture OHLCV supports `1d`, `4h`, and `1h` timeframes for indicator and chart
+tools; unsupported timeframes are rejected before any live adapter is involved.
+`get_market_snapshot` returns `market_snapshot.v1` with QQQ, SPY, SMH, SOXX,
+and BTC as the core fixture universe, freshness/degraded markers, and a guard
+showing that feature-store persistence remains behind migration/repository
+approval.
+`calculate_indicators` exposes a `swing_level_contract` with gap detection,
+20-bar support/resistance, and previous swing high/low levels.
+`score_leverage_swing` returns `strategy_config_contract`, showing
+`strategy_config.v1` validation, weight sum, threshold order, bounds checks, and
+config hash reproducibility.
+`generate_trade_guide` returns `trade_guide.v1` with entry, stop, take-profit,
+time-exit, invalidation, config trace, and no-order-submission guards.
+`evaluate_position` returns `position_management.v1` for WAIT/TRIM/EXIT/STOP
+position decisions with numeric-authority and no-order-submission guards.
+`get_macro_snapshot` exposes an offline `macro_filter_contract` and
+`macro_filter_summary` for VIX, VXN, DXY, 2Y, 10Y, and WTI oil changes, and the
+scoring path honors macro block flags without requiring live macro data.
+Swing signals expose Phase 2 component scores for `trend`, `pullback`,
+`breadth`, `volatility`, `theme`, and event risk. The new component diagnostics
+do not automatically promote a challenger or change live behavior.
+`get_event_calendar` exposes an offline `event_window_summary` plus per-event
+`danger_window` payloads so 2x/3x pre-event blocks are visible without a live
+calendar source or network call.
+It also returns `event_policy.v1` covering CPI, FOMC, NFP, and large-cap
+earnings fixture event types.
+`get_news_bundle` exposes `news_score_contract`, and `score_leverage_swing`
+returns `news_usage_contract` to show that the explicit `news_score` field feeds
+the theme component used in swing scoring.
+`get_news_bundle` also exposes `news_source_policy.v1`, covering Fed, Treasury,
+White House, EIA, Iran/Hormuz, and AI/semiconductor fixture source groups
+without enabling live collection.
+Signal labels support `TAKE_PROFIT_FIRST`, `STOP_LOSS_FIRST`, `TIME_EXIT`,
+`NO_DATA`, and `INVALIDATED_BY_EVENT` through the offline JSONL labeler.
+`label_signal_outcome` exposes `signal_label_outcome.v1`; MFE, MAE, and
+realized R are calculated only inside `price_path[:time_barrier_days]`.
+`record_signal` stores a `run_journal.v1` entry in the JSONL ledger with
+run/config traceability, an idempotency key, and no-network/no-DB guards.
+`get_integration_readiness` reports blocked deployment gates without network
+calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
+macro, and news source decisions. It includes `hermes_mcp_config_readiness.v1`
+for config path and MCP registration evidence. It also exposes
+`telegram_delivery_readiness.v1` for bot-token/gateway readiness while keeping
+`send_call=false`, and a separate `live_order_submission` gate that requires
+explicit approval, the live-trading env flag, encrypted credentials, manual
+passphrase availability, trade-only/no-withdraw attestation, and kill-switch
+evidence while still reporting `order_submission=false`.
+Report tools include an offline `delivery_preview` payload for Hermes and
+Telegram. The preview contains Telegram message chunks and guard checks, but it
+does not send messages or require credentials. Telegram previews expose the
+`telegram_report_format.v1` contract for section-separated, 1-based message
+chunks. Latest signal reports also include an `evidence_guard` that caps summary
+sizes and records acknowledged conflict flags before text is handed to Hermes or
+Telegram.
+`generate_cron_prompt_pack` returns Hermes prompt templates for pre-market,
+intraday, post-market, and position review jobs without installing a scheduler,
+sending Telegram messages, or requiring credentials.
+Performance evaluation supports explicit `score_calibration` plus a
+deterministic 90-day fixture window with `out_of_sample_report`,
+`walk_forward_report`, and `overfit_guard`; the guard includes
+`deflated_sharpe_proxy.v1`, an offline conservative realized-R metric with a
+multiple-testing penalty. It remains advisory and never promotes a challenger
+without explicit approval. `suggest_weight_update`
+returns a `challenger_config.v1` contract that keeps the candidate in shadow mode
+with approval and out-of-sample requirements.
+Evidence cards include `modality` and portable `artifact_ref` metadata.
+`render_chart` returns a `chart_artifact.v1` contract and guard that confirm
+the PNG was written with the offline stdlib renderer and no live data call.
+`create_document_evidence_card` accepts caller-supplied PDF/document summaries
+without parsing files, reading local documents, or calling networks, so Phase 8
+multimodal inputs can be validated offline before any Hermes image/PDF flow is
+enabled. `generate_latest_signal_report` can attach those cards through
+`extra_evidence_cards` and returns a guarded `multimodal_context` when document
+evidence or chart refs are present.
+`normalize_binance_coinm_account_snapshot` turns caller-supplied COIN-M balance
+and position payloads into a BTC-only read-only portfolio summary without
+credentials, network calls, or order side effects. `preview_btc_order` can take
+that snapshot as `portfolio_snapshot` and returns `position_effect`, showing
+whether the preview would open, increase, reduce, close, or flip the BTC
+position without submitting an order.
 
 The MCP server entrypoint is available at:
 
@@ -122,4 +222,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.trading_admin_web --host 127
 Open `http://127.0.0.1:8766` to set Binance COIN-M API credentials, BTC risk
 limits, run public connectivity checks, read account/position snapshots, and
 preview orders. Credentials are encrypted into `state/binance_credentials.enc.json`;
-plaintext API keys, API secrets, and passphrases are not committed.
+plaintext API keys, API secrets, and passphrases are not committed. The local
+risk settings include an emergency kill switch; when enabled it blocks order
+execution even if the confirmation string is supplied. Credential status and
+order previews expose `binance_credential_policy.v1`: the Binance key must be
+trade-only for COIN-M futures, withdraw permissions are forbidden, and the
+passphrase remains manual input only.

@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     binance_credentials_path: str = "state/binance_credentials.enc.json"
     btc_risk_settings_path: str = "state/btc_risk_settings.json"
     btc_risk_state_path: str = "state/btc_risk_state.json"
+    runtime_checkpoint_path: str = "state/runtime_checkpoints.jsonl"
+    runtime_retention_max_records: int = 1000
+    runtime_retention_max_bytes: int = 5_000_000
+    runtime_failure_window: int = 20
+    runtime_failure_threshold: int = 3
 
     model_config = SettingsConfigDict(
         env_file=".env",

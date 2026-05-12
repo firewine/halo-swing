@@ -103,6 +103,7 @@ def test_signal_replay_bundle_fixture_validates_and_preserves_links() -> None:
     assert bundle.signal["config_hash"] == bundle.strategy_config["config_hash"]
     assert bundle.signal["run_id"] == bundle.run_journal["run_id"]
     assert len(bundle.evidence_cards) >= 2
+    assert all(card["modality"] for card in bundle.evidence_cards)
 
 
 def test_latest_signal_report_rejects_missing_required_field() -> None:

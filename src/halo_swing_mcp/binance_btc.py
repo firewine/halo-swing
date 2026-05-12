@@ -18,6 +18,7 @@ from halo_swing_mcp.risk_settings import (
     validate_btc_order_limits,
 )
 from halo_swing_mcp.secret_store import (
+    binance_credential_policy,
     get_binance_credentials_status,
     load_binance_credentials,
 )
@@ -35,6 +36,7 @@ EXCHANGE_INFO_PATH = "/dapi/v1/exchangeInfo"
 POSITION_RISK_PATH = "/dapi/v1/positionRisk"
 SERVER_TIME_PATH = "/dapi/v1/time"
 LIVE_CONFIRMATION = "CONFIRM_BTC_BINANCE_COINM_ORDER"
+PORTFOLIO_SNAPSHOT_SCHEMA_VERSION = "binance_coinm_portfolio_snapshot.v1"
 
 
 @dataclass(frozen=True)
@@ -106,6 +108,7 @@ def preview_btc_order(
     settings_path: str | None = None,
     state_path: str | None = None,
     credentials_path: str | None = None,
+    portfolio_snapshot: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return a BTCUSD_PERP Binance COIN-M order preview without submitting it."""
 
@@ -127,7 +130,7 @@ def preview_btc_order(
         settings_path=settings_path,
         state_path=state_path,
     )
-    return {
+    payload = {
         "status": "preview",
         "exchange": "binance_coin_m_futures",
         "symbol": intent.symbol,
@@ -148,13 +151,28 @@ def preview_btc_order(
         "risk": risk,
         "credentials": get_binance_credentials_status(credentials_path),
         "execution_guard": {
+            "schema_version": "btc_order_execution_guard.v1",
             "btc_only": True,
             "coin_m_futures_only": True,
+            "order_submission_default": False,
+            "network_call_before_all_guards_pass": False,
+            "required_for_submission": [
+                f"confirm is {LIVE_CONFIRMATION}",
+                "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true",
+                "encrypted Binance credentials are configured locally",
+                "credential_passphrase is provided at execution time",
+                "BTC risk settings pass",
+                "testnet-only policy passes",
+            ],
             "requires_env_flag": "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true",
             "requires_confirmation": LIVE_CONFIRMATION,
             "passphrase_policy": "manual_input_only",
+            "credential_policy": binance_credential_policy(),
         },
     }
+    if portfolio_snapshot is not None:
+        payload["position_effect"] = _position_effect(intent, portfolio_snapshot)
+    return payload
 
 
 def execute_btc_order(
@@ -205,6 +223,12 @@ def execute_btc_order(
             **preview,
             "status": "blocked",
             "blocked_reason": "missing_confirmation",
+        }
+    if "emergency_kill_switch_enabled" in preview["risk"]["blocked_reasons"]:
+        return {
+            **preview,
+            "status": "blocked",
+            "blocked_reason": "emergency_kill_switch_enabled",
         }
     if not preview["risk"]["valid"]:
         return {
@@ -320,6 +344,10 @@ def get_binance_coinm_account_snapshot(
         for position in positions
         if isinstance(position, dict) and position.get("symbol") == ALLOWED_SYMBOL
     ]
+    portfolio_snapshot = normalize_binance_coinm_account_snapshot(
+        balance=balance if isinstance(balance, list) else [],
+        positions=btc_positions,
+    )
     return {
         "status": "ok",
         "exchange": "binance_coin_m_futures",
@@ -328,7 +356,52 @@ def get_binance_coinm_account_snapshot(
         "credentials": get_binance_credentials_status(credentials_path),
         "balance": balance,
         "positions": btc_positions,
+        "portfolio_snapshot": portfolio_snapshot,
         "live_data_required": True,
+    }
+
+
+def normalize_binance_coinm_account_snapshot(
+    balance: list[dict[str, Any]] | None = None,
+    positions: list[dict[str, Any]] | None = None,
+    as_of: str | None = None,
+    coinm_contract_size_usd: float | None = None,
+) -> dict[str, Any]:
+    """Normalize caller-supplied COIN-M balances and positions without network calls."""
+
+    normalized_balance_rows = _normalize_snapshot_rows(balance, "balance")
+    normalized_position_rows = _normalize_snapshot_rows(positions, "positions")
+    normalized_as_of = _normalize_optional_snapshot_text(as_of, "as_of")
+    normalized_contract_size = _normalize_optional_snapshot_positive_finite_number(
+        coinm_contract_size_usd,
+        "coinm_contract_size_usd",
+    )
+    normalized_balances = [_normalize_balance(row) for row in normalized_balance_rows]
+    btc_position = _normalize_btc_position(
+        normalized_position_rows,
+        coinm_contract_size_usd=normalized_contract_size,
+    )
+    guard = _portfolio_snapshot_guard(normalized_balances, btc_position)
+    return {
+        "schema_version": PORTFOLIO_SNAPSHOT_SCHEMA_VERSION,
+        "status": guard["status"],
+        "exchange": "binance_coin_m_futures",
+        "symbol": ALLOWED_SYMBOL,
+        "as_of": normalized_as_of,
+        "snapshot_source": "caller_supplied",
+        "portfolio_sync_contract": {
+            "read_only": True,
+            "order_submission": False,
+            "network_call": False,
+            "credential_required": False,
+            "secret_values_returned": False,
+            "raw_snapshot_returned": False,
+        },
+        "balances": normalized_balances,
+        "btc_position": btc_position,
+        "position_detected": btc_position["position_state"] != "flat",
+        "guard": guard,
+        "live_data_required": False,
     }
 
 
@@ -383,24 +456,381 @@ def _build_intent(
     reduce_only: bool,
     client_order_id: str | None,
 ) -> BinanceOrderIntent:
+    normalized_position_side = _normalize_optional_order_text(
+        position_side,
+        "position_side",
+    )
+    normalized_time_in_force = _normalize_optional_order_text(
+        time_in_force,
+        "time_in_force",
+    )
     return BinanceOrderIntent(
         symbol=ALLOWED_SYMBOL,
-        side=side.upper(),
-        order_type=order_type.upper(),
-        quantity=str(quantity),
-        price=price,
-        time_in_force=time_in_force,
-        position_side=position_side.upper() if position_side else None,
-        reduce_only=bool(reduce_only),
-        client_order_id=client_order_id,
+        side=_normalize_required_order_text(side, "side").upper(),
+        order_type=_normalize_required_order_text(order_type, "order_type").upper(),
+        quantity=_normalize_required_order_decimal_text(quantity, "quantity"),
+        price=_normalize_optional_order_decimal_text(price, "price"),
+        time_in_force=(
+            normalized_time_in_force.upper()
+            if normalized_time_in_force is not None
+            else None
+        ),
+        position_side=(
+            normalized_position_side.upper()
+            if normalized_position_side is not None
+            else None
+        ),
+        reduce_only=_normalize_order_boolean(reduce_only, "reduce_only"),
+        client_order_id=_normalize_optional_order_text(
+            client_order_id,
+            "client_order_id",
+        ),
     )
 
 
 def _positive_decimal(value: str) -> Decimal:
     try:
-        return Decimal(str(value))
+        decimal = Decimal(str(value))
     except InvalidOperation as exc:
         raise ValueError(f"invalid decimal value: {value}") from exc
+    if not decimal.is_finite():
+        raise ValueError(f"invalid decimal value: {value}")
+    return decimal
+
+
+def _normalize_order_boolean(value: bool, field_name: str) -> bool:
+    if type(value) is not bool:
+        raise ValueError(f"{field_name} must be a boolean")
+    return value
+
+
+def _normalize_required_order_text(value: str, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError(f"{field_name} must be a nonempty string")
+    return normalized
+
+
+def _normalize_optional_order_text(value: str | None, field_name: str) -> str | None:
+    if value is None:
+        return None
+    return _normalize_required_order_text(value, field_name)
+
+
+def _normalize_required_order_decimal_text(value: str, field_name: str) -> str:
+    normalized = _normalize_required_order_text(value, field_name)
+    _positive_decimal(normalized)
+    return normalized
+
+
+def _normalize_optional_order_decimal_text(
+    value: str | None,
+    field_name: str,
+) -> str | None:
+    if value is None:
+        return None
+    normalized = _normalize_required_order_text(value, field_name)
+    _positive_decimal(normalized)
+    return normalized
+
+
+def _has_no_control_characters(value: str) -> bool:
+    return all(ord(character) >= 32 and ord(character) != 127 for character in value)
+
+
+def _normalize_snapshot_rows(
+    rows: list[dict[str, Any]] | None,
+    field_name: str,
+) -> list[dict[str, Any]]:
+    if rows is None:
+        return []
+    if not isinstance(rows, list):
+        raise ValueError(f"{field_name} must be a list of objects")
+    normalized_rows: list[dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError(f"{field_name} must be a list of objects")
+        normalized_rows.append(row)
+    return normalized_rows
+
+
+def _normalize_snapshot_required_text(value: Any, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError(f"{field_name} must be a nonempty string")
+    return normalized
+
+
+def _normalize_optional_snapshot_text(value: Any, field_name: str) -> str | None:
+    if value is None:
+        return None
+    return _normalize_snapshot_required_text(value, field_name)
+
+
+def _normalize_optional_snapshot_positive_finite_number(
+    value: float | int | None,
+    field_name: str,
+) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{field_name} must be a positive finite number")
+    normalized = Decimal(str(value))
+    if not normalized.is_finite() or normalized <= 0:
+        raise ValueError(f"{field_name} must be a positive finite number")
+    return float(normalized)
+
+
+def _validated_decimal(value: Any, field_name: str) -> Decimal:
+    if isinstance(value, bool):
+        raise ValueError(f"{field_name} must be a finite decimal value")
+    try:
+        decimal = Decimal(str(value))
+    except InvalidOperation as exc:
+        raise ValueError(f"{field_name} must be a finite decimal value") from exc
+    if not decimal.is_finite():
+        raise ValueError(f"{field_name} must be a finite decimal value")
+    return decimal
+
+
+def _validated_decimal_string(value: Any, field_name: str) -> str:
+    return _decimal_string(_validated_decimal(value, field_name))
+
+
+def _normalize_balance(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "asset": _normalize_snapshot_required_text(row.get("asset"), "balance.asset"),
+        "balance": _validated_decimal_string(
+            row.get("balance", row.get("walletBalance", "0")),
+            "balance.balance",
+        ),
+        "available_balance": _validated_decimal_string(
+            row.get("availableBalance", "0"),
+            "balance.availableBalance",
+        ),
+        "cross_wallet_balance": _validated_decimal_string(
+            row.get("crossWalletBalance", "0"),
+            "balance.crossWalletBalance",
+        ),
+        "cross_unrealized_pnl": _validated_decimal_string(
+            row.get("crossUnPnl", "0"),
+            "balance.crossUnPnl",
+        ),
+    }
+
+
+def _normalize_btc_position(
+    positions: list[dict[str, Any]],
+    coinm_contract_size_usd: float | None = None,
+) -> dict[str, Any]:
+    contract_size = (
+        Decimal(str(coinm_contract_size_usd))
+        if coinm_contract_size_usd is not None
+        else Decimal(str(load_btc_risk_settings().coinm_contract_size_usd))
+    )
+    btc_position = next(
+        (
+            position
+            for position in positions
+            if isinstance(position, dict) and position.get("symbol") == ALLOWED_SYMBOL
+        ),
+        {},
+    )
+    amount = _validated_decimal(
+        btc_position.get("positionAmt", "0"),
+        "positions.positionAmt",
+    )
+    mark_price = _validated_decimal(
+        btc_position.get("markPrice", "0"),
+        "positions.markPrice",
+    )
+    entry_price = _validated_decimal(
+        btc_position.get("entryPrice", "0"),
+        "positions.entryPrice",
+    )
+    state = "flat"
+    if amount > 0:
+        state = "long"
+    elif amount < 0:
+        state = "short"
+    return {
+        "symbol": ALLOWED_SYMBOL,
+        "position_side": _normalize_optional_snapshot_text(
+            btc_position.get("positionSide"),
+            "positions.positionSide",
+        )
+        or "BOTH",
+        "position_state": state,
+        "position_amt_contracts": _decimal_string(amount),
+        "contract_size_usd": _decimal_string(contract_size),
+        "estimated_notional_usd": _decimal_string(abs(amount) * contract_size),
+        "entry_price": _decimal_string(entry_price),
+        "mark_price": _decimal_string(mark_price),
+        "unrealized_pnl": _validated_decimal_string(
+            btc_position.get("unRealizedProfit", "0"),
+            "positions.unRealizedProfit",
+        ),
+        "liquidation_price": _validated_decimal_string(
+            btc_position.get("liquidationPrice", "0"),
+            "positions.liquidationPrice",
+        ),
+        "leverage": _normalize_optional_snapshot_text(
+            btc_position.get("leverage"),
+            "positions.leverage",
+        )
+        or "",
+        "margin_type": _normalize_optional_snapshot_text(
+            btc_position.get("marginType"),
+            "positions.marginType",
+        )
+        or "",
+    }
+
+
+def _portfolio_snapshot_guard(
+    balances: list[dict[str, Any]],
+    btc_position: dict[str, Any],
+) -> dict[str, Any]:
+    checks = [
+        {
+            "name": "btc_only_position_scope",
+            "passed": btc_position["symbol"] == ALLOWED_SYMBOL,
+            "expected": ALLOWED_SYMBOL,
+            "actual": btc_position["symbol"],
+        },
+        {
+            "name": "read_only_no_order_submission",
+            "passed": True,
+            "expected": False,
+            "actual": False,
+        },
+        {
+            "name": "no_network_call",
+            "passed": True,
+            "expected": False,
+            "actual": False,
+        },
+        {
+            "name": "secret_values_not_returned",
+            "passed": True,
+            "expected": False,
+            "actual": False,
+        },
+        {
+            "name": "balances_are_normalized",
+            "passed": all("asset" in balance and "balance" in balance for balance in balances),
+            "expected": "normalized_balance_rows",
+            "actual": len(balances),
+        },
+    ]
+    return {
+        "status": "ok" if all(check["passed"] for check in checks) else "conflict",
+        "checks": checks,
+    }
+
+
+def _position_effect(
+    intent: BinanceOrderIntent,
+    portfolio_snapshot: dict[str, Any],
+) -> dict[str, Any]:
+    btc_position = dict(portfolio_snapshot.get("btc_position") or {})
+    current_contracts = _safe_decimal(btc_position.get("position_amt_contracts", "0"))
+    order_contracts = _positive_decimal(intent.quantity)
+    signed_order_contracts = order_contracts if intent.side == "BUY" else -order_contracts
+    projected_contracts = current_contracts + signed_order_contracts
+    effect = _classify_position_effect(current_contracts, projected_contracts)
+    reduce_only_effect_valid = not intent.reduce_only or effect in {
+        "reduces_long",
+        "closes_long",
+        "reduces_short",
+        "closes_short",
+    }
+    checks = [
+        {
+            "name": "portfolio_snapshot_symbol_matches",
+            "passed": btc_position.get("symbol", ALLOWED_SYMBOL) == ALLOWED_SYMBOL,
+            "expected": ALLOWED_SYMBOL,
+            "actual": btc_position.get("symbol", ALLOWED_SYMBOL),
+        },
+        {
+            "name": "no_order_submission",
+            "passed": True,
+            "expected": False,
+            "actual": False,
+        },
+        {
+            "name": "reduce_only_does_not_increase_or_flip",
+            "passed": reduce_only_effect_valid,
+            "expected": True,
+            "actual": reduce_only_effect_valid,
+        },
+    ]
+    return {
+        "schema_version": "btc_order_position_effect.v1",
+        "source": "portfolio_snapshot",
+        "current_position_state": btc_position.get("position_state", "flat"),
+        "current_contracts": _decimal_string(current_contracts),
+        "order_contracts": _decimal_string(order_contracts),
+        "signed_order_contracts": _decimal_string(signed_order_contracts),
+        "projected_contracts": _decimal_string(projected_contracts),
+        "effect": effect,
+        "reduce_only_requested": intent.reduce_only,
+        "guard": {
+            "status": "ok" if all(check["passed"] for check in checks) else "conflict",
+            "checks": checks,
+        },
+        "live_data_required": False,
+    }
+
+
+def _classify_position_effect(
+    current_contracts: Decimal,
+    projected_contracts: Decimal,
+) -> str:
+    if current_contracts == 0:
+        if projected_contracts > 0:
+            return "opens_long"
+        if projected_contracts < 0:
+            return "opens_short"
+        return "stays_flat"
+    if current_contracts > 0:
+        if projected_contracts > current_contracts:
+            return "increases_long"
+        if projected_contracts > 0:
+            return "reduces_long"
+        if projected_contracts == 0:
+            return "closes_long"
+        return "flips_long_to_short"
+    if projected_contracts < current_contracts:
+        return "increases_short"
+    if projected_contracts < 0:
+        return "reduces_short"
+    if projected_contracts == 0:
+        return "closes_short"
+    return "flips_short_to_long"
+
+
+def _safe_decimal(value: Any) -> Decimal:
+    try:
+        return Decimal(str(value or "0"))
+    except InvalidOperation:
+        return Decimal("0")
+
+
+def _decimal_string(value: Any) -> str:
+    decimal = _safe_decimal(value)
+    normalized = decimal.normalize()
+    if normalized == normalized.to_integral():
+        return format(normalized, "f")
+    return format(normalized, "f")
 
 
 def _base_url() -> str:

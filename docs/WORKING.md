@@ -23,11 +23,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BTC_COINM_READ_ONLY_FLOW_IMPLEMENTED
-gate_id: FULL_GOAL_STAGE_G_BTC_BINANCE
-review_tier: S2_medium
+status: POSITION_REVIEW_REPORT_NUMERIC_INPUT_FAILURE_AUDIT_VERIFIED
+gate_id: POSITION_REVIEW_REPORT_NUMERIC_INPUT_FAILURE_AUDIT
+review_tier: S1_small
 
-next_atomic_step: run deferred tests and Binance testnet read-only smoke when user requests verification
+next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -51,23 +51,387 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - BTC-only Binance COIN-M Futures scope is recorded
-  - preview_btc_order tool exists
-  - execute_btc_order tool exists
-  - local trading admin page exists
-  - Binance API credentials are encrypted at rest in local state
-  - per-order notional, daily order count, and daily loss limits are configurable
-  - Binance COIN-M public connectivity and read-only account snapshot tools exist
-  - management page exposes connectivity check, account snapshot, and order preview
-  - first connected execution is guarded by testnet-only policy by default
-  - non-BTC Binance order intents are rejected
-  - execute path is blocked without confirmation, live-trading env flag, risk pass, encrypted credentials, and passphrase
-  - Binance HMAC SHA256 signing helper is tested
-  - tests and lint pass offline
-  - no non-BTC broker, DB/data artifact changes are added
-  - gate packet, SSOT, and WORKING reflect BTC Binance status
+  - get_integration_readiness tool exists
+  - readiness covers Hermes, Telegram, migration, repository, Binance testnet read-only, live order submission, and live data gates
+  - get_integration_readiness next_actions exactly reflect blocked gate missing reasons and are empty when all gates are ready
+  - get_integration_readiness validates approval booleans, optional configured booleans, and optional paths before gate evaluation or credential/risk reads
+  - get_integration_readiness rejects ASCII control characters in explicit path inputs before gate evaluation or credential/risk reads
+  - BTC risk settings and daily risk state tools reject ASCII control characters in settings_path and state_path before local state reads or writes
+  - get_integration_readiness top-level payload, gates, evidence, and Binance credential policy key schemas are contract-tested
+  - get_integration_readiness configured encrypted Binance credential metadata schema is contract-tested without exposing secret material
+  - get_binance_credentials_status direct tool/registry output schemas are contract-tested for missing and configured credentials without exposing secret material
+  - save_binance_credentials and get_binance_credentials_status validate credential text, passphrase, and path inputs before encrypted file writes or reads
+  - save_binance_credentials and load_binance_credentials reject ASCII control characters in api_key, api_secret, and passphrase before encrypted credential writes, reads, or key derivation
+  - save_binance_credentials, get_binance_credentials_status, and load_binance_credentials reject ASCII control characters in credentials_path before encrypted credential writes or reads
+  - harness audit logging for save_binance_credentials redacts credential inputs and does not serialize secret, salt, or token values
+  - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
+  - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
+  - trading admin account snapshot HTTP endpoint blocks missing/invalid passphrase paths without serializing passphrase, secret, salt, or token values
+  - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints validate JSON/form payload strings, numeric strings, finite values, and booleans before credential writes, account reads, order previews, or risk settings writes
+  - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints reject ASCII control characters before credential writes, account reads, order previews, or risk settings writes
+  - MCP server execute_btc_order audit logging redacts credential_passphrase in blocked order paths
+  - MCP server get_binance_coinm_account_snapshot audit logging redacts credential_passphrase in read-only account paths
+  - harness get_binance_coinm_account_snapshot failure audit logging redacts wrong credential_passphrase and credential metadata
+  - get_audit_log and audit web events_payload preserve redacted Binance failure events without re-exposing passphrases or credential material
+  - get_audit_log and get_audit_summary validate audit_log_path before audit reads so blank explicit paths cannot silently fall back to default runtime state
+  - audit web events_payload validates query limit, trims optional filters, caps limit at 1000, and returns HTTP 400 for invalid events query values before audit reads
+  - get_audit_log, get_audit_summary, and audit web events_payload reject ASCII control characters in audit_log_path, query limit, and optional filter inputs before audit reads
+  - audit web server rejects non-localhost bind hosts before starting the HTTP server
+  - get_runtime_status watchdog consumes audit failures without returning event details, passphrases, credential material, or raw error strings
+  - get_runtime_status validates apply_retention, retention limits, and failure watchdog windows before retention inspection or mutation
+  - get_runtime_status validates audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
+  - get_runtime_status rejects ASCII control characters in audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
+  - record_runtime_checkpoint persists runtime watchdog state without audit event details, passphrases, credential material, or raw error strings
+  - record_runtime_checkpoint validates include_readiness and run_id before checkpoint writes
+  - record_runtime_checkpoint validates checkpoint_path, audit_log_path, and ledger_path before runtime status reads or checkpoint writes
+  - record_runtime_checkpoint rejects ASCII control characters in checkpoint_path, audit_log_path, ledger_path, and run_id before runtime status reads or checkpoint writes
+  - record_runtime_checkpoint with readiness snapshot does not persist Telegram, gateway, market, macro, or news env secret values
+  - get_integration_readiness treats Telegram, gateway, market, macro, and news env secrets as boolean evidence without returning secret values or env key names
+  - get_integration_readiness treats Telegram, gateway, market, macro, and news env secret aliases as boolean evidence without returning secret values or env key names
+  - get_integration_readiness treats market, macro, and news live data source env values as boolean evidence without returning source values or env key names
+  - harness get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
+  - MCP server get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
+  - get_audit_log and audit web events_payload preserve readiness audit events without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
+  - get_audit_summary and audit web summary_payload preserve readiness audit summaries without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
+  - Binance read-only smoke readiness requires encrypted credentials and a non-secret passphrase confirmation flag
+  - BTC risk settings and daily risk state tools validate public numeric, boolean, and path inputs before local state writes
+  - preview_btc_order and execute_btc_order validate order text, decimal, and boolean fields before risk checks, credential reads, or submission guards
+  - preview_btc_order and execute_btc_order reject ASCII control characters in order text fields before risk checks, credential reads, or submission guards
+  - normalize_binance_coinm_account_snapshot validates caller-supplied balance, position, timestamp, and contract-size inputs before portfolio summary projection
+  - normalize_binance_coinm_account_snapshot rejects ASCII control characters in caller-supplied snapshot text before portfolio summary projection
+  - readiness tool returns no secret values
+  - readiness tool performs no network calls
+  - health capabilities exactly match MVP required_tools manifest, including health_check and get_integration_readiness
+  - get_integration_readiness exposes hermes_mcp_config_readiness.v1 with config path and MCP registration evidence
+  - tests cover blocked defaults, configured local evidence, and harness call
+  - get_market_snapshot exposes market_snapshot.v1 for QQQ/SPY/SMH/SOXX/BTC with feature_store persistence blocked
+  - get_market_snapshot rejects non-list symbols containers before provider calls so strings, tuples, dicts, or booleans cannot be interpreted as requested symbols
+  - get_market_snapshot, calculate_indicators, and render_chart normalize symbol/timeframe identity and reject blank/non-string identity values before provider calls or chart artifact creation
+  - get_market_snapshot, calculate_indicators, render_chart, and get_news_bundle reject ASCII control characters in symbol, timeframe, topic, and output_dir inputs before provider calls, chart artifact creation, or news bundle lookup
+  - render_chart and generate_latest_signal_report validate explicit chart output paths before chart artifact directory creation or report chart rendering
+  - generate_latest_signal_report rejects ASCII control characters in chart_output_dir before score calculation, chart rendering, or chart artifact directory creation
+  - calculate_indicators supports fixture-backed 1d, 4h, and 1h timeframes
+  - calculate_indicators exposes swing_level_contract with gap/support/resistance and previous swing high/low
+  - score_leverage_swing exposes strategy_config_contract with schema, bounds, sum, threshold order, and hash validation
+  - score_leverage_swing, generate_trade_guide, and evaluate_position normalize asset/timeframe identity and reject blank/non-string identity values at the public tool boundary
+  - score_leverage_swing, generate_trade_guide, and evaluate_position reject ASCII control characters in asset/timeframe identity before scoring, guide construction, or position evaluation
+  - generate_trade_guide exposes trade_guide.v1 with time_exit_conditions and no-order-submission guards
+  - evaluate_position exposes position_management.v1 with WAIT/TRIM/EXIT/STOP and no-order-submission guards
+  - evaluate_position validates entry_price, current_price, and size as optional positive finite numbers before PnL or position-state calculations
+  - get_macro_snapshot exposes macro_filter_contract and macro_filter_summary contracts
+  - score_leverage_swing honors macro filter block flags
+  - score_leverage_swing exposes pullback and breadth component scores
+  - get_event_calendar exposes event_policy.v1 covering CPI/FOMC/NFP/EARNINGS without live calls
+  - get_event_calendar validates days as a positive integer and get_news_bundle trims/lowercases topic while rejecting blank/non-string topics before fixture/provider calls
+  - harness get_event_calendar invalid days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - get_event_calendar exposes event_window_summary and per-event danger_window contracts
+  - get_news_bundle exposes news_score_contract and score_leverage_swing uses explicit news_score
+  - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
+  - record_signal stores run_journal.v1 entries with idempotency and offline guards
+  - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
+  - harness record_signal non-object signal failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal non-string signal.run_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal control-character signal.run_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal blank signal.created_at failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal control-character signal.created_at failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal null signal.underlying failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal control-character signal.underlying failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal blank signal.config_version failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal control-character signal.config_version failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal non-string signal.config_hash failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness record_signal control-character signal.config_hash failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - record_signal rejects ASCII control characters in caller-supplied signal identity fields before repository writes or indicator snapshots
+  - record_signal, label_signal_outcome, and evaluate_score_performance validate ledger_path before ledger repository resolution or writes
+  - harness record_signal non-string ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalid ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome non-string ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance invalid ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance non-string ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - record_signal, label_signal_outcome, and evaluate_recorded_score_performance reject ASCII control characters in ledger_path before ledger repository resolution, reads, or writes
+  - harness label_signal_outcome control-character ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance control-character ledger_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - label_signal_outcome exposes signal_label_outcome.v1 metric fields and time-barrier MFE/MAE window
+  - label_signal_outcome supports NO_DATA and INVALIDATED_BY_EVENT labels
+  - label_signal_outcome normalizes signal_id and invalidating_event_id, validates price_path, stop_loss_pct, take_profit_pct, time_barrier_days, and invalidated_by_event before triple-barrier calculations
+  - harness label_signal_outcome non-list price_path failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonpositive price_path element failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonfinite price_path element failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome non-numeric stop_loss_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonfinite stop_loss_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalid signal_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome non-string signal_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalid stop_loss_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonpositive take_profit_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonfinite take_profit_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalid take_profit_pct failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome nonpositive time_barrier_days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome non-integer time_barrier_days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalid time_barrier_days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalidated_by_event truthy string failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - label_signal_outcome rejects ASCII control characters in signal_id and invalidating_event_id before ledger lookup or label writes
+  - harness label_signal_outcome blank invalidating_event_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome non-string invalidating_event_id failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome invalidating_event_id control-character failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness label_signal_outcome unused invalidating_event_id control-character failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - evaluate_score_performance registry wrapper validates days as a positive integer before fixture fallback or recorded ledger evaluation
+  - harness evaluate_score_performance invalid days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - harness evaluate_score_performance bool, negative, and string days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - Phase 6 performance report includes explicit score_calibration section
+  - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
+  - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
+  - create_document_evidence_card rejects ASCII control characters in document summary text, artifact refs, scalar fields, and asset_scope before evidence card construction
+  - no migrations, DDL, DB connection, live adapter, scheduler, credential, or runtime artifact is added
+  - get_audit_log and get_audit_summary expose audit_log.v1/audit_summary.v1 with no-network/no-secret evidence
+  - get_audit_log validates limit as a positive integer, caps it at 1000, and trims optional string filters before audit reads
+  - get_audit_log rejects ASCII control characters in optional filter inputs before audit reads
+  - MCP server @mcp.tool wrappers exactly match shared registry tool names
+  - MCP server wrappers dispatch only to the matching shared registry tool name
+  - MCP server wrapper payload keys exactly match wrapper parameters
+  - MCP server wrapper parameters exactly match registered implementation function parameters
+  - shared ToolSpec registry has unique ordered names, callable functions, and nonempty descriptions
+  - MVP required_tools manifest exactly matches shared registry tool_names order
+  - README, DevOps guide, SSOT, gate packet, and WORKING reflect readiness harness status
+  - completion audit maps Phase 0-9 requirements to concrete evidence and blockers
+  - Phase 6 offline feedback includes component attribution, ablation report, and promotion report
+  - suggest_weight_update exposes challenger_config.v1 with shadow/approval/OOS requirements
+  - MVP contract manifest includes evaluate_score_performance, suggest_weight_update, and compare_champion_challenger
+  - report harness includes delivery contract and guard coverage without network sends
+  - report harness supports pre-market, intraday risk, and post-market intent-specific sections and Telegram required sections
+  - report contract guard verifies generated section order exactly matches the selected report intent required_sections
+  - report contract guard verifies formatted report text section markers appear in selected intent order
+  - report contract guard verifies report_intent_contract key schema exactly matches name/schedule_hint/decision_focus/required_sections
+  - report contract guard verifies report_intent_contract values exactly match the REPORT_INTENTS registry
+  - generate_latest_signal_report normalizes report_intent by type check, control-character rejection, trim, and lowercase before report contract lookup
+  - generate_latest_signal_report, generate_position_review_report, and generate_cron_prompt_pack reject ASCII control characters in asset, timeframe, and chart_timeframe identity fields before scoring, chart rendering, prompt construction, or report construction
+  - generate_latest_signal_report rejects unsupported report_intent values at the public boundary with allowed registry evidence
+  - harness generate_latest_signal_report rejects unsupported report_intent values with failure audit evidence and no output summary
+  - report contract guard verifies Telegram required_sections match the selected report intent
+  - report contract guard verifies delivery contract cron_intents exactly match the report intent registry
+  - report contract guard verifies delivery channel format values match Hermes structured JSON plus Telegram plain text
+  - report contract guard verifies Telegram delivery contract max_chars remains 3900
+  - report contract guard verifies Telegram delivery contract schema_version remains telegram_report_format.v1
+  - report contract guard verifies Telegram delivery contract chunking fields match the expected policy
+  - report contract guard verifies prompt_contract must_include exactly matches the selected report intent terms
+  - report contract guard verifies prompt_contract key schema exactly matches numeric_authority/llm_role/must_include
+  - report contract guard verifies prompt_contract numeric_authority and llm_role identity values
+  - report intent prompt contracts align must_include terms with intent-specific output sections
+  - generate_latest_signal_report validates extra_evidence_cards container and item object types before score calculation, chart rendering, or multimodal context construction
+  - harness generate_latest_signal_report invalid extra_evidence_cards type failures exit nonzero, emit no stdout payload, create no chart artifacts, and record failure audit events without output_summary
+  - generate_position_review_report validates entry_price, current_price, and size before position evaluation or report construction
+  - harness generate_position_review_report invalid numeric input failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
+  - generate_cron_prompt_pack returns guarded Hermes prompt templates without adding a scheduler
+  - generate_cron_prompt_pack aligns report prompt input_json and expected_sections with report intent contracts
+  - generate_cron_prompt_pack trims and uppercases asset identity before emitting prompt input_json, text, and idempotency keys
+  - generate_cron_prompt_pack rejects blank asset identity before emitting empty prompt input_json or idempotency keys
+  - generate_cron_prompt_pack trims timeframe identity and rejects blank/non-string timeframe values before emitting prompt input_json
+  - generate_cron_prompt_pack rejects non-boolean include_position_review values before truthiness can alter prompt composition
+  - generate_cron_prompt_pack verifies prompt tool_name and input_json schema match the target tool
+  - generate_cron_prompt_pack verifies idempotency_key_template matches prompt name, asset, and date placeholder
+  - generate_cron_prompt_pack verifies prompt text references the idempotency_key_template
+  - generate_cron_prompt_pack verifies prompt text references expected Telegram sections
+  - generate_cron_prompt_pack verifies position_review expected_sections match the position review section contract
+  - generate_cron_prompt_pack verifies prompt metadata and text reference expected tool output schemas
+  - generate_cron_prompt_pack verifies prompt metadata and text preserve the no-live-data boundary
+  - generate_cron_prompt_pack verifies prompt metadata and text reference decision_focus values
+  - generate_cron_prompt_pack verifies supported_report_intents exactly match the report intent registry
+  - generate_cron_prompt_pack verifies pack contract name, prompt asset, and report timeframe identity
+  - generate_cron_prompt_pack verifies include_position_review contract value matches the requested pack option
+  - generate_cron_prompt_pack verifies top-level schema_version and live_data_required values in the guard
+  - generate_cron_prompt_pack verifies top-level pack keys exactly match the expected schema
+  - generate_cron_prompt_pack verifies manual setup requirements exactly match the registry
+  - generate_cron_prompt_pack verifies cron_prompt_contract keys exactly match the expected schema
+  - generate_cron_prompt_pack verifies each prompt object key schema exactly matches the expected schema
+  - generate_cron_prompt_pack verifies cron_prompt_guard keys exactly match the expected schema
+  - generate_cron_prompt_pack verifies cron_prompt_guard check names exactly match the expected schema
+  - generate_cron_prompt_pack verifies cron_prompt_guard check keys exactly match the expected schema
+  - generate_cron_prompt_pack verifies unattended cron prerequisites are declared before scheduler setup
+  - generate_cron_prompt_pack verifies prompt text references manual setup prerequisites
+  - generate_cron_prompt_pack verifies prompt generation requires no Telegram credentials and returns no secrets
+  - generate_cron_prompt_pack verifies prompt text preserves no-secret instructions
+  - generate_cron_prompt_pack verifies prompt text references prompt names
+  - generate_cron_prompt_pack verifies prompt names exactly match report intents plus optional position_review
+  - generate_cron_prompt_pack verifies prompt names are unique and ordered as report intents plus optional position_review
+  - generate_cron_prompt_pack verifies prompt schedule_hint values match report intent and position review contracts
+  - generate_cron_prompt_pack verifies prompt text references schedule_hint values
+  - generate_cron_prompt_pack verifies prompt text matches declared tool_name and input_json values
+  - generate_cron_prompt_pack verifies prompt text requires the configured Hermes/Telegram gateway
+  - generate_cron_prompt_pack verifies prompt text references delivery_preview.channels.telegram.chunks
+  - generate_cron_prompt_pack verifies prompt text matches declared delivery_preview_path values
+  - generate_cron_prompt_pack verifies prompt metadata and text reference telegram_report_format.v1
+  - generate_cron_prompt_pack verifies prompt metadata and text reference numeric authority values
+  - generate_cron_prompt_pack verifies prompt text preserves report and position numeric authority instructions
+  - generate_cron_prompt_pack verifies every prompt text preserves the no-order-submission instruction
+  - position review report wraps evaluate_position with Hermes/Telegram delivery contract and guard coverage
+  - position review guard verifies Telegram required_sections match the position review contract
+  - position review guard uses the Telegram delivery contract max_chars for text length checks
+  - position review guard verifies position_review_contract key schema exactly matches the expected schema
+  - position review guard verifies position_review_contract declares no network side effect
+  - position review guard verifies position_review_contract name, trigger, and decision_focus identity values
+  - position review guard verifies position_review_contract required_sections exactly match the expected position review section schema
+  - position review guard verifies position_review_contract declares no order submission side effect
+  - position review guard verifies generated section order exactly matches the position review contract
+  - generate_position_review_report trims/uppercases asset identity and rejects blank/non-string asset values before evaluating position state
+  - position review guard verifies prompt_contract must_include exactly matches the expected position review terms
+  - position review guard verifies prompt_contract key schema exactly matches the expected schema
+  - position review guard verifies prompt_contract numeric_authority and llm_role identity values
+  - position review guard verifies Telegram delivery contract max_chars remains 3900
+  - position review guard verifies Telegram delivery contract schema_version remains telegram_report_format.v1
+  - position review guard verifies Telegram delivery contract chunking fields match the expected policy
+  - position review guard verifies delivery channel format values match Hermes structured JSON plus Telegram plain text
+  - position review guard verifies delivery contract cron_intents exactly match the report intent registry
+  - report and position review guards verify delivery contract channels have no send side effect
+  - report and position review guards verify delivery contract channels have no network side effect
+  - report and position review guards verify delivery contract key schemas exactly match the expected schema
+  - report and position review guards verify guard check names exactly match the expected schema
+  - report and position review guards verify guard check key schemas exactly match the expected schema
+  - report, position, and evidence guards verify top-level guard keys exactly match the expected status/checks schema
+  - report contract guard verifies Hermes delivery numeric_authority is latest_signal_report
+  - report and position review guards verify generated text reflects structured numeric authority fields
+  - latest signal and position review report payloads expose top-level payload key schema guards
+  - latest signal and position review report payload guards verify schema_version and live_data_required values
+  - latest signal and position review payload guards verify check names exactly match the expected schema
+  - latest signal and position review payload guards verify check key schemas exactly match the expected schema
+  - latest signal and position review payload guards verify guard top-level key schemas exactly match the expected status/checks schema
+  - position review payload guard verifies top-level summary fields match position_review identity values
+  - position review payload guard verifies nested delivery_preview and position review guards are ok
+  - latest signal report payload guard verifies top-level report_intent matches report_intent_contract.name
+  - latest signal report payload guard verifies top-level summary fields match latest_signal_report identity values
+  - latest signal report payload guard verifies nested delivery_preview, evidence, and report contract guards are ok
+  - latest signal report payload guard verifies optional chart and multimodal context statuses are ok when present
+  - latest signal report payload guard verifies optional chart and multimodal nested guard statuses are ok when present
+  - latest signal report payload guard verifies source_signal_ref key schema exactly matches signal_id/run_id/config_hash
+  - latest signal report payload guard verifies source_signal_ref matches report signal_id/config_hash identity and keeps run_id nonempty
+  - latest signal report payload guard verifies source_signal_ref values preserve traceable nonempty ids and sha256 config hash format
+  - latest signal report payload guard verifies source_signal_ref config_hash contains a 64-character hex sha256 digest
+  - report payloads expose telegram_report_format.v1 for section-separated 1-based chunks without send calls
+  - generate_latest_signal_report rejects non-boolean include_chart values before chart rendering can run
+  - generate_latest_signal_report trims/uppercases asset identity, trims timeframe identity, and rejects blank/non-string asset/timeframe values before scoring or chart rendering
+  - generate_latest_signal_report trims/lowercases chart_timeframe and rejects blank/non-string chart_timeframe before chart rendering
+  - report payloads include offline Hermes/Telegram delivery previews with Telegram chunk guards
+  - delivery_preview guard verifies no Telegram send side effect for report and position review previews
+  - delivery_preview guard verifies no network side effect for report and position review previews
+  - delivery_preview guard verifies Telegram format schema, max chunk size, and text preservation
+  - delivery_preview guard verifies check names exactly match the expected schema
+  - delivery_preview guard verifies check key schemas exactly match the expected schema
+  - delivery_preview guard verifies payload, channel, chunk, and guard keys exactly match the expected schema
+  - delivery_preview guard verifies Hermes payload_ref and numeric_authority match the structured payload key
+  - delivery_preview guard verifies Telegram required section headers are present in preview text/chunks
+  - delivery_preview guard verifies unrequested known section headers are absent from Telegram preview text/chunks
+  - delivery_preview guard verifies Telegram chunk indexes are 1-based and sequential
+  - delivery_preview guard verifies Telegram message_count and fits_single_message match the actual chunks
+  - delivery_preview guard verifies Telegram chunk chars metadata matches actual chunk text length
+  - delivery_preview guard verifies Telegram chunks are nonempty before delivery
+  - delivery_preview guard verifies the declared Telegram section_separator preserves preview text reconstruction
+  - delivery_preview guard verifies Telegram overflow_policy splits continuation chunks on required section boundaries
+  - get_integration_readiness exposes telegram_delivery_readiness.v1 with bot-token/gateway readiness and no-send evidence
+  - latest signal report includes evidence summary limits and acknowledged conflict flags
+  - evidence_guard verifies check names exactly match the expected schema, including data warning variants
+  - evidence_guard verifies guard check key schemas exactly match the expected schema
+  - degraded latest signal report data_warnings are explicitly reflected in Cautions and evidence guard checks
+  - evaluate_score_performance supports a deterministic 90-day fixture OOS report
+  - evaluate_score_performance supports a deterministic 180-day fixture OOS report with fixture_oos_window.v1 metadata
+  - evaluate_score_performance marks unsupported long fixture windows with coverage gap metadata instead of implying full-window support
+  - evaluate_score_performance supports walk-forward fixture folds and an overfit_guard
+  - overfit_guard exposes deflated_sharpe_proxy.v1 conservative fixture metric without auto-promotion
+  - evidence cards include modality, portable artifact refs, and multimodal guard coverage
+  - render_chart exposes chart_artifact.v1 contract and PNG/offline renderer guard
+  - create_document_evidence_card produces guarded document/PDF summary evidence cards
+  - generate_latest_signal_report attaches extra evidence cards and chart refs into guarded multimodal_context
+  - multimodal_context.guard verifies check names, check key schemas, and guard top-level keys
+  - multimodal_context.guard verifies multimodal_context top-level key schema
+  - multimodal_context.guard verifies evidence card and artifact_ref evidence_id values are nonempty and unique
+  - multimodal_context tests verify duplicate safe document evidence ids conflict before downstream identity assumptions
+  - multimodal_context.guard verifies document evidence ids do not use reserved context ids
+  - multimodal_context.guard verifies document evidence ids match a safe lowercase ASCII underscore contract
+  - multimodal_context.guard verifies artifact_ref evidence ids match a safe lowercase ASCII underscore contract
+  - multimodal_context.guard verifies artifact_ref values are nonempty and unique
+  - multimodal_context tests verify chart slot and manual CHART refs cannot point at the same artifact URI
+  - multimodal_context.guard verifies CHART artifact refs match the PNG suffix or sha256 content-address contract
+  - multimodal_context.guard verifies CHART artifact refs use offline local, artifact://, or sha256 locations
+  - multimodal_context.guard rejects CHART artifact refs that use file:// URI syntax
+  - multimodal_context.guard rejects CHART artifact refs that use ~/ user-home syntax
+  - multimodal_context.guard rejects CHART artifact refs that use /Users/ or drive-root machine-specific paths
+  - multimodal_context.guard rejects artifact refs that embed local path markers inside otherwise allowed URI prefixes
+  - multimodal_context.guard verifies artifact_ref values have no surrounding whitespace or ASCII control characters
+  - multimodal_context tests verify CHART artifact_ref values reject ASCII control characters while PNG/offline guards stay ok
+  - multimodal_context.guard verifies sha256 content-addressed artifact refs include a 64-character hex digest
+  - multimodal_context tests verify valid sha256 content-addressed CHART and PDF refs stay accepted
+  - multimodal_context tests verify missing CHART artifact_ref metadata keys conflict after DTO defaulting before downstream metadata assumptions
+  - multimodal_context.guard verifies artifact_refs envelope and artifact_ref key schemas
+  - multimodal_context tests verify non-string PDF artifact_ref ref_type conflicts before downstream normalization
+  - multimodal_context.guard verifies artifact_ref ref_type values stay within the CHART/PDF contract
+  - multimodal_context tests verify unexpected PDF artifact_ref top-level keys conflict before downstream consumers accept undeclared fields
+  - multimodal_context tests verify missing PDF artifact_ref ref keys conflict before downstream URI assumptions
+  - multimodal_context tests verify missing PDF artifact_ref ref_type keys conflict before downstream artifact type assumptions
+  - multimodal_context tests verify missing PDF artifact_ref metadata keys conflict before downstream metadata assumptions
+  - multimodal_context.guard verifies artifact_ref metadata key schema per artifact_ref entry
+  - multimodal_context.guard verifies CHART and PDF artifact_ref metadata key schemas
+  - multimodal_context.guard verifies CHART and PDF artifact_ref metadata safety values
+  - multimodal_context.guard verifies CHART artifact_ref renderer metadata is string typed
+  - LatestSignalReport DTO rejects non-string CHART artifact_ref ref_type before malformed report payload emission
+  - LatestSignalReport DTO rejects empty CHART artifact_ref ref_type before malformed report payload emission
+  - LatestSignalReport DTO rejects lowercase CHART artifact_ref ref_type before malformed report payload emission
+  - multimodal_context tests verify unknown CHART artifact_ref renderer values conflict while renderer type remains valid
+  - multimodal_context.guard verifies CHART artifact_ref renderer metadata has no surrounding whitespace or ASCII control characters
+  - multimodal_context.guard verifies PDF artifact_ref metadata description has no surrounding whitespace or ASCII control characters
+  - multimodal_context tests verify PDF artifact_ref metadata description must remain nonempty before text safety checks
+  - multimodal_context tests verify PDF artifact_ref metadata boolean values stay exact before downstream parsing
+  - multimodal_context tests verify PDF artifact_ref metadata required keys cannot be omitted from a dict payload
+  - multimodal_context tests verify CHART artifact_ref metadata required keys cannot be omitted from a dict payload
+  - multimodal_context tests verify CHART artifact_ref metadata bars and timeframe_supported values stay safe
+  - multimodal_context.guard verifies modality_counts match chart and evidence card context
+  - multimodal_context.guard verifies evidence card key schemas for document evidence context
+  - multimodal_context tests verify missing document source keys conflict before downstream categorical assumptions
+  - multimodal_context tests verify unexpected document evidence card top-level keys conflict before downstream consumers accept unbounded fields
+  - multimodal_context.guard verifies document evidence modality stays on the supported pdf_summary contract
+  - multimodal_context tests verify document modality must preserve string type before supported-modality checks
+  - multimodal_context tests verify document modality must remain nonempty before supported-modality checks
+  - multimodal_context tests verify document bias must preserve string type before categorical checks
+  - multimodal_context.guard verifies document evidence modality and observed_at have no surrounding whitespace or ASCII control characters
+  - multimodal_context tests verify document observed_at must preserve string type before timestamp parsing
+  - multimodal_context tests verify document observed_at must remain nonempty before timestamp checks
+  - multimodal_context.guard verifies document evidence artifact_ref uses an explicit portable URI prefix
+  - multimodal_context tests verify document PDF artifact_ref values must remain nonempty before URI/PDF contract checks
+  - multimodal_context tests verify document PDF artifact_ref ref_type must remain nonempty before artifact type contract checks
+  - multimodal_context.guard verifies PDF artifact refs match the PDF suffix or sha256 content-address contract
+  - multimodal_context.guard verifies document evidence observed_at is a parseable UTC ISO timestamp
+  - multimodal_context.guard verifies document evidence observed_at is not after report created_at
+  - multimodal_context.guard verifies document evidence asset_scope includes report asset and underlying
+  - multimodal_context tests verify empty document asset_scope cannot satisfy report asset/underlying scope
+  - multimodal_context tests verify document asset_scope must preserve uppercase values after scope matching
+  - multimodal_context.guard verifies document evidence asset_scope values have no surrounding whitespace or ASCII control characters
+  - multimodal_context tests verify document strength/confidence must preserve numeric type and reject string/None drift
+  - multimodal_context tests verify document strength/confidence must remain within the 0..1 range
+  - multimodal_context.guard verifies document evidence summaries stay within normalized max length
+  - multimodal_context tests verify document summary must remain nonempty after trimming
+  - multimodal_context.guard verifies summary_truncated flags match normalized summary length
+  - multimodal_context.guard verifies document evidence invalidating_condition is non-placeholder and actionable
+  - multimodal_context tests verify document invalidating_condition must preserve string type before actionability checks
+  - multimodal_context tests verify document invalidating_condition must remain nonempty before actionability checks
+  - multimodal_context.guard verifies document evidence card category/source/bias categorical values
+  - multimodal_context tests verify document category/source must preserve string type before categorical checks
+  - multimodal_context tests verify document category/source must remain nonempty and identity-matched before categorical checks
+  - multimodal_context tests verify document bias must remain nonempty and in the categorical allowed set
+  - multimodal_context.guard verifies document evidence buy/sell impacts remain context_only
+  - multimodal_context tests verify document buy/sell impact fields must preserve string type before context-only checks
+  - multimodal_context tests verify document buy/sell impact fields must remain nonempty before context-only checks
+  - multimodal_context.guard verifies artifact_refs match chart and evidence card context
+  - multimodal_context.guard verifies evidence card value safety for document evidence context
+  - multimodal_context.guard verifies document evidence summary and invalidating_condition have no surrounding whitespace or ASCII control characters
+  - multimodal_context.guard verifies identity values for schema_version, numeric_authority, and no-call/no-embed flags
+  - non-default report intents preserve guarded multimodal context with chart and document evidence
+  - non-default report intents preserve document-only guarded multimodal context without chart_code_guard
+  - BTC COIN-M risk settings include an emergency kill switch that blocks execution
+  - normalize_binance_coinm_account_snapshot provides BTC-only read-only portfolio summary without credentials, network calls, or order side effects
+  - preview_btc_order reports position_effect from portfolio_snapshot without submitting orders
+  - Binance credential status and order preview expose binance_credential_policy.v1 with trade-only, no-withdraw, and manual-passphrase rules
+  - MVP contract manifest includes guarded Phase 9 BTC risk, credential, read-only account, preview, and execute tools
+  - get_integration_readiness exposes live_order_submission gate with explicit approval, live-trading env flag, passphrase, permission attestation, and kill-switch evidence
+  - get_integration_readiness exposes live_data_source_readiness.v1 with market OHLCV, macro, and news source decisions tracked separately
+  - record_runtime_checkpoint appends runtime/readiness checkpoint JSONL without scheduler, network call, Telegram send, or secret values
+  - MVP contract manifest includes get_runtime_status and record_runtime_checkpoint
 
-next_state_after_success: BTC_COINM_READ_ONLY_FLOW_IMPLEMENTED
+next_state_after_success: AWAITING_USER_ENVIRONMENT_OR_GATE_DECISION
 ```
 
 Previous completed directive:
@@ -83,31 +447,34 @@ p1_dto_contract_tests:
 ## 2. CURRENT_TASK_CONTRACT
 
 ```yaml
-task_contract: user directive 2026-05-09: make auditing possible and view audit logs on the web
-portable_mirror: docs/halo-swing-development-plan.md#3.22
-gate_packet: audit log and web viewer record in SSOT
+task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
+portable_mirror: docs/halo-swing-development-plan.md#3.418
+gate_packet: docs/halo-swing-development-plan.md#3.418
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.22
-  - src/halo_swing_mcp/audit.py
-  - src/halo_swing_mcp/audit_web.py
-  - src/halo_swing_mcp/contracts.py
-  - src/halo_swing_mcp/fixtures.py
-  - src/halo_swing_mcp/indicators.py
-  - src/halo_swing_mcp/strategy.py
-  - src/halo_swing_mcp/tools/
-  - tests/golden/
+  - docs/halo-swing-development-plan.md#3.418
+  - src/halo_swing_mcp/tools/recording.py
+  - src/halo_swing_mcp/tools/scoring.py
+  - tests/test_mvp_tools.py
 
 implementation_rule:
   - keep reusable module boundaries
   - preserve existing design patterns unless user approves a pattern change
   - keep default execution offline and deterministic
-  - keep audit logging as a reusable cross-cutting module
-  - keep web viewer local-only by default
-  - BTC automatic order execution must stay Binance COIN-M only
-  - do not persist plaintext secrets
+  - keep Phase 6 OOS evaluation fixture-backed until live/repository gates are approved
+  - keep Phase 8 multimodal scope metadata-only until Hermes/runtime gates are approved
+  - keep document summary input caller-supplied; do not read files or parse PDFs in MCP
+  - keep multimodal report context offline; do not call Hermes multimodal APIs
+  - keep Phase 9 execution approval-required and blocked by default
+  - keep offline portfolio snapshot normalization read-only and caller-supplied
+  - keep runtime checkpoints manual and append-only; do not add schedulers or Telegram sends
+  - keep report and position review harnesses offline and non-invasive
+  - keep Hermes evidence summaries bounded and conflict flags explicit
+  - keep code-calculated fields as numeric authority for Hermes/Telegram text
+  - do not add migrations, DDL, schema runners, or DB connection code
+  - do not add live adapters, schedulers, alerting integrations, Telegram credentials, or committed runtime/chart artifacts
   - verify through tests and CLI harness
 ```
 
@@ -126,6 +493,7 @@ p1_dto_contract:
   gates:
     DECISION_LOG_GO: recorded
     DTO_CONTRACT_GO: recorded
+    MIGRATION_GATE_READINESS: recorded_no_go
     MIGRATION_GO: not_recorded
     REPOSITORY_GO: not_recorded
   implemented:
@@ -183,6 +551,7 @@ tool_registry_foundation:
     - registry-backed health_check
     - registry-backed CLI harness
     - registry-backed MCP server wrapper bodies
+    - exact @mcp.tool wrapper parity test against the shared registry
     - tests/test_tool_registry.py
   pattern_decision:
     changed: false
@@ -201,6 +570,136 @@ replay_provider_interface:
   pattern_decision:
     changed: false
     note: public tool functions and payload shapes preserved; fixture access moved behind provider boundary
+
+signal_repository_contract:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/signal_repository.py
+    - SignalLedgerRepository protocol
+    - JsonlSignalLedgerRepository
+    - repository-backed record_signal tool path
+    - repository-backed label_signal_outcome tool path
+    - repository-backed evaluate_score_performance ledger path
+    - tests/test_signal_repository.py
+  pattern_decision:
+    changed: false
+    note: existing JSONL runtime ledger behavior and tool payload shapes preserved; DB migrations and DB connection code remain blocked
+
+runtime_watchdog_retention:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/runtime_guard.py
+    - src/halo_swing_mcp/tools/runtime.py
+    - get_runtime_status tool
+    - record_runtime_checkpoint tool
+    - JSONL retention inspect/apply helper
+    - append-only JSONL runtime checkpoint snapshot
+    - watchdog event payload contract
+    - repeated audit failure degraded-mode evaluation
+    - tests/test_runtime_guard.py
+  pattern_decision:
+    changed: false
+    note: local JSONL runtime guard added without scheduler, DB persistence, live adapter, or committed runtime artifacts
+
+report_harness:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/tools/reporting.py
+    - generate_latest_signal_report tool
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+    - report prompt contract metadata
+    - report text snapshot
+  pattern_decision:
+    changed: false
+    note: deterministic report harness added before live Hermes/Telegram environment setup
+
+position_review_report:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - generate_position_review_report tool
+    - position_review numeric authority delivery contract
+    - position review prompt contract
+    - position review guard
+    - tests/test_reporting.py position review coverage
+  pattern_decision:
+    changed: false
+    note: deterministic position review report wraps evaluate_position without network, scheduler, Telegram, or order side effects
+
+report_delivery_preview:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - latest signal report delivery_preview
+    - position review report delivery_preview
+    - Hermes payload_ref metadata
+    - Telegram message chunk preview
+    - chunk size and text preservation guard
+    - tests/test_reporting.py delivery preview coverage
+  pattern_decision:
+    changed: false
+    note: delivery preview remains offline and does not send Telegram messages or configure Hermes credentials
+
+report_evidence_guard:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - latest signal report evidence_contract
+    - latest signal report evidence_context
+    - latest signal report evidence_guard
+    - reason and evidence summary length limits
+    - event-risk-vs-long-bias conflict flag
+    - mixed-component conflict flag
+    - risk warning reflection check
+  pattern_decision:
+    changed: false
+    note: evidence guard is a deterministic report contract only; no live evidence collection or Hermes runtime added
+
+multimodal_chart_ref_guard:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - generate_latest_signal_report include_chart option
+    - generate_latest_signal_report chart_timeframe option
+    - generate_latest_signal_report chart_output_dir option
+    - latest_signal_report.chart_ref population
+    - chart_code_guard payload
+    - tests/test_reporting.py chart ref and guard coverage
+  pattern_decision:
+    changed: false
+    note: chart refs are optional and generated only on demand; numeric authority remains code-calculated fields
+
+p1_migration_gate_readiness:
+  status: recorded_no_go
+  gate_packet: docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md
+  recorded:
+    - recommended text ID policy
+    - recommended UTC ISO-8601 timestamp policy
+    - initial table list
+    - deferred table list
+    - constraints and indexes
+    - migration naming/idempotency policy
+    - required verification after MIGRATION_GO
+  pattern_decision:
+    changed: false
+    note: readiness packet only; MIGRATION_GO and REPOSITORY_GO remain blocked
+
+integration_readiness_harness:
+  status: verified
+  gate_packet: docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  implemented:
+    - src/halo_swing_mcp/tools/readiness.py
+    - get_integration_readiness tool
+    - tests/test_readiness.py
+    - health capability registration
+    - README and DevOps guide command
+  pattern_decision:
+    changed: false
+    note: offline readiness only; no network calls, secrets, live adapters, migrations, or schedulers
 
 btc_binance_guarded_execution:
   status: verified
@@ -300,6 +799,8 @@ p1_dto_contract_tests:
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: CLI smoke for record_signal, label_signal_outcome, evaluate_score_performance with /private/tmp JSONL ledger
       result: passed
   blocked_paths_changed: false
   db_data_artifact_or_state_files_added: false
@@ -471,6 +972,16867 @@ btc_binance_guarded_execution_final:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m compileall -q src
       result: passed
+
+signal_repository_contract_final:
+  status: passed
+  changed_files:
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/signal_repository.py
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_signal_repository.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "53 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+  design_pattern_change:
+    required: false
+    note: existing JSONL ledger behavior is now behind a repository contract without changing public tool payload shapes
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  migrations_or_db_connections_added: false
+
+runtime_watchdog_retention_final:
+  status: passed
+  changed_files:
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/runtime_guard.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/runtime.py
+    - tests/golden/health_check.json
+    - tests/test_runtime_guard.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "57 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m compileall -q src
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status with /private/tmp JSONL paths and apply_retention=true
+      result: passed
+  design_pattern_change:
+    required: false
+    note: runtime guard added as a small local tool behind the existing registry/server/harness pattern
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  migrations_or_db_connections_added: false
+  scheduler_or_alerting_added: false
+
+phase_7_runtime_checkpoint_final:
+  status: passed
+  changed_files:
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/runtime.py
+    - tests/golden/health_check.json
+    - tests/test_runtime_guard.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/runtime.py src/halo_swing_mcp/runtime_guard.py src/halo_swing_mcp/tool_registry.py src/halo_swing_mcp/server.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint with /private/tmp JSONL paths
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "78 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  design_pattern_change:
+    required: false
+    note: checkpoint tool follows the existing registry/server/harness pattern and reuses runtime/readiness snapshots
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  migrations_or_db_connections_added: false
+  scheduler_or_alerting_added: false
+  hermes_or_telegram_credentials_added: false
+
+report_harness_final:
+  status: passed
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/health_check.json
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_reporting.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "61 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m compileall -q src
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --audit-log-path /private/tmp/halo_swing_report_harness_audit.jsonl
+      result: passed
+  design_pattern_change:
+    required: false
+    note: deterministic report harness added behind the existing registry/server/harness pattern before live Hermes setup
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  hermes_or_telegram_credentials_added: false
+  scheduler_or_alerting_added: false
+
+multimodal_chart_ref_guard_final:
+  status: passed
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "63 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m compileall -q src
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_chart_ref_guard"}' --audit-log-path /private/tmp/halo_swing_chart_ref_guard_audit.jsonl
+      result: passed
+  design_pattern_change:
+    required: false
+    note: optional chart ref uses existing deterministic render_chart tool and keeps numeric authority in code fields
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  hermes_or_telegram_credentials_added: false
+  scheduler_or_alerting_added: false
+  committed_chart_artifacts_added: false
+
+p1_migration_gate_readiness_final:
+  status: passed
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md
+    - docs/halo-swing-development-plan.md
+  verification:
+    - command: rg -n "MIGRATION_GO.*not_recorded|recorded_no_go|NO_GO_UNTIL_USER_APPROVAL" docs/WORKING.md docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md docs/halo-swing-development-plan.md
+      result: passed
+    - command: blocked path and artifact audit
+      result: passed
+  design_pattern_change:
+    required: false
+    note: docs-only readiness packet; no migration, DDL, DB connection, or repository persistence added
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  ignored_local_state_present:
+    path: state/audit_log.jsonl
+    git_status: ignored
+  dependency_changes: false
+  migrations_or_db_connections_added: false
+  repository_persistence_added: false
+
+integration_readiness_harness_final:
+  status: passed
+  changed_files:
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_readiness.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "66 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  design_pattern_change:
+    required: false
+    note: offline readiness harness added behind existing registry/server/harness pattern
+  blocked_paths_changed: false
+  repo_runtime_artifacts_added: false
+  dependency_changes: false
+  live_api_or_broker_added: false
+  migrations_or_db_connections_added: false
+  hermes_or_telegram_credentials_added: false
+  scheduler_or_alerting_added: false
+  secret_values_returned: false
+
+integration_readiness_passphrase_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "70 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_passphrase_confirmed":true}' --no-audit
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  behavior:
+    - readiness no longer marks Binance testnet read-only smoke ready from encrypted credentials alone
+    - binance_passphrase_confirmed is a non-secret boolean confirming the operator can provide the passphrase at smoke time
+    - missing manual passphrase confirmation keeps the Binance gate blocked
+  secret_values_returned: false
+  network_calls_added: false
+  broker_calls_added: false
+
+gate_packet_gap_summary_sync:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+  reason:
+    - top-level gap summary still listed completed gates as not implemented
+    - immediate-next text still described policy/passphrase recording as future work
+    - stale gap summaries can cause future agents to reopen blocked or completed scope
+  verification:
+    - command: stale gate summary search for prior baseline and obsolete not-yet-implemented heading
+      result: no_matches
+    - command: git diff --check
+      result: passed
+  behavior_change: false
+  code_change: false
+
+full_goal_completion_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  purpose:
+    - map each explicit product phase and gate to concrete artifacts
+    - avoid treating passing tests as full product completion
+    - record remaining user/environment blockers
+  coverage_hardening:
+    - QLD/TQQQ/SSO/UPRO/SOXL guide generation coverage
+    - high event risk prevents new 3x entry coverage
+    - explicit news/policy/geopolitical/AI theme score contract coverage
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_health_check.py
+      result: "15 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "70 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  conclusion:
+    overall_goal_complete: false
+    reason: Hermes/Telegram, live data, DB gates, Binance smoke credentials, and live order approval remain unresolved
+
+phase_6_attribution_ablation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance component_attribution
+    - evaluate_score_performance ablation_report
+    - compare_champion_challenger promotion_report
+    - recorded ledger performance includes signal component_scores when present
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py tests/test_reporting.py tests/test_health_check.py
+      result: "24 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_health_check.py
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "70 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  behavior_change:
+    - performance payloads now include attribution and ablation summaries when component_scores are present
+    - challenger comparison returns a promotion_report but still refuses automatic promotion
+  blocked_scope_unchanged:
+    - strategy repository persistence
+    - DB connection
+    - live data adapters
+
+phase_6_oos_fixture_report:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/recording.py
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance days parameter
+    - deterministic 90-day fixture sample expansion
+    - evaluation_window metadata
+    - out_of_sample_report with in-sample/OOS split
+    - promotion_report OOS readiness fields
+    - server and ledger wrapper days passthrough
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_tool_registry.py
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py src/halo_swing_mcp/tools/recording.py src/halo_swing_mcp/server.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness compare_champion_challenger --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "75 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - strategy repository persistence
+    - DB connection
+    - live data adapters
+    - automatic champion promotion
+
+phase_6_score_calibration:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance score_calibration section
+    - per-bin expected_take_profit_rate and realized_take_profit_rate
+    - per-bin calibration_error and largest_abs_calibration_error
+    - score_bin_order_check and take_profit_rate_order_check
+    - MVP contract requires score_calibration section
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_tool_registry.py
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "78 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - strategy repository persistence
+    - DB connection
+    - live data adapters
+    - automatic champion promotion
+
+phase_8_evidence_modality:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/fixtures.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/golden/signal_replay_bundle.json
+    - tests/test_contracts.py
+    - tests/test_mvp_tools.py
+    - tests/test_providers.py
+  implementation:
+    - evidence card modality fields
+    - portable artifact_ref fields for PDF/news fixture evidence
+    - get_news_bundle modality_counts
+    - get_news_bundle artifact_refs
+    - multimodal_evidence_guard
+    - signal replay bundle modality fixture coverage
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py tests/test_contracts.py
+      result: "28 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/fixtures.py src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py tests/test_providers.py tests/test_contracts.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "75 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - live Hermes multimodal call
+    - real PDF/image parsing
+    - live evidence adapter
+    - committed evidence artifacts
+
+phase_8_document_summary_input:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - create_document_evidence_card MCP/CLI tool
+    - document_evidence_card.v1 schema marker
+    - document_summary_input_contract
+    - document_summary_input_guard
+    - multimodal_evidence_guard for generated evidence card
+    - portable artifact_ref enforcement
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/tool_registry.py src/halo_swing_mcp/server.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness create_document_evidence_card --input-json '{"summary":"FOMC minutes summary says policy remains restrictive but stable.","artifact_ref":"artifact://documents/fomc-minutes-summary.pdf","asset_scope":["QQQ","TQQQ"],"bias":"slightly_bullish","strength":0.57,"confidence":0.68}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "79 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live Hermes multimodal call
+    - real PDF/image parsing
+    - local file reads
+    - committed evidence artifacts
+
+phase_8_multimodal_report_context:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report extra_evidence_cards parameter
+    - multimodal_context payload when chart refs or extra evidence cards are present
+    - multimodal_context artifact_refs and modality_counts
+    - multimodal_context guard with latest_signal_report numeric authority
+    - guard records no Hermes multimodal call, no network call, no raw artifact embedding
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/server.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report with include_chart=true and extra_evidence_cards
+      result: passed, multimodal_context.status ok
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "80 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live Hermes multimodal call
+    - real PDF/image parsing
+    - Telegram send
+    - committed evidence artifacts
+
+phase_9_emergency_kill_switch:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/risk_settings.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/trading_admin_web.py
+    - tests/test_binance_btc.py
+  implementation:
+    - emergency_kill_switch_enabled BTC risk setting
+    - kill switch included in get/update risk settings
+    - validate_btc_order_limits blocks when kill switch is enabled
+    - execute_btc_order returns emergency_kill_switch_enabled before credential use
+    - trading admin form/status exposes kill switch
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_tool_registry.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/risk_settings.py src/halo_swing_mcp/binance_btc.py src/halo_swing_mcp/server.py src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness execute_btc_order --input-json '{"confirm":"CONFIRM_BTC_BINANCE_COINM_ORDER","settings_path":"/private/tmp/halo_swing_kill_switch_settings.json"}' --no-audit
+      result: passed_blocked_emergency_kill_switch_enabled
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "77 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - live order submission
+    - non-BTC broker support
+    - withdrawal permissions
+    - credential passphrase automation
+
+phase_9_offline_portfolio_snapshot:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - tests/golden/health_check.json
+    - tests/test_binance_btc.py
+  implementation:
+    - normalize_binance_coinm_account_snapshot MCP/CLI tool
+    - binance_coinm_portfolio_snapshot.v1 schema marker
+    - portfolio_sync_contract read_only true
+    - BTCUSD_PERP-only position summary
+    - normalized balance rows
+    - guard records no order submission, no network call, no credentials, and no secrets
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "24 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py src/halo_swing_mcp/tool_registry.py src/halo_swing_mcp/server.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":"BTC","balance":"0.25000000","availableBalance":"0.20000000","crossWalletBalance":"0.24000000","crossUnPnl":"0.01000000"}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":"3","entryPrice":"90000","markPrice":"92000","unRealizedProfit":"0.0065","liquidationPrice":"65000","leverage":"2","marginType":"cross","positionSide":"BOTH"}],"as_of":"2026-05-10T00:00:00Z","coinm_contract_size_usd":100}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "81 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live Binance read-only smoke
+    - credential passphrase automation
+    - live order approval
+    - non-BTC broker scope
+
+phase_6_deflated_sharpe_proxy_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - deflated_sharpe_proxy.v1 contract
+    - sharpe_like_realized_r based on fixture realized_R mean/stddev
+    - multiple_testing_penalty based on fixture asset trial count and sample size
+    - explicit exact_deflated_sharpe_ratio false marker
+    - promotion_allowed false
+    - overfit_guard check deflated_sharpe_proxy_positive
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: passed, deflated_sharpe_proxy.v1 present
+  blocked_scope_unchanged:
+    - exact Deflated Sharpe Ratio implementation
+    - real out-of-sample dataset
+    - durable strategy repository
+    - automatic champion promotion
+
+phase_9_credential_permission_policy_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/secret_store.py
+    - tests/test_binance_btc.py
+  implementation:
+    - binance_credential_policy.v1 contract
+    - credential status includes trade_permission_required true
+    - credential status includes withdraw_permission_allowed false
+    - order preview execution_guard includes credential_policy
+    - secret status reports secret_values_returned false and passphrase_persisted false
+    - permission verification remains operator-attested, not a live network call
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_binance_credentials_status --no-audit
+      result: passed, binance_credential_policy.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --no-audit
+      result: passed, execution_guard credential_policy present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "92 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live Binance read-only smoke
+    - live order submission approval
+    - credential passphrase automation
+    - Binance console permission auto-verification
+
+phase_9_live_order_readiness_gate:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness live_order_submission gate
+    - explicit_live_order_approval missing reason
+    - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true missing reason
+    - encrypted credential and manual passphrase evidence
+    - binance_console_trade_only_no_withdraw_attestation missing reason
+    - emergency kill switch evidence
+    - order_submission=false and network_call=false readiness evidence
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit
+      result: passed, live_order_submission blocked with explicit missing approvals
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "93 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected and live_order_submission gate present
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live order submission
+    - live Binance read-only smoke
+    - credential passphrase automation
+    - Binance console permission auto-verification
+
+live_data_source_readiness_gate:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - live_data_source_readiness.v1 readiness evidence
+    - market_ohlcv_source_or_api_key_decision missing reason
+    - macro_source_or_api_key_decision missing reason
+    - news_source_or_api_key_decision missing reason
+    - optional non-secret readiness inputs for market/macro/news source decisions
+    - environment checks for approved source/API-key presence without returning secrets
+    - live_adapter_added=false and network_call=false evidence
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit
+      result: passed, live_data blocked with market/macro/news missing reasons
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "94 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, live_data_source_readiness.v1 present and status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live market/news/macro adapters
+    - API key storage
+    - network calls
+    - scheduler or unattended collection
+
+telegram_delivery_readiness_gate:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - telegram_delivery_readiness.v1 readiness evidence
+    - telegram_bot_token_or_gateway missing reason
+    - non-secret telegram_bot_token_configured readiness input
+    - non-secret telegram_gateway_configured readiness input
+    - delivery_preview_available=true evidence
+    - telegram_report_format.v1 evidence
+    - send_call=false, network_call=false, credential_storage_added=false evidence
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit
+      result: passed, telegram_delivery_readiness.v1 present and blocked without token/gateway
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "95 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, telegram_delivery_readiness.v1 present and status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - Telegram send call
+    - Telegram credential storage
+    - Hermes runtime configuration
+    - scheduler or unattended delivery
+
+hermes_mcp_config_readiness_gate:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - hermes_mcp_config_readiness.v1 readiness evidence
+    - hermes_config_path missing reason
+    - hermes_mcp_config_registration missing reason
+    - expected stdio server command evidence
+    - mcp_server_name halo_swing_mcp evidence
+    - runtime_started=false, network_call=false, secret_values_returned=false evidence
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit
+      result: passed, hermes_mcp_config_readiness.v1 present and blocked without config path/registration
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "96 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, hermes_mcp_config_readiness.v1 present and status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - Hermes runtime registration
+    - Hermes process start
+    - scheduler or unattended delivery
+    - credential storage
+
+phase_6_extended_oos_fixture_window:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - fixture_oos_window.v1 evaluation_window metadata
+    - deterministic 180-day fixture replay window
+    - 34-sample extended fixture set for days=180
+    - requested_window_supported and requested_window_coverage_ratio evidence
+    - supported_fixture_windows_days [90, 180]
+    - live_data_required=false, repository_required=false, network_call=false evidence
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: passed, sample_size 18 and fixture_oos_window.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":180}' --no-audit
+      result: passed, sample_size 34, walk_forward_report.ready true, overfit_guard.status ok
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "97 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with Hermes/Telegram/live-data/order/repository gates unchanged
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - durable strategy repository
+    - real out-of-sample dataset ingestion
+    - live market/news/macro adapter
+    - automatic champion promotion
+
+report_intent_output_variants:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - pre_market_swing_report keeps full report sections
+    - intraday_risk_watch emits Target, Decision, Stop, Cautions only
+    - post_market_review emits Target, Decision, Reasons, Take Profit, Cautions only
+    - delivery_contract.channels.telegram.required_sections follows the active report_intent
+    - report_contract_guard validates intent-specific required sections
+    - default golden latest signal report remains unchanged
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch"}' --no-audit
+      result: passed, sections Target/Decision/Stop/Cautions and telegram required_sections aligned
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit
+      result: passed, sections Target/Decision/Reasons/Take Profit/Cautions and telegram required_sections aligned
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "97 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+phase_6_feedback_tool_manifest:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - MVP required_tools now includes suggest_weight_update
+    - Phase 6 feedback tool manifest covers evaluate_score_performance, suggest_weight_update, and compare_champion_challenger
+    - health_check capability coverage now verifies the full Phase 6 feedback trio from MVP_CONTRACT
+    - challenger_config.v1 harness remains guarded with live_data_required=false and db_required=false
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed, suggest_weight_update advertised
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit
+      result: passed, challenger_config.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "98 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - champion auto-promotion
+    - durable strategy repository
+    - DB connection
+    - live data adapter
+
+phase_7_runtime_tool_manifest:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - MVP required_tools now includes get_runtime_status
+    - MVP required_tools now includes record_runtime_checkpoint
+    - Phase 7 runtime tool manifest check
+    - health_check capability coverage now verifies runtime status and checkpoint tools from MVP_CONTRACT
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_runtime_guard.py -q
+      result: "28 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed, get_runtime_status and record_runtime_checkpoint advertised
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"/private/tmp/halo_swing_runtime_manifest_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_manifest_ledger.jsonl"}' --no-audit
+      result: passed, watchdog.v1 and retention resources present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "99 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime registration
+    - DB watchdog_event table
+    - committed runtime artifacts
+
+phase_9_btc_tool_manifest:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - MVP required_tools now includes BTC risk settings tools
+    - MVP required_tools now includes encrypted Binance credential status/save tools
+    - MVP required_tools now includes Binance COIN-M connectivity/account tools
+    - MVP required_tools now includes offline portfolio snapshot normalizer
+    - MVP required_tools now includes preview_btc_order and execute_btc_order
+    - Phase 9 BTC tool manifest check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_binance_btc.py -q
+      result: "43 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed, Phase 9 BTC tools advertised
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --no-audit
+      result: passed, preview only with btc_order_execution_guard.v1 and no order submission
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "100 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - Binance network smoke without credentials
+    - live order submission
+    - credential passphrase automation
+    - live adapter
+    - broker package
+
+health_capability_manifest_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - MVP required_tools now includes health_check
+    - tests assert health_check capabilities exactly equal MVP required_tools
+    - manifest now covers all 35 advertised public tools
+    - future health/tool manifest drift fails tests directly
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_health_check.py -q
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_health_check.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed, 35 capabilities advertised
+    - command: manifest/health parity check
+      result: passed, manifest_equals_health true and count 35
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "100 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime registration
+    - live order submission
+
+audit_tool_payload_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/audit_tools.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_audit.py
+  implementation:
+    - get_audit_log returns audit_log.v1 schema_version
+    - get_audit_summary returns audit_summary.v1 schema_version
+    - audit payloads include network_call=false
+    - audit payloads include secret_values_returned=false
+    - mvp_tool_contracts audit_fixture records audit schemas and required payload fields
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/audit_tools.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_summary --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_contract.jsonl"}' --no-audit
+      result: passed, audit_summary.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_contract.jsonl","limit":5}' --no-audit
+      result: passed, audit_log.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "100 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected with environment gates unchanged
+  blocked_scope_unchanged:
+    - external audit sink
+    - DB audit table
+    - network call
+    - secret value output
+    - committed runtime artifact
+
+phase_4_news_source_policy_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/fixtures.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - news_source_policy.v1 contract
+    - source_group metadata on evidence cards
+    - Fed/Treasury/White House/EIA/Iran-Hormuz/AI-semiconductor fixture coverage
+    - source_group_counts payload
+    - no_live_collection and no_network_call guards
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py
+      result: "34 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/fixtures.py src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit
+      result: passed, news_source_policy.v1 covers required source groups
+  blocked_scope_unchanged:
+    - live RSS/API collection
+    - external source credentials
+    - scheduler
+    - Telegram sends
+
+phase_3_event_policy_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/fixtures.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - event_policy.v1 contract
+    - NFP fixture event added to policy taxonomy
+    - CPI/FOMC/NFP/EARNINGS required coverage guard
+    - buy restriction policy documents blocks_3x_before_hours and blocks_2x_before_hours
+    - no_live_data_required and no_network_call guards
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/fixtures.py src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit
+      result: passed, event_policy.v1 covers CPI/EARNINGS/FOMC/NFP
+  blocked_scope_unchanged:
+    - live event calendar source
+    - scheduler
+    - Telegram sends
+    - live market adapters
+
+phase_2_position_management_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - position_management.v1 contract
+    - WAIT/TRIM/EXIT/STOP allowed action set
+    - maintain/trim/exit/stop position state set
+    - numeric_authority marker for position decision fields
+    - signal/config trace fields
+    - no_order_submission and no_live_data_required guards
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py
+      result: "34 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed, position_management.v1 present
+  blocked_scope_unchanged:
+    - order submission
+    - live market adapters
+    - scheduler/automatic position review
+    - Telegram sends
+
+phase_5_label_metric_window_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - signal_label_outcome.v1 metric fields
+    - MFE/MAE scoped to price_path[:time_barrier_days]
+    - realized_r unit declared as stop_loss_risk
+    - barrier field list in label contract
+    - regression case proving post-barrier prices do not alter TIME_EXIT metrics
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":[570.611014,576.260628,706.20175],"time_barrier_days":2,"stop_loss_pct":0.05,"take_profit_pct":0.10}' --no-audit
+      result: passed, signal_label_outcome.v1 metric window present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "91 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+  blocked_scope_unchanged:
+    - DB-backed label_store
+    - live market adapters
+    - scheduler/automatic relabel jobs
+    - repository persistence
+
+phase_1_market_snapshot_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - market_snapshot.v1 contract
+    - QQQ/SPY/SMH/SOXX/BTC core fixture universe
+    - data_freshness_status/degraded_mode/data_warnings markers
+    - required snapshot fields list
+    - feature_store persistence blocked until MIGRATION_GO and REPOSITORY_GO
+    - no_live_data_required guard
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","SPY","SMH","SOXX","BTC"]}' --no-audit
+      result: passed, market_snapshot.v1 and SOXX core coverage present
+  blocked_scope_unchanged:
+    - feature_store persistence
+    - live market adapters
+    - DB migrations
+    - repository persistence
+
+phase_2_trade_guide_time_exit_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - trade_guide.v1 contract
+    - time_exit_conditions guide field
+    - config trace contract fields
+    - no_order_submission guard
+    - no_live_data_required guard
+    - required guide field guard checks
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, trade_guide.v1 and time_exit_conditions present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+  blocked_scope_unchanged:
+    - live market/news/macro adapters
+    - DB migrations
+    - order submission
+    - Hermes/Telegram sends
+
+phase_6_challenger_config_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - challenger_config.v1 contract
+    - candidate_status challenger marker
+    - champion_unchanged flag
+    - approval_required and shadow_validation_required flags
+    - out_of_sample_required flag
+    - auto_promotion_allowed false guard
+    - config hash match with generated challenger
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit
+      result: passed, challenger_config.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - durable strategy repository
+    - automatic champion promotion
+    - live market/news/macro adapters
+    - DB migrations
+
+phase_7_telegram_format_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - telegram_report_format.v1 delivery contract
+    - schema marker in delivery_preview Telegram channel
+    - section_separator contract
+    - 1-based chunk indexing contract
+    - send_call false contract
+    - guard check for declared Telegram format schema
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_mvp_tools.py
+      result: "33 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, telegram_report_format.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - Telegram send call
+    - Telegram credentials
+    - Hermes runtime configuration
+    - scheduler
+
+phase_8_chart_artifact_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - chart_artifact.v1 render_chart contract
+    - chart_artifact_guard payload
+    - PNG signature verification
+    - CHART artifact_ref type guard
+    - offline stdlib renderer guard
+    - no-live-data guard
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py
+      result: "33 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness render_chart --input-json '{"symbol":"QQQ","timeframe":"1d","output_dir":"/private/tmp/halo_swing_chart_artifact_contract"}' --no-audit
+      result: passed, chart_artifact.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - committed chart artifact
+    - live chart renderer
+    - Hermes multimodal upload
+    - scheduler
+
+phase_2_strategy_config_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/strategy.py
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - strategy_config.v1 validation contract
+    - required sections validation
+    - weight sum and bounds checks
+    - threshold order checks
+    - risk bounds checks
+    - config hash match exposed in score_leverage_swing
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/strategy.py src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, strategy_config_contract present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - DB-backed strategy_config repository
+    - migrations
+    - automatic champion promotion
+    - external config service
+
+phase_1_swing_level_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/indicators.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - swing_levels.v1 calculate_indicators contract
+    - previous_swing_high and previous_swing_low fields
+    - previous swing timestamps
+    - 20-bar support/resistance lookback metadata
+    - gap detection lookback metadata
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/indicators.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1d"}' --no-audit
+      result: passed, swing_level_contract present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "89 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live OHLCV source
+    - feature_store persistence
+    - live market credentials
+    - DB migrations
+
+phase_5_run_journal_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - run_journal.v1 record_signal contract
+    - run_id and signal_id traceability
+    - config_version and config_hash traceability
+    - idempotency_key for duplicate-safe journal records
+    - no-network/no-DB/no-secret guard fields
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"/private/tmp/halo_swing_run_journal_ledger.jsonl"}' --no-audit
+      result: passed, run_journal.v1 present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "89 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - DB-backed run_journal table
+    - migrations
+    - scheduler
+    - live repository persistence
+
+phase_4_news_score_usage_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - news_score.v1 get_news_bundle contract
+    - news_score_usage.v1 score_leverage_swing contract
+    - required news/policy/geopolitical/AI semiconductor score fields
+    - scoring path uses explicit news_score field for theme component
+    - monkeypatch coverage proves average_strength is not the scoring authority
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit
+      result: passed, news_score_contract present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, news_usage_contract present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "89 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live news/RSS/API collector
+    - live market/news/macro adapters
+    - external source policy
+    - DB persistence
+
+phase_3_macro_filter_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - macro_filter.v1 contract
+    - macro_filter_summary.v1 summary
+    - required VIX, VXN, DXY, 2Y, 10Y, and WTI oil indicator coverage
+    - fixture 5-day change risk trigger classification
+    - blocks_new_longs_now, blocks_new_3x_now, and blocks_new_2x_now flags
+    - score_leverage_swing macro block handling
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit
+      result: passed, macro_filter_summary present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "88 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live macro data source
+    - live market/news/macro adapters
+    - scheduled macro refresh
+    - DB persistence
+
+phase_3_event_window_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - event_danger_window.v1 per-event contract
+    - event_danger_window_summary.v1 summary contract
+    - pre-event 3x and 2x block flags
+    - hours_until_event calculation against fixture as_of
+    - blocking event id lists
+    - explicit no-network/no-live-data contract
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit
+      result: passed, event_window_summary.next_event_id evt_20260512_cpi
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "87 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live macro/event calendar source
+    - live market/news/macro adapters
+    - scheduled event refresh
+    - DB persistence
+
+phase_5_label_outcome_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome invalidated_by_event input
+    - label_signal_outcome invalidating_event_id metadata
+    - NO_DATA outcome for explicit empty price_path
+    - INVALIDATED_BY_EVENT outcome
+    - signal_label_outcome.v1 label_contract
+    - JSONL append support for non-price labels
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py tests/test_tool_registry.py
+      result: "23 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py src/halo_swing_mcp/server.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"invalidated_by_event":true,"invalidating_event_id":"evt_fixture_cpi"}' --no-audit
+      result: passed, outcome INVALIDATED_BY_EVENT
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "87 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":[]}' --no-audit
+      result: passed, outcome NO_DATA
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - DB-backed label_store
+    - scheduled label updater
+    - live market data lookup
+    - migrations
+
+phase_2_component_score_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - pullback component score
+    - breadth component score
+    - MVP contract required_component_scores
+    - bounds checks for required component scores
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py
+      result: "29 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, component_scores includes pullback and breadth
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "86 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live breadth data source
+    - live market/news/macro adapters
+    - automatic strategy promotion
+    - DB persistence
+
+phase_1_timeframe_fixture_contract:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/fixtures.py
+    - src/halo_swing_mcp/indicators.py
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+    - tests/test_providers.py
+  implementation:
+    - replay provider supported_timeframes contract
+    - fixture OHLCV generation for 1d, 4h, and 1h
+    - calculate_indicators timeframe_contract payload
+    - render_chart and get_market_snapshot use requested fixture timeframe
+    - unsupported timeframe validation
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/fixtures.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/indicators.py src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py tests/test_providers.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"4h"}' --no-audit
+      result: passed, timeframe_contract.provider_supports_timeframe true
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "86 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1h"}' --no-audit
+      result: passed, timeframe_contract.provider_supports_timeframe true
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live OHLCV source
+    - feature_store persistence
+    - live market data credentials
+    - DB migrations
+
+phase_7_cron_prompt_pack:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_reporting.py
+  implementation:
+    - generate_cron_prompt_pack MCP/CLI tool
+    - hermes_cron_prompt_pack.v1 schema marker
+    - prompt templates for pre_market_swing_report, intraday_risk_watch, post_market_review, and position_review
+    - idempotency_key_template metadata
+    - cron_prompt_contract with scheduler_added=false and telegram_send=false
+    - cron_prompt_guard covering intents, registered tools, delivery preview path, scheduler/network/order side effects
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_tool_registry.py tests/test_health_check.py
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/tool_registry.py src/halo_swing_mcp/server.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed, cron_prompt_guard.status ok
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "85 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed, generate_cron_prompt_pack advertised
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Telegram credential storage
+    - Hermes runtime configuration
+    - live order submission
+
+phase_6_walk_forward_oos_guard:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance 18-sample deterministic 90-day fixture replay
+    - out_of_sample_report asset_breakdown and regime_breakdown
+    - walk_forward_report rolling fixture folds
+    - overfit_guard with fixture size, OOS, walk-forward, fold-rate, and regime coverage checks
+    - conservative_realized_r_ratio
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: passed, sample_size 18, walk_forward_report.ready true, overfit_guard.status ok
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "83 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - durable strategy repository
+    - real out-of-sample datasets
+    - live market/news/macro adapters
+    - automatic challenger promotion
+
+phase_9_position_aware_preview:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - src/halo_swing_mcp/server.py
+    - tests/test_binance_btc.py
+  implementation:
+    - preview_btc_order portfolio_snapshot parameter
+    - position_effect schema btc_order_position_effect.v1
+    - current/projected contract calculation
+    - open/increase/reduce/close/flip effect classification
+    - reduce_only effect guard
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "26 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py src/halo_swing_mcp/server.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "83 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order with portfolio_snapshot
+      result: passed, position_effect.effect reduces_long
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed, status blocked as expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+  blocked_scope_unchanged:
+    - live order submission
+    - live Binance read-only smoke
+    - non-BTC broker scope
+    - credential passphrase automation
+
+report_delivery_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_contract for Hermes and Telegram report delivery profiles
+    - report_contract_guard checking required sections, prompt coverage, Telegram length, and no network side effects
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_mvp_tools.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "70 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - Telegram send call
+    - Hermes runtime configuration
+    - scheduler or cron runner
+    - credentials
+
+report_intent_variant_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_intent parameter
+    - intent contracts for pre_market_swing_report, intraday_risk_watch, post_market_review
+    - report_intent_contract payload
+    - guard checks for supported intent and intent-required sections
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py
+      result: "15 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/server.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "71 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+
+position_review_report:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_reporting.py
+  implementation:
+    - generate_position_review_report MCP/CLI tool
+    - structured sections for Position, Decision, Rationale, Stop, Take Profit, and Risk
+    - delivery contract with position_review numeric authority
+    - guard coverage for required sections, prompt terms, no network side effects, no order submission, and Telegram length
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py
+      result: "30 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "73 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - order submission
+
+report_delivery_preview:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview payload for generate_latest_signal_report
+    - delivery_preview payload for generate_position_review_report
+    - Telegram message chunks with max-char guard
+    - text preservation guard for reconstructed Telegram chunks
+    - Hermes payload_ref metadata for structured consumers
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py
+      result: "31 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "74 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Telegram credential storage
+    - Hermes runtime configuration
+
+report_evidence_guard:
+  status: verified
+  changed_files:
+    - README.md
+    - docs/WORKING.md
+    - docs/devops-setup-guide.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - evidence_contract with bounded reason/evidence summaries
+    - evidence_context with component extremes, risk warnings, and conflict flags
+    - evidence_guard checks summary lengths, conflict field shape, risk warning reflection, and acknowledged conflict status
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "75 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked path and runtime artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - live evidence adapter
+    - Hermes runtime configuration
+    - Telegram send call
+
+mcp_server_wrapper_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - AST-based @mcp.tool decorator discovery in src/halo_swing_mcp/server.py
+    - exact equality assertion between MCP wrapper names and shared registry tool_names
+    - retained callable check for each decorated wrapper
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "100 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+mcp_server_dispatch_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - AST-based registry dispatch discovery inside each @mcp.tool wrapper
+    - exact assertion that wrapper registry dispatch names equal the wrapper function name
+    - shared helper for MCP wrapper discovery reused by wrapper parity tests
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "101 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+mcp_server_payload_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - AST-based MCP wrapper parameter extraction
+    - AST-based literal payload binding extraction
+    - assertion that wrapper payload keys exactly match wrapper parameters
+    - assertion that each payload key is bound from the same-named parameter variable
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "102 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+mcp_server_signature_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - inspect-based registered implementation function parameter extraction
+    - assertion that every @mcp.tool wrapper parameter set matches ToolSpec.function parameters
+    - health_check handled by ignoring var-keyword catchall parameters
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "103 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+tool_registry_spec_invariants:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - duplicate ToolSpec name detection
+    - canonical order assertion across TOOL_SPECS, tool_names, and TOOL_REGISTRY
+    - ToolSpec object identity check in TOOL_REGISTRY
+    - callable function and nonempty description checks for every public tool spec
+    - boolean metadata checks for audit_enabled and live_data_required
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "104 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "104 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+mvp_manifest_registry_parity:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_tool_registry.py
+  implementation:
+    - direct equality assertion between tests/golden/mvp_tool_contracts.json required_tools and tool_names()
+    - ordered manifest-to-registry parity without relying on health_check as an intermediary
+    - existing health capability parity remains in the same registry test
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py
+      result: passed
+  blocked_scope_unchanged:
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live order submission
+
+report_intent_prompt_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - intent-specific latest-signal prompt_contract.must_include terms
+    - report_contract_guard prompt coverage uses intent required sections
+    - tests assert non-empty intent sections, Telegram chunk text reconstruction, and 1-based chunk indexes
+    - default pre-market golden snapshot remains unchanged
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_tool_registry.py -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "104 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch"}' --no-audit
+      result: passed_intent_prompt_terms_aligned
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit
+      result: passed_intent_prompt_terms_aligned
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live data adapter
+    - order submission
+
+cron_prompt_intent_alignment:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard verifies report prompt input_json.report_intent matches prompt name
+    - cron_prompt_guard verifies expected_sections match REPORT_INTENTS required_sections
+    - cron_prompt_guard verifies position_review prompt is absent when include_position_review=false
+    - tests exercise generated report contracts from each cron prompt input_json
+    - tests exercise include_position_review=false without scheduler, Telegram send, network call, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "15 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_no_position_review_no_side_effects
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "105 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime configuration
+    - live data adapter
+    - order submission
+
+phase6_unsupported_window_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluation_window exposes available_fixture_window_days
+    - evaluation_window exposes minimum_supported_coverage_ratio
+    - evaluation_window exposes requested_window_gap_days
+    - evaluation_window exposes coverage_status and unsupported_reason
+    - tests assert days=365 is marked unsupported instead of treated as a supported fixture window
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "25 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":365}' --no-audit
+      result: passed_unsupported_requested_window
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "106 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - repository persistence
+    - live data adapter
+    - scheduler or cron runner
+    - Telegram send call
+    - order submission
+
+report_data_warning_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - evidence_guard adds data_warnings_reflected_in_cautions when data_warnings are present
+    - degraded latest_signal_report fixture is exercised through report section and evidence guard helpers
+    - degraded data_quality_caveat conflict flag remains acknowledged
+    - normal report snapshot remains unchanged when data_warnings is empty
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_normal_snapshot_unchanged_no_data_warnings
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+report_telegram_section_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds telegram_required_sections_match_intent
+    - intent report tests assert guard expected and actual sections match the selected intent
+    - golden Hermes latest signal report snapshot includes the new guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+position_review_telegram_section_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds telegram_required_sections_match_position_review
+    - position review tests assert Telegram required_sections match position_review_contract required_sections
+    - harness smoke confirms guard is present in generated position review payload
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+delivery_preview_no_send_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds delivery_preview_has_no_send_side_effect
+    - latest signal and position review report tests assert the no-send guard passes
+    - delivery split test asserts chunked Telegram previews remain no-send
+    - Hermes latest signal report golden snapshot includes the no-send guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+delivery_preview_hermes_payload_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds hermes_payload_ref_matches_structured_payload
+    - delivery_preview guard adds hermes_numeric_authority_matches_payload_ref
+    - guard checks read the actual generated preview channel payloads
+    - latest signal, position review, and chunked delivery preview tests assert the Hermes guard checks pass
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_required_sections_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_required_sections_present_in_preview
+    - guard reconstructs Telegram chunks and verifies every required section header is present
+    - report intent tests assert required section headers match the selected intent
+    - position review and chunked preview tests assert required section presence remains guarded
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_unrequested_sections_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_unrequested_sections_absent_from_preview
+    - guard compares preview text against known report and position review section headers
+    - report intent tests assert unrequested known sections are absent for each intent
+    - position review and chunked preview tests assert the absence guard passes
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_chunk_index_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_chunks_are_1_based_sequential
+    - guard compares chunk_indexing metadata with actual chunk index sequence
+    - latest signal, report intent, position review, and split-preview tests assert the chunk index guard passes
+    - Hermes latest signal report golden snapshot includes the guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_message_count_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_message_count_matches_chunks
+    - delivery_preview guard adds telegram_single_message_flag_matches_chunk_count
+    - latest signal, report intent, position review, and split-preview tests assert the message count guards pass
+    - Hermes latest signal report golden snapshot includes the guard checks
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_section_separator_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_section_separator_preserves_preview_text
+    - guard reconstructs chunk text using the declared Telegram section_separator
+    - latest signal, report intent, position review, and split-preview tests assert the section separator guard passes
+    - Hermes latest signal report golden snapshot includes the guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_overflow_policy_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_overflow_policy_splits_on_section_boundary
+    - guard verifies split_on_section_boundary policy and continuation chunk section starts
+    - split-preview test asserts continuation chunks start at required section headers
+    - Hermes latest signal report golden snapshot includes the guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_chunk_char_count_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_chunk_char_counts_match_text
+    - guard compares each chunk chars metadata with len(chunk.text)
+    - latest signal, report intent, position review, and split-preview tests assert the char-count guard passes
+    - Hermes latest signal report golden snapshot includes the guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+telegram_preview_nonempty_chunk_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds telegram_chunks_are_nonempty
+    - guard checks each chunk has nonempty text and chars > 0
+    - latest signal, report intent, position review, and split-preview tests assert the nonempty chunk guard passes
+    - Hermes latest signal report golden snapshot includes the guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+position_review_max_chars_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard telegram_text_fits_single_message uses delivery_contract channels.telegram.max_chars
+    - position review test asserts expected_max_chars matches the delivery contract
+    - position review test asserts actual_chars matches generated text length
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_guard_uses_contract_max_chars
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+delivery_contract_no_send_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds delivery_contract_has_no_send_side_effect
+    - position_review_guard adds delivery_contract_has_no_send_side_effect
+    - latest signal, report intent, and position review tests assert the no-send delivery contract guard passes
+    - Hermes latest signal report golden snapshot includes the no-send delivery contract guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_contract_no_send_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_contract_no_send_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+report_contract_numeric_authority_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds delivery_numeric_authority_is_latest_signal_report
+    - latest signal and report intent tests assert the report guard numeric authority check passes
+    - Hermes latest signal report golden snapshot includes the numeric authority guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_numeric_authority_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+report_text_numeric_field_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_text_reflects_latest_signal_numeric_fields
+    - position_review_guard adds position_review_text_reflects_review_numeric_fields
+    - latest signal, report intent, and position review tests assert text reflects structured numeric fields
+    - Hermes latest signal report golden snapshot includes the report text numeric field guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_text_numeric_field_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_text_numeric_field_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+cron_prompt_tool_input_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds report_prompt_tool_and_input_schema_match
+    - cron_prompt_guard adds position_review_prompt_tool_and_input_schema_match
+    - cron prompt tests assert latest signal prompts use asset/timeframe/report_intent inputs
+    - cron prompt tests assert position review prompt uses asset-only input and remains absent when excluded
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_tool_input_schema_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_position_review_schema_guard_absent_actual_empty
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+cron_prompt_idempotency_key_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds idempotency_key_templates_match_prompt_identity
+    - cron prompt tests assert each template matches prompt name, asset, and yyyy_mm_dd placeholder
+    - excluded position review cron prompt path still verifies report prompt idempotency keys
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_idempotency_key_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_idempotency_key_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+cron_prompt_manual_setup_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds manual_setup_requirements_declared_before_unattended_run
+    - guard requires Hermes config path, Telegram gateway, duplicate run lock, runtime checkpoint path, and watchdog alert destination prerequisites
+    - cron prompt tests assert manual setup requirements are present for default and position-review-excluded prompt packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_manual_setup_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_manual_setup_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+
+cron_prompt_no_secret_credential_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_contract_requires_no_credentials_or_secrets
+    - guard verifies telegram_credentials_required=false and secret_values_returned=false
+    - cron prompt tests assert no credential requirement or secret return for default and position-review-excluded prompt packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_no_secret_credential_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_no_secret_credential_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_name_set_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_names_match_contract_and_position_option
+    - guard verifies prompt names exactly match supported report intents plus optional position_review
+    - cron prompt tests assert default prompt set includes position_review and excluded prompt set omits it
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_prompt_name_set_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_prompt_name_set_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_schedule_hint_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_schedule_hints_match_contract
+    - guard verifies report prompt schedule hints match REPORT_INTENTS
+    - guard verifies optional position_review uses manual_or_scheduled_position_check
+    - cron prompt tests assert default and position-review-excluded schedule hint maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_schedule_hint_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_schedule_hint_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_delivery_preview_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_text_references_delivery_preview_chunks
+    - guard verifies every prompt text references delivery_preview.channels.telegram.chunks
+    - cron prompt tests assert default and position-review-excluded prompt text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_preview_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_delivery_preview_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_numeric_authority_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_text_preserves_numeric_authority
+    - guard verifies report prompts preserve Use MCP numeric fields as source of truth
+    - guard verifies position_review prompt preserves Use position_review numeric fields as source of truth
+    - cron prompt tests assert default and position-review-excluded numeric authority maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_numeric_authority_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_numeric_authority_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_order_block_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard strengthens prompt_text_preserves_order_block
+    - guard verifies every prompt text includes Do not submit orders.
+    - cron prompt tests assert default and position-review-excluded no-order text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_order_block_text_guard_per_prompt
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_order_block_text_guard_per_prompt_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_tool_input_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_text_matches_declared_tool_and_inputs
+    - guard verifies report prompt text includes declared tool_name, asset, timeframe, and report_intent values
+    - guard verifies position_review prompt text includes declared tool_name and asset values
+    - cron prompt tests assert default and position-review-excluded tool/input text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_tool_input_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_tool_input_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_configured_gateway_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_text_requires_configured_gateway
+    - guard verifies every prompt text includes Send Telegram only through the configured Hermes/Telegram gateway
+    - cron prompt tests assert default and position-review-excluded configured gateway maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_configured_gateway_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_configured_gateway_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_idempotency_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes each prompt idempotency_key_template
+    - cron_prompt_guard adds prompt_text_references_idempotency_key_template
+    - cron prompt tests assert default and position-review-excluded idempotency text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_idempotency_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_idempotency_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_expected_sections_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes each prompt expected_sections list
+    - cron_prompt_guard adds prompt_text_references_expected_sections
+    - cron prompt tests assert default and position-review-excluded expected sections text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_expected_sections_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_expected_sections_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_schedule_hint_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes each prompt schedule_hint value
+    - cron_prompt_guard adds prompt_text_references_schedule_hint
+    - cron prompt tests assert default and position-review-excluded schedule hint text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_schedule_hint_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_schedule_hint_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_manual_setup_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes manual setup prerequisites before unattended runs
+    - cron_prompt_guard adds prompt_text_references_manual_setup_requirements
+    - cron prompt tests assert default and position-review-excluded manual setup text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_manual_setup_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_manual_setup_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_no_secret_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes a no-credentials/no-secret-values instruction
+    - cron_prompt_guard adds prompt_text_references_no_secret_instruction
+    - cron prompt tests assert default and position-review-excluded no-secret text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_no_secret_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_no_secret_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_name_text_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now includes an explicit Prompt name line
+    - cron_prompt_guard adds prompt_text_references_prompt_name
+    - cron prompt tests assert default and position-review-excluded prompt name text maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_prompt_name_text_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_prompt_name_text_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_delivery_path_metadata_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_text_matches_declared_delivery_preview_path
+    - cron prompt tests assert default and position-review-excluded delivery path metadata maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_declared_delivery_preview_path_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_declared_delivery_preview_path_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_telegram_format_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt metadata now includes telegram_format_schema
+    - cron prompt text now references telegram_report_format.v1
+    - cron_prompt_guard adds prompt_telegram_format_schema_matches_contract
+    - cron_prompt_guard adds prompt_text_references_telegram_format_schema
+    - cron prompt tests assert default and position-review-excluded Telegram schema maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_telegram_format_schema_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_telegram_format_schema_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_numeric_authority_metadata_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt metadata now includes numeric_authority
+    - cron prompt text now references declared numeric authority values
+    - cron_prompt_guard adds prompt_numeric_authority_matches_contract
+    - cron_prompt_guard adds prompt_text_references_numeric_authority
+    - cron prompt tests assert default and position-review-excluded numeric authority maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_numeric_authority_metadata_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_numeric_authority_metadata_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: blocked artifact audit
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_output_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt metadata now includes expected_output_schema
+    - cron prompt text now references expected tool output schemas
+    - cron_prompt_guard adds prompt_output_schema_matches_tool_contract
+    - cron_prompt_guard adds prompt_text_references_output_schema
+    - cron prompt tests assert default and position-review-excluded output schema maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_output_schema_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_output_schema_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_live_data_boundary_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt metadata now includes live_data_required=false
+    - cron prompt contract now declares live_data_required=false
+    - cron prompt text now prohibits live market, macro, news, broker, or exchange data calls
+    - cron_prompt_guard adds prompt_live_data_required_matches_contract
+    - cron_prompt_guard adds prompt_text_references_no_live_data_boundary
+    - cron prompt tests assert default and position-review-excluded live-data boundary maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_live_data_boundary_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_live_data_boundary_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_decision_focus_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt metadata now includes decision_focus
+    - cron prompt text now references decision_focus values
+    - cron_prompt_guard adds prompt_decision_focus_matches_contract
+    - cron_prompt_guard adds prompt_text_references_decision_focus
+    - cron prompt tests assert default and position-review-excluded decision focus maps
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_decision_focus_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_decision_focus_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_supported_intents_registry_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds supported_report_intents_match_registry
+    - supported_report_intents_match_registry compares the contract list to REPORT_INTENTS order
+    - cron prompt tests assert the registry list for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_supported_report_intents_match_registry_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_supported_report_intents_match_registry_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_pack_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_contract_name_matches_schema
+    - cron_prompt_guard adds prompt_assets_match_pack_asset
+    - cron_prompt_guard adds report_prompt_timeframes_match_pack_timeframe
+    - cron prompt tests assert pack asset/timeframe identity for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_pack_identity_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_pack_identity_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_position_option_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds include_position_review_contract_matches_request
+    - cron prompt tests assert the include_position_review contract matches default and excluded requests
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_include_position_review_contract_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_include_position_review_contract_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_pack_top_level_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_pack_schema_version_matches_expected
+    - cron_prompt_guard adds pack_live_data_required_matches_contract
+    - cron prompt tests assert schema_version and top-level live_data_required guard checks for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_top_level_contract_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_top_level_contract_guard_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_manual_setup_registry_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds manual_setup_requirements_match_registry
+    - cron prompt tests assert manual setup requirements match the registry for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_manual_setup_requirements_match_registry_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_manual_setup_requirements_match_registry_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_contract_keys_match_expected_schema
+    - cron prompt tests assert contract keys match the expected ordered schema for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_contract_keys_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_prompt_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_prompt_keys_match_expected_schema
+    - cron prompt tests assert every prompt object matches the expected ordered key schema for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_prompt_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_prompt_keys_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_pack_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_pack_keys_match_expected_schema
+    - cron prompt tests assert the top-level pack payload matches the expected ordered key schema for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_pack_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_pack_keys_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_guard_check_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_guard_check_keys_match_expected_schema
+    - cron prompt tests assert every existing guard check exposes the expected ordered key schema for default and position-review-excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_guard_check_keys_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_guard_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_guard_keys_match_expected_schema
+    - cron prompt tests assert the guard object exposes the expected ordered key schema for default and position-review-excluded packs
+    - cron_prompt_guard_check_keys_match_expected_schema now includes the guard key schema check and itself in actual coverage
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_guard_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_guard_keys_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_guard_check_name_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds cron_prompt_guard_check_names_match_expected_schema
+    - cron prompt tests assert the guard check names match the expected ordered schema for default and position-review-excluded packs
+    - cron_prompt_guard_check_keys_match_expected_schema includes the check-name schema check in actual coverage
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_cron_prompt_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_cron_prompt_guard_check_names_match_expected_schema_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_scheduler_setup_prerequisite_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron prompt text now blocks scheduler or cron runner setup until manual setup prerequisites are complete
+    - cron_prompt_guard adds prompt_text_declares_manual_setup_before_scheduler_setup
+    - cron prompt tests assert default and position-review-excluded prompt text place manual setup before scheduler setup
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_prompt_text_declares_manual_setup_before_scheduler_setup_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_prompt_text_declares_manual_setup_before_scheduler_setup_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+delivery_preview_no_network_and_chunk_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - report and position review tests now assert delivery preview no-network side-effect guards
+    - report and position review tests now assert delivery contract no-network side-effect guards
+    - delivery preview tests now assert Telegram format schema, max chunk size, and text preservation guards
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_preview_no_network_and_chunk_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_preview_no_network_and_chunk_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+delivery_preview_guard_check_name_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds delivery_preview_guard_check_names_match_expected_schema
+    - report and position review tests assert delivery_preview guard check names match the expected ordered schema
+    - Hermes latest signal report golden includes the delivery_preview guard check-name schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_preview_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_preview_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+delivery_preview_guard_check_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds delivery_preview_guard_check_keys_match_expected_schema
+    - delivery_preview guard records default and special guard check key schemas
+    - report and position review tests assert delivery_preview guard check keys match the expected schema
+    - Hermes latest signal report golden includes the delivery_preview guard check-key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_preview_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_preview_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+delivery_preview_payload_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - delivery_preview guard adds delivery_preview_payload_keys_match_expected_schema
+    - delivery_preview guard records preview, channel, Telegram chunk, and guard key schemas
+    - report and position review tests assert delivery_preview payload keys match the expected schema
+    - Hermes latest signal report golden includes the delivery_preview payload key-schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_preview_payload_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_preview_payload_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+delivery_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds delivery_contract_keys_match_expected_schema
+    - position_review_guard adds delivery_contract_keys_match_expected_schema
+    - delivery contract schema helper records contract, channel, Hermes, and Telegram key schemas
+    - report and position review tests assert delivery contract key schemas match the expected schema
+    - Hermes latest signal report golden includes the report delivery contract key-schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_delivery_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_delivery_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_guard_check_name_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_contract_guard_check_names_match_expected_schema
+    - position_review_guard adds position_review_guard_check_names_match_expected_schema
+    - report and position review tests assert guard check names match the expected schema
+    - Hermes latest signal report golden includes the report guard check-name schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_contract_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_guard_check_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_contract_guard_check_keys_match_expected_schema
+    - position_review_guard adds position_review_guard_check_keys_match_expected_schema
+    - report and position review guards record default and special check key schemas
+    - report and position review tests assert guard check keys match the expected schema
+    - Hermes latest signal report golden includes the report guard check-key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_contract_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+evidence_guard_check_name_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - evidence_guard adds evidence_guard_check_names_match_expected_schema
+    - evidence_guard check-name schema includes data_warnings_reflected_in_cautions only when data_warnings are present
+    - report tests assert default and degraded evidence guard check names match the expected schema
+    - Hermes latest signal report golden includes the evidence guard check-name schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_evidence_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+evidence_guard_check_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - evidence_guard adds evidence_guard_check_keys_match_expected_schema
+    - evidence_guard records default guard check keys and special key schemas for summary limit and conflict-count checks
+    - report tests assert default and degraded evidence guard check key schemas match expected values
+    - Hermes latest signal report golden includes the evidence guard check-key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_evidence_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_evidence_guard_top_level_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_contract_guard_keys_match_expected_schema
+    - position_review_guard adds position_review_guard_keys_match_expected_schema
+    - evidence_guard adds evidence_guard_keys_match_expected_schema
+    - report, position, and evidence guard check-name/key schema checks include the top-level guard key schema checks
+    - report tests and Hermes latest signal report golden include the new guard key schema checks
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_contract_and_evidence_guard_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_guard_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_payload_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report adds report_payload_guard with report_payload_keys_match_expected_schema
+    - generate_position_review_report adds position_payload_guard with position_payload_keys_match_expected_schema
+    - report payload key guard supports optional chart_code_guard and multimodal_context keys
+    - report tests assert default, chart, multimodal, and position payload key schemas
+    - Hermes latest signal report golden includes report_payload_guard
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_payload_schema_live_data_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_schema_version_matches_expected
+    - report_payload_guard adds report_payload_live_data_required_matches_expected
+    - position_payload_guard adds position_payload_schema_version_matches_expected
+    - position_payload_guard adds position_payload_live_data_required_matches_expected
+    - report tests and Hermes latest signal report golden cover the new payload value guards
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_schema_and_live_data_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_schema_and_live_data_guard_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_payload_guard_check_name_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_guard_check_names_match_expected_schema
+    - position_payload_guard adds position_payload_guard_check_names_match_expected_schema
+    - payload guard check-name schema includes schema_version, live_data_required, payload key schema, and check-name schema checks
+    - report tests assert report and position payload guard check-name schemas
+    - Hermes latest signal report golden includes the report payload guard check-name schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_guard_check_names_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_payload_guard_check_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_guard_check_keys_match_expected_schema
+    - position_payload_guard adds position_payload_guard_check_keys_match_expected_schema
+    - payload guard check-key schema verifies every check uses name/passed/expected/actual
+    - report tests assert report and position payload guard check-key schemas
+    - Hermes latest signal report golden includes the report payload guard check-key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_guard_check_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_position_payload_guard_top_level_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_guard_keys_match_expected_schema
+    - position_payload_guard adds position_payload_guard_keys_match_expected_schema
+    - payload guard top-level schema verifies guards expose only status/checks keys
+    - report tests assert report and position payload guard top-level key schemas
+    - Hermes latest signal report golden includes the report payload guard top-level key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_guard_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_guard_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_source_signal_ref_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_source_signal_ref_keys_match_expected_schema
+    - payload guard source_signal_ref schema verifies signal_id/run_id/config_hash keys
+    - payload guard check-name and check-key schemas include the source_signal_ref guard check
+    - report tests assert source_signal_ref key schema and check key schema coverage
+    - Hermes latest signal report golden includes the source_signal_ref key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_source_signal_ref_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_source_signal_ref_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_source_signal_ref_matches_report_identity
+    - source_signal_ref signal_id and config_hash must match latest_signal_report identity fields
+    - source_signal_ref run_id must remain nonempty for traceability
+    - payload guard check-name and check-key schemas include the identity guard check
+    - Hermes latest signal report golden includes the source_signal_ref identity guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_source_signal_ref_matches_report_identity_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_source_signal_ref_trace_format_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_source_signal_ref_values_have_traceable_format
+    - source_signal_ref signal_id and run_id must remain nonempty
+    - source_signal_ref config_hash must preserve the sha256: prefix format
+    - payload guard check-name and check-key schemas include the trace-format guard check
+    - Hermes latest signal report golden includes the source_signal_ref trace-format guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_source_signal_ref_values_have_traceable_format_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_source_signal_ref_config_hash_digest_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_source_signal_ref_config_hash_digest_is_sha256
+    - source_signal_ref config_hash digest must be 64 characters
+    - source_signal_ref config_hash digest must be hexadecimal
+    - payload guard check-name and check-key schemas include the config hash digest guard check
+    - Hermes latest signal report golden includes the config hash digest guard check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_report_payload_source_signal_ref_config_hash_digest_is_sha256_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_contract_keys_match_expected_schema
+    - position_review_contract key schema is fixed to name/trigger/decision_focus/required_sections/network_call/order_submission
+    - position review tests assert contract key schema guard output
+    - position review guard check-name schema includes the contract key schema check
+    - position review guard check-key schema covers the contract key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_contract_no_network_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_contract_has_no_network_side_effect
+    - position_review_contract network_call must remain false
+    - position review tests assert contract no-network guard output
+    - position review guard check-name schema includes the contract no-network check
+    - position review guard check-key schema covers the contract no-network check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_contract_has_no_network_side_effect_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_contract_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_contract_identity_matches_expected
+    - position_review_contract name must remain position_review
+    - position_review_contract trigger must remain manual_or_scheduled_position_check
+    - position_review_contract decision_focus must remain hold_trim_exit_or_stop_review
+    - position review tests assert contract identity guard output
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_review_contract_identity_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_contract_required_sections_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_contract_required_sections_match_expected
+    - position_review_contract required_sections must exactly match the canonical position review section schema
+    - position review tests assert required_sections guard output
+    - position review guard check-name schema includes the required_sections contract check
+    - position review guard check-key schema covers the required_sections contract check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_contract_required_sections_match_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_contract_order_submission_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_contract_has_no_order_submission_side_effect
+    - position_review_contract order_submission must remain false
+    - position review tests assert contract no-order-submission guard output
+    - position review guard check-name schema includes the contract no-order-submission check
+    - position review guard check-key schema covers the contract no-order-submission check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_contract_has_no_order_submission_side_effect_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_section_order_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_sections_match_contract_order
+    - generated position review sections must exactly match position_review_contract.required_sections order
+    - position review tests assert section order guard output
+    - position review guard check-name schema includes the section order check
+    - position review guard check-key schema covers the section order check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_sections_match_contract_order_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_prompt_must_include_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_prompt_must_include_matches_expected_terms
+    - position_review prompt_contract must_include must exactly match the expected position review terms
+    - position review tests assert prompt must_include guard output
+    - position review guard check-name schema includes the prompt must_include check
+    - position review guard check-key schema covers the prompt must_include check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_prompt_must_include_matches_expected_terms_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_prompt_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_prompt_contract_keys_match_expected_schema
+    - position_review prompt_contract keys must exactly match numeric_authority/llm_role/must_include
+    - position review tests assert prompt contract key schema guard output
+    - position review guard check-name schema includes the prompt contract key schema check
+    - position review guard check-key schema covers the prompt contract key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_prompt_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_prompt_contract_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_prompt_contract_identity_matches_expected
+    - position_review prompt_contract numeric_authority must remain position_review numeric authority
+    - position_review prompt_contract llm_role must remain hold/trim/exit/stop rationale only
+    - position review tests assert prompt contract identity guard output
+    - position review guard check-name and check-key schemas cover the prompt contract identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_prompt_contract_identity_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_telegram_max_chars_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_telegram_max_chars_matches_expected
+    - position review Telegram delivery contract max_chars must remain 3900
+    - position review tests assert Telegram max_chars identity guard output
+    - position review guard check-name schema includes the Telegram max_chars identity check
+    - position review guard check-key schema covers the Telegram max_chars identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_telegram_max_chars_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_telegram_schema_version_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_telegram_schema_version_matches_expected
+    - position review Telegram delivery contract schema_version must remain telegram_report_format.v1
+    - position review tests assert Telegram schema_version guard output
+    - position review guard check-name schema includes the Telegram schema version check
+    - position review guard check-key schema covers the Telegram schema version check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_telegram_schema_version_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_telegram_chunking_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds position_review_telegram_chunking_contract_matches_expected
+    - position review Telegram delivery contract overflow_policy must remain split_on_section_boundary
+    - position review Telegram delivery contract section_separator must remain blank-line separated
+    - position review Telegram delivery contract chunk_indexing must remain 1_based
+    - position review tests assert Telegram chunking contract guard output
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_position_review_telegram_chunking_contract_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_delivery_channel_format_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds delivery_channel_formats_match_expected
+    - Hermes delivery channel format must remain structured_json_plus_text
+    - Telegram delivery channel format must remain plain_text
+    - position review tests assert delivery channel format guard output
+    - position review guard check-name and check-key schemas cover the delivery channel format check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_delivery_channel_formats_match_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_review_delivery_cron_intents_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_review_guard adds delivery_cron_intents_match_report_intent_registry
+    - position review delivery contract cron_intents must equal REPORT_INTENTS registry order
+    - position review tests assert delivery cron intent guard output
+    - position review guard check-name and check-key schemas cover the delivery cron intent registry check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --no-audit
+      result: passed_delivery_cron_intents_match_report_intent_registry_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_delivery_cron_intents_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds delivery_cron_intents_match_report_intent_registry
+    - latest signal delivery contract cron_intents must equal REPORT_INTENTS registry order
+    - latest signal and report intent variant tests assert delivery cron intent guard output
+    - Hermes latest signal report golden snapshot includes the delivery cron intent registry guard
+    - report contract guard check-name and check-key schemas cover the delivery cron intent registry check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_delivery_cron_intents_match_report_intent_registry_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_delivery_channel_format_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds delivery_channel_formats_match_expected
+    - Hermes delivery channel format must remain structured_json_plus_text
+    - Telegram delivery channel format must remain plain_text
+    - latest signal and report intent variant tests assert delivery channel format guard output
+    - Hermes latest signal report golden snapshot includes the delivery channel format guard
+    - report contract guard check-name and check-key schemas cover the delivery channel format check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_delivery_channel_formats_match_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_telegram_max_chars_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_telegram_max_chars_matches_expected
+    - latest signal Telegram delivery contract max_chars must remain 3900
+    - latest signal and report intent variant tests assert Telegram max_chars identity guard output
+    - Hermes latest signal report golden snapshot includes the Telegram max_chars identity guard
+    - report contract guard check-name and check-key schemas cover the Telegram max_chars identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_telegram_max_chars_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_telegram_schema_version_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_telegram_schema_version_matches_expected
+    - latest signal Telegram delivery contract schema_version must remain telegram_report_format.v1
+    - latest signal and report intent variant tests assert Telegram schema_version guard output
+    - Hermes latest signal report golden snapshot includes the Telegram schema_version guard
+    - report contract guard check-name and check-key schemas cover the Telegram schema_version check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_telegram_schema_version_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_telegram_chunking_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_telegram_chunking_contract_matches_expected
+    - latest signal Telegram delivery contract overflow_policy must remain split_on_section_boundary
+    - latest signal Telegram delivery contract section_separator must remain blank-line separated
+    - latest signal Telegram delivery contract chunk_indexing must remain 1_based
+    - latest signal and report intent variant tests assert Telegram chunking contract guard output
+    - Hermes latest signal report golden snapshot includes the Telegram chunking contract guard
+    - report contract guard check-name and check-key schemas cover the Telegram chunking contract check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_telegram_chunking_contract_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_prompt_must_include_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_prompt_must_include_matches_intent_terms
+    - latest signal prompt_contract.must_include must exactly match selected report intent terms
+    - latest signal report intent variant tests assert exact prompt must_include guard output
+    - Hermes latest signal report golden snapshot includes the exact prompt must_include guard
+    - report contract guard check-name and check-key schemas cover the exact prompt must_include check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_prompt_must_include_matches_intent_terms_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_prompt_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_prompt_contract_keys_match_expected_schema
+    - latest signal prompt_contract keys must exactly match numeric_authority/llm_role/must_include
+    - latest signal report intent variant tests assert prompt contract key schema guard output
+    - Hermes latest signal report golden snapshot includes the prompt contract key schema guard
+    - report contract guard check-name and check-key schemas cover the prompt contract key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_prompt_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_prompt_contract_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_prompt_contract_identity_matches_expected
+    - latest signal prompt_contract numeric_authority must remain MCP numeric fields authority
+    - latest signal prompt_contract llm_role must remain conflicts, caveats, and final wording only
+    - latest signal report intent variant tests assert prompt contract identity guard output
+    - Hermes latest signal report golden snapshot includes the prompt contract identity guard
+    - report contract guard check-name and check-key schemas cover the prompt contract identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_prompt_contract_identity_matches_expected_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_intent_contract_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_intent_contract_keys_match_expected_schema
+    - latest signal report_intent_contract keys must exactly match name/schedule_hint/decision_focus/required_sections
+    - latest signal report intent variant tests assert report intent contract key schema guard output
+    - Hermes latest signal report golden snapshot includes the report intent contract key schema guard
+    - report contract guard check-name and check-key schemas cover the report intent contract key schema check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_intent_contract_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_intent_contract_registry_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_intent_contract_matches_registry
+    - latest signal report_intent_contract values must exactly match the REPORT_INTENTS registry
+    - latest signal report intent variant tests assert report intent contract registry guard output
+    - Hermes latest signal report golden snapshot includes the report intent contract registry guard
+    - report contract guard check-name and check-key schemas cover the report intent contract registry check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_intent_contract_matches_registry_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_sections_intent_order_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_sections_match_intent_order
+    - latest signal report sections must exactly match the selected report intent required_sections order
+    - latest signal report intent variant tests assert section order guard output
+    - Hermes latest signal report golden snapshot includes the section order guard
+    - report contract guard check-name and check-key schemas cover the section order check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_sections_match_intent_order_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_text_sections_intent_order_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_contract_guard adds report_text_sections_match_intent_order
+    - latest signal report text section markers must appear in selected report intent required_sections order
+    - latest signal report intent variant tests assert text section order guard output
+    - Hermes latest signal report golden snapshot includes the text section order guard
+    - report contract guard check-name and check-key schemas cover the text section order check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_text_sections_match_intent_order_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_intent_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_intent_matches_contract
+    - latest signal top-level report_intent must match report_intent_contract.name
+    - latest signal report tests assert payload intent contract identity guard output
+    - Hermes latest signal report golden snapshot includes the payload intent contract guard
+    - report payload guard check-name and check-key schemas cover the payload intent contract check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_payload_intent_matches_contract_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_top_level_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_top_level_identity_matches_latest_signal_report
+    - latest signal top-level as_of, asset, underlying, timeframe, action, and confidence_label must match latest_signal_report identity values
+    - latest signal report tests assert the top-level identity guard output and check-key schema
+    - Hermes latest signal report golden snapshot includes the payload top-level identity guard
+    - report payload guard check-name and check-key schemas cover the payload top-level identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_payload_top_level_identity_matches_latest_signal_report_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_nested_guard_status_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_nested_guard_statuses_are_ok
+    - latest signal payload guard verifies delivery_preview.guard, evidence_guard, and report_contract_guard status values are ok
+    - latest signal report tests assert nested guard status output and check-key schema
+    - Hermes latest signal report golden snapshot includes the nested guard status check
+    - report payload guard check-name and check-key schemas cover the nested guard status check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_payload_nested_guard_statuses_are_ok_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_payload_top_level_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_payload_guard adds position_payload_top_level_identity_matches_position_review
+    - position review top-level as_of, asset, underlying, action, and position_state must match position_review identity values
+    - position review report tests assert the top-level identity guard output and check-key schema
+    - position payload guard check-name and check-key schemas cover the position payload top-level identity check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_top_level_identity_matches_position_review_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+position_payload_nested_guard_status_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - position_payload_guard adds position_payload_nested_guard_statuses_are_ok
+    - position review payload guard verifies delivery_preview.guard and position_review_guard status values are ok
+    - position review report tests assert nested guard status output and check-key schema
+    - position payload guard check-name and check-key schemas cover the nested guard status check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: passed_position_payload_nested_guard_statuses_are_ok_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_ordered_unique_prompt_names_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds prompt_names_match_contract_order_and_are_unique
+    - cron prompt pack guard verifies prompt names are unique and ordered as REPORT_INTENTS plus optional position_review
+    - cron prompt tests assert ordered prompt names for default and include_position_review=false packs
+    - cron prompt guard check-name and check-key schemas cover the ordered unique prompt-name check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_prompt_names_match_contract_order_and_are_unique_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_prompt_names_match_contract_order_and_are_unique_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+cron_prompt_position_review_sections_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - cron_prompt_guard adds position_review_prompt_expected_sections_match_contract
+    - cron prompt pack guard verifies position_review expected_sections match POSITION_REVIEW_SECTIONS when included
+    - cron prompt pack guard records empty expected/actual sections when include_position_review=false
+    - cron prompt tests assert position_review expected_sections for default and excluded packs
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit
+      result: passed_position_review_prompt_expected_sections_match_contract_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: passed_position_review_prompt_expected_sections_match_contract_present_without_position_review
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_optional_context_status_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_optional_context_statuses_are_ok
+    - default reports record empty optional context expected/actual status maps
+    - chart reports verify chart_code_guard and multimodal_context statuses are ok
+    - multimodal document-context reports verify chart_code_guard and multimodal_context statuses are ok
+    - Hermes latest signal report golden includes the optional context status guard
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_payload_optional_context_statuses_are_ok_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+report_payload_optional_context_guard_status_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/golden/hermes_latest_signal_report.json
+    - tests/test_reporting.py
+  implementation:
+    - report_payload_guard adds report_payload_optional_context_guards_are_ok
+    - default reports record empty optional context guard expected/actual status maps
+    - chart reports verify chart_code_guard and multimodal_context.guard statuses are ok
+    - chart plus document-context reports verify chart_code_guard and multimodal_context.guard statuses are ok
+    - document-only multimodal reports verify multimodal_context.guard status without chart_code_guard
+    - Hermes latest signal report golden includes the optional context guard-status check
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --no-audit
+      result: passed_report_payload_optional_context_guards_are_ok_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_guard_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_guard_check_names_match_expected_schema
+    - multimodal_context.guard adds multimodal_context_guard_check_keys_match_expected_schema
+    - multimodal_context.guard adds multimodal_context_guard_keys_match_expected_schema
+    - chart, chart-plus-document, and document-only multimodal report tests assert the guard schema checks
+    - harness include_chart path exposes the multimodal context guard schema checks without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_guard_schema"}' --no-audit
+      result: passed_multimodal_context_guard_schema_checks_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_payload_key_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_keys_match_expected_schema
+    - multimodal context construction records the actual top-level key order before guard insertion
+    - chart, chart-plus-document, and document-only multimodal report tests assert the payload key schema check
+    - harness include_chart path exposes multimodal_context_keys_match_expected_schema without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_context_keys"}' --no-audit
+      result: passed_multimodal_context_keys_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_artifact_ref_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_artifact_refs_match_expected_schema
+    - guard verifies artifact_refs entries use evidence_id/artifact_ref envelope keys
+    - guard verifies nested artifact_ref keys use ref_type/ref/metadata schema
+    - chart, chart-plus-document, and document-only multimodal report tests assert artifact ref schema output
+    - harness include_chart path exposes the artifact ref schema check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_artifact_ref_schema"}' --no-audit
+      result: passed_multimodal_context_artifact_refs_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_artifact_metadata_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_artifact_ref_metadata_matches_expected_schema
+    - guard verifies artifact_ref.metadata is a dict for every multimodal artifact ref
+    - guard verifies CHART metadata keys are bars/renderer/timeframe_supported
+    - guard verifies PDF metadata keys are description/portable/parsed_by_mcp
+    - chart, chart-plus-document, and document-only multimodal report tests assert metadata schema output
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_artifact_metadata_schema"}' --no-audit
+      result: passed_multimodal_context_artifact_ref_metadata_matches_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_artifact_metadata_values_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_artifact_ref_metadata_values_are_safe
+    - guard verifies CHART metadata keeps renderer stdlib_png, positive bars, and supported timeframe
+    - guard verifies PDF metadata keeps portable true, parsed_by_mcp false, and nonempty description
+    - chart, chart-plus-document, and document-only multimodal report tests assert metadata safety values
+    - harness include_chart path exposes the metadata safety check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_artifact_metadata_values"}' --no-audit
+      result: passed_multimodal_context_artifact_ref_metadata_values_are_safe_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_modality_counts_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_modality_counts_match_expected_context
+    - multimodal context passes actual modality_counts into the guard before guard insertion
+    - guard recomputes expected modality_counts from chart_ref and evidence cards
+    - chart, chart-plus-document, and document-only multimodal report tests assert modality count guard output
+    - harness include_chart path exposes the modality count guard without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_modality_counts"}' --no-audit
+      result: passed_multimodal_context_modality_counts_match_expected_context_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_evidence_card_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_evidence_cards_match_expected_schema
+    - guard verifies caller-supplied document evidence cards keep the expected key order
+    - chart-only context reports an empty evidence card key list while keeping guard status ok
+    - chart-plus-document and document-only multimodal report tests assert document evidence card keys
+    - harness include_chart path exposes the evidence card schema check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_evidence_card_schema"}' --no-audit
+      result: passed_multimodal_context_evidence_cards_match_expected_schema_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_artifact_ref_identity_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_artifact_refs_match_expected_context
+    - guard recomputes expected artifact_refs from chart_ref and evidence cards
+    - chart-only context verifies latest_signal_chart artifact_ref identity
+    - chart-plus-document and document-only report tests assert document artifact_ref identity
+    - harness include_chart path exposes the artifact_ref identity check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_artifact_ref_identity"}' --no-audit
+      result: passed_multimodal_context_artifact_refs_match_expected_context_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_evidence_card_values_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_evidence_card_values_are_safe
+    - guard verifies document evidence card scores remain in range
+    - guard verifies document evidence card summary, observation time, impacts, and invalidating condition stay nonempty
+    - guard verifies document evidence asset_scope remains uppercase and artifact_ref stays portable
+    - chart, chart-plus-document, and document-only report tests assert evidence card value safety output
+    - harness include_chart path exposes the evidence card value safety check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_evidence_card_values"}' --no-audit
+      result: passed_multimodal_context_evidence_card_values_are_safe_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_identity_values_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context.guard adds multimodal_context_identity_values_match_expected_contract
+    - guard verifies schema_version remains multimodal_context.v1
+    - guard verifies numeric_authority remains latest_signal_report
+    - guard verifies Hermes multimodal call, network call, and raw artifact embedding flags remain false
+    - chart, chart-plus-document, and document-only report tests assert identity values
+    - harness include_chart path exposes the identity values check without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_identity_values"}' --no-audit
+      result: passed_multimodal_context_identity_values_match_expected_contract_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_report_variants_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - intraday_risk_watch report test covers chart plus document multimodal context
+    - post_market_review report test covers chart plus document multimodal context
+    - variant coverage asserts report_intent_contract required_sections stay intent-specific
+    - variant coverage asserts optional chart_code_guard and multimodal_context guard statuses stay ok
+    - variant coverage asserts multimodal identity values, evidence card values, and artifact refs remain guarded
+    - harness include_chart paths expose non-default report intent multimodal guards without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_intraday_variant"}' --no-audit
+      result: passed_intraday_multimodal_context_and_optional_context_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_multimodal_post_market_variant"}' --no-audit
+      result: passed_post_market_multimodal_context_and_optional_context_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "109 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+
+multimodal_context_document_only_report_variants_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - intraday_risk_watch report test covers document-only multimodal context
+    - post_market_review report test covers document-only multimodal context
+    - variant coverage asserts chart_code_guard stays absent when no chart is requested
+    - variant coverage asserts optional context statuses only include multimodal_context
+    - variant coverage asserts document-only multimodal identity, evidence card values, and artifact refs remain guarded
+    - harness extra_evidence_cards paths expose non-default document-only multimodal guards without live calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch","extra_evidence_cards":[{"evidence_id":"manual_document_summary","category":"manual_document","source":"manual:document_summary","modality":"pdf_summary","observed_at":"2026-05-11T00:00:00Z","asset_scope":["QQQ","TQQQ"],"bias":"neutral","strength":0.5,"confidence":0.5,"summary":"FOMC minutes summary says policy remains restrictive but stable.","summary_truncated":false,"buy_impact":"context_only","sell_impact":"context_only","invalidating_condition":"Document summary becomes stale or contradicted.","artifact_ref":{"ref_type":"PDF","ref":"artifact://documents/fomc-minutes-summary.pdf","metadata":{"description":"Caller-supplied document summary reference","portable":true,"parsed_by_mcp":false}}}]}' --no-audit
+      result: passed_intraday_document_only_multimodal_context_and_optional_context_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review","extra_evidence_cards":[{"evidence_id":"manual_document_summary","category":"manual_document","source":"manual:document_summary","modality":"pdf_summary","observed_at":"2026-05-11T00:00:00Z","asset_scope":["QQQ","TQQQ"],"bias":"neutral","strength":0.5,"confidence":0.5,"summary":"FOMC minutes summary says policy remains restrictive but stable.","summary_truncated":false,"buy_impact":"context_only","sell_impact":"context_only","invalidating_condition":"Document summary becomes stale or contradicted.","artifact_ref":{"ref_type":"PDF","ref":"artifact://documents/fomc-minutes-summary.pdf","metadata":{"description":"Caller-supplied document summary reference","portable":true,"parsed_by_mcp":false}}}]}' --no-audit
+      result: passed_post_market_document_only_multimodal_context_and_optional_context_guards_present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "110 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+
+multimodal_context_artifact_ref_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies artifact_ref ref_type values stay within CHART/PDF
+    - chart-only, chart+document, and document-only report tests assert emitted ref_type values
+    - negative document evidence test proves DOCX ref_type causes multimodal_context conflict
+    - report payload optional context status guard reflects the multimodal_context conflict
+    - no parser, Hermes multimodal call, network call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "111 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_artifact_ref_metadata_entry_schema_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies artifact_ref metadata keys per artifact_ref entry
+    - chart-only, chart+document, and document-only coverage assert per-entry metadata key envelopes
+    - duplicate PDF negative coverage proves one bad metadata envelope is not hidden by a later good PDF entry
+    - report payload optional context status guard reflects the multimodal_context conflict
+    - no parser, Hermes multimodal call, network call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "112 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_id_uniqueness_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies evidence card ids are nonempty and unique
+    - multimodal_context guard now verifies artifact_ref evidence ids are nonempty and unique
+    - chart+document coverage asserts valid latest_signal_chart/manual_document_summary ids
+    - reserved latest_signal_chart collision coverage proves document evidence cannot reuse the chart evidence id
+    - report payload optional context status and guard checks reflect the multimodal_context conflict
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "113 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_categorical_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence card category/source/bias categorical values
+    - category is fixed to manual_document for document summary evidence
+    - source is fixed to manual:document_summary for document summary evidence
+    - bias is limited to the explicit bullish/neutral/bearish vocabulary
+    - invalid bias coverage proves unknown labels produce multimodal_context conflict
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "23 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "114 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_summary_bounds_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence summaries stay within DOCUMENT_SUMMARY_MAX_CHARS
+    - report guard reuses the document summary normalization max length from market tooling
+    - chart+document coverage asserts bounded document summary evidence
+    - raw-length summary coverage proves oversized caller-supplied summaries produce multimodal_context conflict
+    - report payload optional context status reflects the multimodal_context conflict
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "24 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "115 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_summary_truncation_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies summary_truncated flags match normalized summary length
+    - summary_truncated true requires summary length to equal DOCUMENT_SUMMARY_MAX_CHARS
+    - normal chart+document coverage asserts consistent truncation metadata
+    - short-summary with summary_truncated true coverage proves inconsistent flags produce multimodal_context conflict
+    - report payload optional context status reflects the multimodal_context conflict
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "25 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "116 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_impact_context_only_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence buy/sell impacts remain context_only
+    - manual document evidence cannot carry actionable buy/sell instructions into report context
+    - normal chart+document coverage asserts context_only impact values
+    - actionable buy_impact coverage proves document evidence cannot override MCP numeric authority
+    - report payload optional context status reflects the multimodal_context conflict
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "26 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "117 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_asset_scope_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence asset_scope includes report asset and underlying
+    - normal chart+document coverage asserts TQQQ/QQQ asset scope relevance
+    - wrong asset_scope coverage proves unrelated SPY-only document evidence produces multimodal_context conflict
+    - report payload optional context status reflects the multimodal_context conflict
+    - no live data adapter, parser, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "118 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_invalidating_condition_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence invalidating_condition is non-placeholder and actionable
+    - invalidating_condition must have at least four words and must not normalize to placeholder terms such as TBD, TODO, none, unknown, or placeholder
+    - normal chart+document coverage asserts the default invalidating condition remains accepted
+    - placeholder invalidating_condition coverage proves TBD produces multimodal_context conflict
+    - report payload optional context status reflects the multimodal_context conflict
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "28 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "119 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored_local_state_only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_observed_at_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence observed_at is a parseable UTC ISO timestamp
+    - normal chart+document coverage asserts the provider fixture timestamp is accepted
+    - non-ISO observed_at coverage proves relative text such as yesterday produces multimodal_context conflict
+    - the older nonempty observed_at value safety guard stays passing, proving the new timestamp guard catches a stricter contract gap
+    - report payload optional context status reflects the multimodal_context conflict
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "29 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "120 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_modality_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence modality stays on the supported pdf_summary contract
+    - normal chart+document coverage asserts the default document evidence modality remains accepted
+    - unsupported raw_pdf modality coverage proves arbitrary modality values produce multimodal_context conflict
+    - the modality_counts and nonempty modality guards stay passing, proving the new guard catches a stricter contract gap
+    - report payload optional context status reflects the multimodal_context conflict
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "30 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "121 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_artifact_uri_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence artifact_ref uses an explicit portable URI prefix
+    - allowed prefixes are artifact://, https://, memory://, urn:, and sha256:
+    - normal chart+document coverage asserts the default artifact:// document reference remains accepted
+    - relative document artifact_ref coverage proves relative refs produce multimodal_context conflict
+    - the older portable-ref guard stays passing, proving the new guard catches a stricter contract gap
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "31 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "122 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_pdf_artifact_ref_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies PDF artifact refs match the PDF suffix or sha256 content-address contract
+    - normal chart+document coverage asserts artifact:// document PDF refs remain accepted
+    - PDF ref_type with a .docx artifact URI now produces multimodal_context conflict
+    - artifact ref type and explicit URI guards stay passing, proving the new guard catches a stricter contract gap
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "123 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed
+    - command: git status --short --ignored state
+      result: ignored local state only
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_observed_at_temporal_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence observed_at is not after report created_at
+    - normal chart+document coverage asserts fixture document observed_at is at or before the report created_at
+    - future observed_at coverage proves valid UTC timestamps after report creation produce multimodal_context conflict
+    - observed_at ISO and value safety guards stay passing, proving the new guard catches a stricter temporal contract gap
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "33 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "124 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_reserved_id_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence ids do not use reserved context ids
+    - reserved ids currently include latest_signal_chart, which remains reserved for chart artifact context
+    - normal chart+document and document-only coverage asserts manual_document_summary remains accepted
+    - document-only reserved-id coverage proves latest_signal_chart now produces multimodal_context conflict even without chart refs
+    - chart+document reserved-id collision coverage now fails on both reserved-id and artifact_ref evidence_id uniqueness checks
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "34 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "125 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_evidence_card_safe_id_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence ids match a safe lowercase ASCII underscore contract
+    - the accepted contract requires 3-64 characters, a lowercase ASCII letter first, and only lowercase letters, digits, or underscores
+    - normal chart+document and document-only coverage asserts manual_document_summary remains accepted
+    - unsafe id coverage proves a whitespace-containing evidence id produces multimodal_context conflict
+    - uniqueness, reserved-id, and artifact_ref evidence_id uniqueness guards stay passing in the unsafe-id case, proving the new guard catches a stricter namespace contract gap
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "35 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "126 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_artifact_ref_evidence_id_safe_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies artifact_ref evidence ids match the safe lowercase ASCII underscore contract
+    - chart artifact id latest_signal_chart and document artifact id manual_document_summary are explicitly covered
+    - unsafe document id coverage proves artifact_ref evidence ids conflict when the referenced evidence id contains whitespace
+    - artifact_ref evidence_id uniqueness can stay passing while the safe-id guard fails, proving this is a stricter namespace contract
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "35 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "126 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_artifact_ref_value_uniqueness_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies artifact_ref values are nonempty and unique
+    - normal chart+document and document-only coverage asserts unique artifact refs remain accepted
+    - duplicate document artifact_ref coverage proves two safe evidence ids cannot point at the same artifact URI
+    - evidence card id uniqueness, artifact_ref evidence id uniqueness, artifact_ref evidence id safe contract, and artifact_refs identity guards stay passing in the duplicate-ref case
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "36 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "127 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+
+multimodal_context_chart_artifact_ref_png_contract_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies CHART artifact refs match the PNG suffix or sha256 content-address contract
+    - normal chart-only and chart+document coverage asserts QQQ_1d.png remains accepted
+    - non-PNG chart artifact_ref coverage proves artifact://charts/QQQ_1d.svg produces multimodal_context conflict
+    - chart_code_guard and artifact_ref metadata guards stay ok in the non-PNG case, proving this guard catches the stricter render artifact contract
+    - no live data adapter, parser, Hermes multimodal call, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "37 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "128 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_chart_artifact_ref_offline_location_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies CHART artifact refs use offline local paths, artifact:// refs, or sha256 content addresses
+    - normal chart-only and chart+document coverage asserts local QQQ_1d.png refs remain accepted
+    - remote PNG chart artifact_ref coverage proves https://charts.example.test/QQQ_1d.png produces multimodal_context conflict
+    - PNG suffix and artifact_ref metadata guards stay ok in the remote-ref case, proving this guard catches the no-network/offline-location gap
+    - no live data adapter, parser, Hermes multimodal call, remote chart fetch, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "38 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "129 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_chart_artifact_ref_file_uri_rejection:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context CHART offline-location guard now rejects file:// URI syntax even when the ref has a .png suffix
+    - file:// chart artifact_ref coverage proves file:///tmp/QQQ_1d.png produces multimodal_context conflict
+    - PNG suffix and artifact_ref metadata guards stay ok in the file-uri case, proving this closes a separate URI-scheme gap
+    - normal chart-only and chart+document coverage still accepts local filesystem paths produced by the offline renderer
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, file URI dereference, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "39 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "130 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_chart_artifact_ref_tilde_path_rejection:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context CHART offline-location guard now rejects ~/ user-home syntax even when the ref has a .png suffix
+    - tilde chart artifact_ref coverage proves ~/charts/QQQ_1d.png produces multimodal_context conflict
+    - PNG suffix and artifact_ref metadata guards stay ok in the tilde case, proving this closes a separate user-home path leak gap
+    - normal chart-only and chart+document coverage still accepts local filesystem paths produced by the offline renderer
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, user-home expansion, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "40 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "131 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_content_address_digest_format_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - CHART and PDF artifact ref suffix guards now require sha256 content-addressed refs to include a 64-character hex digest
+    - CHART offline-location guard also rejects malformed sha256 refs instead of accepting prefix-only content addresses
+    - malformed CHART sha256 ref coverage proves sha256:not-a-real-digest produces multimodal_context conflict
+    - malformed PDF sha256 ref coverage proves sha256:not-a-real-digest produces multimodal_context conflict while explicit URI and metadata guards stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, file dereference, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "42 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "133 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_valid_content_address_acceptance_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - added positive CHART coverage proving sha256 plus a 64-character hex digest remains accepted by the PNG/offline-location multimodal_context guards
+    - added positive PDF coverage proving sha256 plus a 64-character hex digest remains accepted by the PDF artifact_ref contract guard
+    - valid content-addressed CHART and PDF refs keep multimodal_context status ok
+    - no production code change was needed beyond the existing digest-format helper
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, artifact storage, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "44 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "135 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_chart_machine_specific_path_rejection:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - CHART offline-location guard now rejects /Users/ absolute paths and drive-root paths such as C:/Users/... even when refs end in .png
+    - /Users/june/charts/QQQ_1d.png coverage proves machine-specific macOS user paths produce multimodal_context conflict
+    - C:/Users/june/charts/QQQ_1d.png coverage proves drive-root paths produce multimodal_context conflict
+    - PNG suffix and artifact_ref metadata guards stay ok in both cases, proving the offline-location guard catches the path leak
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, user-path expansion, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "46 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "137 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_embedded_local_path_marker_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies all artifact_ref.ref values do not embed /Users/, file://, ~/, or drive-root local path markers
+    - CHART coverage proves artifact://charts//Users/june/QQQ_1d.png conflicts even while PNG/offline-location guards stay ok
+    - PDF coverage proves artifact://documents//Users/june/fomc-minutes-summary.pdf conflicts even while explicit URI and PDF suffix guards stay ok
+    - the guard covers hidden local path leaks inside otherwise allowed artifact:// refs
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, user-path expansion, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "48 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "139 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_string_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies all artifact_ref.ref values have no surrounding whitespace and no ASCII control characters
+    - chart coverage proves artifact://charts/QQQ_1d.png with trailing whitespace conflicts even while PNG/offline-location guards stay ok
+    - PDF coverage proves artifact://documents/fomc-minutes-summary.pdf with a newline conflicts even while explicit URI and PDF suffix guards stay ok
+    - normal chart-only and chart+document coverage asserts clean artifact refs keep the string-safety guard ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, artifact normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "50 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "141 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_text_string_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence summary and invalidating_condition have no surrounding whitespace and no ASCII control characters
+    - normal chart+document and document-only coverage asserts clean document text values keep the text-safety guard ok
+    - summary coverage proves embedded newline/control characters conflict while value and length guards stay ok
+    - invalidating_condition coverage proves trailing whitespace conflicts while actionability and value guards stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, text normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "143 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_metadata_text_string_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies PDF artifact_ref metadata description has no surrounding whitespace and no ASCII control characters
+    - normal chart+document and document-only coverage asserts clean PDF metadata descriptions keep the metadata text-safety guard ok
+    - metadata description coverage proves a trailing newline conflicts while metadata schema and value guards stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, metadata normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "53 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "144 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_scalar_string_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence modality and observed_at have no surrounding whitespace and no ASCII control characters
+    - normal chart+document and document-only coverage asserts clean scalar values keep the scalar string-safety guard ok
+    - modality coverage proves trailing whitespace conflicts while modality_counts, value safety, and supported-modality guards stay ok
+    - observed_at coverage proves newline/control characters conflict while value, UTC ISO, and temporal guards stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, scalar normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "55 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "146 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_asset_scope_string_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence asset_scope values have no surrounding whitespace and no ASCII control characters
+    - normal chart+document and document-only coverage asserts clean asset_scope values keep the asset-scope string-safety guard ok
+    - dirty extra asset_scope coverage proves SPY newline conflicts while value safety and required asset-scope relevance guards stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, asset_scope normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "56 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "147 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_type_canonical_case_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies artifact_ref ref_type values use canonical uppercase CHART/PDF spelling
+    - normal chart-only, chart+document, and document-only coverage asserts clean canonical ref_type values keep the guard ok
+    - lowercase pdf coverage proves canonical-case conflicts while the normalized ref-type contract and PDF suffix contract stay ok
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, ref_type normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "57 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "148 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_metadata_value_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies CHART metadata bars is a positive non-bool int and timeframe_supported is exactly boolean true
+    - multimodal_context guard now verifies PDF metadata description is a string, portable is exactly boolean true, and parsed_by_mcp is exactly boolean false
+    - normal chart-only, chart+document, and document-only coverage asserts clean metadata value types keep the guard ok
+    - numeric PDF flag coverage proves portable=1 and parsed_by_mcp=0 conflict while the older loose metadata value guard still passes
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, metadata normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "58 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "149 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_chart_metadata_value_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover CHART metadata bars=True and timeframe_supported=1 as loose bool/numeric type drift
+    - coverage proves PNG artifact ref and older loose metadata value guard can stay ok while strict metadata value type guard conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, metadata normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "59 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "150 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_string_field_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence string fields preserve string types before trim/control/bounds checks
+    - normal chart+document and document-only coverage asserts clean string field types keep the guard ok
+    - non-string summary coverage proves str-coercion based value, text, and bounds guards can stay ok while strict string field type guard conflicts
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "60 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "151 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_structural_field_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now verifies document evidence asset_scope is a list and artifact_ref is a dict before downstream schema/value checks
+    - normal chart+document and document-only coverage asserts clean structural field types keep the guard ok
+    - non-list asset_scope coverage proves value and string-safety guards can stay ok while strict structural field type guard conflicts
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "61 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "152 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_document_artifact_ref_structural_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence artifact_ref supplied as a raw string instead of a dict
+    - coverage proves normalized artifact ref type and metadata guards can remain ok while schema, explicit URI, and structural type guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "62 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "153 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_card_numeric_bool_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence strength=True and confidence=False as bool numeric drift
+    - coverage proves string and structural type guards remain ok while evidence_card_values_are_safe conflicts on bool numeric fields
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "63 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "154 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_summary_truncation_flag_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence summary_truncated="false" as non-bool flag drift
+    - coverage proves summary bounds and truncation-consistency guards can remain ok while evidence_card_values_are_safe conflicts on the flag type
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "64 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "155 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_asset_scope_value_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence asset_scope containing a non-string value
+    - coverage proves required report asset/underlying scope can remain ok while value safety and asset_scope string-safety guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "65 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "156 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_evidence_id_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now records raw evidence card and artifact_ref evidence_id values before safe-id string coercion
+    - evidence_id type guard requires both evidence card ids and artifact_ref evidence ids to be string typed
+    - reporting tests cover chart-only, chart-plus-document, document-only, and non-string document evidence_id conflict cases
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "66 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "157 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_string_field_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now requires artifact_ref ref_type and ref to be string typed before downstream string coercion
+    - reporting tests cover chart-only, chart-plus-document, document-only, and non-string PDF artifact_ref ref value conflict cases
+    - coverage proves trim/control string-safety can remain ok while artifact_ref string field type guard conflicts on raw ref type
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "67 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "158 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+multimodal_context_artifact_ref_metadata_non_dict_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover PDF artifact_ref metadata replaced with a non-dict list value
+    - coverage proves metadata schema, per-entry schema, value safety, and value type guards conflict while text trim/control remains harmless
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "68 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "159 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_metadata_dto_validation_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref metadata as a non-dict list value
+    - coverage proves invalid chart metadata is rejected by LatestSignalReport DTO validation before a malformed report payload is emitted
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "69 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "160 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_scalar_dto_validation_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref ref as a non-string value
+    - coverage proves invalid chart ref scalar values are rejected by LatestSignalReport DTO validation before a malformed report payload is emitted
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "70 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "161 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_ref_slot_artifact_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now requires the latest_signal_report chart_ref slot to use CHART artifact_ref type
+    - reporting tests cover render_chart returning a DTO-valid PDF artifact_ref in the chart slot
+    - coverage proves generic artifact type, PDF contract, metadata schema, and chart declaration checks can pass while the chart slot type guard conflicts
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "71 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "162 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_declaration_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref with an empty ref value
+    - coverage proves chart declaration, PNG contract, and offline-location guards conflict while chart slot type, artifact type, and metadata value guards remain ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "72 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "163 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_reserved_id_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now requires CHART artifact_refs to use latest_signal_chart evidence_id
+    - reporting tests cover an extra evidence card attempting to attach a CHART artifact_ref under manual_document_summary
+    - coverage proves chart declaration, chart slot type, artifact type, CHART PNG contract, and metadata schema can pass while the reserved chart evidence id guard conflicts
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "73 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "164 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_renderer_type_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context artifact_ref metadata value type guard now requires CHART renderer metadata to be string typed
+    - reporting tests cover render_chart returning CHART artifact_ref renderer metadata as a non-string list value
+    - coverage proves PNG contract and metadata key schema can pass while strict metadata value type guard conflicts on renderer type
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "74 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "165 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_renderer_value_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning a CHART artifact_ref renderer metadata value other than stdlib_png
+    - coverage proves PNG contract, metadata key schema, and strict metadata value type guard can pass while the metadata safety value guard conflicts on renderer identity
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "75 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "166 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_renderer_text_safety_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context artifact_ref metadata text safety guard now includes CHART renderer metadata
+    - chart-only and chart-plus-document positive coverage assert renderer metadata text safety guard output
+    - reporting tests cover render_chart returning a CHART artifact_ref renderer value with a newline control character
+    - coverage proves PNG contract, metadata key schema, and strict metadata value type guard can pass while renderer text safety conflicts
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "76 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "167 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_artifact_ref_type_field_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref ref_type supplied as a non-string value
+    - coverage proves explicit URI and metadata schema checks can remain ok while artifact_ref string field type and ref_type contract guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "77 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "168 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_type_dto_validation_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref ref_type as a non-string value
+    - coverage proves invalid chart ref_type scalar values are rejected by LatestSignalReport DTO validation before a malformed report payload is emitted
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "78 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "169 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_observed_at_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence observed_at supplied as a non-string value
+    - coverage proves evidence value safety and scalar trim/control guards can remain ok while strict string field type and timestamp guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "79 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "170 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_modality_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence modality supplied as a non-string value
+    - coverage proves evidence value safety and scalar trim/control guards can remain ok while strict string field type and supported-modality guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "80 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "171 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_bias_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence bias supplied as a non-string value
+    - coverage proves evidence value safety can remain ok while strict string field type and categorical bias guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "81 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "172 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_invalidating_condition_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence invalidating_condition supplied as a non-string value
+    - coverage proves evidence value safety and text trim/control guards can remain ok while strict string field type and actionability guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "82 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "173 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_impact_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence buy_impact supplied as a non-string value
+    - coverage proves evidence value safety can remain ok while strict string field type and context-only impact guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "83 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "174 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_category_source_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence category and source supplied as non-string values
+    - coverage proves evidence value safety can remain ok while strict string field type and categorical guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "84 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "175 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_numeric_type_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence strength as a string and confidence as None
+    - coverage proves string and structural type guards remain ok while evidence card value safety conflicts on non-numeric score fields
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "85 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "176 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_numeric_range_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence strength above 1.0 and confidence below 0.0
+    - coverage proves string and structural type guards remain ok while evidence card value safety conflicts on out-of-range numeric score fields
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "86 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "177 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_summary_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence summary supplied as an empty string
+    - coverage proves string type, text safety, summary bounds, and truncation guards remain ok while summary presence and evidence value safety conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "87 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "178 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_modality_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence modality supplied as an empty string
+    - coverage proves modality count, string type, and scalar trim/control guards can remain ok while modality presence, value safety, and supported-modality guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "88 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "179 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_observed_at_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence observed_at supplied as an empty string
+    - coverage proves string type and scalar trim/control guards remain ok while observed_at presence, UTC ISO timestamp, temporal, and value safety guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "89 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "180 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_asset_scope_empty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence asset_scope supplied as an empty list
+    - coverage proves structural type, value safety, and asset_scope trim/control guards stay ok while report asset/underlying scope matching conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "90 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "181 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_invalidating_condition_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence invalidating_condition supplied as an empty string
+    - coverage proves string type and text trim/control guards stay ok while invalidating_condition presence, actionability, and value safety guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "91 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "182 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_impact_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence buy_impact supplied as an empty string
+    - coverage proves string type stays ok while impact presence, context-only, and value safety guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "92 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "183 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_category_source_empty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence category and source supplied as empty strings
+    - coverage proves value safety and strict string field type guards stay ok while category/source identity categorical guard conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "93 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "184 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_bias_empty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence bias supplied as an empty string
+    - coverage proves value safety and strict string field type guards stay ok while the categorical bias allowed-set guard conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "94 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "185 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_asset_scope_uppercase_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document evidence asset_scope supplied as lowercase asset symbols
+    - coverage proves structural type, asset scope matching, and asset_scope trim/control guards stay ok while uppercase value safety conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "95 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "186 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_pdf_artifact_ref_empty_value_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref ref supplied as an empty string
+    - coverage proves artifact_ref string type and trim/control guards stay ok while nonempty, explicit URI, and PDF contract guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "96 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "187 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_pdf_artifact_ref_type_empty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref ref_type supplied as an empty string
+    - coverage proves explicit URI and artifact_ref string type guards stay ok while artifact type contract and canonical uppercase guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "97 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "188 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_pdf_metadata_description_nonempty_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref metadata description supplied as an empty string
+    - coverage proves metadata schema, value type, and text trim/control guards stay ok while metadata value safety conflicts on description_nonempty
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "98 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "189 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_pdf_metadata_bool_values_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref metadata portable=false and parsed_by_mcp=true
+    - coverage proves metadata schema and text safety guards stay ok while metadata value safety and exact bool-value strictness conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "99 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "190 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_pdf_metadata_missing_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover document PDF artifact_ref metadata missing the required parsed_by_mcp key while metadata remains a dict
+    - coverage proves metadata schema, per-entry schema, value safety, and exact value/type guards conflict while text safety stays ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "100 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "191 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_metadata_missing_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover CHART artifact_ref metadata missing the required timeframe_supported key while metadata remains a dict
+    - coverage proves chart PNG contract stays ok while metadata schema, per-entry schema, value safety, and exact value/type guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "101 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "192 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_metadata_values_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover CHART artifact_ref metadata bars=0 and timeframe_supported=false
+    - coverage proves chart PNG contract and metadata schema stay ok while metadata value safety and exact value/type guards conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "102 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "193 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_type_empty_dto_validation_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref ref_type as an empty string
+    - coverage proves LatestSignalReport DTO rejects invalid enum-string chart_ref.ref_type before malformed report payload emission
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "103 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "194 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_type_lowercase_dto_validation_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover render_chart returning CHART artifact_ref ref_type as lowercase chart
+    - coverage proves LatestSignalReport DTO rejects invalid non-canonical enum-string chart_ref.ref_type before malformed report payload emission
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "104 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "195 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_control_character_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover CHART artifact_ref ref values containing a newline control character
+    - coverage proves chart PNG contract and offline-location guards stay ok while artifact_ref string safety conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "105 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "196 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_duplicate_value_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover chart slot and manual CHART artifact_ref entries sharing the same artifact URI
+    - coverage proves artifact_ref evidence ids stay unique while artifact_ref value uniqueness conflicts
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "106 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "197 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_evidence_id_duplicate_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover two document evidence cards sharing the same safe non-reserved evidence_id
+    - coverage proves reserved-id and artifact_ref value uniqueness guards stay ok while evidence card and artifact_ref evidence_id uniqueness conflict
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "198 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_evidence_card_source_key_schema_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a document evidence card missing the required source key
+    - coverage proves the evidence card key schema, string type, and categorical guards conflict before downstream categorical assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_source_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "199 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_evidence_card_unexpected_key_schema_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a document evidence card carrying an unexpected raw_text top-level key
+    - coverage proves the evidence card key schema conflicts while value, string type, structural type, and categorical guards stay ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_document_card_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "109 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "200 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_artifact_ref_unexpected_key_schema_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a PDF artifact_ref carrying an unexpected mime_type top-level key
+    - coverage proves the artifact_ref key schema conflicts while context identity, string field, ref_type, PDF contract, and metadata schema guards stay ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_pdf_artifact_ref_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "110 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "201 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_artifact_ref_missing_ref_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a PDF artifact_ref missing the required ref key while ref_type and metadata stay present
+    - coverage proves artifact_ref schema, string field type, nonempty ref, explicit URI, and PDF contract guards conflict before downstream URI assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_value_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "111 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "202 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_artifact_ref_missing_ref_type_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a PDF artifact_ref missing the required ref_type key while ref and metadata stay present
+    - coverage proves artifact_ref schema, string field type, ref_type contract, and canonical uppercase guards conflict before downstream artifact type assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_type_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "112 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "203 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_artifact_ref_missing_metadata_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a PDF artifact_ref missing the required metadata key while ref_type and ref stay present
+    - coverage proves artifact_ref schema, metadata schema, metadata entry schema, metadata value, and metadata value-type guards conflict before downstream metadata assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_metadata_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "113 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "204 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_missing_metadata_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a CHART artifact_ref missing the metadata key while ref_type and ref stay present
+    - coverage proves DTO defaulting keeps artifact_ref schema valid but metadata schema, per-entry schema, metadata value, and value-type guards conflict before downstream metadata assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_metadata_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "114 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "205 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_missing_ref_key_dto_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a CHART artifact_ref missing the required ref key while ref_type and metadata stay present
+    - coverage proves LatestSignalReport DTO validation raises chart_ref.ref before downstream URI, PNG, offline-location, or multimodal guard assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_value_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "115 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "206 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_missing_ref_type_key_dto_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a CHART artifact_ref missing the required ref_type key while ref and metadata stay present
+    - coverage proves LatestSignalReport DTO validation raises chart_ref.ref_type before downstream artifact type, canonical uppercase, PNG, or multimodal guard assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_type_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "116 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "207 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_artifact_ref_unexpected_key_dto_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a CHART artifact_ref with an unexpected top-level mime_type key while required fields stay valid
+    - coverage proves LatestSignalReport DTO validation raises chart_ref.mime_type before downstream artifact schema, PNG, offline-location, metadata, or multimodal guard assumptions
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_chart_artifact_ref_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "117 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "208 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+chart_metadata_unexpected_key_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a CHART artifact_ref metadata dict with an unexpected source key while required metadata fields stay valid
+    - coverage proves exact metadata schema and per-entry metadata schema guards conflict while PNG, metadata value safety, and metadata value-type guards remain ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_chart_metadata_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "118 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "209 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+pdf_metadata_unexpected_key_aggregate_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - reporting tests now cover a single PDF artifact_ref metadata dict with an unexpected raw_text key while required metadata fields stay valid
+    - coverage proves aggregate metadata schema and per-entry metadata schema guards conflict while PDF contract, metadata value safety, and metadata value-type guards remain ok
+    - no production code, live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, or artifact embedding added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_pdf_metadata_key -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "119 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "210 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - production code change
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+document_artifact_ref_missing_key_portable_guard_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - reporting guard now treats blank artifact_ref values as non-portable instead of accepting an empty relative reference
+    - reporting tests now cover a document evidence card missing the artifact_ref key, proving evidence card schema, value safety, explicit URI, and structural guards conflict even though artifact_refs are omitted from context collection
+    - existing empty PDF artifact_ref value coverage now verifies evidence card value safety conflicts along with nonempty ref, explicit URI, and PDF contract guards
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, artifact embedding, scheduler, credential storage, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key tests/test_reporting.py::test_latest_signal_report_rejects_empty_pdf_artifact_ref_value -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "120 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "211 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+empty_document_artifact_ref_dict_collection_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal artifact_ref collection now includes evidence cards when the artifact_ref key is present, even if the value is an empty dict
+    - reporting tests now cover an empty document artifact_ref dict, proving artifact_refs context/schema, string field type, ref type contract, ref value, value safety, and explicit URI guards conflict instead of silently omitting the malformed artifact_ref
+    - missing artifact_ref key coverage remains separate and still proves evidence card schema/structural/value guards conflict
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, artifact embedding, scheduler, credential storage, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_artifact_ref_dict tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key tests/test_reporting.py::test_latest_signal_report_rejects_non_dict_document_artifact_ref -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "121 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "212 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+binance_credential_status_schema_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - direct Binance credential status tests now assert missing and configured credential status key schemas
+    - configured status tests now assert safe kdf/cipher metadata key schemas and credential_policy key schema
+    - registry-backed get_binance_credentials_status output is asserted equal to direct save/status output
+    - serialized credential status is checked against api_secret, api_key raw key, passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "215 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - order submission
+
+integration_readiness_configured_credential_schema:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - readiness tests now assert configured encrypted Binance credential status keys remain stable for binance_testnet_read_only and live_order_submission gates
+    - configured credential metadata now has explicit test coverage for api_key_hint, created_at, updated_at, kdf, cipher, credential_policy, secret_values_returned, passphrase_persisted, and live_data_required fields
+    - safe kdf/cipher metadata schemas are fixed to name/iterations and name, proving salt_b64 and encrypted token are not returned through readiness
+    - serialized readiness payload is checked against api_secret, passphrase, salt_b64, and encrypted token leakage
+    - no Hermes runtime start, Telegram send, Binance network call, live adapter, migration, repository persistence, credential exposure, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "215 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Hermes runtime start
+    - Telegram send call
+    - Binance network call
+    - live data adapter
+    - migration or repository persistence
+    - credential exposure
+    - order submission
+
+integration_readiness_payload_schema_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - readiness tests now assert top-level payload keys remain status/gates/next_actions/live_data_required
+    - readiness tests now assert gate ordering and each gate envelope key schema remain stable
+    - readiness tests now assert each gate evidence key schema remains stable for Hermes, Telegram, migration, repository, Binance testnet, live order submission, and live data
+    - readiness tests now assert missing Binance credential status and credential_policy key schemas remain stable without returning secrets
+    - no Hermes runtime start, Telegram send, Binance network call, live adapter, migration, repository persistence, credential exposure, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "214 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Hermes runtime start
+    - Telegram send call
+    - Binance network call
+    - live data adapter
+    - migration or repository persistence
+    - credential exposure
+    - order submission
+
+integration_readiness_next_actions_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - readiness tests now assert blocked-default next_actions exactly mirror each blocked gate and its missing reasons in gate order
+    - readiness tests now assert next_actions is empty when all integration gates are ready with safe local evidence
+    - the coverage keeps Hermes, Telegram, migration, repository, Binance testnet, live-order, and live-data operator guidance from drifting away from gate missing evidence
+    - no Hermes runtime start, Telegram send, Binance network call, live adapter, migration, repository persistence, credential exposure, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "213 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Hermes runtime start
+    - Telegram send call
+    - Binance network call
+    - live data adapter
+    - migration or repository persistence
+    - credential exposure
+    - order submission
+
+null_document_artifact_ref_collection_negative_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - latest signal report tests now cover a document evidence card whose artifact_ref key is present with a null value
+    - null document artifact_ref values are verified as collected into multimodal_context.artifact_refs instead of being silently omitted
+    - the negative case proves artifact_ref context/schema, collection coverage, portable-ref safety, explicit URI, structural type, and payload optional-context guards surface conflict
+    - no production parser, live adapter, Hermes multimodal call, remote fetch, field normalization, artifact embedding, scheduler, credential storage, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_null_document_artifact_ref -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_artifact_ref_dict tests/test_reporting.py::test_latest_signal_report_rejects_null_document_artifact_ref tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "122 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "213 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+artifact_ref_collection_coverage_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - multimodal_context guard now includes an independent artifact_refs coverage check for evidence cards that contain an artifact_ref key
+    - coverage check compares evidence card ids with artifact_ref keys against non-chart artifact_ref evidence ids instead of relying only on _multimodal_artifact_refs for both expected and actual values
+    - empty document artifact_ref dict and missing artifact_ref key tests now verify the new coverage guard passes for present malformed refs and for truly missing refs respectively
+    - no live data adapter, parser, Hermes multimodal call, remote fetch, field normalization, artifact embedding, scheduler, credential storage, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_artifact_ref_dict tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "121 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "212 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send call
+    - Hermes runtime call
+    - live data adapter
+    - order submission
+    - Telegram credential storage
+    - parser for DOCX/PDF/image files
+    - committed chart artifact
+
+binance_credential_harness_audit_redaction_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - harness save_binance_credentials audit coverage now exercises the real CLI harness path with encrypted local credential output under tmp_path
+    - audit details assert api_key, api_secret, passphrase, and credentials_path inputs are redacted
+    - harness stdout, raw audit JSONL, and parsed audit event serialization are checked against raw api key, api secret, passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_save_binance_credentials_audit_redacts_secret_inputs -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "216 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+trading_admin_credential_status_secret_safe_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin status test now asserts the admin credentials payload exactly matches get_binance_credentials_status safe projection
+    - admin status coverage fixes configured credential, kdf, cipher, and credential_policy key schemas at the local UI/API status surface
+    - serialized admin status payload is checked against raw api key, api secret, passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_status_is_secret_safe -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "216 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+trading_admin_credentials_endpoint_secret_safe_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin credentials endpoint test now drives create_handler with in-memory HTTP request bytes instead of opening a socket
+    - POST /api/credentials is verified to return get_binance_credentials_status safe projection after encrypted credential save
+    - GET /api/status after endpoint save is verified to expose the same safe credentials projection
+    - endpoint response and status response serialization are checked against raw api key, api secret, passphrase, salt_b64, and encrypted token leakage
+    - no local socket bind, Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_returns_secret_safe_status -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "217 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - local socket bind
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+trading_admin_account_endpoint_secret_safe_block_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin account snapshot endpoint test now drives missing-passphrase and invalid-passphrase paths through create_handler with in-memory HTTP requests
+    - missing passphrase path is verified to block before live data and return get_binance_credentials_status safe projection
+    - invalid passphrase path is verified to return a generic HTTP 400 error without echoing the supplied passphrase
+    - blocked and error response serialization are checked against raw api key, api secret, correct passphrase, wrong passphrase, salt_b64, and encrypted token leakage
+    - no local socket bind, Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_blocks_secret_safely -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "218 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - local socket bind
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+mcp_server_order_passphrase_audit_redaction_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - MCP server execute_btc_order wrapper audit coverage now exercises a blocked order path with credential_passphrase input
+    - audit event actor/resource_id are verified as mcp_server/execute_btc_order
+    - audit input credential_passphrase is verified as [REDACTED]
+    - raw audit JSONL and parsed event serialization are checked against passphrase leakage while preserving the redacted key presence
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_mcp_server_execute_order_audit_redacts_credential_passphrase -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "219 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+mcp_server_account_passphrase_audit_redaction_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - MCP server get_binance_coinm_account_snapshot wrapper audit coverage now exercises the read-only account path with encrypted credentials and credential_passphrase input
+    - signed Binance reads are monkeypatched in-test so credential decrypt and audit behavior are verified without network calls
+    - audit event actor/resource_id are verified as mcp_server/get_binance_coinm_account_snapshot
+    - audit input credential_passphrase and credentials_path are verified as [REDACTED]
+    - raw audit JSONL and parsed event serialization are checked against raw api key, api secret, passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_mcp_server_account_snapshot_audit_redacts_credential_passphrase -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "220 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+harness_account_failure_passphrase_audit_redaction_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - harness get_binance_coinm_account_snapshot failure audit coverage now exercises wrong credential_passphrase with encrypted credentials
+    - harness process failure and audit failure event are both verified
+    - audit input credential_passphrase and credentials_path are verified as [REDACTED]
+    - audit error keeps the generic invalid passphrase message without echoing the supplied passphrase
+    - raw audit JSONL and parsed event serialization are checked against raw api key, api secret, correct passphrase, wrong passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_account_snapshot_failure_audit_redacts_passphrase -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "221 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+audit_read_surface_failure_redaction_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - audit read-surface coverage now creates a harness get_binance_coinm_account_snapshot failure event with wrong credential_passphrase
+    - get_audit_log outcome/resource filters are verified to return the redacted failure event with secret_values_returned=false
+    - audit web events_payload outcome/resource filters are verified to return the same redacted event
+    - read-surface serialization is checked against raw api key, api secret, correct passphrase, wrong passphrase, salt_b64, and encrypted token leakage
+    - no Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_read_surfaces_preserve_redacted_failure_event -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "222 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+runtime_status_audit_failure_secret_boundary_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - runtime status watchdog coverage now feeds a redacted Binance account snapshot failure event with credential-like details
+    - get_runtime_status is verified to enter degraded mode from failure counts without returning the source audit event details
+    - serialized runtime status is checked against tool resource_id, credential_passphrase key, credentials_path key, raw api key, api secret, wrong passphrase, raw error string, salt_b64, and encrypted token leakage
+    - no audit event detail forwarding, Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_watchdog_does_not_return_audit_event_details_or_secrets -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "223 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - audit event detail forwarding
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+runtime_checkpoint_audit_failure_secret_boundary_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - runtime checkpoint coverage now records a degraded checkpoint after secret-like Binance account snapshot audit failures
+    - record_runtime_checkpoint is verified to persist watchdog counts and checkpoint metadata without source audit event details
+    - serialized checkpoint payload and JSONL record are checked against tool resource_id, credential_passphrase key, credentials_path key, raw api key, api secret, wrong passphrase, raw error string, salt_b64, and encrypted token leakage
+    - checkpoint contract secret_values_returned=false remains asserted
+    - no audit event detail forwarding, Binance network call, live trading, credential exposure, passphrase persistence, migration, repository persistence, live adapter, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_does_not_persist_audit_event_details_or_secrets -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "224 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+  blocked_scope_unchanged:
+    - audit event detail forwarding
+    - Binance network call
+    - live trading
+    - credential exposure
+    - passphrase persistence
+    - migration or repository persistence
+    - live adapter
+    - order submission
+
+runtime_checkpoint_readiness_env_secret_boundary_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - runtime checkpoint readiness coverage now records the default include_readiness=true path with Telegram, gateway, market, macro, and news env secrets configured
+    - checkpoint readiness snapshot is verified to persist only readiness_status and readiness_next_actions, not gate evidence or environment values
+    - serialized checkpoint payload and JSONL record are checked against Telegram token, gateway URL, market data API key, FRED API key, news API key, and the corresponding environment variable names
+    - checkpoint contract secret_values_returned=false remains asserted
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "225 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: passed_blocked_as_expected
+blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+position_review_report_numeric_input_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_position_review_report now validates entry_price, current_price, and size at the report wrapper boundary before evaluate_position, position review text, or payload construction
+    - entry_price, current_price, and size still accept omitted values but reject bool, non-number, NaN, infinity, zero, and negative values when supplied
+    - direct coverage verifies invalid numeric inputs fail before position evaluation is called
+    - harness coverage verifies entry_price, current_price, and size failures exit nonzero, emit no stdout payload, and record failure audits without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_rejects_invalid_numeric_inputs_before_position_evaluation tests/test_reporting.py::test_harness_rejects_position_review_numeric_inputs_with_failure_audit -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "205 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "499 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_418_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: pending_final_audit
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: pending_final_audit
+    - command: git status --short --ignored state
+      result: pending_final_audit
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+latest_report_extra_evidence_cards_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report now normalizes extra_evidence_cards before score calculation, chart rendering, report construction, or multimodal context construction
+    - invalid extra_evidence_cards containers fail with extra_evidence_cards must be a list of objects
+    - non-object extra_evidence_cards entries fail with extra_evidence_cards items must be objects
+    - harness coverage verifies both public-boundary failures exit nonzero, emit no stdout payload, create no chart artifacts, and record failure audits without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_invalid_extra_evidence_cards_container tests/test_reporting.py::test_latest_signal_report_rejects_extra_evidence_card_non_object tests/test_reporting.py::test_harness_rejects_invalid_extra_evidence_cards_container_with_failure_audit tests/test_reporting.py::test_harness_rejects_extra_evidence_card_non_object_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "196 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "499 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_417_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+evaluate_score_performance_remaining_days_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_recorded_score_performance direct coverage now verifies negative and string days values fail with the positive-integer contract before fixture fallback or ledger evaluation
+    - harness coverage now verifies bool, negative, and string days values exit nonzero at the evaluate_score_performance public tool boundary
+    - harness coverage now verifies those failure audits preserve the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_remaining_days_values_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "149 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "484 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_416_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_unused_invalidating_event_id_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome now has direct coverage proving invalidating_event_id control-character validation applies even when invalidated_by_event=false
+    - harness coverage now verifies unused invalidating_event_id containing a newline exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_unused_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "146 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "481 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_415_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_remaining_identity_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.run_id, signal.created_at, and signal.underlying control-character validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies those remaining identity fields containing a newline exit nonzero and emit no stdout payload
+    - harness coverage now verifies each failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_remaining_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "15 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "145 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "480 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_414_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_config_version_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.config_version control-character validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies signal.config_version containing a newline exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "142 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "477 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_413_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_config_hash_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.config_hash control-character validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies signal.config_hash containing a newline exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "141 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "476 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_412_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_config_hash_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.config_hash nonempty string validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies non-string signal.config_hash exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "140 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "475 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_411_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_config_version_blank_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.config_version nonempty string validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies blank signal.config_version exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "139 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "474 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_410_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_underlying_null_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.underlying nonempty string validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies signal.underlying=null exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "138 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "473 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_409_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_created_at_blank_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.created_at nonempty string validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies signal.created_at="" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "137 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "472 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_408_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_run_id_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal signal.run_id nonempty string validation already had direct public input coverage before indicator snapshots or ledger writes
+    - harness coverage now verifies signal.run_id=123 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "136 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "471 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_407_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_signal_id_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome signal_id nonempty string validation now has direct public input coverage for non-string values before repository lookup or label writes
+    - harness coverage now verifies signal_id=123 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "135 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "470 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_406_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_invalidating_event_id_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome invalidating_event_id nonempty string validation now has direct public input coverage for non-string values before repository lookup or event invalidation labeling
+    - harness coverage now verifies invalidated_by_event=true with invalidating_event_id=123 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_blank_label_invalidating_event_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "134 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "469 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_405_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_take_profit_nonfinite_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome take_profit_pct finite positive validation now has direct public input coverage for infinite values before barrier math or realized-R division
+    - harness coverage now verifies take_profit_pct=1e999 exits nonzero after JSON parsing produces infinity and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original parsed input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonfinite_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "133 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "468 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_404_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_stop_loss_nonfinite_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome stop_loss_pct finite positive validation now has direct public input coverage for infinite values before barrier math or realized-R division
+    - harness coverage now verifies stop_loss_pct=1e999 exits nonzero after JSON parsing produces infinity and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original parsed input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_nonfinite_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "132 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "467 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_403_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_time_barrier_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome time_barrier_days strict integer validation now has direct public input coverage for string values before repository lookup or triple-barrier calculations
+    - harness coverage now verifies time_barrier_days="2" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_type_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "131 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "466 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_402_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_time_barrier_nonpositive_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome time_barrier_days positive integer validation now has direct public input coverage for zero values before repository lookup or triple-barrier calculations
+    - harness coverage now verifies time_barrier_days=0 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_nonpositive_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "130 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "465 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_401_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_take_profit_nonpositive_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome take_profit_pct positive finite validation now has direct public input coverage for zero values before barrier math
+    - harness coverage now verifies take_profit_pct=0 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonpositive_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "129 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "464 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_400_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_stop_loss_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome stop_loss_pct numeric positive finite validation now has direct public input coverage for string values before barrier math or realized-R division
+    - harness coverage now verifies stop_loss_pct="0.05" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_type_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "128 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "463 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_399_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_price_path_nonfinite_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome price_path finite number validation was already direct-tested before fixture fallback, repository resolution, or triple-barrier calculations
+    - harness coverage now verifies price_path=[100, 1e999] exits nonzero and emits no stdout payload after JSON parsing produces infinity
+    - harness coverage now verifies the failure audit records the parsed original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonfinite_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "127 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "462 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_398_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_price_path_nonpositive_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome price_path positive finite number validation was already direct-tested before fixture fallback, repository resolution, or triple-barrier calculations
+    - harness coverage now verifies price_path=[100, 0] exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonpositive_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "126 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "461 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_397_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_price_path_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome price_path list validation was already direct-tested before fixture fallback, repository resolution, or triple-barrier calculations
+    - harness coverage now verifies price_path="not-a-list" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "125 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "460 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_396_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_object_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal caller-supplied signal object validation was already direct-tested before fixture fallback, repository resolution, or signal writes
+    - harness coverage now verifies signal="not-a-signal" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "124 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "459 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_395_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+evaluate_score_performance_ledger_path_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance ledger_path nonempty string validation was already direct-tested before fixture fallback or recorded ledger evaluation
+    - harness coverage now verifies ledger_path=[] exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "123 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "458 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_394_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_ledger_path_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal ledger_path nonempty string validation was already direct-tested before fixture fallback, repository resolution, or signal writes
+    - harness coverage now verifies ledger_path=false exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "122 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "457 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_393_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_ledger_path_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome ledger_path nonempty string validation was already direct-tested before repository lookup or label writes
+    - harness coverage now verifies ledger_path=false exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "121 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "456 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_392_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_invalidating_event_id_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome invalidating_event_id nonempty string validation was already direct-tested before repository lookup or event invalidation labeling
+    - harness coverage now verifies invalidated_by_event=true with invalidating_event_id="   " exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_blank_label_invalidating_event_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "120 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "455 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_391_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_signal_id_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome signal_id nonempty string validation was already direct-tested before repository lookup or label writes
+    - harness coverage now verifies signal_id="   " exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "119 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "454 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_390_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_time_barrier_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome time_barrier_days positive integer validation was already direct-tested before repository lookup or triple-barrier calculations
+    - harness coverage now verifies time_barrier_days=true exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "118 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "453 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_389_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_take_profit_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome take_profit_pct positive finite validation was already direct-tested before barrier math or realized-R division
+    - harness coverage now verifies take_profit_pct="0.10" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "117 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "452 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_388_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_stop_loss_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome stop_loss_pct positive finite validation was already direct-tested before barrier math or realized-R division
+    - harness coverage now verifies stop_loss_pct=0 exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "116 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "451 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_387_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_invalidating_event_id_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome invalidating_event_id control-character validation was already direct-tested before repository lookup or event invalidation labeling
+    - harness coverage now verifies invalidating_event_id with a newline exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "115 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "450 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_386_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_event_boolean_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome invalidated_by_event strict boolean validation was already direct-tested before repository lookup or event invalidation labeling
+    - harness coverage now verifies the truthy string "true" exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "114 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "449 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_385_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+evaluate_score_performance_ledger_path_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance registry ledger_path control-character validation was already direct-tested through evaluate_recorded_score_performance before ledger repository resolution
+    - harness coverage now verifies control-character ledger_path exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "113 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "448 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_384_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_ledger_path_control_character_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome ledger_path control-character validation was already direct-tested before ledger repository reads or label writes
+    - harness coverage now verifies control-character ledger_path exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "112 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "447 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_383_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+label_signal_ledger_path_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome ledger_path validation was already direct-tested before ledger repository resolution or label writes
+    - harness coverage now verifies invalid ledger_path exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "111 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "446 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_382_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+evaluate_score_performance_ledger_path_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance registry ledger_path validation was already direct-tested through evaluate_recorded_score_performance before ledger repository resolution
+    - harness coverage now verifies invalid ledger_path exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "110 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "445 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_381_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+evaluate_score_performance_days_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_score_performance registry days validation was already direct-tested through evaluate_recorded_score_performance before fixture fallback or recorded ledger evaluation
+    - harness coverage now verifies invalid days exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, repository persistence, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_score_performance_includes_attribution_and_ablation tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "109 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "444 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_380_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+event_calendar_days_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - get_event_calendar days validation was already direct-tested for strict positive integer inputs before provider calls
+    - harness coverage now verifies invalid days exits nonzero and emits no stdout payload
+    - harness coverage now verifies the failure audit records the original input, failure outcome, and error text without output_summary
+    - the slice adds no source changes, network calls, live adapters, scheduler, or runtime artifacts
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_event_calendar_rejects_invalid_days_identity tests/test_mvp_tools.py::test_harness_rejects_invalid_event_calendar_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_news_topic_control_character_with_failure_audit -q
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "108 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "443 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_379_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+market_symbol_list_container_input_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - _normalize_symbol_list existing contract is now regression-tested for non-list symbols containers
+    - get_market_snapshot rejects string, tuple, dict, and boolean symbols containers before provider calls
+    - direct coverage preserves symbol identity normalization and control-character coverage while adding container failures
+    - harness coverage verifies an invalid symbols container exits nonzero, emits no stdout payload, and records a failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_market_snapshot_rejects_invalid_symbols_container tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_symbol_control_character tests/test_mvp_tools.py::test_harness_rejects_invalid_market_symbols_container_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_indicator_symbol_control_character_with_failure_audit -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "107 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "442 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_378_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+signal_identity_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - _normalize_optional_string_identity now rejects ASCII control characters before trim
+    - record_signal rejects control-character signal.signal_id, signal.run_id, signal.created_at, signal.underlying, signal.config_version, and signal.config_hash before indicator snapshots or ledger writes
+    - label_signal_outcome rejects control-character signal_id and invalidating_event_id before ledger lookup, triple-barrier labeling, or label writes
+    - direct coverage verifies recording identity failures without ledger file creation for record_signal
+    - harness coverage verifies record_signal and label_signal_outcome identity control-character failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_normalizes_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "102 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "437 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_377_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+runtime_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/runtime.py
+    - tests/test_runtime_guard.py
+  implementation:
+    - _normalize_optional_path now rejects ASCII control characters before trim
+    - _normalize_optional_run_id now rejects ASCII control characters before trim
+    - get_runtime_status rejects control-character audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
+    - record_runtime_checkpoint rejects control-character checkpoint_path, audit_log_path, ledger_path, and run_id before runtime status reads, checkpoint_id generation, or checkpoint writes
+    - direct coverage verifies runtime path/run_id failures without checkpoint or ledger file creation
+    - harness coverage verifies get_runtime_status and record_runtime_checkpoint control-character failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_applies_retention_and_degraded_mode tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_runtime_status_rejects_path_control_character_inputs tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_public_run_id tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_control_character_inputs tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/runtime.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "433 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_376_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+trading_admin_http_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/trading_admin_web.py
+    - tests/test_binance_btc.py
+  implementation:
+    - _required_str, _optional_str, _optional_float, and _optional_int now reject ASCII control characters before trim
+    - credentials endpoint rejects control-character api_key/api_secret/passphrase before encrypted credential writes
+    - account snapshot endpoint rejects control-character credential_passphrase before account reads
+    - order preview endpoint rejects control-character side/quantity/position_side before preview evaluation
+    - risk settings endpoint rejects control-character numeric form strings before risk settings writes
+    - endpoint coverage verifies HTTP 400 responses and no credential/settings file creation
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_normalizes_form_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_invalid_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_control_characters tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_invalid_input_without_write tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_control_characters_without_write tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_invalid_text_inputs tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_control_characters tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_invalid_passphrase_type tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_passphrase_control_character -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "54 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "429 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_375_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+binance_credential_secret_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/secret_store.py
+    - tests/test_binance_btc.py
+  implementation:
+    - _normalize_required_secret_text now rejects ASCII control characters before trim
+    - _validate_passphrase now rejects ASCII control characters before key derivation
+    - save_binance_credentials rejects control-character api_key, api_secret, and passphrase before encrypted credential writes
+    - load_binance_credentials rejects control-character passphrase before encrypted credential reads or key derivation
+    - direct coverage verifies api_key/api_secret/passphrase failures and no credential file creation before a valid save
+    - harness coverage verifies api_key control-character failure exits nonzero, redacts secret/path inputs, and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_binance_credentials_reject_secret_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_secret_control_character_with_failure_audit tests/test_binance_btc.py::test_binance_credential_status_exposes_trade_only_policy_without_secrets -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "50 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "425 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+portfolio_snapshot_text_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - tests/test_binance_btc.py
+  implementation:
+    - _normalize_snapshot_required_text now rejects ASCII control characters before trim
+    - normalize_binance_coinm_account_snapshot rejects control-character as_of and balance.asset inputs before portfolio summary projection
+    - normalize_binance_coinm_account_snapshot rejects control-character positions.positionSide, positions.leverage, and positions.marginType inputs before BTC position projection
+    - direct coverage verifies caller-supplied snapshot text field failures
+    - harness coverage verifies balance.asset control-character failure exits nonzero and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_is_offline_read_only tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_normalizes_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_invalid_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_text_control_characters tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_portfolio_snapshot_text_control_character_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "48 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "423 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+btc_order_text_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - tests/test_binance_btc.py
+  implementation:
+    - _normalize_required_order_text now rejects ASCII control characters before trim
+    - preview_btc_order rejects control-character side, order_type, quantity, price, time_in_force, position_side, and client_order_id before risk checks or credential reads
+    - execute_btc_order rejects control-character order text before preview construction, credential reads, or submission guards
+    - direct coverage verifies all public BTC order text fields fail on control characters
+    - harness coverage verifies preview_btc_order side control-character failure exits nonzero and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_normalizes_public_order_inputs tests/test_binance_btc.py::test_preview_btc_order_rejects_invalid_public_order_inputs tests/test_binance_btc.py::test_btc_order_tools_reject_order_text_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_btc_order_text_control_character_with_failure_audit tests/test_binance_btc.py::test_execute_btc_order_blocks_without_confirmation -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "46 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "421 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+binance_credential_path_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/secret_store.py
+    - tests/test_binance_btc.py
+  implementation:
+    - resolve_credentials_path now rejects ASCII control characters before trim
+    - save_binance_credentials rejects control-character credentials_path inputs before encrypted credential writes
+    - get_binance_credentials_status rejects control-character credentials_path inputs before credential status reads
+    - load_binance_credentials rejects control-character credentials_path inputs before encrypted credential reads
+    - direct coverage verifies save/status/load credentials_path failures and no credential file creation
+    - harness coverage verifies save_binance_credentials credentials_path control-character failure exits nonzero, redacts secret/path inputs, and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_binance_credentials_reject_credentials_path_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_credentials_path_control_character_with_failure_audit tests/test_binance_btc.py::test_binance_credential_status_exposes_trade_only_policy_without_secrets -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "44 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "419 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+signal_ledger_path_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - _normalize_optional_path now rejects ASCII control characters before trim
+    - record_signal rejects control-character ledger_path inputs before ledger repository resolution or writes
+    - label_signal_outcome rejects control-character ledger_path inputs before ledger repository reads or label writes
+    - evaluate_recorded_score_performance rejects control-character ledger_path inputs before recorded ledger evaluation
+    - direct coverage verifies record/label/evaluate ledger_path failures and no ledger file creation
+    - harness coverage verifies record_signal ledger_path control-character failure exits nonzero and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "98 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "417 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+btc_risk_path_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/risk_settings.py
+    - tests/test_binance_btc.py
+  implementation:
+    - _normalize_optional_path now rejects ASCII control characters before trim
+    - get_btc_risk_settings and update_btc_risk_settings reject control-character settings_path inputs before local settings reads or writes
+    - get_btc_risk_status rejects control-character state_path inputs before daily risk state reads
+    - reset_btc_daily_risk_state rejects control-character state_path inputs before daily risk state writes
+    - direct coverage verifies get/update/status/reset path failures and no settings/state file creation
+    - harness coverage verifies update risk settings settings_path control-character failure exits nonzero and records failure audit without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_update_btc_risk_settings_normalizes_public_inputs tests/test_binance_btc.py::test_update_btc_risk_settings_rejects_invalid_public_inputs tests/test_binance_btc.py::test_btc_risk_tools_reject_path_control_character_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_normalizes_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_risk_settings_path_control_character_with_failure_audit -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/risk_settings.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "42 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "415 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+readiness_path_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - _normalize_optional_path now rejects ASCII control characters before trim
+    - get_integration_readiness rejects control-character hermes_config_path inputs before Hermes gate path checks
+    - get_integration_readiness rejects control-character binance_credentials_path inputs before credential status reads
+    - get_integration_readiness rejects control-character btc_risk_settings_path inputs before live-order risk settings reads
+    - direct coverage verifies hermes_config_path, binance_credentials_path, and btc_risk_settings_path control-character failures
+    - harness coverage verifies control-character binance_credentials_path failure exits nonzero, redacts the credential path input, and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs tests/test_readiness.py::test_integration_readiness_rejects_invalid_public_inputs tests/test_readiness.py::test_integration_readiness_rejects_path_control_character_inputs tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit tests/test_readiness.py::test_harness_returns_integration_readiness -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "18 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "413 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+audit_read_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/audit_tools.py
+    - src/halo_swing_mcp/audit_web.py
+    - tests/test_audit.py
+  implementation:
+    - get_audit_log optional filters now reject ASCII control characters before trim or read_audit_events
+    - get_audit_log and get_audit_summary audit_log_path inputs now reject ASCII control characters before trim or audit reads
+    - audit web events_payload query limit and optional filters now reject ASCII control characters before audit reads
+    - audit web events endpoint returns HTTP 400 for control-character query values
+    - direct coverage verifies audit path, filter, summary path, audit web query, and HTTP bad-request failures
+    - harness coverage verifies control-character audit_log_path and resource_id filter failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_log_normalizes_public_limit_and_filters tests/test_audit.py::test_audit_log_rejects_invalid_public_inputs tests/test_audit.py::test_audit_log_rejects_control_character_public_inputs tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_path_control_character_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_filter_control_character_with_failure_audit tests/test_audit.py::test_audit_web_events_payload_normalizes_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_invalid_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_control_character_query_inputs tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_query tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_control_character_query -q
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/audit_tools.py src/halo_swing_mcp/audit_web.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "411 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+report_chart_output_dir_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - _normalize_report_chart_output_dir now rejects ASCII control characters before trim
+    - generate_latest_signal_report rejects control-character chart_output_dir inputs before score calculation
+    - generate_latest_signal_report rejects control-character chart_output_dir inputs before chart rendering or chart artifact directory creation
+    - direct coverage verifies score_leverage_swing is not called and no chart directory is created for control-character chart_output_dir
+    - harness coverage verifies control-character chart_output_dir failure exits nonzero and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_latest_signal_report_rejects_chart_output_dir_control_character tests/test_reporting.py::test_harness_rejects_blank_chart_output_dir_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_output_dir_control_character_with_failure_audit -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "190 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "406 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+market_tool_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - src/halo_swing_mcp/indicators.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - market and indicator _normalize_symbol_identity now reject ASCII control characters before trim and uppercase
+    - market and indicator _normalize_timeframe_identity now reject ASCII control characters before trim and lowercase
+    - render_chart output_dir normalization rejects ASCII control characters before trim or artifact directory creation
+    - get_news_bundle topic normalization rejects ASCII control characters before trim, lowercase, or fixture lookup
+    - direct coverage verifies symbol, timeframe, topic, and output_dir control-character failures with no chart directory creation
+    - harness coverage verifies indicator symbol, render_chart output_dir, and news topic control-character failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_news_bundle_rejects_invalid_topic_identity tests/test_mvp_tools.py::test_news_bundle_rejects_topic_control_character tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_symbol_control_character tests/test_mvp_tools.py::test_indicator_and_chart_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_indicator_and_chart_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_render_chart_rejects_invalid_output_dir tests/test_mvp_tools.py::test_render_chart_rejects_output_dir_control_character tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_indicator_symbol_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_render_chart_output_dir_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_render_chart_output_dir_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_news_topic_control_character_with_failure_audit -q
+      result: "25 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/indicators.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "96 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "404 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+scoring_identity_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - _normalize_asset_identity now rejects ASCII control characters before trim and uppercase
+    - _normalize_timeframe_identity now rejects ASCII control characters before trim
+    - score_leverage_swing rejects control-character asset and timeframe inputs before resolving fixtures or scoring
+    - generate_trade_guide rejects control-character asset and timeframe inputs before guide construction
+    - evaluate_position rejects control-character asset inputs before score lookup, numeric normalization, PnL, or position-state evaluation
+    - direct coverage verifies asset and timeframe control-character failures for scoring, guide, and position tools
+    - harness coverage verifies scoring asset and trade-guide timeframe control-character failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_normalize_asset_and_timeframe_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_asset_identity tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_blank_scoring_asset_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "89 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "397 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+report_identity_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - _normalize_report_asset now rejects ASCII control characters before trim and uppercase
+    - _normalize_report_timeframe now rejects ASCII control characters before trim
+    - _normalize_report_chart_timeframe now rejects ASCII control characters before trim and lowercase
+    - generate_latest_signal_report rejects control-character asset, timeframe, and chart_timeframe inputs before scoring or chart rendering
+    - generate_position_review_report rejects control-character asset inputs before position evaluation
+    - generate_cron_prompt_pack rejects control-character asset and timeframe inputs before prompt and idempotency-key construction
+    - direct and harness coverage verify control-character failures emit stable errors, no stdout payloads, failure audit events, and no chart directory creation where applicable
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_asset_control_character tests/test_reporting.py::test_latest_signal_report_trims_timeframe_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_latest_signal_report_rejects_timeframe_control_character tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_chart_timeframe_control_character tests/test_reporting.py::test_cron_prompt_pack_trims_and_uppercases_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_asset_control_character tests/test_reporting.py::test_cron_prompt_pack_trims_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_timeframe_control_character tests/test_reporting.py::test_position_review_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_position_review_report_rejects_asset_control_character tests/test_reporting.py::test_harness_rejects_latest_report_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_timeframe_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_timeframe_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_timeframe_control_character_with_failure_audit -q
+      result: "34 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "188 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "393 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+report_intent_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report now normalizes report_intent before report contract lookup
+    - _normalize_report_intent rejects non-string and blank report_intent values with a stable public-boundary error
+    - _normalize_report_intent rejects ASCII control characters before trim so trailing newlines cannot become valid intents
+    - _normalize_report_intent trims and lowercases supported report_intent values before payload and contract construction
+    - direct coverage verifies unsupported, normalized, invalid, and control-character report_intent inputs
+    - harness coverage verifies blank and control-character report_intent failures exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unsupported_report_intent_at_boundary tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_report_intent tests/test_reporting.py::test_latest_signal_report_rejects_invalid_report_intent_identity tests/test_reporting.py::test_latest_signal_report_rejects_report_intent_control_character tests/test_reporting.py::test_harness_rejects_unsupported_report_intent_with_failure_audit tests/test_reporting.py::test_harness_rejects_invalid_report_intent_with_failure_audit tests/test_reporting.py::test_harness_rejects_report_intent_control_character_with_failure_audit -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "176 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "381 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+document_evidence_control_character_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - _normalize_required_text now rejects ASCII control characters on raw input before trim
+    - create_document_evidence_card rejects control characters in summary, artifact_ref, ref_type, modality, evidence_id, category, source, observed_at, bias, buy, sell, invalidating_condition, and asset_scope entries before evidence card construction
+    - trailing newlines cannot be silently stripped into clean document evidence
+    - direct coverage covers summary, artifact_ref, observed_at, and asset_scope control characters
+    - report-side drift guard coverage remains preserved through post-construction evidence-card mutation
+    - harness coverage verifies newline summary exits nonzero and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_document_summary_input_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_document_summary_control_character_with_failure_audit tests/test_reporting.py::test_latest_signal_report_rejects_document_summary_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_pdf_artifact_ref_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_observed_at_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_asset_scope_with_control_character -q
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "85 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "169 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "374 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+document_evidence_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+    - tests/test_reporting.py
+  implementation:
+    - create_document_evidence_card now trims and validates required text inputs before document evidence card construction
+    - create_document_evidence_card now normalizes ref_type to uppercase, optional observed_at by trim, and asset_scope entries by trim plus uppercase
+    - create_document_evidence_card now rejects blank/non-string summary, artifact_ref, scalar fields, and asset_scope entries with ValueError instead of lower-level type errors
+    - create_document_evidence_card now rejects non-list asset_scope and non-finite/non-numeric score inputs before score clamping
+    - report-side negative coverage for deliberately drifted document evidence remains preserved by explicit post-construction evidence-card mutation
+    - harness coverage verifies invalid document summary input exits nonzero and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_document_summary_input_creates_guarded_evidence_card tests/test_mvp_tools.py::test_document_summary_input_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_document_summary_input_with_failure_audit tests/test_reporting.py::test_latest_signal_report_rejects_pdf_artifact_ref_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_asset_scope_with_control_character -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_document_modality_with_surrounding_whitespace tests/test_reporting.py::test_latest_signal_report_rejects_invalidating_condition_with_surrounding_whitespace tests/test_reporting.py::test_latest_signal_report_rejects_document_observed_at_with_control_character -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "80 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "169 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "369 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+chart_output_path_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_mvp_tools.py
+    - tests/test_reporting.py
+  implementation:
+    - render_chart now trims explicit output_dir values and rejects blank/non-string paths before chart artifact directory creation or PNG writes
+    - generate_latest_signal_report now trims explicit chart_output_dir values when include_chart is true and rejects blank/non-string paths before report chart rendering
+    - explicit blank chart output paths no longer silently fall back to the default artifacts/charts path or create whitespace-named directories
+    - direct coverage verifies trimmed output_dir/chart_output_dir behavior and blank/non-string failures before artifact writes
+    - harness coverage verifies invalid render_chart output_dir and invalid generate_latest_signal_report chart_output_dir exit nonzero and record failure audit events without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_render_chart_rejects_invalid_output_dir tests/test_mvp_tools.py::test_harness_rejects_invalid_render_chart_output_dir_with_failure_audit tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_harness_rejects_blank_chart_output_dir_with_failure_audit -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/tools/reporting.py tests/test_mvp_tools.py tests/test_reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "69 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "169 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "358 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+signal_ledger_path_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal now trims explicit ledger_path and rejects blank/non-string paths before signal ledger repository resolution or writes
+    - label_signal_outcome now applies the same ledger_path normalization before outcome label writes
+    - evaluate_recorded_score_performance now applies the same ledger_path normalization before recorded ledger evaluation
+    - explicit blank signal ledger paths no longer silently fall back to the default runtime state ledger
+    - direct coverage verifies trimmed ledger_path behavior for record, duplicate, label, and recorded performance flows plus blank/non-string path failures
+    - harness coverage verifies invalid record_signal ledger_path exits nonzero and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "64 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "348 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+runtime_path_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/runtime.py
+    - tests/test_runtime_guard.py
+  implementation:
+    - get_runtime_status now trims explicit audit_log_path and ledger_path values and rejects blank/non-string paths before audit reads, ledger repository resolution, retention inspection, or retention mutation
+    - record_runtime_checkpoint now validates checkpoint_path before checkpoint writes and relies on get_runtime_status validation for audit_log_path and ledger_path before runtime status reads
+    - explicit blank runtime paths no longer silently fall back to default runtime state paths
+    - runtime status coverage verifies trimmed audit/ledger paths still drive retention and watchdog behavior while blank/non-string path inputs fail at the public boundary
+    - runtime checkpoint coverage verifies trimmed checkpoint/audit/ledger paths and blank/non-string path failures before checkpoint writes
+    - harness coverage verifies invalid get_runtime_status audit_log_path exits nonzero and records a failure audit event without output_summary
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_applies_retention_and_degraded_mode tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_public_run_id tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/runtime.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "345 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+audit_tool_path_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/audit_tools.py
+    - tests/test_audit.py
+  implementation:
+    - get_audit_log now trims explicit audit_log_path values and rejects blank/non-string paths before read_audit_events is called
+    - get_audit_summary now applies the same audit_log_path normalization before audit_summary is called
+    - explicit blank audit_log_path inputs no longer silently fall back to the default runtime audit state path
+    - direct coverage verifies trimmed audit_log_path reads for log and summary payloads plus blank/non-string failures
+    - harness coverage verifies invalid get_audit_log audit_log_path exits nonzero, records a failure audit event without output_summary, and preserves the invalid input in the audit event
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_log_normalizes_public_limit_and_filters tests/test_audit.py::test_audit_log_rejects_invalid_public_inputs tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/audit_tools.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "344 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+audit_web_local_bind_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/audit_web.py
+    - tests/test_audit.py
+  implementation:
+    - audit web main now rejects non-localhost bind hosts before resolving the audit log path or starting ThreadingHTTPServer
+    - allowed audit web bind hosts are 127.0.0.1, localhost, and ::1, matching the local-only operator surface used by the trading admin web server
+    - invalid host coverage verifies --host 0.0.0.0 returns exit code 2 and writes a stderr guard message without binding a socket
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_non_localhost_bind -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "343 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - non-local audit web bind
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+audit_web_query_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/audit_web.py
+    - tests/test_audit.py
+  implementation:
+    - audit web /api/events now validates limit query values as positive integers, trims whitespace, caps the limit at 1000, and rejects invalid values before audit reads
+    - audit web optional action/resource_type/resource_id/outcome filters now trim whitespace, treat blank values as absent filters, and reject non-string direct payload values
+    - invalid /api/events query values now return HTTP 400 JSON error payloads instead of silently falling back to default limits
+    - audit web query coverage verifies trimmed filters, capped limits, blank filter no-op behavior, direct invalid query rejection, and HTTP bad-request behavior
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_events_payload_normalizes_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_invalid_query_inputs tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_query -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "342 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - audit event secret re-exposure
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+trading_admin_http_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/trading_admin_web.py
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin credential POST inputs now require nonempty string api_key, api_secret, and passphrase before encrypted credential writes
+    - trading admin account snapshot POST now preserves the safe missing-passphrase blocked path while rejecting non-string passphrase payloads before credential reads
+    - trading admin order preview POST now validates side, quantity, and optional position_side as strings before preview evaluation
+    - trading admin risk settings POST now parses form numeric strings into positive finite numbers or integers, rejects NaN/Infinity/decimal counts, and requires real booleans for emergency_kill_switch_enabled
+    - omitted admin risk settings fields now remain no-op updates instead of implicitly coercing missing emergency_kill_switch_enabled to false
+    - admin endpoint coverage verifies valid form-string risk settings, invalid risk booleans/numerics, invalid credential payloads without file creation, invalid order text payloads, and invalid account passphrase types
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_normalizes_form_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_invalid_inputs tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_invalid_input_without_write tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_invalid_text_inputs tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_invalid_passphrase_type -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "40 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_audit.py -q
+      result: "57 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "339 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - committed credential material
+    - credential exposure
+    - passphrase persistence
+    - broker implementation
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+binance_credential_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/secret_store.py
+    - tests/test_binance_btc.py
+  implementation:
+    - save_binance_credentials now validates api_key and api_secret as nonempty strings, trims them before encryption, and uses the normalized api_key for api_key_hint
+    - save_binance_credentials and load_binance_credentials now validate passphrase as a nonempty string before key derivation, with save preserving the existing minimum length requirement
+    - resolve_credentials_path now trims explicit credentials_path and rejects blank/non-string path values before credential status reads or encrypted file writes
+    - decrypted credential payload values are validated as nonempty strings before returning BinanceCredentials
+    - direct Binance coverage verifies normalized credential save/load/status behavior and invalid credential/path/passphrase failures without creating files
+    - harness coverage verifies invalid save input exits nonzero, emits no stdout payload, records a failure audit event without output_summary, redacts secret inputs and credentials_path, and does not create the target credential file
+    - valid harness smokes verify trimmed credential/path input returns the safe projection and get_binance_credentials_status reads the normalized path without exposing raw key, secret, passphrase, salt, or token values
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_audit.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"   ","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_credentials_input_normalization.enc.json"}' --audit-log-path /private/tmp/halo_swing_credentials_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with api_key must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":" abcde12345key ","api_secret":" super-secret ","passphrase":"local-passphrase","credentials_path":" /private/tmp/halo_swing_credentials_input_normalization.enc.json "}' --no-audit
+      result: "passed, credentials_path trimmed and api_key_hint derived from normalized api_key"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_binance_credentials_status --input-json '{"credentials_path":" /private/tmp/halo_swing_credentials_input_normalization.enc.json "}' --no-audit
+      result: "passed, configured true with safe metadata only"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "334 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - committed credential material
+    - credential exposure
+    - passphrase persistence
+    - broker implementation
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+btc_portfolio_snapshot_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - tests/test_binance_btc.py
+  implementation:
+    - normalize_binance_coinm_account_snapshot now validates balance and positions as lists of objects before normalization
+    - as_of now trims optional string input and rejects blank/non-string timestamp metadata
+    - coinm_contract_size_usd now requires an optional positive finite numeric value before estimated notional calculations
+    - balance asset and raw balance decimal fields now reject blank/non-string asset and invalid decimal values instead of silently coercing them
+    - selected BTC position raw decimal fields and optional text metadata now reject invalid values before portfolio summary projection
+    - direct Binance coverage verifies normalized snapshot output and invalid row/text/decimal/contract-size failures
+    - harness coverage verifies invalid snapshot input exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies trimmed rows, decimal normalization, read-only contract fields, no credential requirement, no network call, and no order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_is_offline_read_only tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_normalizes_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":{"asset":"BTC"}}' --audit-log-path /private/tmp/halo_swing_portfolio_snapshot_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with balance must be a list of objects"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":" BTC ","balance":" 0.25000000 ","availableBalance":" 0.20000000 ","crossWalletBalance":" 0.24000000 ","crossUnPnl":" 0.01000000 "}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":" 3 ","entryPrice":" 90000 ","markPrice":" 92000 ","unRealizedProfit":" 0.0065 ","liquidationPrice":" 65000 ","leverage":" 2 ","marginType":" cross ","positionSide":" BOTH "}],"as_of":" 2026-05-10T00:00:00Z ","coinm_contract_size_usd":100}' --no-audit
+      result: "passed, snapshot rows trimmed and decimal fields normalized with portfolio_sync_contract read_only/no-network/no-order"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "331 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - broker implementation
+    - live data adapter
+    - credential storage changes
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+btc_order_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - tests/test_binance_btc.py
+  implementation:
+    - preview_btc_order and execute_btc_order now normalize side, order_type, quantity, price, time_in_force, position_side, reduce_only, and client_order_id at the shared intent boundary
+    - side/order_type/position_side/time_in_force are trimmed and uppercased before validation/request payload projection
+    - quantity and price now require nonempty string decimal input and reject NaN/Infinity before notional/risk calculations
+    - reduce_only now requires a real boolean, so reduce_only="false" cannot become truthy and change order semantics
+    - client_order_id now trims surrounding whitespace and rejects blank/non-string values before request parameter construction
+    - direct Binance coverage verifies normalized LIMIT preview output and invalid text/decimal/boolean order input failures
+    - harness coverage verifies invalid reduce_only input exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies trimmed/uppercased LIMIT preview output without order submission, credential reads, live data adapters, or network calls
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_normalizes_public_order_inputs tests/test_binance_btc.py::test_preview_btc_order_rejects_invalid_public_order_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "29 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1","reduce_only":"false"}' --audit-log-path /private/tmp/halo_swing_btc_order_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with reduce_only must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":" buy ","order_type":" limit ","quantity":" 1 ","price":" 90000 ","time_in_force":" gtc ","position_side":" both ","reduce_only":false,"client_order_id":" order-1 "}' --no-audit
+      result: "passed, side/order_type/position_side/time_in_force uppercased and string fields trimmed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness execute_btc_order --input-json '{"side":"BUY","quantity":"1","reduce_only":"false"}' --audit-log-path /private/tmp/halo_swing_btc_order_execute_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with reduce_only must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "328 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - broker implementation
+    - live data adapter
+    - credential storage changes
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+btc_risk_settings_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/risk_settings.py
+    - tests/test_binance_btc.py
+  implementation:
+    - update_btc_risk_settings now validates optional numeric inputs as finite positive numbers or positive integers before writing settings JSON
+    - update_btc_risk_settings now validates emergency_kill_switch_enabled as bool-or-None, so string "false" cannot flip the kill switch truthy
+    - reset_btc_daily_risk_state now validates daily_realized_loss_usd as a non-negative finite number and daily_order_count as a non-negative integer before state writes
+    - get/load risk settings and state helpers trim optional paths and reject blank/non-string path values before file reads or writes
+    - persisted risk settings/state payloads are validated with the same strict numeric and boolean rules when loaded
+    - direct Binance coverage verifies normalized settings/state writes and invalid numeric/boolean/path failures
+    - harness coverage verifies invalid risk settings input exits nonzero, emits no stdout payload, records a failure audit event without output_summary, and does not create the target settings file
+    - valid harness smokes verify settings/state path trimming and numeric normalization without network calls, live data adapters, credential storage, migrations, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_update_btc_risk_settings_normalizes_public_inputs tests/test_binance_btc.py::test_update_btc_risk_settings_rejects_invalid_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_normalizes_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "26 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/risk_settings.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness update_btc_risk_settings --input-json '{"settings_path":"/private/tmp/halo_swing_risk_input_normalization_settings.json","emergency_kill_switch_enabled":"false"}' --audit-log-path /private/tmp/halo_swing_risk_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with emergency_kill_switch_enabled must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness update_btc_risk_settings --input-json '{"settings_path":" /private/tmp/halo_swing_risk_input_normalization_settings.json ","max_notional_usd_per_order":150,"max_daily_order_count":4,"max_daily_loss_usd":75,"coinm_contract_size_usd":100,"emergency_kill_switch_enabled":false}' --no-audit
+      result: "passed, settings_path trimmed and numeric fields normalized"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness reset_btc_daily_risk_state --input-json '{"state_path":" /private/tmp/halo_swing_risk_input_normalization_state.json ","daily_realized_loss_usd":12,"daily_order_count":2}' --no-audit
+      result: "passed, state_path trimmed and daily_realized_loss_usd normalized to 12.0"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "325 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - broker implementation
+    - live data adapter
+    - credential storage changes
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+integration_readiness_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness now validates approval booleans as real booleans before gate evaluation
+    - get_integration_readiness now validates optional configured flags as bool-or-None before Telegram and live-data readiness evidence is computed
+    - get_integration_readiness now trims hermes_config_path, binance_credentials_path, and btc_risk_settings_path and rejects blank/non-string path values before file, credential, or risk reads
+    - string values such as migration_go_approved="false" now raise ValueError instead of being treated as truthy approval evidence
+    - direct readiness coverage verifies normalized path evidence, invalid bool/path failures, and preservation of ready status with explicit valid inputs
+    - harness coverage verifies invalid readiness input exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies explicit boolean false inputs preserve blocked next_actions without network calls or live adapters
+    - no Hermes runtime call, Telegram send, live data adapter, credential storage, Binance network call, migration, repository persistence, scheduler, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs tests/test_readiness.py::test_integration_readiness_rejects_invalid_public_inputs tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "16 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"migration_go_approved":"false"}' --audit-log-path /private/tmp/halo_swing_readiness_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with migration_go_approved must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"migration_go_approved":false,"repository_go_approved":false,"market_data_source_configured":false,"macro_source_configured":false,"news_source_configured":false}' --no-audit
+      result: "passed, status blocked with explicit false readiness evidence and expected next_actions"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "320 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - Hermes runtime call
+    - Telegram send
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - scheduler
+    - order submission
+
+runtime_guard_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/runtime.py
+    - tests/test_runtime_guard.py
+  implementation:
+    - get_runtime_status now validates apply_retention as a real boolean before selecting inspect vs apply retention behavior
+    - get_runtime_status now validates max_records, max_bytes, failure_window, and failure_threshold as optional positive integers before retention policy or watchdog evaluation
+    - invalid runtime status inputs now raise ValueError before JSONL retention can inspect or mutate runtime artifacts
+    - record_runtime_checkpoint now validates include_readiness as a real boolean before readiness snapshot selection
+    - record_runtime_checkpoint now trims run_id and rejects blank/non-string run_id values before checkpoint_id generation and JSONL writes
+    - direct runtime coverage verifies invalid runtime status inputs, invalid checkpoint inputs, and normalized checkpoint run_id persistence
+    - harness coverage verifies invalid apply_retention exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smokes verify explicit retention/watchdog bounds and normalized checkpoint run_id paths without schedulers, sends, live data, or order submission
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_input_with_failure_audit tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_public_run_id tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/runtime.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"/private/tmp/halo_swing_runtime_input_normalization_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_input_normalization_ledger.jsonl","apply_retention":"false"}' --audit-log-path /private/tmp/halo_swing_runtime_input_normalization_audit.jsonl
+      result: "exited nonzero as expected with apply_retention must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"/private/tmp/halo_swing_runtime_input_normalization_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_input_normalization_ledger.jsonl","apply_retention":false,"max_records":10,"max_bytes":10000,"failure_window":5,"failure_threshold":2}' --no-audit
+      result: "passed, explicit retention policy and watchdog bounds returned"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"/private/tmp/halo_swing_runtime_input_normalization_checkpoints.jsonl","audit_log_path":"/private/tmp/halo_swing_runtime_input_normalization_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_input_normalization_ledger.jsonl","run_id":" run_runtime ","include_readiness":false}' --no-audit
+      result: "passed, run_id normalized to run_runtime and readiness omitted"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "317 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+audit_log_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/audit_tools.py
+    - tests/test_audit.py
+  implementation:
+    - get_audit_log now validates limit as a strict positive integer before read_audit_events
+    - get_audit_log rejects bool, string, zero, and negative limits at the public tool boundary
+    - get_audit_log preserves the existing 1000-event maximum by capping valid oversized limits to 1000
+    - optional action, resource_type, resource_id, and outcome filters now require strings when supplied
+    - optional audit filters are trimmed before reads and blank strings normalize to no filter
+    - returned filters now reflect normalized filter identity and normalized limit
+    - direct audit coverage verifies limit capping, filter trimming, blank-to-None behavior, and invalid input failures
+    - harness coverage verifies invalid limit exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies normalized action filter still returns audit_log.v1 with no network call or secrets
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_log_normalizes_public_limit_and_filters tests/test_audit.py::test_audit_log_rejects_invalid_public_inputs tests/test_audit.py::test_harness_rejects_invalid_audit_log_limit_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "17 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/audit_tools.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_input_normalization.jsonl","limit":0}' --audit-log-path /private/tmp/halo_swing_audit_input_normalization.jsonl
+      result: "exited nonzero as expected with limit must be a positive integer"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_input_normalization.jsonl","limit":5,"action":" tool_call "}' --no-audit
+      result: "passed, action normalized to tool_call and audit_log.v1 returned"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "313 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+position_numeric_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - evaluate_position now validates entry_price before PnL division and position-state decisions
+    - evaluate_position now validates current_price before PnL and unrealized_return_pct output
+    - evaluate_position now validates size before returning it in the position payload
+    - entry_price, current_price, and size accept omitted values but reject bool, non-number, NaN, infinity, zero, and negative values when supplied
+    - valid integer numeric inputs are normalized to floats in the returned numeric-authority payload
+    - direct MVP coverage verifies valid normalized numeric fields and invalid numeric input failures
+    - harness coverage verifies invalid current_price exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies normalized asset and numeric fields still return position_management.v1 with guard status ok
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_position_returns_management_action tests/test_mvp_tools.py::test_evaluate_position_rejects_invalid_numeric_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_position_numeric_input_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "61 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":" tqqq ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: "passed, asset normalized to TQQQ, size normalized to 3.0, and position_management_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":"TQQQ","entry_price":100,"current_price":0}' --no-audit
+      result: "exited nonzero as expected with current_price must be a positive finite number"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "310 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+record_signal_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal now treats only signal=None as fixture fallback; empty dicts no longer silently become demo signals
+    - caller-supplied signal values must be JSON-object-like dicts before run_journal or ledger work begins
+    - caller-supplied signal_id, run_id, created_at, underlying, config_version, and config_hash now must be nonempty strings
+    - caller-supplied signal identity fields are trimmed before idempotency, stored signal payloads, and run_journal construction
+    - caller-supplied underlying is uppercased before indicator snapshot generation and stored signal payloads
+    - invalid caller-supplied signal values now raise ValueError before repository writes or indicator provider calls
+    - direct MVP coverage verifies normalized record identity, run_journal identity, indicator snapshot identity, and invalid signal failures
+    - harness coverage verifies invalid record_signal input exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - default record_signal fixture harness path remains offline and still returns run_journal.v1 without live data or sends
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_normalizes_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "59 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"signal":{"signal_id":"   "}}' --no-audit
+      result: "exited nonzero as expected with signal.signal_id must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"/private/tmp/halo_swing_record_signal_identity_ledger.jsonl"}' --no-audit
+      result: "passed, run_journal.v1 returned for default fixture path"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "308 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+recording_label_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - label_signal_outcome now trims caller-supplied signal_id before ledger lookup and returned label identity
+    - label_signal_outcome now trims caller-supplied invalidating_event_id when present
+    - blank or non-string signal_id and invalidating_event_id now raise ValueError before repository lookup or label writes
+    - price_path now must be a list of positive finite numbers; empty lists still produce the existing NO_DATA label
+    - stop_loss_pct and take_profit_pct now must be positive finite numbers before barrier math or realized-R division
+    - time_barrier_days and evaluate_score_performance registry days now reject bool, non-integer, zero, and negative values before fixture fallback or ledger evaluation
+    - invalidated_by_event now requires a real boolean, preventing truthy strings from creating event invalidation labels
+    - direct MVP coverage verifies normalized label identity, invalid public input failures, and invalid performance days failures
+    - harness coverage verifies invalid label price_path exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies normalized signal_id is returned by label_signal_outcome without live data or sends
+    - invalid harness smokes verify label price_path and evaluate_score_performance days fail at the tool boundary
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "56 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/recording.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"signal_id":" sig_fixture_20260511_tqqq ","price_path":[500,510],"time_barrier_days":2,"stop_loss_pct":0.05,"take_profit_pct":0.1}' --no-audit
+      result: "passed, signal_id normalized to sig_fixture_20260511_tqqq and signal_label_outcome.v1 returned"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":["not-a-price"]}' --no-audit
+      result: "exited nonzero as expected with price_path must be a list of positive finite numbers"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":0}' --no-audit
+      result: "exited nonzero as expected with days must be a positive integer"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit
+      result: "passed, evaluation_window requested_days 90"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "305 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+event_news_input_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - get_event_calendar now validates days as a strict positive integer before provider calls
+    - get_event_calendar returns normalized integer days in the payload identity
+    - get_news_bundle now trims and lowercases topic before fixture/provider calls
+    - blank and non-string topics now raise ValueError before the provider can fall back to the full news bundle
+    - direct MVP coverage verifies valid event/news identity normalization and invalid days/topic failures
+    - harness coverage verifies blank news topic exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies event calendar and normalized news topic paths without live data or sends
+    - invalid harness smoke verifies days=0 and blank topic fail at the tool boundary
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_event_calendar_rejects_invalid_days_identity tests/test_mvp_tools.py::test_news_bundle_rejects_invalid_topic_identity tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit -q
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py src/halo_swing_mcp/tools/market.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit
+      result: "passed, event_policy_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":" ALL "}' --no-audit
+      result: "passed, topic normalized to all and news_source_policy_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":0}' --no-audit
+      result: "exited nonzero as expected with days must be a positive integer"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"   "}' --no-audit
+      result: "exited nonzero as expected with topic must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "301 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+market_indicator_chart_identity_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/indicators.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - get_market_snapshot now trims and uppercases requested symbols before provider resolution
+    - calculate_indicator_payload now trims and uppercases symbol and trims/lowercases timeframe before provider calls
+    - render_chart now trims and uppercases symbol and trims/lowercases timeframe before creating output directories or chart artifact paths
+    - blank and non-string symbol values now raise ValueError before market snapshot, indicator, or chart provider calls can run
+    - blank and non-string timeframe values now raise ValueError before indicator or chart provider calls can run
+    - chart artifact filenames now use normalized timeframe identity, so " 1D " writes QQQ_1d.png rather than a whitespace-preserving path
+    - direct MVP coverage verifies normalized market, indicator, and chart identities and invalid symbol/timeframe failures without creating chart directories on invalid input
+    - harness coverage verifies blank indicator symbol exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies normalized market snapshot, indicator, and chart paths without live data or sends
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_indicator_and_chart_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "41 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py src/halo_swing_mcp/tools/market.py src/halo_swing_mcp/indicators.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":[" qqq "," tqqq "]}' --no-audit
+      result: "passed, symbols normalized to QQQ/TQQQ and market_snapshot_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":" tqqq ","timeframe":" 1D "}' --no-audit
+      result: "passed, symbol normalized to TQQQ and timeframe normalized to 1d"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness render_chart --input-json '{"symbol":" qqq ","timeframe":" 1D ","output_dir":"/private/tmp/halo_swing_market_identity_chart"}' --no-audit
+      result: "passed, wrote normalized QQQ_1d.png with chart_artifact_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"   "}' --no-audit
+      result: "exited nonzero as expected with symbol must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "290 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+scoring_tool_identity_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/scoring.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - score_leverage_swing now trims and uppercases asset before resolving fixture identity
+    - score_leverage_swing now trims timeframe before returning the signal identity payload
+    - generate_trade_guide inherits normalized asset/timeframe identity from score_leverage_swing
+    - evaluate_position now returns signal asset identity instead of uppercasing the raw caller value
+    - blank and non-string asset values now raise ValueError before scoring, guide, or position evaluation can run
+    - blank and non-string timeframe values now raise ValueError before scoring or guide identity payloads can be built
+    - direct MVP coverage verifies normalized score, guide, and position identities and invalid asset/timeframe failures
+    - harness coverage verifies blank score asset exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies normalized scoring, trade guide, and position paths without live data or sends
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_normalize_asset_and_timeframe_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_asset_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_harness_rejects_blank_scoring_asset_with_failure_audit -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "33 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py src/halo_swing_mcp/tools/scoring.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":" tqqq ","timeframe":" swing_3d_10d "}' --no-audit
+      result: "passed, asset normalized to TQQQ and timeframe normalized to swing_3d_10d"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":" qld ","timeframe":" swing_3d_10d "}' --no-audit
+      result: "passed, asset normalized to QLD and trade_guide_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":" tqqq ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: "passed, asset normalized to TQQQ and position_management_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ","timeframe":"   "}' --no-audit
+      result: "exited nonzero as expected with timeframe must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "282 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+position_review_asset_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_position_review_report now trims and uppercases asset before evaluate_position receives it
+    - blank and non-string position review asset values now raise ValueError before scoring, position state evaluation, or report payload construction can run
+    - position review report and latest signal report share the same report asset normalization helper
+    - direct reporting coverage verifies " tqqq " emits TQQQ/QQQ identity, omits raw whitespace identity from text, and keeps position_payload_guard ok
+    - direct invalid coverage verifies blank, null, and numeric asset values fail with the shared nonempty asset error
+    - harness coverage verifies blank position-review asset exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - valid harness smoke verifies position review asset normalization without live data or sends
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_position_review_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_harness_rejects_blank_position_review_asset_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "164 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":" tqqq ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: "passed, asset normalized to TQQQ and position_review_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"   ","entry_price":100,"current_price":114,"size":3}' --no-audit
+      result: "exited nonzero as expected with asset must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "274 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+latest_report_asset_timeframe_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report now trims and uppercases asset before score_leverage_swing receives it
+    - generate_latest_signal_report now trims timeframe before the signal/report identity is built
+    - blank and non-string asset/timeframe values now raise ValueError before scoring, chart rendering, or artifact creation can run
+    - cron prompt asset/timeframe normalization reuses the same report identity helpers to keep error contracts aligned
+    - direct reporting coverage verifies " tqqq " emits TQQQ/QQQ identity and " swing_3d_10d " emits normalized timeframe in payload/report guard evidence
+    - direct invalid coverage verifies blank, null, and numeric asset/timeframe values do not create chart output files when include_chart is true
+    - harness coverage verifies blank latest-report asset/timeframe exits nonzero, emits no stdout payload, records failure audit events without output_summary, and does not create chart output directories
+    - valid harness smoke verifies asset/timeframe normalization in generate_latest_signal_report without live data or sends
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_trims_timeframe_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_harness_rejects_blank_latest_report_asset_with_failure_audit tests/test_reporting.py::test_harness_rejects_blank_latest_report_timeframe_with_failure_audit -q
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "159 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":" tqqq ","timeframe":" swing_3d_10d "}' --no-audit
+      result: "passed, asset normalized to TQQQ and timeframe normalized to swing_3d_10d"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"   "}' --no-audit
+      result: "exited nonzero as expected with asset must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","timeframe":"   "}' --no-audit
+      result: "exited nonzero as expected with timeframe must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "269 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+latest_report_chart_timeframe_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report now trims and lowercases chart_timeframe before chart rendering when include_chart is true
+    - blank and non-string chart_timeframe values now raise ValueError before render_chart can derive artifact paths or fail with provider-level errors
+    - direct reporting coverage verifies " 1D " creates QQQ_1d.png, not a whitespace-preserving artifact name, and keeps chart_code_guard ok
+    - direct invalid coverage verifies blank, null, and numeric chart_timeframe values do not create chart output files
+    - harness coverage verifies blank chart_timeframe exits nonzero, emits no stdout payload, records a failure audit event without output_summary, and does not create the chart output directory
+    - valid harness smoke verifies normalized chart_timeframe keeps chart_code_guard ok
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_timeframe tests/test_reporting.py::test_harness_rejects_blank_chart_timeframe_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "149 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_timeframe":" 1D ","chart_output_dir":"/private/tmp/halo_swing_chart_timeframe_normalized"}' --no-audit
+      result: "passed, chart_timeframe normalized and chart_code_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_timeframe":"   ","chart_output_dir":"/private/tmp/halo_swing_chart_timeframe_blank"}' --no-audit
+      result: "exited nonzero as expected with chart_timeframe must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "259 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+latest_report_include_chart_boolean:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report now rejects non-boolean include_chart values before chart rendering or optional multimodal context construction
+    - direct reporting coverage verifies string, numeric, and null include_chart values raise ValueError and do not create chart output files
+    - harness coverage verifies include_chart="false" exits nonzero, emits no stdout payload, records a failure audit event without output_summary, and does not create the chart output directory
+    - boolean true harness smoke still verifies the valid chart path keeps chart_code_guard ok
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_non_bool_include_chart tests/test_reporting.py::test_harness_rejects_non_bool_include_chart_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "144 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_include_chart_bool_smoke"}' --no-audit
+      result: "passed, chart_code_guard ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":"false","chart_output_dir":"/private/tmp/halo_swing_include_chart_string_false"}' --no-audit
+      result: "exited nonzero as expected with include_chart must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "254 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+cron_prompt_include_position_review_boolean:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_cron_prompt_pack now rejects non-boolean include_position_review values before prompt construction
+    - direct reporting coverage verifies string, numeric, and null include_position_review values raise ValueError instead of relying on Python truthiness
+    - harness coverage verifies include_position_review="false" exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - boolean false harness smoke still verifies the valid exclusion path omits position_review and keeps guard status ok
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_rejects_non_bool_include_position_review tests/test_reporting.py::test_harness_rejects_non_bool_include_position_review_with_failure_audit -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "138 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":false}' --no-audit
+      result: "passed, valid false option omits position_review with guard status ok"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","include_position_review":"false"}' --no-audit
+      result: "exited nonzero as expected with include_position_review must be a boolean"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "248 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+cron_prompt_timeframe_identity_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_cron_prompt_pack now strips surrounding whitespace from timeframe before report prompt construction
+    - generate_cron_prompt_pack now rejects blank-after-trim and non-string timeframe values before prompt construction
+    - direct reporting coverage verifies normalized timeframe appears in payload, report prompt input_json, prompt text, and cron_prompt_guard evidence
+    - harness coverage verifies blank timeframe exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_trims_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_harness_rejects_blank_cron_prompt_timeframe_with_failure_audit -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "132 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","timeframe":" swing_3d_10d "}' --no-audit
+      result: "passed, timeframe normalized to swing_3d_10d"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ","timeframe":"   "}' --no-audit
+      result: "exited nonzero as expected with timeframe must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "242 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+cron_prompt_blank_asset_rejection:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_cron_prompt_pack now rejects non-string or blank-after-trim asset identity before prompt construction
+    - direct reporting coverage verifies whitespace-only asset values raise ValueError instead of emitting empty prompt input_json or idempotency keys
+    - harness coverage verifies blank asset exits nonzero, emits no stdout payload, and records a failure audit event without output_summary
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_harness_rejects_blank_cron_prompt_asset_with_failure_audit -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "127 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"   "}' --no-audit
+      result: "exited nonzero as expected with asset must be a nonempty string"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "237 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+cron_prompt_asset_identity_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_cron_prompt_pack now strips surrounding whitespace and uppercases asset identity before prompt construction
+    - cron prompt tests verify payload asset, prompt input_json assets, prompt text, and idempotency_key_template values use the normalized asset
+    - harness smoke verifies asset=" tqqq " returns asset=TQQQ and whitespace-free idempotency keys without adding scheduling or send side effects
+    - no scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_cron_prompt_pack_trims_and_uppercases_asset_identity -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "125 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":" tqqq "}' --no-audit
+      result: "passed, asset normalized to TQQQ and idempotency keys use TQQQ"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "235 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+harness_unsupported_report_intent_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - harness generate_latest_signal_report now has regression coverage for unsupported report_intent values
+    - harness failure is verified to exit nonzero with no stdout payload and an unsupported report_intent stderr message
+    - failure audit event is verified to record actor=harness, resource_id=generate_latest_signal_report, outcome=failure, original safe input, and no output_summary
+    - no harness behavior change, new report intent, scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_harness_rejects_unsupported_report_intent_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "124 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/harness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "234 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - harness behavior change
+    - new report intent registration
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+report_intent_unsupported_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report public boundary now has regression coverage for unsupported report_intent values
+    - unsupported report_intent errors are verified to include the rejected value and allowed REPORT_INTENTS registry values
+    - no new report intent, scheduler, Telegram send, Hermes runtime call, live data adapter, credential storage, Binance network call, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unsupported_report_intent_at_boundary -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q
+      result: "123 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_reporting.py src/halo_swing_mcp/tools/reporting.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "233 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - new report intent registration
+    - scheduler or cron runner
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - credential storage
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+integration_readiness_live_data_source_env_boolean_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - integration readiness coverage now sets HALO_SWING_MARKET_DATA_SOURCE, HALO_SWING_MACRO_SOURCE, and HALO_SWING_NEWS_SOURCE env values
+    - live data readiness source-env evidence is verified to expose only market/macro/news configured booleans and secret_values_returned=false
+    - serialized readiness payload is checked against source env values and source env key names
+    - no env/source value persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_are_boolean_only -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "232 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - source value persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+integration_readiness_env_alias_secret_boolean_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - integration readiness coverage now sets Telegram token/gateway alias env values plus Polygon, Alpaca, Tiingo, HALO_SWING_FRED_API_KEY, and HALO_SWING_NEWS_API_KEY values
+    - Telegram readiness alias evidence is verified to expose only bot_token_configured/gateway_configured booleans and secret_values_returned=false
+    - live data readiness alias evidence is verified to expose only market/macro/news configured booleans and secret_values_returned=false
+    - serialized readiness payload is checked against alias env secret values and corresponding alias env key names
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "231 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+audit_summary_readiness_env_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - audit summary coverage now creates an MCP server get_integration_readiness event with real Telegram token, gateway URL, market data API key, FRED API key, and news API key env values
+    - get_audit_summary is verified to return only aggregate counts, secret_values_returned=false, and no env secret values or env key names
+    - audit web summary_payload is verified to return aggregate counts without env secret values or env key names
+    - readiness env secret fixture setup remains shared across harness, MCP server, event read-surface, and summary read-surface tests
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "230 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+audit_read_surface_readiness_env_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - audit read surface coverage now creates an MCP server get_integration_readiness event with real Telegram token, gateway URL, market data API key, FRED API key, and news API key env values
+    - get_audit_log is verified to return the same readiness event without env secret values or env key names
+    - audit web events_payload is verified to return the same readiness event without env secret values or env key names
+    - readiness env secret fixture setup is shared across harness, MCP server, and audit read-surface tests
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "229 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+mcp_server_readiness_audit_env_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - MCP server audit coverage now calls get_integration_readiness with real Telegram token, gateway URL, market data API key, FRED API key, and news API key env values
+    - MCP server payload is verified to keep Telegram and live_data ready evidence without returning env secret values or env key names
+    - MCP server audit JSONL is verified to record only redacted input and summarized output without env secret values or env key names
+    - binance_credentials_path remains redacted in the MCP server audit input payload
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "228 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+harness_readiness_audit_env_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - harness audit coverage now runs get_integration_readiness with real Telegram token, gateway URL, market data API key, FRED API key, and news API key env values
+    - harness stdout is verified to keep Telegram and live_data ready evidence without returning env secret values or env key names
+    - harness audit JSONL is verified to record only the redacted/summarized event boundary without env secret values or env key names
+    - output_summary for get_integration_readiness is verified to expose blocked status and top-level payload keys only
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "227 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+integration_readiness_env_secret_boolean_contract:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - integration readiness coverage now sets real Telegram token, gateway URL, market data API key, FRED API key, and news API key env values
+    - Telegram readiness evidence is verified to expose only bot_token_configured/gateway_configured booleans and secret_values_returned=false
+    - live data readiness evidence is verified to expose only market/macro/news configured booleans and secret_values_returned=false
+    - serialized readiness payload is checked against env secret values and corresponding env key names
+    - no env secret persistence, credential storage, Telegram send, live data adapter, Binance network call, live trading, migration, repository persistence, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "11 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "226 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - env secret persistence
+    - credential storage
+    - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
 ```
 
 ## 6. HARNESS_PROMOTION_RULE
@@ -510,5 +17872,5 @@ archived_sources:
 
 active_source_of_execution:
   - CURRENT_DIRECTIVE
-  - docs/halo-swing-development-plan.md#3.21
+  - docs/halo-swing-development-plan.md#3.374
 ```

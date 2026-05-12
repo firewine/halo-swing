@@ -90,6 +90,58 @@ def get_audit_summary(audit_log_path: str | None = None) -> dict[str, Any]:
 
 
 @mcp.tool()
+def get_runtime_status(
+    audit_log_path: str | None = None,
+    ledger_path: str | None = None,
+    apply_retention: bool = False,
+    max_records: int | None = None,
+    max_bytes: int | None = None,
+    failure_window: int | None = None,
+    failure_threshold: int | None = None,
+) -> dict[str, Any]:
+    """Return local runtime guard status and optional JSONL retention result."""
+
+    payload = {
+        "audit_log_path": audit_log_path,
+        "ledger_path": ledger_path,
+        "apply_retention": apply_retention,
+        "max_records": max_records,
+        "max_bytes": max_bytes,
+        "failure_window": failure_window,
+        "failure_threshold": failure_threshold,
+    }
+    return _audited_tool_call(
+        "get_runtime_status",
+        payload,
+        call_tool("get_runtime_status", payload),
+    )
+
+
+@mcp.tool()
+def record_runtime_checkpoint(
+    checkpoint_path: str | None = None,
+    audit_log_path: str | None = None,
+    ledger_path: str | None = None,
+    run_id: str | None = None,
+    include_readiness: bool = True,
+) -> dict[str, Any]:
+    """Append a local runtime checkpoint snapshot without scheduling work."""
+
+    payload = {
+        "checkpoint_path": checkpoint_path,
+        "audit_log_path": audit_log_path,
+        "ledger_path": ledger_path,
+        "run_id": run_id,
+        "include_readiness": include_readiness,
+    }
+    return _audited_tool_call(
+        "record_runtime_checkpoint",
+        payload,
+        call_tool("record_runtime_checkpoint", payload),
+    )
+
+
+@mcp.tool()
 def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
     """Return fixture-backed market trend snapshots."""
 
@@ -126,6 +178,50 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
         "get_news_bundle",
         {"topic": topic},
         call_tool("get_news_bundle", {"topic": topic}),
+    )
+
+
+@mcp.tool()
+def create_document_evidence_card(
+    summary: str,
+    artifact_ref: str,
+    ref_type: str = "PDF",
+    modality: str = "pdf_summary",
+    evidence_id: str = "manual_document_summary",
+    category: str = "manual_document",
+    source: str = "manual:document_summary",
+    observed_at: str | None = None,
+    asset_scope: list[str] | None = None,
+    bias: str = "neutral",
+    strength: float = 0.5,
+    confidence: float = 0.5,
+    buy_impact: str = "context_only",
+    sell_impact: str = "context_only",
+    invalidating_condition: str = "Document summary becomes stale or contradicted.",
+) -> dict[str, Any]:
+    """Normalize a caller-supplied document summary into an evidence card."""
+
+    payload = {
+        "summary": summary,
+        "artifact_ref": artifact_ref,
+        "ref_type": ref_type,
+        "modality": modality,
+        "evidence_id": evidence_id,
+        "category": category,
+        "source": source,
+        "observed_at": observed_at,
+        "asset_scope": asset_scope,
+        "bias": bias,
+        "strength": strength,
+        "confidence": confidence,
+        "buy_impact": buy_impact,
+        "sell_impact": sell_impact,
+        "invalidating_condition": invalidating_condition,
+    }
+    return _audited_tool_call(
+        "create_document_evidence_card",
+        payload,
+        call_tool("create_document_evidence_card", payload),
     )
 
 
@@ -237,6 +333,8 @@ def label_signal_outcome(
     take_profit_pct: float = 0.10,
     time_barrier_days: int = 10,
     ledger_path: str | None = None,
+    invalidated_by_event: bool = False,
+    invalidating_event_id: str | None = None,
 ) -> dict[str, Any]:
     """Label a signal outcome with triple-barrier logic."""
 
@@ -249,6 +347,8 @@ def label_signal_outcome(
             "take_profit_pct": take_profit_pct,
             "time_barrier_days": time_barrier_days,
             "ledger_path": ledger_path,
+            "invalidated_by_event": invalidated_by_event,
+            "invalidating_event_id": invalidating_event_id,
         },
         call_tool(
             "label_signal_outcome",
@@ -259,19 +359,24 @@ def label_signal_outcome(
                 "take_profit_pct": take_profit_pct,
                 "time_barrier_days": time_barrier_days,
                 "ledger_path": ledger_path,
+                "invalidated_by_event": invalidated_by_event,
+                "invalidating_event_id": invalidating_event_id,
             },
         ),
     )
 
 
 @mcp.tool()
-def evaluate_score_performance(ledger_path: str | None = None) -> dict[str, Any]:
+def evaluate_score_performance(
+    ledger_path: str | None = None,
+    days: int = 90,
+) -> dict[str, Any]:
     """Evaluate score calibration and realized-R performance."""
 
     return _audited_tool_call(
         "evaluate_score_performance",
-        {"ledger_path": ledger_path},
-        call_tool("evaluate_score_performance", {"ledger_path": ledger_path}),
+        {"ledger_path": ledger_path, "days": days},
+        call_tool("evaluate_score_performance", {"ledger_path": ledger_path, "days": days}),
     )
 
 
@@ -294,6 +399,120 @@ def compare_champion_challenger() -> dict[str, Any]:
 
 
 @mcp.tool()
+def generate_latest_signal_report(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+    report_intent: str = "pre_market_swing_report",
+    include_chart: bool = False,
+    chart_timeframe: str = "1d",
+    chart_output_dir: str | None = None,
+    extra_evidence_cards: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Generate a deterministic Hermes-facing latest signal report."""
+
+    payload = {
+        "asset": asset,
+        "timeframe": timeframe,
+        "report_intent": report_intent,
+        "include_chart": include_chart,
+        "chart_timeframe": chart_timeframe,
+        "chart_output_dir": chart_output_dir,
+        "extra_evidence_cards": extra_evidence_cards,
+    }
+    return _audited_tool_call(
+        "generate_latest_signal_report",
+        payload,
+        call_tool("generate_latest_signal_report", payload),
+    )
+
+
+@mcp.tool()
+def generate_position_review_report(
+    asset: str = "TQQQ",
+    entry_price: float | None = None,
+    current_price: float | None = None,
+    size: float | None = None,
+) -> dict[str, Any]:
+    """Generate a deterministic Hermes-facing open-position review report."""
+
+    payload = {
+        "asset": asset,
+        "entry_price": entry_price,
+        "current_price": current_price,
+        "size": size,
+    }
+    return _audited_tool_call(
+        "generate_position_review_report",
+        payload,
+        call_tool("generate_position_review_report", payload),
+    )
+
+
+@mcp.tool()
+def generate_cron_prompt_pack(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+    include_position_review: bool = True,
+) -> dict[str, Any]:
+    """Generate offline Hermes cron prompt templates without scheduling work."""
+
+    payload = {
+        "asset": asset,
+        "timeframe": timeframe,
+        "include_position_review": include_position_review,
+    }
+    return _audited_tool_call(
+        "generate_cron_prompt_pack",
+        payload,
+        call_tool("generate_cron_prompt_pack", payload),
+    )
+
+
+@mcp.tool()
+def get_integration_readiness(
+    hermes_config_path: str | None = None,
+    hermes_mcp_config_registered: bool = False,
+    telegram_configured: bool | None = None,
+    telegram_bot_token_configured: bool | None = None,
+    telegram_gateway_configured: bool | None = None,
+    migration_go_approved: bool = False,
+    repository_go_approved: bool = False,
+    binance_credentials_path: str | None = None,
+    binance_passphrase_confirmed: bool = False,
+    binance_trade_only_permission_attested: bool = False,
+    live_order_approved: bool = False,
+    btc_risk_settings_path: str | None = None,
+    market_data_source_configured: bool | None = None,
+    macro_source_configured: bool | None = None,
+    news_source_configured: bool | None = None,
+) -> dict[str, Any]:
+    """Return offline readiness for deployment, data, and live-order gates."""
+
+    payload = {
+        "hermes_config_path": hermes_config_path,
+        "hermes_mcp_config_registered": hermes_mcp_config_registered,
+        "telegram_configured": telegram_configured,
+        "telegram_bot_token_configured": telegram_bot_token_configured,
+        "telegram_gateway_configured": telegram_gateway_configured,
+        "migration_go_approved": migration_go_approved,
+        "repository_go_approved": repository_go_approved,
+        "binance_credentials_path": binance_credentials_path,
+        "binance_passphrase_confirmed": binance_passphrase_confirmed,
+        "binance_trade_only_permission_attested": binance_trade_only_permission_attested,
+        "live_order_approved": live_order_approved,
+        "btc_risk_settings_path": btc_risk_settings_path,
+        "market_data_source_configured": market_data_source_configured,
+        "macro_source_configured": macro_source_configured,
+        "news_source_configured": news_source_configured,
+    }
+    return _audited_tool_call(
+        "get_integration_readiness",
+        payload,
+        call_tool("get_integration_readiness", payload),
+    )
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 
@@ -310,6 +529,7 @@ def update_btc_risk_settings(
     max_daily_order_count: int | None = None,
     max_daily_loss_usd: float | None = None,
     coinm_contract_size_usd: float | None = None,
+    emergency_kill_switch_enabled: bool | None = None,
     settings_path: str | None = None,
 ) -> dict[str, Any]:
     """Update BTC COIN-M risk settings."""
@@ -319,6 +539,7 @@ def update_btc_risk_settings(
         "max_daily_order_count": max_daily_order_count,
         "max_daily_loss_usd": max_daily_loss_usd,
         "coinm_contract_size_usd": coinm_contract_size_usd,
+        "emergency_kill_switch_enabled": emergency_kill_switch_enabled,
         "settings_path": settings_path,
     }
     return _audited_tool_call(
@@ -425,6 +646,28 @@ def get_binance_coinm_account_snapshot(
 
 
 @mcp.tool()
+def normalize_binance_coinm_account_snapshot(
+    balance: list[dict[str, Any]] | None = None,
+    positions: list[dict[str, Any]] | None = None,
+    as_of: str | None = None,
+    coinm_contract_size_usd: float | None = None,
+) -> dict[str, Any]:
+    """Normalize caller-supplied Binance COIN-M account payloads."""
+
+    payload = {
+        "balance": balance,
+        "positions": positions,
+        "as_of": as_of,
+        "coinm_contract_size_usd": coinm_contract_size_usd,
+    }
+    return _audited_tool_call(
+        "normalize_binance_coinm_account_snapshot",
+        payload,
+        call_tool("normalize_binance_coinm_account_snapshot", payload),
+    )
+
+
+@mcp.tool()
 def preview_btc_order(
     side: str = "BUY",
     order_type: str = "MARKET",
@@ -437,6 +680,7 @@ def preview_btc_order(
     settings_path: str | None = None,
     state_path: str | None = None,
     credentials_path: str | None = None,
+    portfolio_snapshot: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Preview a BTCUSD_PERP Binance COIN-M order without submitting it."""
 
@@ -452,6 +696,7 @@ def preview_btc_order(
         "settings_path": settings_path,
         "state_path": state_path,
         "credentials_path": credentials_path,
+        "portfolio_snapshot": portfolio_snapshot,
     }
 
     return _audited_tool_call(

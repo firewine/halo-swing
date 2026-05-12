@@ -10,6 +10,7 @@ from halo_swing_mcp.binance_btc import (
     check_binance_coinm_connectivity,
     execute_btc_order,
     get_binance_coinm_account_snapshot,
+    normalize_binance_coinm_account_snapshot,
     preview_btc_order,
 )
 from halo_swing_mcp.risk_settings import (
@@ -25,6 +26,7 @@ from halo_swing_mcp.secret_store import (
 from halo_swing_mcp.tools.audit_tools import get_audit_log, get_audit_summary
 from halo_swing_mcp.tools.market import (
     calculate_indicators,
+    create_document_evidence_card,
     get_event_calendar,
     get_macro_snapshot,
     get_market_snapshot,
@@ -36,6 +38,13 @@ from halo_swing_mcp.tools.recording import (
     label_signal_outcome,
     record_signal,
 )
+from halo_swing_mcp.tools.readiness import get_integration_readiness
+from halo_swing_mcp.tools.reporting import (
+    generate_cron_prompt_pack,
+    generate_latest_signal_report,
+    generate_position_review_report,
+)
+from halo_swing_mcp.tools.runtime import get_runtime_status, record_runtime_checkpoint
 from halo_swing_mcp.tools.scoring import (
     compare_champion_challenger,
     evaluate_position,
@@ -76,6 +85,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
     ToolSpec("get_macro_snapshot", get_macro_snapshot, "Return macro snapshot."),
     ToolSpec("get_event_calendar", get_event_calendar, "Return event calendar."),
     ToolSpec("get_news_bundle", get_news_bundle, "Return evidence cards."),
+    ToolSpec(
+        "create_document_evidence_card",
+        create_document_evidence_card,
+        "Normalize a document summary into an evidence card.",
+    ),
     ToolSpec("calculate_indicators", calculate_indicators, "Calculate indicators."),
     ToolSpec("render_chart", render_chart, "Render a PNG chart."),
     ToolSpec("score_leverage_swing", score_leverage_swing, "Score swing candidate."),
@@ -98,8 +112,34 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         compare_champion_challenger,
         "Compare champion and challenger.",
     ),
+    ToolSpec(
+        "generate_latest_signal_report",
+        generate_latest_signal_report,
+        "Generate a Hermes-facing latest signal report.",
+    ),
+    ToolSpec(
+        "generate_position_review_report",
+        generate_position_review_report,
+        "Generate a Hermes-facing open-position review report.",
+    ),
+    ToolSpec(
+        "generate_cron_prompt_pack",
+        generate_cron_prompt_pack,
+        "Generate offline Hermes cron prompt templates.",
+    ),
+    ToolSpec(
+        "get_integration_readiness",
+        get_integration_readiness,
+        "Return offline readiness for blocked integration gates.",
+    ),
     ToolSpec("get_audit_log", get_audit_log, "Return recent audit events."),
     ToolSpec("get_audit_summary", get_audit_summary, "Return audit event summary."),
+    ToolSpec("get_runtime_status", get_runtime_status, "Return runtime guard status."),
+    ToolSpec(
+        "record_runtime_checkpoint",
+        record_runtime_checkpoint,
+        "Append a local runtime checkpoint snapshot.",
+    ),
     ToolSpec("get_btc_risk_settings", get_btc_risk_settings, "Return BTC risk settings."),
     ToolSpec(
         "update_btc_risk_settings",
@@ -131,6 +171,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_binance_coinm_account_snapshot",
         get_binance_coinm_account_snapshot,
         "Read Binance COIN-M balance and BTC position.",
+    ),
+    ToolSpec(
+        "normalize_binance_coinm_account_snapshot",
+        normalize_binance_coinm_account_snapshot,
+        "Normalize caller-supplied Binance COIN-M account payloads.",
     ),
     ToolSpec("preview_btc_order", preview_btc_order, "Preview BTCUSD_PERP COIN-M order."),
     ToolSpec("execute_btc_order", execute_btc_order, "Submit guarded BTCUSD_PERP order."),

@@ -27,6 +27,7 @@
     {
       "evidence_id": "ev_demo_macro_policy_001",
       "category": "macro_policy",
+      "modality": "pdf_summary",
       "observed_at": "2026-04-29T12:45:00Z",
       "bias": "bullish",
       "strength": 0.56,
@@ -42,6 +43,7 @@
     {
       "evidence_id": "ev_demo_market_technical_001",
       "category": "market_technical",
+      "modality": "chart_image",
       "observed_at": "2026-04-29T13:20:00Z",
       "bias": "bullish",
       "strength": 0.67,

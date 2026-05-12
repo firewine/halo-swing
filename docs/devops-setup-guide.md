@@ -13,9 +13,27 @@ dependencies: requirements.txt
 mcp_stack: official MCP Python SDK / FastMCP
 server_status: offline_mvp_tools_implemented
 harness_status: parameterized_cli_harness_implemented
-storage_schema_status: runtime_jsonl_ledger_for_offline_mvp
+storage_schema_status: jsonl_signal_repository_contract
 audit_log_status: runtime_jsonl_with_local_web_viewer
+runtime_guard_status: jsonl_retention_and_failure_watchdog
+runtime_checkpoint_status: append_only_jsonl_checkpoint_tool
+report_harness_status: deterministic_latest_signal_report_snapshot
+position_review_report_status: deterministic_position_review_report_snapshot
+delivery_preview_status: offline_hermes_telegram_payload_preview
+evidence_guard_status: report_summary_limits_and_conflict_flags
+multimodal_evidence_status: modality_and_portable_artifact_refs
+document_summary_input_status: guarded_manual_document_summary_card
+multimodal_report_status: optional_chart_ref_and_code_guard
+integration_readiness_status: offline_gate_readiness_harness
+hermes_readiness_status: config_path_and_mcp_registration_gate
+telegram_readiness_status: bot_token_or_gateway_gate_no_send
+live_data_readiness_status: market_macro_news_source_policy_gate
+score_feedback_status: fixture_90d_oos_walk_forward_guard
 trading_admin_status: local_only_btc_coin_m_settings_and_encrypted_credentials
+btc_kill_switch_status: local_risk_setting_blocks_execution
+btc_portfolio_snapshot_status: guarded_offline_coin_m_snapshot_normalizer
+btc_credential_policy_status: trade_only_no_withdraw_contract
+btc_live_order_readiness_status: explicit_approval_gate_blocked_by_default
 live_network_tests: disabled
 default_data_mode: fixture
 ```
@@ -64,14 +82,56 @@ Verified offline smoke commands:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ","BTC"]}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"4h"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness create_document_evidence_card --input-json '{"summary":"FOMC minutes summary says policy remains restrictive but stable.","artifact_ref":"artifact://documents/fomc-minutes-summary.pdf","asset_scope":["QQQ","TQQQ"]}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"artifacts/charts"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_summary --input-json '{"audit_log_path":"state/audit_log.jsonl"}' --audit-log-path state/audit_log.jsonl
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"state/runtime_checkpoints.jsonl","audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":"BTC","balance":"0.25","availableBalance":"0.2"}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":"3","entryPrice":"90000","markPrice":"92000"}]}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_btc_risk_status
 PYTHONPATH=src ./.venv/bin/python -m pytest
 PYTHONPATH=src ./.venv/bin/python -m ruff check .
 ```
+
+`generate_trade_guide` should include `trade_guide_contract.schema_version`
+`trade_guide.v1`, `guide.time_exit_conditions`, and a `trade_guide_guard` with
+no order submission or live data requirement.
+
+`evaluate_position` should include `position_management_contract.schema_version`
+`position_management.v1` and a `position_management_guard` proving the
+WAIT/TRIM/EXIT/STOP decision is numeric-authoritative and does not submit orders.
+
+`get_market_snapshot` should include `market_snapshot_contract.schema_version`
+`market_snapshot.v1`, core fixture assets QQQ/SPY/SMH/SOXX/BTC, and a guard
+showing feature-store persistence is not active before `MIGRATION_GO` and
+`REPOSITORY_GO`.
+
+`get_event_calendar` should include `event_policy_contract.schema_version`
+`event_policy.v1`, with CPI/FOMC/NFP/EARNINGS coverage and per-event danger
+windows. The fixture policy guard must stay offline and no-network.
+
+`get_news_bundle` should include `news_source_policy_contract.schema_version`
+`news_source_policy.v1`, with fixture coverage for Fed, Treasury, White House,
+EIA, Iran/Hormuz, and AI/semiconductor source groups. The source policy guard
+must stay offline and no-network.
+
+`label_signal_outcome` should include `signal_label_outcome.v1` with metric
+fields `mfe`, `mae`, and `realized_r`. MFE/MAE are scoped to
+`price_path[:time_barrier_days]`, so prices after the time barrier do not change
+the label metrics.
+
+`evaluate_score_performance` should include `overfit_guard.deflated_sharpe_proxy`
+with schema `deflated_sharpe_proxy.v1`. This is an offline conservative proxy,
+not an exact Deflated Sharpe Ratio, and it must not enable automatic promotion.
 
 `record_signal` writes a local JSONL runtime ledger. Use an ignored or temporary
 path during development:
@@ -85,6 +145,29 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_perfo
 SQLite/schema commands remain absent from the offline MVP. The current ledger is
 a reusable JSONL runtime adapter; migrations and repository persistence can be a
 later implementation behind the same tool contracts.
+
+Indicator timeframe smoke:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1d"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"4h"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1h"}'
+```
+
+The replay provider exposes only `1d`, `4h`, and `1h`. Unsupported timeframes
+raise a deterministic validation error and do not call live adapters.
+
+Score feedback OOS smoke:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}'
+```
+
+The default fixture window returns `out_of_sample_report` with a deterministic
+in-sample/OOS split, `walk_forward_report` with rolling fixture folds,
+`overfit_guard`, and `score_calibration` with per-bin expected versus realized
+take-profit rates. This report is evidence only; champion promotion still
+requires explicit approval.
 
 Audit log viewer:
 
@@ -102,6 +185,149 @@ Open `http://127.0.0.1:8765`. JSON APIs are available at:
 Audit events are append-only JSONL records with redacted sensitive keys such as
 `api_key`, `authorization`, `password`, `passphrase`, `secret`, and `token`.
 
+Runtime guard:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl","apply_retention":true}'
+```
+
+Default local retention keeps the newest 1000 records and caps each JSONL file
+at roughly 5 MB. Repeated tool failures trigger degraded mode when 3 failures
+appear inside the most recent 20 audit events.
+
+Runtime checkpoint:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"state/runtime_checkpoints.jsonl","audit_log_path":"state/audit_log.jsonl","ledger_path":"state/signal_ledger.jsonl"}'
+```
+
+This appends one local JSONL checkpoint with runtime status, watchdog resources,
+and optional integration readiness. It does not install a scheduler, call
+networks, send Telegram messages, or return secret values. Keep
+`state/runtime_checkpoints.jsonl` ignored like other local runtime files.
+
+Position review report:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}'
+```
+
+This wraps `evaluate_position` into a Hermes/Telegram-facing structured report.
+The payload keeps `position_review` as the numeric authority, includes
+Position/Decision/Rationale/Stop/Take Profit/Risk sections, and performs no
+network call or order submission.
+
+Hermes cron prompt pack:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}'
+```
+
+This returns prompt templates for `pre_market_swing_report`,
+`intraday_risk_watch`, `post_market_review`, and `position_review`. It does not
+install a scheduler, run cron, send Telegram messages, call networks, submit
+orders, or require credentials.
+
+Report delivery preview:
+
+```text
+generate_latest_signal_report.delivery_preview
+generate_position_review_report.delivery_preview
+```
+
+The preview returns Hermes payload metadata and Telegram message chunks under
+the same no-network contract used by the report guards. It is safe to inspect
+offline and does not require Telegram credentials.
+
+Report evidence guard:
+
+```text
+generate_latest_signal_report.evidence_contract
+generate_latest_signal_report.evidence_context
+generate_latest_signal_report.evidence_guard
+```
+
+The guard caps reason/evidence summaries, records acknowledged conflict flags
+such as event-risk-vs-long-bias, and verifies that risk warnings are reflected
+in the Cautions section.
+
+Multimodal evidence metadata:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}'
+```
+
+Fixture evidence cards include `modality`, portable `artifact_ref`, bundle-level
+`modality_counts`, and `multimodal_evidence_guard`. This does not parse PDFs,
+call Hermes multimodal APIs, or write evidence artifacts.
+
+Caller-supplied PDF/document summary input:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness create_document_evidence_card --input-json '{"summary":"FOMC minutes summary says policy remains restrictive but stable.","artifact_ref":"artifact://documents/fomc-minutes-summary.pdf","asset_scope":["QQQ","TQQQ"]}'
+```
+
+This normalizes a manual document summary into one evidence card with
+`document_summary_input_contract`, `document_summary_input_guard`,
+`modality_counts`, `artifact_refs`, and `multimodal_evidence_guard`. It does not
+read files, parse PDFs, call networks, return raw documents, or send anything to
+Hermes/Telegram.
+
+Multimodal report chart refs:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"artifacts/charts"}'
+```
+
+This writes a local chart PNG to an ignored artifact path, attaches `chart_ref`
+to `latest_signal_report`, and returns `chart_code_guard`. The guard records
+that chart images are visual context only; indicator values, stop levels, and
+take-profit levels remain code-calculated fields.
+
+When `generate_latest_signal_report` receives `extra_evidence_cards`, the report
+also returns `multimodal_context`. This context links chart refs and manual
+document evidence cards while keeping `latest_signal_report` as the numeric
+authority and recording that no Hermes multimodal call or network call occurred.
+
+Integration readiness:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+```
+
+This command does not call networks or return secret values. It reports which
+future gates are still blocked for Hermes, Telegram, DB migration/repository,
+Binance testnet read-only smoke, live order submission, and live data adapters.
+The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
+stdio server command, server module, MCP server name, config path existence, and
+whether the operator has registered the MCP config. It does not start Hermes.
+The live data gate returns `live_data_source_readiness.v1` and tracks market
+OHLCV, macro, and news source/API-key decisions separately. The check may use
+non-secret booleans or environment presence, but it does not return key values
+and does not add a live adapter.
+
+The Telegram gate returns `telegram_delivery_readiness.v1`. It accepts either a
+bot-token readiness signal or a gateway readiness signal, exposes only booleans,
+and keeps `send_call=false`, `network_call=false`, and
+`credential_storage_added=false`. Actual Telegram delivery remains blocked until
+the Hermes/Telegram environment is configured outside this offline harness.
+
+For Binance testnet read-only smoke readiness, encrypted credentials alone are
+not sufficient. Confirm passphrase availability with a non-secret boolean only:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_passphrase_confirmed":true}'
+```
+
+Live BTC order submission readiness is separate from read-only smoke readiness.
+It remains blocked unless all order-specific approvals are represented without
+secrets: explicit live-order approval, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`,
+encrypted credentials, manual passphrase availability, Binance console
+trade-only/no-withdraw attestation, testnet policy compatibility, and emergency
+kill switch disabled. The readiness check still reports `order_submission=false`
+and `network_call=false`.
+
 BTC COIN-M trading admin:
 
 ```bash
@@ -116,11 +342,29 @@ Open `http://127.0.0.1:8766`. The admin page is local-only and manages:
 - max_daily_order_count
 - max_daily_loss_usd
 - coinm_contract_size_usd
+- emergency_kill_switch_enabled
 - Binance public connectivity check
 - read-only account and BTC position snapshot
 - BTC COIN-M order preview
 - daily counter reset
 ```
+
+Offline COIN-M account snapshot normalization:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":"BTC","balance":"0.25","availableBalance":"0.2"}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":"3","entryPrice":"90000","markPrice":"92000"}]}'
+```
+
+This normalizes caller-supplied Binance COIN-M balance/position rows into a
+BTC-only read-only `portfolio_sync_contract`. It does not require credentials,
+call networks, submit orders, or return secret values. The live read-only
+account snapshot still requires encrypted testnet credentials and a manual
+passphrase at smoke time.
+
+Pass the resulting snapshot to `preview_btc_order` as `portfolio_snapshot` to
+receive `position_effect`. This indicates whether the preview opens, increases,
+reduces, closes, or flips the BTC position. It remains a dry run and does not
+submit orders.
 
 Credential storage:
 
@@ -130,7 +374,28 @@ algorithm: Fernet
 kdf: PBKDF2HMAC-SHA256
 iterations: 390000
 commit_policy: forbidden
+permission_policy_schema: binance_credential_policy.v1
+required_permission: coin_m_futures_trade
+withdraw_permission_allowed: false
+passphrase_handling: manual_input_only
 ```
+
+`get_binance_credentials_status` and `preview_btc_order` return the same
+non-secret credential policy. The tooling does not verify Binance console
+permissions by network call; the operator must attest that the key is COIN-M
+trade-only and has withdraw/transfer permissions disabled before any live order
+approval is considered.
+
+Emergency kill switch smoke:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness update_btc_risk_settings --input-json '{"emergency_kill_switch_enabled":true,"settings_path":"/private/tmp/halo_swing_kill_switch_settings.json"}' --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness execute_btc_order --input-json '{"confirm":"CONFIRM_BTC_BINANCE_COINM_ORDER","settings_path":"/private/tmp/halo_swing_kill_switch_settings.json"}' --no-audit
+```
+
+The second command must return `blocked_reason:
+emergency_kill_switch_enabled`. Use an ignored or temporary settings path for
+local smoke checks.
 
 MCP stdio server command:
 
@@ -161,6 +426,7 @@ mcp_servers:
         - get_macro_snapshot
         - get_event_calendar
         - get_news_bundle
+        - create_document_evidence_card
         - calculate_indicators
         - render_chart
         - score_leverage_swing
@@ -171,8 +437,14 @@ mcp_servers:
         - evaluate_score_performance
         - suggest_weight_update
         - compare_champion_challenger
+        - generate_latest_signal_report
+        - generate_position_review_report
+        - generate_cron_prompt_pack
+        - get_integration_readiness
         - get_audit_log
         - get_audit_summary
+        - get_runtime_status
+        - record_runtime_checkpoint
         - get_btc_risk_settings
         - update_btc_risk_settings
         - get_btc_risk_status
@@ -181,6 +453,7 @@ mcp_servers:
         - get_binance_credentials_status
         - check_binance_coinm_connectivity
         - get_binance_coinm_account_snapshot
+        - normalize_binance_coinm_account_snapshot
         - preview_btc_order
         - execute_btc_order
 ```

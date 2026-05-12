@@ -35,6 +35,8 @@ DEFAULT_STRATEGY_CONFIG: dict[str, Any] = {
     },
 }
 
+STRATEGY_CONFIG_SCHEMA_VERSION = "strategy_config.v1"
+
 
 def canonical_json(payload: dict[str, Any]) -> str:
     """Return stable JSON for hashing and fixture comparisons."""
@@ -64,7 +66,12 @@ def validate_strategy_config(config: dict[str, Any]) -> dict[str, Any]:
 
     weights = config.get("weights", {})
     thresholds = config.get("thresholds", {})
+    risk = config.get("risk", {})
     errors: list[str] = []
+
+    for field in ("config_id", "version", "status", "target_universe", "weights", "thresholds", "risk"):
+        if field not in config:
+            errors.append(f"{field} is required")
 
     if not weights:
         errors.append("weights are required")
@@ -92,8 +99,48 @@ def validate_strategy_config(config: dict[str, Any]) -> dict[str, Any]:
     ):
         errors.append("thresholds must be strictly descending")
 
+    for field in (
+        "max_3x_event_risk",
+        "time_barrier_days",
+        "stop_atr_multiple",
+        "take_profit_atr_multiple",
+    ):
+        if field not in risk:
+            errors.append(f"risk.{field} is required")
+
+    if "max_3x_event_risk" in risk and not 0 <= float(risk["max_3x_event_risk"]) <= 1:
+        errors.append("risk.max_3x_event_risk is out of bounds")
+    if "time_barrier_days" in risk and int(risk["time_barrier_days"]) <= 0:
+        errors.append("risk.time_barrier_days must be positive")
+    if "stop_atr_multiple" in risk and float(risk["stop_atr_multiple"]) <= 0:
+        errors.append("risk.stop_atr_multiple must be positive")
+    if "take_profit_atr_multiple" in risk and float(risk["take_profit_atr_multiple"]) <= 0:
+        errors.append("risk.take_profit_atr_multiple must be positive")
+
+    expected_hash = config_hash(config)
+    provided_hash = config.get("config_hash")
     return {
+        "schema_version": STRATEGY_CONFIG_SCHEMA_VERSION,
         "valid": not errors,
         "errors": errors,
-        "config_hash": config_hash(config),
+        "config_hash": expected_hash,
+        "provided_config_hash": provided_hash,
+        "config_hash_matches": provided_hash in {None, expected_hash},
+        "weight_sum": round(sum(float(value) for value in weights.values()), 8)
+        if weights
+        else 0.0,
+        "required_sections": [
+            "config_id",
+            "version",
+            "status",
+            "target_universe",
+            "weights",
+            "thresholds",
+            "risk",
+        ],
+        "bounds_checked": True,
+        "sum_checked": True,
+        "threshold_order_checked": True,
+        "hash_algorithm": "sha256:canonical_json_without_config_hash",
+        "db_required": False,
     }

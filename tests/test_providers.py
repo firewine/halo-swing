@@ -1,5 +1,7 @@
 from typing import Any
 
+import pytest
+
 from halo_swing_mcp.providers import (
     MarketDataProvider,
     ReplayMarketDataProvider,
@@ -18,8 +20,13 @@ def assert_market_data_provider(provider: MarketDataProvider) -> None:
     assert provider.data_mode == "fixture"
     assert provider.live_data_required is False
     assert "TQQQ" in provider.supported_assets()
+    assert provider.supported_timeframes() == ["1d", "4h", "1h"]
     assert provider.resolve_asset("TQQQ") == ("QQQ", 3)
     assert provider.ohlcv("QQQ", 30)[-1]["close"] > 0
+    assert provider.ohlcv("QQQ", 30, "4h")[-1]["timeframe"] == "4h"
+    assert provider.ohlcv("QQQ", 30, "1h")[-1]["timestamp"].endswith("Z")
+    with pytest.raises(ValueError, match="unsupported timeframe"):
+        provider.ohlcv("QQQ", 30, "15m")
     assert provider.macro_snapshot()["live_data_required"] is False
     assert provider.event_calendar(14)
     assert provider.news_cards("all")
@@ -46,3 +53,6 @@ def test_market_tools_keep_replay_payload_contract() -> None:
     assert market["snapshots"][0]["symbol"] == "QQQ"
     assert events["events"]
     assert news["evidence_cards"]
+    assert news["modality_counts"]["pdf_summary"] >= 1
+    assert news["artifact_refs"]
+    assert news["multimodal_evidence_guard"]["status"] == "ok"

@@ -1,0 +1,1678 @@
+{
+  "action": "BUY_WATCH",
+  "as_of": "2026-05-08T20:00:00Z",
+  "asset": "TQQQ",
+  "confidence_label": "medium",
+  "delivery_contract": {
+    "channels": {
+      "hermes": {
+        "format": "structured_json_plus_text",
+        "network_call": false,
+        "numeric_authority": "latest_signal_report"
+      },
+      "telegram": {
+        "chunk_indexing": "1_based",
+        "format": "plain_text",
+        "max_chars": 3900,
+        "network_call": false,
+        "overflow_policy": "split_on_section_boundary",
+        "required_sections": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "schema_version": "telegram_report_format.v1",
+        "section_separator": "\n\n",
+        "send_call": false
+      }
+    },
+    "cron_intents": [
+      "pre_market_swing_report",
+      "intraday_risk_watch",
+      "post_market_review"
+    ]
+  },
+  "delivery_preview": {
+    "channels": {
+      "hermes": {
+        "format": "structured_json_plus_text",
+        "network_call": false,
+        "numeric_authority": "latest_signal_report",
+        "payload_ref": "latest_signal_report"
+      },
+      "telegram": {
+        "chunk_indexing": "1_based",
+        "chunks": [
+          {
+            "chars": 863,
+            "index": 1,
+            "text": "Target: TQQQ / QQQ\nDecision: BUY_WATCH\nConfidence: medium (0.7251)\nScore: 0.6657\n\nReasons:\n- BUY_WATCH comes from strongest component trend and weakest component event_safety; event risk remains explicit.\n- Policy tone is not loose, but volatility and rates are not worsening.; Semiconductor leadership remains constructive, but earnings risk is near.\n\nEntry:\n- QQQ is a watch candidate; wait for confirmation before entry.\n- QQQ holds above MA20 or reclaims prior session high\n\nStop:\n- QQQ closes below 542.53\n- VIX/VXN expands with rates or DXY rising\n- No upside follow-through within three sessions\n\nTake Profit:\n- QQQ reaches 585.74\n- QQQ tests the 20-day resistance near 564.96\n- RSI pushes above 70 while +DI becomes extended\n\nCautions:\n- A high-risk event window is inside the next 14 days.\n- 3x entries require confirmation because CPI/FOMC risk is near."
+          }
+        ],
+        "fits_single_message": true,
+        "format": "plain_text",
+        "max_chars": 3900,
+        "message_count": 1,
+        "network_call": false,
+        "overflow_policy": "split_on_section_boundary",
+        "schema_version": "telegram_report_format.v1",
+        "section_separator": "\n\n",
+        "send_call": false
+      }
+    },
+    "guard": {
+      "checks": [
+        {
+          "actual": "latest_signal_report",
+          "expected": "latest_signal_report",
+          "name": "hermes_payload_ref_matches_structured_payload",
+          "passed": true
+        },
+        {
+          "actual": "latest_signal_report",
+          "expected": "latest_signal_report",
+          "name": "hermes_numeric_authority_matches_payload_ref",
+          "passed": true
+        },
+        {
+          "actual": "telegram_report_format.v1",
+          "expected": "telegram_report_format.v1",
+          "name": "telegram_format_schema_declared",
+          "passed": true
+        },
+        {
+          "actual": [
+            "Target:",
+            "Decision:",
+            "Reasons:",
+            "Entry:",
+            "Stop:",
+            "Take Profit:",
+            "Cautions:"
+          ],
+          "expected": [
+            "Target:",
+            "Decision:",
+            "Reasons:",
+            "Entry:",
+            "Stop:",
+            "Take Profit:",
+            "Cautions:"
+          ],
+          "name": "telegram_required_sections_present_in_preview",
+          "passed": true
+        },
+        {
+          "actual_present": [],
+          "expected_absent": [
+            "Position:",
+            "Rationale:",
+            "Risk:"
+          ],
+          "name": "telegram_unrequested_sections_absent_from_preview",
+          "passed": true
+        },
+        {
+          "actual": {
+            "chunk_indexing": "1_based",
+            "indexes": [
+              1
+            ]
+          },
+          "expected": {
+            "chunk_indexing": "1_based",
+            "indexes": [
+              1
+            ]
+          },
+          "name": "telegram_chunks_are_1_based_sequential",
+          "passed": true
+        },
+        {
+          "actual": 1,
+          "expected": 1,
+          "name": "telegram_message_count_matches_chunks",
+          "passed": true
+        },
+        {
+          "actual": true,
+          "expected": true,
+          "name": "telegram_single_message_flag_matches_chunk_count",
+          "passed": true
+        },
+        {
+          "actual": [
+            {
+              "chars": 863,
+              "index": 1,
+              "text_len": 863
+            }
+          ],
+          "expected": "len(chunk.text)",
+          "name": "telegram_chunk_char_counts_match_text",
+          "passed": true
+        },
+        {
+          "actual": [
+            {
+              "chars": 863,
+              "index": 1,
+              "text_empty": false
+            }
+          ],
+          "expected": "nonempty_chunk_text",
+          "name": "telegram_chunks_are_nonempty",
+          "passed": true
+        },
+        {
+          "actual": "declared_separator_reconstructed_text",
+          "expected": "original_text",
+          "name": "telegram_section_separator_preserves_preview_text",
+          "passed": true
+        },
+        {
+          "actual": {
+            "continuation_chunk_starts": [],
+            "overflow_policy": "split_on_section_boundary"
+          },
+          "expected": {
+            "continuation_chunks_start_with_required_section": true,
+            "overflow_policy": "split_on_section_boundary"
+          },
+          "name": "telegram_overflow_policy_splits_on_section_boundary",
+          "passed": true
+        },
+        {
+          "actual_chars": [
+            863
+          ],
+          "expected_max_chars": 3900,
+          "name": "telegram_chunks_fit_max_chars",
+          "passed": true
+        },
+        {
+          "actual": "reconstructed_text",
+          "expected": "original_text",
+          "name": "telegram_chunks_preserve_text",
+          "passed": true
+        },
+        {
+          "actual": {
+            "hermes": false,
+            "telegram": false
+          },
+          "expected": false,
+          "name": "delivery_preview_has_no_network_side_effect",
+          "passed": true
+        },
+        {
+          "actual": {
+            "hermes": false,
+            "telegram": false
+          },
+          "expected": false,
+          "name": "delivery_preview_has_no_send_side_effect",
+          "passed": true
+        },
+        {
+          "actual": [
+            "hermes_payload_ref_matches_structured_payload",
+            "hermes_numeric_authority_matches_payload_ref",
+            "telegram_format_schema_declared",
+            "telegram_required_sections_present_in_preview",
+            "telegram_unrequested_sections_absent_from_preview",
+            "telegram_chunks_are_1_based_sequential",
+            "telegram_message_count_matches_chunks",
+            "telegram_single_message_flag_matches_chunk_count",
+            "telegram_chunk_char_counts_match_text",
+            "telegram_chunks_are_nonempty",
+            "telegram_section_separator_preserves_preview_text",
+            "telegram_overflow_policy_splits_on_section_boundary",
+            "telegram_chunks_fit_max_chars",
+            "telegram_chunks_preserve_text",
+            "delivery_preview_has_no_network_side_effect",
+            "delivery_preview_has_no_send_side_effect",
+            "delivery_preview_guard_check_names_match_expected_schema",
+            "delivery_preview_guard_check_keys_match_expected_schema",
+            "delivery_preview_payload_keys_match_expected_schema"
+          ],
+          "expected": [
+            "hermes_payload_ref_matches_structured_payload",
+            "hermes_numeric_authority_matches_payload_ref",
+            "telegram_format_schema_declared",
+            "telegram_required_sections_present_in_preview",
+            "telegram_unrequested_sections_absent_from_preview",
+            "telegram_chunks_are_1_based_sequential",
+            "telegram_message_count_matches_chunks",
+            "telegram_single_message_flag_matches_chunk_count",
+            "telegram_chunk_char_counts_match_text",
+            "telegram_chunks_are_nonempty",
+            "telegram_section_separator_preserves_preview_text",
+            "telegram_overflow_policy_splits_on_section_boundary",
+            "telegram_chunks_fit_max_chars",
+            "telegram_chunks_preserve_text",
+            "delivery_preview_has_no_network_side_effect",
+            "delivery_preview_has_no_send_side_effect",
+            "delivery_preview_guard_check_names_match_expected_schema",
+            "delivery_preview_guard_check_keys_match_expected_schema",
+            "delivery_preview_payload_keys_match_expected_schema"
+          ],
+          "name": "delivery_preview_guard_check_names_match_expected_schema",
+          "passed": true
+        },
+        {
+          "actual": {
+            "default_check_names": [
+              "hermes_payload_ref_matches_structured_payload",
+              "hermes_numeric_authority_matches_payload_ref",
+              "telegram_format_schema_declared",
+              "telegram_required_sections_present_in_preview",
+              "telegram_chunks_are_1_based_sequential",
+              "telegram_message_count_matches_chunks",
+              "telegram_single_message_flag_matches_chunk_count",
+              "telegram_chunk_char_counts_match_text",
+              "telegram_chunks_are_nonempty",
+              "telegram_section_separator_preserves_preview_text",
+              "telegram_overflow_policy_splits_on_section_boundary",
+              "telegram_chunks_preserve_text",
+              "delivery_preview_has_no_network_side_effect",
+              "delivery_preview_has_no_send_side_effect",
+              "delivery_preview_guard_check_names_match_expected_schema",
+              "delivery_preview_guard_check_keys_match_expected_schema",
+              "delivery_preview_payload_keys_match_expected_schema"
+            ],
+            "default_keys": [
+              "name",
+              "passed",
+              "expected",
+              "actual"
+            ],
+            "special_check_keys": {
+              "telegram_chunks_fit_max_chars": [
+                "name",
+                "passed",
+                "expected_max_chars",
+                "actual_chars"
+              ],
+              "telegram_unrequested_sections_absent_from_preview": [
+                "name",
+                "passed",
+                "expected_absent",
+                "actual_present"
+              ]
+            }
+          },
+          "expected": {
+            "default_check_names": [
+              "hermes_payload_ref_matches_structured_payload",
+              "hermes_numeric_authority_matches_payload_ref",
+              "telegram_format_schema_declared",
+              "telegram_required_sections_present_in_preview",
+              "telegram_chunks_are_1_based_sequential",
+              "telegram_message_count_matches_chunks",
+              "telegram_single_message_flag_matches_chunk_count",
+              "telegram_chunk_char_counts_match_text",
+              "telegram_chunks_are_nonempty",
+              "telegram_section_separator_preserves_preview_text",
+              "telegram_overflow_policy_splits_on_section_boundary",
+              "telegram_chunks_preserve_text",
+              "delivery_preview_has_no_network_side_effect",
+              "delivery_preview_has_no_send_side_effect",
+              "delivery_preview_guard_check_names_match_expected_schema",
+              "delivery_preview_guard_check_keys_match_expected_schema",
+              "delivery_preview_payload_keys_match_expected_schema"
+            ],
+            "default_keys": [
+              "name",
+              "passed",
+              "expected",
+              "actual"
+            ],
+            "special_check_keys": {
+              "telegram_chunks_fit_max_chars": [
+                "name",
+                "passed",
+                "expected_max_chars",
+                "actual_chars"
+              ],
+              "telegram_unrequested_sections_absent_from_preview": [
+                "name",
+                "passed",
+                "expected_absent",
+                "actual_present"
+              ]
+            }
+          },
+          "name": "delivery_preview_guard_check_keys_match_expected_schema",
+          "passed": true
+        },
+        {
+          "actual": {
+            "channel_names": [
+              "hermes",
+              "telegram"
+            ],
+            "guard_keys": [
+              "status",
+              "checks"
+            ],
+            "hermes_channel_keys": [
+              "format",
+              "network_call",
+              "numeric_authority",
+              "payload_ref"
+            ],
+            "preview_keys": [
+              "channels",
+              "guard"
+            ],
+            "telegram_channel_keys": [
+              "schema_version",
+              "format",
+              "network_call",
+              "max_chars",
+              "overflow_policy",
+              "section_separator",
+              "chunk_indexing",
+              "send_call",
+              "message_count",
+              "fits_single_message",
+              "chunks"
+            ],
+            "telegram_chunk_keys": [
+              [
+                "index",
+                "chars",
+                "text"
+              ]
+            ]
+          },
+          "expected": {
+            "channel_names": [
+              "hermes",
+              "telegram"
+            ],
+            "guard_keys": [
+              "status",
+              "checks"
+            ],
+            "hermes_channel_keys": [
+              "format",
+              "network_call",
+              "numeric_authority",
+              "payload_ref"
+            ],
+            "preview_keys": [
+              "channels",
+              "guard"
+            ],
+            "telegram_channel_keys": [
+              "schema_version",
+              "format",
+              "network_call",
+              "max_chars",
+              "overflow_policy",
+              "section_separator",
+              "chunk_indexing",
+              "send_call",
+              "message_count",
+              "fits_single_message",
+              "chunks"
+            ],
+            "telegram_chunk_keys": [
+              [
+                "index",
+                "chars",
+                "text"
+              ]
+            ]
+          },
+          "name": "delivery_preview_payload_keys_match_expected_schema",
+          "passed": true
+        }
+      ],
+      "status": "ok"
+    }
+  },
+  "evidence_context": {
+    "component_extremes": {
+      "spread": 0.72,
+      "strongest": {
+        "name": "trend",
+        "score": 1.0
+      },
+      "weakest": {
+        "name": "event_safety",
+        "score": 0.28
+      }
+    },
+    "conflict_flags": [
+      {
+        "details": "Report keeps event risk explicit while action still monitors a leveraged long setup.",
+        "name": "event_risk_vs_long_bias",
+        "severity": "medium",
+        "status": "acknowledged"
+      },
+      {
+        "details": "Component spread is wide enough that the report should summarize both supportive and weak evidence.",
+        "name": "mixed_component_signal",
+        "severity": "low",
+        "status": "acknowledged"
+      }
+    ],
+    "evidence_summary": "Policy tone is not loose, but volatility and rates are not worsening.; Semiconductor leadership remains constructive, but earnings risk is near.",
+    "reason_summary": "BUY_WATCH comes from strongest component trend and weakest component event_safety; event risk remains explicit.",
+    "risk_warnings": [
+      "A high-risk event window is inside the next 14 days.",
+      "3x entries require confirmation because CPI/FOMC risk is near."
+    ]
+  },
+  "evidence_contract": {
+    "max_conflict_flags": 8,
+    "max_evidence_summary_chars": 700,
+    "max_reason_summary_chars": 260,
+    "required_conflict_fields": [
+      "name",
+      "severity",
+      "status",
+      "details"
+    ]
+  },
+  "evidence_guard": {
+    "checks": [
+      {
+        "actual_chars": 111,
+        "expected_max_chars": 260,
+        "name": "reason_summary_within_limit",
+        "passed": true
+      },
+      {
+        "actual_chars": 144,
+        "expected_max_chars": 700,
+        "name": "evidence_summary_within_limit",
+        "passed": true
+      },
+      {
+        "actual_count": 2,
+        "expected_max": 8,
+        "name": "conflict_flags_within_limit",
+        "passed": true
+      },
+      {
+        "actual": [
+          [
+            "details",
+            "name",
+            "severity",
+            "status"
+          ],
+          [
+            "details",
+            "name",
+            "severity",
+            "status"
+          ]
+        ],
+        "expected": [
+          "name",
+          "severity",
+          "status",
+          "details"
+        ],
+        "name": "conflict_flags_have_required_fields",
+        "passed": true
+      },
+      {
+        "actual": [
+          "A high-risk event window is inside the next 14 days.",
+          "3x entries require confirmation because CPI/FOMC risk is near."
+        ],
+        "expected": [
+          "A high-risk event window is inside the next 14 days.",
+          "3x entries require confirmation because CPI/FOMC risk is near."
+        ],
+        "name": "risk_warnings_reflected_in_cautions",
+        "passed": true
+      },
+      {
+        "actual": [
+          "acknowledged",
+          "acknowledged"
+        ],
+        "expected": "acknowledged",
+        "name": "flagged_conflicts_are_acknowledged",
+        "passed": true
+      },
+      {
+        "actual": [
+          "reason_summary_within_limit",
+          "evidence_summary_within_limit",
+          "conflict_flags_within_limit",
+          "conflict_flags_have_required_fields",
+          "risk_warnings_reflected_in_cautions",
+          "flagged_conflicts_are_acknowledged",
+          "evidence_guard_check_names_match_expected_schema",
+          "evidence_guard_check_keys_match_expected_schema",
+          "evidence_guard_keys_match_expected_schema"
+        ],
+        "expected": [
+          "reason_summary_within_limit",
+          "evidence_summary_within_limit",
+          "conflict_flags_within_limit",
+          "conflict_flags_have_required_fields",
+          "risk_warnings_reflected_in_cautions",
+          "flagged_conflicts_are_acknowledged",
+          "evidence_guard_check_names_match_expected_schema",
+          "evidence_guard_check_keys_match_expected_schema",
+          "evidence_guard_keys_match_expected_schema"
+        ],
+        "name": "evidence_guard_check_names_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "default_check_names": [
+            "conflict_flags_have_required_fields",
+            "risk_warnings_reflected_in_cautions",
+            "flagged_conflicts_are_acknowledged",
+            "evidence_guard_check_names_match_expected_schema",
+            "evidence_guard_check_keys_match_expected_schema",
+            "evidence_guard_keys_match_expected_schema"
+          ],
+          "default_keys": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "special_check_keys": {
+            "conflict_flags_within_limit": [
+              "name",
+              "passed",
+              "expected_max",
+              "actual_count"
+            ],
+            "evidence_summary_within_limit": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ],
+            "reason_summary_within_limit": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ]
+          }
+        },
+        "expected": {
+          "default_check_names": [
+            "conflict_flags_have_required_fields",
+            "risk_warnings_reflected_in_cautions",
+            "flagged_conflicts_are_acknowledged",
+            "evidence_guard_check_names_match_expected_schema",
+            "evidence_guard_check_keys_match_expected_schema",
+            "evidence_guard_keys_match_expected_schema"
+          ],
+          "default_keys": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "special_check_keys": {
+            "conflict_flags_within_limit": [
+              "name",
+              "passed",
+              "expected_max",
+              "actual_count"
+            ],
+            "evidence_summary_within_limit": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ],
+            "reason_summary_within_limit": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ]
+          }
+        },
+        "name": "evidence_guard_check_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": [
+          "status",
+          "checks"
+        ],
+        "expected": [
+          "status",
+          "checks"
+        ],
+        "name": "evidence_guard_keys_match_expected_schema",
+        "passed": true
+      }
+    ],
+    "status": "ok"
+  },
+  "latest_signal_report": {
+    "action": "BUY_WATCH",
+    "action_label": "Watch for buy trigger",
+    "asset": "TQQQ",
+    "chart_ref": null,
+    "confidence": 0.7251,
+    "config_hash": "sha256:fdee9b496fee781bdc639ca869d72d8796a219e13708257054a96b0c6ec7388f",
+    "created_at": "2026-05-08T20:00:00Z",
+    "data_freshness_status": "FRESH",
+    "data_warnings": [],
+    "degraded_mode": false,
+    "entry_summary": "QQQ is a watch candidate; wait for confirmation before entry.",
+    "evidence_summary": "Policy tone is not loose, but volatility and rates are not worsening.; Semiconductor leadership remains constructive, but earnings risk is near.",
+    "final_score": 0.6657,
+    "invalidation_summary": "Setup invalidates if QQQ loses support with volatility expansion.",
+    "label_status": null,
+    "reason_summary": "BUY_WATCH comes from strongest component trend and weakest component event_safety; event risk remains explicit.",
+    "risk_summary": "Risk is mixed; confirmation is required before any leveraged entry.",
+    "signal_id": "sig_fixture_20260508_tqqq",
+    "stop_summary": "Stop is guided by QQQ closing below 542.53.",
+    "take_profit_summary": "Take profit is guided by QQQ reaching 585.74 or resistance exhaustion.",
+    "timeframe": "swing_3d_10d",
+    "underlying": "QQQ"
+  },
+  "live_data_required": false,
+  "prompt_contract": {
+    "llm_role": "Summarize conflicts, caveats, and final wording only.",
+    "must_include": [
+      "action",
+      "confidence",
+      "entry",
+      "stop",
+      "take_profit",
+      "risk",
+      "data_warnings"
+    ],
+    "numeric_authority": "Use MCP numeric fields as source of truth."
+  },
+  "report_payload_guard": {
+    "checks": [
+      {
+        "actual": "hermes_report.v1",
+        "expected": "hermes_report.v1",
+        "name": "report_payload_schema_version_matches_expected",
+        "passed": true
+      },
+      {
+        "actual": false,
+        "expected": false,
+        "name": "report_payload_live_data_required_matches_expected",
+        "passed": true
+      },
+      {
+        "actual": [
+          "schema_version",
+          "as_of",
+          "asset",
+          "underlying",
+          "timeframe",
+          "action",
+          "confidence_label",
+          "report_intent",
+          "latest_signal_report",
+          "sections",
+          "text",
+          "prompt_contract",
+          "delivery_contract",
+          "delivery_preview",
+          "evidence_contract",
+          "evidence_context",
+          "evidence_guard",
+          "report_intent_contract",
+          "report_contract_guard",
+          "source_signal_ref",
+          "live_data_required",
+          "report_payload_guard"
+        ],
+        "expected": [
+          "schema_version",
+          "as_of",
+          "asset",
+          "underlying",
+          "timeframe",
+          "action",
+          "confidence_label",
+          "report_intent",
+          "latest_signal_report",
+          "sections",
+          "text",
+          "prompt_contract",
+          "delivery_contract",
+          "delivery_preview",
+          "evidence_contract",
+          "evidence_context",
+          "evidence_guard",
+          "report_intent_contract",
+          "report_contract_guard",
+          "source_signal_ref",
+          "live_data_required",
+          "report_payload_guard"
+        ],
+        "name": "report_payload_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": [
+          "signal_id",
+          "run_id",
+          "config_hash"
+        ],
+        "expected": [
+          "signal_id",
+          "run_id",
+          "config_hash"
+        ],
+        "name": "report_payload_source_signal_ref_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "config_hash": "sha256:fdee9b496fee781bdc639ca869d72d8796a219e13708257054a96b0c6ec7388f",
+          "run_id_nonempty": true,
+          "signal_id": "sig_fixture_20260508_tqqq"
+        },
+        "expected": {
+          "config_hash": "sha256:fdee9b496fee781bdc639ca869d72d8796a219e13708257054a96b0c6ec7388f",
+          "run_id_nonempty": true,
+          "signal_id": "sig_fixture_20260508_tqqq"
+        },
+        "name": "report_payload_source_signal_ref_matches_report_identity",
+        "passed": true
+      },
+      {
+        "actual": {
+          "config_hash_sha256_prefix": true,
+          "run_id_nonempty": true,
+          "signal_id_nonempty": true
+        },
+        "expected": {
+          "config_hash_sha256_prefix": true,
+          "run_id_nonempty": true,
+          "signal_id_nonempty": true
+        },
+        "name": "report_payload_source_signal_ref_values_have_traceable_format",
+        "passed": true
+      },
+      {
+        "actual": {
+          "config_hash_digest_hex": true,
+          "config_hash_digest_length": 64
+        },
+        "expected": {
+          "config_hash_digest_hex": true,
+          "config_hash_digest_length": 64
+        },
+        "name": "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+        "passed": true
+      },
+      {
+        "actual": "pre_market_swing_report",
+        "expected": "pre_market_swing_report",
+        "name": "report_payload_intent_matches_contract",
+        "passed": true
+      },
+      {
+        "actual": {
+          "action": "BUY_WATCH",
+          "as_of": "2026-05-08T20:00:00Z",
+          "asset": "TQQQ",
+          "confidence_label": "medium",
+          "timeframe": "swing_3d_10d",
+          "underlying": "QQQ"
+        },
+        "expected": {
+          "action": "BUY_WATCH",
+          "as_of": "2026-05-08T20:00:00Z",
+          "asset": "TQQQ",
+          "confidence_label": "medium",
+          "timeframe": "swing_3d_10d",
+          "underlying": "QQQ"
+        },
+        "name": "report_payload_top_level_identity_matches_latest_signal_report",
+        "passed": true
+      },
+      {
+        "actual": {
+          "delivery_preview.guard": "ok",
+          "evidence_guard": "ok",
+          "report_contract_guard": "ok"
+        },
+        "expected": {
+          "delivery_preview.guard": "ok",
+          "evidence_guard": "ok",
+          "report_contract_guard": "ok"
+        },
+        "name": "report_payload_nested_guard_statuses_are_ok",
+        "passed": true
+      },
+      {
+        "actual": {},
+        "expected": {},
+        "name": "report_payload_optional_context_statuses_are_ok",
+        "passed": true
+      },
+      {
+        "actual": {},
+        "expected": {},
+        "name": "report_payload_optional_context_guards_are_ok",
+        "passed": true
+      },
+      {
+        "actual": [
+          "report_payload_schema_version_matches_expected",
+          "report_payload_live_data_required_matches_expected",
+          "report_payload_keys_match_expected_schema",
+          "report_payload_source_signal_ref_keys_match_expected_schema",
+          "report_payload_source_signal_ref_matches_report_identity",
+          "report_payload_source_signal_ref_values_have_traceable_format",
+          "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+          "report_payload_intent_matches_contract",
+          "report_payload_top_level_identity_matches_latest_signal_report",
+          "report_payload_nested_guard_statuses_are_ok",
+          "report_payload_optional_context_statuses_are_ok",
+          "report_payload_optional_context_guards_are_ok",
+          "report_payload_guard_check_names_match_expected_schema",
+          "report_payload_guard_keys_match_expected_schema",
+          "report_payload_guard_check_keys_match_expected_schema"
+        ],
+        "expected": [
+          "report_payload_schema_version_matches_expected",
+          "report_payload_live_data_required_matches_expected",
+          "report_payload_keys_match_expected_schema",
+          "report_payload_source_signal_ref_keys_match_expected_schema",
+          "report_payload_source_signal_ref_matches_report_identity",
+          "report_payload_source_signal_ref_values_have_traceable_format",
+          "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+          "report_payload_intent_matches_contract",
+          "report_payload_top_level_identity_matches_latest_signal_report",
+          "report_payload_nested_guard_statuses_are_ok",
+          "report_payload_optional_context_statuses_are_ok",
+          "report_payload_optional_context_guards_are_ok",
+          "report_payload_guard_check_names_match_expected_schema",
+          "report_payload_guard_keys_match_expected_schema",
+          "report_payload_guard_check_keys_match_expected_schema"
+        ],
+        "name": "report_payload_guard_check_names_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": [
+          "status",
+          "checks"
+        ],
+        "expected": [
+          "status",
+          "checks"
+        ],
+        "name": "report_payload_guard_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "report_payload_guard_check_keys_match_expected_schema": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_guard_check_names_match_expected_schema": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_guard_keys_match_expected_schema": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_intent_matches_contract": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_top_level_identity_matches_latest_signal_report": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_nested_guard_statuses_are_ok": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_optional_context_statuses_are_ok": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_optional_context_guards_are_ok": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_keys_match_expected_schema": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_source_signal_ref_keys_match_expected_schema": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_source_signal_ref_matches_report_identity": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_source_signal_ref_values_have_traceable_format": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_source_signal_ref_config_hash_digest_is_sha256": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_live_data_required_matches_expected": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "report_payload_schema_version_matches_expected": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ]
+        },
+        "expected": [
+          "name",
+          "passed",
+          "expected",
+          "actual"
+        ],
+        "name": "report_payload_guard_check_keys_match_expected_schema",
+        "passed": true
+      }
+    ],
+    "status": "ok"
+  },
+  "report_contract_guard": {
+    "checks": [
+      {
+        "actual": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "expected": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "name": "required_sections_present",
+        "passed": true
+      },
+      {
+        "actual": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "expected": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "name": "intent_required_sections_present",
+        "passed": true
+      },
+      {
+        "actual": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "expected": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "name": "report_sections_match_intent_order",
+        "passed": true
+      },
+      {
+        "actual": {
+          "found_sections": [
+            "Target",
+            "Decision",
+            "Reasons",
+            "Entry",
+            "Stop",
+            "Take Profit",
+            "Cautions"
+          ],
+          "positions": {
+            "Cautions": 734,
+            "Decision": 19,
+            "Entry": 353,
+            "Reasons": 82,
+            "Stop": 479,
+            "Take Profit": 604,
+            "Target": 0
+          },
+          "positions_ascending": true
+        },
+        "expected": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "name": "report_text_sections_match_intent_order",
+        "passed": true
+      },
+      {
+        "actual": "pre_market_swing_report",
+        "expected": [
+          "pre_market_swing_report",
+          "intraday_risk_watch",
+          "post_market_review"
+        ],
+        "name": "report_intent_is_supported",
+        "passed": true
+      },
+      {
+        "actual": [
+          "name",
+          "schedule_hint",
+          "decision_focus",
+          "required_sections"
+        ],
+        "expected": [
+          "name",
+          "schedule_hint",
+          "decision_focus",
+          "required_sections"
+        ],
+        "name": "report_intent_contract_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "decision_focus": "new_swing_entry_and_watchlist",
+          "name": "pre_market_swing_report",
+          "required_sections": [
+            "Target",
+            "Decision",
+            "Reasons",
+            "Entry",
+            "Stop",
+            "Take Profit",
+            "Cautions"
+          ],
+          "schedule_hint": "weekday_pre_market"
+        },
+        "expected": {
+          "decision_focus": "new_swing_entry_and_watchlist",
+          "name": "pre_market_swing_report",
+          "required_sections": [
+            "Target",
+            "Decision",
+            "Reasons",
+            "Entry",
+            "Stop",
+            "Take Profit",
+            "Cautions"
+          ],
+          "schedule_hint": "weekday_pre_market"
+        },
+        "name": "report_intent_contract_matches_registry",
+        "passed": true
+      },
+      {
+        "actual": [
+          "pre_market_swing_report",
+          "intraday_risk_watch",
+          "post_market_review"
+        ],
+        "expected": [
+          "pre_market_swing_report",
+          "intraday_risk_watch",
+          "post_market_review"
+        ],
+        "name": "delivery_cron_intents_match_report_intent_registry",
+        "passed": true
+      },
+      {
+        "actual": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "expected": [
+          "Target",
+          "Decision",
+          "Reasons",
+          "Entry",
+          "Stop",
+          "Take Profit",
+          "Cautions"
+        ],
+        "name": "telegram_required_sections_match_intent",
+        "passed": true
+      },
+      {
+        "actual": [
+          "action",
+          "confidence",
+          "entry",
+          "stop",
+          "take_profit",
+          "risk",
+          "data_warnings"
+        ],
+        "expected": [
+          "action",
+          "confidence",
+          "entry",
+          "stop",
+          "take_profit",
+          "risk",
+          "data_warnings"
+        ],
+        "name": "prompt_must_include_is_covered",
+        "passed": true
+      },
+      {
+        "actual": [
+          "action",
+          "confidence",
+          "entry",
+          "stop",
+          "take_profit",
+          "risk",
+          "data_warnings"
+        ],
+        "expected": [
+          "action",
+          "confidence",
+          "entry",
+          "stop",
+          "take_profit",
+          "risk",
+          "data_warnings"
+        ],
+        "name": "report_prompt_must_include_matches_intent_terms",
+        "passed": true
+      },
+      {
+        "actual": [
+          "numeric_authority",
+          "llm_role",
+          "must_include"
+        ],
+        "expected": [
+          "numeric_authority",
+          "llm_role",
+          "must_include"
+        ],
+        "name": "report_prompt_contract_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "llm_role": "Summarize conflicts, caveats, and final wording only.",
+          "numeric_authority": "Use MCP numeric fields as source of truth."
+        },
+        "expected": {
+          "llm_role": "Summarize conflicts, caveats, and final wording only.",
+          "numeric_authority": "Use MCP numeric fields as source of truth."
+        },
+        "name": "report_prompt_contract_identity_matches_expected",
+        "passed": true
+      },
+      {
+        "actual_chars": 863,
+        "expected_max_chars": 3900,
+        "name": "telegram_text_fits_single_message",
+        "passed": true
+      },
+      {
+        "actual": {
+          "hermes": false,
+          "telegram": false
+        },
+        "expected": false,
+        "name": "delivery_contract_has_no_network_side_effect",
+        "passed": true
+      },
+      {
+        "actual": {
+          "hermes": false,
+          "telegram": false
+        },
+        "expected": false,
+        "name": "delivery_contract_has_no_send_side_effect",
+        "passed": true
+      },
+      {
+        "actual": {
+          "channel_names": [
+            "hermes",
+            "telegram"
+          ],
+          "contract_keys": [
+            "channels",
+            "cron_intents"
+          ],
+          "hermes_channel_keys": [
+            "format",
+            "network_call",
+            "numeric_authority"
+          ],
+          "telegram_channel_keys": [
+            "schema_version",
+            "format",
+            "network_call",
+            "max_chars",
+            "required_sections",
+            "overflow_policy",
+            "section_separator",
+            "chunk_indexing",
+            "send_call"
+          ]
+        },
+        "expected": {
+          "channel_names": [
+            "hermes",
+            "telegram"
+          ],
+          "contract_keys": [
+            "channels",
+            "cron_intents"
+          ],
+          "hermes_channel_keys": [
+            "format",
+            "network_call",
+            "numeric_authority"
+          ],
+          "telegram_channel_keys": [
+            "schema_version",
+            "format",
+            "network_call",
+            "max_chars",
+            "required_sections",
+            "overflow_policy",
+            "section_separator",
+            "chunk_indexing",
+            "send_call"
+          ]
+        },
+        "name": "delivery_contract_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "hermes": "structured_json_plus_text",
+          "telegram": "plain_text"
+        },
+        "expected": {
+          "hermes": "structured_json_plus_text",
+          "telegram": "plain_text"
+        },
+        "name": "delivery_channel_formats_match_expected",
+        "passed": true
+      },
+      {
+        "actual": 3900,
+        "expected": 3900,
+        "name": "report_telegram_max_chars_matches_expected",
+        "passed": true
+      },
+      {
+        "actual": "telegram_report_format.v1",
+        "expected": "telegram_report_format.v1",
+        "name": "report_telegram_schema_version_matches_expected",
+        "passed": true
+      },
+      {
+        "actual": {
+          "chunk_indexing": "1_based",
+          "overflow_policy": "split_on_section_boundary",
+          "section_separator": "\n\n"
+        },
+        "expected": {
+          "chunk_indexing": "1_based",
+          "overflow_policy": "split_on_section_boundary",
+          "section_separator": "\n\n"
+        },
+        "name": "report_telegram_chunking_contract_matches_expected",
+        "passed": true
+      },
+      {
+        "actual": "latest_signal_report",
+        "expected": "latest_signal_report",
+        "name": "delivery_numeric_authority_is_latest_signal_report",
+        "passed": true
+      },
+      {
+        "actual": {
+          "confidence_line_present": true,
+          "decision_line_present": true,
+          "score_line_present": true
+        },
+        "expected": {
+          "action": "BUY_WATCH",
+          "confidence": 0.7251,
+          "final_score": 0.6657
+        },
+        "name": "report_text_reflects_latest_signal_numeric_fields",
+        "passed": true
+      },
+      {
+        "actual": [
+          "required_sections_present",
+          "intent_required_sections_present",
+          "report_sections_match_intent_order",
+          "report_text_sections_match_intent_order",
+          "report_intent_is_supported",
+          "report_intent_contract_keys_match_expected_schema",
+          "report_intent_contract_matches_registry",
+          "delivery_cron_intents_match_report_intent_registry",
+          "telegram_required_sections_match_intent",
+          "prompt_must_include_is_covered",
+          "report_prompt_must_include_matches_intent_terms",
+          "report_prompt_contract_keys_match_expected_schema",
+          "report_prompt_contract_identity_matches_expected",
+          "telegram_text_fits_single_message",
+          "delivery_contract_has_no_network_side_effect",
+          "delivery_contract_has_no_send_side_effect",
+          "delivery_contract_keys_match_expected_schema",
+          "delivery_channel_formats_match_expected",
+          "report_telegram_max_chars_matches_expected",
+          "report_telegram_schema_version_matches_expected",
+          "report_telegram_chunking_contract_matches_expected",
+          "delivery_numeric_authority_is_latest_signal_report",
+          "report_text_reflects_latest_signal_numeric_fields",
+          "report_contract_guard_check_names_match_expected_schema",
+          "report_contract_guard_check_keys_match_expected_schema",
+          "report_contract_guard_keys_match_expected_schema"
+        ],
+        "expected": [
+          "required_sections_present",
+          "intent_required_sections_present",
+          "report_sections_match_intent_order",
+          "report_text_sections_match_intent_order",
+          "report_intent_is_supported",
+          "report_intent_contract_keys_match_expected_schema",
+          "report_intent_contract_matches_registry",
+          "delivery_cron_intents_match_report_intent_registry",
+          "telegram_required_sections_match_intent",
+          "prompt_must_include_is_covered",
+          "report_prompt_must_include_matches_intent_terms",
+          "report_prompt_contract_keys_match_expected_schema",
+          "report_prompt_contract_identity_matches_expected",
+          "telegram_text_fits_single_message",
+          "delivery_contract_has_no_network_side_effect",
+          "delivery_contract_has_no_send_side_effect",
+          "delivery_contract_keys_match_expected_schema",
+          "delivery_channel_formats_match_expected",
+          "report_telegram_max_chars_matches_expected",
+          "report_telegram_schema_version_matches_expected",
+          "report_telegram_chunking_contract_matches_expected",
+          "delivery_numeric_authority_is_latest_signal_report",
+          "report_text_reflects_latest_signal_numeric_fields",
+          "report_contract_guard_check_names_match_expected_schema",
+          "report_contract_guard_check_keys_match_expected_schema",
+          "report_contract_guard_keys_match_expected_schema"
+        ],
+        "name": "report_contract_guard_check_names_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": {
+          "default_check_names": [
+            "required_sections_present",
+            "intent_required_sections_present",
+            "report_sections_match_intent_order",
+            "report_text_sections_match_intent_order",
+            "report_intent_is_supported",
+            "report_intent_contract_keys_match_expected_schema",
+            "report_intent_contract_matches_registry",
+            "delivery_cron_intents_match_report_intent_registry",
+            "telegram_required_sections_match_intent",
+            "prompt_must_include_is_covered",
+            "report_prompt_must_include_matches_intent_terms",
+            "report_prompt_contract_keys_match_expected_schema",
+            "report_prompt_contract_identity_matches_expected",
+            "delivery_contract_has_no_network_side_effect",
+            "delivery_contract_has_no_send_side_effect",
+            "delivery_contract_keys_match_expected_schema",
+            "delivery_channel_formats_match_expected",
+            "report_telegram_max_chars_matches_expected",
+            "report_telegram_schema_version_matches_expected",
+            "report_telegram_chunking_contract_matches_expected",
+            "delivery_numeric_authority_is_latest_signal_report",
+            "report_text_reflects_latest_signal_numeric_fields",
+            "report_contract_guard_check_names_match_expected_schema",
+            "report_contract_guard_check_keys_match_expected_schema",
+            "report_contract_guard_keys_match_expected_schema"
+          ],
+          "default_keys": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "special_check_keys": {
+            "telegram_text_fits_single_message": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ]
+          }
+        },
+        "expected": {
+          "default_check_names": [
+            "required_sections_present",
+            "intent_required_sections_present",
+            "report_sections_match_intent_order",
+            "report_text_sections_match_intent_order",
+            "report_intent_is_supported",
+            "report_intent_contract_keys_match_expected_schema",
+            "report_intent_contract_matches_registry",
+            "delivery_cron_intents_match_report_intent_registry",
+            "telegram_required_sections_match_intent",
+            "prompt_must_include_is_covered",
+            "report_prompt_must_include_matches_intent_terms",
+            "report_prompt_contract_keys_match_expected_schema",
+            "report_prompt_contract_identity_matches_expected",
+            "delivery_contract_has_no_network_side_effect",
+            "delivery_contract_has_no_send_side_effect",
+            "delivery_contract_keys_match_expected_schema",
+            "delivery_channel_formats_match_expected",
+            "report_telegram_max_chars_matches_expected",
+            "report_telegram_schema_version_matches_expected",
+            "report_telegram_chunking_contract_matches_expected",
+            "delivery_numeric_authority_is_latest_signal_report",
+            "report_text_reflects_latest_signal_numeric_fields",
+            "report_contract_guard_check_names_match_expected_schema",
+            "report_contract_guard_check_keys_match_expected_schema",
+            "report_contract_guard_keys_match_expected_schema"
+          ],
+          "default_keys": [
+            "name",
+            "passed",
+            "expected",
+            "actual"
+          ],
+          "special_check_keys": {
+            "telegram_text_fits_single_message": [
+              "name",
+              "passed",
+              "expected_max_chars",
+              "actual_chars"
+            ]
+          }
+        },
+        "name": "report_contract_guard_check_keys_match_expected_schema",
+        "passed": true
+      },
+      {
+        "actual": [
+          "status",
+          "checks"
+        ],
+        "expected": [
+          "status",
+          "checks"
+        ],
+        "name": "report_contract_guard_keys_match_expected_schema",
+        "passed": true
+      }
+    ],
+    "status": "ok"
+  },
+  "report_intent": "pre_market_swing_report",
+  "report_intent_contract": {
+    "decision_focus": "new_swing_entry_and_watchlist",
+    "name": "pre_market_swing_report",
+    "required_sections": [
+      "Target",
+      "Decision",
+      "Reasons",
+      "Entry",
+      "Stop",
+      "Take Profit",
+      "Cautions"
+    ],
+    "schedule_hint": "weekday_pre_market"
+  },
+  "schema_version": "hermes_report.v1",
+  "sections": [
+    {
+      "items": [
+        "TQQQ / QQQ"
+      ],
+      "title": "Target"
+    },
+    {
+      "items": [
+        "BUY_WATCH",
+        "medium confidence",
+        "score 0.6657"
+      ],
+      "title": "Decision"
+    },
+    {
+      "items": [
+        "BUY_WATCH comes from strongest component trend and weakest component event_safety; event risk remains explicit.",
+        "Policy tone is not loose, but volatility and rates are not worsening.; Semiconductor leadership remains constructive, but earnings risk is near."
+      ],
+      "title": "Reasons"
+    },
+    {
+      "items": [
+        "QQQ is a watch candidate; wait for confirmation before entry.",
+        "QQQ holds above MA20 or reclaims prior session high"
+      ],
+      "title": "Entry"
+    },
+    {
+      "items": [
+        "QQQ closes below 542.53",
+        "VIX/VXN expands with rates or DXY rising",
+        "No upside follow-through within three sessions"
+      ],
+      "title": "Stop"
+    },
+    {
+      "items": [
+        "QQQ reaches 585.74",
+        "QQQ tests the 20-day resistance near 564.96",
+        "RSI pushes above 70 while +DI becomes extended"
+      ],
+      "title": "Take Profit"
+    },
+    {
+      "items": [
+        "A high-risk event window is inside the next 14 days.",
+        "3x entries require confirmation because CPI/FOMC risk is near."
+      ],
+      "title": "Cautions"
+    }
+  ],
+  "source_signal_ref": {
+    "config_hash": "sha256:fdee9b496fee781bdc639ca869d72d8796a219e13708257054a96b0c6ec7388f",
+    "run_id": "run_fixture_20260508_swing",
+    "signal_id": "sig_fixture_20260508_tqqq"
+  },
+  "text": "Target: TQQQ / QQQ\nDecision: BUY_WATCH\nConfidence: medium (0.7251)\nScore: 0.6657\n\nReasons:\n- BUY_WATCH comes from strongest component trend and weakest component event_safety; event risk remains explicit.\n- Policy tone is not loose, but volatility and rates are not worsening.; Semiconductor leadership remains constructive, but earnings risk is near.\n\nEntry:\n- QQQ is a watch candidate; wait for confirmation before entry.\n- QQQ holds above MA20 or reclaims prior session high\n\nStop:\n- QQQ closes below 542.53\n- VIX/VXN expands with rates or DXY rising\n- No upside follow-through within three sessions\n\nTake Profit:\n- QQQ reaches 585.74\n- QQQ tests the 20-day resistance near 564.96\n- RSI pushes above 70 while +DI becomes extended\n\nCautions:\n- A high-risk event window is inside the next 14 days.\n- 3x entries require confirmation because CPI/FOMC risk is near.",
+  "timeframe": "swing_3d_10d",
+  "underlying": "QQQ"
+}

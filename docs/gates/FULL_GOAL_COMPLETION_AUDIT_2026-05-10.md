@@ -1,999 +1,580 @@
-# Full Goal Implementation Plan And Cross Review
+# Full Goal Completion Audit - 2026-05-10
 
-> Date: 2026-05-09  
-> Mode: staged implementation plan  
-> Source of truth: `docs/halo-swing-development-plan.md`  
-> Current baseline: offline MVP plus staged gates A-H, audit log, local audit web
-> viewer, Phase 6 attribution/ablation/OOS hardening, report intent variants,
-> position review report, delivery previews, evidence guards, and 156 passing tests
+## 1. Objective Restatement
 
-## 1. Objective
-
-Bring Halo Swing from the current offline MVP toward the full documented product goal while preserving these constraints:
-
-- deterministic offline harness remains the default test path
-- no automatic trading without explicit future approval
-- no secrets or runtime artifacts committed
-- reusable module boundaries stay stronger than one-off implementation
-- every phase adds tests, CLI harness coverage, and audit visibility
-
-## 2. Current Gap Summary
-
-Implemented and verified:
-
-- FastMCP server and JSON CLI harness
-- exact parity between health_check capabilities and MVP required tool manifest
-- fixture-backed market, macro, event, news, indicator, chart tools
-- Phase 1 market_snapshot.v1 core universe contract
-- fixture-backed `1d`/`4h`/`1h` indicator timeframe contract
-- Phase 1 swing level contract with gap/support/resistance and previous swing high/low
-- Phase 2 strategy_config validation contract with bounds/sum/hash checks
-- Phase 2 pullback and breadth component score contract
-- Phase 2 position_management.v1 position decision contract
-- Phase 3 macro filter contract with VIX/VXN/DXY/rate/oil block flags
-- Phase 3 event_policy.v1 CPI/FOMC/NFP/EARNINGS taxonomy contract
-- Phase 3 event danger window contract with summary and per-event block flags
-- Phase 4 news_source_policy.v1 source taxonomy contract
-- Phase 4 explicit news_score usage contract in score_leverage_swing
-- Phase 5 run_journal.v1 JSONL recording contract
-- Phase 5 signal_label_outcome.v1 MFE/MAE time-barrier metric contract
-- Phase 5 NO_DATA and INVALIDATED_BY_EVENT label outcome contract
-- leverage scoring, trade guide, position review
-- Phase 2 trade_guide.v1 time-exit contract
-- JSONL signal ledger and triple-barrier labeling
-- score performance, score calibration, component attribution, ablation, and Champion/Challenger comparison
-- deterministic 90-day fixture out-of-sample performance report
-- deterministic 180-day fixture out-of-sample performance report with `fixture_oos_window.v1`
-- Phase 6 unsupported long fixture window guard for requests beyond fixture coverage
-- walk-forward fixture folds and conservative overfit guard
-- Phase 6 deflated_sharpe_proxy.v1 conservative metric contract
-- Phase 6 challenger_config.v1 shadow candidate contract
-- Phase 6 feedback tool manifest covers evaluate_score_performance,
-  suggest_weight_update, and compare_champion_challenger
-- multimodal evidence modality and portable artifact refs
-- Phase 8 chart_artifact.v1 render_chart contract and guard
-- CHART ref slot artifact type guard
-- CHART artifact_ref declaration negative coverage
-- CHART artifact_ref reserved evidence_id guard
-- CHART artifact_ref renderer value type guard
-- CHART artifact_ref renderer value negative coverage
-- CHART artifact_ref renderer text safety guard
-- CHART artifact_ref ref_type DTO validation coverage
-- guarded manual PDF/document summary evidence input
-- guarded offline multimodal report context
-- multimodal_context.guard schema self-checks
-- multimodal_context payload key schema guard
-- multimodal_context artifact_refs schema guard
-- multimodal_context artifact_ref string field type guard
-- PDF artifact_ref ref_type field negative coverage
-- multimodal_context evidence_id uniqueness guard
-- multimodal_context evidence card reserved id guard
-- multimodal_context evidence card safe id guard
-- multimodal_context artifact_ref evidence id safe guard
-- multimodal_context evidence_id type guard
-- multimodal_context artifact_ref value uniqueness guard
-- multimodal_context CHART artifact ref PNG contract guard
-- multimodal_context CHART artifact ref offline location guard
-- multimodal_context CHART artifact ref file URI rejection coverage
-- multimodal_context CHART artifact ref tilde path rejection coverage
-- multimodal_context CHART machine-specific path rejection coverage
-- multimodal_context artifact_ref embedded local path marker guard
-- multimodal_context artifact_ref string safety guard
-- multimodal_context content-address digest format guard for CHART/PDF artifact refs
-- multimodal_context valid content-address acceptance coverage for CHART/PDF artifact refs
-- multimodal_context evidence card asset scope guard
-- multimodal_context evidence card categorical value guard
-- multimodal_context evidence card summary bounds guard
-- multimodal_context evidence card summary truncation consistency guard
-- multimodal_context evidence card impact context-only guard
-- multimodal_context artifact_ref ref_type contract guard
-- multimodal_context artifact_ref metadata per-entry schema guard
-- multimodal_context artifact_ref metadata schema guard
-- multimodal_context artifact_ref metadata value safety guard
-- multimodal_context artifact_ref metadata text string safety guard
-- multimodal_context modality_counts guard
-- multimodal_context evidence card key schema guard
-- multimodal_context artifact_ref identity guard
-- multimodal_context evidence card value safety guard
-- multimodal_context evidence card scalar string safety guard
-- multimodal_context evidence card text string safety guard
-- multimodal_context evidence card supported modality guard
-- document modality type negative coverage
-- document bias type negative coverage
-- document bias empty negative coverage
-- multimodal_context evidence card explicit artifact URI guard
-- multimodal_context PDF artifact ref contract guard
-- document PDF artifact_ref empty value negative coverage
-- document PDF artifact_ref ref_type empty negative coverage
-- document PDF metadata description nonempty negative coverage
-- document PDF metadata bool values negative coverage
-- document PDF metadata missing key negative coverage
-- CHART metadata missing key negative coverage
-- CHART metadata values negative coverage
-- CHART artifact_ref ref_type empty DTO validation coverage
-- CHART artifact_ref ref_type lowercase DTO validation coverage
-- CHART artifact_ref control character negative coverage
-- CHART artifact_ref duplicate value negative coverage
-- document evidence_id duplicate negative coverage
-- document evidence card source key schema negative coverage
-- document evidence card unexpected key schema negative coverage
-- PDF artifact_ref unexpected key schema negative coverage
-- PDF artifact_ref missing ref key negative coverage
-- PDF artifact_ref missing ref_type key negative coverage
-- PDF artifact_ref missing metadata key negative coverage
-- CHART artifact_ref missing metadata key negative coverage
-- CHART artifact_ref missing ref key DTO negative coverage
-- CHART artifact_ref missing ref_type key DTO negative coverage
-- CHART artifact_ref unexpected key DTO negative coverage
-- CHART metadata unexpected key negative coverage
-- PDF metadata unexpected key aggregate negative coverage
-- document artifact_ref missing key portable guard negative coverage
-- empty document artifact_ref dict collection negative coverage
-- artifact_ref collection coverage guard
-- null document artifact_ref collection negative coverage
-- multimodal_context evidence card observed_at UTC ISO timestamp guard
-- document observed_at type negative coverage
-- document observed_at nonempty negative coverage
-- multimodal_context evidence card observed_at temporal guard
-- multimodal_context evidence card asset_scope string safety guard
-- document asset_scope empty negative coverage
-- document asset_scope uppercase negative coverage
-- document invalidating_condition type negative coverage
-- document invalidating_condition nonempty negative coverage
-- document impact type negative coverage
-- document impact nonempty negative coverage
-- document category/source type negative coverage
-- document category/source empty negative coverage
-- document numeric type negative coverage
-- document numeric range negative coverage
-- document summary nonempty negative coverage
-- document modality nonempty negative coverage
-- multimodal_context artifact_ref ref_type canonical case guard
-- multimodal_context artifact_ref metadata value type guard
-- multimodal_context CHART metadata value type negative coverage
-- multimodal_context artifact_ref metadata non-dict negative coverage
-- CHART artifact_ref metadata DTO validation coverage
-- CHART artifact_ref scalar DTO validation coverage
-- multimodal_context evidence card string field type guard
-- multimodal_context evidence card structural field type guard
-- multimodal_context document artifact_ref structural negative coverage
-- multimodal_context evidence card numeric bool negative coverage
-- multimodal_context summary truncation flag type negative coverage
-- multimodal_context asset_scope value type negative coverage
-- multimodal_context evidence card invalidating_condition actionability guard
-- multimodal_context identity values guard
-- multimodal_context report intent variant coverage
-- multimodal_context document-only report intent variant coverage
-- JSONL audit log, audit tools, local audit web viewer
-- audit_log.v1 and audit_summary.v1 read tool payload contracts
-- shared tool registry
-- replay provider interface
-- JSONL signal repository contract
-- runtime watchdog, JSONL retention controls, and append-only runtime checkpoints
-- Phase 7 runtime tool manifest covers get_runtime_status and
-  record_runtime_checkpoint
-- deterministic Hermes-facing report harness with delivery contract guard
-- Phase 7 Telegram report format contract with section-separated chunks
-- delivery preview no-send guard for report and position review payloads
-- delivery preview no-network guard coverage for report and position review payloads
-- delivery preview Telegram format, max chunk size, and text preservation guard coverage
-- delivery preview guard check name schema guard verifies check names exactly match the expected schema
-- delivery contract no-send guard for report and position review guards
-- delivery contract no-network guard coverage for report and position review guards
-- report contract numeric authority guard for latest signal delivery
-- report text numeric field guard for latest signal and position review payloads
-- Hermes delivery preview payload_ref and numeric authority guard
-- Telegram delivery preview required section presence guard
-- Telegram delivery preview unrequested section absence guard
-- Telegram delivery preview 1-based sequential chunk index guard
-- Telegram delivery preview message count and single-message flag guard
-- Telegram delivery preview chunk char-count metadata guard
-- Telegram delivery preview nonempty chunk guard
-- Telegram delivery preview section separator reconstruction guard
-- Telegram delivery preview overflow policy section-boundary guard
-- intent-specific report sections and Telegram required sections for pre-market,
-  intraday risk, and post-market report variants
-- report_contract_guard verifies Telegram required_sections match selected report intent
-- cron prompt tool/input schema guard verifies prompt tool_name and input_json keys
-- cron prompt idempotency key guard verifies prompt identity and asset key templates
-- cron prompt idempotency text guard verifies prompt text references idempotency key templates
-- cron prompt expected sections text guard verifies prompt text references expected Telegram sections
-- cron prompt output schema guard verifies metadata and prompt text reference expected tool output schemas
-- cron prompt live data boundary guard verifies metadata and prompt text preserve no-live-data execution
-- cron prompt decision focus guard verifies metadata and prompt text reference decision_focus values
-- cron prompt supported intents registry guard verifies supported_report_intents matches the report intent registry
-- cron prompt pack identity guard verifies contract name and pack asset/timeframe identity
-- cron prompt position option contract guard verifies include_position_review matches the requested pack option
-- cron prompt pack top-level contract guard verifies schema_version and top-level live_data_required
-- cron prompt pack key schema guard verifies top-level pack keys exactly match the expected schema
-- cron prompt guard key schema guard verifies cron_prompt_guard keys exactly match the expected schema
-- cron prompt guard check name schema guard verifies cron_prompt_guard check names exactly match the expected schema
-- cron prompt guard check key schema guard verifies cron_prompt_guard check keys exactly match the expected schema
-- cron prompt manual setup registry guard verifies manual setup requirements exactly match the registry
-- cron prompt contract key schema guard verifies cron_prompt_contract keys exactly match the expected schema
-- cron prompt prompt key schema guard verifies each prompt object key schema exactly matches the expected schema
-- cron prompt schedule hint text guard verifies prompt text references schedule_hint values
-- cron prompt manual setup text guard verifies prompt text references unattended-run prerequisites
-- cron prompt scheduler setup prerequisite guard verifies prompt text declares manual setup before scheduler setup
-- cron prompt no-secret text guard verifies prompt text forbids credentials or secret values
-- cron prompt name text guard verifies prompt text references prompt names
-- cron prompt delivery path metadata guard verifies prompt text matches declared delivery_preview_path values
-- cron prompt Telegram format schema guard verifies metadata and prompt text reference telegram_report_format.v1
-- cron prompt numeric authority metadata guard verifies metadata and prompt text reference numeric authority values
-- cron prompt manual setup guard verifies unattended run prerequisites are declared
-- cron prompt no-secret credential guard verifies no credential requirement or secret return
-- cron prompt name set guard verifies only supported prompt names are emitted
-- cron prompt schedule hint guard verifies prompt schedule hints match report and position contracts
-- cron prompt tool/input text guard verifies prompt text matches declared tool and input metadata
-- cron prompt configured gateway text guard verifies prompt text requires the configured Hermes/Telegram gateway
-- cron prompt delivery preview text guard verifies prompt text references Telegram chunks
-- cron prompt numeric authority text guard verifies prompt text preserves numeric authority instructions
-- cron prompt order block text guard verifies every prompt text preserves no-order instructions
-- degraded report data_warnings are guarded for Cautions reflection
-- report_contract_guard verifies generated section order exactly matches the selected report intent required_sections
-- report_contract_guard verifies formatted report text section markers appear in selected intent order
-- report_contract_guard verifies report_intent_contract key schema exactly matches name/schedule_hint/decision_focus/required_sections
-- report_contract_guard verifies report_intent_contract values exactly match the REPORT_INTENTS registry
-- report_contract_guard verifies delivery contract cron_intents match REPORT_INTENTS registry order
-- report_contract_guard verifies delivery channel format values match expected Hermes and Telegram formats
-- report_contract_guard verifies Telegram delivery contract max_chars remains 3900
-- report_contract_guard verifies Telegram delivery contract schema_version remains telegram_report_format.v1
-- report_contract_guard verifies Telegram delivery contract chunking policy fields match expected values
-- report_contract_guard verifies prompt_contract must_include exactly matches selected report intent terms
-- report_contract_guard verifies prompt_contract key schema exactly matches numeric_authority/llm_role/must_include
-- report_contract_guard verifies prompt_contract numeric_authority and llm_role identity values
-- deterministic Hermes-facing position review report harness
-- position_review_guard verifies Telegram required_sections match position review contract
-- position_review_guard verifies position_review_contract required_sections match the canonical position review section schema
-- position_review_guard verifies position_review_contract order_submission remains false
-- position_review_guard verifies generated section order matches the position review contract
-- position_review_guard verifies prompt_contract must_include matches the expected position review terms
-- position_review_guard verifies prompt_contract key schema matches the expected schema
-- position_review_guard verifies prompt_contract numeric_authority and llm_role identity values
-- position_review_guard verifies Telegram delivery contract max_chars remains 3900
-- position_review_guard verifies Telegram delivery contract schema_version remains telegram_report_format.v1
-- position_review_guard verifies Telegram delivery contract chunking policy fields match expected values
-- position_review_guard verifies delivery channel format values match expected Hermes and Telegram formats
-- position_review_guard verifies delivery contract cron_intents match REPORT_INTENTS registry order
-- position_review_guard uses Telegram delivery contract max_chars for text length checks
-- offline Hermes cron prompt pack without scheduler side effects
-- cron prompt guard verifies prompt names are unique and ordered as report intents plus optional position_review
-- cron prompt guard verifies position_review expected_sections match the position review section contract
-- offline Hermes/Telegram delivery preview chunks for report payloads
-- position review payload guard verifies top-level summary fields match position_review identity values
-- position review payload guard verifies nested delivery_preview and position review guards are ok
-- latest signal report payload guard verifies report_intent matches report_intent_contract.name
-- latest signal report payload guard verifies top-level summary fields match latest_signal_report identity values
-- latest signal report payload guard verifies nested delivery_preview, evidence, and report contract guards are ok
-- latest signal report payload guard verifies optional chart and multimodal context statuses are ok when present
-- latest signal report payload guard verifies optional chart and multimodal nested guard statuses are ok when present
-- multimodal_context.guard verifies check names, check key schemas, and guard top-level keys
-- multimodal_context.guard verifies multimodal_context top-level key schema
-- multimodal_context.guard verifies evidence card and artifact_ref evidence_id values are nonempty and unique
-- multimodal_context.guard verifies document evidence ids do not use reserved context ids
-- multimodal_context.guard verifies document evidence ids match a safe lowercase ASCII underscore contract
-- multimodal_context.guard verifies artifact_ref evidence ids match a safe lowercase ASCII underscore contract
-- multimodal_context.guard verifies artifact_ref values are nonempty and unique
-- multimodal_context.guard verifies CHART artifact refs match the PNG suffix or sha256 content-address contract
-- multimodal_context.guard verifies CHART artifact refs use offline local, artifact://, or sha256 locations
-- multimodal_context.guard rejects CHART artifact refs that use file:// URI syntax
-- multimodal_context.guard rejects CHART artifact refs that use ~/ user-home syntax
-- multimodal_context.guard rejects CHART artifact refs that use /Users/ or drive-root machine-specific paths
-- multimodal_context.guard rejects artifact refs that embed local path markers inside otherwise allowed URI prefixes
-- multimodal_context.guard verifies artifact_ref values have no surrounding whitespace or ASCII control characters
-- multimodal_context.guard verifies sha256 content-addressed artifact refs include a 64-character hex digest
-- multimodal_context tests verify valid sha256 content-addressed CHART and PDF refs stay accepted
-- multimodal_context.guard verifies artifact_refs envelope and artifact_ref key schemas
-- multimodal_context.guard verifies artifact_ref ref_type values stay within the CHART/PDF contract
-- multimodal_context.guard verifies artifact_ref metadata key schema per artifact_ref entry
-- multimodal_context.guard verifies CHART and PDF artifact_ref metadata key schemas
-- multimodal_context.guard verifies CHART and PDF artifact_ref metadata safety values
-- multimodal_context.guard verifies PDF artifact_ref metadata description has no surrounding whitespace or ASCII control characters
-- multimodal_context.guard verifies modality_counts match chart and evidence card context
-- multimodal_context.guard verifies evidence card key schemas for document evidence context
-- multimodal_context.guard verifies document evidence modality stays on the supported pdf_summary contract
-- multimodal_context.guard verifies document evidence modality and observed_at have no surrounding whitespace or ASCII control characters
-- multimodal_context.guard verifies document evidence artifact_ref uses an explicit portable URI prefix
-- multimodal_context.guard verifies PDF artifact refs match the PDF suffix or sha256 content-address contract
-- multimodal_context.guard verifies document evidence observed_at is a parseable UTC ISO timestamp
-- multimodal_context.guard verifies document evidence observed_at is not after report created_at
-- multimodal_context.guard verifies document evidence asset_scope includes report asset and underlying
-- multimodal_context.guard verifies document evidence asset_scope values have no surrounding whitespace or ASCII control characters
-- multimodal_context.guard verifies document evidence summaries stay within normalized max length
-- multimodal_context.guard verifies summary_truncated flags match normalized summary length
-- multimodal_context.guard verifies document evidence invalidating_condition is non-placeholder and actionable
-- multimodal_context.guard verifies document evidence card category/source/bias categorical values
-- multimodal_context.guard verifies document evidence buy/sell impacts remain context_only
-- multimodal_context.guard verifies artifact_refs match chart and evidence card context
-- multimodal_context.guard verifies evidence card value safety for document evidence context
-- multimodal_context.guard verifies document evidence summary and invalidating_condition have no surrounding whitespace or ASCII control characters
-- multimodal_context.guard verifies identity values for schema_version, numeric_authority, and no-call/no-embed flags
-- non-default report intents preserve guarded multimodal context with chart and document evidence
-- non-default report intents preserve document-only guarded multimodal context without chart_code_guard
-- latest signal report evidence summary limits and conflict flags
-- optional chart ref and chart/code guard for reports
-- BTC-only Binance COIN-M guarded preview/execution path, portfolio snapshot normalizer, and local admin
-- BTC COIN-M emergency kill switch risk setting
-- offline integration readiness harness
-- integration readiness next_actions contract coverage
-- integration readiness payload schema contract coverage
-- integration readiness configured credential schema coverage
-- Binance credential status schema contract coverage
-- live order submission readiness gate, blocked by default until explicit
-  approval, live-trading env flag, credential/passphrase, permission
-  attestation, and kill-switch evidence are present
-- live data source readiness gate for market OHLCV, macro, and news source/API
-  decisions without adding live adapters
-- Telegram delivery readiness gate for bot-token/gateway decisions without
-  sending messages or storing credentials
-- Hermes MCP config readiness gate for config path and explicit registration
-  confirmation without starting Hermes
-
-Still blocked or not yet implemented:
-
-- SQLite/Postgres migrations and repository persistence
-- live market/news/macro adapters
-- Hermes/Telegram/crons
-- live Hermes multimodal call and Telegram delivery
-- Binance testnet read-only smoke with real testnet credentials
-- live order submission
-
-Required decisions before blocked scope:
-
-- `MIGRATION_GO` and `REPOSITORY_GO` for migrations and DB-backed persistence.
-- Live data source/API-key policy for market OHLCV, macro, and news adapters.
-- Hermes config path and Telegram credential/gateway choice.
-- Binance encrypted testnet credentials and manual passphrase procedure.
-- Explicit future approval before any live order submission.
-
-## 3. Team Plans
-
-### FE
-
-Plan:
-
-- Keep report-facing DTOs readable and compact.
-- Add audit web UI only for local inspection until auth exists.
-- Define future Telegram/report formatter after tool payloads stabilize.
-- Avoid dashboard-only schemas before storage/repository gates.
-
-Deliverables:
-
-- report snapshot contract
-- audit UI usability checks
-- Telegram report format draft after Hermes integration gate
-
-Risks:
-
-- if payloads keep growing without formatter boundary, Hermes-facing output will become noisy
-
-### BE
-
-Plan:
-
-- Introduce shared tool registry first.
-- Split provider interfaces before live data adapters.
-- Keep scoring/indicator logic transport-independent.
-- Add repository interfaces before database migrations.
-
-Deliverables:
-
-- `tool_registry.py`
-- provider interfaces for replay/live data
-- repository contracts for signal, audit, labels, strategy config, run journal
-
-Risks:
-
-- `server.py` and `harness.py` duplication can drift if registry is delayed
-- scoring module can become too broad as rules grow
-
-### DB
-
-Plan:
-
-- Do not write migrations until repository contracts and ID/timestamp policy are fixed.
-- Start with SQLite-compatible schema, but keep PostgreSQL portability.
-- Preserve replay/audit requirements before dashboard convenience.
-
-Deliverables:
-
-- repository contract review
-- migration gate packet
-- tmp_path SQLite migration tests after approval
-
-Risks:
-
-- JSONL runtime ledger lacks concurrency, indexing, retention, and transaction guarantees
-
-### AI LLM
-
-Plan:
-
-- Keep LLM out of numeric authority.
-- Define Hermes prompt/report contracts only after deterministic tool outputs are stable.
-- Add evidence summary limits and conflict flags.
-
-Deliverables:
-
-- Hermes report prompt templates
-- chart-vs-code conflict guard
-- evidence bundle size limits
-
-Risks:
-
-- overlong evidence can degrade Hermes report quality and increase hallucination risk
-
-### Security
-
-Plan:
-
-- Preserve secret redaction in audit logs.
-- Keep audit web viewer local-only until auth exists.
-- Add tests for no broker/live API imports in default path.
-- For future broker work, require read-only first and approval-required execution.
-
-Deliverables:
-
-- boundary tests
-- audit redaction tests
-- auth requirement before non-local audit viewer
-
-Risks:
-
-- exposing audit viewer beyond localhost without auth would leak strategy and signal history
-
-### DevOps
-
-Plan:
-
-- Keep all default tests offline.
-- Add documented smoke commands for every phase.
-- Add retention and supervisor docs before unattended cron.
-- Avoid committed `state/`, `artifacts/`, `data/`, DB files, or logs.
-
-Deliverables:
-
-- updated DevOps guide per phase
-- retention/watchdog config docs
-- Hermes config examples
-
-Risks:
-
-- live adapters without timeout/retry/circuit breaker would make cron unsafe
-
-### QC
-
-Plan:
-
-- Maintain fixture/golden coverage for every tool.
-- Add architecture boundary tests.
-- Add replay/live separation tests before live adapters.
-- Use tmp_path for all persistence tests.
-
-Deliverables:
-
-- tool registry tests
-- provider contract tests
-- repository contract tests
-- retention/watchdog tests
-
-Risks:
-
-- smoke-only live tests cannot substitute deterministic regression tests
-
-### Docs Gardener
-
-Plan:
-
-- Keep SSOT in `halo-swing-development-plan.md`.
-- Put gate packets under `docs/gates/`.
-- Keep `WORKING.md` as operational state only.
-- Avoid duplicating detailed implementation logic in durable docs.
-
-Deliverables:
-
-- phase gate packet updates
-- architecture report updates when major structure changes
-- DevOps command updates
-
-Risks:
-
-- stale docs can cause agents to reopen blocked scopes incorrectly
-
-### CTO
-
-Plan:
-
-- Proceed in staged gates.
-- Start with no-decision foundation: tool registry and boundary tests.
-- Require explicit user decisions before live APIs, DB migrations, Hermes/Telegram setup, or broker integration.
-
-Deliverables:
-
-- staged implementation order
-- go/no-go decisions per gate
-- final completion audit per phase
-
-Risks:
-
-- trying to implement full production scope in one pass would blur live-data, persistence, and execution risks
-
-## 4. Cross Review Results
-
-1. BE -> DevOps/QC:
-   Tool registry should come first because it reduces duplication across server, harness, health capabilities, and docs. QC agrees this is testable without external decisions.
-
-2. DB -> CTO:
-   Repository interfaces can be planned next, but migrations still need an explicit gate. CTO agrees no DDL until repository contracts are reviewed.
-
-3. Security -> FE/DevOps:
-   Audit web viewer must remain `127.0.0.1` by default. Any remote exposure needs auth and is out of current scope.
-
-4. AI LLM -> BE:
-   Hermes prompt contracts should depend on stable deterministic outputs, not raw tool internals. BE agrees to keep formatter/prompt layer separate.
-
-5. QC -> All:
-   Every future phase needs fixture tests and a CLI harness command. Live smoke can be added later but cannot be the only verification.
-
-6. Docs -> CTO:
-   SSOT should record phase outcomes, while detailed implementation plans belong in gate packets. CTO agrees.
-
-## 5. Staged Implementation Order
-
-### Stage A. Foundation Without User Decision
-
-Status: implemented and verified.
-
-Tasks:
-
-1. Add shared tool registry.
-2. Refactor `server.py`, `harness.py`, and `health.py` to use registry metadata.
-3. Add architecture boundary tests.
-4. Update docs and run full verification.
-
-Success criteria:
-
-- no tool capability drift between server, harness, and health
-- all existing tools still callable through CLI and server wrappers
-- tests pass offline
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/tool_registry.py` as canonical tool metadata and dispatch source.
-- Refactored health, CLI harness, and MCP server wrapper bodies to use registry-backed calls.
-- Preserved existing public FastMCP wrapper function names and signatures.
-- Added registry and architecture boundary tests in `tests/test_tool_registry.py`.
-
-Verification:
+User objective:
 
 ```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 36 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --audit-log-path /private/tmp/halo_swing_registry_verify.jsonl -> passed
+docs/halo-swing-development-plan.md의 개발 목표를 확인하고 개발 목표대로 개발한다.
 ```
 
-### Stage B. Provider Interface
+Concrete success means:
 
-Status: replay-only interface implemented and verified.
+- The documented Halo Swing MCP product goals are mapped to real artifacts.
+- Implementable offline/default-safe scope is built with tests and harnesses.
+- Blocked live, DB, Hermes/Telegram, and order-submission scope is not silently
+  treated as complete.
+- Every remaining gap has a concrete gate, required decision, or environment
+  prerequisite.
 
-Tasks:
-
-1. Introduce replay provider interface for market/macro/events/news. Done.
-2. Move fixture data behind provider methods. Done.
-3. Keep current tool outputs stable. Done.
-4. Add provider contract tests. Done.
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/providers.py`.
-- Added `MarketDataProvider` protocol and `ReplayMarketDataProvider`.
-- Routed market snapshot, macro snapshot, event calendar, news bundle, indicator, and chart data reads through the default replay provider.
-- Kept scoring rules and public tool payload contracts unchanged.
-- Added provider contract coverage in `tests/test_providers.py`.
-
-Verification:
+Conclusion:
 
 ```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 38 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","TQQQ"]}' --audit-log-path /private/tmp/halo_swing_provider_verify.jsonl -> passed
+overall_goal_complete: false
+reason: multiple documented product requirements still require user/environment
+        decisions or future hard-gate approval
 ```
 
-Decision needed before live implementation:
+Do not mark the active goal complete until the blocked rows below are resolved
+or explicitly removed from the product objective.
 
-- Which live data source should be used for OHLCV and macro data?
-- Which news/feed sources are acceptable?
-- Are API keys available, and where should they be configured?
+## 2. Prompt-To-Artifact Checklist
 
-### Stage C. Repository Contract
+| Requirement / Gate | Evidence Inspected | Status | Gap / Next Requirement |
+| --- | --- | --- | --- |
+| Read and follow `docs/halo-swing-development-plan.md` | SSOT sections 1, 2.2, 4, 5, 3.23-3.33; `docs/WORKING.md` current directive | Verified | Continue using SSOT plus gate packets before code changes. |
+| Deterministic offline harness default | `src/halo_swing_mcp/harness.py`, `src/halo_swing_mcp/tool_registry.py`, `src/halo_swing_mcp/server.py`, `tests/test_tool_registry.py`, `tests/test_mvp_tools.py`, exact parity between `health_check.capabilities` and `tests/golden/mvp_tool_contracts.json` required tools, direct ordered parity between MVP `required_tools` and `tool_registry.tool_names()`, exact parity between `@mcp.tool()` server wrappers and `tool_registry.tool_names()`, exact parity between MCP wrapper names and registry dispatch strings, exact parity between MCP wrapper parameters and same-named payload bindings, exact parity between MCP wrapper parameters and registered implementation signatures, unique ordered ToolSpec registry with callable functions and nonempty descriptions, `audit_log.v1`/`audit_summary.v1` read tool contracts | Verified | Keep live smoke separate from deterministic regression tests. |
+| No automatic trading as MVP default | `src/halo_swing_mcp/binance_btc.py`, `tests/test_binance_btc.py`, readiness gates | Verified | Live submission still requires explicit future approval. |
+| No secrets or runtime artifacts committed | audit redaction tests, credential status masking, artifact audit | Verified | Local ignored `state/` may exist; do not commit runtime files. |
+| Phase 0 project/server/health/harness/devops | `src/halo_swing_mcp/server.py`, `tools/health.py`, `.env.example`, `README.md`, `docs/devops-setup-guide.md` | Verified with scope caveat | P0 SQLite connection was intentionally deferred by later P0/P1 storage policy. |
+| Phase 1 market data and indicator engine | `tools/market.py`, `indicators.py`, `providers.py`, `tests/test_mvp_tools.py`, `tests/test_providers.py`, `market_snapshot.v1` for QQQ/SPY/SMH/SOXX/BTC, fixture-backed `1d`/`4h`/`1h` timeframe contract, `swing_level_contract`, gap/support/resistance and previous swing high/low fields | Replay verified | Live OHLCV source and persistent `feature_store` remain blocked by live-data and DB gates. |
+| Phase 2 leveraged ETF swing guide | `tools/scoring.py`, `strategy.py`, `tests/test_mvp_tools.py`, `strategy_config_contract`, `trade_guide.v1`, `position_management.v1`, `time_exit_conditions`, component score contract for trend/pullback/momentum/breadth/volatility/macro/event/theme | Verified for QLD/TQQQ/SSO/UPRO/SOXL fixture universe | Future live behavior depends on live data source decisions. |
+| Phase 3 macro/event filter | `get_macro_snapshot`, `macro_filter_summary`, macro block flags, `get_event_calendar`, `event_policy.v1` covering CPI/FOMC/NFP/EARNINGS, high-event-risk 3x block coverage, `event_window_summary`, per-event `danger_window` | Fixture verified | Live macro source/API and exact event feed policy remain blocked. |
+| Phase 4 news/policy/geopolitical engine | `get_news_bundle`, evidence cards, `news_source_policy.v1` covering Fed/Treasury/White House/EIA/Iran-Hormuz/AI-semiconductor fixture groups, `news_score_contract`, `news_score`, `policy_score`, `geopolitical_score`, `ai_semiconductor_theme_score`, `score_leverage_swing.news_usage_contract` | Fixture verified | Live RSS/API collection and external source policy remain blocked. |
+| Phase 5 signal recording and labeling | `tools/recording.py`, `signal_repository.py`, `tests/test_signal_repository.py`, `tests/test_mvp_tools.py`, `run_journal.v1`, `signal_label_outcome.v1`, MFE/MAE/realized_R time-barrier metric contract, label outcomes `TAKE_PROFIT_FIRST`/`STOP_LOSS_FIRST`/`TIME_EXIT`/`NO_DATA`/`INVALIDATED_BY_EVENT` | JSONL verified | DB-backed `signal_ledger`/`label_store`/`run_journal` remains blocked until `MIGRATION_GO` and `REPOSITORY_GO`. |
+| Phase 6 scoring feedback pipeline | `evaluate_score_performance(days=90)`, `evaluate_score_performance(days=180)`, `evaluate_score_performance(days=365)` unsupported-window guard, `fixture_oos_window.v1`, explicit `score_calibration`, component attribution, ablation report, 90-day and 180-day fixture OOS reports, coverage gap metadata for requests beyond fixture coverage, walk-forward fixture folds, `overfit_guard`, `deflated_sharpe_proxy.v1`, `suggest_weight_update`, `challenger_config.v1`, `compare_champion_challenger`, promotion report, `tests/golden/mvp_tool_contracts.json` required tool manifest, `tests/test_mvp_tools.py` | Offline MVP verified | Durable strategy repository and real out-of-sample datasets remain blocked by repository/live-data decisions. |
+| Phase 7 Hermes integration | DevOps MCP config example, `generate_latest_signal_report`, `generate_position_review_report`, `generate_cron_prompt_pack`, intent-specific report sections for `pre_market_swing_report`/`intraday_risk_watch`/`post_market_review`, intent-aligned prompt contracts, cron prompt input/section alignment, cron prompt tool/input schema guard, cron prompt idempotency key guard, cron prompt idempotency text guard, cron prompt expected sections text guard, cron prompt position review sections guard, cron prompt output schema guard, cron prompt live data boundary guard, cron prompt decision focus guard, cron prompt supported intents registry guard, cron prompt pack identity guard, cron prompt position option contract guard, cron prompt pack top-level contract guard, cron prompt pack key schema guard, cron prompt guard key schema guard, cron prompt guard check key schema guard, cron prompt guard check name schema guard, cron prompt manual setup registry guard, cron prompt contract key schema guard, cron prompt prompt key schema guard, cron prompt schedule hint text guard, cron prompt manual setup text guard, cron prompt scheduler setup prerequisite guard, cron prompt no-secret text guard, cron prompt name text guard, cron prompt delivery path metadata guard, cron prompt Telegram format schema guard, cron prompt numeric authority metadata guard, cron prompt manual setup guard, cron prompt no-secret credential guard, cron prompt name set guard, cron prompt ordered unique prompt name guard, cron prompt schedule hint guard, cron prompt tool/input text guard, cron prompt configured gateway text guard, cron prompt delivery preview text guard, cron prompt numeric authority text guard, cron prompt order block text guard, report sections intent order guard, report intent contract key schema guard, report intent contract registry guard, report delivery contract, intent-aligned `telegram_report_format.v1` required sections with guard parity, report prompt exact must_include guard, report prompt contract key schema guard, report prompt contract identity guard, position review Telegram required section guard parity, position review max_chars contract guard, position review delivery cron intents registry guard, position review contract key schema guard, position review contract no-network guard, position review contract identity guard, position review contract required sections guard, delivery contract no-send/no-network guard coverage, delivery contract key schema guard, report and position review guard check name schema guard, report and position review guard check key schema guard, report contract numeric authority guard, report delivery cron intents registry guard, report delivery channel format guard, report Telegram max_chars identity guard, report Telegram schema_version guard, report Telegram chunking contract guard, report text numeric field guard, `delivery_preview`, delivery preview no-send/no-network guard, delivery preview Telegram format/max chunk/text preservation guard coverage, delivery preview guard check name schema guard, delivery preview guard check key schema guard, delivery preview payload key schema guard, Hermes payload_ref/numeric authority preview guard, Telegram required section presence preview guard, Telegram unrequested section absence preview guard, Telegram 1-based chunk index preview guard, Telegram message count preview guard, Telegram chunk char-count preview guard, Telegram nonempty chunk preview guard, Telegram section separator preview guard, Telegram overflow policy section-boundary guard, `evidence_guard`, evidence guard check name schema guard, evidence guard check key schema guard, report/position/evidence guard top-level key schema guard, report/position payload key schema guard, report/position payload schema/live-data guard, report/position payload guard check name schema guard, report/position payload guard check key schema guard, report/position payload guard top-level key schema guard, position payload top-level identity guard, position payload nested guard status guard, report payload intent contract guard, report payload top-level identity guard, report payload nested guard status guard, report payload optional context status guard, report payload optional context guard-status guard, report payload source signal ref key schema guard, report payload source signal ref identity guard, report payload source signal ref trace format guard, report payload source signal ref config hash digest guard, degraded `data_warnings` Cautions reflection guard, report/position guards, runtime guard, `get_runtime_status`, `record_runtime_checkpoint`, MVP required tool manifest coverage, readiness gate | Harness verified | Real Hermes config path, Telegram credential/gateway, and scheduler/crons require user environment decision. |
+| Phase 8 multimodal extension | `render_chart`, `chart_artifact_contract`, `chart_artifact_guard`, optional `chart_ref`, `chart_code_guard`, CHART ref slot artifact type guard, CHART artifact_ref declaration negative coverage, CHART artifact_ref reserved evidence_id guard, CHART artifact_ref renderer value type guard, CHART artifact_ref renderer value negative coverage, CHART artifact_ref renderer text safety guard, CHART artifact_ref ref_type DTO validation coverage, evidence card `modality`, portable `artifact_ref`, `create_document_evidence_card`, document summary input guard, `multimodal_context`, `multimodal_context` payload key schema guard, `multimodal_context` artifact ref schema guard, `multimodal_context` artifact_ref string field type guard, PDF artifact_ref ref_type field negative coverage, `multimodal_context` evidence_id uniqueness guard, `multimodal_context` evidence card reserved id guard, `multimodal_context` evidence card safe id guard, `multimodal_context` artifact_ref evidence id safe guard, `multimodal_context` evidence_id type guard, `multimodal_context` artifact_ref value uniqueness guard, `multimodal_context` CHART artifact ref PNG contract guard, `multimodal_context` CHART artifact ref offline location guard, `multimodal_context` CHART artifact ref file URI rejection coverage, `multimodal_context` CHART artifact ref tilde path rejection coverage, `multimodal_context` CHART machine-specific path rejection coverage, `multimodal_context` artifact_ref embedded local path marker guard, `multimodal_context` artifact_ref string safety guard, `multimodal_context` content-address digest format guard, `multimodal_context` valid content-address acceptance coverage, `multimodal_context` evidence card supported modality guard, document modality type negative coverage, document modality nonempty negative coverage, document bias type negative coverage, `multimodal_context` evidence card explicit artifact URI guard, `multimodal_context` PDF artifact ref contract guard, `multimodal_context` evidence card observed_at UTC ISO timestamp guard, document observed_at type negative coverage, document observed_at nonempty negative coverage, `multimodal_context` evidence card observed_at temporal guard, `multimodal_context` evidence card asset scope guard, document asset_scope empty negative coverage, `multimodal_context` evidence card asset_scope string safety guard, `multimodal_context` asset_scope value type negative coverage, `multimodal_context` evidence card invalidating_condition actionability guard, document invalidating_condition type negative coverage, `multimodal_context` evidence card categorical value guard, document category/source type negative coverage, `multimodal_context` evidence card summary bounds guard, document summary nonempty negative coverage, `multimodal_context` evidence card summary truncation consistency guard, `multimodal_context` evidence card impact context-only guard, document impact type negative coverage, `multimodal_context` evidence card scalar string safety guard, `multimodal_context` evidence card text string safety guard, `multimodal_context` evidence card string field type guard, `multimodal_context` evidence card structural field type guard, `multimodal_context` document artifact_ref structural negative coverage, `multimodal_context` evidence card numeric bool negative coverage, document numeric type negative coverage, document numeric range negative coverage, `multimodal_context` summary truncation flag type negative coverage, `multimodal_context` artifact_ref metadata text string safety guard, `multimodal_context` artifact_ref ref_type contract guard, `multimodal_context` artifact_ref ref_type canonical case guard, `multimodal_context` artifact metadata per-entry schema guard, `multimodal_context` artifact metadata schema guard, `multimodal_context` artifact metadata value guard, `multimodal_context` artifact metadata value type guard, `multimodal_context` CHART metadata value type negative coverage, `multimodal_context` artifact_ref metadata non-dict negative coverage, CHART artifact_ref metadata DTO validation coverage, CHART artifact_ref scalar DTO validation coverage, `multimodal_context` modality count guard, `multimodal_context` evidence card key schema guard, `multimodal_context` artifact_ref identity guard, `multimodal_context` evidence card value safety guard, `multimodal_context` identity values guard, non-default report intent multimodal coverage, non-default document-only multimodal coverage, multimodal evidence/report guards, `multimodal_context.guard` schema self-checks, report/tests | Partial verified | Live Hermes multimodal call, real PDF/image parsing, and default chart policy remain deferred. |
+| Phase 9 order integration | BTC-only Binance COIN-M module, local admin, preview, position-aware preview effect, read-only account tools, offline portfolio snapshot normalizer, safety guards, emergency kill switch, `binance_credential_policy.v1` trade-only/no-withdraw contract, guarded BTC tool manifest coverage, `live_order_submission` readiness gate | Guarded path verified; live smoke blocked | Testnet read-only smoke needs real encrypted testnet credentials and manual passphrase. Live submission needs explicit future approval, live-trading env flag, and operator permission attestation. |
+| P1 storage/schema gate | `docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md` | Readiness recorded no-go | No migrations, DDL, schema runner, or DB connection until `MIGRATION_GO`; no DB repository persistence until `REPOSITORY_GO`. |
+| Integration readiness | `src/halo_swing_mcp/tools/readiness.py`, `tests/test_readiness.py` | Verified | Tool correctly reports blocked `hermes_mcp_config_readiness.v1`, `telegram_delivery_readiness.v1`, migration, repository, Binance read-only, live-order, and `live_data_source_readiness.v1` market/macro/news gates. Top-level `next_actions` is now contract-tested against gate missing reasons and empty ready-state guidance. |
 
-Status: JSONL signal ledger contract implemented and verified.
+Integration readiness latest audit addendum:
 
-Scope decision recorded on 2026-05-10:
+- Binance credential status schema contract coverage is verified by
+  `tests/test_binance_btc.py::test_binance_credential_status_exposes_trade_only_policy_without_secrets`.
+- The coverage proves direct and registry-backed `get_binance_credentials_status`
+  outputs keep missing/configured credential status schemas stable, include only
+  safe kdf/cipher metadata, and exclude api_secret, raw api_key, passphrase,
+  salt_b64, and encrypted token values.
+- configured credential schema coverage is verified by
+  `tests/test_readiness.py::test_integration_readiness_configured_credential_schema_is_stable`.
+- The coverage proves encrypted Binance credential metadata returns only safe
+  configured status fields, api key hint, timestamp, kdf/cipher names, and
+  policy metadata while excluding api_secret, passphrase, salt_b64, and encrypted
+  token values.
+- payload schema contract coverage is verified by
+  `tests/test_readiness.py::test_integration_readiness_payload_schema_is_stable`.
+- The coverage proves top-level payload keys, gate order, gate envelope keys,
+  gate evidence keys, missing Binance credential status keys, and Binance
+  credential policy keys remain stable without returning secrets or performing
+  external side effects.
+- next_actions contract coverage is verified by
+  `tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults`
+  and `tests/test_readiness.py::test_integration_readiness_uses_safe_local_evidence`.
+- The coverage proves top-level operator guidance mirrors blocked gate missing
+  reasons in gate order and becomes empty when all gates are ready with safe
+  local evidence, without starting Hermes, sending Telegram, calling Binance,
+  exposing credentials, adding live adapters, or submitting orders.
 
-- Continue JSONL for the existing runtime signal ledger until a separate
-  migration gate records DB direction.
-- Keep fixture/text signal IDs and caller-supplied UTC ISO-8601 timestamps.
-- Do not add SQLite, migrations, schema runners, or repository-backed DB
-  persistence in this stage.
+Phase 8 latest audit addendum:
 
-Tasks:
+- null document artifact_ref collection negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_null_document_artifact_ref`.
+- The coverage proves present-but-null document artifact_ref values are included
+  in artifact_refs collection and conflict through artifact_ref schema,
+  portable-ref safety, explicit URI, structural type, and payload optional-context
+  guards instead of being silently omitted.
+- artifact_ref collection coverage guard is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_artifact_ref_dict`
+  and `tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key`.
+- The guard independently compares evidence card ids with artifact_ref keys
+  against non-chart artifact_refs evidence ids, reducing reliance on the same
+  collection helper for expected and actual context.
+- empty document artifact_ref dict collection negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_artifact_ref_dict`.
+- The coverage proves present-but-empty document artifact_ref dicts are included
+  in artifact_refs collection and conflict through artifact_ref context/schema,
+  string field type, ref type contract, ref value, value safety, and explicit
+  URI guards instead of being silently omitted.
+- document artifact_ref missing key portable guard negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_artifact_ref_key`
+  and `tests/test_reporting.py::test_latest_signal_report_rejects_empty_pdf_artifact_ref_value`.
+- The coverage proves blank refs are non-portable and missing document
+  artifact_ref keys conflict through evidence card schema, value safety,
+  explicit URI, and structural guards even when artifact_refs collection omits
+  the card.
+- PDF metadata unexpected key aggregate negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_pdf_metadata_key`.
+- The coverage proves aggregate metadata schema and per-entry metadata schema
+  guards conflict while PDF contract, metadata value safety, and metadata
+  value-type guards remain ok.
+- CHART metadata unexpected key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_chart_metadata_key`.
+- The coverage proves exact metadata schema and per-entry metadata schema
+  guards conflict while PNG, metadata value safety, and metadata value-type
+  guards remain ok.
+- CHART artifact_ref unexpected key DTO negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_chart_artifact_ref_key`.
+- The coverage proves `LatestSignalReport` rejects unexpected
+  `chart_ref.mime_type` before downstream artifact schema, PNG,
+  offline-location, metadata, or multimodal guard assumptions.
+- CHART artifact_ref missing ref_type key DTO negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_type_key`.
+- The coverage proves `LatestSignalReport` rejects missing `chart_ref.ref_type`
+  before downstream artifact type, canonical uppercase, PNG, or multimodal
+  guard assumptions.
+- CHART artifact_ref missing ref key DTO negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_value_key`.
+- The coverage proves `LatestSignalReport` rejects missing `chart_ref.ref`
+  before downstream URI, PNG, offline-location, or multimodal guard assumptions.
+- CHART artifact_ref missing metadata key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_artifact_ref_metadata_key`.
+- The coverage proves DTO defaulting keeps artifact_ref schema valid while
+  metadata schema, per-entry schema, value, and value-type guards conflict.
+- PDF artifact_ref missing metadata key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_metadata_key`.
+- The coverage proves a missing required `metadata` key trips artifact_ref
+  schema, metadata schema, per-entry schema, value, and value-type guards.
+- PDF artifact_ref missing ref_type key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_type_key`.
+- The coverage proves a missing required `ref_type` key trips artifact_ref
+  schema, string type, ref_type contract, and canonical uppercase guards.
+- PDF artifact_ref missing ref key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_artifact_ref_value_key`.
+- The coverage proves a missing required `ref` key trips artifact_ref schema,
+  string type, nonempty ref, explicit URI, and PDF contract guards.
+- PDF artifact_ref unexpected key schema negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_pdf_artifact_ref_key`.
+- The coverage proves an unexpected `mime_type` top-level key trips the
+  artifact_ref key schema while ref/type/PDF/metadata guards stay ok.
+- document unexpected key schema negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unexpected_document_card_key`.
+- The coverage proves an unexpected `raw_text` top-level key trips the evidence
+  card key schema while value/type/categorical guards stay ok.
+- document source key schema negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_document_source_key`.
+- The coverage proves a missing required `source` key trips the evidence card
+  key schema, string type, and categorical guards before downstream assumptions.
+- document evidence_id duplicate negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_duplicate_document_evidence_ids`.
+- The coverage proves reserved-id and artifact_ref value uniqueness guards stay
+  ok while evidence card and artifact_ref evidence_id uniqueness conflict.
+- CHART artifact_ref duplicate value negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_duplicate_chart_artifact_ref_values`.
+- The coverage proves artifact_ref evidence ids stay unique while artifact_ref
+  value uniqueness conflicts.
+- CHART artifact_ref control character negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_chart_artifact_ref_with_control_character`.
+- The coverage proves chart PNG contract and offline-location guards stay ok
+  while artifact_ref string safety conflicts.
+- CHART artifact_ref ref_type lowercase DTO validation coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_lowercase_chart_artifact_ref_type`.
+- The coverage proves `LatestSignalReport` DTO rejects invalid non-canonical
+  enum-string `chart_ref.ref_type` before malformed report payload emission.
+- CHART artifact_ref ref_type empty DTO validation coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_chart_artifact_ref_type`.
+- The coverage proves `LatestSignalReport` DTO rejects invalid enum-string
+  `chart_ref.ref_type` before malformed report payload emission.
+- CHART metadata values negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unsafe_chart_metadata_values`.
+- The coverage proves chart PNG contract and metadata schema stay ok while
+  metadata value safety and exact value/type guards conflict.
+- CHART metadata missing key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_chart_metadata_key`.
+- The coverage proves chart PNG contract stays ok while metadata schema,
+  per-entry schema, value safety, and exact value/type guards conflict.
+- document PDF metadata missing key negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_missing_pdf_metadata_key`.
+- The coverage proves metadata schema, per-entry schema, value safety, and
+  exact value/type guards conflict while text safety stays ok.
+- document PDF metadata bool values negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_unsafe_pdf_metadata_bool_values`.
+- The coverage proves metadata schema and text safety guards stay ok while
+  metadata value safety and exact bool-value strictness conflict.
+- document PDF metadata description nonempty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_pdf_metadata_description`.
+- The coverage proves metadata schema, value type, and text trim/control guards
+  stay ok while metadata value safety conflicts on `description_nonempty`.
+- document PDF artifact_ref ref_type empty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_pdf_artifact_ref_type`.
+- The coverage proves explicit URI and artifact_ref string type guards stay ok
+  while artifact type contract and canonical uppercase guards conflict.
+- document PDF artifact_ref empty value negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_pdf_artifact_ref_value`.
+- The coverage proves artifact_ref string type and trim/control guards stay ok
+  while nonempty, explicit URI, and PDF contract guards conflict.
+- document asset_scope uppercase negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_lowercase_document_asset_scope`.
+- The coverage proves structural type, asset scope matching, and
+  asset_scope trim/control guards stay ok while uppercase value safety
+  conflicts.
+- document bias empty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_evidence_bias`.
+- The coverage proves value safety and strict string field type guards stay ok
+  while the categorical bias allowed-set guard conflicts.
+- document category/source empty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_category_source`.
+- The coverage proves value safety and strict string field type guards stay ok
+  while category/source identity categorical guard conflicts.
+- document impact nonempty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_document_evidence_impact`.
+- The coverage proves string type stays ok while impact presence,
+  context-only, and value safety guards conflict.
+- document invalidating_condition nonempty negative coverage is verified by
+  `tests/test_reporting.py::test_latest_signal_report_rejects_empty_invalidating_condition`.
+- The coverage proves string type and text trim/control guards stay ok while
+  invalidating_condition presence, actionability, and value safety guards
+  conflict.
+- This remains offline-only; no parser, Hermes multimodal call, remote fetch,
+  field normalization, live adapter, scheduler, credential, or artifact
+  embedding was added.
 
-1. Define signal ledger repository interface. Done.
-2. Keep JSONL adapter as the only implementation. Done.
-3. Move record/label/evaluate tools behind the repository boundary. Done.
-4. Add tmp_path repository contract tests. Done.
+## 3. Current Blockers
 
-Implementation record:
+These are real blockers, not test failures:
 
-- Added `src/halo_swing_mcp/signal_repository.py`.
-- Added `SignalLedgerRepository` protocol and `JsonlSignalLedgerRepository`.
-- Refactored `record_signal`, `label_signal_outcome`, and
-  `evaluate_score_performance` to use the repository boundary.
-- Added `tests/test_signal_repository.py`.
+- `MIGRATION_GO` and `REPOSITORY_GO` are not recorded.
+- Hermes config path and MCP registration confirmation are not provided.
+- Telegram credential/gateway decision is not provided.
+- Binance encrypted testnet credentials and manual passphrase availability are
+  not provided.
+- Live market OHLCV, macro, and news source/API-key policies are not decided.
+- Live order submission has no explicit future approval.
 
-Verification:
+## 4. Scope Guard Result
 
-```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 53 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
-CLI smoke for record_signal, label_signal_outcome, evaluate_score_performance with /private/tmp JSONL ledger -> passed
+Allowed during this audit:
+
+- Offline fixture/replay implementation.
+- Contract/golden/test strengthening.
+- Documentation synchronization and readiness reporting.
+
+Not added:
+
+- `migrations/`
+- DDL or schema runner
+- DB connection code
+- live market/news/macro adapter
+- Hermes/Telegram runtime credential
+- scheduler/cron runner
+- committed chart or runtime artifact
+- live order submission enablement
+
+## 5. Verification To Maintain
+
+Required final verification after any implementation change:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m pytest
+PYTHONPATH=src ./.venv/bin/python -m ruff check .
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"/private/tmp/halo_swing_runtime_checkpoints.jsonl","audit_log_path":"/private/tmp/halo_swing_checkpoint_audit.jsonl","ledger_path":"/private/tmp/halo_swing_checkpoint_ledger.jsonl","run_id":"manual_smoke"}' --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl
+git diff --check
 ```
 
-Decision still needed before DB implementation:
+Artifact audit:
 
-- SQLite migration naming/idempotency rules.
-- PostgreSQL portability constraints for future schema work.
-- Retention limits for local JSONL ledgers and audit logs.
-
-Follow-up gate packet:
-
-- `docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md` records recommended
-  migration defaults and verification requirements.
-- This packet is readiness only; `MIGRATION_GO` is still not recorded.
-
-### Stage D. Runtime Watchdog, Retention, And Checkpoint
-
-Status: local JSONL runtime guard and manual checkpoint tool implemented and verified.
-
-Scope decision recorded on 2026-05-10:
-
-- Use local JSONL retention defaults before introducing DB persistence.
-- Default retention: 1000 records and 5,000,000 bytes per JSONL artifact.
-- Default watchdog degraded-mode trigger: 3 failed tool audit events inside
-  the most recent 20 audit events.
-- Do not add background daemons, schedulers, live adapters, DB tables, or
-  committed runtime state in this stage.
-- Runtime checkpoints are manual append-only JSONL snapshots, not a scheduler
-  or Hermes/Telegram delivery loop.
-
-Tasks:
-
-1. Add retention limits for audit and signal ledgers. Done.
-2. Add watchdog event contract. Done.
-3. Add degraded-mode controls for repeated failures. Done.
-4. Expose runtime status through MCP/CLI harness. Done.
-5. Expose append-only runtime checkpoint through MCP/CLI harness. Done.
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/runtime_guard.py`.
-- Added `src/halo_swing_mcp/tools/runtime.py`.
-- Added `get_runtime_status` tool.
-- Added `record_runtime_checkpoint` tool.
-- Added `runtime_checkpoint_path` setting.
-- Added runtime retention and failure threshold settings.
-- Added `tests/test_runtime_guard.py`.
-
-Verification:
-
-```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 57 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"/private/tmp/halo_swing_runtime_guard_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_guard_ledger.jsonl","apply_retention":true,"max_records":2,"max_bytes":10000,"failure_window":4,"failure_threshold":3}' --audit-log-path /private/tmp/halo_swing_runtime_guard_audit.jsonl -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"/private/tmp/halo_swing_runtime_checkpoints.jsonl","audit_log_path":"/private/tmp/halo_swing_checkpoint_audit.jsonl","ledger_path":"/private/tmp/halo_swing_checkpoint_ledger.jsonl","run_id":"manual_smoke"}' --no-audit -> passed
+```bash
+find . \( -path './migrations' -o -path './data' -o -path './src/halo_swing_mcp/live_adapters' -o -name '*.sqlite' -o -name '*.sqlite3' -o -name '*.png' \) -print
+git status --short --ignored state
 ```
 
-Decision needed:
-
-- Retention age policy, if record count/size limits are not enough.
-- Whether watchdog events should later persist to DB, JSONL, or both.
-- Alert destination for critical watchdog events before unattended cron.
-
-### Stage E. Hermes And Telegram Integration
-
-Status: report harness, position review report, and offline cron prompt pack implemented; live Hermes/Telegram setup still requires user environment decision.
-
-Tasks:
-
-1. Write Hermes MCP config. Documented for stdio local server.
-2. Add report prompt templates. Report prompt contract implemented.
-3. Add cron prompt examples. Offline prompt pack implemented; no scheduler added.
-4. Add Telegram report format. Deterministic report text snapshot implemented.
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/tools/reporting.py`.
-- Added `generate_latest_signal_report` tool.
-- Added `generate_position_review_report` tool.
-- Added `generate_cron_prompt_pack` tool.
-- Added `tests/golden/hermes_latest_signal_report.json`.
-- Added `tests/test_reporting.py`.
-- Registered the report tool in the shared registry, MCP server wrappers,
-  health golden, README, and DevOps guide.
-- Wrapped `evaluate_position` into a Hermes/Telegram-facing position review
-  payload with `position_review` numeric authority, required section guard,
-  Telegram length check, and no network/order side effects.
-- Added offline `delivery_preview` payloads for latest signal and position
-  review reports, including Hermes payload refs, Telegram message chunks,
-  chunk guard checks, and no network side effects.
-- Added `evidence_contract`, `evidence_context`, and `evidence_guard` to latest
-  signal reports so Hermes-facing summaries stay bounded and conflicting
-  signals are explicitly acknowledged.
-
-Verification:
+Latest execution:
 
 ```text
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py -> 21 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 61 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --audit-log-path /private/tmp/halo_swing_report_harness_audit.jsonl -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py -> 30 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py tests/test_reporting.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 73 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py -> 31 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 74 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py -> 32 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 75 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness compare_champion_challenger --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit -> passed, cron_prompt_guard.status ok
-```
-
-Decision needed:
-
-- Is Hermes installed/configurable on this machine?
-- Should Telegram be configured now, and are credentials available?
-
-### Stage F. Multimodal Report Integration
-
-Status: optional chart ref and chart/code guard implemented; live Hermes multimodal use still deferred.
-
-Tasks:
-
-1. Link chart refs into report payloads. Done when `include_chart=true`.
-2. Add chart/code conflict guard. Done.
-3. Add report snapshot tests. Done.
-4. Normalize caller-supplied PDF/document summaries into evidence cards. Done.
-5. Attach chart/document evidence into offline report multimodal context. Done.
-
-Implementation record:
-
-- Extended `generate_latest_signal_report` with `include_chart`,
-  `chart_timeframe`, and `chart_output_dir`.
-- Chart rendering uses the existing deterministic `render_chart` tool.
-- `latest_signal_report.chart_ref` is populated from the chart artifact ref.
-- `chart_code_guard` records that chart images are visual context only and
-  numeric indicator authority remains code-calculated.
-- `create_document_evidence_card` records caller-supplied PDF/document summaries
-  as guarded evidence cards.
-- `document_summary_input_contract` records no parser, file read, network call,
-  raw document return, or secret return.
-- `generate_latest_signal_report(extra_evidence_cards=...)` returns
-  `multimodal_context` when chart refs or extra evidence cards are present.
-- `multimodal_context` records latest_signal_report numeric authority, linked
-  artifact refs, modality counts, no Hermes multimodal call, and no network call.
-- Added chart ref and guard coverage to `tests/test_reporting.py`.
-
-Verification:
-
-```text
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -> 6 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py src/halo_swing_mcp/server.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 63 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","include_chart":true,"chart_output_dir":"/private/tmp/halo_swing_chart_ref_guard"}' --audit-log-path /private/tmp/halo_swing_chart_ref_guard_audit.jsonl -> passed
-```
-
-Decision needed:
-
-- Whether regular reports should include charts by default or only on demand.
-- Which chart artifacts should be included in live Hermes multimodal reports.
-
-### Stage G. Broker / Order Preview
-
-Status: BTC-only Binance COIN-M Futures scope approved; guarded implementation and local admin verified.
-
-Tasks:
-
-1. Read-only portfolio sync. Live smoke blocked by credentials; offline snapshot normalizer implemented.
-2. Order preview only. BTCUSD_PERP Binance COIN-M preview implemented.
-3. Approval-required execution only. BTCUSD_PERP execution path implemented with default block guards.
-
-Scope decision recorded on 2026-05-09:
-
-- Automatic trading scope is BTC only.
-- Exchange/API is Binance COIN-M Futures API.
-- Initial symbol is `BTCUSD_PERP`.
-- Non-BTC symbols are rejected by code.
-- Binance trading API credentials are entered through a local admin page and saved encrypted in local state.
-- Per-order notional, daily order count, and daily loss limits are configurable.
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/binance_btc.py`.
-- Added `src/halo_swing_mcp/secret_store.py`.
-- Added `src/halo_swing_mcp/risk_settings.py`.
-- Added `src/halo_swing_mcp/trading_admin_web.py`.
-- Added `preview_btc_order` tool.
-- Added `execute_btc_order` tool.
-- Added BTC-only COIN-M validation, confirmation guard, live-trading env flag guard, encrypted credential guard, risk limit guard, testnet default, and Binance HMAC SHA256 signing helper.
-- Added local-only trading admin page for encrypted credentials and BTC risk settings.
-- Added read-only Binance COIN-M connectivity and account snapshot tools.
-- Added offline COIN-M account snapshot normalizer for caller-supplied read-only payloads.
-- Added position-aware order preview effect classification from portfolio snapshots.
-- Added management page controls for public connectivity check, read-only account snapshot, and order preview.
-- Added testnet-only execution policy guard with `HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true`.
-- Added emergency kill switch risk setting that blocks execution even when the
-  confirmation string is supplied.
-- Added `binance_credential_policy.v1` to credential status and order previews,
-  requiring COIN-M trade-only keys, forbidding withdraw permissions, and keeping
-  passphrases manual-only.
-- Added `live_order_submission` readiness gate so the remaining live-order
-  blocker is visible without submitting orders or calling Binance.
-- Added Phase 9 BTC tool manifest coverage for guarded risk, credential,
-  account, preview, and execute tools.
-- No live order is submitted unless `confirm` is `CONFIRM_BTC_BINANCE_COINM_ORDER`, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, encrypted credentials are configured, and `credential_passphrase` is provided.
-
-Verification:
-
-```text
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 50 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_credentials.enc.json"}' --audit-log-path /private/tmp/halo_swing_coinm_verify.jsonl -> passed
-GET http://127.0.0.1:8766/api/status -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py tests/test_tool_registry.py -> 20 passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness execute_btc_order --input-json '{"confirm":"CONFIRM_BTC_BINANCE_COINM_ORDER","settings_path":"/private/tmp/halo_swing_kill_switch_settings.json"}' --no-audit -> passed, blocked_reason emergency_kill_switch_enabled
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 77 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 78 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_runtime_checkpoint --input-json '{"checkpoint_path":"/private/tmp/halo_swing_runtime_checkpoints.jsonl","audit_log_path":"/private/tmp/halo_swing_checkpoint_audit.jsonl","ledger_path":"/private/tmp/halo_swing_checkpoint_ledger.jsonl","run_id":"manual_smoke"}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed, score_calibration present
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness create_document_evidence_card --input-json '{"summary":"FOMC minutes summary says policy remains restrictive but stable.","artifact_ref":"artifact://documents/fomc-minutes-summary.pdf","asset_scope":["QQQ","TQQQ"],"bias":"slightly_bullish","strength":0.57,"confidence":0.68}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 79 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 80 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report with include_chart=true and extra_evidence_cards -> passed, multimodal_context.status ok
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 81 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness normalize_binance_coinm_account_snapshot --input-json '{"balance":[{"asset":"BTC","balance":"0.25000000","availableBalance":"0.20000000","crossWalletBalance":"0.24000000","crossUnPnl":"0.01000000"}],"positions":[{"symbol":"BTCUSD_PERP","positionAmt":"3","entryPrice":"90000","markPrice":"92000","unRealizedProfit":"0.0065","liquidationPrice":"65000","leverage":"2","marginType":"cross","positionSide":"BOTH"}],"as_of":"2026-05-10T00:00:00Z","coinm_contract_size_usd":100}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_position_review_report --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 83 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order with portfolio_snapshot -> passed, position_effect.effect reduces_long
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -> 14 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed, sample_size 18, walk_forward_report.ready true, overfit_guard.status ok
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 83 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_tool_registry.py tests/test_health_check.py -> 22 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit -> passed, cron_prompt_guard.status ok
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 85 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, generate_cron_prompt_pack advertised
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 17 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"4h"}' --no-audit -> passed, timeframe_contract.provider_supports_timeframe true
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 86 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1h"}' --no-audit -> passed, timeframe_contract.provider_supports_timeframe true
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit -> passed, component_scores includes pullback and breadth
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 86 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py tests/test_tool_registry.py -> 23 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"invalidated_by_event":true,"invalidating_event_id":"evt_fixture_cpi"}' --no-audit -> passed, outcome INVALIDATED_BY_EVENT
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 87 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":[]}' --no-audit -> passed, outcome NO_DATA
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 18 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit -> passed, event_window_summary.next_event_id evt_20260512_cpi
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 87 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 19 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit -> passed, macro_filter_summary present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 88 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 20 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit -> passed, news_score_contract present
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit -> passed, news_usage_contract present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 89 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py -> 20 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"/private/tmp/halo_swing_run_journal_ledger.jsonl"}' --no-audit -> passed, run_journal.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 89 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 20 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1d"}' --no-audit -> passed, swing_level_contract present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 89 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 21 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit -> passed, strategy_config_contract present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 90 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py -> 33 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness render_chart --input-json '{"symbol":"QQQ","timeframe":"1d","output_dir":"/private/tmp/halo_swing_chart_artifact_contract"}' --no-audit -> passed, chart_artifact.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 90 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py tests/test_mvp_tools.py -> 33 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit -> passed, telegram_report_format.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 90 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -> 19 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit -> passed, challenger_config.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 90 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -> 19 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}' --no-audit -> passed, trade_guide.v1 and time_exit_conditions present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 90 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 21 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","SPY","SMH","SOXX","BTC"]}' --no-audit -> passed, market_snapshot.v1 and SOXX core coverage present
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_signal_repository.py -> 22 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":[570.611014,576.260628,706.20175],"time_barrier_days":2,"stop_loss_pct":0.05,"take_profit_pct":0.10}' --no-audit -> passed, signal_label_outcome.v1 metric window present
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 91 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py -> 34 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit -> passed, position_management.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_providers.py -> 22 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit -> passed, event_policy.v1 covers CPI/EARNINGS/FOMC/NFP
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_reporting.py -> 34 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit -> passed, news_source_policy.v1 covers required source groups
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -> 20 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed, deflated_sharpe_proxy.v1 present
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -> 19 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_binance_credentials_status --no-audit -> passed, binance_credential_policy.v1 present
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --no-audit -> passed, execution_guard credential_policy present
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 92 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 5 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, live_order_submission blocked
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 6 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, live_data_source_readiness.v1 present
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 7 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, telegram_delivery_readiness.v1 present
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 8 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, hermes_mcp_config_readiness.v1 present
-```
-
-Follow-up implementation record:
-
-```text
-implemented_not_live_smoked:
-  - check_binance_coinm_connectivity
-  - get_binance_coinm_account_snapshot
-  - management page order preview form
-  - management page read-only account form
-  - testnet-only execution policy guard
-```
-
-Decision needed:
-
-- Operational passphrase handling for unattended runs.
-
-### Stage H. Offline Integration Readiness
-
-Status: implemented and verified.
-
-Purpose:
-
-- Report which blocked gates are ready or still missing user/environment input.
-- Avoid network calls, secret disclosure, schedulers, live adapters, migrations,
-  and runtime artifact creation.
-
-Implementation record:
-
-- Added `src/halo_swing_mcp/tools/readiness.py`.
-- Added `get_integration_readiness` tool.
-- Registered the tool in the shared registry, MCP server wrappers, health
-  golden, README, and DevOps guide.
-- Added `tests/test_readiness.py`.
-- Strengthened `tests/test_tool_registry.py` so `server.py` `@mcp.tool()`
-  wrappers must exactly match `tool_registry.tool_names()`.
-- Strengthened `tests/test_tool_registry.py` so every `@mcp.tool()` wrapper
-  dispatches only to the matching shared registry tool name.
-- Strengthened `tests/test_tool_registry.py` so every `@mcp.tool()` wrapper
-  payload key matches a wrapper parameter and same-named parameter binding.
-- Strengthened `tests/test_tool_registry.py` so every `@mcp.tool()` wrapper
-  parameter set matches its registered implementation function signature.
-- Strengthened `tests/test_tool_registry.py` so `TOOL_SPECS` names are unique,
-  ordered, callable, and metadata-complete.
-- Strengthened `tests/test_tool_registry.py` so MVP `required_tools` directly
-  equals `tool_names()` in registry order.
-- Aligned latest-signal report `prompt_contract.must_include` terms with
-  intent-specific required sections for pre-market, intraday risk, and
-  post-market reports.
-- Strengthened `generate_cron_prompt_pack` guard so report prompt input JSON and
-  expected sections match report intent contracts, including the
-  `include_position_review=false` path.
-
-Readiness gates covered:
-
-- Hermes local config.
-- Telegram token/gateway configured flag.
-- `MIGRATION_GO` and `REPOSITORY_GO`.
-- Binance testnet read-only smoke prerequisites, including encrypted
-  credentials and non-secret manual passphrase confirmation.
-- Live data source/API-key decisions.
-
-Verification:
-
-```text
-PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_health_check.py tests/test_tool_registry.py tests/test_mvp_tools.py -> 22 passed
-PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py src/halo_swing_mcp/server.py src/halo_swing_mcp/tool_registry.py -> passed
-PYTHONPATH=src ./.venv/bin/python -m pytest -> 71 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, live_order_submission blocked with explicit missing approvals
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 93 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit -> passed, event_window_summary and danger_window present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit -> passed, macro_filter_summary present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit -> passed, news_usage_contract present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"/private/tmp/halo_swing_run_journal_ledger.jsonl"}' --no-audit -> passed, run_journal.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness calculate_indicators --input-json '{"symbol":"QQQ","timeframe":"1d"}' --no-audit -> passed, swing_level_contract present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness score_leverage_swing --input-json '{"asset":"TQQQ"}' --no-audit -> passed, strategy_config_contract present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness render_chart --input-json '{"symbol":"QQQ","timeframe":"1d","output_dir":"/private/tmp/halo_swing_chart_artifact_contract"}' --no-audit -> passed, chart_artifact.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ"}' --no-audit -> passed, telegram_report_format.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit -> passed, challenger_config.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_trade_guide --input-json '{"asset":"TQQQ"}' --no-audit -> passed, trade_guide.v1 and time_exit_conditions present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ","SPY","SMH","SOXX","BTC"]}' --no-audit -> passed, market_snapshot.v1 and SOXX core coverage present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"price_path":[570.611014,576.260628,706.20175],"time_barrier_days":2,"stop_loss_pct":0.05,"take_profit_pct":0.10}' --no-audit -> passed, signal_label_outcome.v1 metric window present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_position --input-json '{"asset":"TQQQ","entry_price":100,"current_price":114,"size":3}' --no-audit -> passed, position_management.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_event_calendar --input-json '{"days":14}' --no-audit -> passed, event_policy.v1 covers CPI/EARNINGS/FOMC/NFP
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"all"}' --no-audit -> passed, news_source_policy.v1 covers required source groups
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed, deflated_sharpe_proxy.v1 present
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":180}' --no-audit -> passed, sample_size 34 and fixture_oos_window.v1 present
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected and live_order_submission gate present
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 6 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, live_data blocked with market/macro/news missing reasons
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 94 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, live_data_source_readiness.v1 present and status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 7 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, telegram_delivery_readiness.v1 present and blocked without token/gateway
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 95 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, telegram_delivery_readiness.v1 present and status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -> 8 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/server.py tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --no-audit -> passed, hermes_mcp_config_readiness.v1 present and blocked without config path/registration
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 96 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, hermes_mcp_config_readiness.v1 present and status blocked as expected
+git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 21 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/scoring.py tests/test_mvp_tools.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":90}' --no-audit -> passed, sample_size 18 and fixture_oos_window.v1 present
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"days":180}' --no-audit -> passed, sample_size 34, walk_forward_report.ready true, overfit_guard.status ok
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 97 passed
 PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 git diff --check -> passed
+blocked artifact audit -> passed
+git status --short --ignored state -> ignored local state/ only
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 14 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch"}' --no-audit -> passed, intent-specific sections and telegram required_sections aligned
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit -> passed, intent-specific sections and telegram required_sections aligned
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"intraday_risk_watch"}' --no-audit -> passed, sections Target/Decision/Stop/Cautions and telegram required_sections aligned
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_latest_signal_report --input-json '{"asset":"TQQQ","report_intent":"post_market_review"}' --no-audit -> passed, sections Target/Decision/Reasons/Take Profit/Cautions and telegram required_sections aligned
+PYTHONPATH=src ./.venv/bin/python -m pytest -> 97 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 22 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, suggest_weight_update advertised
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness suggest_weight_update --no-audit -> passed, challenger_config.v1 present
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 98 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_runtime_guard.py -q -> 28 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_runtime_guard.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, get_runtime_status and record_runtime_checkpoint advertised
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_runtime_status --input-json '{"audit_log_path":"/private/tmp/halo_swing_runtime_manifest_audit.jsonl","ledger_path":"/private/tmp/halo_swing_runtime_manifest_ledger.jsonl"}' --no-audit -> passed, watchdog.v1 and retention resources present
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 99 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_binance_btc.py -q -> 43 passed
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --no-audit -> passed, preview only with btc_order_execution_guard.v1
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, Phase 9 BTC tools advertised
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness preview_btc_order --input-json '{"side":"BUY","quantity":"1"}' --no-audit -> passed, preview only with btc_order_execution_guard.v1 and no order submission
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 100 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py tests/test_health_check.py -q -> 27 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py tests/test_health_check.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed, 35 capabilities advertised
 manifest/health parity check -> passed, manifest_equals_health true and count 35
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 100 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 5 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/audit_tools.py tests/test_audit.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_summary --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_contract.jsonl"}' --no-audit -> passed, audit_summary.v1 present
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_audit_log --input-json '{"audit_log_path":"/private/tmp/halo_swing_audit_contract.jsonl","limit":5}' --no-audit -> passed, audit_log.v1 present
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 100 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check --no-audit -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_audit.jsonl -> passed, status blocked as expected
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 5 passed, MCP wrapper registry parity enforced
 PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_tool_registry.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m pytest -> 100 passed
@@ -1608,105 +1189,6 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_read
 git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
 git status --short --ignored state -> ignored local state only
-```
-
-## 6. Immediate Next Action
-
-Current completed gates: Stage A, Stage B replay provider, Stage C JSONL signal
-repository contract, Stage D runtime watchdog/retention/checkpoint, Stage E report harness,
-Stage E position review report, delivery preview, and evidence guard, Stage F
-optional chart ref/code guard, Stage G BTC COIN-M guarded path/admin, and Stage
-H offline integration readiness, Phase 6 extended 180-day OOS fixture
-hardening, report intent output variants, and Phase 6 feedback tool manifest
-alignment, plus Phase 7 runtime tool manifest alignment.
-Phase 9 BTC tool manifest alignment is also complete.
-Health capability and MVP required tool manifest parity is complete.
-Audit read tool payload contracts are complete.
-MCP server wrapper parity with the shared registry is complete.
-MCP server dispatch parity with the shared registry is complete.
-MCP server payload parity with wrapper parameters is complete.
-MCP server signature parity with registered implementation functions is complete.
-Tool registry spec invariants are complete.
-MVP manifest and shared registry ordered parity is complete.
-Report intent prompt contract alignment is complete.
-Cron prompt intent/input alignment is complete.
-Phase 6 unsupported long fixture window guard is complete.
-Report data warning Cautions guard is complete.
-Report Telegram required_sections intent guard is complete.
-Position review Telegram required_sections guard is complete.
-Delivery preview no-send guard is complete.
-Hermes delivery preview payload guard is complete.
-Telegram preview required section guard is complete.
-Telegram preview unrequested section guard is complete.
-Telegram preview chunk index guard is complete.
-Telegram preview message count guard is complete.
-Telegram preview chunk char-count guard is complete.
-Telegram preview nonempty chunk guard is complete.
-Telegram preview section separator guard is complete.
-Telegram preview overflow policy guard is complete.
-Position review max_chars contract guard is complete.
-Position review contract key schema guard is complete.
-Position review contract no-network guard is complete.
-Position review contract identity guard is complete.
-Delivery contract no-send guard is complete.
-Delivery contract no-network guard coverage is complete.
-Delivery contract key schema guard is complete.
-Report and position review guard check name schema guard is complete.
-Report and position review guard check key schema guard is complete.
-Evidence guard check name schema guard is complete.
-Evidence guard check key schema guard is complete.
-Report, position, and evidence guard top-level key schema guard is complete.
-Report and position payload key schema guard is complete.
-Report and position payload schema/live-data guard is complete.
-Report and position payload guard check name schema guard is complete.
-Report and position payload guard check key schema guard is complete.
-Report and position payload guard top-level key schema guard is complete.
-Report payload source signal ref key schema guard is complete.
-Report payload source signal ref identity guard is complete.
-Report payload source signal ref trace format guard is complete.
-Report payload source signal ref config hash digest guard is complete.
-Delivery preview no-network and chunk guard coverage is complete.
-Delivery preview guard check name schema guard is complete.
-Delivery preview guard check key schema guard is complete.
-Delivery preview payload key schema guard is complete.
-Report contract numeric authority guard is complete.
-Report text numeric field guard is complete.
-Cron prompt tool/input schema guard is complete.
-Cron prompt idempotency key guard is complete.
-Cron prompt idempotency text guard is complete.
-Cron prompt manual setup guard is complete.
-Cron prompt no-secret credential guard is complete.
-Cron prompt name set guard is complete.
-Cron prompt schedule hint guard is complete.
-Cron prompt tool/input text guard is complete.
-Cron prompt configured gateway text guard is complete.
-Cron prompt delivery preview text guard is complete.
-Cron prompt numeric authority text guard is complete.
-Cron prompt order block text guard is complete.
-Cron prompt expected sections text guard is complete.
-Cron prompt schedule hint text guard is complete.
-Cron prompt manual setup text guard is complete.
-Cron prompt no-secret text guard is complete.
-Cron prompt name text guard is complete.
-Cron prompt delivery path metadata guard is complete.
-Cron prompt Telegram format schema guard is complete.
-Cron prompt numeric authority metadata guard is complete.
-Cron prompt output schema guard is complete.
-Cron prompt live data boundary guard is complete.
-Cron prompt decision focus guard is complete.
-Cron prompt supported intents registry guard is complete.
-Cron prompt pack identity guard is complete.
-Cron prompt position option contract guard is complete.
-Cron prompt pack top-level contract guard is complete.
-Cron prompt pack key schema guard is complete.
-Cron prompt guard key schema guard is complete.
-Cron prompt guard check name schema guard is complete.
-Cron prompt guard check key schema guard is complete.
-Cron prompt manual setup registry guard is complete.
-Cron prompt contract key schema guard is complete.
-Cron prompt prompt key schema guard is complete.
-Cron prompt scheduler setup prerequisite guard is complete.
-
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py -q -> 16 passed, cron prompt scheduler setup prerequisite guard enforced
 PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/reporting.py tests/test_reporting.py -> passed
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness generate_cron_prompt_pack --input-json '{"asset":"TQQQ"}' --no-audit -> passed, prompt_text_declares_manual_setup_before_scheduler_setup present
@@ -3511,23 +2993,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_read
 git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
-
-Choose the next gate:
-
-```text
-Option 1: Hermes/Telegram local integration setup.
-Option 2: Stage G Binance testnet read-only smoke prerequisites.
-Option 3: MIGRATION_GO / REPOSITORY_GO approval or policy revision.
-Option 4: Live data source decisions for macro/news inputs.
-Option 5: Continue offline hardening for report variants or larger fixture coverage.
 ```
 
-Stage G live submission remains blocked by default. The next executable broker
-check is Binance testnet read-only smoke after encrypted testnet credentials
-and manual passphrase availability are confirmed; live submission still requires
-explicit future approval.
-
-## 3.348 Integration Readiness Input Normalization Verification - 2026-05-11
+## 6. 3.348 Integration Readiness Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs tests/test_readiness.py::test_integration_readiness_rejects_invalid_public_inputs tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit -q -> 3 passed, readiness public input normalization coverage enforced
@@ -3544,7 +3012,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.349 BTC Risk Settings Input Normalization Verification - 2026-05-11
+## 7. 3.349 BTC Risk Settings Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_update_btc_risk_settings_normalizes_public_inputs tests/test_binance_btc.py::test_update_btc_risk_settings_rejects_invalid_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_normalizes_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit -q -> 5 passed, BTC risk/state input normalization coverage enforced
@@ -3562,7 +3030,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.350 BTC Order Input Normalization Verification - 2026-05-11
+## 8. 3.350 BTC Order Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_normalizes_public_order_inputs tests/test_binance_btc.py::test_preview_btc_order_rejects_invalid_public_order_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit -q -> 3 passed, BTC order public input normalization coverage enforced
@@ -3580,7 +3048,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.351 BTC Portfolio Snapshot Input Normalization Verification - 2026-05-11
+## 9. 3.351 BTC Portfolio Snapshot Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_is_offline_read_only tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_normalizes_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit -q -> 4 passed, BTC portfolio snapshot input normalization coverage enforced
@@ -3597,7 +3065,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.352 Binance Credential Input Normalization Verification - 2026-05-11
+## 10. 3.352 Binance Credential Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit -q -> 3 passed, Binance credential input normalization coverage enforced
@@ -3615,7 +3083,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.353 Trading Admin HTTP Input Normalization Verification - 2026-05-11
+## 11. 3.353 Trading Admin HTTP Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_normalizes_form_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_invalid_inputs tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_invalid_input_without_write tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_invalid_text_inputs tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_invalid_passphrase_type -q -> 5 passed, trading admin HTTP payload normalization coverage enforced
@@ -3631,7 +3099,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.354 Audit Web Query Input Normalization Verification - 2026-05-11
+## 12. 3.354 Audit Web Query Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_events_payload_normalizes_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_invalid_query_inputs tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_query -q -> 3 passed, audit web query input normalization coverage enforced
@@ -3646,7 +3114,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.355 Audit Web Local Bind Guard Verification - 2026-05-11
+## 13. 3.355 Audit Web Local Bind Guard Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_non_localhost_bind -q -> 1 passed, audit web local bind guard coverage enforced
@@ -3661,7 +3129,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.356 Audit Tool Path Input Normalization Verification - 2026-05-11
+## 14. 3.356 Audit Tool Path Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_log_normalizes_public_limit_and_filters tests/test_audit.py::test_audit_log_rejects_invalid_public_inputs tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit -q -> 3 passed, audit tool path input normalization coverage enforced
@@ -3676,7 +3144,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.357 Runtime Path Input Normalization Verification - 2026-05-11
+## 15. 3.357 Runtime Path Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_applies_retention_and_degraded_mode tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_public_run_id tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs -q -> 5 passed, runtime path input normalization coverage enforced
@@ -3691,7 +3159,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.358 Signal Ledger Path Input Normalization Verification - 2026-05-11
+## 16. 3.358 Signal Ledger Path Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit -q -> 5 passed, signal ledger path input normalization coverage enforced
@@ -3706,7 +3174,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.359 Chart Output Path Input Normalization Verification - 2026-05-11
+## 17. 3.359 Chart Output Path Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_render_chart_rejects_invalid_output_dir tests/test_mvp_tools.py::test_harness_rejects_invalid_render_chart_output_dir_with_failure_audit tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_harness_rejects_blank_chart_output_dir_with_failure_audit -q -> 12 passed, chart output path input normalization coverage enforced
@@ -3722,7 +3190,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.360 Document Evidence Input Normalization Verification - 2026-05-11
+## 18. 3.360 Document Evidence Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_document_summary_input_creates_guarded_evidence_card tests/test_mvp_tools.py::test_document_summary_input_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_document_summary_input_with_failure_audit tests/test_reporting.py::test_latest_signal_report_rejects_pdf_artifact_ref_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_asset_scope_with_control_character -q -> 14 passed, document evidence input normalization coverage enforced
@@ -3739,7 +3207,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.361 Document Evidence Control Character Input Normalization Verification - 2026-05-11
+## 19. 3.361 Document Evidence Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_document_summary_input_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_document_summary_control_character_with_failure_audit tests/test_reporting.py::test_latest_signal_report_rejects_document_summary_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_pdf_artifact_ref_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_observed_at_with_control_character tests/test_reporting.py::test_latest_signal_report_rejects_document_asset_scope_with_control_character -q -> 19 passed, document evidence control-character input normalization coverage enforced
@@ -3755,7 +3223,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.362 Report Intent Input Normalization Verification - 2026-05-11
+## 20. 3.362 Report Intent Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_unsupported_report_intent_at_boundary tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_report_intent tests/test_reporting.py::test_latest_signal_report_rejects_invalid_report_intent_identity tests/test_reporting.py::test_latest_signal_report_rejects_report_intent_control_character tests/test_reporting.py::test_harness_rejects_unsupported_report_intent_with_failure_audit tests/test_reporting.py::test_harness_rejects_invalid_report_intent_with_failure_audit tests/test_reporting.py::test_harness_rejects_report_intent_control_character_with_failure_audit -q -> 9 passed, report_intent input normalization coverage enforced
@@ -3770,7 +3238,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.363 Report Identity Control Character Input Normalization Verification - 2026-05-11
+## 21. 3.363 Report Identity Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_asset_identity tests/test_reporting.py::test_latest_signal_report_rejects_asset_control_character tests/test_reporting.py::test_latest_signal_report_trims_timeframe_identity tests/test_reporting.py::test_latest_signal_report_rejects_invalid_timeframe_identity tests/test_reporting.py::test_latest_signal_report_rejects_timeframe_control_character tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_chart_timeframe_control_character tests/test_reporting.py::test_cron_prompt_pack_trims_and_uppercases_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_blank_asset_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_asset_control_character tests/test_reporting.py::test_cron_prompt_pack_trims_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_invalid_timeframe_identity tests/test_reporting.py::test_cron_prompt_pack_rejects_timeframe_control_character tests/test_reporting.py::test_position_review_report_trims_and_uppercases_asset_identity tests/test_reporting.py::test_position_review_report_rejects_invalid_asset_identity tests/test_reporting.py::test_position_review_report_rejects_asset_control_character tests/test_reporting.py::test_harness_rejects_latest_report_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_latest_report_timeframe_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_cron_prompt_timeframe_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_position_review_asset_control_character_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_timeframe_control_character_with_failure_audit -q -> 34 passed, report identity control-character input normalization coverage enforced
@@ -3785,7 +3253,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.364 Scoring Identity Control Character Input Normalization Verification - 2026-05-11
+## 22. 3.364 Scoring Identity Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_normalize_asset_and_timeframe_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_asset_identity tests/test_mvp_tools.py::test_scoring_tools_reject_asset_control_character tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_scoring_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_harness_rejects_blank_scoring_asset_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q -> 12 passed, scoring identity control-character input normalization coverage enforced
@@ -3800,7 +3268,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.365 Market Tool Control Character Input Normalization Verification - 2026-05-11
+## 23. 3.365 Market Tool Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_news_bundle_rejects_invalid_topic_identity tests/test_mvp_tools.py::test_news_bundle_rejects_topic_control_character tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_symbol_control_character tests/test_mvp_tools.py::test_indicator_and_chart_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_indicator_and_chart_tools_reject_timeframe_control_character tests/test_mvp_tools.py::test_render_chart_rejects_invalid_output_dir tests/test_mvp_tools.py::test_render_chart_rejects_output_dir_control_character tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_indicator_symbol_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_render_chart_output_dir_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_render_chart_output_dir_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_news_topic_control_character_with_failure_audit -q -> 25 passed, market tool control-character input normalization coverage enforced
@@ -3815,7 +3283,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.366 Report Chart Output Dir Control Character Input Normalization Verification - 2026-05-11
+## 24. 3.366 Report Chart Output Dir Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_trims_and_lowercases_chart_timeframe tests/test_reporting.py::test_latest_signal_report_rejects_invalid_chart_output_dir tests/test_reporting.py::test_latest_signal_report_rejects_chart_output_dir_control_character tests/test_reporting.py::test_harness_rejects_blank_chart_output_dir_with_failure_audit tests/test_reporting.py::test_harness_rejects_chart_output_dir_control_character_with_failure_audit -q -> 8 passed, report chart_output_dir control-character input normalization coverage enforced
@@ -3830,7 +3298,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.367 Audit Read Control Character Input Normalization Verification - 2026-05-11
+## 25. 3.367 Audit Read Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_log_normalizes_public_limit_and_filters tests/test_audit.py::test_audit_log_rejects_invalid_public_inputs tests/test_audit.py::test_audit_log_rejects_control_character_public_inputs tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_path_control_character_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_filter_control_character_with_failure_audit tests/test_audit.py::test_audit_web_events_payload_normalizes_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_invalid_query_inputs tests/test_audit.py::test_audit_web_events_payload_rejects_control_character_query_inputs tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_query tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_control_character_query -q -> 11 passed, audit read control-character input normalization coverage enforced
@@ -3845,7 +3313,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.368 Readiness Path Control Character Input Normalization Verification - 2026-05-11
+## 26. 3.368 Readiness Path Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs tests/test_readiness.py::test_integration_readiness_rejects_invalid_public_inputs tests/test_readiness.py::test_integration_readiness_rejects_path_control_character_inputs tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit tests/test_readiness.py::test_harness_returns_integration_readiness -q -> 6 passed, readiness path control-character input normalization coverage enforced
@@ -3860,7 +3328,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.369 BTC Risk Path Control Character Input Normalization Verification - 2026-05-11
+## 27. 3.369 BTC Risk Path Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_update_btc_risk_settings_normalizes_public_inputs tests/test_binance_btc.py::test_update_btc_risk_settings_rejects_invalid_public_inputs tests/test_binance_btc.py::test_btc_risk_tools_reject_path_control_character_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_normalizes_public_inputs tests/test_binance_btc.py::test_reset_btc_daily_risk_state_rejects_invalid_public_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_risk_settings_path_control_character_with_failure_audit -q -> 7 passed, BTC risk path control-character input normalization coverage enforced
@@ -3875,7 +3343,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.370 Signal Ledger Path Control Character Input Normalization Verification - 2026-05-11
+## 28. 3.370 Signal Ledger Path Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit -q -> 7 passed, signal ledger path control-character input normalization coverage enforced
@@ -3890,7 +3358,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.371 Binance Credential Path Control Character Input Normalization Verification - 2026-05-11
+## 29. 3.371 Binance Credential Path Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_binance_credentials_reject_credentials_path_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_credentials_path_control_character_with_failure_audit tests/test_binance_btc.py::test_binance_credential_status_exposes_trade_only_policy_without_secrets -q -> 6 passed, Binance credential path control-character input normalization coverage enforced
@@ -3905,7 +3373,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.372 BTC Order Text Control Character Input Normalization Verification - 2026-05-11
+## 30. 3.372 BTC Order Text Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_normalizes_public_order_inputs tests/test_binance_btc.py::test_preview_btc_order_rejects_invalid_public_order_inputs tests/test_binance_btc.py::test_btc_order_tools_reject_order_text_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_btc_order_text_control_character_with_failure_audit tests/test_binance_btc.py::test_execute_btc_order_blocks_without_confirmation -q -> 6 passed, BTC order text control-character input normalization coverage enforced
@@ -3920,7 +3388,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.373 Portfolio Snapshot Text Control Character Input Normalization Verification - 2026-05-11
+## 31. 3.373 Portfolio Snapshot Text Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_is_offline_read_only tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_normalizes_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_invalid_public_inputs tests/test_binance_btc.py::test_normalize_binance_coinm_account_snapshot_rejects_text_control_characters tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_portfolio_snapshot_text_control_character_with_failure_audit -q -> 6 passed, portfolio snapshot text control-character input normalization coverage enforced
@@ -3935,7 +3403,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.374 Binance Credential Secret Control Character Input Normalization Verification - 2026-05-11
+## 32. 3.374 Binance Credential Secret Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_save_binance_credentials_normalizes_public_inputs tests/test_binance_btc.py::test_save_binance_credentials_rejects_invalid_public_inputs tests/test_binance_btc.py::test_binance_credentials_reject_secret_control_character_inputs tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit tests/test_binance_btc.py::test_harness_rejects_secret_control_character_with_failure_audit tests/test_binance_btc.py::test_binance_credential_status_exposes_trade_only_policy_without_secrets -q -> 6 passed, Binance credential secret control-character input normalization coverage enforced
@@ -3950,7 +3418,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.375 Trading Admin HTTP Control Character Input Normalization Verification - 2026-05-11
+## 33. 3.375 Trading Admin HTTP Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_normalizes_form_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_invalid_inputs tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_control_characters tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_invalid_input_without_write tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_control_characters_without_write tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_invalid_text_inputs tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_control_characters tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_invalid_passphrase_type tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_passphrase_control_character -q -> 9 passed, trading admin HTTP control-character input normalization coverage enforced
@@ -3965,7 +3433,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.376 Runtime Control Character Input Normalization Verification - 2026-05-11
+## 34. 3.376 Runtime Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_applies_retention_and_degraded_mode tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_runtime_status_rejects_path_control_character_inputs tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_public_run_id tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_control_character_inputs tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q -> 9 passed, runtime control-character input normalization coverage enforced
@@ -3980,7 +3448,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.377 Signal Identity Control Character Input Normalization Verification - 2026-05-11
+## 35. 3.377 Signal Identity Control Character Input Normalization Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_normalizes_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit -q -> 9 passed, signal identity control-character input normalization coverage enforced
@@ -3995,7 +3463,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.378 Market Symbol List Container Input Contract Verification - 2026-05-11
+## 36. 3.378 Market Symbol List Container Input Contract Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_normalize_symbol_timeframe_identity tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_invalid_symbol_identity tests/test_mvp_tools.py::test_market_snapshot_rejects_invalid_symbols_container tests/test_mvp_tools.py::test_market_indicator_and_chart_tools_reject_symbol_control_character tests/test_mvp_tools.py::test_harness_rejects_invalid_market_symbols_container_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_indicator_symbol_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_indicator_symbol_control_character_with_failure_audit -q -> 12 passed, market snapshot symbols container contract coverage enforced
@@ -4010,7 +3478,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.379 Event Calendar Days Failure Audit Verification - 2026-05-11
+## 37. 3.379 Event Calendar Days Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_event_and_news_tools_normalize_public_identity tests/test_mvp_tools.py::test_event_calendar_rejects_invalid_days_identity tests/test_mvp_tools.py::test_harness_rejects_invalid_event_calendar_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_blank_news_topic_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_news_topic_control_character_with_failure_audit -q -> 10 passed, event calendar invalid days failure-audit coverage enforced
@@ -4025,7 +3493,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.380 Evaluate Score Performance Days Failure Audit Verification - 2026-05-11
+## 38. 3.380 Evaluate Score Performance Days Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_score_performance_includes_attribution_and_ablation tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit -q -> 3 passed, evaluate_score_performance invalid days failure-audit coverage enforced
@@ -4040,7 +3508,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.381 Evaluate Score Performance Ledger Path Failure Audit Verification - 2026-05-11
+## 39. 3.381 Evaluate Score Performance Ledger Path Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit -q -> 4 passed, evaluate_score_performance invalid ledger_path failure-audit coverage enforced
@@ -4055,7 +3523,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.382 Label Signal Ledger Path Failure Audit Verification - 2026-05-11
+## 40. 3.382 Label Signal Ledger Path Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit -q -> 4 passed, label_signal_outcome invalid ledger_path failure-audit coverage enforced
@@ -4070,7 +3538,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.383 Label Signal Ledger Path Control Character Failure Audit Verification - 2026-05-11
+## 41. 3.383 Label Signal Ledger Path Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_control_character_with_failure_audit -q -> 4 passed, label_signal_outcome control-character ledger_path failure-audit coverage enforced
@@ -4085,7 +3553,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.384 Evaluate Score Performance Ledger Path Control Character Failure Audit Verification - 2026-05-11
+## 42. 3.384 Evaluate Score Performance Ledger Path Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_recording_tools_reject_ledger_path_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit -q -> 4 passed, evaluate_score_performance control-character ledger_path failure-audit coverage enforced
@@ -4100,7 +3568,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.385 Label Signal Event Boolean Failure Audit Verification - 2026-05-11
+## 43. 3.385 Label Signal Event Boolean Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit -q -> 4 passed, label_signal_outcome invalidated_by_event failure-audit coverage enforced
@@ -4115,7 +3583,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.386 Label Signal Invalidating Event ID Control Character Failure Audit Verification - 2026-05-11
+## 44. 3.386 Label Signal Invalidating Event ID Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit -q -> 4 passed, label_signal_outcome invalidating_event_id control-character failure-audit coverage enforced
@@ -4130,7 +3598,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.387 Label Signal Stop Loss Failure Audit Verification - 2026-05-11
+## 45. 3.387 Label Signal Stop Loss Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q -> 4 passed, label_signal_outcome stop_loss_pct failure-audit coverage enforced
@@ -4145,7 +3613,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.388 Label Signal Take Profit Failure Audit Verification - 2026-05-11
+## 46. 3.388 Label Signal Take Profit Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q -> 4 passed, label_signal_outcome take_profit_pct failure-audit coverage enforced
@@ -4160,7 +3628,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.389 Label Signal Time Barrier Failure Audit Verification - 2026-05-11
+## 47. 3.389 Label Signal Time Barrier Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_metrics_respect_time_barrier -q -> 4 passed, label_signal_outcome time_barrier_days failure-audit coverage enforced
@@ -4175,7 +3643,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.390 Label Signal Signal ID Failure Audit Verification - 2026-05-11
+## 48. 3.390 Label Signal Signal ID Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs -q -> 4 passed, label_signal_outcome signal_id failure-audit coverage enforced
@@ -4190,7 +3658,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.391 Label Signal Invalidating Event ID Failure Audit Verification - 2026-05-11
+## 49. 3.391 Label Signal Invalidating Event ID Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_blank_label_invalidating_event_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit -q -> 4 passed, label_signal_outcome invalidating_event_id failure-audit coverage enforced
@@ -4205,7 +3673,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.392 Label Signal Ledger Path Type Failure Audit Verification - 2026-05-11
+## 50. 3.392 Label Signal Ledger Path Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_ledger_path_control_character_with_failure_audit -q -> 4 passed, label_signal_outcome ledger_path type failure-audit coverage enforced
@@ -4220,7 +3688,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.393 Record Signal Ledger Path Type Failure Audit Verification - 2026-05-11
+## 51. 3.393 Record Signal Ledger Path Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_ledger_path_control_character_with_failure_audit -q -> 4 passed, record_signal ledger_path type failure-audit coverage enforced
@@ -4235,7 +3703,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.394 Evaluate Score Performance Ledger Path Type Failure Audit Verification - 2026-05-11
+## 52. 3.394 Evaluate Score Performance Ledger Path Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_ledger_path tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_ledger_path_control_character_with_failure_audit -q -> 4 passed, evaluate_score_performance ledger_path type failure-audit coverage enforced
@@ -4250,7 +3718,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.395 Record Signal Object Type Failure Audit Verification - 2026-05-11
+## 53. 3.395 Record Signal Object Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 4 passed, record_signal object type failure-audit coverage enforced
@@ -4265,7 +3733,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.396 Label Signal Price Path Type Failure Audit Verification - 2026-05-11
+## 54. 3.396 Label Signal Price Path Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit -q -> 3 passed, label_signal_outcome price_path type failure-audit coverage enforced
@@ -4280,7 +3748,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.397 Label Signal Price Path Nonpositive Failure Audit Verification - 2026-05-11
+## 55. 3.397 Label Signal Price Path Nonpositive Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonpositive_with_failure_audit -q -> 4 passed, label_signal_outcome price_path nonpositive failure-audit coverage enforced
@@ -4295,7 +3763,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.398 Label Signal Price Path Nonfinite Failure Audit Verification - 2026-05-11
+## 56. 3.398 Label Signal Price Path Nonfinite Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_price_path_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_price_path_nonfinite_with_failure_audit -q -> 5 passed, label_signal_outcome price_path nonfinite failure-audit coverage enforced
@@ -4310,7 +3778,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.399 Label Signal Stop Loss Type Failure Audit Verification - 2026-05-11
+## 57. 3.399 Label Signal Stop Loss Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_type_with_failure_audit -q -> 3 passed, label_signal_outcome stop_loss_pct type failure-audit coverage enforced
@@ -4325,7 +3793,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.400 Label Signal Take Profit Nonpositive Failure Audit Verification - 2026-05-11
+## 58. 3.400 Label Signal Take Profit Nonpositive Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonpositive_with_failure_audit -q -> 3 passed, label_signal_outcome take_profit_pct nonpositive failure-audit coverage enforced
@@ -4340,7 +3808,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.401 Label Signal Time Barrier Nonpositive Failure Audit Verification - 2026-05-11
+## 59. 3.401 Label Signal Time Barrier Nonpositive Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_nonpositive_with_failure_audit -q -> 3 passed, label_signal_outcome time_barrier_days nonpositive failure-audit coverage enforced
@@ -4355,7 +3823,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.402 Label Signal Time Barrier Type Failure Audit Verification - 2026-05-11
+## 60. 3.402 Label Signal Time Barrier Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_time_barrier_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_time_barrier_type_with_failure_audit -q -> 4 passed, label_signal_outcome time_barrier_days type failure-audit coverage enforced
@@ -4370,7 +3838,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.403 Label Signal Stop Loss Nonfinite Failure Audit Verification - 2026-05-11
+## 61. 3.403 Label Signal Stop Loss Nonfinite Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_stop_loss_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_stop_loss_nonfinite_with_failure_audit -q -> 4 passed, label_signal_outcome stop_loss_pct nonfinite failure-audit coverage enforced
@@ -4385,7 +3853,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.404 Label Signal Take Profit Nonfinite Failure Audit Verification - 2026-05-11
+## 62. 3.404 Label Signal Take Profit Nonfinite Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_take_profit_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonpositive_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_take_profit_nonfinite_with_failure_audit -q -> 4 passed, label_signal_outcome take_profit_pct nonfinite failure-audit coverage enforced
@@ -4400,7 +3868,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.405 Label Signal Invalidating Event ID Type Failure Audit Verification - 2026-05-11
+## 63. 3.405 Label Signal Invalidating Event ID Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_label_signal_outcome_supports_no_data_and_event_invalidation tests/test_mvp_tools.py::test_harness_rejects_blank_label_invalidating_event_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit -q -> 5 passed, label_signal_outcome invalidating_event_id type failure-audit coverage enforced
@@ -4415,7 +3883,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.406 Label Signal Signal ID Type Failure Audit Verification - 2026-05-11
+## 64. 3.406 Label Signal Signal ID Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_invalid_public_inputs tests/test_mvp_tools.py::test_harness_rejects_invalid_label_signal_id_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_label_signal_outcome_normalizes_public_inputs -q -> 5 passed, label_signal_outcome signal_id type failure-audit coverage enforced
@@ -4430,7 +3898,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.407 Record Signal Run ID Type Failure Audit Verification - 2026-05-11
+## 65. 3.407 Record Signal Run ID Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 5 passed, record_signal signal.run_id type failure-audit coverage enforced
@@ -4445,7 +3913,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.408 Record Signal Created At Blank Failure Audit Verification - 2026-05-11
+## 66. 3.408 Record Signal Created At Blank Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 6 passed, record_signal signal.created_at blank failure-audit coverage enforced
@@ -4460,7 +3928,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.409 Record Signal Underlying Null Failure Audit Verification - 2026-05-11
+## 67. 3.409 Record Signal Underlying Null Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 7 passed, record_signal signal.underlying null failure-audit coverage enforced
@@ -4475,7 +3943,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.410 Record Signal Config Version Blank Failure Audit Verification - 2026-05-11
+## 68. 3.410 Record Signal Config Version Blank Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 8 passed, record_signal signal.config_version blank failure-audit coverage enforced
@@ -4490,7 +3958,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.411 Record Signal Config Hash Type Failure Audit Verification - 2026-05-11
+## 69. 3.411 Record Signal Config Hash Type Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 9 passed, record_signal signal.config_hash type failure-audit coverage enforced
@@ -4505,7 +3973,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.412 Record Signal Config Hash Control Character Failure Audit Verification - 2026-05-11
+## 70. 3.412 Record Signal Config Hash Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 11 passed, record_signal signal.config_hash control-character failure-audit coverage enforced
@@ -4520,7 +3988,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.413 Record Signal Config Version Control Character Failure Audit Verification - 2026-05-11
+## 71. 3.413 Record Signal Config Version Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 12 passed, record_signal signal.config_version control-character failure-audit coverage enforced
@@ -4535,7 +4003,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.414 Record Signal Remaining Identity Control Character Failure Audit Verification - 2026-05-11
+## 72. 3.414 Record Signal Remaining Identity Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_signal_rejects_invalid_public_signal_identity tests/test_mvp_tools.py::test_record_signal_rejects_signal_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_record_signal_object_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_record_signal_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_run_id_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_created_at_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_underlying_null_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_blank_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_version_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_type_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_config_hash_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_remaining_identity_control_characters_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_record_signal_identity_control_character_with_failure_audit -q -> 15 passed, record_signal remaining identity control-character failure-audit coverage enforced
@@ -4550,7 +4018,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.415 Label Signal Unused Invalidating Event ID Control Character Failure Audit Verification - 2026-05-11
+## 73. 3.415 Label Signal Unused Invalidating Event ID Control Character Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_label_signal_outcome_rejects_identity_control_character_inputs tests/test_mvp_tools.py::test_harness_rejects_label_signal_identity_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_label_unused_invalidating_event_id_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_label_event_boolean_with_failure_audit -q -> 5 passed, label_signal_outcome unused invalidating_event_id control-character failure-audit coverage enforced
@@ -4565,7 +4033,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.416 Evaluate Score Performance Remaining Days Failure Audit Verification - 2026-05-11
+## 74. 3.416 Evaluate Score Performance Remaining Days Failure Audit Verification - 2026-05-11
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_evaluate_recorded_score_performance_rejects_invalid_days tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_days_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_score_performance_remaining_days_values_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_invalid_score_performance_ledger_path_with_failure_audit -q -> 6 passed, evaluate_score_performance remaining days failure-audit coverage enforced
@@ -4580,7 +4048,7 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 3.417 Latest Report Extra Evidence Cards Type Failure Audit Verification - 2026-05-12
+## 75. 3.417 Latest Report Extra Evidence Cards Type Failure Audit Verification - 2026-05-12
 
 ```text
 PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_rejects_invalid_extra_evidence_cards_container tests/test_reporting.py::test_latest_signal_report_rejects_extra_evidence_card_non_object tests/test_reporting.py::test_harness_rejects_invalid_extra_evidence_cards_container_with_failure_audit tests/test_reporting.py::test_harness_rejects_extra_evidence_card_non_object_with_failure_audit -q -> 6 passed, latest report extra_evidence_cards type failure-audit coverage enforced
@@ -4593,4 +4061,16 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_read
 git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
+```
+
+## 76. Next Concrete Actions
+
+Choose one of:
+
+```text
+1. Provide Hermes config path and Telegram credential/gateway choice.
+2. Provide Binance testnet credentials/passphrase procedure for read-only smoke.
+3. Approve or revise MIGRATION_GO / REPOSITORY_GO.
+4. Choose live data source/API-key policy.
+5. Continue offline hardening for additional Phase 6 fixture coverage or report variants.
 ```

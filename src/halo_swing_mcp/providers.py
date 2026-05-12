@@ -25,10 +25,18 @@ class MarketDataProvider(Protocol):
     def supported_assets(self) -> list[str]:
         """Return supported asset symbols."""
 
+    def supported_timeframes(self) -> list[str]:
+        """Return supported OHLCV timeframes."""
+
     def resolve_asset(self, asset: str) -> tuple[str, int]:
         """Return underlying symbol and leverage multiplier."""
 
-    def ohlcv(self, symbol: str, periods: int = 220) -> tuple[dict[str, Any], ...]:
+    def ohlcv(
+        self,
+        symbol: str,
+        periods: int = 220,
+        timeframe: str = "1d",
+    ) -> tuple[dict[str, Any], ...]:
         """Return OHLCV bars."""
 
     def macro_snapshot(self) -> dict[str, Any]:
@@ -59,11 +67,19 @@ class ReplayMarketDataProvider:
     def supported_assets(self) -> list[str]:
         return fixtures.supported_assets()
 
+    def supported_timeframes(self) -> list[str]:
+        return fixtures.supported_timeframes()
+
     def resolve_asset(self, asset: str) -> tuple[str, int]:
         return fixtures.resolve_asset(asset)
 
-    def ohlcv(self, symbol: str, periods: int = 220) -> tuple[dict[str, Any], ...]:
-        return fixtures.generate_ohlcv(symbol, periods)
+    def ohlcv(
+        self,
+        symbol: str,
+        periods: int = 220,
+        timeframe: str = "1d",
+    ) -> tuple[dict[str, Any], ...]:
+        return fixtures.generate_ohlcv(symbol, periods, timeframe)
 
     def macro_snapshot(self) -> dict[str, Any]:
         return dict(fixtures.MACRO_FIXTURE)

@@ -133,6 +133,40 @@ def detect_recent_gaps(bars: list[dict[str, Any]], lookback: int = 20) -> list[d
     return gaps[-3:]
 
 
+def detect_previous_swing_levels(
+    bars: list[dict[str, Any]],
+    lookback: int = 40,
+    pivot_window: int = 2,
+) -> dict[str, Any]:
+    """Return the latest local swing high/low in a recent lookback window."""
+
+    recent = bars[-lookback:]
+    swing_high: dict[str, Any] | None = None
+    swing_low: dict[str, Any] | None = None
+    for index in range(pivot_window, len(recent) - pivot_window):
+        current = recent[index]
+        neighbors = recent[index - pivot_window : index + pivot_window + 1]
+        high = float(current["high"])
+        low = float(current["low"])
+        if high >= max(float(bar["high"]) for bar in neighbors):
+            swing_high = current
+        if low <= min(float(bar["low"]) for bar in neighbors):
+            swing_low = current
+
+    fallback_high = max(recent[:-1], key=lambda bar: float(bar["high"]))
+    fallback_low = min(recent[:-1], key=lambda bar: float(bar["low"]))
+    high_bar = swing_high or fallback_high
+    low_bar = swing_low or fallback_low
+    return {
+        "previous_swing_high": _round(float(high_bar["high"])),
+        "previous_swing_high_timestamp": high_bar["timestamp"],
+        "previous_swing_low": _round(float(low_bar["low"])),
+        "previous_swing_low_timestamp": low_bar["timestamp"],
+        "swing_lookback": lookback,
+        "pivot_window": pivot_window,
+    }
+
+
 def calculate_indicator_payload(
     symbol: str,
     timeframe: str = "1d",
@@ -141,10 +175,11 @@ def calculate_indicator_payload(
     """Calculate deterministic indicators from OHLCV bars."""
 
     provider = get_market_data_provider()
-    normalized = symbol.upper()
+    normalized = _normalize_symbol_identity(symbol)
+    normalized_timeframe = _normalize_timeframe_identity(timeframe)
     underlying, leverage = provider.resolve_asset(normalized)
     indicator_symbol = underlying if leverage > 1 else normalized
-    bars = list(provider.ohlcv(indicator_symbol, periods))
+    bars = list(provider.ohlcv(indicator_symbol, periods, timeframe=normalized_timeframe))
     closes = [float(bar["close"]) for bar in bars]
     latest_close = closes[-1]
     previous_close = closes[-2]
@@ -156,6 +191,7 @@ def calculate_indicator_payload(
     ma_200 = simple_moving_average(closes, 200)
     support = min(closes[-20:])
     resistance = max(closes[-20:])
+    swing_levels = detect_previous_swing_levels(bars)
     ma_20_previous = simple_moving_average(closes[:-5], 20)
     ma_20_slope = None
     if ma_20 is not None and ma_20_previous is not None:
@@ -170,7 +206,15 @@ def calculate_indicator_payload(
     return {
         "symbol": normalized,
         "indicator_symbol": indicator_symbol,
-        "timeframe": timeframe,
+        "timeframe": normalized_timeframe,
+        "timeframe_contract": {
+            "requested_timeframe": normalized_timeframe,
+            "supported_timeframes": provider.supported_timeframes(),
+            "provider_supports_timeframe": normalized_timeframe
+            in provider.supported_timeframes(),
+            "fixture_replay_default": True,
+            "live_data_required": False,
+        },
         "data_mode": provider.data_mode,
         "live_data_required": provider.live_data_required,
         "latest_bar": bars[-1],
@@ -186,8 +230,47 @@ def calculate_indicator_payload(
         "ma_50": _round(ma_50),
         "ma_200": _round(ma_200),
         "ma_20_slope": _round(ma_20_slope, 6),
+        "swing_level_contract": {
+            "schema_version": "swing_levels.v1",
+            "support_resistance_lookback": 20,
+            "gap_detection_lookback": 20,
+            "previous_swing_lookback": swing_levels["swing_lookback"],
+            "pivot_window": swing_levels["pivot_window"],
+            "network_call": False,
+            "live_data_required": False,
+        },
         "support_20": _round(support),
         "resistance_20": _round(resistance),
+        "previous_swing_high": swing_levels["previous_swing_high"],
+        "previous_swing_high_timestamp": swing_levels["previous_swing_high_timestamp"],
+        "previous_swing_low": swing_levels["previous_swing_low"],
+        "previous_swing_low_timestamp": swing_levels["previous_swing_low_timestamp"],
         "recent_gaps": detect_recent_gaps(bars),
         "trend_state": trend_state,
     }
+
+
+def _normalize_symbol_identity(symbol: str) -> str:
+    if not isinstance(symbol, str):
+        raise ValueError("symbol must be a nonempty string")
+    if not _has_no_control_characters(symbol):
+        raise ValueError("symbol must not contain control characters")
+    normalized = symbol.strip().upper()
+    if not normalized:
+        raise ValueError("symbol must be a nonempty string")
+    return normalized
+
+
+def _normalize_timeframe_identity(timeframe: str) -> str:
+    if not isinstance(timeframe, str):
+        raise ValueError("timeframe must be a nonempty string")
+    if not _has_no_control_characters(timeframe):
+        raise ValueError("timeframe must not contain control characters")
+    normalized = timeframe.strip().lower()
+    if not normalized:
+        raise ValueError("timeframe must be a nonempty string")
+    return normalized
+
+
+def _has_no_control_characters(value: str) -> bool:
+    return all(ord(character) >= 32 and ord(character) != 127 for character in value)

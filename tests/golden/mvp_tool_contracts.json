@@ -1,10 +1,12 @@
 {
   "fixture_clock": "2026-05-08T20:00:00Z",
   "required_tools": [
+    "health_check",
     "get_market_snapshot",
     "get_macro_snapshot",
     "get_event_calendar",
     "get_news_bundle",
+    "create_document_evidence_card",
     "calculate_indicators",
     "render_chart",
     "score_leverage_swing",
@@ -13,13 +15,73 @@
     "record_signal",
     "label_signal_outcome",
     "evaluate_score_performance",
+    "suggest_weight_update",
     "compare_champion_challenger",
+    "generate_latest_signal_report",
+    "generate_position_review_report",
+    "generate_cron_prompt_pack",
+    "get_integration_readiness",
     "get_audit_log",
-    "get_audit_summary"
+    "get_audit_summary",
+    "get_runtime_status",
+    "record_runtime_checkpoint",
+    "get_btc_risk_settings",
+    "update_btc_risk_settings",
+    "get_btc_risk_status",
+    "reset_btc_daily_risk_state",
+    "save_binance_credentials",
+    "get_binance_credentials_status",
+    "check_binance_coinm_connectivity",
+    "get_binance_coinm_account_snapshot",
+    "normalize_binance_coinm_account_snapshot",
+    "preview_btc_order",
+    "execute_btc_order"
   ],
+  "market_fixture": {
+    "schema": "market_snapshot.v1",
+    "core_assets": [
+      "QQQ",
+      "SPY",
+      "SMH",
+      "SOXX",
+      "BTC"
+    ],
+    "required_snapshot_fields": [
+      "symbol",
+      "underlying",
+      "leverage",
+      "timeframe",
+      "last_close",
+      "change_pct_1d",
+      "judgment_basis",
+      "trend_state",
+      "rsi_14",
+      "ma_20",
+      "ma_50",
+      "atr_percent"
+    ],
+    "required_guard_checks": [
+      "core_assets_supported",
+      "requested_assets_returned",
+      "required_fields_present",
+      "feature_store_not_persisted",
+      "no_live_data_required"
+    ]
+  },
   "scoring_fixture": {
     "asset": "TQQQ",
     "underlying": "QQQ",
+    "required_component_scores": [
+      "trend",
+      "pullback",
+      "momentum",
+      "breadth",
+      "volatility",
+      "macro",
+      "event_safety",
+      "event_risk",
+      "theme"
+    ],
     "allowed_actions": [
       "BUY_3X",
       "BUY_2X",
@@ -28,14 +90,256 @@
       "BLOCK"
     ],
     "requires_stop_and_take_profit": true,
-    "requires_config_hash": true
+    "requires_config_hash": true,
+    "strategy_config_schema": "strategy_config.v1",
+    "required_strategy_config_contract_fields": [
+      "valid",
+      "config_hash_matches_signal",
+      "weight_sum",
+      "bounds_checked",
+      "sum_checked",
+      "threshold_order_checked",
+      "hash_algorithm"
+    ]
+  },
+  "trade_guide_fixture": {
+    "schema": "trade_guide.v1",
+    "required_guide_fields": [
+      "entry",
+      "stop_conditions",
+      "take_profit_conditions",
+      "time_exit_conditions",
+      "invalidation_conditions",
+      "position_sizing_note"
+    ],
+    "required_guard_checks": [
+      "entry_present",
+      "stop_conditions_present",
+      "take_profit_conditions_present",
+      "time_exit_conditions_present",
+      "invalidation_conditions_present",
+      "config_trace_present",
+      "no_order_submission",
+      "no_live_data_required"
+    ]
+  },
+  "position_fixture": {
+    "schema": "position_management.v1",
+    "allowed_actions": [
+      "WAIT",
+      "TRIM",
+      "EXIT",
+      "STOP"
+    ],
+    "allowed_position_states": [
+      "maintain",
+      "trim",
+      "exit",
+      "stop"
+    ],
+    "required_guard_checks": [
+      "action_allowed",
+      "position_state_allowed",
+      "stop_conditions_present",
+      "take_profit_conditions_present",
+      "signal_trace_present",
+      "no_order_submission",
+      "no_live_data_required"
+    ]
+  },
+  "indicator_fixture": {
+    "swing_level_schema": "swing_levels.v1",
+    "required_swing_level_fields": [
+      "support_20",
+      "resistance_20",
+      "previous_swing_high",
+      "previous_swing_high_timestamp",
+      "previous_swing_low",
+      "previous_swing_low_timestamp",
+      "recent_gaps"
+    ]
+  },
+  "chart_fixture": {
+    "artifact_schema": "chart_artifact.v1",
+    "required_guard_checks": [
+      "artifact_written",
+      "png_signature",
+      "artifact_ref_type_declared",
+      "renderer_is_offline_stdlib",
+      "no_live_data_required"
+    ]
+  },
+  "news_fixture": {
+    "required_contract_schema": "news_score.v1",
+    "required_source_policy_schema": "news_source_policy.v1",
+    "required_source_groups": [
+      "fed",
+      "treasury",
+      "white_house",
+      "eia",
+      "iran_hormuz",
+      "ai_semiconductor"
+    ],
+    "required_source_policy_guard_checks": [
+      "required_source_groups_covered",
+      "source_group_present_on_cards",
+      "no_live_collection",
+      "no_network_call"
+    ],
+    "required_scoring_usage_schema": "news_score_usage.v1",
+    "required_scores": [
+      "news_score",
+      "policy_score",
+      "geopolitical_score",
+      "ai_semiconductor_theme_score"
+    ],
+    "required_card_fields": [
+      "modality",
+      "artifact_ref",
+      "source_group"
+    ],
+    "required_modalities": [
+      "pdf_summary",
+      "news_text"
+    ]
+  },
+  "macro_fixture": {
+    "required_indicators": [
+      "vix",
+      "vxn",
+      "dxy",
+      "us_2y",
+      "us_10y",
+      "oil_wti"
+    ],
+    "required_summary_fields": [
+      "risk_triggers",
+      "blocks_new_longs_now",
+      "blocks_new_3x_now",
+      "blocks_new_2x_now",
+      "indicator_states"
+    ]
+  },
+  "event_fixture": {
+    "policy_schema": "event_policy.v1",
+    "required_event_types": [
+      "CPI",
+      "FOMC",
+      "NFP",
+      "EARNINGS"
+    ],
+    "required_policy_guard_checks": [
+      "required_event_types_covered",
+      "danger_window_present",
+      "pre_event_block_fields_present",
+      "no_live_data_required",
+      "no_network_call"
+    ]
   },
   "labeling_fixture": {
+    "schema": "signal_label_outcome.v1",
     "allowed_outcomes": [
       "TAKE_PROFIT_FIRST",
       "STOP_LOSS_FIRST",
-      "TIME_EXIT"
+      "TIME_EXIT",
+      "NO_DATA",
+      "INVALIDATED_BY_EVENT"
     ],
-    "requires_mfe_mae_realized_r": true
+    "requires_mfe_mae_realized_r": true,
+    "metric_window": "price_path[:time_barrier_days]",
+    "required_metric_fields": [
+      "mfe",
+      "mae",
+      "realized_r"
+    ],
+    "required_barrier_fields": [
+      "first_barrier_hit",
+      "hit_index",
+      "entry_price",
+      "upper_barrier",
+      "lower_barrier",
+      "time_barrier_days"
+    ]
+  },
+  "recording_fixture": {
+    "run_journal_schema": "run_journal.v1",
+    "required_run_journal_fields": [
+      "schema_version",
+      "run_id",
+      "signal_id",
+      "started_at",
+      "finished_at",
+      "status",
+      "trigger",
+      "config_version",
+      "config_hash",
+      "idempotency_key"
+    ]
+  },
+  "audit_fixture": {
+    "log_schema": "audit_log.v1",
+    "summary_schema": "audit_summary.v1",
+    "required_payload_fields": [
+      "schema_version",
+      "network_call",
+      "secret_values_returned",
+      "live_data_required"
+    ]
+  },
+  "performance_fixture": {
+    "required_sections": [
+      "score_bins",
+      "score_calibration",
+      "component_attribution",
+      "ablation_report",
+      "out_of_sample_report",
+      "walk_forward_report",
+      "overfit_guard"
+    ],
+    "requires_promotion_report": true,
+    "requires_out_of_sample_ready": true,
+    "default_window_days": 90,
+    "extended_window_days": 180,
+    "unsupported_window_days": 365,
+    "minimum_extended_sample_size": 30,
+    "evaluation_window_schema": "fixture_oos_window.v1",
+    "required_evaluation_window_fields": [
+      "requested_days",
+      "sample_source",
+      "sample_size",
+      "sample_age_range_days_ago",
+      "available_fixture_window_days",
+      "minimum_supported_coverage_ratio",
+      "requested_window_coverage_ratio",
+      "requested_window_supported",
+      "requested_window_gap_days",
+      "coverage_status",
+      "unsupported_reason",
+      "fixture_replay_default",
+      "supported_fixture_windows_days",
+      "extended_fixture_window_days",
+      "live_data_required",
+      "repository_required",
+      "network_call"
+    ],
+    "deflated_sharpe_proxy_schema": "deflated_sharpe_proxy.v1",
+    "required_overfit_guard_checks": [
+      "minimum_fixture_size",
+      "out_of_sample_ready",
+      "walk_forward_ready",
+      "positive_walk_forward_fold_rate",
+      "multi_regime_fixture_coverage",
+      "deflated_sharpe_proxy_positive"
+    ],
+    "challenger_contract_schema": "challenger_config.v1",
+    "required_challenger_contract_fields": [
+      "candidate_status",
+      "champion_unchanged",
+      "approval_required",
+      "shadow_validation_required",
+      "out_of_sample_required",
+      "auto_promotion_allowed",
+      "config_hash_matches_challenger"
+    ]
   }
 }

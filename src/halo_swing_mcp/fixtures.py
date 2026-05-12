@@ -11,6 +11,7 @@ from typing import Any
 
 AS_OF = "2026-05-08T20:00:00Z"
 AS_OF_DATE = date(2026, 5, 8)
+SUPPORTED_TIMEFRAMES = ("1d", "4h", "1h")
 
 
 @dataclass(frozen=True)
@@ -92,6 +93,16 @@ EVENT_FIXTURES: list[dict[str, Any]] = [
         "blocks_2x_before_hours": 0,
     },
     {
+        "event_id": "evt_20260515_nfp",
+        "event_type": "NFP",
+        "title": "US labor market report window",
+        "scheduled_at": "2026-05-15T12:30:00Z",
+        "risk_level": "high",
+        "risk_score": 0.64,
+        "blocks_3x_before_hours": 24,
+        "blocks_2x_before_hours": 4,
+    },
+    {
         "event_id": "evt_20260520_fomc_minutes",
         "event_type": "FOMC",
         "title": "FOMC minutes",
@@ -108,6 +119,8 @@ NEWS_FIXTURES: list[dict[str, Any]] = [
         "evidence_id": "ev_fixture_fed_001",
         "category": "macro_policy",
         "source": "fixture:fed",
+        "source_group": "fed",
+        "modality": "pdf_summary",
         "observed_at": "2026-05-08T16:10:00Z",
         "asset_scope": ["QQQ", "SPY", "TQQQ", "QLD", "BTC"],
         "bias": "slightly_bullish",
@@ -117,11 +130,21 @@ NEWS_FIXTURES: list[dict[str, Any]] = [
         "buy_impact": "allow_2x",
         "sell_impact": "trim_if_yields_break_higher",
         "invalidating_condition": "DXY and yields rise together for two sessions.",
+        "artifact_ref": {
+            "ref_type": "PDF",
+            "ref": "https://example.invalid/evidence/fed-policy-summary.pdf",
+            "metadata": {
+                "description": "Fixture macro policy PDF summary",
+                "portable": True,
+            },
+        },
     },
     {
         "evidence_id": "ev_fixture_ai_001",
         "category": "ai_semiconductor",
         "source": "fixture:semiconductor_theme",
+        "source_group": "ai_semiconductor",
+        "modality": "news_text",
         "observed_at": "2026-05-08T17:25:00Z",
         "asset_scope": ["SMH", "SOXX", "SOXL", "QQQ", "TQQQ"],
         "bias": "bullish",
@@ -131,11 +154,21 @@ NEWS_FIXTURES: list[dict[str, Any]] = [
         "buy_impact": "support_2x_or_watch_3x",
         "sell_impact": "trim_into_earnings_spike",
         "invalidating_condition": "Semiconductor breadth loses the prior swing low.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/semiconductor-theme",
+            "metadata": {
+                "description": "Fixture semiconductor theme evidence",
+                "portable": True,
+            },
+        },
     },
     {
         "evidence_id": "ev_fixture_oil_001",
         "category": "geopolitical_oil",
         "source": "fixture:oil_risk",
+        "source_group": "oil_market",
+        "modality": "news_text",
         "observed_at": "2026-05-08T18:00:00Z",
         "asset_scope": ["SPY", "QQQ", "BTC"],
         "bias": "neutral_to_bearish",
@@ -145,6 +178,110 @@ NEWS_FIXTURES: list[dict[str, Any]] = [
         "buy_impact": "watch",
         "sell_impact": "trim_if_oil_spikes",
         "invalidating_condition": "WTI breaks higher with VIX expansion.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/oil-risk",
+            "metadata": {
+                "description": "Fixture geopolitical oil evidence",
+                "portable": True,
+            },
+        },
+    },
+    {
+        "evidence_id": "ev_fixture_treasury_001",
+        "category": "macro_policy",
+        "source": "fixture:treasury",
+        "source_group": "treasury",
+        "modality": "news_text",
+        "observed_at": "2026-05-08T18:15:00Z",
+        "asset_scope": ["QQQ", "SPY", "TQQQ", "QLD", "BTC"],
+        "bias": "neutral",
+        "strength": 0.52,
+        "confidence": 0.66,
+        "summary": "Treasury issuance risk is monitored but not forcing a risk-off block.",
+        "buy_impact": "context_only",
+        "sell_impact": "watch_if_yields_break_higher",
+        "invalidating_condition": "Auction tail pushes yields higher with DXY strength.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/treasury-issuance",
+            "metadata": {
+                "description": "Fixture Treasury policy evidence",
+                "portable": True,
+            },
+        },
+    },
+    {
+        "evidence_id": "ev_fixture_white_house_001",
+        "category": "macro_policy",
+        "source": "fixture:white_house",
+        "source_group": "white_house",
+        "modality": "news_text",
+        "observed_at": "2026-05-08T18:20:00Z",
+        "asset_scope": ["QQQ", "SPY", "TQQQ", "QLD"],
+        "bias": "neutral",
+        "strength": 0.50,
+        "confidence": 0.62,
+        "summary": "White House policy headlines are monitored for tariff or fiscal shocks.",
+        "buy_impact": "context_only",
+        "sell_impact": "trim_if_policy_shock",
+        "invalidating_condition": "Policy headline raises inflation or margin pressure.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/white-house-policy",
+            "metadata": {
+                "description": "Fixture White House policy evidence",
+                "portable": True,
+            },
+        },
+    },
+    {
+        "evidence_id": "ev_fixture_eia_001",
+        "category": "energy_policy",
+        "source": "fixture:eia",
+        "source_group": "eia",
+        "modality": "news_text",
+        "observed_at": "2026-05-08T18:25:00Z",
+        "asset_scope": ["SPY", "QQQ", "BTC"],
+        "bias": "neutral_to_bearish",
+        "strength": 0.54,
+        "confidence": 0.64,
+        "summary": "EIA energy context is watched for oil inflation pressure.",
+        "buy_impact": "watch",
+        "sell_impact": "trim_if_energy_shock",
+        "invalidating_condition": "Oil inventory shock combines with VIX expansion.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/eia-energy-context",
+            "metadata": {
+                "description": "Fixture EIA energy evidence",
+                "portable": True,
+            },
+        },
+    },
+    {
+        "evidence_id": "ev_fixture_iran_001",
+        "category": "geopolitical_oil",
+        "source": "fixture:iran_hormuz",
+        "source_group": "iran_hormuz",
+        "modality": "news_text",
+        "observed_at": "2026-05-08T18:30:00Z",
+        "asset_scope": ["SPY", "QQQ", "BTC"],
+        "bias": "neutral_to_bearish",
+        "strength": 0.56,
+        "confidence": 0.61,
+        "summary": "Iran/Hormuz risk is monitored for oil shock transmission.",
+        "buy_impact": "watch",
+        "sell_impact": "trim_if_oil_or_vix_spikes",
+        "invalidating_condition": "Shipping risk creates a sustained oil volatility spike.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": "https://example.invalid/evidence/iran-hormuz-risk",
+            "metadata": {
+                "description": "Fixture Iran/Hormuz risk evidence",
+                "portable": True,
+            },
+        },
     },
 ]
 
@@ -168,33 +305,59 @@ def supported_assets() -> list[str]:
     return sorted(ASSET_UNDERLYING)
 
 
+def supported_timeframes() -> list[str]:
+    return list(SUPPORTED_TIMEFRAMES)
+
+
+def validate_timeframe(timeframe: str) -> str:
+    normalized = timeframe.lower()
+    if normalized not in SUPPORTED_TIMEFRAMES:
+        supported = ", ".join(SUPPORTED_TIMEFRAMES)
+        raise ValueError(f"unsupported timeframe: {timeframe}; supported: {supported}")
+    return normalized
+
+
 @lru_cache(maxsize=64)
-def generate_ohlcv(symbol: str, periods: int = 220) -> tuple[dict[str, Any], ...]:
+def generate_ohlcv(
+    symbol: str,
+    periods: int = 220,
+    timeframe: str = "1d",
+) -> tuple[dict[str, Any], ...]:
     """Generate deterministic OHLCV bars for offline harnesses."""
 
     normalized = symbol.upper()
+    normalized_timeframe = validate_timeframe(timeframe)
     if normalized in UNDERLYING_PROFILES:
-        return tuple(_generate_underlying_ohlcv(UNDERLYING_PROFILES[normalized], periods))
+        return tuple(
+            _generate_underlying_ohlcv(
+                UNDERLYING_PROFILES[normalized],
+                periods,
+                normalized_timeframe,
+            )
+        )
 
     underlying, leverage = resolve_asset(normalized)
     base = LEVERAGED_BASE_PRICE.get(normalized)
     if base is None:
         raise ValueError(f"unsupported leveraged asset: {symbol}")
-    underlying_bars = generate_ohlcv(underlying, periods)
+    underlying_bars = generate_ohlcv(underlying, periods, normalized_timeframe)
     return tuple(_generate_leveraged_ohlcv(normalized, base, leverage, underlying_bars))
 
 
 def _generate_underlying_ohlcv(
     profile: SymbolProfile,
     periods: int,
+    timeframe: str,
 ) -> list[dict[str, Any]]:
     start = AS_OF_DATE - timedelta(days=periods - 1)
     bars: list[dict[str, Any]] = []
     previous_close = profile.base_price
+    timeframe_scale = {"1d": 1.0, "4h": 0.45, "1h": 0.22}[timeframe]
+    volume_scale = {"1d": 1.0, "4h": 0.18, "1h": 0.055}[timeframe]
 
     for index in range(periods):
         current_date = start + timedelta(days=index)
-        trend = 1 + profile.drift * index
+        trend = 1 + profile.drift * index * timeframe_scale
         cycle = profile.cycle * math.sin(index / 6 + profile.phase)
         slower_cycle = profile.cycle * 0.55 * math.sin(index / 17 + profile.phase / 2)
         pullback = -0.035 * math.exp(-((periods - index - 19) / 8) ** 2)
@@ -203,10 +366,15 @@ def _generate_underlying_ohlcv(
         open_price = previous_close * (1 + 0.002 * math.sin(index / 3 + profile.phase))
         high = max(open_price, close) * (1 + 0.005 + abs(math.sin(index)) * 0.003)
         low = min(open_price, close) * (1 - 0.005 - abs(math.cos(index)) * 0.003)
-        volume = int(profile.volume * (1 + 0.08 * math.sin(index / 5 + profile.phase)))
+        volume = int(
+            profile.volume
+            * volume_scale
+            * (1 + 0.08 * math.sin(index / 5 + profile.phase))
+        )
         bars.append(
             {
-                "timestamp": current_date.isoformat(),
+                "timestamp": _bar_timestamp(current_date, index, periods, timeframe),
+                "timeframe": timeframe,
                 "open": round(open_price, 4),
                 "high": round(high, 4),
                 "low": round(low, 4),
@@ -217,6 +385,21 @@ def _generate_underlying_ohlcv(
         previous_close = close
 
     return bars
+
+
+def _bar_timestamp(
+    current_date: date,
+    index: int,
+    periods: int,
+    timeframe: str,
+) -> str:
+    if timeframe == "1d":
+        return current_date.isoformat()
+
+    as_of_dt = datetime.fromisoformat(AS_OF.replace("Z", "+00:00"))
+    hours = {"4h": 4, "1h": 1}[timeframe]
+    timestamp = as_of_dt - timedelta(hours=hours * (periods - index - 1))
+    return timestamp.isoformat().replace("+00:00", "Z")
 
 
 def _generate_leveraged_ohlcv(
@@ -241,6 +424,7 @@ def _generate_leveraged_ohlcv(
         bars.append(
             {
                 "timestamp": bar["timestamp"],
+                "timeframe": bar["timeframe"],
                 "open": round(open_price, 4),
                 "high": round(high, 4),
                 "low": round(low, 4),

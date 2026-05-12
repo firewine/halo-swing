@@ -16,6 +16,7 @@ from halo_swing_mcp.audit import audit_summary, read_audit_events, resolve_audit
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
+ALLOWED_HOSTS = {DEFAULT_HOST, "localhost", "::1"}
 
 
 HTML = """<!doctype html>
@@ -244,7 +245,12 @@ def create_handler(audit_log_path: str | None = None) -> type[BaseHTTPRequestHan
                 return
             if parsed.path == "/api/events":
                 query = parse_qs(parsed.query)
-                self._send_json(HTTPStatus.OK, events_payload(audit_log_path, query))
+                try:
+                    payload = events_payload(audit_log_path, query)
+                except ValueError as exc:
+                    self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                    return
+                self._send_json(HTTPStatus.OK, payload)
                 return
             if parsed.path == "/api/summary":
                 self._send_json(HTTPStatus.OK, summary_payload(audit_log_path))
@@ -283,14 +289,19 @@ def events_payload(
     """Build the JSON payload for the events API."""
 
     query = query or {}
+    normalized_limit = _int_query(query, "limit", 100)
+    normalized_action = _str_query(query, "action")
+    normalized_resource_type = _str_query(query, "resource_type")
+    normalized_resource_id = _str_query(query, "resource_id")
+    normalized_outcome = _str_query(query, "outcome")
     return {
         "events": read_audit_events(
             audit_log_path=audit_log_path,
-            limit=_int_query(query, "limit", 100),
-            action=_str_query(query, "action"),
-            resource_type=_str_query(query, "resource_type"),
-            resource_id=_str_query(query, "resource_id"),
-            outcome=_str_query(query, "outcome"),
+            limit=normalized_limit,
+            action=normalized_action,
+            resource_type=normalized_resource_type,
+            resource_id=normalized_resource_id,
+            outcome=normalized_outcome,
         )
     }
 
@@ -311,6 +322,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.host not in ALLOWED_HOSTS:
+        print("Audit web must bind to localhost only.", file=sys.stderr)
+        return 2
     audit_path = str(resolve_audit_log_path(args.audit_log_path))
     handler = create_handler(audit_path)
     server = ThreadingHTTPServer((args.host, args.port), handler)
@@ -328,15 +342,38 @@ def main(argv: list[str] | None = None) -> int:
 
 def _str_query(query: dict[str, list[str]], key: str) -> str | None:
     value = query.get(key, [""])[0]
-    return value or None
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{key} must be a string when provided")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{key} must not contain control characters")
+    normalized = value.strip()
+    return normalized or None
 
 
 def _int_query(query: dict[str, list[str]], key: str, default: int) -> int:
     raw = query.get(key, [str(default)])[0]
-    try:
-        return int(raw)
-    except ValueError:
+    if raw is None:
         return default
+    if not isinstance(raw, str):
+        raise ValueError(f"{key} must be a positive integer")
+    if not _has_no_control_characters(raw):
+        raise ValueError(f"{key} must not contain control characters")
+    normalized = raw.strip()
+    if not normalized:
+        return default
+    try:
+        value = int(normalized)
+    except ValueError:
+        raise ValueError(f"{key} must be a positive integer") from None
+    if value <= 0:
+        raise ValueError(f"{key} must be a positive integer")
+    return min(value, 1000)
+
+
+def _has_no_control_characters(value: str) -> bool:
+    return all(ord(character) >= 32 and ord(character) != 127 for character in value)
 
 
 if __name__ == "__main__":

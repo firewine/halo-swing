@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -157,6 +158,7 @@ HTML = """<!doctype html>
           <label>Max Daily Orders<input name="max_daily_order_count" type="number" step="1" min="1" required></label>
           <label>Max Daily Loss USDT<input name="max_daily_loss_usd" type="number" step="0.01" min="0.01" required></label>
           <label>COIN-M Contract Size USD<input name="coinm_contract_size_usd" type="number" step="0.01" min="0.01" required></label>
+          <label><input name="emergency_kill_switch_enabled" type="checkbox"> Emergency Kill Switch</label>
           <button type="submit">Save Settings</button>
         </form>
         <div class="message" id="riskMessage"></div>
@@ -220,7 +222,11 @@ HTML = """<!doctype html>
     }
 
     function formObject(form) {
-      return Object.fromEntries(new FormData(form).entries());
+      const payload = Object.fromEntries(new FormData(form).entries());
+      for (const input of form.querySelectorAll("input[type='checkbox']")) {
+        payload[input.name] = input.checked;
+      }
+      return payload;
     }
 
     async function postJson(path, body) {
@@ -237,7 +243,9 @@ HTML = """<!doctype html>
     function fillRiskForm(settings) {
       for (const [key, value] of Object.entries(settings)) {
         const input = riskForm.elements[key];
-        if (input) input.value = value;
+        if (!input) continue;
+        if (input.type === "checkbox") input.checked = Boolean(value);
+        else input.value = value;
       }
     }
 
@@ -251,6 +259,7 @@ HTML = """<!doctype html>
         metric("api key", payload.credentials.api_key_hint || "none"),
         metric("environment", payload.execution.testnet ? "testnet" : "live"),
         metric("execution policy", payload.execution.force_testnet_execution ? "testnet only" : "env selected"),
+        metric("kill switch", settings.emergency_kill_switch_enabled ? "enabled" : "off"),
         metric("remaining orders", payload.risk.remaining_daily_order_count),
         metric("remaining loss", payload.risk.remaining_daily_loss_usd)
       ].join("");
@@ -365,9 +374,15 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                 payload = self._read_json()
                 if parsed.path == "/api/credentials":
                     result = save_binance_credentials(
-                        api_key=str(payload.get("api_key", "")),
-                        api_secret=str(payload.get("api_secret", "")),
-                        passphrase=str(payload.get("passphrase", "")),
+                        api_key=_required_str(payload.get("api_key"), "api_key"),
+                        api_secret=_required_str(
+                            payload.get("api_secret"),
+                            "api_secret",
+                        ),
+                        passphrase=_required_str(
+                            payload.get("passphrase"),
+                            "passphrase",
+                        ),
                     )
                     self._send_json(HTTPStatus.OK, result)
                     return
@@ -378,8 +393,9 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                     self._send_json(
                         HTTPStatus.OK,
                         get_binance_coinm_account_snapshot(
-                            credential_passphrase=str(
-                                payload.get("credential_passphrase", "")
+                            credential_passphrase=_optional_str(
+                                payload.get("credential_passphrase"),
+                                "credential_passphrase",
                             )
                         ),
                     )
@@ -388,25 +404,39 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                     self._send_json(
                         HTTPStatus.OK,
                         preview_btc_order(
-                            side=str(payload.get("side", "BUY")),
-                            quantity=str(payload.get("quantity", "1")),
-                            position_side=_optional_str(payload.get("position_side")),
+                            side=_required_str(payload.get("side", "BUY"), "side"),
+                            quantity=_required_str(
+                                payload.get("quantity", "1"),
+                                "quantity",
+                            ),
+                            position_side=_optional_str(
+                                payload.get("position_side"),
+                                "position_side",
+                            ),
                         ),
                     )
                     return
                 if parsed.path == "/api/risk-settings":
                     result = update_btc_risk_settings(
                         max_notional_usd_per_order=_optional_float(
-                            payload.get("max_notional_usd_per_order")
+                            payload.get("max_notional_usd_per_order"),
+                            "max_notional_usd_per_order",
                         ),
                         max_daily_order_count=_optional_int(
-                            payload.get("max_daily_order_count")
+                            payload.get("max_daily_order_count"),
+                            "max_daily_order_count",
                         ),
                         max_daily_loss_usd=_optional_float(
-                            payload.get("max_daily_loss_usd")
+                            payload.get("max_daily_loss_usd"),
+                            "max_daily_loss_usd",
                         ),
                         coinm_contract_size_usd=_optional_float(
-                            payload.get("coinm_contract_size_usd")
+                            payload.get("coinm_contract_size_usd"),
+                            "coinm_contract_size_usd",
+                        ),
+                        emergency_kill_switch_enabled=_optional_bool(
+                            payload.get("emergency_kill_switch_enabled"),
+                            "emergency_kill_switch_enabled",
                         ),
                     )
                     self._send_json(HTTPStatus.OK, result)
@@ -475,22 +505,81 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _optional_float(value: Any) -> float | None:
-    if value in {None, ""}:
+def _required_str(value: Any, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError(f"{field_name} must be a nonempty string")
+    return normalized
+
+
+def _optional_float(value: Any, field_name: str) -> float | None:
+    if value is None:
         return None
-    return float(value)
+    if isinstance(value, str):
+        if not _has_no_control_characters(value):
+            raise ValueError(f"{field_name} must not contain control characters")
+        normalized_text = value.strip()
+        if not normalized_text:
+            return None
+        try:
+            normalized = float(normalized_text)
+        except ValueError as exc:
+            raise ValueError(f"{field_name} must be a positive finite number") from exc
+    elif isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{field_name} must be a positive finite number")
+    else:
+        normalized = float(value)
+    if not math.isfinite(normalized) or normalized <= 0.0:
+        raise ValueError(f"{field_name} must be a positive finite number")
+    return normalized
 
 
-def _optional_int(value: Any) -> int | None:
-    if value in {None, ""}:
+def _optional_int(value: Any, field_name: str) -> int | None:
+    if value is None:
         return None
-    return int(value)
+    if isinstance(value, str):
+        if not _has_no_control_characters(value):
+            raise ValueError(f"{field_name} must not contain control characters")
+        normalized_text = value.strip()
+        if not normalized_text:
+            return None
+        if not normalized_text.isdecimal():
+            raise ValueError(f"{field_name} must be a positive integer")
+        normalized = int(normalized_text)
+    elif type(value) is int:
+        normalized = value
+    else:
+        raise ValueError(f"{field_name} must be a positive integer")
+    if normalized < 1:
+        raise ValueError(f"{field_name} must be a positive integer")
+    return normalized
 
 
-def _optional_str(value: Any) -> str | None:
-    if value in {None, ""}:
+def _optional_bool(value: Any, field_name: str) -> bool | None:
+    if value is None:
         return None
-    return str(value)
+    if type(value) is not bool:
+        raise ValueError(f"{field_name} must be a boolean")
+    return value
+
+
+def _optional_str(value: Any, field_name: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a string when provided")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    normalized = value.strip()
+    return normalized or None
+
+
+def _has_no_control_characters(value: str) -> bool:
+    return all(ord(character) >= 32 and ord(character) != 127 for character in value)
 
 
 if __name__ == "__main__":
