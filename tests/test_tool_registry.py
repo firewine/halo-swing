@@ -451,6 +451,131 @@ def test_harness_rejects_invalid_input_file_json_with_failure_audit(
     assert expected_error in event["details"]["error"]
 
 
+def test_harness_rejects_unreadable_input_file_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = tmp_path / "missing.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            str(input_file),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input file must be readable"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {
+        "input_source": "input_file",
+        "input_file": str(input_file),
+    }
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_invalid_utf8_input_file_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = tmp_path / "input.json"
+    input_file.write_bytes(b"\xff")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            str(input_file),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input file must be readable"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {
+        "input_source": "input_file",
+        "input_file": str(input_file),
+    }
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
+def test_harness_rejects_input_source_conflict_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = tmp_path / "missing.json"
+    input_json = {"api_key": "secret-value"}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            str(input_file),
+            "--input-json",
+            json.dumps(input_json),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input-json and input-file are mutually exclusive"
+    event_details = json.dumps(event["details"])
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert "input file must be readable" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {
+        "input_source": "input_conflict",
+        "input_file": str(input_file),
+        "input_json_provided": True,
+    }
+    assert "secret-value" not in event_details
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_default_source_does_not_import_live_db_or_broker_clients() -> None:
     imported_modules: set[str] = set()
 

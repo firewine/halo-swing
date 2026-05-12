@@ -9302,6 +9302,119 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.432 Harness Input Source Conflict Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+The harness accepts payloads from either `--input-json` or `--input-file`.
+Supplying both sources silently preferred the file path and ignored the explicit
+JSON payload, which made caller intent ambiguous and could hide invalid or
+sensitive JSON text from the public failure boundary. This slice rejects
+conflicting input sources before file reads or tool dispatch and records only
+safe conflict metadata.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness now rejects simultaneous input_json and input_file sources before file reads or tool dispatch
+  - conflict failure audits record input_source=input_conflict, input_file path, and input_json_provided without serializing raw input-json text
+  - harness coverage verifies conflict failures exit nonzero and emit no stdout payload
+  - harness coverage verifies conflict handling happens before input-file readability errors
+  - harness coverage verifies failure audits record resource_id, failure outcome, conflict metadata, and public error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_input_source_conflict_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 23 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 562 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.431 Harness Unreadable Input File Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+The harness now audits malformed JSON and non-object payload failures before
+tool dispatch. Unreadable or undecodable `--input-file` inputs could still fail
+while opening or decoding the file before the audit path. This slice converts
+file-read failures into public harness validation failures and records only
+path/source metadata.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness input-file loading now converts OSError and UnicodeDecodeError failures into public ValueError failures before tool dispatch
+  - unreadable or undecodable input-file failure audits record input_source=input_file and input_file path without serializing file contents
+  - harness coverage verifies a missing input file exits nonzero and emits no stdout payload
+  - harness coverage verifies an invalid UTF-8 input file exits nonzero and emits no stdout payload
+  - harness coverage verifies failure audits record resource_id, failure outcome, input-file metadata, and public error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_unreadable_input_file_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_invalid_utf8_input_file_with_failure_audit -q -> 2 passed, harness unreadable/undecodable input-file failure-audit coverage enforced
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 22 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 561 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.430 Harness Invalid JSON Failure Audit Record - 2026-05-12
 
 ### A. 목적

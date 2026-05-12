@@ -16,7 +16,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("command", choices=tool_names())
     parser.add_argument(
         "--input-json",
-        default="{}",
         help="JSON object passed as keyword arguments to the selected command.",
     )
     parser.add_argument(
@@ -39,12 +38,31 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.input_file and args.input_json is not None:
+        error = ValueError("input-json and input-file are mutually exclusive")
+        if not args.no_audit:
+            append_tool_audit_event(
+                command_name=args.command,
+                input_payload={
+                    "input_source": "input_conflict",
+                    "input_file": args.input_file,
+                    "input_json_provided": True,
+                },
+                result=None,
+                outcome="failure",
+                actor="harness",
+                audit_log_path=args.audit_log_path,
+                error=repr(error),
+            )
+        raise error
+
     try:
         if args.input_file:
             with open(args.input_file, encoding="utf-8") as handle:
                 input_payload = json.load(handle)
         else:
-            input_payload = json.loads(args.input_json)
+            input_json = args.input_json if args.input_json is not None else "{}"
+            input_payload = json.loads(input_json)
     except json.JSONDecodeError as exc:
         error = ValueError("input payload must be valid JSON")
         if not args.no_audit:
@@ -56,6 +74,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             append_tool_audit_event(
                 command_name=args.command,
                 input_payload=input_payload,
+                result=None,
+                outcome="failure",
+                actor="harness",
+                audit_log_path=args.audit_log_path,
+                error=repr(error),
+            )
+        raise error from exc
+    except (OSError, UnicodeDecodeError) as exc:
+        error = ValueError("input file must be readable")
+        if not args.no_audit:
+            append_tool_audit_event(
+                command_name=args.command,
+                input_payload={
+                    "input_source": "input_file",
+                    "input_file": args.input_file,
+                },
                 result=None,
                 outcome="failure",
                 actor="harness",
