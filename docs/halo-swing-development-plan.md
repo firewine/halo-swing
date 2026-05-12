@@ -9354,6 +9354,9 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 523 passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
 ```
 
 ## 3.421 Score Performance Provided Signals Input Audit Record - 2026-05-12
