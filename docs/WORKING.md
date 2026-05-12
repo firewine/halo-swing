@@ -23,8 +23,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: POSITION_REVIEW_ASSET_TYPE_FAILURE_AUDIT_VERIFIED
-gate_id: POSITION_REVIEW_ASSET_TYPE_FAILURE_AUDIT
+status: SCORING_TOOL_IDENTITY_TYPE_FAILURE_AUDIT_VERIFIED
+gate_id: SCORING_TOOL_IDENTITY_TYPE_FAILURE_AUDIT
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -114,6 +114,7 @@ done_means:
   - calculate_indicators exposes swing_level_contract with gap/support/resistance and previous swing high/low
   - score_leverage_swing exposes strategy_config_contract with schema, bounds, sum, threshold order, and hash validation
   - score_leverage_swing, generate_trade_guide, and evaluate_position normalize asset/timeframe identity and reject blank/non-string identity values at the public tool boundary
+  - harness score_leverage_swing, generate_trade_guide, and evaluate_position non-string identity type failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - score_leverage_swing, generate_trade_guide, and evaluate_position reject ASCII control characters in asset/timeframe identity before scoring, guide construction, or position evaluation
   - generate_trade_guide exposes trade_guide.v1 with time_exit_conditions and no-order-submission guards
   - evaluate_position exposes position_management.v1 with WAIT/TRIM/EXIT/STOP and no-order-submission guards
@@ -457,15 +458,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.423
-gate_packet: docs/halo-swing-development-plan.md#3.423
+portable_mirror: docs/halo-swing-development-plan.md#3.424
+gate_packet: docs/halo-swing-development-plan.md#3.424
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.423
-  - src/halo_swing_mcp/tools/reporting.py
-  - tests/test_reporting.py
+  - docs/halo-swing-development-plan.md#3.424
+  - src/halo_swing_mcp/tools/scoring.py
+  - tests/test_mvp_tools.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -13170,6 +13171,55 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+scoring_tool_identity_type_failure_audit:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_mvp_tools.py
+  implementation:
+    - tests-only slice; no source code change was needed because scoring identity normalization already rejects non-string asset/timeframe values at the public boundary
+    - harness coverage now verifies score_leverage_swing asset=123 and timeframe=null failures exit nonzero before scoring payload emission
+    - harness coverage now verifies generate_trade_guide asset=null and timeframe=[] failures exit nonzero before guide construction
+    - harness coverage now verifies evaluate_position asset=false exits nonzero before position-state calculation
+    - harness coverage verifies failure audits preserve original input, resource_id, failure outcome, and error text without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_asset_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_harness_rejects_blank_scoring_asset_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_tool_identity_types_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q
+      result: "14 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "165 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "530 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_424_audit.jsonl
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

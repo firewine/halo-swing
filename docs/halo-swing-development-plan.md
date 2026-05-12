@@ -9302,6 +9302,62 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.424 Scoring Tool Identity Type Failure Audit Record - 2026-05-12
+
+### A. 목적
+
+`score_leverage_swing`, `generate_trade_guide`, and `evaluate_position` already
+normalize public asset/timeframe identity and reject malformed values before
+scoring, guide construction, or position-state calculation. Earlier coverage
+proved the direct boundary and blank/control-character harness failures, but the
+CLI failure-audit boundary still needed representative JSON type failures for
+the scoring tool family.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source code change was needed because scoring identity normalization already rejects non-string asset/timeframe values at the public boundary
+  - harness coverage verifies score_leverage_swing asset=123 and timeframe=null failures exit nonzero before scoring payload emission
+  - harness coverage verifies generate_trade_guide asset=null and timeframe=[] failures exit nonzero before guide construction
+  - harness coverage verifies evaluate_position asset=false exits nonzero before position-state calculation
+  - harness coverage verifies each failure audit records original input, resource_id, failure outcome, and error text without output_summary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_asset_identity tests/test_mvp_tools.py::test_scoring_tools_reject_invalid_timeframe_identity tests/test_mvp_tools.py::test_harness_rejects_blank_scoring_asset_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_tool_identity_types_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_scoring_asset_control_character_with_failure_audit tests/test_mvp_tools.py::test_harness_rejects_trade_guide_timeframe_control_character_with_failure_audit -q -> 14 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_mvp_tools.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 165 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 530 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --audit-log-path /private/tmp/halo_swing_readiness_3_424_audit.jsonl -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.423 Position Review Asset Type Failure Audit Record - 2026-05-12
 
 ### A. 목적

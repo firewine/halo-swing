@@ -3500,6 +3500,73 @@ def test_harness_rejects_blank_scoring_asset_with_failure_audit(
     assert "asset must be a nonempty string" in event["details"]["error"]
 
 
+@pytest.mark.parametrize(
+    ("tool_name", "input_payload", "expected_error"),
+    [
+        (
+            "score_leverage_swing",
+            {"asset": 123},
+            "asset must be a nonempty string",
+        ),
+        (
+            "score_leverage_swing",
+            {"asset": "TQQQ", "timeframe": None},
+            "timeframe must be a nonempty string",
+        ),
+        (
+            "generate_trade_guide",
+            {"asset": "TQQQ", "timeframe": []},
+            "timeframe must be a nonempty string",
+        ),
+        (
+            "generate_trade_guide",
+            {"asset": None},
+            "asset must be a nonempty string",
+        ),
+        (
+            "evaluate_position",
+            {"asset": False},
+            "asset must be a nonempty string",
+        ),
+    ],
+)
+def test_harness_rejects_scoring_tool_identity_types_with_failure_audit(
+    tmp_path: Path,
+    tool_name: str,
+    input_payload: dict[str, object],
+    expected_error: str,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            tool_name,
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == tool_name
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_harness_rejects_scoring_asset_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
