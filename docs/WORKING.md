@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TRADING_ADMIN_POST_JSON_CONTAINER_VERIFIED
-gate_id: TRADING_ADMIN_POST_JSON_CONTAINER
+status: TRADING_ADMIN_MALFORMED_JSON_BOUNDARY_VERIFIED
+gate_id: TRADING_ADMIN_MALFORMED_JSON_BOUNDARY
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -102,6 +102,7 @@ done_means:
   - trading admin credentials HTTP endpoint returns a JSON 400 for invalid Binance credential environment paths before encrypted writes and without serializing submitted secret values
   - trading admin risk-settings HTTP endpoint returns a JSON 400 for invalid BTC risk settings environment paths before local settings writes
   - trading admin POST endpoints return a JSON 400 for non-object JSON payloads before credential writes, connectivity calls, account reads, order previews, risk settings writes, or risk state writes
+  - trading admin POST endpoints return a JSON 400 for malformed JSON bodies before credential writes, connectivity calls, account reads, order previews, risk settings writes, or risk state writes and without echoing submitted secret-looking text
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints validate JSON/form payload strings, numeric strings, finite values, and booleans before credential writes, account reads, order previews, or risk settings writes
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints reject ASCII control characters before credential writes, account reads, order previews, or risk settings writes
   - MCP server execute_btc_order audit logging redacts credential_passphrase in blocked order paths
@@ -521,13 +522,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.460
-gate_packet: docs/halo-swing-development-plan.md#3.460
+portable_mirror: docs/halo-swing-development-plan.md#3.461
+gate_packet: docs/halo-swing-development-plan.md#3.461
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.460
+  - docs/halo-swing-development-plan.md#3.461
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -835,16 +836,60 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.460 Trading Admin Non-Object JSON Payload Boundary is verified. All
-trading admin POST routes now have coverage for JSON containers that are not
-objects, returning JSON 400 before credential writes, connectivity calls,
-account reads, order previews, risk settings writes, or risk state writes can
-run. Focused admin payload coverage passed with 1 test,
-`tests/test_binance_btc.py` passed with 77 tests, and full pytest passed with
-611 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.461 Trading Admin Malformed JSON Payload Boundary is verified. All
+trading admin POST routes now have coverage for malformed JSON bodies returning
+JSON 400 before credential writes, connectivity calls, account reads, order
+previews, risk settings writes, or risk state writes can run, and without
+echoing submitted secret-looking text. Focused admin malformed JSON coverage
+passed with 1 test, `tests/test_binance_btc.py` passed with 78 tests, and full
+pytest passed with 612 tests. Ruff, health_check, get_integration_readiness,
+diff whitespace, blocked-path status, and ignored state checks passed.
 
 ```yaml
+trading_admin_malformed_json_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - all trading admin POST routes reject malformed JSON bodies with HTTP 400 JSON before route-side functions are reached
+    - endpoint coverage checks submitted secret-looking text is not echoed in malformed JSON error responses
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_endpoints_reject_malformed_json_before_side_effects -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "78 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "612 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 trading_admin_post_json_container:
   status: verified
   changed_files:

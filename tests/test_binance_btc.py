@@ -2403,6 +2403,53 @@ def test_trading_admin_post_endpoints_reject_non_object_json_before_side_effects
     assert not (tmp_path / "state").exists()
 
 
+def test_trading_admin_post_endpoints_reject_malformed_json_before_side_effects(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    get_settings.cache_clear()
+
+    def fail_side_effect(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("side effect function must not run")
+
+    for target in (
+        "halo_swing_mcp.trading_admin_web.save_binance_credentials",
+        "halo_swing_mcp.trading_admin_web.check_binance_coinm_connectivity",
+        "halo_swing_mcp.trading_admin_web.get_binance_coinm_account_snapshot",
+        "halo_swing_mcp.trading_admin_web.preview_btc_order",
+        "halo_swing_mcp.trading_admin_web.update_btc_risk_settings",
+        "halo_swing_mcp.trading_admin_web.reset_btc_daily_risk_state",
+    ):
+        monkeypatch.setattr(target, fail_side_effect)
+
+    raw_body = b'{"api_secret": "super-secret", "passphrase": "local-passphrase"'
+
+    try:
+        for path in (
+            "/api/credentials",
+            "/api/connectivity",
+            "/api/account-snapshot",
+            "/api/order-preview",
+            "/api/risk-settings",
+            "/api/risk-state/reset",
+        ):
+            response_payload = _admin_raw_json_request(
+                path,
+                raw_body,
+                expected_status="HTTP/1.0 400 Bad Request",
+            )
+            serialized_response = json.dumps(response_payload)
+
+            assert "Expecting" in str(response_payload["error"])
+            assert "super-secret" not in serialized_response
+            assert "local-passphrase" not in serialized_response
+    finally:
+        get_settings.cache_clear()
+
+    assert not (tmp_path / "state").exists()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,
@@ -2489,6 +2536,30 @@ def _admin_json_request(
     method = "POST" if payload is not None else "GET"
     raw_request = (
         f"{method} {path} HTTP/1.1\r\n"
+        "Host: 127.0.0.1\r\n"
+        "Content-Type: application/json\r\n"
+        f"Content-Length: {len(body)}\r\n"
+        "\r\n"
+    ).encode("utf-8") + body
+    socket = _MemorySocket(raw_request)
+    create_handler()(socket, ("127.0.0.1", 0), object())
+    response = socket.output.getvalue()
+    headers, _, response_body = response.partition(b"\r\n\r\n")
+    status_line = headers.splitlines()[0].decode("ascii")
+
+    assert status_line == expected_status
+    parsed = json.loads(response_body.decode("utf-8"))
+    assert isinstance(parsed, dict)
+    return parsed
+
+
+def _admin_raw_json_request(
+    path: str,
+    body: bytes,
+    expected_status: str = "HTTP/1.0 200 OK",
+) -> dict[str, object]:
+    raw_request = (
+        f"POST {path} HTTP/1.1\r\n"
         "Host: 127.0.0.1\r\n"
         "Content-Type: application/json\r\n"
         f"Content-Length: {len(body)}\r\n"
