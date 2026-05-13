@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_CHECKPOINT_HARNESS_INCLUDE_READINESS_NULL_NO_WRITE_VERIFIED
-gate_id: RUNTIME_CHECKPOINT_HARNESS_INCLUDE_READINESS_NULL_NO_WRITE
+status: RUNTIME_CHECKPOINT_HARNESS_RUN_ID_CONTROL_NO_WRITE_VERIFIED
+gate_id: RUNTIME_CHECKPOINT_HARNESS_RUN_ID_CONTROL_NO_WRITE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -160,6 +160,7 @@ done_means:
   - harness record_runtime_checkpoint zero include_readiness records a failure audit without checkpoint, ledger, or default state fallback before validation failure
   - harness record_runtime_checkpoint numeric include_readiness records a failure audit without checkpoint, ledger, or default state fallback before validation failure
   - harness record_runtime_checkpoint invalid public inputs record failure audit events without creating checkpoint or ledger files before validation failure
+  - harness record_runtime_checkpoint control-character run_id records a failure audit without checkpoint, ledger, or default state fallback before validation failure
   - harness record_runtime_checkpoint invalid run_id records a failure audit without checkpoint or ledger file creation
   - harness record_runtime_checkpoint non-string run_id records a failure audit without checkpoint or ledger file creation
   - harness record_runtime_checkpoint invalid checkpoint_path records a failure audit without default state fallback or ledger file creation
@@ -575,13 +576,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.514
-gate_packet: docs/halo-swing-development-plan.md#3.514
+portable_mirror: docs/halo-swing-development-plan.md#3.515
+gate_packet: docs/halo-swing-development-plan.md#3.515
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.514
+  - docs/halo-swing-development-plan.md#3.515
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -889,17 +890,61 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.514 Runtime Checkpoint Harness Include Readiness Null No-Write Guard is verified.
-Harness `record_runtime_checkpoint` null include_readiness coverage now proves
-failure audit events are recorded without checkpoint writes, ledger creation, or
-default `state/` fallback before returning an error. Focused harness runtime
-checkpoint include_readiness null coverage passed with 1 test,
-`tests/test_runtime_guard.py` passed with 59 tests, and full pytest passed with
-665 tests. Ruff, health_check,
+Summary: 3.515 Runtime Checkpoint Harness Run ID Control No-Write Guard is verified.
+Harness `record_runtime_checkpoint` control-character run_id coverage now
+proves failure audit events are recorded without checkpoint writes, ledger
+creation, or default `state/` fallback before returning an error. Focused
+harness runtime checkpoint run_id control-character coverage passed with 1
+test, `tests/test_runtime_guard.py` passed with 60 tests, and full pytest
+passed with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+runtime_checkpoint_harness_run_id_control_no_write:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint now covers control-character run_id payload input from an isolated tmp_path cwd
+    - harness control-character run_id coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+    - harness control-character run_id coverage asserts no checkpoint, no default state/ fallback, and no ledger file creation before validation failure
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "60 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "666 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_checkpoint_harness_include_readiness_null_no_write:
   status: verified
   changed_files:
