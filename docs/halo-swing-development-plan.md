@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.477 Runtime Checkpoint Harness Invalid Input No-Write Guard Record - 2026-05-13
+
+### A. 목적
+
+Harness `record_runtime_checkpoint` already covered control-character failures.
+The remaining coverage gap was invalid public input through the harness:
+`include_readiness` must be a real boolean, and the harness must record a
+failure audit event without creating checkpoint or ledger files before returning
+the validation error. This tests-only slice pins that boundary.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; added harness coverage for invalid include_readiness input
+  - invalid include_readiness coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+  - invalid include_readiness coverage asserts checkpoint_path and ledger_path remain absent after the failure audit
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 22 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 628 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.476 Runtime Status Harness Failure Ledger No-Write Guard Record - 2026-05-13
 
 ### A. 목적
