@@ -1162,6 +1162,51 @@ def test_harness_rejects_invalid_runtime_checkpoint_ledger_path_without_checkpoi
     assert not (tmp_path / "   ").exists()
 
 
+def test_harness_rejects_runtime_checkpoint_ledger_path_type_without_checkpoint(
+    tmp_path: Path,
+) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {
+        "checkpoint_path": str(checkpoint_path),
+        "audit_log_path": str(audit_path),
+        "ledger_path": 123,
+        "include_readiness": False,
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "record_runtime_checkpoint",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "ledger_path must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "record_runtime_checkpoint"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "ledger_path must be a nonempty string" in event["details"]["error"]
+    assert not checkpoint_path.exists()
+    assert not (tmp_path / "state").exists()
+
+
 def test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint(
     tmp_path: Path,
 ) -> None:
