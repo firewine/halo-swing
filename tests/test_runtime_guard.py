@@ -1606,10 +1606,14 @@ def test_runtime_checkpoint_rejects_invalid_public_inputs(tmp_path: Path) -> Non
         assert not ledger_path.exists()
 
 
-def test_runtime_checkpoint_rejects_control_character_inputs(tmp_path: Path) -> None:
+def test_runtime_checkpoint_rejects_control_character_inputs(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
     checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
+    monkeypatch.chdir(tmp_path)
     invalid_cases = [
         (
             {"run_id": "run_runtime\n"},
@@ -1643,6 +1647,7 @@ def test_runtime_checkpoint_rejects_control_character_inputs(tmp_path: Path) -> 
         assert not checkpoint_path.exists()
         assert not audit_path.exists()
         assert not ledger_path.exists()
+        assert not (tmp_path / "state").exists()
 
 
 def test_runtime_checkpoint_normalizes_env_checkpoint_path(
