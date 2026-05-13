@@ -281,9 +281,11 @@ def test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback(
 
 def test_runtime_status_rejects_path_control_character_inputs(
     tmp_path: Path,
+    monkeypatch,
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
+    monkeypatch.chdir(tmp_path)
     invalid_cases = [
         (
             {"audit_log_path": f"{audit_path}\n"},
@@ -306,6 +308,7 @@ def test_runtime_status_rejects_path_control_character_inputs(
 
         assert not audit_path.exists()
         assert not ledger_path.exists()
+        assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(

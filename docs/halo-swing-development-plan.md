@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.525 Runtime Status Control Public No-Fallback Guard Record - 2026-05-13
+### A. 목적
+
+Direct `get_runtime_status` control-character path input coverage now runs from
+an isolated cwd and explicitly asserts that validation failure creates no audit,
+ledger, or default `state/` fallback. The existing test already covered
+control-character audit_log_path and ledger_path values; this gate tightens the
+same boundary to match the current runtime status no-fallback standard.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; direct control-character path input coverage now runs from an isolated tmp_path cwd
+  - control-character path coverage verifies audit_log_path and ledger_path validation failures before audit reads, ledger resolution, or retention mutation
+  - control-character path coverage asserts no audit file, ledger file, or default state/ fallback
+  - user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_rejects_path_control_character_inputs -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.524 Runtime Status Invalid Public No-Fallback Guard Record - 2026-05-13
 ### A. 목적
 
