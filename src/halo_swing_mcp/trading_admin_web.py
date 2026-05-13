@@ -341,13 +341,14 @@ HTML = """<!doctype html>
 def admin_status_payload() -> dict[str, Any]:
     """Return trading admin status without exposing secrets."""
 
+    settings = get_settings()
     return {
         "credentials": get_binance_credentials_status(),
         "risk": get_btc_risk_status(),
         "execution": {
-            "testnet": get_settings().binance_testnet,
-            "force_testnet_execution": get_settings().binance_force_testnet_execution,
-            "live_trading_enabled": get_settings().binance_enable_live_trading,
+            "testnet": settings.binance_testnet,
+            "force_testnet_execution": settings.binance_force_testnet_execution,
+            "live_trading_enabled": settings.binance_enable_live_trading,
         },
     }
 

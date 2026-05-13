@@ -2124,6 +2124,37 @@ def test_trading_admin_status_is_secret_safe(tmp_path: Path, monkeypatch) -> Non
     assert payload["risk"]["settings"]["emergency_kill_switch_enabled"] is False
 
 
+def test_trading_admin_status_prevalidates_binance_env_before_local_reads(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not load with invalid testnet env")
+
+    def fail_risk_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("risk status must not load with invalid testnet env")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.get_btc_risk_status",
+        fail_risk_status,
+    )
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ):
+            admin_status_payload()
+    finally:
+        get_settings.cache_clear()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

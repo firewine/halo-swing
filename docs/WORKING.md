@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_ACCOUNT_SNAPSHOT_MISSING_PASSPHRASE_ENV_PREVALIDATION_VERIFIED
-gate_id: BINANCE_ACCOUNT_SNAPSHOT_MISSING_PASSPHRASE_ENV_PREVALIDATION
+status: TRADING_ADMIN_STATUS_ENV_PREVALIDATION_VERIFIED
+gate_id: TRADING_ADMIN_STATUS_ENV_PREVALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -90,6 +90,7 @@ done_means:
   - check_binance_coinm_connectivity and get_binance_coinm_account_snapshot reject noncanonical Binance testnet environment values before network or credential work
   - get_binance_coinm_account_snapshot rejects noncanonical Binance testnet environment values before missing-passphrase credential status reads
   - harness audit logging for save_binance_credentials redacts credential inputs and does not serialize secret, salt, or token values
+  - trading admin status payload prevalidates Binance environment booleans before credential or risk status reads
   - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
   - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
   - trading admin account snapshot HTTP endpoint blocks missing/invalid passphrase paths without serializing passphrase, secret, salt, or token values
@@ -512,13 +513,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.451
-gate_packet: docs/halo-swing-development-plan.md#3.451
+portable_mirror: docs/halo-swing-development-plan.md#3.452
+gate_packet: docs/halo-swing-development-plan.md#3.452
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.451
+  - docs/halo-swing-development-plan.md#3.452
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -826,16 +827,62 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.451 Binance Account Snapshot Missing Passphrase Environment
-Prevalidation is verified. `get_binance_coinm_account_snapshot` now validates
-settings-backed Binance boolean env values before returning the missing
-passphrase block, so invalid `HALO_SWING_BINANCE_TESTNET` values cannot trigger
-credential status evidence. Focused Binance coverage passed with 3 tests,
-`tests/test_binance_btc.py` passed with 68 tests, and full pytest passed with
-602 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.452 Trading Admin Status Environment Prevalidation is verified.
+`admin_status_payload` now validates settings-backed Binance boolean env values
+before credential or risk status helpers run, so invalid
+`HALO_SWING_BINANCE_TESTNET` values cannot trigger local status reads. Focused
+admin status coverage passed with 2 tests, `tests/test_binance_btc.py` passed
+with 69 tests, and full pytest passed with 603 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
+trading_admin_status_env_prevalidation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/trading_admin_web.py
+    - tests/test_binance_btc.py
+  implementation:
+    - admin_status_payload now loads settings before credential status and risk status helpers
+    - invalid HALO_SWING_BINANCE_TESTNET values now fail before trading admin local status reads
+    - coverage monkeypatches credential and risk status helpers to prove invalid testnet env validation happens first
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_status_prevalidates_binance_env_before_local_reads tests/test_binance_btc.py::test_trading_admin_status_is_secret_safe -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "69 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "603 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 binance_account_snapshot_missing_passphrase_env_prevalidation:
   status: verified
   changed_files:
