@@ -10,6 +10,7 @@ from halo_swing_mcp.audit import (
     append_audit_event,
     audit_summary,
     read_audit_events,
+    resolve_audit_log_path,
 )
 from halo_swing_mcp.audit_web import HTML, create_handler, events_payload, summary_payload
 from halo_swing_mcp import server as mcp_server
@@ -178,6 +179,45 @@ def test_audit_log_normalizes_public_limit_and_filters(tmp_path: Path) -> None:
     assert unfiltered["filters"]["outcome"] is None
     assert unfiltered["filters"]["limit"] == 1
     assert get_audit_summary(audit_log_path=f" {audit_path} ")["total_events"] == 2
+
+
+def test_resolve_audit_log_path_normalizes_env_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", f" {audit_path} ")
+
+    assert resolve_audit_log_path() == audit_path
+
+
+def test_append_audit_event_rejects_invalid_env_audit_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    invalid_cases = [
+        ("", "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string", tmp_path / "state"),
+        ("   ", "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string", tmp_path / "   "),
+        (
+            f"{tmp_path / 'bad'}\x7faudit.jsonl",
+            "HALO_SWING_AUDIT_LOG_PATH must not contain control characters",
+            tmp_path / "bad\x7faudit.jsonl",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", env_value)
+        with pytest.raises(ValueError, match=expected_error):
+            append_audit_event(
+                action="tool_call",
+                resource_type="mcp_tool",
+                resource_id="health_check",
+                outcome="success",
+                actor="test",
+            )
+
+        assert not unexpected_path.exists()
 
 
 def test_audit_log_rejects_invalid_public_inputs(tmp_path: Path) -> None:

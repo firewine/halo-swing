@@ -37,12 +37,27 @@ def utc_now() -> str:
 def resolve_audit_log_path(audit_log_path: str | None = None) -> Path:
     """Resolve audit path from explicit input, environment, then settings."""
 
-    configured = (
-        audit_log_path
-        or os.environ.get("HALO_SWING_AUDIT_LOG_PATH")
-        or get_settings().audit_log_path
-    )
+    if audit_log_path is not None:
+        configured = _normalize_audit_log_path(audit_log_path, "audit_log_path")
+    elif "HALO_SWING_AUDIT_LOG_PATH" in os.environ:
+        configured = _normalize_audit_log_path(
+            os.environ["HALO_SWING_AUDIT_LOG_PATH"],
+            "HALO_SWING_AUDIT_LOG_PATH",
+        )
+    else:
+        configured = _normalize_audit_log_path(
+            get_settings().audit_log_path,
+            "settings.audit_log_path",
+        )
     return Path(configured)
+
+
+def _normalize_audit_log_path(value: str, field_name: str) -> str:
+    if not value.strip():
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    return value.strip()
 
 
 def redact_details(value: Any) -> Any:

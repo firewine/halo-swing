@@ -4340,7 +4340,23 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 94. Next Concrete Actions
+## 94. 3.436 Audit Environment Path Validation Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_resolve_audit_log_path_normalizes_env_path tests/test_audit.py::test_append_audit_event_rejects_invalid_env_audit_path_without_fallback -q -> 2 passed, audit env path validation coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit.py tests/test_audit.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 570 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 95. Next Concrete Actions
 
 Choose one of:
 
