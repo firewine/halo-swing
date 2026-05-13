@@ -6432,3 +6432,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.540 Readiness Invalid Binance Boolean Prevalidation Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_rejects_noncanonical_binance_boolean_env -q -> 1 passed, invalid Binance boolean env values fail before Binance credential status reads
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 667 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

@@ -710,6 +710,14 @@ def test_integration_readiness_rejects_noncanonical_binance_boolean_env(
         ),
     ]
 
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not run before boolean env validation")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+
     for env_key, env_value, expected_error in invalid_cases:
         clear_readiness_env(monkeypatch)
         monkeypatch.setenv(env_key, env_value)
