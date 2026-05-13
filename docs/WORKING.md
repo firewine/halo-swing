@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: ARTIFACT_DIR_ENV_VALIDATION_VERIFIED
-gate_id: ARTIFACT_DIR_ENV_VALIDATION
+status: BINANCE_BOOLEAN_ENV_CANONICALIZATION_VERIFIED
+gate_id: BINANCE_BOOLEAN_ENV_CANONICALIZATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -113,6 +113,7 @@ done_means:
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secret aliases as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats market, macro, and news live data source env values as boolean evidence without returning source values or env key names
   - get_integration_readiness treats blank or control-character Telegram, gateway, market, macro, and news env values as not configured without returning secret values or env key names
+  - Binance execution policy env booleans accept only canonical true/false strings before readiness or execution policy evaluation
   - harness get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
   - MCP server get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
   - get_audit_log and audit web events_payload preserve readiness audit events without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
@@ -506,13 +507,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.445
-gate_packet: docs/halo-swing-development-plan.md#3.445
+portable_mirror: docs/halo-swing-development-plan.md#3.446
+gate_packet: docs/halo-swing-development-plan.md#3.446
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.445
+  - docs/halo-swing-development-plan.md#3.446
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -820,14 +821,13 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.445 Artifact Directory Environment Validation is verified.
-`render_chart` now uses the validated `artifact_dir` setting for default chart
-output instead of hardcoding `artifacts/charts`, and blank/control-character
-`HALO_SWING_ARTIFACT_DIR` values fail before chart directory creation. Focused
-artifact-dir coverage passed with 2 tests, `tests/test_mvp_tools.py` passed
-with 185 tests, and full pytest passed with 591 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.446 Binance Boolean Environment Canonicalization is verified.
+Binance execution-policy env booleans now accept only canonical `true`/`false`
+strings, so `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=1` or permissive aliases
+cannot silently satisfy live-trading readiness. Focused readiness coverage
+passed with 2 tests, `tests/test_readiness.py` passed with 24 tests, and full
+pytest passed with 593 tests. Ruff, health_check, get_integration_readiness,
+diff whitespace, blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13237,6 +13237,53 @@ blocked_scope_unchanged:
     - Binance network call
     - live trading
     - migration or repository persistence
+    - order submission
+
+binance_boolean_env_canonicalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - tests/test_readiness.py
+  implementation:
+    - Binance execution policy settings now validate env string values before Pydantic permissive bool coercion
+    - HALO_SWING_BINANCE_TESTNET and HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION accept only canonical true/false strings
+    - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING accepts only canonical true/false strings, matching the readiness missing-reason contract
+    - readiness coverage verifies canonical values are reflected in Binance gate evidence and noncanonical aliases are rejected before credential file fallback
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_canonical_binance_boolean_env tests/test_readiness.py::test_integration_readiness_rejects_noncanonical_binance_boolean_env -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "24 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "593 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
     - order submission
 
 artifact_dir_env_validation:

@@ -2,7 +2,15 @@
 
 from functools import lru_cache
 
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+BINANCE_BOOLEAN_ENV_NAMES = {
+    "binance_testnet": "HALO_SWING_BINANCE_TESTNET",
+    "binance_force_testnet_execution": "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
+    "binance_enable_live_trading": "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+}
 
 
 class Settings(BaseSettings):
@@ -30,6 +38,29 @@ class Settings(BaseSettings):
     runtime_retention_max_bytes: int = 5_000_000
     runtime_failure_window: int = 20
     runtime_failure_threshold: int = 3
+
+    @field_validator(
+        "binance_testnet",
+        "binance_force_testnet_execution",
+        "binance_enable_live_trading",
+        mode="before",
+    )
+    @classmethod
+    def _validate_binance_boolean_env(
+        cls,
+        value: bool | str,
+        info: ValidationInfo,
+    ) -> bool:
+        if isinstance(value, bool):
+            return value
+        env_name = BINANCE_BOOLEAN_ENV_NAMES.get(info.field_name or "", info.field_name or "")
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized == "true":
+                return True
+            if normalized == "false":
+                return False
+        raise ValueError(f"{env_name} must be 'true' or 'false'")
 
     model_config = SettingsConfigDict(
         env_file=".env",

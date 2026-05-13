@@ -9302,6 +9302,60 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.446 Binance Boolean Environment Canonicalization Record - 2026-05-13
+
+### A. 목적
+
+Readiness and execution guards explicitly require
+`HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`, while the default settings loader
+used Pydantic's permissive boolean parsing. That allowed aliases such as `1`,
+`yes`, or `on` to satisfy Binance execution policy booleans. This slice requires
+canonical `true`/`false` strings for Binance policy env booleans before readiness
+or execution policy evaluation.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - HALO_SWING_BINANCE_TESTNET validates to canonical true/false strings only
+  - HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION validates to canonical true/false strings only
+  - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING validates to canonical true/false strings only
+  - readiness coverage verifies canonical env values are reflected in Binance gate evidence
+  - noncanonical aliases are rejected before credential file fallback or gate evaluation can proceed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_canonical_binance_boolean_env tests/test_readiness.py::test_integration_readiness_rejects_noncanonical_binance_boolean_env -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 24 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 593 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.445 Artifact Directory Environment Validation Record - 2026-05-13
 
 ### A. 목적

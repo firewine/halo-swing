@@ -22,6 +22,8 @@ READINESS_ENV_KEYS = (
     "NEWS_API_KEY",
     "HALO_SWING_FRED_API_KEY",
     "HALO_SWING_NEWS_API_KEY",
+    "HALO_SWING_BINANCE_TESTNET",
+    "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
     "HALO_SWING_MARKET_DATA_SOURCE",
     "HALO_SWING_MARKET_DATA_API_KEY",
@@ -452,6 +454,78 @@ def test_integration_readiness_rejects_env_hermes_config_path_without_fallback(
             get_integration_readiness(
                 binance_credentials_path=f"{tmp_path / 'credentials.enc.json'}\n",
             )
+
+
+def test_integration_readiness_uses_canonical_binance_boolean_env(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "false")
+    monkeypatch.setenv("HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION", "false")
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
+    get_settings.cache_clear()
+
+    try:
+        payload = get_integration_readiness(
+            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+        )
+    finally:
+        get_settings.cache_clear()
+
+    binance_gate = payload["gates"]["binance_testnet_read_only"]
+    live_order_gate = payload["gates"]["live_order_submission"]
+    assert binance_gate["evidence"]["testnet"] is False
+    assert binance_gate["evidence"]["force_testnet_execution"] is False
+    assert binance_gate["evidence"]["live_trading_enabled"] is True
+    assert "HALO_SWING_BINANCE_TESTNET=true" in binance_gate["missing"]
+    assert (
+        "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true"
+        in binance_gate["missing"]
+    )
+    assert live_order_gate["evidence"]["live_trading_enabled"] is True
+    assert "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true" not in live_order_gate[
+        "missing"
+    ]
+
+
+def test_integration_readiness_rejects_noncanonical_binance_boolean_env(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    invalid_cases = [
+        (
+            "HALO_SWING_BINANCE_TESTNET",
+            "yes",
+            "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ),
+        (
+            "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
+            "on",
+            "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION must be 'true' or 'false'",
+        ),
+        (
+            "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+            "1",
+            "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING must be 'true' or 'false'",
+        ),
+    ]
+
+    for env_key, env_value, expected_error in invalid_cases:
+        clear_readiness_env(monkeypatch)
+        monkeypatch.setenv(env_key, env_value)
+        get_settings.cache_clear()
+
+        try:
+            with pytest.raises(ValueError, match=expected_error):
+                get_integration_readiness(
+                    binance_credentials_path=str(tmp_path / "missing.enc.json"),
+                )
+        finally:
+            get_settings.cache_clear()
+
+    assert not (tmp_path / "missing.enc.json").exists()
 
 
 def test_integration_readiness_rejects_invalid_public_inputs(tmp_path: Path) -> None:
