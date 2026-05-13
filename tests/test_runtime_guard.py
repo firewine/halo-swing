@@ -340,6 +340,7 @@ def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(
     assert event["details"]["input"] == input_payload
     assert "output_summary" not in event["details"]
     assert "apply_retention must be a boolean" in event["details"]["error"]
+    assert not ledger_path.exists()
 
 
 def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
@@ -379,6 +380,7 @@ def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
     assert event["details"]["input"] == input_payload
     assert "output_summary" not in event["details"]
     assert "audit_log_path must be a nonempty string" in event["details"]["error"]
+    assert not ledger_path.exists()
 
 
 def test_harness_rejects_runtime_path_control_character_with_failure_audit(
