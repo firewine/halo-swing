@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.493 Runtime Status Harness Ledger Path Control No-Write Guard Record - 2026-05-13
+
+### A. 목적
+
+Harness `get_runtime_status` now covers control-character ledger_path payload
+input from an isolated cwd. The remaining runtime status ledger path coverage
+gap was control-character validation through the harness: malformed ledger paths
+must fail before ledger repository resolution, default `state/` fallback, or
+malformed ledger file creation, while still recording the harness failure audit
+event to the explicit harness audit sink.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; added harness coverage for control-character ledger_path payload input
+  - control-character ledger_path coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+  - control-character ledger_path coverage asserts no default state/ fallback and no malformed ledger file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 644 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.492 Runtime Status Harness Audit Path No-Write Guard Record - 2026-05-13
 
 ### A. 목적
