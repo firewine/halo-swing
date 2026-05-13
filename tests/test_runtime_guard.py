@@ -7,6 +7,7 @@ import pytest
 
 from halo_swing_mcp.audit import append_audit_event
 from halo_swing_mcp.audit import read_audit_events
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.runtime_guard import (
     RetentionPolicy,
     apply_jsonl_retention,
@@ -544,6 +545,67 @@ def test_runtime_checkpoint_rejects_control_character_inputs(tmp_path: Path) -> 
             record_runtime_checkpoint(**payload)
 
         assert not checkpoint_path.exists()
+        assert not ledger_path.exists()
+
+
+def test_runtime_checkpoint_normalizes_env_checkpoint_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"
+    audit_path = tmp_path / "audit.jsonl"
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    write_jsonl(ledger_path, [{"sequence": 1}])
+    monkeypatch.setenv("HALO_SWING_RUNTIME_CHECKPOINT_PATH", f" {checkpoint_path} ")
+    get_settings.cache_clear()
+
+    payload = record_runtime_checkpoint(
+        audit_log_path=str(audit_path),
+        ledger_path=str(ledger_path),
+        include_readiness=False,
+    )
+
+    assert payload["checkpoint_path"] == str(checkpoint_path)
+    assert read_jsonl(checkpoint_path)[0]["readiness_status"] is None
+
+
+def test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    audit_path = tmp_path / "audit.jsonl"
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_RUNTIME_CHECKPOINT_PATH must be a nonempty string",
+            tmp_path / "state",
+        ),
+        (
+            "   ",
+            "HALO_SWING_RUNTIME_CHECKPOINT_PATH must be a nonempty string",
+            tmp_path / "   ",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7fruntime_checkpoints.jsonl",
+            "HALO_SWING_RUNTIME_CHECKPOINT_PATH must not contain control characters",
+            tmp_path / "bad\x7fruntime_checkpoints.jsonl",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_RUNTIME_CHECKPOINT_PATH", env_value)
+        get_settings.cache_clear()
+
+        with pytest.raises(ValueError, match=expected_error):
+            record_runtime_checkpoint(
+                audit_log_path=f"{audit_path}\n",
+                ledger_path=f"{ledger_path}\n",
+                include_readiness=False,
+            )
+        assert not unexpected_path.exists()
+        assert not audit_path.exists()
         assert not ledger_path.exists()
 
 

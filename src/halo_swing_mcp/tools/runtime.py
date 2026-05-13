@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ from halo_swing_mcp.tools.readiness import get_integration_readiness
 
 
 CHECKPOINT_SCHEMA_VERSION = "runtime_checkpoint.v1"
+RUNTIME_CHECKPOINT_PATH_ENV = "HALO_SWING_RUNTIME_CHECKPOINT_PATH"
 
 
 def get_runtime_status(
@@ -122,6 +124,7 @@ def record_runtime_checkpoint(
         "checkpoint_path",
     )
     normalized_run_id = _normalize_optional_run_id(run_id)
+    path = _resolve_checkpoint_path(normalized_checkpoint_path)
     runtime_status = get_runtime_status(
         audit_log_path=audit_log_path,
         ledger_path=ledger_path,
@@ -147,7 +150,6 @@ def record_runtime_checkpoint(
         },
         "live_data_required": False,
     }
-    path = _resolve_checkpoint_path(normalized_checkpoint_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(checkpoint, ensure_ascii=False, sort_keys=True) + "\n")
@@ -167,11 +169,21 @@ def _checkpoint_id(run_id: str | None) -> str:
 
 
 def _resolve_checkpoint_path(checkpoint_path: str | None = None) -> Path:
-    normalized_checkpoint_path = _normalize_optional_path(
-        checkpoint_path,
-        "checkpoint_path",
+    if checkpoint_path is not None:
+        return Path(_normalize_path(checkpoint_path, "checkpoint_path"))
+    if RUNTIME_CHECKPOINT_PATH_ENV in os.environ:
+        return Path(
+            _normalize_path(
+                os.environ[RUNTIME_CHECKPOINT_PATH_ENV],
+                RUNTIME_CHECKPOINT_PATH_ENV,
+            )
+        )
+    return Path(
+        _normalize_path(
+            get_settings().runtime_checkpoint_path,
+            "settings.runtime_checkpoint_path",
+        )
     )
-    return Path(normalized_checkpoint_path or get_settings().runtime_checkpoint_path)
 
 
 def _normalize_boolean(value: bool, field_name: str) -> bool:
@@ -209,6 +221,10 @@ def _normalize_optional_run_id(run_id: str | None) -> str | None:
 def _normalize_optional_path(value: str | None, field_name: str) -> str | None:
     if value is None:
         return None
+    return _normalize_path(value, field_name)
+
+
+def _normalize_path(value: Any, field_name: str) -> str:
     if not isinstance(value, str):
         raise ValueError(f"{field_name} must be a nonempty string")
     if not _has_no_control_characters(value):

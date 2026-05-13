@@ -9302,6 +9302,62 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.440 Runtime Checkpoint Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Public checkpoint inputs already validate explicit `checkpoint_path` values.
+The shared runtime checkpoint resolver still accepted
+`HALO_SWING_RUNTIME_CHECKPOINT_PATH` through settings without the same
+blank/control-character guard, and it resolved the final checkpoint path after
+runtime status reads. This slice hardens the resolver and validates the final
+checkpoint path before any runtime status reads or checkpoint writes.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - _resolve_checkpoint_path now trims valid explicit, environment, and settings runtime checkpoint paths before Path construction
+  - record_runtime_checkpoint resolves and validates checkpoint_path before runtime status reads or checkpoint writes
+  - a present blank HALO_SWING_RUNTIME_CHECKPOINT_PATH now raises instead of falling back to default state paths
+  - C0 and DEL control characters in HALO_SWING_RUNTIME_CHECKPOINT_PATH now raise before runtime status reads or checkpoint writes
+  - runtime checkpoint coverage verifies invalid env paths raise before audit/ledger reads, default fallback, or malformed checkpoint file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_normalizes_env_checkpoint_path tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/runtime.py tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 19 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 579 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.439 BTC Risk Environment Path Validation Record - 2026-05-13
 
 ### A. 목적
