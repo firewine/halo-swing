@@ -456,6 +456,66 @@ def test_integration_readiness_rejects_env_hermes_config_path_without_fallback(
             )
 
 
+def test_integration_readiness_normalizes_env_binance_credentials_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    monkeypatch.setenv(
+        "HALO_SWING_BINANCE_CREDENTIALS_PATH",
+        f" {credentials_path} ",
+    )
+    get_settings.cache_clear()
+
+    try:
+        payload = get_integration_readiness()
+    finally:
+        get_settings.cache_clear()
+
+    for gate_name in ("binance_testnet_read_only", "live_order_submission"):
+        credentials = payload["gates"][gate_name]["evidence"]["credentials"]
+        assert credentials["configured"] is False
+        assert credentials["credentials_path"] == str(credentials_path)
+    assert not credentials_path.exists()
+
+
+def test_integration_readiness_rejects_env_binance_credentials_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must be a nonempty string",
+            tmp_path / "state",
+        ),
+        (
+            "   ",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must be a nonempty string",
+            tmp_path / "   ",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7fcredentials.enc.json",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must not contain control characters",
+            tmp_path / "bad\x7fcredentials.enc.json",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        clear_readiness_env(monkeypatch)
+        monkeypatch.setenv("HALO_SWING_BINANCE_CREDENTIALS_PATH", env_value)
+        get_settings.cache_clear()
+
+        try:
+            with pytest.raises(ValueError, match=expected_error):
+                get_integration_readiness()
+        finally:
+            get_settings.cache_clear()
+        assert not unexpected_path.exists()
+
+
 def test_integration_readiness_uses_canonical_binance_boolean_env(
     tmp_path: Path,
     monkeypatch,

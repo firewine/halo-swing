@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.447 Readiness Binance Credentials Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Direct Binance credential tools already validate
+`HALO_SWING_BINANCE_CREDENTIALS_PATH` with env-key-specific errors. The
+readiness tool, however, converted `settings.binance_credentials_path` into an
+explicit `credentials_path` before calling credential status helpers. That made
+invalid env defaults surface as generic explicit-path errors and weakened the
+readiness boundary. This slice leaves default credential path resolution inside
+the credential helper so readiness uses the same env validation contract.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness passes None for default Binance credential path resolution
+  - get_binance_credentials_status remains the single resolver for HALO_SWING_BINANCE_CREDENTIALS_PATH in readiness evidence
+  - valid HALO_SWING_BINANCE_CREDENTIALS_PATH values are trimmed and reflected in both Binance readiness gates
+  - blank or control-character HALO_SWING_BINANCE_CREDENTIALS_PATH values raise with the env key before fallback or readiness evidence construction
+  - tests verify no fallback credential file is created for invalid env credential paths
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_env_binance_credentials_path tests/test_readiness.py::test_integration_readiness_rejects_env_binance_credentials_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 26 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 595 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.446 Binance Boolean Environment Canonicalization Record - 2026-05-13
 
 ### A. 목적

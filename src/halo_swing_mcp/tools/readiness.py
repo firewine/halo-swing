@@ -96,8 +96,7 @@ def get_integration_readiness(
         news_source_configured,
         "news_source_configured",
     )
-    settings = get_settings()
-    credentials_path = normalized_binance_credentials_path or settings.binance_credentials_path
+    credentials_path = normalized_binance_credentials_path
     hermes = _hermes_readiness(
         normalized_hermes_config_path,
         normalized_hermes_registered,
@@ -272,7 +271,7 @@ def _repository_readiness(
 
 
 def _binance_readiness(
-    credentials_path: str,
+    credentials_path: str | None,
     passphrase_confirmed: bool,
 ) -> dict[str, Any]:
     settings = get_settings()
@@ -308,7 +307,7 @@ def _binance_readiness(
 
 
 def _live_order_submission_readiness(
-    credentials_path: str,
+    credentials_path: str | None,
     passphrase_confirmed: bool,
     trade_only_permission_attested: bool,
     live_order_approved: bool,

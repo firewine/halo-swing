@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_BOOLEAN_ENV_CANONICALIZATION_VERIFIED
-gate_id: BINANCE_BOOLEAN_ENV_CANONICALIZATION
+status: READINESS_BINANCE_CREDENTIALS_ENV_PATH_VERIFIED
+gate_id: READINESS_BINANCE_CREDENTIALS_ENV_PATH
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -84,6 +84,7 @@ done_means:
   - save_binance_credentials and load_binance_credentials reject ASCII control characters in api_key, api_secret, and passphrase before encrypted credential writes, reads, or key derivation
   - save_binance_credentials, get_binance_credentials_status, and load_binance_credentials reject ASCII control characters in credentials_path before encrypted credential writes or reads
   - Binance credential storage trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before encrypted credential reads or writes
+  - get_integration_readiness trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before Binance readiness evidence is built
   - harness audit logging for save_binance_credentials redacts credential inputs and does not serialize secret, salt, or token values
   - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
   - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
@@ -507,13 +508,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.446
-gate_packet: docs/halo-swing-development-plan.md#3.446
+portable_mirror: docs/halo-swing-development-plan.md#3.447
+gate_packet: docs/halo-swing-development-plan.md#3.447
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.446
+  - docs/halo-swing-development-plan.md#3.447
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -821,13 +822,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.446 Binance Boolean Environment Canonicalization is verified.
-Binance execution-policy env booleans now accept only canonical `true`/`false`
-strings, so `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=1` or permissive aliases
-cannot silently satisfy live-trading readiness. Focused readiness coverage
-passed with 2 tests, `tests/test_readiness.py` passed with 24 tests, and full
-pytest passed with 593 tests. Ruff, health_check, get_integration_readiness,
-diff whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.447 Readiness Binance Credentials Environment Path Validation is
+verified. `get_integration_readiness` now leaves default Binance credential path
+resolution to the credential helper, so valid `HALO_SWING_BINANCE_CREDENTIALS_PATH`
+values are trimmed in readiness evidence and invalid blank/control-character env
+paths raise with the env key before fallback or gate evidence construction.
+Focused readiness coverage passed with 2 tests, `tests/test_readiness.py` passed
+with 26 tests, and full pytest passed with 595 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13237,6 +13240,53 @@ blocked_scope_unchanged:
     - Binance network call
     - live trading
     - migration or repository persistence
+    - order submission
+
+readiness_binance_credentials_env_path_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness now passes None for default Binance credential path resolution instead of converting settings.binance_credentials_path into an explicit path
+    - get_binance_credentials_status remains the single resolver for default HALO_SWING_BINANCE_CREDENTIALS_PATH handling in readiness evidence
+    - valid HALO_SWING_BINANCE_CREDENTIALS_PATH values are trimmed and reflected in both Binance readiness gates without creating credential files
+    - blank or control-character HALO_SWING_BINANCE_CREDENTIALS_PATH values raise with the env key before fallback or readiness evidence construction
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_env_binance_credentials_path tests/test_readiness.py::test_integration_readiness_rejects_env_binance_credentials_path_without_fallback -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "26 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "595 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
     - order submission
 
 binance_boolean_env_canonicalization:
