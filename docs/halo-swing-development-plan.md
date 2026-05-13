@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.437 Signal Ledger Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Public signal ledger tool inputs already validate explicit `ledger_path`
+values. The shared JSONL repository still accepted `HALO_SWING_LEDGER_PATH`
+directly, so a blank environment value could fall back to default state and
+whitespace or control-character values could select malformed local ledger
+files. This slice hardens the repository resolver itself before Phase 6
+recording, labeling, or ledger-backed evaluation touches local state.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - JsonlSignalLedgerRepository now trims valid explicit, environment, and settings ledger paths before Path construction
+  - JsonlSignalLedgerRepository now treats a present blank HALO_SWING_LEDGER_PATH as invalid instead of falling back to default state
+  - JsonlSignalLedgerRepository now rejects C0 and DEL control characters in HALO_SWING_LEDGER_PATH before ledger reads, labels, or writes
+  - repository coverage verifies invalid env paths raise before default-state fallback or malformed local ledger file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/signal_repository.py tests/test_signal_repository.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q -> 183 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 572 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.436 Audit Environment Path Validation Record - 2026-05-13
 
 ### A. 목적

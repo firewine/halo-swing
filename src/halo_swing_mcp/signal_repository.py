@@ -42,11 +42,18 @@ class JsonlSignalLedgerRepository:
     """Append-oriented JSONL implementation for local offline harnesses."""
 
     def __init__(self, ledger_path: str | os.PathLike[str] | None = None) -> None:
-        configured = (
-            ledger_path
-            or os.environ.get("HALO_SWING_LEDGER_PATH")
-            or get_settings().ledger_path
-        )
+        if ledger_path is not None:
+            configured = _normalize_ledger_path(ledger_path, "ledger_path")
+        elif "HALO_SWING_LEDGER_PATH" in os.environ:
+            configured = _normalize_ledger_path(
+                os.environ["HALO_SWING_LEDGER_PATH"],
+                "HALO_SWING_LEDGER_PATH",
+            )
+        else:
+            configured = _normalize_ledger_path(
+                get_settings().ledger_path,
+                "settings.ledger_path",
+            )
         self.path = Path(configured)
 
     @property
@@ -118,6 +125,15 @@ def get_signal_ledger_repository(
     """Return the default replay-safe signal ledger repository."""
 
     return JsonlSignalLedgerRepository(ledger_path)
+
+
+def _normalize_ledger_path(value: str | os.PathLike[str], field_name: str) -> str:
+    normalized = str(value)
+    if not normalized.strip():
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if any(ord(character) < 32 or ord(character) == 127 for character in normalized):
+        raise ValueError(f"{field_name} must not contain control characters")
+    return normalized.strip()
 
 
 __all__ = [
