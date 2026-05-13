@@ -4611,7 +4611,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 112. Next Concrete Actions
+## 112. 3.454 Trading Admin Connectivity HTTP Environment Error Handling Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network tests/test_binance_btc.py::test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network -q -> 2 passed, trading admin connectivity HTTP env error handling enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 71 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 605 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 113. Next Concrete Actions
 
 Choose one of:
 

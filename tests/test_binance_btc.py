@@ -2189,6 +2189,31 @@ def test_trading_admin_status_endpoint_returns_json_error_for_invalid_binance_en
     )
 
 
+def test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "on")
+    get_settings.cache_clear()
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid testnet env")
+
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/connectivity",
+            {},
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'" in str(
+        response_payload["error"]
+    )
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

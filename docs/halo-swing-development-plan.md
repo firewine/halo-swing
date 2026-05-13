@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.454 Trading Admin Connectivity HTTP Environment Error Handling Record - 2026-05-13
+
+### A. 목적
+
+The direct Binance connectivity helper rejects noncanonical testnet env values
+before public network reads, and POST handlers already convert exceptions into
+JSON errors. This slice pins the trading admin `/api/connectivity` HTTP boundary
+so invalid settings-backed Binance boolean env values return a JSON 400 before
+any Binance public network read can run.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - POST /api/connectivity rejects HALO_SWING_BINANCE_TESTNET=on with HTTP 400 JSON
+  - connectivity endpoint coverage proves invalid testnet env validation happens before URL reads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network tests/test_binance_btc.py::test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 71 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 605 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.453 Trading Admin Status HTTP Environment Error Handling Record - 2026-05-13
 
 ### A. 목적
