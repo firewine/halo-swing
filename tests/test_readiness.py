@@ -400,6 +400,60 @@ def test_integration_readiness_normalizes_public_path_inputs(
     )
 
 
+def test_integration_readiness_normalizes_env_hermes_config_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    hermes_config = tmp_path / "hermes.yaml"
+    missing_credentials = tmp_path / "missing.enc.json"
+    hermes_config.write_text("mcp_servers: {}\n", encoding="utf-8")
+    monkeypatch.setenv("HALO_SWING_HERMES_CONFIG_PATH", f" {hermes_config} ")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        hermes_mcp_config_registered=True,
+        binance_credentials_path=str(missing_credentials),
+    )
+    hermes_gate = payload["gates"]["hermes"]
+
+    assert hermes_gate["status"] == "ready"
+    assert hermes_gate["missing"] == []
+    assert hermes_gate["evidence"]["config_path"] == str(hermes_config)
+    assert hermes_gate["evidence"]["config_path_exists"] is True
+    assert hermes_gate["evidence"]["config_path_is_absolute"] is True
+
+
+def test_integration_readiness_rejects_env_hermes_config_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_HERMES_CONFIG_PATH must be a nonempty string",
+        ),
+        (
+            "   ",
+            "HALO_SWING_HERMES_CONFIG_PATH must be a nonempty string",
+        ),
+        (
+            f"{tmp_path / 'hermes'}\x7f.yaml",
+            "HALO_SWING_HERMES_CONFIG_PATH must not contain control characters",
+        ),
+    ]
+
+    for env_value, expected_error in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_HERMES_CONFIG_PATH", env_value)
+        get_settings.cache_clear()
+
+        with pytest.raises(ValueError, match=expected_error):
+            get_integration_readiness(
+                binance_credentials_path=f"{tmp_path / 'credentials.enc.json'}\n",
+            )
+
+
 def test_integration_readiness_rejects_invalid_public_inputs(tmp_path: Path) -> None:
     missing_credentials = tmp_path / "missing.enc.json"
     invalid_cases = [

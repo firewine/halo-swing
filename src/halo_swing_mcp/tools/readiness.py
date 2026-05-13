@@ -14,6 +14,7 @@ from halo_swing_mcp.secret_store import get_binance_credentials_status
 
 
 HERMES_SERVER_COMMAND = "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.server"
+HERMES_CONFIG_PATH_ENV = "HALO_SWING_HERMES_CONFIG_PATH"
 
 
 def get_integration_readiness(
@@ -36,9 +37,8 @@ def get_integration_readiness(
 ) -> dict[str, Any]:
     """Return offline readiness for gates that need user environment decisions."""
 
-    normalized_hermes_config_path = _normalize_optional_path(
+    normalized_hermes_config_path = _resolve_hermes_config_path(
         hermes_config_path,
-        "hermes_config_path",
     )
     normalized_hermes_registered = _normalize_boolean(
         hermes_mcp_config_registered,
@@ -150,7 +150,7 @@ def _hermes_readiness(
     hermes_config_path: str | None,
     mcp_config_registered: bool,
 ) -> dict[str, Any]:
-    configured_path = hermes_config_path or os.environ.get("HALO_SWING_HERMES_CONFIG_PATH")
+    configured_path = hermes_config_path
     config_path_exists = bool(configured_path and Path(configured_path).exists())
     config_path_is_absolute = bool(
         configured_path and Path(configured_path).is_absolute()
@@ -180,6 +180,14 @@ def _hermes_readiness(
             "secret_values_returned": False,
         },
     }
+
+
+def _resolve_hermes_config_path(hermes_config_path: str | None) -> str | None:
+    if hermes_config_path is not None:
+        return _normalize_path(hermes_config_path, "hermes_config_path")
+    if HERMES_CONFIG_PATH_ENV in os.environ:
+        return _normalize_path(os.environ[HERMES_CONFIG_PATH_ENV], HERMES_CONFIG_PATH_ENV)
+    return None
 
 
 def _telegram_readiness(
@@ -450,6 +458,10 @@ def _normalize_optional_boolean(value: bool | None, field_name: str) -> bool | N
 def _normalize_optional_path(value: str | None, field_name: str) -> str | None:
     if value is None:
         return None
+    return _normalize_path(value, field_name)
+
+
+def _normalize_path(value: Any, field_name: str) -> str:
     if not isinstance(value, str):
         raise ValueError(f"{field_name} must be a nonempty string")
     if not _has_no_control_characters(value):

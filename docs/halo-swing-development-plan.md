@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.441 Hermes Config Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Explicit `hermes_config_path` values already validate and trim public input.
+The Hermes readiness gate still read `HALO_SWING_HERMES_CONFIG_PATH` directly,
+so a blank env value was treated as missing and whitespace/control-character
+values could flow into `Path` checks unchecked. This slice hardens the env
+resolver before gate evaluation or credential/risk reads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness now resolves HALO_SWING_HERMES_CONFIG_PATH through the same path normalizer used for explicit hermes_config_path values
+  - valid HALO_SWING_HERMES_CONFIG_PATH values are trimmed before Path existence and absolute-path checks
+  - a present blank HALO_SWING_HERMES_CONFIG_PATH now raises instead of being treated as a missing Hermes config path
+  - C0 and DEL control characters in HALO_SWING_HERMES_CONFIG_PATH now raise before gate evaluation or credential/risk reads
+  - readiness coverage verifies invalid env paths raise before later invalid credential path validation can run
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_env_hermes_config_path tests/test_readiness.py::test_integration_readiness_rejects_env_hermes_config_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 20 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 581 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.440 Runtime Checkpoint Environment Path Validation Record - 2026-05-13
 
 ### A. 목적
