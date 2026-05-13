@@ -2361,6 +2361,48 @@ def test_trading_admin_risk_state_reset_endpoint_rejects_invalid_env_path_withou
     assert not (tmp_path / "   ").exists()
 
 
+def test_trading_admin_post_endpoints_reject_non_object_json_before_side_effects(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    get_settings.cache_clear()
+
+    def fail_side_effect(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("side effect function must not run")
+
+    for target in (
+        "halo_swing_mcp.trading_admin_web.save_binance_credentials",
+        "halo_swing_mcp.trading_admin_web.check_binance_coinm_connectivity",
+        "halo_swing_mcp.trading_admin_web.get_binance_coinm_account_snapshot",
+        "halo_swing_mcp.trading_admin_web.preview_btc_order",
+        "halo_swing_mcp.trading_admin_web.update_btc_risk_settings",
+        "halo_swing_mcp.trading_admin_web.reset_btc_daily_risk_state",
+    ):
+        monkeypatch.setattr(target, fail_side_effect)
+
+    try:
+        for path in (
+            "/api/credentials",
+            "/api/connectivity",
+            "/api/account-snapshot",
+            "/api/order-preview",
+            "/api/risk-settings",
+            "/api/risk-state/reset",
+        ):
+            response_payload = _admin_json_request(
+                path,
+                [],
+                expected_status="HTTP/1.0 400 Bad Request",
+            )
+
+            assert response_payload == {"error": "payload must be a JSON object"}
+    finally:
+        get_settings.cache_clear()
+
+    assert not (tmp_path / "state").exists()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,
@@ -2440,7 +2482,7 @@ def test_trading_admin_account_snapshot_endpoint_blocks_secret_safely(
 
 def _admin_json_request(
     path: str,
-    payload: dict[str, object] | None = None,
+    payload: object | None = None,
     expected_status: str = "HTTP/1.0 200 OK",
 ) -> dict[str, object]:
     body = json.dumps(payload).encode("utf-8") if payload is not None else b""

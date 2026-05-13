@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.460 Trading Admin Non-Object JSON Payload Boundary Record - 2026-05-13
+
+### A. 목적
+
+Trading admin POST routes accept JSON form payloads for credential storage,
+connectivity checks, account snapshots, order previews, risk settings, and risk
+state reset. The handler already rejects JSON containers that are not objects,
+but this behavior was not pinned across every POST route. This slice adds
+route-level coverage proving non-object JSON returns a JSON 400 before any
+credential write, connectivity call, account read, order preview, risk settings
+write, or risk state write can run.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - all trading admin POST routes reject non-object JSON payload containers with HTTP 400 JSON
+  - endpoint coverage patches route-side functions so the regression fails if side-effect paths are reached after non-object JSON
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_endpoints_reject_non_object_json_before_side_effects -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 77 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 611 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.459 Trading Admin Risk-Settings HTTP Environment Path Validation Record - 2026-05-13
 
 ### A. 목적
