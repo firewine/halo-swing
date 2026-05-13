@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.464 Trading Admin Content-Type Compatibility Record - 2026-05-13
+
+### A. 목적
+
+The trading admin now rejects non-JSON `Content-Type` values before POST route
+dispatch. This stricter boundary must still accept normal JSON media-type
+variants such as mixed-case `Application/JSON` and parameterized
+`application/json; charset=utf-8`. This slice pins that compatibility through
+the `/api/risk-settings` route using a tmp-local settings path.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin POST coverage verifies application/json Content-Type values with parameters and mixed case remain accepted
+  - compatibility coverage uses a tmp-local risk settings path and does not touch committed state
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_accepts_json_content_type_with_parameters -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 81 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 615 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.463 Trading Admin Content-Type Boundary Record - 2026-05-13
 
 ### A. 목적

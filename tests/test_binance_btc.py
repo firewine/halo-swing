@@ -2551,6 +2551,29 @@ def test_trading_admin_post_endpoints_reject_non_json_content_type_before_side_e
     assert not (tmp_path / "state").exists()
 
 
+def test_trading_admin_post_accepts_json_content_type_with_parameters(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    settings_path = tmp_path / "risk_settings.json"
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", str(settings_path))
+    get_settings.cache_clear()
+    raw_body = json.dumps({"max_notional_usd_per_order": "150"}).encode("utf-8")
+
+    try:
+        response_payload = _admin_raw_json_request(
+            "/api/risk-settings",
+            raw_body,
+            content_type_header="Application/JSON; charset=utf-8",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert response_payload["max_notional_usd_per_order"] == 150.0
+    assert response_payload["settings_path"] == str(settings_path)
+    assert settings_path.exists()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,
