@@ -471,7 +471,10 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                 raise ValueError("Content-Length must be a nonnegative integer")
             if length == 0:
                 return {}
-            body = self.rfile.read(length).decode("utf-8")
+            try:
+                body = self.rfile.read(length).decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise ValueError("request body must be UTF-8 JSON") from exc
             payload = json.loads(body)
             if not isinstance(payload, dict):
                 raise ValueError("payload must be a JSON object")

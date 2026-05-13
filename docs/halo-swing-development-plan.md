@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.465 Trading Admin UTF-8 Body Boundary Record - 2026-05-13
+
+### A. 목적
+
+Trading admin POST bodies are decoded as UTF-8 JSON before route dispatch.
+Previously, invalid byte sequences surfaced Python's raw decode error. This
+slice converts invalid UTF-8 bodies into a stable JSON 400 response before any
+credential write, connectivity call, account read, order preview, risk settings
+write, or risk state write can run, and verifies submitted secret-looking text
+is not echoed in the response.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin request parsing rejects non-UTF-8 request bodies with a stable HTTP 400 JSON error
+  - endpoint coverage patches route-side functions so invalid UTF-8 fails before side-effect paths
+  - invalid UTF-8 coverage checks submitted secret-looking text is absent from error responses
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_endpoints_reject_invalid_utf8_body_before_side_effects -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 82 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 616 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.464 Trading Admin Content-Type Compatibility Record - 2026-05-13
 
 ### A. 목적

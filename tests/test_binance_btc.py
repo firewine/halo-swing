@@ -2574,6 +2574,53 @@ def test_trading_admin_post_accepts_json_content_type_with_parameters(
     assert settings_path.exists()
 
 
+def test_trading_admin_post_endpoints_reject_invalid_utf8_body_before_side_effects(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    get_settings.cache_clear()
+
+    def fail_side_effect(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("side effect function must not run")
+
+    for target in (
+        "halo_swing_mcp.trading_admin_web.save_binance_credentials",
+        "halo_swing_mcp.trading_admin_web.check_binance_coinm_connectivity",
+        "halo_swing_mcp.trading_admin_web.get_binance_coinm_account_snapshot",
+        "halo_swing_mcp.trading_admin_web.preview_btc_order",
+        "halo_swing_mcp.trading_admin_web.update_btc_risk_settings",
+        "halo_swing_mcp.trading_admin_web.reset_btc_daily_risk_state",
+    ):
+        monkeypatch.setattr(target, fail_side_effect)
+
+    raw_body = b'{"api_secret": "super-secret", "bad": "\xff", "passphrase": "local-passphrase"}'
+
+    try:
+        for path in (
+            "/api/credentials",
+            "/api/connectivity",
+            "/api/account-snapshot",
+            "/api/order-preview",
+            "/api/risk-settings",
+            "/api/risk-state/reset",
+        ):
+            response_payload = _admin_raw_json_request(
+                path,
+                raw_body,
+                expected_status="HTTP/1.0 400 Bad Request",
+            )
+            serialized_response = json.dumps(response_payload)
+
+            assert response_payload == {"error": "request body must be UTF-8 JSON"}
+            assert "super-secret" not in serialized_response
+            assert "local-passphrase" not in serialized_response
+    finally:
+        get_settings.cache_clear()
+
+    assert not (tmp_path / "state").exists()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,
