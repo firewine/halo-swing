@@ -9302,6 +9302,63 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.443 Runtime Environment Limits Validation Record - 2026-05-13
+
+### A. 목적
+
+Explicit runtime retention and watchdog inputs already reject nonpositive
+values at the public tool boundary. The environment-backed defaults from
+`HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS`,
+`HALO_SWING_RUNTIME_RETENTION_MAX_BYTES`, `HALO_SWING_RUNTIME_FAILURE_WINDOW`,
+and `HALO_SWING_RUNTIME_FAILURE_THRESHOLD` were still silently clamped to 1 when
+set to zero or negative numbers. This slice makes malformed env defaults fail
+before retention inspection/mutation or watchdog evaluation can proceed.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - default_retention_policy now validates explicit and settings-backed max_records/max_bytes as positive integers
+  - evaluate_failure_degraded_mode now validates explicit and settings-backed failure_window/failure_threshold as positive integers
+  - nonpositive HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS and HALO_SWING_RUNTIME_RETENTION_MAX_BYTES values now raise instead of silently clamping to 1
+  - nonpositive HALO_SWING_RUNTIME_FAILURE_WINDOW and HALO_SWING_RUNTIME_FAILURE_THRESHOLD values now raise instead of silently clamping to 1
+  - runtime coverage verifies valid env limits are honored and invalid env limits raise before artifact reads or fallback defaults
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_uses_valid_env_runtime_limits tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/runtime_guard.py tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 21 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 585 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.442 Readiness Environment Boolean Normalization Record - 2026-05-13
 
 ### A. 목적

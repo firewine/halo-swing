@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_ENV_BOOLEAN_NORMALIZATION_VERIFIED
-gate_id: READINESS_ENV_BOOLEAN_NORMALIZATION
+status: RUNTIME_ENV_LIMITS_VALIDATION_VERIFIED
+gate_id: RUNTIME_ENV_LIMITS_VALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -100,6 +100,7 @@ done_means:
   - audit web server rejects non-localhost bind hosts before starting the HTTP server
   - get_runtime_status watchdog consumes audit failures without returning event details, passphrases, credential material, or raw error strings
   - get_runtime_status validates apply_retention, retention limits, and failure watchdog windows before retention inspection or mutation
+  - get_runtime_status validates environment-backed retention limits and failure watchdog windows before retention inspection or mutation
   - get_runtime_status validates audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
   - get_runtime_status rejects ASCII control characters in audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
   - record_runtime_checkpoint persists runtime watchdog state without audit event details, passphrases, credential material, or raw error strings
@@ -503,13 +504,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.442
-gate_packet: docs/halo-swing-development-plan.md#3.442
+portable_mirror: docs/halo-swing-development-plan.md#3.443
+gate_packet: docs/halo-swing-development-plan.md#3.443
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.442
+  - docs/halo-swing-development-plan.md#3.443
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -817,15 +818,16 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.442 Readiness Environment Boolean Normalization is verified.
-Integration readiness now treats blank or control-character Telegram, gateway,
-market, macro, and news env values as not configured while still returning only
-boolean evidence, so malformed env values cannot make Telegram or live-data
-gates ready and secret values/env key names stay out of payloads. Focused
-coverage passed with 2 tests, `tests/test_readiness.py` passed with 22 tests,
-and full pytest passed with 583 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.443 Runtime Environment Limits Validation is verified. Runtime
+retention and watchdog defaults now reject nonpositive
+`HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS`,
+`HALO_SWING_RUNTIME_RETENTION_MAX_BYTES`, `HALO_SWING_RUNTIME_FAILURE_WINDOW`,
+and `HALO_SWING_RUNTIME_FAILURE_THRESHOLD` values instead of silently clamping
+them to 1, so malformed env settings cannot alter retention or degraded-mode
+behavior before artifact inspection. Focused env-limit coverage passed with 2
+tests, `tests/test_runtime_guard.py` passed with 21 tests, and full pytest
+passed with 585 tests. Ruff, health_check, get_integration_readiness, diff
+whitespace, blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13231,6 +13233,56 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+runtime_env_limits_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/runtime_guard.py
+    - tests/test_runtime_guard.py
+  implementation:
+    - default_retention_policy now validates explicit and settings-backed max_records/max_bytes as positive integers
+    - evaluate_failure_degraded_mode now validates explicit and settings-backed failure_window/failure_threshold as positive integers
+    - nonpositive HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS and HALO_SWING_RUNTIME_RETENTION_MAX_BYTES values now raise instead of silently clamping to 1
+    - nonpositive HALO_SWING_RUNTIME_FAILURE_WINDOW and HALO_SWING_RUNTIME_FAILURE_THRESHOLD values now raise instead of silently clamping to 1
+    - runtime coverage verifies valid env limits are honored and invalid env limits raise before artifact reads or fallback defaults
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, passphrase persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_uses_valid_env_runtime_limits tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/runtime_guard.py tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "585 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

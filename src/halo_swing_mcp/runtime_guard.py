@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,10 @@ from halo_swing_mcp.config import get_settings
 
 
 WATCHDOG_SCHEMA_VERSION = "watchdog.v1"
+RUNTIME_RETENTION_MAX_RECORDS_ENV = "HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS"
+RUNTIME_RETENTION_MAX_BYTES_ENV = "HALO_SWING_RUNTIME_RETENTION_MAX_BYTES"
+RUNTIME_FAILURE_WINDOW_ENV = "HALO_SWING_RUNTIME_FAILURE_WINDOW"
+RUNTIME_FAILURE_THRESHOLD_ENV = "HALO_SWING_RUNTIME_FAILURE_THRESHOLD"
 
 
 @dataclass(frozen=True)
@@ -28,8 +33,20 @@ def default_retention_policy(
 
     settings = get_settings()
     return RetentionPolicy(
-        max_records=max(1, max_records or settings.runtime_retention_max_records),
-        max_bytes=max(1, max_bytes or settings.runtime_retention_max_bytes),
+        max_records=_select_positive_integer(
+            max_records,
+            settings.runtime_retention_max_records,
+            "max_records",
+            "runtime_retention_max_records",
+            RUNTIME_RETENTION_MAX_RECORDS_ENV,
+        ),
+        max_bytes=_select_positive_integer(
+            max_bytes,
+            settings.runtime_retention_max_bytes,
+            "max_bytes",
+            "runtime_retention_max_bytes",
+            RUNTIME_RETENTION_MAX_BYTES_ENV,
+        ),
     )
 
 
@@ -97,8 +114,20 @@ def evaluate_failure_degraded_mode(
     """Evaluate whether recent audit failures should put runtime in degraded mode."""
 
     settings = get_settings()
-    bounded_window = max(1, failure_window or settings.runtime_failure_window)
-    threshold = max(1, failure_threshold or settings.runtime_failure_threshold)
+    bounded_window = _select_positive_integer(
+        failure_window,
+        settings.runtime_failure_window,
+        "failure_window",
+        "runtime_failure_window",
+        RUNTIME_FAILURE_WINDOW_ENV,
+    )
+    threshold = _select_positive_integer(
+        failure_threshold,
+        settings.runtime_failure_threshold,
+        "failure_threshold",
+        "runtime_failure_threshold",
+        RUNTIME_FAILURE_THRESHOLD_ENV,
+    )
     recent_events = events[:bounded_window]
     failure_count = sum(1 for event in recent_events if event.get("outcome") == "failure")
     degraded = failure_count >= threshold
@@ -154,6 +183,27 @@ def build_watchdog_event(
 
 def retention_policy_payload(policy: RetentionPolicy) -> dict[str, int]:
     return asdict(policy)
+
+
+def _select_positive_integer(
+    provided_value: int | None,
+    settings_value: int,
+    provided_field_name: str,
+    settings_field_name: str,
+    env_key: str,
+) -> int:
+    if provided_value is not None:
+        return _normalize_positive_integer(provided_value, provided_field_name)
+    field_name = env_key if env_key in os.environ else f"settings.{settings_field_name}"
+    return _normalize_positive_integer(settings_value, field_name)
+
+
+def _normalize_positive_integer(value: Any, field_name: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise ValueError(f"{field_name} must be a positive integer")
+    if value <= 0:
+        raise ValueError(f"{field_name} must be a positive integer")
+    return value
 
 
 def _read_jsonl_lines(path: Path) -> list[str]:

@@ -194,6 +194,82 @@ def test_runtime_status_rejects_invalid_public_inputs(tmp_path: Path) -> None:
             get_runtime_status(**payload)
 
 
+def test_runtime_status_uses_valid_env_runtime_limits(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    write_jsonl(ledger_path, [{"sequence": 1}])
+    monkeypatch.setenv("HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS", "2")
+    monkeypatch.setenv("HALO_SWING_RUNTIME_RETENTION_MAX_BYTES", "10000")
+    monkeypatch.setenv("HALO_SWING_RUNTIME_FAILURE_WINDOW", "4")
+    monkeypatch.setenv("HALO_SWING_RUNTIME_FAILURE_THRESHOLD", "3")
+    get_settings.cache_clear()
+
+    try:
+        payload = get_runtime_status(
+            audit_log_path=str(audit_path),
+            ledger_path=str(ledger_path),
+        )
+
+        assert payload["retention_policy"] == {"max_records": 2, "max_bytes": 10000}
+        assert payload["watchdog"]["failure_window"] == 4
+        assert payload["watchdog"]["failure_threshold"] == 3
+    finally:
+        get_settings.cache_clear()
+
+
+def test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    invalid_cases = [
+        (
+            "HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS",
+            "0",
+            "HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS must be a positive integer",
+        ),
+        (
+            "HALO_SWING_RUNTIME_RETENTION_MAX_BYTES",
+            "-1",
+            "HALO_SWING_RUNTIME_RETENTION_MAX_BYTES must be a positive integer",
+        ),
+        (
+            "HALO_SWING_RUNTIME_FAILURE_WINDOW",
+            "0",
+            "HALO_SWING_RUNTIME_FAILURE_WINDOW must be a positive integer",
+        ),
+        (
+            "HALO_SWING_RUNTIME_FAILURE_THRESHOLD",
+            "-1",
+            "HALO_SWING_RUNTIME_FAILURE_THRESHOLD must be a positive integer",
+        ),
+    ]
+    runtime_env_keys = [env_key for env_key, _, _ in invalid_cases]
+
+    try:
+        for env_key, env_value, expected_error in invalid_cases:
+            for key in runtime_env_keys:
+                monkeypatch.delenv(key, raising=False)
+            monkeypatch.setenv(env_key, env_value)
+            get_settings.cache_clear()
+
+            with pytest.raises(ValueError, match=expected_error):
+                get_runtime_status(
+                    audit_log_path=str(audit_path),
+                    ledger_path=str(ledger_path),
+                )
+            assert not audit_path.exists()
+            assert not ledger_path.exists()
+    finally:
+        for key in runtime_env_keys:
+            monkeypatch.delenv(key, raising=False)
+        get_settings.cache_clear()
+
+
 def test_runtime_status_rejects_path_control_character_inputs(
     tmp_path: Path,
 ) -> None:
