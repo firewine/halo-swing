@@ -575,23 +575,39 @@ def test_integration_readiness_uses_env_btc_risk_settings_path(
 ) -> None:
     clear_readiness_env(monkeypatch)
     risk_settings_path = tmp_path / "risk_settings.json"
+    credentials_path = tmp_path / "credentials.enc.json"
     update_btc_risk_settings(
         emergency_kill_switch_enabled=True,
         settings_path=str(risk_settings_path),
+    )
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
     )
     monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", f" {risk_settings_path} ")
     get_settings.cache_clear()
 
     try:
         payload = get_integration_readiness(
-            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+            binance_credentials_path=str(credentials_path),
         )
     finally:
         get_settings.cache_clear()
 
     live_order_gate = payload["gates"]["live_order_submission"]
     assert live_order_gate["evidence"]["emergency_kill_switch_enabled"] is True
+    assert live_order_gate["evidence"]["credentials"]["configured"] is True
+    assert live_order_gate["evidence"]["credentials"]["api_key_hint"] == "abcde...5key"
     assert "emergency_kill_switch_disabled" in live_order_gate["missing"]
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "api_secret" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
 
 
 def test_integration_readiness_rejects_env_btc_risk_settings_path_before_credentials(
