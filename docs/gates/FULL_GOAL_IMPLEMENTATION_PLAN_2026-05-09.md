@@ -4855,3 +4855,19 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.435 Harness Argument DEL Control Validation Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_input_file_delete_character_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_audit_log_path_delete_character_without_fallback_audit -q -> 2 passed, harness DEL control-character argument validation coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 568 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

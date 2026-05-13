@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: HARNESS_AUDIT_LOG_PATH_ARGUMENT_VALIDATION_VERIFIED
-gate_id: HARNESS_AUDIT_LOG_PATH_ARGUMENT_VALIDATION
+status: HARNESS_ARGUMENT_DELETE_CONTROL_VALIDATION_VERIFIED
+gate_id: HARNESS_ARGUMENT_DELETE_CONTROL_VALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -216,6 +216,7 @@ done_means:
   - harness conflicting input-json and input-file sources exit nonzero, emit no stdout payload, and record failure audit events without serializing raw input-json text
   - harness blank or control-character input-file arguments exit nonzero, emit no stdout payload, and record failure audit events without serializing raw input-file text
   - harness blank or control-character audit-log-path arguments exit nonzero before audit writes, emit no stdout payload, and do not serialize raw audit-log-path text
+  - harness input-file and audit-log-path arguments reject ASCII DEL as a control character before file reads or audit sink writes
   - Phase 6 performance report includes explicit score_calibration section
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
@@ -495,13 +496,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.434
-gate_packet: docs/halo-swing-development-plan.md#3.434
+portable_mirror: docs/halo-swing-development-plan.md#3.435
+gate_packet: docs/halo-swing-development-plan.md#3.435
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.434
+  - docs/halo-swing-development-plan.md#3.435
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -809,14 +810,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.434 Harness Audit Log Path Argument Validation is verified. The
-CLI harness now rejects blank or control-character `--audit-log-path` arguments
-before audit sink selection, deliberately avoids fallback/default audit writes
-for invalid explicit audit destinations, and avoids serializing raw invalid
-audit path text. Focused regression passed with 2 tests,
-`tests/test_tool_registry.py` passed with 27 tests, `tests/test_audit.py` passed
-with 27 tests, and full pytest passed with 566 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace,
+Summary: 3.435 Harness Argument DEL Control Validation is verified. The CLI
+harness now treats ASCII DEL (`0x7f`) as a control character for both
+`--input-file` and `--audit-log-path`: invalid input-file arguments fail before
+file reads with safe failure-audit metadata, and invalid audit-log-path
+arguments fail before any requested, fallback, or default audit write. Focused
+regression passed with 2 tests, `tests/test_tool_registry.py` passed with 29
+tests, `tests/test_audit.py` passed with 27 tests, and full pytest passed with
+568 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
 blocked-path status, and ignored state checks passed.
 
 ```yaml
@@ -13223,6 +13224,58 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+harness_argument_delete_control_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/harness.py
+    - tests/test_tool_registry.py
+  implementation:
+    - harness argument validation now treats ASCII DEL as a control character
+    - input-file arguments containing ASCII DEL are rejected before file reads
+    - invalid input-file DEL failures write safe failure-audit metadata without serializing raw invalid path text
+    - audit-log-path arguments containing ASCII DEL are rejected before audit sink selection
+    - invalid audit-log-path DEL failures exit before any requested, fallback, or default audit write
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_input_file_delete_character_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_audit_log_path_delete_character_without_fallback_audit -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q
+      result: "29 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "27 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "568 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

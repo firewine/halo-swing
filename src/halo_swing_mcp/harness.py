@@ -167,7 +167,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _validate_input_file_argument(input_file: str) -> ValueError | None:
     if not input_file.strip():
         return ValueError("input-file must be a nonempty string")
-    if any(ord(character) < 32 for character in input_file):
+    if not _has_no_control_characters(input_file):
         return ValueError("input-file must not contain control characters")
     return None
 
@@ -175,9 +175,13 @@ def _validate_input_file_argument(input_file: str) -> ValueError | None:
 def _validate_audit_log_path_argument(audit_log_path: str) -> ValueError | None:
     if not audit_log_path.strip():
         return ValueError("audit-log-path must be a nonempty string")
-    if any(ord(character) < 32 for character in audit_log_path):
+    if not _has_no_control_characters(audit_log_path):
         return ValueError("audit-log-path must not contain control characters")
     return None
+
+
+def _has_no_control_characters(value: str) -> bool:
+    return all(ord(character) >= 32 and ord(character) != 127 for character in value)
 
 
 if __name__ == "__main__":

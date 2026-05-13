@@ -657,6 +657,48 @@ def test_harness_rejects_input_file_control_character_with_failure_audit(
     assert expected_error in event["details"]["error"]
 
 
+def test_harness_rejects_input_file_delete_character_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_file = f"{tmp_path / 'bad'}\x7ffile.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "score_leverage_swing",
+            "--input-file",
+            input_file,
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+    expected_error = "input-file must not contain control characters"
+    event_details = json.dumps(event["details"])
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "score_leverage_swing"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == {
+        "input_source": "input_file",
+        "input_file_provided": True,
+    }
+    assert "bad" not in event_details
+    assert "\\u007f" not in event_details
+    assert "output_summary" not in event["details"]
+    assert expected_error in event["details"]["error"]
+
+
 def test_harness_rejects_blank_audit_log_path_without_fallback_audit(
     tmp_path: Path,
 ) -> None:
@@ -711,6 +753,36 @@ def test_harness_rejects_audit_log_path_control_character_without_fallback_audit
     assert expected_error in result.stderr
     assert "bad" not in result.stderr
     assert "\\n" not in result.stderr
+    assert not fallback_audit_path.exists()
+
+
+def test_harness_rejects_audit_log_path_delete_character_without_fallback_audit(
+    tmp_path: Path,
+) -> None:
+    fallback_audit_path = tmp_path / "fallback_audit.jsonl"
+    audit_log_path = f"{tmp_path / 'bad'}\x7flog.jsonl"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "health_check",
+            "--audit-log-path",
+            audit_log_path,
+        ],
+        check=False,
+        cwd=ROOT,
+        env={**os.environ, "HALO_SWING_AUDIT_LOG_PATH": str(fallback_audit_path)},
+        text=True,
+        capture_output=True,
+    )
+    expected_error = "audit-log-path must not contain control characters"
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert expected_error in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\x7f" not in result.stderr
     assert not fallback_audit_path.exists()
 
 

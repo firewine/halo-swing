@@ -9302,6 +9302,62 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.435 Harness Argument DEL Control Validation Record - 2026-05-13
+
+### A. 목적
+
+The harness already rejected blank values and C0 control characters in
+`--input-file` and `--audit-log-path` arguments. ASCII DEL (`0x7f`) is also a
+control character, but the harness-specific argument guards did not reject it
+while the public tool normalizers did. This slice aligns the harness boundary
+with the rest of the validation policy.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness argument validation now treats ASCII DEL as a control character
+  - input-file arguments containing ASCII DEL are rejected before file reads
+  - invalid input-file DEL failures write safe failure-audit metadata without serializing raw invalid path text
+  - audit-log-path arguments containing ASCII DEL are rejected before audit sink selection
+  - invalid audit-log-path DEL failures exit before any requested, fallback, or default audit write
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_harness_rejects_input_file_delete_character_with_failure_audit tests/test_tool_registry.py::test_harness_rejects_audit_log_path_delete_character_without_fallback_audit -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/harness.py tests/test_tool_registry.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py -q -> 29 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 27 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 568 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.434 Harness Audit Log Path Argument Validation Record - 2026-05-12
 
 ### A. 목적
