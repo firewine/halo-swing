@@ -2214,6 +2214,38 @@ def test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network
     )
 
 
+def test_trading_admin_account_snapshot_endpoint_rejects_invalid_env_before_status(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not load with invalid testnet env")
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid testnet env")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/account-snapshot",
+            {},
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'" in str(
+        response_payload["error"]
+    )
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.455 Trading Admin Account Snapshot HTTP Environment Error Handling Record - 2026-05-13
+
+### A. 목적
+
+The account snapshot helper now validates noncanonical testnet env values before
+the missing-passphrase credential status branch. This slice pins the trading
+admin `/api/account-snapshot` HTTP boundary so invalid settings-backed Binance
+boolean env values return a JSON 400 before credential status or network reads
+can run.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - POST /api/account-snapshot rejects HALO_SWING_BINANCE_TESTNET=yes with HTTP 400 JSON
+  - account snapshot endpoint coverage proves invalid testnet env validation happens before credential status reads
+  - account snapshot endpoint coverage proves invalid testnet env validation happens before URL reads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_account_snapshot_endpoint_rejects_invalid_env_before_status tests/test_binance_btc.py::test_account_snapshot_rejects_noncanonical_testnet_env_before_missing_passphrase_status -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 72 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 606 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.454 Trading Admin Connectivity HTTP Environment Error Handling Record - 2026-05-13
 
 ### A. 목적
