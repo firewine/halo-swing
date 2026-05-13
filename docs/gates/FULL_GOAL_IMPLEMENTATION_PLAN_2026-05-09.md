@@ -5217,3 +5217,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.459 Trading Admin Risk-Settings HTTP Environment Path Validation Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_settings_endpoint_rejects_invalid_env_path_without_write tests/test_binance_btc.py::test_btc_risk_tools_reject_env_settings_path_without_fallback -q -> 2 passed, trading admin risk-settings HTTP env path validation enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 76 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 610 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```

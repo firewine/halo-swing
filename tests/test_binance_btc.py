@@ -1954,6 +1954,30 @@ def test_trading_admin_risk_settings_endpoint_rejects_control_characters(
         assert not settings_path.exists()
 
 
+def test_trading_admin_risk_settings_endpoint_rejects_invalid_env_path_without_write(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", "   ")
+    get_settings.cache_clear()
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/risk-settings",
+            {"max_notional_usd_per_order": "150"},
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert response_payload == {
+        "error": "HALO_SWING_BTC_RISK_SETTINGS_PATH must be a nonempty string"
+    }
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+
+
 def test_trading_admin_credentials_endpoint_rejects_invalid_input_without_write(
     tmp_path: Path,
     monkeypatch,
