@@ -980,6 +980,7 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
     assert telegram_gate["missing"] == ["telegram_bot_token_or_gateway"]
     assert telegram_gate["evidence"]["bot_token_configured"] is False
     assert telegram_gate["evidence"]["gateway_configured"] is False
+    assert telegram_gate["evidence"]["secret_values_returned"] is False
     assert live_data_gate["status"] == "blocked"
     assert live_data_gate["missing"] == [
         "market_ohlcv_source_or_api_key_decision",
@@ -989,6 +990,7 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
     for key, value in secret_env.items():
         assert key not in serialized
         if value.strip():
