@@ -625,6 +625,7 @@ def test_runtime_checkpoint_rejects_control_character_inputs(tmp_path: Path) -> 
             record_runtime_checkpoint(**payload)
 
         assert not checkpoint_path.exists()
+        assert not audit_path.exists()
         assert not ledger_path.exists()
 
 
