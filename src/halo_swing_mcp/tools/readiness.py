@@ -195,13 +195,13 @@ def _telegram_readiness(
     bot_token_configured: bool | None,
     gateway_configured: bool | None,
 ) -> dict[str, Any]:
-    env_bot_token_configured = bool(
-        os.environ.get("HALO_SWING_TELEGRAM_BOT_TOKEN")
-        or os.environ.get("TELEGRAM_BOT_TOKEN")
+    env_bot_token_configured = _env_value_configured(
+        "HALO_SWING_TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_BOT_TOKEN",
     )
-    env_gateway_configured = bool(
-        os.environ.get("HALO_SWING_TELEGRAM_GATEWAY")
-        or os.environ.get("HALO_SWING_TELEGRAM_GATEWAY_URL")
+    env_gateway_configured = _env_value_configured(
+        "HALO_SWING_TELEGRAM_GATEWAY",
+        "HALO_SWING_TELEGRAM_GATEWAY_URL",
     )
     token_ready = (
         bot_token_configured
@@ -416,28 +416,40 @@ def _live_data_readiness(
 
 
 def _market_data_env_configured() -> bool:
-    return bool(
-        os.environ.get("HALO_SWING_MARKET_DATA_SOURCE")
-        or os.environ.get("HALO_SWING_MARKET_DATA_API_KEY")
-        or os.environ.get("POLYGON_API_KEY")
-        or os.environ.get("ALPACA_API_KEY")
-        or os.environ.get("TIINGO_API_KEY")
+    return _env_value_configured(
+        "HALO_SWING_MARKET_DATA_SOURCE",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "ALPACA_API_KEY",
+        "TIINGO_API_KEY",
     )
 
 
 def _macro_env_configured() -> bool:
-    return bool(
-        os.environ.get("HALO_SWING_MACRO_SOURCE")
-        or os.environ.get("FRED_API_KEY")
-        or os.environ.get("HALO_SWING_FRED_API_KEY")
+    return _env_value_configured(
+        "HALO_SWING_MACRO_SOURCE",
+        "FRED_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
     )
 
 
 def _news_env_configured() -> bool:
+    return _env_value_configured(
+        "HALO_SWING_NEWS_SOURCE",
+        "NEWS_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+    )
+
+
+def _env_value_configured(*keys: str) -> bool:
+    return any(_is_env_value_configured(os.environ.get(key)) for key in keys)
+
+
+def _is_env_value_configured(value: str | None) -> bool:
     return bool(
-        os.environ.get("HALO_SWING_NEWS_SOURCE")
-        or os.environ.get("NEWS_API_KEY")
-        or os.environ.get("HALO_SWING_NEWS_API_KEY")
+        isinstance(value, str)
+        and value.strip()
+        and _has_no_control_characters(value)
     )
 
 

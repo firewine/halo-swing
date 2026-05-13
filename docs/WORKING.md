@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: HERMES_CONFIG_ENV_PATH_VALIDATION_VERIFIED
-gate_id: HERMES_CONFIG_ENV_PATH_VALIDATION
+status: READINESS_ENV_BOOLEAN_NORMALIZATION_VERIFIED
+gate_id: READINESS_ENV_BOOLEAN_NORMALIZATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -111,6 +111,7 @@ done_means:
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secrets as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secret aliases as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats market, macro, and news live data source env values as boolean evidence without returning source values or env key names
+  - get_integration_readiness treats blank or control-character Telegram, gateway, market, macro, and news env values as not configured without returning secret values or env key names
   - harness get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
   - MCP server get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
   - get_audit_log and audit web events_payload preserve readiness audit events without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
@@ -502,13 +503,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.441
-gate_packet: docs/halo-swing-development-plan.md#3.441
+portable_mirror: docs/halo-swing-development-plan.md#3.442
+gate_packet: docs/halo-swing-development-plan.md#3.442
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.441
+  - docs/halo-swing-development-plan.md#3.442
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -816,14 +817,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.441 Hermes Config Environment Path Validation is verified.
-Integration readiness now trims valid `HALO_SWING_HERMES_CONFIG_PATH` values
-and rejects blank or control-character environment paths before gate evaluation
-or credential/risk reads, so invalid Hermes env configuration cannot be treated
-as missing or passed to Path unchecked. Focused env-path coverage passed with 2
-tests, `tests/test_readiness.py` passed with 20 tests, and full pytest passed
-with 581 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.442 Readiness Environment Boolean Normalization is verified.
+Integration readiness now treats blank or control-character Telegram, gateway,
+market, macro, and news env values as not configured while still returning only
+boolean evidence, so malformed env values cannot make Telegram or live-data
+gates ready and secret values/env key names stay out of payloads. Focused
+coverage passed with 2 tests, `tests/test_readiness.py` passed with 22 tests,
+and full pytest passed with 583 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13229,6 +13231,56 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+readiness_env_boolean_normalization:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness now evaluates Telegram token/gateway env values through a shared nonblank, no-control-character boolean helper
+    - get_integration_readiness now evaluates market, macro, and news source/API-key env values through the same boolean helper
+    - blank or control-character Telegram/gateway env values no longer make the Telegram gate ready
+    - blank or control-character market/macro/news env values no longer make the live_data gate ready
+    - readiness coverage verifies malformed env values remain secret-safe and do not expose env key names or env values in payloads
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, passphrase persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "22 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "583 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

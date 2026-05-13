@@ -9302,6 +9302,62 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.442 Readiness Environment Boolean Normalization Record - 2026-05-13
+
+### A. 목적
+
+Readiness payloads already keep Telegram/gateway/live-data env values secret by
+returning booleans only. However, the boolean checks used direct env truthiness,
+so whitespace or control-character values could mark Telegram or live-data gates
+as ready even though the environment was malformed. This slice requires env
+values to be nonblank and control-character-free before counting them as
+configured, without returning env values or env key names.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness now evaluates Telegram token/gateway env values through a shared nonblank, no-control-character boolean helper
+  - get_integration_readiness now evaluates market, macro, and news source/API-key env values through the same boolean helper
+  - blank or control-character Telegram/gateway env values no longer make the Telegram gate ready
+  - blank or control-character market/macro/news env values no longer make the live_data gate ready
+  - readiness coverage verifies malformed env values remain secret-safe and do not expose env key names or env values in payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 22 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 583 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.441 Hermes Config Environment Path Validation Record - 2026-05-13
 
 ### A. 목적

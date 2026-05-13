@@ -767,6 +767,48 @@ def test_integration_readiness_env_secret_aliases_are_boolean_only(
         assert value not in serialized
 
 
+def test_integration_readiness_ignores_invalid_env_secret_values_without_exposure(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "   ",
+        "TELEGRAM_BOT_TOKEN": "telegram\x7fsecret",
+        "HALO_SWING_TELEGRAM_GATEWAY": "\n",
+        "HALO_SWING_TELEGRAM_GATEWAY_URL": "https://gateway.example/\x7fsecret",
+        "HALO_SWING_MARKET_DATA_API_KEY": " market\x7fsecret ",
+        "FRED_API_KEY": "   ",
+        "HALO_SWING_FRED_API_KEY": "fred\nsecret",
+        "NEWS_API_KEY": "\x7f",
+        "HALO_SWING_NEWS_API_KEY": "news\x7fsecret",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    telegram_gate = payload["gates"]["telegram"]
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert telegram_gate["status"] == "blocked"
+    assert telegram_gate["missing"] == ["telegram_bot_token_or_gateway"]
+    assert telegram_gate["evidence"]["bot_token_configured"] is False
+    assert telegram_gate["evidence"]["gateway_configured"] is False
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_source_or_api_key_decision",
+        "macro_source_or_api_key_decision",
+        "news_source_or_api_key_decision",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
+    for key, value in secret_env.items():
+        assert key not in serialized
+        if value.strip():
+            assert value not in serialized
+
+
 def test_integration_readiness_live_data_source_env_values_are_boolean_only(
     monkeypatch,
 ) -> None:
@@ -796,6 +838,41 @@ def test_integration_readiness_live_data_source_env_values_are_boolean_only(
     for key, value in source_env.items():
         assert key not in serialized
         assert value not in serialized
+
+
+def test_integration_readiness_ignores_invalid_live_data_source_env_values(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    source_env = {
+        "HALO_SWING_MARKET_DATA_SOURCE": "   ",
+        "POLYGON_API_KEY": "polygon\x7fsource",
+        "ALPACA_API_KEY": "\n",
+        "TIINGO_API_KEY": "tiingo\x7fsource",
+        "HALO_SWING_MACRO_SOURCE": "macro\nsource",
+        "HALO_SWING_NEWS_SOURCE": "\x7fnews-source",
+    }
+    for key, value in source_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_source_or_api_key_decision",
+        "macro_source_or_api_key_decision",
+        "news_source_or_api_key_decision",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert "live_data: provide" in payload["next_actions"][-1]
+    for key, value in source_env.items():
+        assert key not in serialized
+        if value.strip():
+            assert value not in serialized
 
 
 def test_binance_readiness_requires_passphrase_confirmation(tmp_path: Path) -> None:
