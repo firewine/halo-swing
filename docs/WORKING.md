@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_STATUS_HARNESS_MAX_BYTES_BOOLEAN_NO_WRITE_VERIFIED
-gate_id: RUNTIME_STATUS_HARNESS_MAX_BYTES_BOOLEAN_NO_WRITE
+status: RUNTIME_STATUS_HARNESS_APPLY_RETENTION_NUMERIC_NO_WRITE_VERIFIED
+gate_id: RUNTIME_STATUS_HARNESS_APPLY_RETENTION_NUMERIC_NO_WRITE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -141,6 +141,7 @@ done_means:
   - harness get_runtime_status invalid failure_window records a failure audit without default state fallback before validation failure
   - harness get_runtime_status invalid max_bytes records a failure audit without default state fallback before validation failure
   - harness get_runtime_status invalid max_records records a failure audit without default state fallback before validation failure
+  - harness get_runtime_status numeric apply_retention records a failure audit without default state fallback before validation failure
   - harness get_runtime_status invalid apply_retention records a failure audit without default state fallback before validation failure
   - harness get_runtime_status invalid public/path failures record failure audit events without creating ledger files before validation failure
   - harness get_runtime_status invalid audit_log_path records a failure audit without default state fallback before validation failure
@@ -569,13 +570,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.508
-gate_packet: docs/halo-swing-development-plan.md#3.508
+portable_mirror: docs/halo-swing-development-plan.md#3.509
+gate_packet: docs/halo-swing-development-plan.md#3.509
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.508
+  - docs/halo-swing-development-plan.md#3.509
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -883,16 +884,60 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.508 Runtime Status Harness Max Bytes Boolean No-Write Guard is verified.
-Harness `get_runtime_status` boolean max_bytes coverage now proves
+Summary: 3.509 Runtime Status Harness Apply Retention Numeric No-Write Guard is verified.
+Harness `get_runtime_status` numeric apply_retention coverage now proves
 failure audit events are recorded without default `state/` fallback before
-returning an error. Focused harness runtime status max_bytes boolean coverage
-passed with 1 test, `tests/test_runtime_guard.py` passed with 53 tests, and
-full pytest passed with 659 tests. Ruff, health_check,
+returning an error. Focused harness runtime status apply_retention numeric
+coverage passed with 1 test, `tests/test_runtime_guard.py` passed with 54 tests,
+and full pytest passed with 660 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+runtime_status_harness_apply_retention_numeric_no_write:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status now covers numeric apply_retention payload input from an isolated tmp_path cwd
+    - harness numeric apply_retention coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+    - harness numeric apply_retention coverage asserts no default state/ fallback and no ledger file creation before validation failure
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_numeric_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "54 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "660 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_status_harness_max_bytes_boolean_no_write:
   status: verified
   changed_files:
