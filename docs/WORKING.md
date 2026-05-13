@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_NORMALIZED_PATH_FULL_KEY_NO_EXPOSURE_VERIFIED
-gate_id: READINESS_NORMALIZED_PATH_FULL_KEY_NO_EXPOSURE
+status: READINESS_ENV_CREDENTIAL_PATH_FULL_KEY_NO_EXPOSURE_VERIFIED
+gate_id: READINESS_ENV_CREDENTIAL_PATH_FULL_KEY_NO_EXPOSURE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -82,6 +82,7 @@ done_means:
   - get_integration_readiness configured encrypted Binance credential metadata schema is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_integration_readiness all-gates-ready local evidence path is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_integration_readiness normalized public path input ready path is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
+  - get_integration_readiness env-backed Binance credential path is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_binance_credentials_status direct tool/registry output schemas are contract-tested for missing and configured credentials without exposing secret material
   - save_binance_credentials and get_binance_credentials_status validate credential text, passphrase, and path inputs before encrypted file writes or reads
   - save_binance_credentials and load_binance_credentials reject ASCII control characters in api_key, api_secret, and passphrase before encrypted credential writes, reads, or key derivation
@@ -579,13 +580,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.536
-gate_packet: docs/halo-swing-development-plan.md#3.536
+portable_mirror: docs/halo-swing-development-plan.md#3.537
+gate_packet: docs/halo-swing-development-plan.md#3.537
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.536
+  - docs/halo-swing-development-plan.md#3.537
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -893,18 +894,19 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.536 Readiness Normalized Path Full Key No-Exposure Guard is
-verified. The normalized public path input readiness path now asserts the full
-API key value is not serialized into readiness payloads after trimming
-Hermes/Binance/risk paths. The same ready path continues to prove API secret,
+Summary: 3.537 Readiness Env Credential Path Full Key No-Exposure Guard is
+verified. The env-backed Binance credential path readiness coverage now writes a
+real encrypted credential file, resolves it through
+`HALO_SWING_BINANCE_CREDENTIALS_PATH`, and asserts the full API key value is not
+serialized into readiness payloads. The same path continues to prove API secret,
 passphrase, salt, and token material stay absent while no network call or order
 submission occurs. Focused readiness coverage passed with 1 test,
-`tests/test_readiness.py` passed with 28 tests, and full pytest passed with 666
+`tests/test_readiness.py` passed with 29 tests, and full pytest passed with 667
 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
 blocked-path status, and ignored state checks passed.
 
 ```yaml
-readiness_normalized_path_full_key_no_exposure:
+readiness_env_credential_path_full_key_no_exposure:
   status: verified
   changed_files:
     - docs/WORKING.md
@@ -913,20 +915,20 @@ readiness_normalized_path_full_key_no_exposure:
     - docs/halo-swing-development-plan.md
     - tests/test_readiness.py
   implementation:
-    - tests-only slice; normalized public path input readiness coverage now asserts the full API key value stays out of serialized readiness payloads after trimming Hermes/Binance/risk paths
-    - normalized ready readiness coverage still verifies API secret, passphrase, salt, and token material stay absent while no Binance network call or order submission occurs
+    - tests-only slice; env-backed Binance credential path readiness coverage now resolves a real encrypted credential file through HALO_SWING_BINANCE_CREDENTIALS_PATH
+    - env-backed credential readiness coverage asserts the full API key, API secret, passphrase, salt, and token material stay out of serialized readiness payloads
     - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
   verification:
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_env_binance_credentials_path_without_secret_exposure -q
       result: "1 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
-      result: "28 passed"
+      result: "29 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
-      result: "666 passed"
+      result: "667 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness

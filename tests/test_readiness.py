@@ -494,6 +494,45 @@ def test_integration_readiness_normalizes_env_binance_credentials_path(
     assert not credentials_path.exists()
 
 
+def test_integration_readiness_uses_env_binance_credentials_path_without_secret_exposure(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv(
+        "HALO_SWING_BINANCE_CREDENTIALS_PATH",
+        f" {credentials_path} ",
+    )
+    get_settings.cache_clear()
+
+    try:
+        payload = get_integration_readiness()
+    finally:
+        get_settings.cache_clear()
+
+    for gate_name in ("binance_testnet_read_only", "live_order_submission"):
+        credentials = payload["gates"][gate_name]["evidence"]["credentials"]
+        assert credentials["configured"] is True
+        assert credentials["credentials_path"] == str(credentials_path)
+        assert credentials["api_key_hint"] == "abcde...5key"
+        assert credentials["secret_values_returned"] is False
+
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "api_secret" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
+
+
 def test_integration_readiness_rejects_env_binance_credentials_path_without_fallback(
     tmp_path: Path,
     monkeypatch,
