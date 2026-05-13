@@ -407,6 +407,13 @@ def test_integration_readiness_normalizes_public_path_inputs(
         ]
         is True
     )
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "api_secret" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
 
 
 def test_integration_readiness_normalizes_env_hermes_config_path(

@@ -5841,7 +5841,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 194. Next Concrete Actions
+## 194. 3.536 Readiness Normalized Path Full Key No-Exposure Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_normalizes_public_path_inputs -q -> 1 passed, normalized public path input readiness payload keeps the full API key, API secret, passphrase, salt, and token material out of serialized payloads after trimming Hermes/Binance/risk paths
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 28 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 195. Next Concrete Actions
 
 Choose one of:
 
