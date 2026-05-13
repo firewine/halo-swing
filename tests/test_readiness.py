@@ -1056,6 +1056,7 @@ def test_integration_readiness_ignores_invalid_live_data_source_env_values(
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "live_data: provide" in payload["next_actions"][-1]
     for key, value in source_env.items():
         assert key not in serialized

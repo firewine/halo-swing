@@ -9302,6 +9302,55 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.531 Integration Readiness Invalid Live Data Source No-Exposure Guard Record - 2026-05-13
+### A. 목적
+
+Direct `get_integration_readiness` invalid live-data source env coverage now
+explicitly asserts that blank or control-character market, macro, and news source
+env values keep the `live_data` gate blocked while preserving
+`secret_values_returned=false`. The same path continues to keep source env
+values and env key names out of serialized readiness payloads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; invalid live-data source env coverage now asserts live_data evidence keeps secret_values_returned=false
+  - blank/control-character market, macro, and news source env values still leave live_data blocked and absent from serialized payloads
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 28 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.530 Integration Readiness Invalid Env Secret No-Exposure Guard Record - 2026-05-13
 ### A. 목적
 
