@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_CHECKPOINT_HARNESS_AUDIT_PATH_CONTROL_NO_FALLBACK_VERIFIED
-gate_id: RUNTIME_CHECKPOINT_HARNESS_AUDIT_PATH_CONTROL_NO_FALLBACK
+status: RUNTIME_CHECKPOINT_HARNESS_LEDGER_PATH_CONTROL_NO_FALLBACK_VERIFIED
+gate_id: RUNTIME_CHECKPOINT_HARNESS_LEDGER_PATH_CONTROL_NO_FALLBACK
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -171,7 +171,7 @@ done_means:
   - harness record_runtime_checkpoint control-character audit_log_path records a failure audit without malformed audit, checkpoint, ledger, or default state fallback before validation failure
   - harness record_runtime_checkpoint invalid ledger_path records a failure audit without checkpoint, default state fallback, or malformed ledger file creation
   - harness record_runtime_checkpoint non-string ledger_path records a failure audit without checkpoint or default state fallback
-  - harness record_runtime_checkpoint control-character ledger_path records a failure audit without checkpoint or malformed ledger file creation
+  - harness record_runtime_checkpoint control-character ledger_path records a failure audit without checkpoint, malformed ledger, or default state fallback before validation failure
   - record_runtime_checkpoint validates checkpoint_path, audit_log_path, and ledger_path before runtime status reads or checkpoint writes
   - record_runtime_checkpoint invalid public inputs do not create checkpoint, audit, or ledger files before validation failure
   - record_runtime_checkpoint rejects ASCII control characters in checkpoint_path, audit_log_path, ledger_path, and run_id before runtime status reads or checkpoint writes
@@ -576,13 +576,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.520
-gate_packet: docs/halo-swing-development-plan.md#3.520
+portable_mirror: docs/halo-swing-development-plan.md#3.521
+gate_packet: docs/halo-swing-development-plan.md#3.521
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.520
+  - docs/halo-swing-development-plan.md#3.521
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -890,17 +890,63 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.520 Runtime Checkpoint Harness Audit Path Control No-Fallback Guard is verified.
-Harness `record_runtime_checkpoint` control-character audit_log_path coverage
-now proves failure audit events are recorded without malformed audit writes,
-checkpoint writes, ledger creation, or default `state/` fallback before
-returning an error. Focused harness runtime checkpoint audit_log_path control
-coverage passed with 1 test, `tests/test_runtime_guard.py` passed with 60
-tests, and full pytest passed with 666 tests. Ruff, health_check,
+Summary: 3.521 Runtime Checkpoint Harness Ledger Path Control No-Fallback Guard is verified.
+Harness `record_runtime_checkpoint` control-character ledger_path coverage now
+proves failure audit events are recorded without checkpoint writes, malformed
+ledger creation, or default `state/` fallback before returning an error.
+Focused harness runtime checkpoint ledger_path control coverage passed with 1
+test, `tests/test_runtime_guard.py` passed with 60 tests, and full pytest
+passed with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+runtime_checkpoint_harness_ledger_path_control_no_fallback:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint control-character ledger_path payload coverage now asserts no default state/ fallback from an isolated tmp_path cwd
+    - harness control-character ledger_path coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+    - harness control-character ledger_path coverage asserts no checkpoint, no malformed ledger file, and no default state/ fallback before validation failure
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "60 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "666 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  architecture_note:
+    - user clarified tests are excluded from the sub-1000-line source-file rule
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_checkpoint_harness_audit_path_control_no_fallback:
   status: verified
   changed_files:

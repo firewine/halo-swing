@@ -2456,6 +2456,7 @@ def test_harness_rejects_runtime_checkpoint_ledger_path_control_character_withou
     ]
     assert not checkpoint_path.exists()
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit(
