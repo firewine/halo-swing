@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TRADING_ADMIN_ORDER_PREVIEW_HTTP_ENV_ERROR_VERIFIED
-gate_id: TRADING_ADMIN_ORDER_PREVIEW_HTTP_ENV_ERROR
+status: TRADING_ADMIN_RISK_STATE_RESET_HTTP_ENV_PATH_VERIFIED
+gate_id: TRADING_ADMIN_RISK_STATE_RESET_HTTP_ENV_PATH
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -95,6 +95,7 @@ done_means:
   - trading admin connectivity HTTP endpoint returns a JSON 400 for invalid Binance environment booleans before Binance public network reads
   - trading admin account snapshot HTTP endpoint returns a JSON 400 for invalid Binance environment booleans before credential status or network reads
   - trading admin order preview HTTP endpoint returns a JSON 400 for invalid Binance environment booleans before notional or risk reads
+  - trading admin risk-state reset HTTP endpoint returns a JSON 400 for invalid BTC risk state environment paths before local state writes
   - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
   - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
   - trading admin account snapshot HTTP endpoint blocks missing/invalid passphrase paths without serializing passphrase, secret, salt, or token values
@@ -517,13 +518,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.456
-gate_packet: docs/halo-swing-development-plan.md#3.456
+portable_mirror: docs/halo-swing-development-plan.md#3.457
+gate_packet: docs/halo-swing-development-plan.md#3.457
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.456
+  - docs/halo-swing-development-plan.md#3.457
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -831,15 +832,59 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.456 Trading Admin Order Preview HTTP Environment Error Handling is
-verified. The POST `/api/order-preview` route is now covered for invalid
-settings-backed Binance boolean env values, returning JSON 400 before notional
-estimation or BTC risk validation can run. Focused order preview coverage passed
-with 2 tests, `tests/test_binance_btc.py` passed with 73 tests, and full pytest
-passed with 607 tests. Ruff, health_check, get_integration_readiness, diff
-whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.457 Trading Admin Risk-State Reset HTTP Environment Path Validation
+is verified. The POST `/api/risk-state/reset` route is now covered for invalid
+settings-backed BTC risk state path env values, returning JSON 400 before local
+daily risk state writes can run. Focused reset coverage passed with 2 tests,
+`tests/test_binance_btc.py` passed with 74 tests, and full pytest passed with
+608 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
+trading_admin_risk_state_reset_http_env_path:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - POST /api/risk-state/reset coverage now rejects blank HALO_SWING_BTC_RISK_STATE_PATH with HTTP 400 JSON
+    - risk-state reset endpoint coverage proves invalid state env path validation happens before local state writes
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_state_reset_endpoint_rejects_invalid_env_path_without_write tests/test_binance_btc.py::test_btc_risk_tools_reject_env_state_path_without_fallback -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "74 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "608 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 trading_admin_order_preview_http_env_error:
   status: verified
   changed_files:

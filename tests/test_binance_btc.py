@@ -2281,6 +2281,30 @@ def test_trading_admin_order_preview_endpoint_rejects_invalid_env_before_risk(
     )
 
 
+def test_trading_admin_risk_state_reset_endpoint_rejects_invalid_env_path_without_write(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_STATE_PATH", "   ")
+    get_settings.cache_clear()
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/risk-state/reset",
+            {},
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert response_payload == {
+        "error": "HALO_SWING_BTC_RISK_STATE_PATH must be a nonempty string"
+    }
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

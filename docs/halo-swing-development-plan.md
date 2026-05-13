@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.457 Trading Admin Risk-State Reset HTTP Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+The direct BTC risk state reset tool rejects invalid
+`HALO_SWING_BTC_RISK_STATE_PATH` values before writing local state. This slice
+pins the trading admin `/api/risk-state/reset` HTTP boundary so invalid
+settings-backed BTC risk state env paths return a JSON 400 before local daily
+risk state files can be created.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - POST /api/risk-state/reset rejects blank HALO_SWING_BTC_RISK_STATE_PATH with HTTP 400 JSON
+  - reset endpoint coverage proves invalid state env path validation happens before local state writes
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_risk_state_reset_endpoint_rejects_invalid_env_path_without_write tests/test_binance_btc.py::test_btc_risk_tools_reject_env_state_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 74 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 608 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.456 Trading Admin Order Preview HTTP Environment Error Handling Record - 2026-05-13
 
 ### A. 목적
