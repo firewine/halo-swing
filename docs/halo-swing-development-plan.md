@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.486 Runtime Checkpoint Harness Checkpoint Path Type No-Write Guard Record - 2026-05-13
+
+### A. 목적
+
+Harness `record_runtime_checkpoint` now covers non-string checkpoint_path payload
+input. The remaining checkpoint path coverage gap was type validation through
+the harness: malformed checkpoint paths must fail before default `state/`
+fallback or ledger file creation, while still recording the harness failure
+audit event. This tests-only slice pins that boundary from an isolated
+`tmp_path` cwd.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; added harness coverage for non-string checkpoint_path payload input
+  - non-string checkpoint_path coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+  - non-string checkpoint_path coverage asserts no default state/ fallback and no ledger file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_path_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 31 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 637 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.485 Runtime Checkpoint Harness Run ID Type No-Write Guard Record - 2026-05-13
 
 ### A. 목적
