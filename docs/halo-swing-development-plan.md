@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.528 Runtime Checkpoint Readiness Env Alias Secret Boundary Guard Record - 2026-05-13
+### A. 목적
+
+Direct `record_runtime_checkpoint` readiness snapshot coverage now sets the full
+Telegram, gateway, market, macro, and news env key/alias surface before checkpoint
+recording and proves that neither configured env values nor env key names are
+serialized into the returned payload or persisted checkpoint. This keeps the
+runtime checkpoint contract bounded to readiness status and next actions while
+preserving `secret_values_returned=false`.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; readiness snapshot env secret coverage now uses a single env key/value table for Telegram, gateway, market, macro, and news aliases
+  - checkpoint payload and appended checkpoint serialization assert every configured env value and env key name stays absent
+  - configured Telegram and live-data envs still remove those gates from readiness next_actions without persisting secret material
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.527 Runtime Checkpoint Env Path No-Fallback Guard Record - 2026-05-13
 ### A. 목적
 

@@ -2533,11 +2533,25 @@ def test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets(
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
     write_jsonl(ledger_path, [{"sequence": 1}])
-    monkeypatch.setenv("HALO_SWING_TELEGRAM_BOT_TOKEN", "telegram-secret-token")
-    monkeypatch.setenv("HALO_SWING_TELEGRAM_GATEWAY_URL", "https://gateway.example/secret")
-    monkeypatch.setenv("HALO_SWING_MARKET_DATA_API_KEY", "market-secret-key")
-    monkeypatch.setenv("FRED_API_KEY", "fred-secret-key")
-    monkeypatch.setenv("NEWS_API_KEY", "news-secret-key")
+    secret_env_values = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-secret-token",
+        "TELEGRAM_BOT_TOKEN": "telegram-alias-secret-token",
+        "HALO_SWING_TELEGRAM_GATEWAY": "https://gateway.example/secret",
+        "HALO_SWING_TELEGRAM_GATEWAY_URL": "https://gateway-url.example/secret",
+        "HALO_SWING_MARKET_DATA_SOURCE": "market-secret-source",
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-secret-key",
+        "POLYGON_API_KEY": "polygon-secret-key",
+        "ALPACA_API_KEY": "alpaca-secret-key",
+        "TIINGO_API_KEY": "tiingo-secret-key",
+        "HALO_SWING_MACRO_SOURCE": "macro-secret-source",
+        "FRED_API_KEY": "fred-secret-key",
+        "HALO_SWING_FRED_API_KEY": "halo-fred-secret-key",
+        "HALO_SWING_NEWS_SOURCE": "news-secret-source",
+        "NEWS_API_KEY": "news-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "halo-news-secret-key",
+    }
+    for env_key, env_value in secret_env_values.items():
+        monkeypatch.setenv(env_key, env_value)
 
     payload = record_runtime_checkpoint(
         checkpoint_path=str(checkpoint_path),
@@ -2555,15 +2569,9 @@ def test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets(
     assert "telegram: provide" not in checkpoint["readiness_next_actions"]
     assert "live_data: provide" not in checkpoint["readiness_next_actions"]
     for serialized in (serialized_payload, serialized_checkpoint):
-        assert "telegram-secret-token" not in serialized
-        assert "gateway.example/secret" not in serialized
-        assert "market-secret-key" not in serialized
-        assert "fred-secret-key" not in serialized
-        assert "news-secret-key" not in serialized
-        assert "HALO_SWING_TELEGRAM_BOT_TOKEN" not in serialized
-        assert "HALO_SWING_MARKET_DATA_API_KEY" not in serialized
-        assert "FRED_API_KEY" not in serialized
-        assert "NEWS_API_KEY" not in serialized
+        for env_key, env_value in secret_env_values.items():
+            assert env_key not in serialized
+            assert env_value not in serialized
 
 
 def test_record_runtime_checkpoint_appends_snapshot(tmp_path: Path) -> None:
