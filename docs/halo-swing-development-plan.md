@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.526 Runtime Status Env Limit No-Fallback Guard Record - 2026-05-13
+### A. 목적
+
+Direct `get_runtime_status` invalid environment-backed runtime limit coverage now
+runs from an isolated cwd and explicitly asserts that validation failure creates
+no audit, ledger, or default `state/` fallback. The existing test already
+covered invalid retention max_records, retention max_bytes, failure_window, and
+failure_threshold env values; this gate tightens the same boundary to match the
+current runtime status no-fallback standard.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; direct invalid environment-backed runtime limit coverage now runs from an isolated tmp_path cwd
+  - invalid env limit coverage verifies retention max_records, retention max_bytes, failure_window, and failure_threshold validation failures before artifact reads or mutation
+  - invalid env limit coverage asserts no audit file, ledger file, or default state/ fallback
+  - user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.525 Runtime Status Control Public No-Fallback Guard Record - 2026-05-13
 ### A. 목적
 

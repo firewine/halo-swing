@@ -235,6 +235,7 @@ def test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback(
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
+    monkeypatch.chdir(tmp_path)
     invalid_cases = [
         (
             "HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS",
@@ -270,9 +271,10 @@ def test_runtime_status_rejects_invalid_env_runtime_limits_without_fallback(
                 get_runtime_status(
                     audit_log_path=str(audit_path),
                     ledger_path=str(ledger_path),
-                )
+            )
             assert not audit_path.exists()
             assert not ledger_path.exists()
+            assert not (tmp_path / "state").exists()
     finally:
         for key in runtime_env_keys:
             monkeypatch.delenv(key, raising=False)
