@@ -2027,6 +2027,38 @@ def test_trading_admin_credentials_endpoint_rejects_control_characters_without_w
         assert "local-passphrase" not in serialized_response
 
 
+def test_trading_admin_credentials_endpoint_rejects_invalid_env_path_without_secret_leak(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HALO_SWING_BINANCE_CREDENTIALS_PATH", "   ")
+    get_settings.cache_clear()
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/credentials",
+            {
+                "api_key": "abcde12345key",
+                "api_secret": "super-secret",
+                "passphrase": "local-passphrase",
+            },
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    serialized_response = json.dumps(response_payload)
+    assert response_payload == {
+        "error": "HALO_SWING_BINANCE_CREDENTIALS_PATH must be a nonempty string."
+    }
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+    assert "abcde12345key" not in serialized_response
+    assert "super-secret" not in serialized_response
+    assert "local-passphrase" not in serialized_response
+
+
 def test_trading_admin_order_preview_endpoint_rejects_invalid_text_inputs() -> None:
     response_payload = _admin_json_request(
         "/api/order-preview",

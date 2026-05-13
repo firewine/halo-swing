@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.458 Trading Admin Credentials HTTP Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+The direct Binance credential helpers reject invalid
+`HALO_SWING_BINANCE_CREDENTIALS_PATH` values before encrypted credential writes.
+This slice pins the trading admin `/api/credentials` HTTP boundary so invalid
+settings-backed Binance credential env paths return a JSON 400 before writes and
+without serializing submitted API keys, secrets, or passphrases.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - POST /api/credentials rejects blank HALO_SWING_BINANCE_CREDENTIALS_PATH with HTTP 400 JSON
+  - credentials endpoint coverage proves invalid credential env path validation happens before encrypted writes
+  - credentials endpoint coverage proves submitted api_key, api_secret, and passphrase are absent from the error response
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_credentials_endpoint_rejects_invalid_env_path_without_secret_leak tests/test_binance_btc.py::test_binance_credentials_reject_env_credentials_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 75 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 609 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.457 Trading Admin Risk-State Reset HTTP Environment Path Validation Record - 2026-05-13
 
 ### A. 목적
