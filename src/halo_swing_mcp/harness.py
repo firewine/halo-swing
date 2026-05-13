@@ -38,6 +38,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.audit_log_path is not None:
+        audit_log_path_error = _validate_audit_log_path_argument(args.audit_log_path)
+        if audit_log_path_error is not None:
+            raise audit_log_path_error
+
     if args.input_file is not None:
         input_file_error = _validate_input_file_argument(args.input_file)
         if input_file_error is not None:
@@ -164,6 +169,14 @@ def _validate_input_file_argument(input_file: str) -> ValueError | None:
         return ValueError("input-file must be a nonempty string")
     if any(ord(character) < 32 for character in input_file):
         return ValueError("input-file must not contain control characters")
+    return None
+
+
+def _validate_audit_log_path_argument(audit_log_path: str) -> ValueError | None:
+    if not audit_log_path.strip():
+        return ValueError("audit-log-path must be a nonempty string")
+    if any(ord(character) < 32 for character in audit_log_path):
+        return ValueError("audit-log-path must not contain control characters")
     return None
 
 
