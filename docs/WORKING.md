@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_HARNESS_CONTROL_PATH_NO_FALLBACK_VERIFIED
-gate_id: READINESS_HARNESS_CONTROL_PATH_NO_FALLBACK
+status: RUNTIME_HARNESS_CONTROL_PATH_NO_FALLBACK_VERIFIED
+gate_id: RUNTIME_HARNESS_CONTROL_PATH_NO_FALLBACK
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -138,6 +138,7 @@ done_means:
   - get_runtime_status invalid environment-backed retention limits and failure watchdog windows do not create audit, ledger, or default state fallback before validation failure
   - get_runtime_status validates audit_log_path and ledger_path before audit reads, ledger repository resolution, retention inspection, or retention mutation
   - get_runtime_status invalid public inputs do not create audit, ledger, or default state fallback before validation failure
+  - harness get_runtime_status and record_runtime_checkpoint control-character runtime path failures emit no stdout, keep raw malformed paths out of stderr, and create no malformed or default state files
   - harness get_runtime_status boolean failure_window records a failure audit without default state fallback before validation failure
   - harness get_runtime_status boolean failure_threshold records a failure audit without default state fallback before validation failure
   - harness get_runtime_status boolean max_records records a failure audit without default state fallback before validation failure
@@ -586,13 +587,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.543
-gate_packet: docs/halo-swing-development-plan.md#3.543
+portable_mirror: docs/halo-swing-development-plan.md#3.544
+gate_packet: docs/halo-swing-development-plan.md#3.544
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.543
+  - docs/halo-swing-development-plan.md#3.544
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -900,35 +901,36 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.543 Readiness Harness Control Path No-Fallback Guard is verified.
-Harness readiness control-character credential path failure coverage now proves
-the raw invalid path stays out of stderr and failure-audit serialization while
-no requested or malformed credential file is created. Focused readiness coverage
-passed with 1 test,
-`tests/test_readiness.py` passed with 29 tests, and full pytest passed with 667
-tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.544 Runtime Harness Control Path No-Fallback Guard is verified.
+Harness runtime control-character path failure coverage now proves
+`get_runtime_status` and `record_runtime_checkpoint` emit no stdout, keep raw
+malformed paths out of stderr, and create no malformed or default state files.
+Focused runtime coverage passed with 3 tests, `tests/test_runtime_guard.py`
+passed with 60 tests, and full pytest passed with 667 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
-readiness_harness_control_path_no_fallback:
+runtime_harness_control_path_no_fallback:
   status: verified
   changed_files:
     - docs/WORKING.md
     - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
     - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
     - docs/halo-swing-development-plan.md
-    - tests/test_readiness.py
+    - tests/test_runtime_guard.py
   implementation:
-    - tests-only slice; harness readiness control-character credential path failure coverage now asserts the raw invalid path stays out of stderr and failure-audit serialization
-    - harness readiness control-character credential path failure coverage now asserts no requested or malformed credential file is created
+    - tests-only slice; harness get_runtime_status control-character audit and ledger path failures now assert raw malformed paths stay out of stderr
+    - harness record_runtime_checkpoint control-character checkpoint path failures now assert raw malformed paths stay out of stderr
+    - runtime harness control-character path failures continue to assert no stdout, no malformed path file, and no default state fallback
     - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
   verification:
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit -q
-      result: "1 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_control_character_without_fallback tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_path_control_character_without_fallback -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
-      result: "29 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "60 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q

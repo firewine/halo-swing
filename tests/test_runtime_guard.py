@@ -1316,8 +1316,9 @@ def test_harness_rejects_runtime_path_control_character_with_failure_audit(
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
+    invalid_audit_path = f"{audit_path}\n"
     input_payload = {
-        "audit_log_path": f"{audit_path}\n",
+        "audit_log_path": invalid_audit_path,
         "ledger_path": str(ledger_path),
     }
     result = subprocess.run(
@@ -1342,6 +1343,8 @@ def test_harness_rejects_runtime_path_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
+    assert invalid_audit_path not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1387,6 +1390,9 @@ def test_harness_rejects_runtime_status_audit_path_control_character_without_fal
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
+    assert str(malformed_audit_path) not in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1433,6 +1439,9 @@ def test_harness_rejects_runtime_status_ledger_path_control_character_without_fa
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must not contain control characters" in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -2182,6 +2191,9 @@ def test_harness_rejects_runtime_checkpoint_path_control_character_without_fallb
     assert result.returncode != 0
     assert result.stdout == ""
     assert "checkpoint_path must not contain control characters" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\x7f" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
