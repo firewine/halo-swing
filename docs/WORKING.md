@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_ENV_RISK_PATH_FULL_KEY_NO_EXPOSURE_VERIFIED
-gate_id: READINESS_ENV_RISK_PATH_FULL_KEY_NO_EXPOSURE
+status: READINESS_BINANCE_BOOLEAN_ENV_FULL_KEY_NO_EXPOSURE_VERIFIED
+gate_id: READINESS_BINANCE_BOOLEAN_ENV_FULL_KEY_NO_EXPOSURE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -84,6 +84,7 @@ done_means:
   - get_integration_readiness normalized public path input ready path is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_integration_readiness env-backed Binance credential path is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_integration_readiness env-backed BTC risk settings path with configured Binance credentials is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
+  - get_integration_readiness canonical Binance boolean env path with configured Binance credentials is contract-tested without exposing full API key, API secret, passphrase, salt, or token material
   - get_binance_credentials_status direct tool/registry output schemas are contract-tested for missing and configured credentials without exposing secret material
   - save_binance_credentials and get_binance_credentials_status validate credential text, passphrase, and path inputs before encrypted file writes or reads
   - save_binance_credentials and load_binance_credentials reject ASCII control characters in api_key, api_secret, and passphrase before encrypted credential writes, reads, or key derivation
@@ -581,13 +582,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.538
-gate_packet: docs/halo-swing-development-plan.md#3.538
+portable_mirror: docs/halo-swing-development-plan.md#3.539
+gate_packet: docs/halo-swing-development-plan.md#3.539
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.538
+  - docs/halo-swing-development-plan.md#3.539
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -895,18 +896,19 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.538 Readiness Env Risk Path Full Key No-Exposure Guard is verified.
-The env-backed BTC risk settings readiness path now runs with configured Binance
-credentials and asserts the full API key value is not serialized into readiness
-payloads while preserving the emergency kill switch evidence. The same path
-continues to prove API secret, passphrase, salt, and token material stay absent
-while no network call or order submission occurs. Focused readiness coverage
-passed with 1 test, `tests/test_readiness.py` passed with 29 tests, and full
-pytest passed with 667 tests. Ruff, health_check, get_integration_readiness,
-diff whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.539 Readiness Binance Boolean Env Full Key No-Exposure Guard is
+verified. The canonical Binance boolean env readiness path now runs with
+configured Binance credentials and asserts the full API key value is not
+serialized into readiness payloads while preserving testnet, force-testnet, and
+live-trading evidence. The same path continues to prove API secret, passphrase,
+salt, and token material stay absent while no network call or order submission
+occurs. Focused readiness coverage passed with 1 test,
+`tests/test_readiness.py` passed with 29 tests, and full pytest passed with 667
+tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
-readiness_env_risk_path_full_key_no_exposure:
+readiness_binance_boolean_env_full_key_no_exposure:
   status: verified
   changed_files:
     - docs/WORKING.md
@@ -915,11 +917,11 @@ readiness_env_risk_path_full_key_no_exposure:
     - docs/halo-swing-development-plan.md
     - tests/test_readiness.py
   implementation:
-    - tests-only slice; env-backed BTC risk settings readiness coverage now runs with configured Binance credentials and preserves emergency kill switch evidence
-    - env-backed risk settings readiness coverage asserts the full API key, API secret, passphrase, salt, and token material stay out of serialized readiness payloads
+    - tests-only slice; canonical Binance boolean env readiness coverage now runs with configured Binance credentials and preserves testnet/force-testnet/live-trading evidence
+    - canonical Binance boolean env readiness coverage asserts the full API key, API secret, passphrase, salt, and token material stay out of serialized readiness payloads
     - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
   verification:
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_env_btc_risk_settings_path -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_canonical_binance_boolean_env -q
       result: "1 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
       result: passed

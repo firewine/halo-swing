@@ -643,6 +643,13 @@ def test_integration_readiness_uses_canonical_binance_boolean_env(
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
     monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "false")
     monkeypatch.setenv("HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION", "false")
     monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
@@ -650,7 +657,7 @@ def test_integration_readiness_uses_canonical_binance_boolean_env(
 
     try:
         payload = get_integration_readiness(
-            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+            binance_credentials_path=str(credentials_path),
         )
     finally:
         get_settings.cache_clear()
@@ -660,6 +667,8 @@ def test_integration_readiness_uses_canonical_binance_boolean_env(
     assert binance_gate["evidence"]["testnet"] is False
     assert binance_gate["evidence"]["force_testnet_execution"] is False
     assert binance_gate["evidence"]["live_trading_enabled"] is True
+    assert binance_gate["evidence"]["credentials"]["configured"] is True
+    assert binance_gate["evidence"]["credentials"]["api_key_hint"] == "abcde...5key"
     assert "HALO_SWING_BINANCE_TESTNET=true" in binance_gate["missing"]
     assert (
         "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true"
@@ -669,6 +678,13 @@ def test_integration_readiness_uses_canonical_binance_boolean_env(
     assert "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true" not in live_order_gate[
         "missing"
     ]
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "api_secret" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
 
 
 def test_integration_readiness_rejects_noncanonical_binance_boolean_env(
