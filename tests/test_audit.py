@@ -926,6 +926,81 @@ def test_audit_web_main_rejects_non_localhost_bind(capsys) -> None:
     assert "Audit web must bind to localhost only." in captured.err
 
 
+def test_audit_web_main_rejects_invalid_port_without_server(
+    monkeypatch,
+    capsys,
+) -> None:
+    def fail_resolve_path(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("audit path must not resolve with an invalid port")
+
+    def fail_server(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("server must not bind with an invalid port")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.audit_web.resolve_audit_log_path",
+        fail_resolve_path,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.audit_web.ThreadingHTTPServer",
+        fail_server,
+    )
+
+    for port in ("-1", "65536"):
+        result = audit_web.main(["--host", "127.0.0.1", "--port", port])
+        captured = capsys.readouterr()
+
+        assert result == 2
+        assert "Audit web port must be between 0 and 65535." in captured.err
+
+
+def test_audit_web_main_allows_localhost_ephemeral_port(
+    tmp_path: Path,
+    monkeypatch,
+    capsys,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    server_events: list[tuple[str, object]] = []
+
+    class FakeServer:
+        server_address = ("127.0.0.1", 8765)
+
+        def __init__(self, server_address: tuple[str, int], _handler: object) -> None:
+            server_events.append(("init", server_address))
+
+        def serve_forever(self) -> None:
+            server_events.append(("serve_forever", None))
+            raise KeyboardInterrupt
+
+        def server_close(self) -> None:
+            server_events.append(("server_close", None))
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.audit_web.ThreadingHTTPServer",
+        FakeServer,
+    )
+
+    result = audit_web.main(
+        [
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "0",
+            "--audit-log-path",
+            str(audit_path),
+        ]
+    )
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert server_events == [
+        ("init", ("127.0.0.1", 0)),
+        ("serve_forever", None),
+        ("server_close", None),
+    ]
+    assert "Serving Halo Swing audit log at http://127.0.0.1:8765" in captured.out
+    assert f"Audit log: {audit_path}" in captured.out
+
+
 def test_audit_web_events_payload_normalizes_query_inputs(tmp_path: Path) -> None:
     audit_path = tmp_path / "audit.jsonl"
     append_audit_event(

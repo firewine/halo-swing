@@ -325,6 +325,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.host not in ALLOWED_HOSTS:
         print("Audit web must bind to localhost only.", file=sys.stderr)
         return 2
+    if args.port < 0 or args.port > 65535:
+        print("Audit web port must be between 0 and 65535.", file=sys.stderr)
+        return 2
     audit_path = str(resolve_audit_log_path(args.audit_log_path))
     handler = create_handler(audit_path)
     server = ThreadingHTTPServer((args.host, args.port), handler)

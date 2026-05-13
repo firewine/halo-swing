@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TRADING_ADMIN_PORT_GUARD_VERIFIED
-gate_id: TRADING_ADMIN_PORT_GUARD
+status: AUDIT_WEB_PORT_GUARD_VERIFIED
+gate_id: AUDIT_WEB_PORT_GUARD
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -119,6 +119,7 @@ done_means:
   - audit web events_payload validates query limit, trims optional filters, caps limit at 1000, and returns HTTP 400 for invalid events query values before audit reads
   - get_audit_log, get_audit_summary, and audit web events_payload reject ASCII control characters in audit_log_path, query limit, and optional filter inputs before audit reads
   - audit web server rejects non-localhost bind hosts before starting the HTTP server
+  - audit web server rejects invalid port values before audit path resolution or HTTP server start
   - get_runtime_status watchdog consumes audit failures without returning event details, passphrases, credential material, or raw error strings
   - get_runtime_status validates apply_retention, retention limits, and failure watchdog windows before retention inspection or mutation
   - get_runtime_status validates environment-backed retention limits and failure watchdog windows before retention inspection or mutation
@@ -528,13 +529,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.467
-gate_packet: docs/halo-swing-development-plan.md#3.467
+portable_mirror: docs/halo-swing-development-plan.md#3.468
+gate_packet: docs/halo-swing-development-plan.md#3.468
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.467
+  - docs/halo-swing-development-plan.md#3.468
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -842,15 +843,62 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.467 Trading Admin Port Guard is verified. Trading admin CLI startup
-now rejects invalid `--port` values before `ThreadingHTTPServer` can construct
-or bind a server, while preserving port 0 as the valid ephemeral-port path.
-Focused port guard coverage passed with 2 tests, `tests/test_binance_btc.py`
-passed with 85 tests, and full pytest passed with 619 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.468 Audit Web Port Guard is verified. Audit web CLI startup now
+rejects invalid `--port` values before audit path resolution or
+`ThreadingHTTPServer` construction, while preserving port 0 as the valid
+ephemeral-port path. Focused port guard coverage passed with 2 tests,
+`tests/test_audit.py` passed with 31 tests, and full pytest passed with 621
+tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
+audit_web_port_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/audit_web.py
+    - tests/test_audit.py
+  implementation:
+    - audit web CLI startup now rejects --port values outside 0..65535 with exit code 2 and a port guard message
+    - coverage patches resolve_audit_log_path and ThreadingHTTPServer so invalid ports fail before audit path resolution, server construction, or socket binding
+    - coverage verifies localhost port 0 still reaches server construction as the valid ephemeral-port path
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, scheduler, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_port_without_server tests/test_audit.py::test_audit_web_main_allows_localhost_ephemeral_port -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "31 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "621 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - scheduler
+    - live trading
+    - order submission
+
 trading_admin_port_guard:
   status: verified
   changed_files:
