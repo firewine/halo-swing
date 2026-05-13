@@ -473,6 +473,61 @@ def test_save_binance_credentials_normalizes_public_inputs(tmp_path: Path) -> No
     assert credentials_path.exists()
 
 
+def test_binance_credentials_normalizes_env_credentials_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "binance_credentials.enc.json"
+    monkeypatch.setenv(
+        "HALO_SWING_BINANCE_CREDENTIALS_PATH",
+        f" {credentials_path} ",
+    )
+    get_settings.cache_clear()
+
+    status = get_binance_credentials_status()
+
+    assert status["configured"] is False
+    assert status["credentials_path"] == str(credentials_path)
+    assert not credentials_path.exists()
+
+
+def test_binance_credentials_reject_env_credentials_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must be a nonempty string",
+            tmp_path / "state",
+        ),
+        (
+            "   ",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must be a nonempty string",
+            tmp_path / "   ",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7fcredentials.enc.json",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH must not contain control characters",
+            tmp_path / "bad\x7fcredentials.enc.json",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_BINANCE_CREDENTIALS_PATH", env_value)
+        get_settings.cache_clear()
+
+        with pytest.raises(ValueError, match=expected_error):
+            get_binance_credentials_status()
+        with pytest.raises(ValueError, match=expected_error):
+            save_binance_credentials(
+                api_key="abcde12345key",
+                api_secret="super-secret",
+                passphrase="local-passphrase",
+            )
+        assert not unexpected_path.exists()
+
+
 def test_save_binance_credentials_rejects_invalid_public_inputs(
     tmp_path: Path,
 ) -> None:

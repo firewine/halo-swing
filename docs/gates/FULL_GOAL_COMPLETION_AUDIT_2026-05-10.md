@@ -4371,7 +4371,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 96. Next Concrete Actions
+## 96. 3.438 Binance Credentials Environment Path Validation Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_binance_credentials_normalizes_env_credentials_path tests/test_binance_btc.py::test_binance_credentials_reject_env_credentials_path_without_fallback -q -> 2 passed, Binance credential env path validation coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 56 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 574 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 97. Next Concrete Actions
 
 Choose one of:
 

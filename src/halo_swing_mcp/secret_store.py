@@ -19,6 +19,7 @@ from halo_swing_mcp.config import get_settings
 
 CREDENTIAL_SCHEMA_VERSION = "binance_credentials.v1"
 CREDENTIAL_POLICY_SCHEMA_VERSION = "binance_credential_policy.v1"
+BINANCE_CREDENTIALS_PATH_ENV = "HALO_SWING_BINANCE_CREDENTIALS_PATH"
 KDF_ITERATIONS = 390_000
 
 
@@ -167,16 +168,32 @@ def load_binance_credentials(
 
 
 def resolve_credentials_path(credentials_path: str | None = None) -> Path:
-    if credentials_path is None:
-        return Path(get_settings().binance_credentials_path)
-    if not isinstance(credentials_path, str):
-        raise ValueError("credentials_path must be a nonempty string.")
-    if not _has_no_control_characters(credentials_path):
-        raise ValueError("credentials_path must not contain control characters.")
-    normalized = credentials_path.strip()
+    if credentials_path is not None:
+        return Path(_normalize_credentials_path(credentials_path, "credentials_path"))
+    if BINANCE_CREDENTIALS_PATH_ENV in os.environ:
+        return Path(
+            _normalize_credentials_path(
+                os.environ[BINANCE_CREDENTIALS_PATH_ENV],
+                BINANCE_CREDENTIALS_PATH_ENV,
+            )
+        )
+    return Path(
+        _normalize_credentials_path(
+            get_settings().binance_credentials_path,
+            "settings.binance_credentials_path",
+        )
+    )
+
+
+def _normalize_credentials_path(value: Any, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a nonempty string.")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters.")
+    normalized = value.strip()
     if not normalized:
-        raise ValueError("credentials_path must be a nonempty string.")
-    return Path(normalized)
+        raise ValueError(f"{field_name} must be a nonempty string.")
+    return normalized
 
 
 def _has_no_control_characters(value: str) -> bool:

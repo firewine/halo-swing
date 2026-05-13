@@ -9302,6 +9302,62 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.438 Binance Credentials Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Public credential tool inputs already validate explicit `credentials_path`
+values. The default resolver still accepted
+`HALO_SWING_BINANCE_CREDENTIALS_PATH` through settings without the same
+blank/control-character guard, so invalid env configuration could resolve an
+unsafe path or select malformed local credential files before encrypted
+credential status reads or writes. This slice hardens the shared credential
+path resolver itself.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - resolve_credentials_path now trims valid explicit, environment, and settings Binance credential paths before Path construction
+  - resolve_credentials_path now treats a present blank HALO_SWING_BINANCE_CREDENTIALS_PATH as invalid instead of resolving an unsafe path
+  - resolve_credentials_path now rejects C0 and DEL control characters in HALO_SWING_BINANCE_CREDENTIALS_PATH before encrypted credential reads or writes
+  - credential coverage verifies invalid env paths raise before status reads, encrypted credential writes, default fallback, or malformed local file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_binance_credentials_normalizes_env_credentials_path tests/test_binance_btc.py::test_binance_credentials_reject_env_credentials_path_without_fallback -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/secret_store.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 56 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 574 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.437 Signal Ledger Environment Path Validation Record - 2026-05-13
 
 ### A. 목적
