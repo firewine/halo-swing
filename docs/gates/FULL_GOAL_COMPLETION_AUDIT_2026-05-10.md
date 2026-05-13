@@ -4806,7 +4806,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 125. Next Concrete Actions
+## 125. 3.467 Trading Admin Port Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_web_main_rejects_invalid_port_without_server tests/test_binance_btc.py::test_trading_admin_web_main_allows_localhost_ephemeral_port -q -> 2 passed, trading admin rejects invalid ports before ThreadingHTTPServer construction while preserving localhost port 0
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 85 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 619 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 126. Next Concrete Actions
 
 Choose one of:
 

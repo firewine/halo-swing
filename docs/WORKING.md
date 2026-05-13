@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TRADING_ADMIN_BIND_HOST_VERIFIED
-gate_id: TRADING_ADMIN_BIND_HOST
+status: TRADING_ADMIN_PORT_GUARD_VERIFIED
+gate_id: TRADING_ADMIN_PORT_GUARD
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -108,6 +108,7 @@ done_means:
   - trading admin POST endpoints accept application/json Content-Type values with parameters and mixed case after media-type validation
   - trading admin POST endpoints return a JSON 400 for non-UTF-8 request bodies before credential writes, connectivity calls, account reads, order previews, risk settings writes, or risk state writes and without echoing submitted secret-looking text
   - trading admin web server rejects non-localhost bind hosts before constructing or starting the HTTP server
+  - trading admin web server rejects invalid port values before constructing or starting the HTTP server
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints validate JSON/form payload strings, numeric strings, finite values, and booleans before credential writes, account reads, order previews, or risk settings writes
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints reject ASCII control characters before credential writes, account reads, order previews, or risk settings writes
   - MCP server execute_btc_order audit logging redacts credential_passphrase in blocked order paths
@@ -527,13 +528,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.466
-gate_packet: docs/halo-swing-development-plan.md#3.466
+portable_mirror: docs/halo-swing-development-plan.md#3.467
+gate_packet: docs/halo-swing-development-plan.md#3.467
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.466
+  - docs/halo-swing-development-plan.md#3.467
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -841,15 +842,61 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.466 Trading Admin Bind Host Guard is verified. Trading admin CLI
-startup now has direct coverage proving non-localhost `--host` values return
-exit code 2 with the local-only guard message before `ThreadingHTTPServer` can
-construct or bind a server. Focused bind-host coverage passed with 1 test,
-`tests/test_binance_btc.py` passed with 83 tests, and full pytest passed with
-617 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.467 Trading Admin Port Guard is verified. Trading admin CLI startup
+now rejects invalid `--port` values before `ThreadingHTTPServer` can construct
+or bind a server, while preserving port 0 as the valid ephemeral-port path.
+Focused port guard coverage passed with 2 tests, `tests/test_binance_btc.py`
+passed with 85 tests, and full pytest passed with 619 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
+trading_admin_port_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/trading_admin_web.py
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin CLI startup now rejects --port values outside 0..65535 with exit code 2 and a port guard message
+    - coverage patches ThreadingHTTPServer so the regression fails if invalid ports reach server construction or socket binding
+    - coverage verifies localhost port 0 still reaches server construction as the valid ephemeral-port path
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_web_main_rejects_invalid_port_without_server tests/test_binance_btc.py::test_trading_admin_web_main_allows_localhost_ephemeral_port -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "85 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "619 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 trading_admin_bind_host:
   status: verified
   changed_files:

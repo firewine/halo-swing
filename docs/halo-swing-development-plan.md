@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.467 Trading Admin Port Guard Record - 2026-05-13
+
+### A. 목적
+
+The trading admin CLI accepts a numeric `--port` argument before constructing
+the local HTTP server. Invalid values such as `-1` or `65536` should fail as
+operator input errors before `ThreadingHTTPServer` construction or socket bind
+attempts, while preserving `0` as the valid ephemeral-port path. This slice pins
+that startup guard.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin CLI startup rejects --port values outside 0..65535 with exit code 2 and a port guard message
+  - coverage patches ThreadingHTTPServer so invalid ports fail before server construction or socket binding
+  - coverage verifies localhost port 0 still reaches server construction as the valid ephemeral-port path
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_web_main_rejects_invalid_port_without_server tests/test_binance_btc.py::test_trading_admin_web_main_allows_localhost_ephemeral_port -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 85 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 619 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.466 Trading Admin Bind Host Guard Record - 2026-05-13
 
 ### A. 목적

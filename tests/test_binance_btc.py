@@ -2265,6 +2265,64 @@ def test_trading_admin_web_main_rejects_non_localhost_bind_without_server(
     assert "Trading admin must bind to localhost only." in captured.err
 
 
+def test_trading_admin_web_main_rejects_invalid_port_without_server(
+    monkeypatch,
+    capsys,
+) -> None:
+    def fail_server(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("server must not bind with an invalid port")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.ThreadingHTTPServer",
+        fail_server,
+    )
+
+    for port in ("-1", "65536"):
+        result = trading_admin_web.main(["--host", "127.0.0.1", "--port", port])
+        captured = capsys.readouterr()
+
+        assert result == 2
+        assert "Trading admin port must be between 0 and 65535." in captured.err
+
+
+def test_trading_admin_web_main_allows_localhost_ephemeral_port(
+    monkeypatch,
+    capsys,
+) -> None:
+    server_events: list[tuple[str, object]] = []
+
+    class FakeServer:
+        server_address = ("127.0.0.1", 8766)
+
+        def __init__(self, server_address: tuple[str, int], _handler: object) -> None:
+            server_events.append(("init", server_address))
+
+        def serve_forever(self) -> None:
+            server_events.append(("serve_forever", None))
+            raise KeyboardInterrupt
+
+        def server_close(self) -> None:
+            server_events.append(("server_close", None))
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.ThreadingHTTPServer",
+        FakeServer,
+    )
+
+    result = trading_admin_web.main(["--host", "127.0.0.1", "--port", "0"])
+    captured = capsys.readouterr()
+
+    assert result == 0
+    assert server_events == [
+        ("init", ("127.0.0.1", 0)),
+        ("serve_forever", None),
+        ("server_close", None),
+    ]
+    assert "Serving Halo Swing trading admin at http://127.0.0.1:8766" in (
+        captured.out
+    )
+
+
 def test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network(
     monkeypatch,
 ) -> None:
