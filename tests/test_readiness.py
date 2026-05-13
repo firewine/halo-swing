@@ -294,6 +294,7 @@ def test_integration_readiness_configured_credential_schema_is_stable(
         assert credentials["live_data_required"] is False
 
     serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
     assert "super-secret" not in serialized
     assert "local-passphrase" not in serialized
     assert "salt_b64" not in serialized
