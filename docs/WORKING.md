@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_CHECKPOINT_READINESS_ENV_ALIAS_SECRET_BOUNDARY_VERIFIED
-gate_id: RUNTIME_CHECKPOINT_READINESS_ENV_ALIAS_SECRET_BOUNDARY
+status: INTEGRATION_READINESS_PRIMARY_ENV_SECRET_BOUNDARY_VERIFIED
+gate_id: INTEGRATION_READINESS_PRIMARY_ENV_SECRET_BOUNDARY
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -179,7 +179,7 @@ done_means:
   - record_runtime_checkpoint control-character public inputs do not create checkpoint, audit, ledger, or default state fallback before validation failure
   - record_runtime_checkpoint trims valid HALO_SWING_RUNTIME_CHECKPOINT_PATH values and rejects blank or control-character environment paths without malformed checkpoint, audit, ledger, or default state fallback before runtime status reads or checkpoint writes
   - record_runtime_checkpoint with readiness snapshot does not persist Telegram, gateway, market, macro, or news env secret values, configured source values, or env key names and aliases
-  - get_integration_readiness treats Telegram, gateway, market, macro, and news env secrets as boolean evidence without returning secret values or env key names
+  - get_integration_readiness treats primary Telegram, gateway, market, macro, and news env secrets as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secret aliases as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats market, macro, and news live data source env values as boolean evidence without returning source values or env key names
   - get_integration_readiness treats blank or control-character Telegram, gateway, market, macro, and news env values as not configured without returning secret values or env key names
@@ -577,13 +577,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.528
-gate_packet: docs/halo-swing-development-plan.md#3.528
+portable_mirror: docs/halo-swing-development-plan.md#3.529
+gate_packet: docs/halo-swing-development-plan.md#3.529
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.528
+  - docs/halo-swing-development-plan.md#3.529
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -891,17 +891,64 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.528 Runtime Checkpoint Readiness Env Alias Secret Boundary Guard is
-verified. Direct `record_runtime_checkpoint` readiness snapshot coverage now
-sets the Telegram, gateway, market, macro, and news env key/alias surface and
-proves neither configured values nor env key names are serialized into the
-returned payload or append-only checkpoint. Focused readiness snapshot coverage
-passed with 1 test, `tests/test_runtime_guard.py` passed with 60 tests, and full
-pytest passed with 666 tests. Ruff, health_check,
+Summary: 3.529 Integration Readiness Primary Env Secret Boundary Guard is
+verified. Direct `get_integration_readiness` primary env secret coverage now
+uses a key/value table for Telegram bot token, Telegram gateway URL, market data
+API key, FRED API key, and news API key and proves every configured value and
+every env key name stays out of the readiness payload. Focused readiness
+coverage passed with 1 test, `tests/test_readiness.py` passed with 28 tests, and
+full pytest passed with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+integration_readiness_primary_env_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - tests-only slice; direct get_integration_readiness primary env secret coverage now uses a key/value table for Telegram, gateway, market, macro, and news envs
+    - readiness payload serialization asserts every configured primary env value and every primary env key name stays absent
+    - coverage keeps Telegram and live_data gates ready via boolean evidence while preserving secret_values_returned=false
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "28 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "666 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  architecture_note:
+    - user clarified tests are excluded from the sub-1000-line source-file rule
+    - no source files changed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_checkpoint_readiness_env_alias_secret_boundary:
   status: verified
   changed_files:

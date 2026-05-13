@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.529 Integration Readiness Primary Env Secret Boundary Guard Record - 2026-05-13
+### A. 목적
+
+Direct `get_integration_readiness` primary env secret coverage now uses a single
+key/value table for Telegram bot token, Telegram gateway URL, market data API
+key, FRED API key, and news API key. The gate proves every configured value and
+every env key name stays out of the readiness payload while the tool still uses
+the environment only as boolean evidence for Telegram and live-data readiness.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; primary readiness env secret coverage now loops over a key/value table instead of scattered assertions
+  - readiness payload serialization asserts Telegram, gateway, market, macro, and news primary env values and key names are absent
+  - configured primary envs still mark Telegram and live_data gates ready through boolean evidence with secret_values_returned=false
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 28 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.528 Runtime Checkpoint Readiness Env Alias Secret Boundary Guard Record - 2026-05-13
 ### A. 목적
 

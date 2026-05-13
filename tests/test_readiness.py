@@ -879,11 +879,15 @@ def test_integration_readiness_env_secrets_are_boolean_only(
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
-    monkeypatch.setenv("HALO_SWING_TELEGRAM_BOT_TOKEN", "telegram-secret-token")
-    monkeypatch.setenv("HALO_SWING_TELEGRAM_GATEWAY_URL", "https://gateway.example/secret")
-    monkeypatch.setenv("HALO_SWING_MARKET_DATA_API_KEY", "market-secret-key")
-    monkeypatch.setenv("FRED_API_KEY", "fred-secret-key")
-    monkeypatch.setenv("NEWS_API_KEY", "news-secret-key")
+    secret_env = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-secret-token",
+        "HALO_SWING_TELEGRAM_GATEWAY_URL": "https://gateway.example/secret",
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-secret-key",
+        "FRED_API_KEY": "fred-secret-key",
+        "NEWS_API_KEY": "news-secret-key",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
 
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     telegram_gate = payload["gates"]["telegram"]
@@ -904,15 +908,9 @@ def test_integration_readiness_env_secrets_are_boolean_only(
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "telegram: provide" not in payload["next_actions"]
     assert "live_data: provide" not in payload["next_actions"]
-    assert "telegram-secret-token" not in serialized
-    assert "gateway.example/secret" not in serialized
-    assert "market-secret-key" not in serialized
-    assert "fred-secret-key" not in serialized
-    assert "news-secret-key" not in serialized
-    assert "HALO_SWING_TELEGRAM_BOT_TOKEN" not in serialized
-    assert "HALO_SWING_MARKET_DATA_API_KEY" not in serialized
-    assert "FRED_API_KEY" not in serialized
-    assert "NEWS_API_KEY" not in serialized
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
 
 
 def test_integration_readiness_env_secret_aliases_are_boolean_only(
