@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.474 Runtime Status Control Character No-Write Guard Record - 2026-05-13
+
+### A. 목적
+
+`get_runtime_status` already rejects control-character audit_log_path and
+ledger_path values before audit reads, ledger repository resolution, retention
+inspection, or retention mutation. The remaining coverage gap was direct
+side-effect proof: those validation failures must not create audit or ledger
+files before returning the validation error. This tests-only slice pins that
+no-write boundary.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source change was needed because control-character path validation already happens before runtime status reads or retention work
+  - control-character path coverage now asserts audit_log_path remains absent after each direct validation failure
+  - control-character path coverage now asserts ledger_path remains absent after each direct validation failure
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_rejects_path_control_character_inputs -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 21 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 627 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.473 Runtime Checkpoint Control Character No-Write Guard Record - 2026-05-13
 
 ### A. 목적

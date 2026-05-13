@@ -295,6 +295,7 @@ def test_runtime_status_rejects_path_control_character_inputs(
         with pytest.raises(ValueError, match=expected_error):
             get_runtime_status(**payload)
 
+        assert not audit_path.exists()
         assert not ledger_path.exists()
 
 

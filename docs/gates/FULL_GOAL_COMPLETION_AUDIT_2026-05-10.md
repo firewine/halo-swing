@@ -4911,7 +4911,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 132. Next Concrete Actions
+## 132. 3.474 Runtime Status Control Character No-Write Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_status_rejects_path_control_character_inputs -q -> 1 passed, control-character runtime status path inputs do not create audit/ledger files before validation failure
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 21 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 627 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 133. Next Concrete Actions
 
 Choose one of:
 
