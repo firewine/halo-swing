@@ -5946,7 +5946,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 201. Next Concrete Actions
+## 201. 3.543 Readiness Harness Control Path No-Fallback Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit -q -> 1 passed, harness readiness control-character credential path failure keeps the raw invalid path out of stderr and audit serialization while creating no requested or malformed credential file
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 29 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 667 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 202. Next Concrete Actions
 
 Choose one of:
 

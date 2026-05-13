@@ -905,7 +905,9 @@ def test_harness_rejects_readiness_path_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
     audit_path = tmp_path / "audit.jsonl"
-    input_payload = {"binance_credentials_path": f"{tmp_path / 'credentials.enc.json'}\n"}
+    credentials_path = tmp_path / "credentials.enc.json"
+    invalid_credentials_path = f"{credentials_path}\n"
+    input_payload = {"binance_credentials_path": invalid_credentials_path}
     result = subprocess.run(
         [
             sys.executable,
@@ -936,6 +938,11 @@ def test_harness_rejects_readiness_path_control_character_with_failure_audit(
     assert "binance_credentials_path must not contain control characters" in event[
         "details"
     ]["error"]
+    serialized_event = json.dumps(event)
+    assert invalid_credentials_path not in result.stderr
+    assert invalid_credentials_path not in serialized_event
+    assert not credentials_path.exists()
+    assert not Path(invalid_credentials_path).exists()
 
 
 def test_hermes_readiness_requires_config_path_and_registration(tmp_path: Path) -> None:
