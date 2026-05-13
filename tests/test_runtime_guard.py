@@ -1983,6 +1983,7 @@ def test_harness_rejects_runtime_checkpoint_run_id_type_without_checkpoint(
     assert "run_id must be a nonempty string" in event["details"]["error"]
     assert not checkpoint_path.exists()
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint(
