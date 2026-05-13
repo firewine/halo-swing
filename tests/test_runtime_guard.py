@@ -139,9 +139,13 @@ def test_runtime_status_applies_retention_and_degraded_mode(tmp_path: Path) -> N
     assert read_jsonl(ledger_path) == [{"sequence": 2}, {"sequence": 3}]
 
 
-def test_runtime_status_rejects_invalid_public_inputs(tmp_path: Path) -> None:
+def test_runtime_status_rejects_invalid_public_inputs(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
+    monkeypatch.chdir(tmp_path)
     invalid_cases = [
         (
             {"apply_retention": "false"},
@@ -196,6 +200,7 @@ def test_runtime_status_rejects_invalid_public_inputs(tmp_path: Path) -> None:
 
         assert not audit_path.exists()
         assert not ledger_path.exists()
+        assert not (tmp_path / "state").exists()
 
 
 def test_runtime_status_uses_valid_env_runtime_limits(
