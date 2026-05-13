@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_BTC_RISK_ENV_PATH_PREVALIDATION_VERIFIED
-gate_id: READINESS_BTC_RISK_ENV_PATH_PREVALIDATION
+status: BINANCE_EXECUTION_BOOLEAN_ENV_COVERAGE_VERIFIED
+gate_id: BINANCE_EXECUTION_BOOLEAN_ENV_COVERAGE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -86,6 +86,7 @@ done_means:
   - save_binance_credentials, get_binance_credentials_status, and load_binance_credentials reject ASCII control characters in credentials_path before encrypted credential writes or reads
   - Binance credential storage trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before encrypted credential reads or writes
   - get_integration_readiness trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before Binance readiness evidence is built
+  - preview_btc_order and execute_btc_order reject noncanonical Binance boolean environment values before credential or network work
   - harness audit logging for save_binance_credentials redacts credential inputs and does not serialize secret, salt, or token values
   - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
   - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
@@ -509,13 +510,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.448
-gate_packet: docs/halo-swing-development-plan.md#3.448
+portable_mirror: docs/halo-swing-development-plan.md#3.449
+gate_packet: docs/halo-swing-development-plan.md#3.449
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.448
+  - docs/halo-swing-development-plan.md#3.449
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -823,16 +824,61 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.448 Readiness BTC Risk Environment Path Prevalidation is verified.
-`get_integration_readiness` now resolves the default BTC risk settings path
-before Binance credential status reads, so invalid
-`HALO_SWING_BTC_RISK_SETTINGS_PATH` values fail before credential evidence is
-built. Focused readiness coverage passed with 2 tests, `tests/test_readiness.py`
-passed with 28 tests, and full pytest passed with 597 tests. Ruff, health_check,
+Summary: 3.449 Binance Execution Boolean Environment Canonicalization Coverage
+is verified. Direct preview/execution coverage now proves noncanonical Binance
+boolean environment aliases such as `yes` and `1` fail through settings
+validation before credential loading or network submission can run. Focused
+Binance coverage passed with 2 tests, `tests/test_binance_btc.py` passed with
+65 tests, and full pytest passed with 599 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+binance_execution_boolean_env_canonicalization_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - preview_btc_order coverage now rejects HALO_SWING_BINANCE_TESTNET=yes through canonical boolean settings validation
+    - execute_btc_order coverage now rejects HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=1 before credential loading
+    - execute_btc_order coverage monkeypatches credential loading and URL submission to prove invalid boolean env validation happens first
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_rejects_noncanonical_testnet_env tests/test_binance_btc.py::test_execute_btc_order_rejects_noncanonical_live_trading_env_before_credentials -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "65 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "599 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 codex_harness_bootstrap:
   status: passed
   implemented:

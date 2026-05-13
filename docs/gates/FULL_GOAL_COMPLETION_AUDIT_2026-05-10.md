@@ -4536,7 +4536,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 107. Next Concrete Actions
+## 107. 3.449 Binance Execution Boolean Environment Canonicalization Coverage Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_rejects_noncanonical_testnet_env tests/test_binance_btc.py::test_execute_btc_order_rejects_noncanonical_live_trading_env_before_credentials -q -> 2 passed, direct Binance boolean env canonicalization coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 65 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 599 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 108. Next Concrete Actions
 
 Choose one of:
 

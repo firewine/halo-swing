@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.449 Binance Execution Boolean Environment Canonicalization Coverage Record - 2026-05-13
+
+### A. 목적
+
+The Binance boolean environment validator was already covered through
+`get_integration_readiness`, but the direct preview and execution surfaces did
+not explicitly prove that permissive aliases fail before live-order guard work.
+This slice adds direct Binance coverage for canonical boolean env enforcement on
+the preview and execution paths.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - preview_btc_order rejects HALO_SWING_BINANCE_TESTNET=yes through settings validation
+  - execute_btc_order rejects HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=1 through settings validation
+  - execute_btc_order coverage proves invalid live-trading env validation happens before credential loading
+  - execute_btc_order coverage proves invalid live-trading env validation happens before URL submission
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_preview_btc_order_rejects_noncanonical_testnet_env tests/test_binance_btc.py::test_execute_btc_order_rejects_noncanonical_live_trading_env_before_credentials -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 65 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 599 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.448 Readiness BTC Risk Environment Path Prevalidation Record - 2026-05-13
 
 ### A. 목적

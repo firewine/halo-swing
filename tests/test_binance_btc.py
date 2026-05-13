@@ -117,6 +117,58 @@ def test_execute_btc_order_blocks_when_live_flag_is_disabled() -> None:
     assert payload["blocked_reason"] == "live_trading_disabled"
 
 
+def test_preview_btc_order_rejects_noncanonical_testnet_env(monkeypatch) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ):
+            preview_btc_order(side="BUY", quantity="1")
+    finally:
+        get_settings.cache_clear()
+
+
+def test_execute_btc_order_rejects_noncanonical_live_trading_env_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "missing_credentials.enc.json"
+
+    def fail_load_credentials(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credentials must not load with invalid live trading env")
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid live trading env")
+
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "1")
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.load_binance_credentials",
+        fail_load_credentials,
+    )
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+    get_settings.cache_clear()
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_ENABLE_LIVE_TRADING must be 'true' or 'false'",
+        ):
+            execute_btc_order(
+                side="BUY",
+                quantity="1",
+                confirm=LIVE_CONFIRMATION,
+                credential_passphrase="local-passphrase",
+                credentials_path=str(credentials_path),
+            )
+    finally:
+        get_settings.cache_clear()
+
+    assert not credentials_path.exists()
+
+
 def test_execute_btc_order_blocks_when_risk_limit_is_exceeded(tmp_path: Path) -> None:
     settings_path = tmp_path / "risk_settings.json"
     update_btc_risk_settings(
