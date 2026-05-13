@@ -9,6 +9,7 @@ from urllib import parse
 
 import pytest
 
+from halo_swing_mcp import trading_admin_web
 from halo_swing_mcp.binance_btc import (
     ALLOWED_SYMBOL,
     LIVE_CONFIRMATION,
@@ -2243,6 +2244,25 @@ def test_trading_admin_status_endpoint_returns_json_error_for_invalid_binance_en
     assert "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'" in str(
         response_payload["error"]
     )
+
+
+def test_trading_admin_web_main_rejects_non_localhost_bind_without_server(
+    monkeypatch,
+    capsys,
+) -> None:
+    def fail_server(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("server must not bind with a non-localhost host")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.ThreadingHTTPServer",
+        fail_server,
+    )
+
+    result = trading_admin_web.main(["--host", "0.0.0.0", "--port", "8766"])
+    captured = capsys.readouterr()
+
+    assert result == 2
+    assert "Trading admin must bind to localhost only." in captured.err
 
 
 def test_trading_admin_connectivity_endpoint_rejects_invalid_env_without_network(

@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.466 Trading Admin Bind Host Guard Record - 2026-05-13
+
+### A. 목적
+
+The trading admin is a local operator surface for Binance credential entry,
+read-only account checks, previews, and BTC risk controls. The CLI already
+rejects non-localhost bind hosts, but that local-only startup guard was not
+covered by a direct regression test. This slice pins the guard so invalid
+`--host` values return before `ThreadingHTTPServer` can construct or bind a
+server.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin CLI startup coverage rejects non-localhost bind hosts with exit code 2 and a local-only guard message
+  - coverage patches ThreadingHTTPServer so invalid hosts fail before server construction or socket binding
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_web_main_rejects_non_localhost_bind_without_server -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 83 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 617 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.465 Trading Admin UTF-8 Body Boundary Record - 2026-05-13
 
 ### A. 목적

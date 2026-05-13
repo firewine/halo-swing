@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TRADING_ADMIN_UTF8_BODY_BOUNDARY_VERIFIED
-gate_id: TRADING_ADMIN_UTF8_BODY_BOUNDARY
+status: TRADING_ADMIN_BIND_HOST_VERIFIED
+gate_id: TRADING_ADMIN_BIND_HOST
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -107,6 +107,7 @@ done_means:
   - trading admin POST endpoints return a JSON 400 for non-JSON Content-Type headers before credential writes, connectivity calls, account reads, order previews, risk settings writes, or risk state writes and without echoing submitted secret-looking text
   - trading admin POST endpoints accept application/json Content-Type values with parameters and mixed case after media-type validation
   - trading admin POST endpoints return a JSON 400 for non-UTF-8 request bodies before credential writes, connectivity calls, account reads, order previews, risk settings writes, or risk state writes and without echoing submitted secret-looking text
+  - trading admin web server rejects non-localhost bind hosts before constructing or starting the HTTP server
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints validate JSON/form payload strings, numeric strings, finite values, and booleans before credential writes, account reads, order previews, or risk settings writes
   - trading admin credentials, account snapshot, order preview, and risk settings HTTP endpoints reject ASCII control characters before credential writes, account reads, order previews, or risk settings writes
   - MCP server execute_btc_order audit logging redacts credential_passphrase in blocked order paths
@@ -526,13 +527,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.465
-gate_packet: docs/halo-swing-development-plan.md#3.465
+portable_mirror: docs/halo-swing-development-plan.md#3.466
+gate_packet: docs/halo-swing-development-plan.md#3.466
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.465
+  - docs/halo-swing-development-plan.md#3.466
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -840,16 +841,59 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.465 Trading Admin UTF-8 Body Boundary is verified. Trading admin POST
-request parsing now returns a stable JSON 400 for non-UTF-8 request bodies
-before credential writes, connectivity calls, account reads, order previews,
-risk settings writes, or risk state writes can run, and without echoing
-submitted secret-looking text. Focused UTF-8 body coverage passed with 1 test,
-`tests/test_binance_btc.py` passed with 82 tests, and full pytest passed with
-616 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+Summary: 3.466 Trading Admin Bind Host Guard is verified. Trading admin CLI
+startup now has direct coverage proving non-localhost `--host` values return
+exit code 2 with the local-only guard message before `ThreadingHTTPServer` can
+construct or bind a server. Focused bind-host coverage passed with 1 test,
+`tests/test_binance_btc.py` passed with 83 tests, and full pytest passed with
+617 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
 blocked-path status, and ignored state checks passed.
 
 ```yaml
+trading_admin_bind_host:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - trading admin CLI startup coverage now rejects non-localhost bind hosts with exit code 2 and a local-only guard message
+    - coverage patches ThreadingHTTPServer so the regression fails if invalid hosts reach server construction or socket binding
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_web_main_rejects_non_localhost_bind_without_server -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "83 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "617 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 trading_admin_utf8_body_boundary:
   status: verified
   changed_files:
