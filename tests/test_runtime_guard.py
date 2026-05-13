@@ -193,6 +193,9 @@ def test_runtime_status_rejects_invalid_public_inputs(tmp_path: Path) -> None:
         with pytest.raises(ValueError, match=expected_error):
             get_runtime_status(**payload)
 
+        assert not audit_path.exists()
+        assert not ledger_path.exists()
+
 
 def test_runtime_status_uses_valid_env_runtime_limits(
     tmp_path: Path,
