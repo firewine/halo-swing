@@ -9302,6 +9302,59 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.462 Trading Admin Content-Length Boundary Record - 2026-05-13
+
+### A. 목적
+
+Trading admin POST parsing previously treated nonpositive `Content-Length`
+values as an empty JSON object. That preserved empty-body compatibility, but a
+negative request length could still dispatch to route-side functions such as
+connectivity checks or risk-state reset. This slice validates the header
+explicitly so negative or nonnumeric `Content-Length` values return JSON 400
+before any route-side side-effect path can run, without echoing submitted
+secret-looking body text.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin request parsing rejects negative or nonnumeric Content-Length headers with HTTP 400 JSON
+  - endpoint coverage patches route-side functions so invalid Content-Length fails before side-effect paths
+  - invalid Content-Length coverage checks submitted secret-looking text is absent from error responses
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_endpoints_reject_invalid_content_length_before_side_effects -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 79 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 613 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.461 Trading Admin Malformed JSON Payload Boundary Record - 2026-05-13
 
 ### A. 목적

@@ -456,8 +456,16 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
             return
 
         def _read_json(self) -> dict[str, Any]:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0:
+            raw_length = self.headers.get("Content-Length", "0")
+            try:
+                length = int(raw_length)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    "Content-Length must be a nonnegative integer"
+                ) from exc
+            if length < 0:
+                raise ValueError("Content-Length must be a nonnegative integer")
+            if length == 0:
                 return {}
             body = self.rfile.read(length).decode("utf-8")
             payload = json.loads(body)
