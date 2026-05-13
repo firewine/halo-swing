@@ -2218,6 +2218,7 @@ def test_harness_rejects_invalid_runtime_checkpoint_audit_path_without_checkpoin
     assert "audit_log_path must be a nonempty string" in event["details"]["error"]
     assert not checkpoint_path.exists()
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_checkpoint_audit_path_type_without_checkpoint(
