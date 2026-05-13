@@ -9302,6 +9302,63 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.439 BTC Risk Environment Path Validation Record - 2026-05-13
+
+### A. 목적
+
+Public BTC risk tools already validate explicit `settings_path` and
+`state_path` values. The shared default resolvers still accepted
+`HALO_SWING_BTC_RISK_SETTINGS_PATH` and `HALO_SWING_BTC_RISK_STATE_PATH`
+through settings without the same blank/control-character guard, so invalid env
+configuration could fall back to default state paths or select malformed local
+risk files before reads or writes. This slice hardens the shared risk path
+resolvers themselves.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - resolve_settings_path now trims valid explicit, environment, and settings BTC risk settings paths before Path construction
+  - resolve_state_path now trims valid explicit, environment, and settings BTC risk state paths before Path construction
+  - present blank HALO_SWING_BTC_RISK_SETTINGS_PATH and HALO_SWING_BTC_RISK_STATE_PATH values now raise instead of falling back to default state paths
+  - C0 and DEL control characters in BTC risk settings/state environment paths now raise before local state reads or writes
+  - risk coverage verifies invalid env paths raise before status reads, settings writes, state writes, default fallback, or malformed local file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - runtime scheduler
+  - audit event secret re-exposure
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - live trading
+  - migration or repository persistence
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_btc_risk_tools_normalize_env_paths tests/test_binance_btc.py::test_btc_risk_tools_reject_env_settings_path_without_fallback tests/test_binance_btc.py::test_btc_risk_tools_reject_env_state_path_without_fallback -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/risk_settings.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 59 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 577 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.438 Binance Credentials Environment Path Validation Record - 2026-05-13
 
 ### A. 목적

@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_CREDENTIALS_ENV_PATH_VALIDATION_VERIFIED
-gate_id: BINANCE_CREDENTIALS_ENV_PATH_VALIDATION
+status: BTC_RISK_ENV_PATH_VALIDATION_VERIFIED
+gate_id: BTC_RISK_ENV_PATH_VALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -76,6 +76,7 @@ done_means:
   - get_integration_readiness validates approval booleans, optional configured booleans, and optional paths before gate evaluation or credential/risk reads
   - get_integration_readiness rejects ASCII control characters in explicit path inputs before gate evaluation or credential/risk reads
   - BTC risk settings and daily risk state tools reject ASCII control characters in settings_path and state_path before local state reads or writes
+  - BTC risk settings and daily risk state storage trims valid HALO_SWING_BTC_RISK_SETTINGS_PATH and HALO_SWING_BTC_RISK_STATE_PATH values and rejects blank or control-character environment paths before local state reads or writes
   - get_integration_readiness top-level payload, gates, evidence, and Binance credential policy key schemas are contract-tested
   - get_integration_readiness configured encrypted Binance credential metadata schema is contract-tested without exposing secret material
   - get_binance_credentials_status direct tool/registry output schemas are contract-tested for missing and configured credentials without exposing secret material
@@ -499,13 +500,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.438
-gate_packet: docs/halo-swing-development-plan.md#3.438
+portable_mirror: docs/halo-swing-development-plan.md#3.439
+gate_packet: docs/halo-swing-development-plan.md#3.439
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.438
+  - docs/halo-swing-development-plan.md#3.439
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -813,15 +814,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.438 Binance Credentials Environment Path Validation is verified.
-Encrypted Binance credential storage now trims valid
-`HALO_SWING_BINANCE_CREDENTIALS_PATH` values and rejects blank or
-control-character environment paths before credential status reads or encrypted
-credential writes, so invalid env configuration cannot fall back to an unsafe
-path or create malformed local credential files. Focused env-path coverage
-passed with 2 tests, `tests/test_binance_btc.py` passed with 56 tests, and full
-pytest passed with 574 tests. Ruff, health_check, get_integration_readiness,
-diff whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.439 BTC Risk Environment Path Validation is verified. BTC risk
+settings and daily risk state storage now trim valid
+`HALO_SWING_BTC_RISK_SETTINGS_PATH` and `HALO_SWING_BTC_RISK_STATE_PATH` values
+and reject blank or control-character environment paths before local risk state
+reads or writes, so invalid env configuration cannot fall back to default state
+or create malformed local files. Focused env-path coverage passed with 3 tests,
+`tests/test_binance_btc.py` passed with 59 tests, and full pytest passed with
+577 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13227,6 +13228,56 @@ blocked_scope_unchanged:
     - env secret persistence
     - credential storage
     - Telegram send
+    - live data adapter
+    - Binance network call
+    - live trading
+    - migration or repository persistence
+    - order submission
+
+btc_risk_env_path_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/risk_settings.py
+    - tests/test_binance_btc.py
+  implementation:
+    - resolve_settings_path now trims valid explicit, environment, and settings BTC risk settings paths before Path construction
+    - resolve_state_path now trims valid explicit, environment, and settings BTC risk state paths before Path construction
+    - present blank HALO_SWING_BTC_RISK_SETTINGS_PATH and HALO_SWING_BTC_RISK_STATE_PATH values now raise instead of falling back to default state paths
+    - C0 and DEL control characters in BTC risk settings/state environment paths now raise before local state reads or writes
+    - risk coverage verifies invalid env paths raise before status reads, settings writes, state writes, default fallback, or malformed local file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live adapter, Binance network call, migration, repository persistence, credential storage, passphrase persistence, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_btc_risk_tools_normalize_env_paths tests/test_binance_btc.py::test_btc_risk_tools_reject_env_settings_path_without_fallback tests/test_binance_btc.py::test_btc_risk_tools_reject_env_state_path_without_fallback -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/risk_settings.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "59 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "577 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - runtime scheduler
+    - audit event secret re-exposure
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
     - live data adapter
     - Binance network call
     - live trading

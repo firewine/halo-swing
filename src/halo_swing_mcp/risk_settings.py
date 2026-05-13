@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from halo_swing_mcp.config import get_settings
+
+
+BTC_RISK_SETTINGS_PATH_ENV = "HALO_SWING_BTC_RISK_SETTINGS_PATH"
+BTC_RISK_STATE_PATH_ENV = "HALO_SWING_BTC_RISK_STATE_PATH"
 
 
 @dataclass(frozen=True)
@@ -285,16 +290,48 @@ def record_btc_order_submission(
 
 
 def resolve_settings_path(settings_path: str | None = None) -> Path:
-    return Path(settings_path or get_settings().btc_risk_settings_path)
+    if settings_path is not None:
+        return Path(_normalize_path(settings_path, "settings_path"))
+    if BTC_RISK_SETTINGS_PATH_ENV in os.environ:
+        return Path(
+            _normalize_path(
+                os.environ[BTC_RISK_SETTINGS_PATH_ENV],
+                BTC_RISK_SETTINGS_PATH_ENV,
+            )
+        )
+    return Path(
+        _normalize_path(
+            get_settings().btc_risk_settings_path,
+            "settings.btc_risk_settings_path",
+        )
+    )
 
 
 def resolve_state_path(state_path: str | None = None) -> Path:
-    return Path(state_path or get_settings().btc_risk_state_path)
+    if state_path is not None:
+        return Path(_normalize_path(state_path, "state_path"))
+    if BTC_RISK_STATE_PATH_ENV in os.environ:
+        return Path(
+            _normalize_path(
+                os.environ[BTC_RISK_STATE_PATH_ENV],
+                BTC_RISK_STATE_PATH_ENV,
+            )
+        )
+    return Path(
+        _normalize_path(
+            get_settings().btc_risk_state_path,
+            "settings.btc_risk_state_path",
+        )
+    )
 
 
 def _normalize_optional_path(value: str | None, field_name: str) -> str | None:
     if value is None:
         return None
+    return _normalize_path(value, field_name)
+
+
+def _normalize_path(value: Any, field_name: str) -> str:
     if not isinstance(value, str):
         raise ValueError(f"{field_name} must be a nonempty string")
     if not _has_no_control_characters(value):

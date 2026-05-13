@@ -1325,6 +1325,111 @@ def test_btc_risk_tools_reject_path_control_character_inputs(
     assert not state_path.exists()
 
 
+def test_btc_risk_tools_normalize_env_paths(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    settings_path = tmp_path / "risk_settings.json"
+    state_path = tmp_path / "risk_state.json"
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", f" {settings_path} ")
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_STATE_PATH", f" {state_path} ")
+    get_settings.cache_clear()
+
+    settings = call_tool(
+        "update_btc_risk_settings",
+        {"max_notional_usd_per_order": 150},
+    )
+    state = call_tool(
+        "reset_btc_daily_risk_state",
+        {"daily_realized_loss_usd": 0, "daily_order_count": 1},
+    )
+    status = call_tool("get_btc_risk_status", {})
+
+    assert settings["settings_path"] == str(settings_path)
+    assert state["state_path"] == str(state_path)
+    assert status["settings"]["settings_path"] == str(settings_path)
+    assert status["state"]["state_path"] == str(state_path)
+    assert settings_path.exists()
+    assert state_path.exists()
+
+
+def test_btc_risk_tools_reject_env_settings_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_BTC_RISK_SETTINGS_PATH must be a nonempty string",
+            tmp_path / "state",
+        ),
+        (
+            "   ",
+            "HALO_SWING_BTC_RISK_SETTINGS_PATH must be a nonempty string",
+            tmp_path / "   ",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7frisk_settings.json",
+            "HALO_SWING_BTC_RISK_SETTINGS_PATH must not contain control characters",
+            tmp_path / "bad\x7frisk_settings.json",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", env_value)
+        get_settings.cache_clear()
+
+        with pytest.raises(ValueError, match=expected_error):
+            call_tool("get_btc_risk_settings", {})
+        with pytest.raises(ValueError, match=expected_error):
+            call_tool(
+                "update_btc_risk_settings",
+                {"max_notional_usd_per_order": 150},
+            )
+        assert not unexpected_path.exists()
+
+
+def test_btc_risk_tools_reject_env_state_path_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    settings_path = tmp_path / "risk_settings.json"
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", str(settings_path))
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_BTC_RISK_STATE_PATH must be a nonempty string",
+            tmp_path / "state",
+        ),
+        (
+            "   ",
+            "HALO_SWING_BTC_RISK_STATE_PATH must be a nonempty string",
+            tmp_path / "   ",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7frisk_state.json",
+            "HALO_SWING_BTC_RISK_STATE_PATH must not contain control characters",
+            tmp_path / "bad\x7frisk_state.json",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_BTC_RISK_STATE_PATH", env_value)
+        get_settings.cache_clear()
+
+        with pytest.raises(ValueError, match=expected_error):
+            call_tool("get_btc_risk_status", {})
+        with pytest.raises(ValueError, match=expected_error):
+            call_tool(
+                "reset_btc_daily_risk_state",
+                {"daily_realized_loss_usd": 0, "daily_order_count": 0},
+            )
+        assert not unexpected_path.exists()
+    assert not settings_path.exists()
+
+
 def test_reset_btc_daily_risk_state_normalizes_public_inputs(tmp_path: Path) -> None:
     state_path = tmp_path / "risk_state.json"
     payload = call_tool(
