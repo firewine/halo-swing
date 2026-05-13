@@ -7,6 +7,7 @@ import pytest
 
 from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.risk_settings import update_btc_risk_settings
 from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import get_integration_readiness
 
@@ -514,6 +515,59 @@ def test_integration_readiness_rejects_env_binance_credentials_path_without_fall
         finally:
             get_settings.cache_clear()
         assert not unexpected_path.exists()
+
+
+def test_integration_readiness_uses_env_btc_risk_settings_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    risk_settings_path = tmp_path / "risk_settings.json"
+    update_btc_risk_settings(
+        emergency_kill_switch_enabled=True,
+        settings_path=str(risk_settings_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", f" {risk_settings_path} ")
+    get_settings.cache_clear()
+
+    try:
+        payload = get_integration_readiness(
+            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+        )
+    finally:
+        get_settings.cache_clear()
+
+    live_order_gate = payload["gates"]["live_order_submission"]
+    assert live_order_gate["evidence"]["emergency_kill_switch_enabled"] is True
+    assert "emergency_kill_switch_disabled" in live_order_gate["missing"]
+
+
+def test_integration_readiness_rejects_env_btc_risk_settings_path_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_BTC_RISK_SETTINGS_PATH", "   ")
+    get_settings.cache_clear()
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not run before risk path validation")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BTC_RISK_SETTINGS_PATH must be a nonempty string",
+        ):
+            get_integration_readiness(
+                binance_credentials_path=str(tmp_path / "missing.enc.json"),
+            )
+    finally:
+        get_settings.cache_clear()
 
 
 def test_integration_readiness_uses_canonical_binance_boolean_env(

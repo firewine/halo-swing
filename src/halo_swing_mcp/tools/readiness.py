@@ -9,7 +9,7 @@ from typing import Any
 from halo_swing_mcp import MCP_SERVER_NAME
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
 from halo_swing_mcp.config import get_settings
-from halo_swing_mcp.risk_settings import load_btc_risk_settings
+from halo_swing_mcp.risk_settings import load_btc_risk_settings, resolve_settings_path
 from halo_swing_mcp.secret_store import get_binance_credentials_status
 
 
@@ -97,6 +97,11 @@ def get_integration_readiness(
         "news_source_configured",
     )
     credentials_path = normalized_binance_credentials_path
+    risk_settings_path = (
+        normalized_btc_risk_settings_path
+        if normalized_btc_risk_settings_path is not None
+        else str(resolve_settings_path())
+    )
     hermes = _hermes_readiness(
         normalized_hermes_config_path,
         normalized_hermes_registered,
@@ -120,7 +125,7 @@ def get_integration_readiness(
         normalized_binance_passphrase_confirmed,
         normalized_binance_trade_only_permission_attested,
         normalized_live_order_approved,
-        normalized_btc_risk_settings_path,
+        risk_settings_path,
     )
     live_data = _live_data_readiness(
         normalized_market_data_source_configured,

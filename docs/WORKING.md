@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_BINANCE_CREDENTIALS_ENV_PATH_VERIFIED
-gate_id: READINESS_BINANCE_CREDENTIALS_ENV_PATH
+status: READINESS_BTC_RISK_ENV_PATH_PREVALIDATION_VERIFIED
+gate_id: READINESS_BTC_RISK_ENV_PATH_PREVALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -77,6 +77,7 @@ done_means:
   - get_integration_readiness rejects ASCII control characters in explicit path inputs before gate evaluation or credential/risk reads
   - BTC risk settings and daily risk state tools reject ASCII control characters in settings_path and state_path before local state reads or writes
   - BTC risk settings and daily risk state storage trims valid HALO_SWING_BTC_RISK_SETTINGS_PATH and HALO_SWING_BTC_RISK_STATE_PATH values and rejects blank or control-character environment paths before local state reads or writes
+  - get_integration_readiness prevalidates settings-backed HALO_SWING_BTC_RISK_SETTINGS_PATH before Binance credential status reads
   - get_integration_readiness top-level payload, gates, evidence, and Binance credential policy key schemas are contract-tested
   - get_integration_readiness configured encrypted Binance credential metadata schema is contract-tested without exposing secret material
   - get_binance_credentials_status direct tool/registry output schemas are contract-tested for missing and configured credentials without exposing secret material
@@ -508,13 +509,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.447
-gate_packet: docs/halo-swing-development-plan.md#3.447
+portable_mirror: docs/halo-swing-development-plan.md#3.448
+gate_packet: docs/halo-swing-development-plan.md#3.448
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.447
+  - docs/halo-swing-development-plan.md#3.448
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -822,13 +823,12 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.447 Readiness Binance Credentials Environment Path Validation is
-verified. `get_integration_readiness` now leaves default Binance credential path
-resolution to the credential helper, so valid `HALO_SWING_BINANCE_CREDENTIALS_PATH`
-values are trimmed in readiness evidence and invalid blank/control-character env
-paths raise with the env key before fallback or gate evidence construction.
-Focused readiness coverage passed with 2 tests, `tests/test_readiness.py` passed
-with 26 tests, and full pytest passed with 595 tests. Ruff, health_check,
+Summary: 3.448 Readiness BTC Risk Environment Path Prevalidation is verified.
+`get_integration_readiness` now resolves the default BTC risk settings path
+before Binance credential status reads, so invalid
+`HALO_SWING_BTC_RISK_SETTINGS_PATH` values fail before credential evidence is
+built. Focused readiness coverage passed with 2 tests, `tests/test_readiness.py`
+passed with 28 tests, and full pytest passed with 597 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
@@ -13240,6 +13240,53 @@ blocked_scope_unchanged:
     - Binance network call
     - live trading
     - migration or repository persistence
+    - order submission
+
+readiness_btc_risk_env_path_prevalidation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness now resolves the default BTC risk settings path before building Binance readiness gates
+    - valid HALO_SWING_BTC_RISK_SETTINGS_PATH values are trimmed and used for live-order kill-switch evidence
+    - invalid HALO_SWING_BTC_RISK_SETTINGS_PATH values raise before Binance credential status is read
+    - readiness coverage monkeypatches credential status to prove invalid risk env path validation happens first
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_uses_env_btc_risk_settings_path tests/test_readiness.py::test_integration_readiness_rejects_env_btc_risk_settings_path_before_credentials -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "28 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "597 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
     - order submission
 
 readiness_binance_credentials_env_path_validation:
