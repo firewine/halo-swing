@@ -456,6 +456,10 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
             return
 
         def _read_json(self) -> dict[str, Any]:
+            raw_content_type = self.headers.get("Content-Type", "")
+            content_type = raw_content_type.split(";", 1)[0].strip().lower()
+            if content_type != "application/json":
+                raise ValueError("Content-Type must be application/json")
             raw_length = self.headers.get("Content-Length", "0")
             try:
                 length = int(raw_length)

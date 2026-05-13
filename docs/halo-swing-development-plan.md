@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.463 Trading Admin Content-Type Boundary Record - 2026-05-13
+
+### A. 목적
+
+Trading admin POST routes are JSON endpoints used by the local admin page. The
+handler parsed any body as JSON regardless of `Content-Type`, which could allow
+non-JSON request types to reach route dispatch. This slice requires
+`application/json` before JSON parsing or route dispatch so non-JSON requests
+return JSON 400 before any credential write, connectivity call, account read,
+order preview, risk settings write, or risk state write can run.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - trading admin request parsing rejects non-JSON Content-Type headers with HTTP 400 JSON
+  - endpoint coverage patches route-side functions so non-JSON Content-Type fails before side-effect paths
+  - non-JSON Content-Type coverage checks submitted secret-looking text is absent from error responses
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_post_endpoints_reject_non_json_content_type_before_side_effects -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/trading_admin_web.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 80 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 614 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.462 Trading Admin Content-Length Boundary Record - 2026-05-13
 
 ### A. 목적
