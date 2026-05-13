@@ -2155,6 +2155,40 @@ def test_trading_admin_status_prevalidates_binance_env_before_local_reads(
         get_settings.cache_clear()
 
 
+def test_trading_admin_status_endpoint_returns_json_error_for_invalid_binance_env(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not load with invalid testnet env")
+
+    def fail_risk_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("risk status must not load with invalid testnet env")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.trading_admin_web.get_btc_risk_status",
+        fail_risk_status,
+    )
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/status",
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'" in str(
+        response_payload["error"]
+    )
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

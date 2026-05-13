@@ -365,7 +365,10 @@ def create_handler() -> type[BaseHTTPRequestHandler]:
                 self._send_text(HTTPStatus.OK, "text/html; charset=utf-8", HTML)
                 return
             if parsed.path == "/api/status":
-                self._send_json(HTTPStatus.OK, admin_status_payload())
+                try:
+                    self._send_json(HTTPStatus.OK, admin_status_payload())
+                except Exception as exc:
+                    self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
                 return
             self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
 
