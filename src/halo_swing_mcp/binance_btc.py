@@ -317,6 +317,7 @@ def get_binance_coinm_account_snapshot(
 ) -> dict[str, Any]:
     """Read BTC COIN-M account balance and position without placing orders."""
 
+    settings = get_settings()
     if not credential_passphrase:
         return {
             "status": "blocked",
@@ -325,7 +326,6 @@ def get_binance_coinm_account_snapshot(
             "live_data_required": False,
         }
 
-    settings = get_settings()
     credentials = load_binance_credentials(
         credential_passphrase,
         credentials_path=credentials_path,

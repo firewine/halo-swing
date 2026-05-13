@@ -226,6 +226,34 @@ def test_account_snapshot_rejects_noncanonical_testnet_env_before_credentials(
     assert not credentials_path.exists()
 
 
+def test_account_snapshot_rejects_noncanonical_testnet_env_before_missing_passphrase_status(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not load with invalid testnet env")
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid testnet env")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ):
+            get_binance_coinm_account_snapshot()
+    finally:
+        get_settings.cache_clear()
+
+
 def test_execute_btc_order_blocks_when_risk_limit_is_exceeded(tmp_path: Path) -> None:
     settings_path = tmp_path / "risk_settings.json"
     update_btc_risk_settings(

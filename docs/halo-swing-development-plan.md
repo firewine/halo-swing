@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.451 Binance Account Snapshot Missing Passphrase Environment Prevalidation Record - 2026-05-13
+
+### A. 목적
+
+`get_binance_coinm_account_snapshot` validated Binance boolean environment
+settings only after the missing-passphrase blocked branch. That allowed an
+invalid `HALO_SWING_BINANCE_TESTNET` value to skip canonical boolean validation
+and still build credential status evidence. This slice prevalidates settings
+before the missing-passphrase response is assembled.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_binance_coinm_account_snapshot now loads settings before the missing-passphrase blocked response
+  - invalid HALO_SWING_BINANCE_TESTNET values fail before credential status reads
+  - coverage proves invalid testnet env validation happens before credential status and URL submission hooks
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_noncanonical_testnet_env_before_credentials tests/test_binance_btc.py::test_account_snapshot_rejects_noncanonical_testnet_env_before_missing_passphrase_status -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 68 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 602 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.450 Binance Read-Only Boolean Environment Canonicalization Coverage Record - 2026-05-13
 
 ### A. 목적
