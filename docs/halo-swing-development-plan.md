@@ -9302,6 +9302,61 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.444 Binance Recv Window Environment Validation Record - 2026-05-13
+
+### A. 목적
+
+Binance COIN-M signed order and read-only account requests include a
+`recvWindow` parameter. The default is environment-backed through
+`HALO_SWING_BINANCE_RECV_WINDOW_MS`, but nonpositive values could reach signing
+and request construction after all execution/read guards had passed. This slice
+validates explicit and settings-backed recvWindow values before signing or any
+network attempt.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - BinanceOrderIntent.request_params now validates recvWindow as a positive integer before signed order query construction
+  - signed_read_query now validates recvWindow as a positive integer before USER_DATA query signing
+  - execute_btc_order validates HALO_SWING_BINANCE_RECV_WINDOW_MS-derived settings before signed POST request construction
+  - get_binance_coinm_account_snapshot validates HALO_SWING_BINANCE_RECV_WINDOW_MS-derived settings before signed read-only GET request construction
+  - valid HALO_SWING_BINANCE_RECV_WINDOW_MS values are preserved in signed order request bodies
+  - invalid recvWindow env tests prove no Binance network attempt occurs
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage beyond encrypted local file
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - real Binance network call
+  - migration or repository persistence
+  - unguarded live trading behavior
+  - order submission outside explicit confirmation/live flag/credential/risk guards
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_execute_btc_order_uses_valid_env_recv_window_in_signed_request tests/test_binance_btc.py::test_signed_queries_reject_invalid_recv_window_ms tests/test_binance_btc.py::test_execute_btc_order_rejects_invalid_env_recv_window_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_invalid_env_recv_window_without_network -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 63 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 589 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.443 Runtime Environment Limits Validation Record - 2026-05-13
 
 ### A. 목적

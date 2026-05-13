@@ -14,6 +14,7 @@ from halo_swing_mcp.binance_btc import (
     LIVE_CONFIRMATION,
     BinanceOrderIntent,
     execute_btc_order,
+    get_binance_coinm_account_snapshot,
     normalize_binance_coinm_account_snapshot,
     preview_btc_order,
     signed_read_query,
@@ -430,6 +431,150 @@ def test_signed_read_query_uses_hmac_sha256_signature() -> None:
     ).hexdigest()
 
     assert parse.parse_qs(query)["signature"] == [expected_signature]
+
+
+def test_signed_queries_reject_invalid_recv_window_ms() -> None:
+    intent = BinanceOrderIntent(
+        symbol=ALLOWED_SYMBOL,
+        side="BUY",
+        order_type="MARKET",
+        quantity="1",
+    )
+
+    with pytest.raises(ValueError, match="recv_window_ms must be a positive integer"):
+        signed_order_query(
+            intent,
+            api_secret="secret",
+            timestamp_ms=1234567890,
+            recv_window_ms=0,
+        )
+    with pytest.raises(ValueError, match="recv_window_ms must be a positive integer"):
+        signed_read_query(
+            {"pair": "BTCUSD"},
+            api_secret="secret",
+            timestamp_ms=1234567890,
+            recv_window_ms=-1,
+        )
+
+
+def test_execute_btc_order_uses_valid_env_recv_window_in_signed_request(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "binance_credentials.enc.json"
+    state_path = tmp_path / "risk_state.json"
+    requests = []
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_RECV_WINDOW_MS", "6000")
+    get_settings.cache_clear()
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args: object) -> bool:
+            return False
+
+        def read(self) -> bytes:
+            return json.dumps({"orderId": 123, "symbol": ALLOWED_SYMBOL}).encode()
+
+    def fake_urlopen(http_request, timeout: int):
+        requests.append((http_request, timeout))
+        return FakeResponse()
+
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fake_urlopen)
+
+    try:
+        payload = execute_btc_order(
+            side="BUY",
+            quantity="1",
+            confirm=LIVE_CONFIRMATION,
+            credential_passphrase="local-passphrase",
+            credentials_path=str(credentials_path),
+            state_path=str(state_path),
+        )
+    finally:
+        get_settings.cache_clear()
+
+    body = requests[0][0].data.decode()
+    assert payload["status"] == "submitted"
+    assert parse.parse_qs(body)["recvWindow"] == ["6000"]
+
+
+def test_execute_btc_order_rejects_invalid_env_recv_window_without_network(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "binance_credentials.enc.json"
+    state_path = tmp_path / "risk_state.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_RECV_WINDOW_MS", "0")
+    get_settings.cache_clear()
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid recvWindow")
+
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_RECV_WINDOW_MS must be a positive integer",
+        ):
+            execute_btc_order(
+                side="BUY",
+                quantity="1",
+                confirm=LIVE_CONFIRMATION,
+                credential_passphrase="local-passphrase",
+                credentials_path=str(credentials_path),
+                state_path=str(state_path),
+            )
+    finally:
+        get_settings.cache_clear()
+
+
+def test_account_snapshot_rejects_invalid_env_recv_window_without_network(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "binance_credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_RECV_WINDOW_MS", "-1")
+    get_settings.cache_clear()
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid recvWindow")
+
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_RECV_WINDOW_MS must be a positive integer",
+        ):
+            get_binance_coinm_account_snapshot(
+                credential_passphrase="local-passphrase",
+                credentials_path=str(credentials_path),
+            )
+    finally:
+        get_settings.cache_clear()
 
 
 def test_encrypted_binance_credentials_round_trip(tmp_path: Path) -> None:

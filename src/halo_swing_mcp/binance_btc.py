@@ -37,6 +37,7 @@ POSITION_RISK_PATH = "/dapi/v1/positionRisk"
 SERVER_TIME_PATH = "/dapi/v1/time"
 LIVE_CONFIRMATION = "CONFIRM_BTC_BINANCE_COINM_ORDER"
 PORTFOLIO_SNAPSHOT_SCHEMA_VERSION = "binance_coinm_portfolio_snapshot.v1"
+BINANCE_RECV_WINDOW_MS_ENV = "HALO_SWING_BINANCE_RECV_WINDOW_MS"
 
 
 @dataclass(frozen=True)
@@ -76,13 +77,17 @@ class BinanceOrderIntent:
 
     def request_params(self, timestamp_ms: int, recv_window_ms: int) -> dict[str, str]:
         self.validate()
+        normalized_recv_window_ms = _normalize_recv_window_ms(
+            recv_window_ms,
+            "recv_window_ms",
+        )
         params = {
             "symbol": self.symbol,
             "side": self.side,
             "type": self.order_type,
             "quantity": self.quantity,
             "timestamp": str(timestamp_ms),
-            "recvWindow": str(recv_window_ms),
+            "recvWindow": str(normalized_recv_window_ms),
         }
         optional = {
             "price": self.price,
@@ -261,7 +266,10 @@ def execute_btc_order(
 
     params = intent.request_params(
         timestamp_ms=int(time.time() * 1000),
-        recv_window_ms=settings.binance_recv_window_ms,
+        recv_window_ms=_normalize_recv_window_ms(
+            settings.binance_recv_window_ms,
+            BINANCE_RECV_WINDOW_MS_ENV,
+        ),
     )
     response_payload = _signed_post(
         base_url=TESTNET_BASE_URL if settings.binance_testnet else MAINNET_BASE_URL,
@@ -323,13 +331,17 @@ def get_binance_coinm_account_snapshot(
         credentials_path=credentials_path,
     )
     base_url = _base_url()
+    recv_window_ms = _normalize_recv_window_ms(
+        settings.binance_recv_window_ms,
+        BINANCE_RECV_WINDOW_MS_ENV,
+    )
     balance = _signed_get(
         base_url=base_url,
         path=BALANCE_PATH,
         params={},
         api_key=credentials.api_key,
         api_secret=credentials.api_secret,
-        recv_window_ms=settings.binance_recv_window_ms,
+        recv_window_ms=recv_window_ms,
     )
     positions = _signed_get(
         base_url=base_url,
@@ -337,7 +349,7 @@ def get_binance_coinm_account_snapshot(
         params={"pair": "BTCUSD"},
         api_key=credentials.api_key,
         api_secret=credentials.api_secret,
-        recv_window_ms=settings.binance_recv_window_ms,
+        recv_window_ms=recv_window_ms,
     )
     btc_positions = [
         position
@@ -438,7 +450,7 @@ def signed_read_query(
     request_params = {
         **params,
         "timestamp": str(timestamp_ms),
-        "recvWindow": str(recv_window_ms),
+        "recvWindow": str(_normalize_recv_window_ms(recv_window_ms, "recv_window_ms")),
     }
     query = parse.urlencode(request_params)
     signature = hmac.new(api_secret.encode(), query.encode(), hashlib.sha256).hexdigest()
@@ -496,6 +508,14 @@ def _positive_decimal(value: str) -> Decimal:
     if not decimal.is_finite():
         raise ValueError(f"invalid decimal value: {value}")
     return decimal
+
+
+def _normalize_recv_window_ms(value: int, field_name: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise ValueError(f"{field_name} must be a positive integer")
+    if value <= 0:
+        raise ValueError(f"{field_name} must be a positive integer")
+    return value
 
 
 def _normalize_order_boolean(value: bool, field_name: str) -> bool:

@@ -4461,7 +4461,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 102. Next Concrete Actions
+## 102. 3.444 Binance Recv Window Environment Validation Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_execute_btc_order_uses_valid_env_recv_window_in_signed_request tests/test_binance_btc.py::test_signed_queries_reject_invalid_recv_window_ms tests/test_binance_btc.py::test_execute_btc_order_rejects_invalid_env_recv_window_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_invalid_env_recv_window_without_network -q -> 4 passed, Binance recvWindow env validation coverage enforced
+PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 63 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 589 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 103. Next Concrete Actions
 
 Choose one of:
 

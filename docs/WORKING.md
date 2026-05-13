@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_ENV_LIMITS_VALIDATION_VERIFIED
-gate_id: RUNTIME_ENV_LIMITS_VALIDATION
+status: BINANCE_RECV_WINDOW_ENV_VALIDATION_VERIFIED
+gate_id: BINANCE_RECV_WINDOW_ENV_VALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -121,6 +121,7 @@ done_means:
   - BTC risk settings and daily risk state tools validate public numeric, boolean, and path inputs before local state writes
   - preview_btc_order and execute_btc_order validate order text, decimal, and boolean fields before risk checks, credential reads, or submission guards
   - preview_btc_order and execute_btc_order reject ASCII control characters in order text fields before risk checks, credential reads, or submission guards
+  - Binance signed order/read requests validate explicit and settings-backed recvWindow values before signing or network attempts
   - normalize_binance_coinm_account_snapshot validates caller-supplied balance, position, timestamp, and contract-size inputs before portfolio summary projection
   - normalize_binance_coinm_account_snapshot rejects ASCII control characters in caller-supplied snapshot text before portfolio summary projection
   - readiness tool returns no secret values
@@ -504,13 +505,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.443
-gate_packet: docs/halo-swing-development-plan.md#3.443
+portable_mirror: docs/halo-swing-development-plan.md#3.444
+gate_packet: docs/halo-swing-development-plan.md#3.444
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.443
+  - docs/halo-swing-development-plan.md#3.444
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -818,16 +819,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.443 Runtime Environment Limits Validation is verified. Runtime
-retention and watchdog defaults now reject nonpositive
-`HALO_SWING_RUNTIME_RETENTION_MAX_RECORDS`,
-`HALO_SWING_RUNTIME_RETENTION_MAX_BYTES`, `HALO_SWING_RUNTIME_FAILURE_WINDOW`,
-and `HALO_SWING_RUNTIME_FAILURE_THRESHOLD` values instead of silently clamping
-them to 1, so malformed env settings cannot alter retention or degraded-mode
-behavior before artifact inspection. Focused env-limit coverage passed with 2
-tests, `tests/test_runtime_guard.py` passed with 21 tests, and full pytest
-passed with 585 tests. Ruff, health_check, get_integration_readiness, diff
-whitespace, blocked-path status, and ignored state checks passed.
+Summary: 3.444 Binance Recv Window Environment Validation is verified. Binance
+COIN-M signed order and read-only account request construction now rejects
+nonpositive explicit or settings-backed recvWindow values before signing or any
+network attempt, while valid `HALO_SWING_BINANCE_RECV_WINDOW_MS` values are
+preserved in the signed request body. Focused recvWindow coverage passed with 4
+tests, `tests/test_binance_btc.py` passed with 63 tests, and full pytest passed
+with 589 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
+blocked-path status, and ignored state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13238,6 +13237,55 @@ blocked_scope_unchanged:
     - live trading
     - migration or repository persistence
     - order submission
+
+binance_recv_window_env_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/binance_btc.py
+    - tests/test_binance_btc.py
+  implementation:
+    - Binance order intent request parameter construction now validates recvWindow as a positive integer before signing
+    - signed read query diagnostics now validate recvWindow as a positive integer before signing
+    - execute_btc_order validates HALO_SWING_BINANCE_RECV_WINDOW_MS-derived settings before the signed POST path can run
+    - get_binance_coinm_account_snapshot validates HALO_SWING_BINANCE_RECV_WINDOW_MS-derived settings before signed read-only GET paths can run
+    - valid HALO_SWING_BINANCE_RECV_WINDOW_MS values are preserved in the signed order request body
+    - invalid env recvWindow coverage uses fake urlopen hooks to prove no Binance network request is attempted
+    - the slice adds no credential storage beyond encrypted local file, passphrase persistence, Telegram send, Hermes runtime call, live adapter, real Binance network call, migration, repository persistence, or unguarded live trading behavior
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_execute_btc_order_uses_valid_env_recv_window_in_signed_request tests/test_binance_btc.py::test_signed_queries_reject_invalid_recv_window_ms tests/test_binance_btc.py::test_execute_btc_order_rejects_invalid_env_recv_window_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_invalid_env_recv_window_without_network -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/binance_btc.py tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "63 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "589 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage beyond encrypted local file
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - real Binance network call
+    - migration or repository persistence
+    - unguarded live trading behavior
+    - order submission outside explicit confirmation/live flag/credential/risk guards
 
 runtime_env_limits_validation:
   status: verified
