@@ -2246,6 +2246,41 @@ def test_trading_admin_account_snapshot_endpoint_rejects_invalid_env_before_stat
     )
 
 
+def test_trading_admin_order_preview_endpoint_rejects_invalid_env_before_risk(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "yes")
+    get_settings.cache_clear()
+
+    def fail_estimate_notional(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("notional estimate must not run with invalid testnet env")
+
+    def fail_validate_risk(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("risk validation must not run with invalid testnet env")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.estimate_notional_usd",
+        fail_estimate_notional,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.validate_btc_order_limits",
+        fail_validate_risk,
+    )
+
+    try:
+        response_payload = _admin_json_request(
+            "/api/order-preview",
+            {"side": "BUY", "quantity": "1"},
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+    finally:
+        get_settings.cache_clear()
+
+    assert "HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'" in str(
+        response_payload["error"]
+    )
+
+
 def test_trading_admin_credentials_endpoint_returns_secret_safe_status(
     tmp_path: Path,
     monkeypatch,

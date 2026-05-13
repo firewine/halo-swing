@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.456 Trading Admin Order Preview HTTP Environment Error Handling Record - 2026-05-13
+
+### A. 목적
+
+The direct order preview helper rejects noncanonical Binance boolean env values
+before notional estimation or BTC risk validation. This slice pins the trading
+admin `/api/order-preview` HTTP boundary so invalid settings-backed Binance
+boolean env values return a JSON 400 before any notional or risk reads can run.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - POST /api/order-preview rejects HALO_SWING_BINANCE_TESTNET=yes with HTTP 400 JSON
+  - order preview endpoint coverage proves invalid testnet env validation happens before notional estimation
+  - order preview endpoint coverage proves invalid testnet env validation happens before BTC risk validation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_trading_admin_order_preview_endpoint_rejects_invalid_env_before_risk tests/test_binance_btc.py::test_preview_btc_order_rejects_noncanonical_testnet_env -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 73 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 607 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.455 Trading Admin Account Snapshot HTTP Environment Error Handling Record - 2026-05-13
 
 ### A. 목적
