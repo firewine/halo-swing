@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.520 Runtime Checkpoint Harness Audit Path Control No-Fallback Guard Record - 2026-05-13
+### A. 목적
+
+Harness `record_runtime_checkpoint` control-character audit_log_path coverage now
+explicitly asserts that malformed runtime audit path input fails from an isolated
+cwd without default `state/` fallback. The existing harness test already proved
+failure audit recording and no malformed runtime audit, checkpoint, or requested
+ledger creation; this gate tightens the same boundary to match the current
+runtime checkpoint no-fallback standard.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; strengthened control-character audit_log_path harness coverage with a default state/ no-fallback assertion
+  - control-character audit_log_path coverage verifies nonzero exit, empty stdout, failure audit without output_summary, and sanitized error details
+  - control-character audit_log_path coverage asserts no malformed runtime audit file, no checkpoint, no requested ledger file, and no default state/ fallback
+  - user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_control_character_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.519 Runtime Checkpoint Harness Audit Path Type No-Fallback Guard Record - 2026-05-13
 
 ### A. 목적
