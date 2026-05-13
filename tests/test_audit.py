@@ -1001,6 +1001,64 @@ def test_audit_web_main_allows_localhost_ephemeral_port(
     assert f"Audit log: {audit_path}" in captured.out
 
 
+def test_audit_web_main_rejects_invalid_audit_log_path_without_server(
+    monkeypatch,
+    capsys,
+) -> None:
+    def fail_server(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("server must not bind with an invalid audit log path")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.audit_web.ThreadingHTTPServer",
+        fail_server,
+    )
+
+    for audit_log_path, expected_error in (
+        ("", "audit_log_path must be a nonempty string"),
+        ("   ", "audit_log_path must be a nonempty string"),
+        ("bad\x7faudit.jsonl", "audit_log_path must not contain control characters"),
+    ):
+        result = audit_web.main(
+            [
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "8765",
+                "--audit-log-path",
+                audit_log_path,
+            ]
+        )
+        captured = capsys.readouterr()
+
+        assert result == 2
+        assert expected_error in captured.err
+
+
+def test_audit_web_main_rejects_invalid_env_audit_log_path_without_server(
+    tmp_path: Path,
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", "   ")
+
+    def fail_server(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("server must not bind with an invalid audit log path")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.audit_web.ThreadingHTTPServer",
+        fail_server,
+    )
+
+    result = audit_web.main(["--host", "127.0.0.1", "--port", "8765"])
+    captured = capsys.readouterr()
+
+    assert result == 2
+    assert "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string" in captured.err
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+
+
 def test_audit_web_events_payload_normalizes_query_inputs(tmp_path: Path) -> None:
     audit_path = tmp_path / "audit.jsonl"
     append_audit_event(

@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.469 Audit Web Audit Log Path Guard Record - 2026-05-13
+
+### A. 목적
+
+The audit web CLI resolves `--audit-log-path` or `HALO_SWING_AUDIT_LOG_PATH`
+before constructing the local HTTP server. Invalid explicit or environment path
+values should fail as operator input errors before handler creation,
+`ThreadingHTTPServer` construction, socket bind attempts, default-state
+fallback, or malformed local file creation. This slice pins that startup guard.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - audit web CLI startup catches invalid audit log path configuration, prints the validation error to stderr, and exits with code 2
+  - invalid explicit --audit-log-path values fail before handler creation, server construction, socket binding, or malformed local file creation
+  - invalid HALO_SWING_AUDIT_LOG_PATH values fail before default-state fallback, handler creation, server construction, socket binding, or malformed local file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - scheduler
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_audit_log_path_without_server tests/test_audit.py::test_audit_web_main_rejects_invalid_env_audit_log_path_without_server -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 623 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.468 Audit Web Port Guard Record - 2026-05-13
 
 ### A. 목적
