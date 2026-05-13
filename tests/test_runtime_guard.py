@@ -585,6 +585,10 @@ def test_runtime_checkpoint_rejects_invalid_public_inputs(tmp_path: Path) -> Non
         with pytest.raises(ValueError, match=expected_error):
             record_runtime_checkpoint(**payload)
 
+        assert not checkpoint_path.exists()
+        assert not audit_path.exists()
+        assert not ledger_path.exists()
+
 
 def test_runtime_checkpoint_rejects_control_character_inputs(tmp_path: Path) -> None:
     checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"

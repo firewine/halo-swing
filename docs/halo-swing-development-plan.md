@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.472 Runtime Checkpoint Invalid Input No-Write Guard Record - 2026-05-13
+
+### A. 목적
+
+`record_runtime_checkpoint` already rejects invalid public inputs before normal
+checkpoint writes. The remaining coverage gap was side-effect proof: when
+include_readiness, run_id, checkpoint_path, audit_log_path, or ledger_path is
+invalid, the tool must not create checkpoint, audit, or ledger files before
+returning the validation error. This tests-only slice pins that no-write
+boundary.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; no source change was needed because validation already happens before checkpoint writes
+  - invalid public-input coverage now asserts checkpoint_path remains absent after each validation failure
+  - invalid public-input coverage now asserts audit_log_path and ledger_path remain absent after each validation failure
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 21 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 627 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.471 Audit Web Events Path Guard Record - 2026-05-13
 
 ### A. 목적

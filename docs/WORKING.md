@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: AUDIT_WEB_EVENTS_PATH_GUARD_VERIFIED
-gate_id: AUDIT_WEB_EVENTS_PATH_GUARD
+status: RUNTIME_CHECKPOINT_INVALID_INPUT_NO_WRITE_VERIFIED
+gate_id: RUNTIME_CHECKPOINT_INVALID_INPUT_NO_WRITE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -131,6 +131,7 @@ done_means:
   - record_runtime_checkpoint persists runtime watchdog state without audit event details, passphrases, credential material, or raw error strings
   - record_runtime_checkpoint validates include_readiness and run_id before checkpoint writes
   - record_runtime_checkpoint validates checkpoint_path, audit_log_path, and ledger_path before runtime status reads or checkpoint writes
+  - record_runtime_checkpoint invalid public inputs do not create checkpoint, audit, or ledger files before validation failure
   - record_runtime_checkpoint rejects ASCII control characters in checkpoint_path, audit_log_path, ledger_path, and run_id before runtime status reads or checkpoint writes
   - record_runtime_checkpoint trims valid HALO_SWING_RUNTIME_CHECKPOINT_PATH values and rejects blank or control-character environment paths before runtime status reads or checkpoint writes
   - record_runtime_checkpoint with readiness snapshot does not persist Telegram, gateway, market, macro, or news env secret values
@@ -532,13 +533,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.471
-gate_packet: docs/halo-swing-development-plan.md#3.471
+portable_mirror: docs/halo-swing-development-plan.md#3.472
+gate_packet: docs/halo-swing-development-plan.md#3.472
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.471
+  - docs/halo-swing-development-plan.md#3.472
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -846,15 +847,59 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.471 Audit Web Events Path Guard is verified. Audit web `/api/events`
-now has endpoint coverage proving invalid explicit or environment audit log
-paths return HTTP 400 JSON before audit reads, default-state fallback, or
-malformed local file creation. Focused events path guard coverage passed with 2
-tests, `tests/test_audit.py` passed with 37 tests, and full pytest passed with
+Summary: 3.472 Runtime Checkpoint Invalid Input No-Write Guard is verified.
+`record_runtime_checkpoint` invalid public input coverage now proves validation
+failures do not create checkpoint, audit, or ledger files before returning an
+error. Focused checkpoint invalid-input coverage passed with 1 test,
+`tests/test_runtime_guard.py` passed with 21 tests, and full pytest passed with
 627 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
 blocked-path status, and ignored state checks passed.
 
 ```yaml
+runtime_checkpoint_invalid_input_no_write:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; record_runtime_checkpoint already validated include_readiness, run_id, checkpoint_path, audit_log_path, and ledger_path before checkpoint writes
+    - invalid public-input coverage now asserts checkpoint_path remains absent after each validation failure
+    - invalid public-input coverage now asserts audit_log_path and ledger_path remain absent after each validation failure
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_invalid_public_inputs -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "21 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "627 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 audit_web_events_path_guard:
   status: verified
   changed_files:
