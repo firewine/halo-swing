@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: READINESS_CONFIGURED_CREDENTIAL_FULL_KEY_NO_EXPOSURE_VERIFIED
-gate_id: READINESS_CONFIGURED_CREDENTIAL_FULL_KEY_NO_EXPOSURE
+status: READINESS_CREDENTIAL_BLOCKED_GATE_FULL_KEY_NO_EXPOSURE_VERIFIED
+gate_id: READINESS_CREDENTIAL_BLOCKED_GATE_FULL_KEY_NO_EXPOSURE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -577,13 +577,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.533
-gate_packet: docs/halo-swing-development-plan.md#3.533
+portable_mirror: docs/halo-swing-development-plan.md#3.534
+gate_packet: docs/halo-swing-development-plan.md#3.534
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.533
+  - docs/halo-swing-development-plan.md#3.534
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -891,18 +891,18 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.533 Readiness Configured Credential Full Key No-Exposure Guard is
-verified. Configured Binance credential readiness schema coverage now asserts
-the full API key value is not serialized into the readiness payload while the
-safe `api_key_hint` remains available. The same coverage continues to prove API
-secret, passphrase, salt, and token material stay absent. Focused readiness
-coverage passed with 1 test, `tests/test_readiness.py` passed with 28 tests, and
-full pytest passed with 666 tests. Ruff, health_check,
+Summary: 3.534 Readiness Credential Blocked Gate Full Key No-Exposure Guard is
+verified. Binance passphrase-confirmation and explicit-live-order-approval
+blocked readiness coverage now asserts the full API key value is not serialized
+into readiness payloads. The same blocked paths continue to prove API secret and
+passphrase values stay absent while no network call or order submission occurs.
+Focused readiness coverage passed with 2 tests, `tests/test_readiness.py` passed
+with 28 tests, and full pytest passed with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
-readiness_configured_credential_full_key_no_exposure:
+readiness_credential_blocked_gate_full_key_no_exposure:
   status: verified
   changed_files:
     - docs/WORKING.md
@@ -911,12 +911,12 @@ readiness_configured_credential_full_key_no_exposure:
     - docs/halo-swing-development-plan.md
     - tests/test_readiness.py
   implementation:
-    - tests-only slice; configured Binance credential readiness schema coverage now asserts the full API key value stays out of serialized readiness payloads
-    - configured credential readiness coverage still verifies only api_key_hint is exposed and API secret, passphrase, salt, and token material stay absent
+    - tests-only slice; Binance passphrase-confirmation and explicit-live-order-approval blocked readiness coverage now asserts the full API key value stays out of serialized readiness payloads
+    - blocked readiness coverage still verifies API secret and passphrase values stay absent while no Binance network call or order submission occurs
     - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
   verification:
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_configured_credential_schema_is_stable -q
-      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_binance_readiness_requires_passphrase_confirmation tests/test_readiness.py::test_live_order_submission_requires_explicit_approval -q
+      result: "2 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q

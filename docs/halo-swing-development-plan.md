@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.534 Readiness Credential Blocked Gate Full Key No-Exposure Guard Record - 2026-05-13
+### A. 목적
+
+Binance passphrase-confirmation and explicit-live-order-approval blocked
+readiness coverage now asserts that the full API key value is not serialized
+into readiness payloads. The same blocked paths continue to prove API secret and
+passphrase values stay absent while no Binance network call or order submission
+occurs.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; passphrase-confirmation blocked Binance readiness coverage now asserts the full API key value stays out of serialized readiness payloads
+  - explicit-live-order-approval blocked readiness coverage now asserts the full API key value stays out of serialized readiness payloads
+  - blocked readiness coverage still verifies API secret and passphrase values stay absent while no network call or order submission occurs
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_binance_readiness_requires_passphrase_confirmation tests/test_readiness.py::test_live_order_submission_requires_explicit_approval -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 28 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.533 Readiness Configured Credential Full Key No-Exposure Guard Record - 2026-05-13
 ### A. 목적
 

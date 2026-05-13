@@ -1083,8 +1083,10 @@ def test_binance_readiness_requires_passphrase_confirmation(tmp_path: Path) -> N
     assert binance_gate["evidence"]["credentials"]["configured"] is True
     assert binance_gate["evidence"]["manual_passphrase_confirmed"] is False
     assert binance_gate["missing"] == ["manual_credential_passphrase_at_smoke_time"]
-    assert "super-secret" not in json.dumps(payload)
-    assert "local-passphrase" not in json.dumps(payload)
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
 
 
 def test_live_order_submission_requires_explicit_approval(
@@ -1117,8 +1119,10 @@ def test_live_order_submission_requires_explicit_approval(
     assert live_order_gate["evidence"]["credentials"]["configured"] is True
     assert live_order_gate["evidence"]["order_submission"] is False
     assert live_order_gate["evidence"]["network_call"] is False
-    assert "super-secret" not in json.dumps(payload)
-    assert "local-passphrase" not in json.dumps(payload)
+    serialized = json.dumps(payload)
+    assert "abcde12345key" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
 
 
 def test_harness_returns_integration_readiness(tmp_path: Path) -> None:
