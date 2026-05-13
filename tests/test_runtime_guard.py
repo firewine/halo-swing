@@ -384,6 +384,50 @@ def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
     assert not ledger_path.exists()
 
 
+def test_harness_rejects_invalid_runtime_status_audit_path_without_fallback(
+    tmp_path: Path,
+) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    audit_path = tmp_path / "audit.jsonl"
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    input_payload = {
+        "audit_log_path": "   ",
+        "ledger_path": str(ledger_path),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_runtime_status",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "audit_log_path must be a nonempty string" in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "get_runtime_status"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "audit_log_path must be a nonempty string" in event["details"]["error"]
+    assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+
+
 def test_harness_rejects_runtime_status_audit_path_type_with_failure_audit(
     tmp_path: Path,
 ) -> None:
