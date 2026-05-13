@@ -9302,6 +9302,57 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.450 Binance Read-Only Boolean Environment Canonicalization Coverage Record - 2026-05-13
+
+### A. 목적
+
+The direct Binance order paths now prove canonical boolean env validation, but
+the read-only connectivity and account snapshot paths did not have equivalent
+failure-order coverage. This slice adds direct read-only Binance tests to prove
+invalid `HALO_SWING_BINANCE_TESTNET` aliases fail before network calls or
+credential reads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - check_binance_coinm_connectivity rejects HALO_SWING_BINANCE_TESTNET=on before public URL reads
+  - get_binance_coinm_account_snapshot rejects HALO_SWING_BINANCE_TESTNET=1 before credential loading
+  - account snapshot coverage proves invalid testnet env validation happens before signed URL reads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_noncanonical_testnet_env_before_credentials -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q -> 67 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 601 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.449 Binance Execution Boolean Environment Canonicalization Coverage Record - 2026-05-13
 
 ### A. 목적

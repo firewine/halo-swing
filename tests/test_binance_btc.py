@@ -13,6 +13,7 @@ from halo_swing_mcp.binance_btc import (
     ALLOWED_SYMBOL,
     LIVE_CONFIRMATION,
     BinanceOrderIntent,
+    check_binance_coinm_connectivity,
     execute_btc_order,
     get_binance_coinm_account_snapshot,
     normalize_binance_coinm_account_snapshot,
@@ -160,6 +161,62 @@ def test_execute_btc_order_rejects_noncanonical_live_trading_env_before_credenti
                 side="BUY",
                 quantity="1",
                 confirm=LIVE_CONFIRMATION,
+                credential_passphrase="local-passphrase",
+                credentials_path=str(credentials_path),
+            )
+    finally:
+        get_settings.cache_clear()
+
+    assert not credentials_path.exists()
+
+
+def test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "on")
+    get_settings.cache_clear()
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid testnet env")
+
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ):
+            check_binance_coinm_connectivity()
+    finally:
+        get_settings.cache_clear()
+
+
+def test_account_snapshot_rejects_noncanonical_testnet_env_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    credentials_path = tmp_path / "missing_credentials.enc.json"
+
+    def fail_load_credentials(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credentials must not load with invalid testnet env")
+
+    def fail_urlopen(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("network call must not run with invalid testnet env")
+
+    monkeypatch.setenv("HALO_SWING_BINANCE_TESTNET", "1")
+    monkeypatch.setattr(
+        "halo_swing_mcp.binance_btc.load_binance_credentials",
+        fail_load_credentials,
+    )
+    monkeypatch.setattr("halo_swing_mcp.binance_btc.request.urlopen", fail_urlopen)
+    get_settings.cache_clear()
+
+    try:
+        with pytest.raises(
+            ValueError,
+            match="HALO_SWING_BINANCE_TESTNET must be 'true' or 'false'",
+        ):
+            get_binance_coinm_account_snapshot(
                 credential_passphrase="local-passphrase",
                 credentials_path=str(credentials_path),
             )

@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_EXECUTION_BOOLEAN_ENV_COVERAGE_VERIFIED
-gate_id: BINANCE_EXECUTION_BOOLEAN_ENV_COVERAGE
+status: BINANCE_READ_ONLY_BOOLEAN_ENV_COVERAGE_VERIFIED
+gate_id: BINANCE_READ_ONLY_BOOLEAN_ENV_COVERAGE
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -87,6 +87,7 @@ done_means:
   - Binance credential storage trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before encrypted credential reads or writes
   - get_integration_readiness trims valid HALO_SWING_BINANCE_CREDENTIALS_PATH values and rejects blank or control-character environment paths before Binance readiness evidence is built
   - preview_btc_order and execute_btc_order reject noncanonical Binance boolean environment values before credential or network work
+  - check_binance_coinm_connectivity and get_binance_coinm_account_snapshot reject noncanonical Binance testnet environment values before network or credential work
   - harness audit logging for save_binance_credentials redacts credential inputs and does not serialize secret, salt, or token values
   - trading admin status payload uses the Binance credential status safe projection and does not serialize secret, salt, or token values
   - trading admin credentials HTTP endpoint returns the same safe projection without serializing secret, salt, or token values
@@ -510,13 +511,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.449
-gate_packet: docs/halo-swing-development-plan.md#3.449
+portable_mirror: docs/halo-swing-development-plan.md#3.450
+gate_packet: docs/halo-swing-development-plan.md#3.450
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.449
+  - docs/halo-swing-development-plan.md#3.450
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -824,16 +825,61 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.449 Binance Execution Boolean Environment Canonicalization Coverage
-is verified. Direct preview/execution coverage now proves noncanonical Binance
-boolean environment aliases such as `yes` and `1` fail through settings
-validation before credential loading or network submission can run. Focused
-Binance coverage passed with 2 tests, `tests/test_binance_btc.py` passed with
-65 tests, and full pytest passed with 599 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: 3.450 Binance Read-Only Boolean Environment Canonicalization Coverage
+is verified. Direct read-only Binance coverage now proves noncanonical
+`HALO_SWING_BINANCE_TESTNET` aliases fail through settings validation before
+connectivity network calls or account snapshot credential reads can run.
+Focused Binance coverage passed with 2 tests, `tests/test_binance_btc.py`
+passed with 67 tests, and full pytest passed with 601 tests. Ruff,
+health_check, get_integration_readiness, diff whitespace, blocked-path status,
+and ignored state checks passed.
 
 ```yaml
+binance_read_only_boolean_env_canonicalization_coverage:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - check_binance_coinm_connectivity coverage now rejects HALO_SWING_BINANCE_TESTNET=on before URL reads
+    - get_binance_coinm_account_snapshot coverage now rejects HALO_SWING_BINANCE_TESTNET=1 before credential loading
+    - account snapshot coverage monkeypatches credential loading and URL submission to prove invalid testnet env validation happens first
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_check_binance_connectivity_rejects_noncanonical_testnet_env_without_network tests/test_binance_btc.py::test_account_snapshot_rejects_noncanonical_testnet_env_before_credentials -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py -q
+      result: "67 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "601 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 binance_execution_boolean_env_canonicalization_coverage:
   status: verified
   changed_files:
