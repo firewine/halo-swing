@@ -9,11 +9,13 @@ from math import isfinite
 from pathlib import Path
 from typing import Any
 
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.contracts import DataFreshnessStatus
 from halo_swing_mcp.indicators import calculate_indicator_payload
 from halo_swing_mcp.providers import get_market_data_provider
 
 
+ARTIFACT_DIR_ENV = "HALO_SWING_ARTIFACT_DIR"
 DOCUMENT_EVIDENCE_SCHEMA_VERSION = "document_evidence_card.v1"
 DOCUMENT_SUMMARY_MAX_CHARS = 900
 MARKET_SNAPSHOT_CORE_ASSETS = ["QQQ", "SPY", "SMH", "SOXX", "BTC"]
@@ -535,7 +537,7 @@ def render_chart(
     directory = (
         Path(normalized_output_dir)
         if normalized_output_dir is not None
-        else Path("artifacts") / "charts"
+        else _default_chart_output_dir()
     )
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / f"{normalized}_{normalized_timeframe}.png"
@@ -543,11 +545,7 @@ def render_chart(
     bars = list(provider.ohlcv(normalized, 90, timeframe=normalized_timeframe))
     closes = [float(bar["close"]) for bar in bars[-60:]]
     _write_line_chart_png(path, closes)
-    artifact_ref = (
-        str(path)
-        if normalized_output_dir is not None
-        else str(Path("artifacts") / "charts" / path.name)
-    )
+    artifact_ref = str(path)
     artifact = {
         "ref_type": "CHART",
         "ref": artifact_ref,
@@ -641,6 +639,15 @@ def _normalize_optional_path(value: str | None, field_name: str) -> str | None:
     if not normalized:
         raise ValueError(f"{field_name} must be a nonempty string")
     return normalized
+
+
+def _default_chart_output_dir() -> Path:
+    return Path(
+        _normalize_optional_path(
+            get_settings().artifact_dir,
+            ARTIFACT_DIR_ENV,
+        )
+    ) / "charts"
 
 
 def _normalize_symbol_list(symbols: list[str] | None) -> list[str]:

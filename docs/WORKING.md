@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_RECV_WINDOW_ENV_VALIDATION_VERIFIED
-gate_id: BINANCE_RECV_WINDOW_ENV_VALIDATION
+status: ARTIFACT_DIR_ENV_VALIDATION_VERIFIED
+gate_id: ARTIFACT_DIR_ENV_VALIDATION
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -124,6 +124,7 @@ done_means:
   - Binance signed order/read requests validate explicit and settings-backed recvWindow values before signing or network attempts
   - normalize_binance_coinm_account_snapshot validates caller-supplied balance, position, timestamp, and contract-size inputs before portfolio summary projection
   - normalize_binance_coinm_account_snapshot rejects ASCII control characters in caller-supplied snapshot text before portfolio summary projection
+  - render_chart uses validated settings-backed artifact_dir for default chart output and rejects blank/control-character HALO_SWING_ARTIFACT_DIR values before artifact directory creation
   - readiness tool returns no secret values
   - readiness tool performs no network calls
   - health capabilities exactly match MVP required_tools manifest, including health_check and get_integration_readiness
@@ -505,13 +506,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.444
-gate_packet: docs/halo-swing-development-plan.md#3.444
+portable_mirror: docs/halo-swing-development-plan.md#3.445
+gate_packet: docs/halo-swing-development-plan.md#3.445
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.444
+  - docs/halo-swing-development-plan.md#3.445
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -819,14 +820,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.444 Binance Recv Window Environment Validation is verified. Binance
-COIN-M signed order and read-only account request construction now rejects
-nonpositive explicit or settings-backed recvWindow values before signing or any
-network attempt, while valid `HALO_SWING_BINANCE_RECV_WINDOW_MS` values are
-preserved in the signed request body. Focused recvWindow coverage passed with 4
-tests, `tests/test_binance_btc.py` passed with 63 tests, and full pytest passed
-with 589 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
-blocked-path status, and ignored state checks passed.
+Summary: 3.445 Artifact Directory Environment Validation is verified.
+`render_chart` now uses the validated `artifact_dir` setting for default chart
+output instead of hardcoding `artifacts/charts`, and blank/control-character
+`HALO_SWING_ARTIFACT_DIR` values fail before chart directory creation. Focused
+artifact-dir coverage passed with 2 tests, `tests/test_mvp_tools.py` passed
+with 185 tests, and full pytest passed with 591 tests. Ruff, health_check,
+get_integration_readiness, diff whitespace, blocked-path status, and ignored
+state checks passed.
 
 ```yaml
 codex_harness_bootstrap:
@@ -13236,6 +13237,55 @@ blocked_scope_unchanged:
     - Binance network call
     - live trading
     - migration or repository persistence
+    - order submission
+
+artifact_dir_env_validation:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - render_chart default output now resolves from validated settings.artifact_dir instead of a hardcoded artifacts directory
+    - valid HALO_SWING_ARTIFACT_DIR values are trimmed and used for default chart output under the charts subdirectory
+    - blank or control-character HALO_SWING_ARTIFACT_DIR values raise before chart directory creation or fallback writes
+    - explicit output_dir behavior remains unchanged and continues to use public input validation
+    - the slice adds no committed artifacts, live data adapter, network call, Telegram send, Hermes runtime call, Binance call, migration, repository persistence, credential storage, passphrase persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_render_chart_uses_valid_env_artifact_dir tests/test_mvp_tools.py::test_render_chart_rejects_invalid_env_artifact_dir_without_fallback -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/market.py tests/test_mvp_tools.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py -q
+      result: "185 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "591 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - committed artifacts
+    - live data adapter
+    - network call
+    - Telegram send
+    - Hermes runtime call
+    - Binance call
+    - migration or repository persistence
+    - credential storage
+    - passphrase persistence
+    - live trading
     - order submission
 
 binance_recv_window_env_validation:

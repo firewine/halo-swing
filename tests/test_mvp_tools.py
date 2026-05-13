@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from halo_swing_mcp.audit import read_audit_events
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.tools import scoring as scoring_tools
 from halo_swing_mcp.strategy import get_strategy_config, validate_strategy_config
 from halo_swing_mcp.tools.health import health_check
@@ -303,6 +304,61 @@ def test_render_chart_rejects_output_dir_control_character(
         render_chart("QQQ", output_dir=f"{chart_dir}\n")
 
     assert not chart_dir.exists()
+
+
+def test_render_chart_uses_valid_env_artifact_dir(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    artifact_dir = tmp_path / "artifacts"
+    monkeypatch.setenv("HALO_SWING_ARTIFACT_DIR", f" {artifact_dir} ")
+    get_settings.cache_clear()
+
+    try:
+        chart = render_chart("QQQ")
+    finally:
+        get_settings.cache_clear()
+
+    chart_path = artifact_dir / "charts" / "QQQ_1d.png"
+    assert Path(chart["path"]) == chart_path
+    assert chart["artifact_ref"]["ref"] == str(chart_path)
+    assert chart_path.exists()
+    assert chart["chart_artifact_guard"]["status"] == "ok"
+
+
+def test_render_chart_rejects_invalid_env_artifact_dir_without_fallback(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    invalid_cases = [
+        (
+            "",
+            "HALO_SWING_ARTIFACT_DIR must be a nonempty string",
+            tmp_path / "artifacts",
+        ),
+        (
+            "   ",
+            "HALO_SWING_ARTIFACT_DIR must be a nonempty string",
+            tmp_path / "artifacts",
+        ),
+        (
+            f"{tmp_path / 'bad'}\x7fartifacts",
+            "HALO_SWING_ARTIFACT_DIR must not contain control characters",
+            tmp_path / "bad\x7fartifacts",
+        ),
+    ]
+
+    for env_value, expected_error, unexpected_path in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_ARTIFACT_DIR", env_value)
+        get_settings.cache_clear()
+
+        try:
+            with pytest.raises(ValueError, match=expected_error):
+                render_chart("QQQ")
+        finally:
+            get_settings.cache_clear()
+        assert not unexpected_path.exists()
 
 
 def test_document_summary_input_creates_guarded_evidence_card() -> None:
