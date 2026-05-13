@@ -6087,3 +6087,18 @@ git diff --check -> passed
 git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
 git status --short --ignored state -> ignored local state/ only
 ```
+
+## 3.517 Runtime Checkpoint Harness Run ID Blank No-Fallback Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_run_id_without_checkpoint -q -> 1 passed, harness runtime checkpoint blank run_id records failure audit without checkpoint, ledger, or default state fallback
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
