@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.532 Readiness Audit Env Alias Secret Boundary Guard Record - 2026-05-13
+### A. 목적
+
+Readiness audit redaction coverage now seeds the shared readiness env helper with
+Telegram, gateway, market, macro, and news primary, alias, and source env
+key/value pairs. This gate proves harness, MCP server, audit log, and audit
+summary surfaces do not serialize those values or env key names in stdout, JSONL
+audit logs, returned event payloads, or summaries.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; shared readiness audit env helper now covers Telegram, gateway, market, macro, and news primary, alias, and source env key/value pairs
+  - harness get_integration_readiness audit coverage keeps env key/value pairs out of stdout, raw JSONL logs, and serialized audit events
+  - MCP server, audit log, and audit summary readiness surfaces reuse the expanded helper and preserve the same no-exposure boundary
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 37 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.531 Integration Readiness Invalid Live Data Source No-Exposure Guard Record - 2026-05-13
 ### A. 목적
 

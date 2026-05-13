@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: INTEGRATION_READINESS_INVALID_LIVE_DATA_SOURCE_NO_EXPOSURE_VERIFIED
-gate_id: INTEGRATION_READINESS_INVALID_LIVE_DATA_SOURCE_NO_EXPOSURE
+status: READINESS_AUDIT_ENV_ALIAS_SECRET_BOUNDARY_VERIFIED
+gate_id: READINESS_AUDIT_ENV_ALIAS_SECRET_BOUNDARY
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -184,10 +184,10 @@ done_means:
   - get_integration_readiness treats market, macro, and news live data source env values as boolean evidence without returning source values or env key names and preserves secret_values_returned=false for invalid source envs
   - get_integration_readiness treats blank or control-character Telegram, gateway, market, macro, and news env values as not configured without returning secret values or env key names while preserving secret_values_returned=false
   - Binance execution policy env booleans accept only canonical true/false strings before readiness or execution policy evaluation
-  - harness get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
-  - MCP server get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret values or env key names
-  - get_audit_log and audit web events_payload preserve readiness audit events without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
-  - get_audit_summary and audit web summary_payload preserve readiness audit summaries without re-exposing Telegram, gateway, market, macro, or news env secret values or env key names
+  - harness get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret/source values or env key names and aliases
+  - MCP server get_integration_readiness audit logging does not serialize Telegram, gateway, market, macro, or news env secret/source values or env key names and aliases
+  - get_audit_log and audit web events_payload preserve readiness audit events without re-exposing Telegram, gateway, market, macro, or news env secret/source values or env key names and aliases
+  - get_audit_summary and audit web summary_payload preserve readiness audit summaries without re-exposing Telegram, gateway, market, macro, or news env secret/source values or env key names and aliases
   - Binance read-only smoke readiness requires encrypted credentials and a non-secret passphrase confirmation flag
   - BTC risk settings and daily risk state tools validate public numeric, boolean, and path inputs before local state writes
   - preview_btc_order and execute_btc_order validate order text, decimal, and boolean fields before risk checks, credential reads, or submission guards
@@ -577,13 +577,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.531
-gate_packet: docs/halo-swing-development-plan.md#3.531
+portable_mirror: docs/halo-swing-development-plan.md#3.532
+gate_packet: docs/halo-swing-development-plan.md#3.532
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.531
+  - docs/halo-swing-development-plan.md#3.532
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -891,17 +891,64 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.531 Integration Readiness Invalid Live Data Source No-Exposure Guard
-is verified. Direct `get_integration_readiness` invalid live-data source env
-coverage now asserts blank/control-character market, macro, and news source
-values keep the live_data gate blocked while preserving
-`secret_values_returned=false` and avoiding source env value/key serialization.
-Focused readiness coverage passed with 1 test, `tests/test_readiness.py` passed
-with 28 tests, and full pytest passed with 666 tests. Ruff, health_check,
+Summary: 3.532 Readiness Audit Env Alias Secret Boundary Guard is verified.
+Readiness audit redaction coverage now seeds the shared audit env helper with
+Telegram, gateway, market, macro, and news primary, alias, and source env
+key/value pairs. Harness, MCP server, audit log, and audit summary surfaces keep
+those values and key names out of stdout, JSONL audit logs, and returned
+payloads. Focused audit coverage passed with 4 tests, `tests/test_audit.py`
+passed with 37 tests, and full pytest passed with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+readiness_audit_env_alias_secret_boundary:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; shared readiness audit env helper now covers Telegram, gateway, market, macro, and news primary, alias, and source env key/value pairs
+    - harness get_integration_readiness audit coverage proves env key/value pairs stay out of stdout, raw JSONL audit logs, and serialized audit events
+    - MCP server, audit log, and audit summary readiness surfaces now reuse the expanded env helper and prove the same no-exposure boundary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "37 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "666 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  architecture_note:
+    - user clarified tests are excluded from the sub-1000-line source-file rule
+    - no source files changed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 integration_readiness_invalid_live_data_source_no_exposure:
   status: verified
   changed_files:

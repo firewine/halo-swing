@@ -5781,7 +5781,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 190. Next Concrete Actions
+## 190. 3.532 Readiness Audit Env Alias Secret Boundary Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary -q -> 4 passed, readiness audit surfaces keep Telegram, gateway, market, macro, and news env primary/alias/source values and key names out of stdout, JSONL audit logs, returned events, and summaries
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 37 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 191. Next Concrete Actions
 
 Choose one of:
 

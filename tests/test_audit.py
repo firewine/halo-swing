@@ -27,10 +27,20 @@ MVP_CONTRACT = json.loads(
 )
 READINESS_ENV_SECRETS = {
     "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-secret-token",
+    "TELEGRAM_BOT_TOKEN": "telegram-alias-secret-token",
+    "HALO_SWING_TELEGRAM_GATEWAY": "https://gateway-alias.example/secret",
     "HALO_SWING_TELEGRAM_GATEWAY_URL": "https://gateway.example/secret",
+    "HALO_SWING_MARKET_DATA_SOURCE": "market-secret-source",
     "HALO_SWING_MARKET_DATA_API_KEY": "market-secret-key",
+    "POLYGON_API_KEY": "polygon-secret-key",
+    "ALPACA_API_KEY": "alpaca-secret-key",
+    "TIINGO_API_KEY": "tiingo-secret-key",
+    "HALO_SWING_MACRO_SOURCE": "macro-secret-source",
     "FRED_API_KEY": "fred-secret-key",
+    "HALO_SWING_FRED_API_KEY": "halo-fred-secret-key",
+    "HALO_SWING_NEWS_SOURCE": "news-secret-source",
     "NEWS_API_KEY": "news-secret-key",
+    "HALO_SWING_NEWS_API_KEY": "halo-news-secret-key",
 }
 
 
