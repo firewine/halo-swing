@@ -4866,7 +4866,22 @@ git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mc
 git status --short --ignored state -> ignored local state/ only
 ```
 
-## 129. Next Concrete Actions
+## 129. 3.471 Audit Web Events Path Guard Verification - 2026-05-13
+
+```text
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_audit_log_path tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_env_audit_path -q -> 2 passed, audit web events endpoint returns HTTP 400 JSON for invalid explicit/env audit log paths before audit reads or fallback file creation
+PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 37 passed
+PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 627 passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+git diff --check -> passed
+git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+git status --short --ignored state -> ignored local state/ only
+```
+
+## 130. Next Concrete Actions
 
 Choose one of:
 
