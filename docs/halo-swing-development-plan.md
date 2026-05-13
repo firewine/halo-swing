@@ -9302,6 +9302,54 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.542 Readiness Control-Character Path Prevalidation Guard Record - 2026-05-13
+### A. 목적
+
+Control-character path readiness coverage now uses credential-status and BTC
+risk settings sentinels to prove invalid Hermes config, Binance credential, and
+BTC risk settings paths fail before Binance credential status reads or BTC risk
+settings reads.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; control-character path readiness coverage now installs credential-status and BTC risk settings sentinels
+  - invalid Hermes config, Binance credential, and BTC risk settings paths are verified to fail before Binance credential status reads or BTC risk settings reads
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_rejects_path_control_character_inputs -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 29 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 667 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.541 Readiness Invalid Public Input Prevalidation Guard Record - 2026-05-13
 ### A. 목적
 

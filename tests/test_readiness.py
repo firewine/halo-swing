@@ -826,6 +826,7 @@ def test_integration_readiness_rejects_invalid_public_inputs(
 
 def test_integration_readiness_rejects_path_control_character_inputs(
     tmp_path: Path,
+    monkeypatch,
 ) -> None:
     missing_credentials = tmp_path / "missing.enc.json"
     invalid_cases = [
@@ -842,6 +843,21 @@ def test_integration_readiness_rejects_path_control_character_inputs(
             "btc_risk_settings_path must not contain control characters",
         ),
     ]
+
+    def fail_credentials_status(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("credential status must not run before path validation")
+
+    def fail_risk_settings(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("risk settings must not load before path validation")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credentials_status,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.load_btc_risk_settings",
+        fail_risk_settings,
+    )
 
     for overrides, expected_error in invalid_cases:
         payload = {"binance_credentials_path": str(missing_credentials)}
