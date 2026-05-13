@@ -9302,6 +9302,58 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.470 Audit Web Summary Path Guard Record - 2026-05-13
+
+### A. 목적
+
+The audit web `/api/events` endpoint already converts query/path validation
+failures to HTTP 400 JSON, and the CLI now validates audit log path inputs at
+startup. The `/api/summary` read surface still needed the same endpoint-level
+guard so invalid explicit or environment audit log paths cannot escape the
+handler or create fallback/malformed local files. This slice pins that boundary.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - audit web /api/summary catches audit log path validation failures and returns HTTP 400 JSON
+  - invalid explicit audit_log_path values fail before audit reads or malformed local file creation
+  - invalid HALO_SWING_AUDIT_LOG_PATH values fail before audit reads, default-state fallback, or malformed local file creation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - credential storage
+  - passphrase persistence
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - scheduler
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_audit_log_path tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_path -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q -> 35 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 625 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.469 Audit Web Audit Log Path Guard Record - 2026-05-13
 
 ### A. 목적

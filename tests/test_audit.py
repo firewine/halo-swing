@@ -1186,8 +1186,43 @@ def test_audit_web_events_endpoint_returns_bad_request_for_control_character_que
     }
 
 
+def test_audit_web_summary_endpoint_returns_bad_request_for_invalid_audit_log_path(
+    tmp_path: Path,
+) -> None:
+    invalid_path = f"{tmp_path / 'bad'}\x7faudit.jsonl"
+    response_payload = _audit_web_get(
+        invalid_path,
+        "/api/summary",
+        expected_status="HTTP/1.0 400 Bad Request",
+    )
+
+    assert response_payload == {
+        "error": "audit_log_path must not contain control characters"
+    }
+    assert not (tmp_path / "bad\x7faudit.jsonl").exists()
+
+
+def test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_path(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", "   ")
+    response_payload = _audit_web_get(
+        None,
+        "/api/summary",
+        expected_status="HTTP/1.0 400 Bad Request",
+    )
+
+    assert response_payload == {
+        "error": "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"
+    }
+    assert not (tmp_path / "state").exists()
+    assert not (tmp_path / "   ").exists()
+
+
 def _audit_web_get(
-    audit_log_path: str,
+    audit_log_path: str | None,
     path: str,
     expected_status: str = "HTTP/1.0 200 OK",
 ) -> dict[str, object]:

@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: AUDIT_WEB_AUDIT_LOG_PATH_GUARD_VERIFIED
-gate_id: AUDIT_WEB_AUDIT_LOG_PATH_GUARD
+status: AUDIT_WEB_SUMMARY_PATH_GUARD_VERIFIED
+gate_id: AUDIT_WEB_SUMMARY_PATH_GUARD
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -118,6 +118,7 @@ done_means:
   - get_audit_log and get_audit_summary validate audit_log_path before audit reads so blank explicit paths cannot silently fall back to default runtime state
   - audit web events_payload validates query limit, trims optional filters, caps limit at 1000, and returns HTTP 400 for invalid events query values before audit reads
   - get_audit_log, get_audit_summary, and audit web events_payload reject ASCII control characters in audit_log_path, query limit, and optional filter inputs before audit reads
+  - audit web summary endpoint returns a JSON 400 for invalid audit log paths before audit reads or fallback path creation
   - audit web server rejects non-localhost bind hosts before starting the HTTP server
   - audit web server rejects invalid port values before audit path resolution or HTTP server start
   - audit web server rejects invalid explicit or environment audit log paths before HTTP server start
@@ -530,13 +531,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.469
-gate_packet: docs/halo-swing-development-plan.md#3.469
+portable_mirror: docs/halo-swing-development-plan.md#3.470
+gate_packet: docs/halo-swing-development-plan.md#3.470
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.469
+  - docs/halo-swing-development-plan.md#3.470
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -844,15 +845,62 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.469 Audit Web Audit Log Path Guard is verified. Audit web CLI
-startup now returns exit code 2 for invalid explicit or environment audit log
-paths before handler creation, `ThreadingHTTPServer` construction, or socket
-binding. Focused audit-log-path guard coverage passed with 2 tests,
-`tests/test_audit.py` passed with 33 tests, and full pytest passed with 623
+Summary: 3.470 Audit Web Summary Path Guard is verified. Audit web `/api/summary`
+now catches invalid explicit or environment audit log paths and returns HTTP 400
+JSON before audit reads, default-state fallback, or malformed local file
+creation. Focused summary path guard coverage passed with 2 tests,
+`tests/test_audit.py` passed with 35 tests, and full pytest passed with 625
 tests. Ruff, health_check, get_integration_readiness, diff whitespace,
 blocked-path status, and ignored state checks passed.
 
 ```yaml
+audit_web_summary_path_guard:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/audit_web.py
+    - tests/test_audit.py
+  implementation:
+    - audit web /api/summary now catches audit log path validation failures and returns HTTP 400 JSON instead of letting ValueError escape the handler
+    - summary endpoint coverage verifies invalid explicit audit_log_path values fail without creating malformed local files
+    - summary endpoint coverage verifies invalid HALO_SWING_AUDIT_LOG_PATH values fail without default-state fallback or malformed local file creation
+    - the slice adds no credential storage, passphrase persistence, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, scheduler, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_audit_log_path tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_path -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/audit_web.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py -q
+      result: "35 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "625 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - credential storage
+    - passphrase persistence
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - scheduler
+    - live trading
+    - order submission
+
 audit_web_audit_log_path_guard:
   status: verified
   changed_files:

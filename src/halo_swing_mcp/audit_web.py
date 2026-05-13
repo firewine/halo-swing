@@ -253,7 +253,12 @@ def create_handler(audit_log_path: str | None = None) -> type[BaseHTTPRequestHan
                 self._send_json(HTTPStatus.OK, payload)
                 return
             if parsed.path == "/api/summary":
-                self._send_json(HTTPStatus.OK, summary_payload(audit_log_path))
+                try:
+                    payload = summary_payload(audit_log_path)
+                except ValueError as exc:
+                    self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                    return
+                self._send_json(HTTPStatus.OK, payload)
                 return
             self._send_json(
                 HTTPStatus.NOT_FOUND,
