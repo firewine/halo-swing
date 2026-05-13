@@ -1724,6 +1724,7 @@ def test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback(
         assert not unexpected_path.exists()
         assert not audit_path.exists()
         assert not ledger_path.exists()
+        assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit(

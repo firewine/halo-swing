@@ -9302,6 +9302,56 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.527 Runtime Checkpoint Env Path No-Fallback Guard Record - 2026-05-13
+### A. 목적
+
+Direct `record_runtime_checkpoint` invalid `HALO_SWING_RUNTIME_CHECKPOINT_PATH`
+coverage now explicitly asserts that blank, whitespace, and control-character
+environment path validation failures create no malformed checkpoint path, audit,
+ledger, or default `state/` fallback. The existing test already ran from an
+isolated cwd; this gate tightens the same boundary for every invalid env value.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; direct invalid HALO_SWING_RUNTIME_CHECKPOINT_PATH coverage now asserts no default state/ fallback for every invalid env value
+  - invalid env checkpoint path coverage verifies blank, whitespace, and control-character env path validation failures before runtime status reads or checkpoint writes
+  - invalid env checkpoint path coverage asserts no malformed checkpoint path, audit file, ledger file, or default state/ fallback
+  - user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q -> 60 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -q -> 666 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.526 Runtime Status Env Limit No-Fallback Guard Record - 2026-05-13
 ### A. 목적
 

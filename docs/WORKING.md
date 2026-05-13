@@ -42,8 +42,8 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_STATUS_ENV_LIMIT_NO_FALLBACK_VERIFIED
-gate_id: RUNTIME_STATUS_ENV_LIMIT_NO_FALLBACK
+status: RUNTIME_CHECKPOINT_ENV_PATH_NO_FALLBACK_VERIFIED
+gate_id: RUNTIME_CHECKPOINT_ENV_PATH_NO_FALLBACK
 review_tier: S1_small
 
 next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
@@ -177,7 +177,7 @@ done_means:
   - record_runtime_checkpoint invalid public inputs do not create checkpoint, audit, ledger, or default state fallback before validation failure
   - record_runtime_checkpoint rejects ASCII control characters in checkpoint_path, audit_log_path, ledger_path, and run_id before runtime status reads or checkpoint writes
   - record_runtime_checkpoint control-character public inputs do not create checkpoint, audit, ledger, or default state fallback before validation failure
-  - record_runtime_checkpoint trims valid HALO_SWING_RUNTIME_CHECKPOINT_PATH values and rejects blank or control-character environment paths before runtime status reads or checkpoint writes
+  - record_runtime_checkpoint trims valid HALO_SWING_RUNTIME_CHECKPOINT_PATH values and rejects blank or control-character environment paths without malformed checkpoint, audit, ledger, or default state fallback before runtime status reads or checkpoint writes
   - record_runtime_checkpoint with readiness snapshot does not persist Telegram, gateway, market, macro, or news env secret values
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secrets as boolean evidence without returning secret values or env key names
   - get_integration_readiness treats Telegram, gateway, market, macro, and news env secret aliases as boolean evidence without returning secret values or env key names
@@ -577,13 +577,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.526
-gate_packet: docs/halo-swing-development-plan.md#3.526
+portable_mirror: docs/halo-swing-development-plan.md#3.527
+gate_packet: docs/halo-swing-development-plan.md#3.527
 
 read_only_context:
   - AGENTS.md
   - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.526
+  - docs/halo-swing-development-plan.md#3.527
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/tool_registry.py
   - tests/test_tool_registry.py
@@ -891,16 +891,63 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.526 Runtime Status Env Limit No-Fallback Guard is verified.
-Direct `get_runtime_status` invalid environment-backed runtime limit coverage
-now runs from an isolated cwd and proves no audit, ledger, or default `state/`
-fallback is created before validation failure. Focused runtime status env limit
-coverage passed with 1 test, `tests/test_runtime_guard.py` passed with 60
-tests, and full pytest passed with 666 tests. Ruff, health_check,
+Summary: 3.527 Runtime Checkpoint Env Path No-Fallback Guard is verified.
+Direct `record_runtime_checkpoint` invalid `HALO_SWING_RUNTIME_CHECKPOINT_PATH`
+coverage now proves blank and control-character environment path failures create
+no malformed checkpoint path, audit, ledger, or default `state/` fallback before
+validation failure. Focused runtime checkpoint env path coverage passed with 1
+test, `tests/test_runtime_guard.py` passed with 60 tests, and full pytest passed
+with 666 tests. Ruff, health_check,
 get_integration_readiness, diff whitespace, blocked-path status, and ignored
 state checks passed.
 
 ```yaml
+runtime_checkpoint_env_path_no_fallback:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/gates/FULL_GOAL_COMPLETION_AUDIT_2026-05-10.md
+    - docs/gates/FULL_GOAL_IMPLEMENTATION_PLAN_2026-05-09.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; direct record_runtime_checkpoint invalid HALO_SWING_RUNTIME_CHECKPOINT_PATH coverage now asserts no default state/ fallback for every invalid env value
+    - invalid env checkpoint path coverage verifies blank, whitespace, and control-character env path validation failures before runtime status reads or checkpoint writes
+    - invalid env checkpoint path coverage asserts no malformed checkpoint path, audit, ledger, or default state/ fallback before validation failure
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py -q
+      result: "60 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest -q
+      result: "666 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  architecture_note:
+    - user clarified tests are excluded from the sub-1000-line source-file rule
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_status_env_limit_no_fallback:
   status: verified
   changed_files:
