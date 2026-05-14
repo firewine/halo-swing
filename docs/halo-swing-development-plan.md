@@ -9302,6 +9302,53 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.618 Runtime Checkpoint Run ID Control Failure-Audit No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness failure-audit coverage already rejected
+control-character `run_id` values, recorded a failure audit event without
+`output_summary`, avoided checkpoint and ledger creation, and redacted submitted
+path and payload fragments from stderr. This slice aligns the older smoke test
+with the isolated-cwd harness pattern and locks the no-default-state fallback
+behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint control-character run_id failure-audit coverage runs from an isolated tmp_path cwd with explicit PYTHONPATH
+  - control-character run_id failure-audit coverage asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no checkpoint or ledger creation
+  - user directive recorded: actual integrations should be built so live setup requires only user-provided API keys/config values plus documented approval flags
+  - user directive recorded: commit and push after each verified gate
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.617 Runtime Checkpoint Invalid Input Failure-Audit No-Fallback Guard Record - 2026-05-14
 ### A. 목적
 
