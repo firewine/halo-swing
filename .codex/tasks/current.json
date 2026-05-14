@@ -1,39 +1,47 @@
 {
-  "gate_id": "P1_DTO_CONTRACT_TESTS",
+  "gate_id": "RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/gates/P1_DTO_CONTRACT_TESTS.md",
-  "next_atomic_step": "create tests/test_contracts.py exactly from the approved DTO contract work order",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.618",
+  "next_atomic_step": "verify record_runtime_checkpoint harness control-character run_id failure-audit creates no default state fallback without changing runtime checkpoint validation behavior",
   "allowed_edit_paths": [
-    "tests/test_contracts.py",
-    "docs/WORKING.md"
+    ".codex/agents/ai-llm.toml",
+    ".codex/agents/be.toml",
+    ".codex/agents/ceo.toml",
+    ".codex/agents/cto.toml",
+    ".codex/agents/db.toml",
+    ".codex/agents/devops.toml",
+    ".codex/agents/docs-gardener.toml",
+    ".codex/agents/fe.toml",
+    ".codex/agents/fintech-vc.toml",
+    ".codex/agents/qc.toml",
+    ".codex/agents/security.toml",
+    ".codex/tasks/current.json",
+    "docs/WORKING.md",
+    "docs/codex-task.json",
+    "docs/halo-swing-development-plan.md",
+    "tests/test_audit.py",
+    "tests/test_binance_btc.py",
+    "tests/test_readiness.py",
+    "tests/test_runtime_guard.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/gates/P1_DTO_CONTRACT_TESTS.md",
-    "docs/CONTEXT.md",
-    "docs/halo-swing-development-plan.md#3.20",
-    "src/halo_swing_mcp/contracts.py",
-    "tests/golden/latest_signal_report.json",
-    "tests/golden/latest_signal_report_degraded.json",
-    "tests/golden/signal_replay_bundle.json",
-    "tests/golden/storage_health.json"
+    "docs/halo-swing-development-plan.md#3.618",
+    "src/halo_swing_mcp/harness.py",
+    "src/halo_swing_mcp/tools/runtime.py",
+    "tests/test_runtime_guard.py"
   ],
   "blocked_path_prefixes": [
-    "src/halo_swing_mcp/storage/",
-    "src/halo_swing_mcp/adapters/",
-    "src/halo_swing_mcp/scoring/",
+    "src/halo_swing_mcp/broker/",
+    "src/halo_swing_mcp/live_adapters/",
     "migrations/",
     "data/",
     "artifacts/",
     "state/"
   ],
-  "blocked_exact_paths": [
-    "requirements.txt",
-    "src/halo_swing_mcp/server.py",
-    "src/halo_swing_mcp/config.py"
-  ],
+  "blocked_exact_paths": [],
   "required_commands": [
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -41,20 +49,19 @@
   ],
   "post_implementation_review": {
     "roles": [
-      "be",
       "qc",
       "devops",
-      "docs-gardener",
-      "cto"
+      "docs-gardener"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "tests/test_contracts.py exists",
+    "record_runtime_checkpoint harness control-character run_id failure-audit failures emit no stdout",
+    "record_runtime_checkpoint harness control-character run_id failure-audit failures redact harness checkpoint path, audit path, ledger path, and serialized run_id fragments from stderr",
+    "record_runtime_checkpoint harness control-character run_id failure-audit failures record failure audit without output_summary, without checkpoint or ledger creation, and without default state fallback",
     "all required verification passes",
-    "no blocked paths changed",
-    "WORKING.md records result only"
+    "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "DTO_CONTRACT_SLICE_SIGNOFF"
+  "next_state_after_success": "commit and push this verified gate, then open the next API-key-only integration gate so live setup requires only user-provided API keys/config values plus documented approval flags"
 }

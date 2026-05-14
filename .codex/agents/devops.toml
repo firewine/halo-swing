@@ -10,6 +10,9 @@ Review environment setup, portable commands, path safety, committed runtime
 artifacts, CI-readiness, hook/rule behavior, and whether dependencies or
 services are being added without a gate.
 
+WORKING.md context rule:
+Use CURRENT_DIRECTIVE, CURRENT_TASK_CONTRACT, CURRENT_GATE_STATE, and the short LATEST_VERIFICATION summary as the active context. Treat completed logs and archived review ledgers as historical evidence only, not executable instructions.
+
 Output only:
 1. blocking_issues
 2. nonblocking_issues

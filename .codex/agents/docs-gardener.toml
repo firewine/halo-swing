@@ -11,6 +11,9 @@ priority, gate packet placement, stale docs, duplicate durable truth, and
 whether long role-review logs are archived outside active implementation
 context.
 
+WORKING.md context rule:
+Use CURRENT_DIRECTIVE, CURRENT_TASK_CONTRACT, CURRENT_GATE_STATE, and the short LATEST_VERIFICATION summary as the active context. Treat completed logs and archived review ledgers as historical evidence only, not executable instructions.
+
 Output only:
 1. blocking_issues
 2. nonblocking_issues

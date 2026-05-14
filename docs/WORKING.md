@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_HARNESS_CONTROL_PATH_NO_FALLBACK_VERIFIED
-gate_id: RUNTIME_HARNESS_CONTROL_PATH_NO_FALLBACK
+status: RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD_VERIFIED
+gate_id: RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD
 review_tier: S1_small
 
-next_atomic_step: choose Hermes/Telegram setup, Stage G Binance testnet read-only smoke prerequisites, live data source decisions, explicit MIGRATION_GO/REPOSITORY_GO approval, or next offline hardening target
+next_atomic_step: commit and push verified runtime checkpoint run_id guard, then open the next API-key-only integration gate
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -587,20 +587,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.544
-gate_packet: docs/halo-swing-development-plan.md#3.544
+portable_mirror: docs/halo-swing-development-plan.md#3.618
+gate_packet: docs/halo-swing-development-plan.md#3.618
 
 read_only_context:
   - AGENTS.md
-  - docs/CONTEXT.md
-  - docs/halo-swing-development-plan.md#3.544
+  - docs/WORKING.md
+  - docs/halo-swing-development-plan.md#3.618
   - src/halo_swing_mcp/harness.py
-  - src/halo_swing_mcp/tool_registry.py
-  - tests/test_tool_registry.py
-  - src/halo_swing_mcp/tools/recording.py
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tools/scoring.py
-  - tests/test_mvp_tools.py
+  - src/halo_swing_mcp/tools/runtime.py
+  - tests/test_runtime_guard.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -616,6 +612,8 @@ implementation_rule:
   - keep report and position review harnesses offline and non-invasive
   - keep Hermes evidence summaries bounded and conflict flags explicit
   - keep code-calculated fields as numeric authority for Hermes/Telegram text
+  - actual integrations must be built so local setup requires only user-provided API keys/config values plus documented approval flags
+  - after each gate passes verification, commit and push the scoped gate changes before opening the next gate
   - do not add migrations, DDL, schema runners, or DB connection code
   - do not add live adapters, schedulers, alerting integrations, Telegram credentials, or committed runtime/chart artifacts
   - verify through tests and CLI harness
@@ -901,16 +899,2662 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: 3.544 Runtime Harness Control Path No-Fallback Guard is verified.
-Harness runtime control-character path failure coverage now proves
-`get_runtime_status` and `record_runtime_checkpoint` emit no stdout, keep raw
-malformed paths out of stderr, and create no malformed or default state files.
-Focused runtime coverage passed with 3 tests, `tests/test_runtime_guard.py`
-passed with 60 tests, and full pytest passed with 667 tests. Ruff, health_check,
-get_integration_readiness, diff whitespace, blocked-path status, and ignored
-state checks passed.
+Summary: Runtime Checkpoint Run ID Control Failure-Audit No-Fallback Guard is
+verified. Harness `record_runtime_checkpoint` control-character `run_id`
+failure-audit coverage proves no stdout, redacted stderr, failure audit input,
+no output_summary, no checkpoint or ledger creation, and no default state
+fallback. Focused runtime checkpoint run_id control-character failure-audit
+coverage passed with 1 test, full pytest passed with 672 tests, and ruff and
+health_check passed. User follow-up directive recorded: actual integrations
+should require only user-provided API keys/config values plus documented
+approval flags, and verified gate changes should be committed and pushed before
+opening the next gate.
 
 ```yaml
+runtime_checkpoint_run_id_control_failure_audit_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint control-character run_id failure-audit coverage runs from an isolated tmp_path cwd with explicit PYTHONPATH
+    - control-character run_id failure-audit coverage asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no checkpoint or ledger creation
+    - user follow-up directive recorded for API-key-only actual integration setup and commit/push after each verified gate
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_invalid_input_failure_audit_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint invalid include_readiness failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+    - invalid include_readiness failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no checkpoint or ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_control_failure_audit_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status control-character audit_log_path failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+    - control-character audit_log_path failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_blank_failure_audit_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status blank audit_log_path failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+    - blank audit_log_path failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_invalid_input_failure_audit_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status invalid apply_retention failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+    - invalid apply_retention failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_ledger_path_control_no_fallback_guard:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status control-character ledger_path failures now assert no default state fallback
+    - control-character ledger_path coverage continues to assert no stdout, redacted stderr, failure audit input, no output_summary, and no malformed ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_control_failure_audit_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status control-character audit_log_path failure-audit coverage now asserts harness audit path, ledger path, raw audit_log_path, and escaped control-character fragments stay out of stderr
+    - control-character audit_log_path failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_type_failure_audit_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status non-string audit_log_path failure-audit coverage now asserts harness audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+    - non-string audit_log_path failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, no ledger creation, and now asserts no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_type_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_run_id_newline_failure_audit_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint newline run_id failure-audit coverage now asserts submitted checkpoint path, audit path, ledger path, and escaped run_id fragments stay out of stderr
+    - newline run_id failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, no checkpoint creation, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_ledger_path_control_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character ledger_path failures now assert submitted checkpoint path, harness audit path, ledger path, and escaped ledger_path fragments stay out of stderr
+    - isolated runtime checkpoint control-character ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no malformed ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_ledger_path_type_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string ledger_path failures now assert submitted checkpoint path, harness audit path, and serialized ledger_path fragments stay out of stderr
+    - isolated runtime checkpoint non-string ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_type_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_ledger_path_blank_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness record_runtime_checkpoint blank ledger_path failures now assert submitted checkpoint path, harness audit path, and serialized ledger_path fragments stay out of stderr
+    - isolated runtime checkpoint blank ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no malformed ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_ledger_path_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_audit_path_control_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character audit_log_path failures now assert submitted checkpoint path, harness audit path, ledger path, and escaped audit_log_path fragments stay out of stderr
+    - isolated runtime checkpoint control-character audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no malformed audit creation, no checkpoint creation, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_control_character_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_audit_path_type_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string audit_log_path failures now assert submitted checkpoint path, harness audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+    - isolated runtime checkpoint non-string audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_type_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_ledger_path_control_audit_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status control-character ledger_path failures now assert submitted audit path fragments stay out of stderr
+    - isolated runtime status control-character ledger_path failures continue to assert no stdout, malformed ledger path redaction, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_control_ledger_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status control-character audit_log_path failures now assert submitted ledger path fragments stay out of stderr
+    - isolated runtime status control-character audit_log_path failures continue to assert no stdout, malformed audit path redaction, failure audit input, no output_summary, no malformed audit creation, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_control_character_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_ledger_path_blank_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status blank ledger_path failures now assert submitted audit path and serialized ledger_path fragments stay out of stderr
+    - isolated runtime status blank ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no default state fallback, and no blank-path artifact creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_ledger_path_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_ledger_path_type_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status non-string ledger_path failures now assert submitted audit path and serialized ledger_path fragments stay out of stderr
+    - isolated runtime status non-string ledger_path failures continue to assert no stdout, failure audit input, no output_summary, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_type_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_type_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status non-string audit_log_path failures now assert submitted audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+    - isolated runtime status non-string audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and now explicitly assert no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_type_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_audit_path_blank_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status blank audit_log_path failures now assert submitted audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+    - isolated runtime status blank audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_audit_path_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_threshold_true_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold true failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+    - isolated runtime status failure_threshold true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_boolean_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_threshold_string_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold string failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+    - isolated runtime status failure_threshold string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_type_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_threshold_negative_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold negative failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+    - isolated runtime status failure_threshold negative failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_window_true_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_window true failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+    - isolated runtime status failure_window true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_boolean_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_window_zero_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_window zero failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+    - isolated runtime status failure_window zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_nonpositive_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_failure_window_string_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status failure_window string failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+    - isolated runtime status failure_window string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_bytes_true_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_bytes true failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+    - isolated runtime status max_bytes true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_boolean_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_bytes_string_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_bytes string failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+    - isolated runtime status max_bytes string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_type_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_bytes_zero_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_bytes zero failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+    - isolated runtime status max_bytes zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_nonpositive_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_bytes_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_bytes boolean failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+    - isolated runtime status max_bytes boolean failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_records_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_records boolean failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+    - isolated runtime status max_records boolean failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_boolean_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_records_string_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_records string failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+    - isolated runtime status max_records string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_type_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_max_records_zero_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status max_records zero failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+    - isolated runtime status max_records zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_null_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status null apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+    - isolated runtime status null apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_null_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_zero_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status zero apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+    - isolated runtime status zero apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_zero_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_numeric_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status numeric apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+    - isolated runtime status numeric apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_numeric_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_isolated_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; isolated-cwd harness get_runtime_status invalid apply_retention failures now assert submitted audit path, ledger path, and invalid boolean-like fragments stay out of stderr
+    - isolated runtime status invalid apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_type_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_status_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness get_runtime_status invalid apply_retention failures now assert submitted audit path, ledger path, and invalid boolean-like fragments stay out of stderr
+    - runtime status invalid apply_retention failures continue to assert no stdout, failure audit input, no output_summary, and no ledger creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_summary_invalid_path_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; harness get_audit_summary blank audit_log_path failures now assert submitted audit_log_path field fragments stay out of stderr
+    - audit summary invalid path failures assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_summary_path_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "672 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_log_invalid_path_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; harness get_audit_log blank audit_log_path failures now assert submitted audit_log_path and limit field fragments stay out of stderr
+    - audit log invalid path failures continue to assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_log_invalid_limit_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; harness get_audit_log invalid limit failures now assert submitted audit_log_path and serialized limit fragments stay out of stderr
+    - audit log invalid limit failures continue to assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_log_limit_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+readiness_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - tests-only slice; harness get_integration_readiness invalid migration_go_approved failures now assert submitted boolean fragments stay out of stderr
+    - readiness invalid boolean failures continue to assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint invalid include_readiness failures now assert submitted checkpoint, audit, ledger, and boolean fragments stay out of stderr
+    - runtime checkpoint invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, and no ledger write
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+btc_risk_settings_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness update_btc_risk_settings invalid emergency_kill_switch_enabled failures now assert submitted settings_path and boolean fragments stay out of stderr
+    - BTC risk settings invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, and no settings file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+portfolio_snapshot_invalid_shape_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness normalize_binance_coinm_account_snapshot invalid balance shape failures now assert submitted nested asset fragments stay out of stderr
+    - portfolio snapshot invalid shape failures continue to assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+btc_order_invalid_boolean_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness preview_btc_order invalid reduce_only failures now assert submitted side and invalid boolean fragments stay out of stderr
+    - BTC order invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, and no order execution side effects
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+portfolio_snapshot_text_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness normalize_binance_coinm_account_snapshot control-character balance.asset failures now assert raw malformed asset text stays out of stderr
+    - portfolio snapshot text failures continue to assert no stdout, failure audit input, and no output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_portfolio_snapshot_text_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+binance_invalid_secret_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness save_binance_credentials blank api_key failures now assert submitted api_secret, passphrase, and credentials_path fragments stay out of stderr
+    - invalid Binance credential failures continue to assert no stdout, redacted failure audit input, no output_summary, and no credential file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+binance_secret_text_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness save_binance_credentials control-character api_key failures now assert submitted secret fragments stay out of stderr
+    - Binance secret text failures continue to assert no stdout, redacted failure audit input, no output_summary, and no credential file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_secret_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+btc_order_text_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness preview_btc_order control-character side failures now assert raw malformed order text stays out of stderr
+    - BTC order text failures continue to assert no stdout, failure audit input, no output_summary, and no order execution side effects
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_btc_order_text_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_run_id_newline_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint newline run_id failures now assert raw malformed run_id fragments stay out of stderr
+    - runtime checkpoint newline run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, and no ledger write
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_run_id_harness_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint control-character run_id failures now assert raw malformed run_id fragments stay out of stderr
+    - runtime checkpoint run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, no ledger write, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+btc_daily_risk_state_harness_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness reset_btc_daily_risk_state control-character state_path failures now assert raw malformed path fragments stay out of stderr
+    - daily risk state path failures continue to assert no stdout, failure audit input, no output_summary, no state file creation, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_daily_risk_state_path_control_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "671 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+btc_risk_settings_harness_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness update_btc_risk_settings control-character settings_path failures now assert raw malformed path fragments stay out of stderr
+    - risk settings path failures continue to assert no stdout, failure audit input, no output_summary, and no settings file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_risk_settings_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "670 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+binance_credentials_harness_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_binance_btc.py
+  implementation:
+    - tests-only slice; harness save_binance_credentials control-character credentials_path failures now assert raw malformed path fragments stay out of stderr
+    - credential path failures continue to assert no stdout, redacted secret inputs, redacted credential path audit input, no output_summary, and no credential file creation
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_credentials_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "670 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+readiness_harness_risk_settings_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - tests-only slice; harness get_integration_readiness control-character btc_risk_settings_path failures now assert raw malformed path fragments stay out of stderr
+    - harness failure audit preserves btc_risk_settings_path error evidence while redacting binance_credentials_path input
+    - BTC risk settings path failures create no malformed risk settings path and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_risk_settings_path_control_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "670 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+readiness_harness_hermes_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - tests-only slice; harness get_integration_readiness control-character hermes_config_path failures now assert raw malformed path fragments stay out of stderr
+    - harness failure audit preserves hermes_config_path error evidence while redacting binance_credentials_path input
+    - Hermes path failures create no malformed Hermes config path and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_hermes_path_control_character_without_fallback -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "669 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+readiness_harness_credential_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+  implementation:
+    - tests-only slice; harness get_integration_readiness control-character binance_credentials_path failures now assert raw malformed path fragments stay out of stderr
+    - readiness credential path failures continue to assert no stdout, redacted failure audit input, no output_summary, and no requested or malformed credential files
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "668 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_web_endpoint_env_path_response_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; audit web events endpoint rejects environment-backed control-character audit paths with JSON 400 before audit reads
+    - audit web summary endpoint rejects environment-backed control-character audit paths with JSON 400 before audit reads
+    - endpoint responses do not expose malformed path fragments and do not create malformed audit paths or default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_env_audit_path tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_path -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "668 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_web_main_env_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; audit web main environment-backed control-character audit path failures now assert raw malformed path fragments stay out of stderr
+    - environment-backed invalid path coverage continues to assert exit code 2 before server construction and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_env_audit_log_path_without_server -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "668 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_web_main_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; audit web main control-character --audit-log-path failures now assert raw malformed path fragments stay out of stderr
+    - audit web main invalid path coverage continues to assert exit code 2 before server construction
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_audit_log_path_without_server -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "668 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_summary_harness_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; harness get_audit_summary control-character audit_log_path failures now assert raw malformed path fragments stay out of stderr
+    - summary path failures continue to assert no stdout and failure audit events without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_audit_summary_path_control_character_with_failure_audit -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "668 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+audit_harness_control_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_audit.py
+  implementation:
+    - tests-only slice; harness get_audit_log control-character audit_log_path failures now assert raw malformed path fragments stay out of stderr
+    - harness get_audit_log control-character resource_id filter failures now assert raw malformed filter fragments stay out of stderr
+    - audit control-character failures continue to assert no stdout and failure audit events without output_summary
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_audit_log_path_control_character_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_filter_control_character_with_failure_audit -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "667 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
+runtime_checkpoint_dependency_path_stderr_redaction:
+  status: verified
+  changed_files:
+    - docs/WORKING.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_runtime_guard.py
+  implementation:
+    - tests-only slice; harness record_runtime_checkpoint control-character audit_log_path failures now assert raw malformed paths stay out of stderr
+    - harness record_runtime_checkpoint control-character ledger_path failures now assert raw malformed paths stay out of stderr
+    - checkpoint dependency path failures continue to assert no stdout, no checkpoint file, no malformed dependency path file, and no default state fallback
+    - the slice adds no scheduler, Telegram send, Hermes runtime call, live data adapter, Binance network call, migration, repository persistence, live trading, or order submission
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_control_character_without_checkpoint tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "667 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+  blocked_scope_unchanged:
+    - scheduler
+    - Telegram send
+    - Hermes runtime call
+    - live data adapter
+    - Binance network call
+    - migration or repository persistence
+    - live trading
+    - order submission
+
 runtime_harness_control_path_no_fallback:
   status: verified
   changed_files:

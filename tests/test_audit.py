@@ -351,6 +351,9 @@ def test_harness_rejects_invalid_audit_log_limit_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "limit must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert '"limit": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_audit_log"
     assert event["outcome"] == "failure"
@@ -386,8 +389,46 @@ def test_harness_rejects_invalid_audit_log_path_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert '"audit_log_path":' not in result.stderr
+    assert '"limit": 5' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_audit_log"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "audit_log_path must be a nonempty string" in event["details"]["error"]
+
+
+def test_harness_rejects_invalid_audit_summary_path_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"audit_log_path": "   "}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_audit_summary",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "audit_log_path must be a nonempty string" in result.stderr
+    assert '"audit_log_path":' not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "get_audit_summary"
     assert event["outcome"] == "failure"
     assert event["details"]["input"] == input_payload
     assert "output_summary" not in event["details"]
@@ -421,6 +462,9 @@ def test_harness_rejects_audit_log_path_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
+    assert str(tmp_path / "events.jsonl") not in result.stderr
+    assert "events.jsonl" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_audit_log"
     assert event["outcome"] == "failure"
@@ -429,6 +473,7 @@ def test_harness_rejects_audit_log_path_control_character_with_failure_audit(
     assert "audit_log_path must not contain control characters" in event["details"][
         "error"
     ]
+    assert not (tmp_path / "events.jsonl").exists()
 
 
 def test_harness_rejects_audit_log_filter_control_character_with_failure_audit(
@@ -462,6 +507,8 @@ def test_harness_rejects_audit_log_filter_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "resource_id must not contain control characters" in result.stderr
+    assert "health_check" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_audit_log"
     assert event["outcome"] == "failure"
@@ -470,6 +517,47 @@ def test_harness_rejects_audit_log_filter_control_character_with_failure_audit(
     assert "resource_id must not contain control characters" in event["details"][
         "error"
     ]
+
+
+def test_harness_rejects_audit_summary_path_control_character_with_failure_audit(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    input_payload = {"audit_log_path": f"{tmp_path / 'summary.jsonl'}\n"}
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_audit_summary",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "audit_log_path must not contain control characters" in result.stderr
+    assert str(tmp_path / "summary.jsonl") not in result.stderr
+    assert "summary.jsonl" not in result.stderr
+    assert "\\n" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "get_audit_summary"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "audit_log_path must not contain control characters" in event["details"][
+        "error"
+    ]
+    assert not (tmp_path / "summary.jsonl").exists()
 
 
 def test_harness_writes_audit_event(tmp_path: Path) -> None:
@@ -1042,6 +1130,11 @@ def test_audit_web_main_rejects_invalid_audit_log_path_without_server(
 
         assert result == 2
         assert expected_error in captured.err
+        if "\x7f" in audit_log_path:
+            assert "bad" not in captured.err
+            assert "audit.jsonl" not in captured.err
+            assert "\x7f" not in captured.err
+            assert not Path(audit_log_path).exists()
 
 
 def test_audit_web_main_rejects_invalid_env_audit_log_path_without_server(
@@ -1050,7 +1143,6 @@ def test_audit_web_main_rejects_invalid_env_audit_log_path_without_server(
     capsys,
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", "   ")
 
     def fail_server(*_args: object, **_kwargs: object) -> None:
         raise AssertionError("server must not bind with an invalid audit log path")
@@ -1060,13 +1152,27 @@ def test_audit_web_main_rejects_invalid_env_audit_log_path_without_server(
         fail_server,
     )
 
-    result = audit_web.main(["--host", "127.0.0.1", "--port", "8765"])
-    captured = capsys.readouterr()
+    for env_value, expected_error in (
+        ("   ", "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"),
+        (
+            str(tmp_path / "bad\x7faudit.jsonl"),
+            "HALO_SWING_AUDIT_LOG_PATH must not contain control characters",
+        ),
+    ):
+        monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", env_value)
+        result = audit_web.main(["--host", "127.0.0.1", "--port", "8765"])
+        captured = capsys.readouterr()
 
-    assert result == 2
-    assert "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string" in captured.err
-    assert not (tmp_path / "state").exists()
-    assert not (tmp_path / "   ").exists()
+        assert result == 2
+        assert expected_error in captured.err
+        assert not (tmp_path / "state").exists()
+        assert not (tmp_path / "   ").exists()
+        if "\x7f" in env_value:
+            assert str(tmp_path / "bad\x7faudit.jsonl") not in captured.err
+            assert "bad" not in captured.err
+            assert "audit.jsonl" not in captured.err
+            assert "\x7f" not in captured.err
+            assert not (tmp_path / "bad\x7faudit.jsonl").exists()
 
 
 def test_audit_web_events_payload_normalizes_query_inputs(tmp_path: Path) -> None:
@@ -1217,18 +1323,32 @@ def test_audit_web_events_endpoint_returns_bad_request_for_invalid_env_audit_pat
     monkeypatch,
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", "   ")
-    response_payload = _audit_web_get(
-        None,
-        "/api/events?limit=10",
-        expected_status="HTTP/1.0 400 Bad Request",
-    )
+    invalid_cases = [
+        ("   ", "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"),
+        (
+            str(tmp_path / "bad\x7faudit.jsonl"),
+            "HALO_SWING_AUDIT_LOG_PATH must not contain control characters",
+        ),
+    ]
 
-    assert response_payload == {
-        "error": "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"
-    }
-    assert not (tmp_path / "state").exists()
-    assert not (tmp_path / "   ").exists()
+    for env_value, expected_error in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", env_value)
+        response_payload = _audit_web_get(
+            None,
+            "/api/events?limit=10",
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+        serialized_response = json.dumps(response_payload, sort_keys=True)
+
+        assert response_payload == {"error": expected_error}
+        assert not (tmp_path / "state").exists()
+        assert not (tmp_path / "   ").exists()
+        if "\x7f" in env_value:
+            assert str(tmp_path / "bad\x7faudit.jsonl") not in serialized_response
+            assert "bad" not in serialized_response
+            assert "audit.jsonl" not in serialized_response
+            assert "\x7f" not in serialized_response
+            assert not (tmp_path / "bad\x7faudit.jsonl").exists()
 
 
 def test_audit_web_summary_endpoint_returns_bad_request_for_invalid_audit_log_path(
@@ -1252,18 +1372,32 @@ def test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_pa
     monkeypatch,
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", "   ")
-    response_payload = _audit_web_get(
-        None,
-        "/api/summary",
-        expected_status="HTTP/1.0 400 Bad Request",
-    )
+    invalid_cases = [
+        ("   ", "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"),
+        (
+            str(tmp_path / "bad\x7faudit.jsonl"),
+            "HALO_SWING_AUDIT_LOG_PATH must not contain control characters",
+        ),
+    ]
 
-    assert response_payload == {
-        "error": "HALO_SWING_AUDIT_LOG_PATH must be a nonempty string"
-    }
-    assert not (tmp_path / "state").exists()
-    assert not (tmp_path / "   ").exists()
+    for env_value, expected_error in invalid_cases:
+        monkeypatch.setenv("HALO_SWING_AUDIT_LOG_PATH", env_value)
+        response_payload = _audit_web_get(
+            None,
+            "/api/summary",
+            expected_status="HTTP/1.0 400 Bad Request",
+        )
+        serialized_response = json.dumps(response_payload, sort_keys=True)
+
+        assert response_payload == {"error": expected_error}
+        assert not (tmp_path / "state").exists()
+        assert not (tmp_path / "   ").exists()
+        if "\x7f" in env_value:
+            assert str(tmp_path / "bad\x7faudit.jsonl") not in serialized_response
+            assert "bad" not in serialized_response
+            assert "audit.jsonl" not in serialized_response
+            assert "\x7f" not in serialized_response
+            assert not (tmp_path / "bad\x7faudit.jsonl").exists()
 
 
 def _audit_web_get(

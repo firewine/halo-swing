@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -893,6 +894,7 @@ def test_harness_rejects_invalid_readiness_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "migration_go_approved must be a boolean" in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_integration_readiness"
     assert event["outcome"] == "failure"
@@ -930,6 +932,9 @@ def test_harness_rejects_readiness_path_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "binance_credentials_path must not contain control characters" in result.stderr
+    assert str(credentials_path) not in result.stderr
+    assert "credentials.enc.json" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_integration_readiness"
     assert event["outcome"] == "failure"
@@ -943,6 +948,109 @@ def test_harness_rejects_readiness_path_control_character_with_failure_audit(
     assert invalid_credentials_path not in serialized_event
     assert not credentials_path.exists()
     assert not Path(invalid_credentials_path).exists()
+
+
+def test_harness_rejects_readiness_hermes_path_control_character_without_fallback(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    hermes_config_path = tmp_path / "hermes.yaml"
+    invalid_hermes_config_path = f"{hermes_config_path}\n"
+    input_payload = {
+        "hermes_config_path": invalid_hermes_config_path,
+        "binance_credentials_path": str(tmp_path / "missing.enc.json"),
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_integration_readiness",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "hermes_config_path must not contain control characters" in result.stderr
+    assert str(hermes_config_path) not in result.stderr
+    assert "hermes.yaml" not in result.stderr
+    assert "\\n" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "get_integration_readiness"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"]["hermes_config_path"] == invalid_hermes_config_path
+    assert event["details"]["input"]["binance_credentials_path"] == "[REDACTED]"
+    assert "output_summary" not in event["details"]
+    assert "hermes_config_path must not contain control characters" in event[
+        "details"
+    ]["error"]
+    assert not hermes_config_path.exists()
+    assert not Path(invalid_hermes_config_path).exists()
+    assert not (tmp_path / "state").exists()
+
+
+def test_harness_rejects_readiness_risk_settings_path_control_without_fallback(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    risk_settings_path = tmp_path / "risk_settings.json"
+    invalid_risk_settings_path = f"{risk_settings_path}\n"
+    input_payload = {
+        "binance_credentials_path": str(tmp_path / "missing.enc.json"),
+        "btc_risk_settings_path": invalid_risk_settings_path,
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_integration_readiness",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "btc_risk_settings_path must not contain control characters" in result.stderr
+    assert str(risk_settings_path) not in result.stderr
+    assert "risk_settings.json" not in result.stderr
+    assert "\\n" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "get_integration_readiness"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"]["binance_credentials_path"] == "[REDACTED]"
+    assert (
+        event["details"]["input"]["btc_risk_settings_path"]
+        == invalid_risk_settings_path
+    )
+    assert "output_summary" not in event["details"]
+    assert "btc_risk_settings_path must not contain control characters" in event[
+        "details"
+    ]["error"]
+    assert not risk_settings_path.exists()
+    assert not Path(invalid_risk_settings_path).exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_hermes_readiness_requires_config_path_and_registration(tmp_path: Path) -> None:

@@ -316,6 +316,7 @@ def test_runtime_status_rejects_path_control_character_inputs(
 def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(
     tmp_path: Path,
 ) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
     input_payload = {
@@ -335,7 +336,8 @@ def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(
             str(audit_path),
         ],
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
         text=True,
         capture_output=True,
     )
@@ -345,6 +347,11 @@ def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "apply_retention must be a boolean" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -352,6 +359,7 @@ def test_harness_rejects_invalid_runtime_status_input_with_failure_audit(
     assert "output_summary" not in event["details"]
     assert "apply_retention must be a boolean" in event["details"]["error"]
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_status_apply_retention_type_without_fallback(
@@ -388,6 +396,11 @@ def test_harness_rejects_runtime_status_apply_retention_type_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "apply_retention must be a boolean" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -432,6 +445,11 @@ def test_harness_rejects_runtime_status_apply_retention_numeric_without_fallback
     assert result.returncode != 0
     assert result.stdout == ""
     assert "apply_retention must be a boolean" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"apply_retention": 1' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -476,6 +494,11 @@ def test_harness_rejects_runtime_status_apply_retention_zero_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "apply_retention must be a boolean" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"apply_retention": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -520,6 +543,11 @@ def test_harness_rejects_runtime_status_apply_retention_null_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "apply_retention must be a boolean" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"apply_retention": null' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -564,6 +592,11 @@ def test_harness_rejects_runtime_status_max_records_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_records must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_records": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -608,6 +641,11 @@ def test_harness_rejects_runtime_status_max_records_type_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_records must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_records": "2"' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -652,6 +690,11 @@ def test_harness_rejects_runtime_status_max_records_boolean_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_records must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_records": true' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -696,6 +739,11 @@ def test_harness_rejects_runtime_status_max_bytes_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_bytes must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_bytes": false' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -740,6 +788,11 @@ def test_harness_rejects_runtime_status_max_bytes_nonpositive_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_bytes must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_bytes": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -784,6 +837,11 @@ def test_harness_rejects_runtime_status_max_bytes_type_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_bytes must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_bytes": "10000"' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -828,6 +886,11 @@ def test_harness_rejects_runtime_status_max_bytes_boolean_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "max_bytes must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"max_bytes": true' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -872,6 +935,11 @@ def test_harness_rejects_runtime_status_failure_window_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_window must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_window": "5"' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -916,6 +984,11 @@ def test_harness_rejects_runtime_status_failure_window_nonpositive_without_fallb
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_window must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_window": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -960,6 +1033,11 @@ def test_harness_rejects_runtime_status_failure_window_boolean_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_window must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_window": true' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1004,6 +1082,11 @@ def test_harness_rejects_runtime_status_failure_threshold_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_threshold must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_threshold": -1' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1048,6 +1131,11 @@ def test_harness_rejects_runtime_status_failure_threshold_type_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_threshold must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_threshold": "3"' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1092,6 +1180,11 @@ def test_harness_rejects_runtime_status_failure_threshold_boolean_without_fallba
     assert result.returncode != 0
     assert result.stdout == ""
     assert "failure_threshold must be a positive integer" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"failure_threshold": true' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1105,6 +1198,7 @@ def test_harness_rejects_runtime_status_failure_threshold_boolean_without_fallba
 def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
     tmp_path: Path,
 ) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
     input_payload = {
@@ -1123,7 +1217,8 @@ def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
             str(audit_path),
         ],
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
         text=True,
         capture_output=True,
     )
@@ -1133,6 +1228,11 @@ def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"audit_log_path": "   "' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1140,6 +1240,7 @@ def test_harness_rejects_invalid_runtime_path_input_with_failure_audit(
     assert "output_summary" not in event["details"]
     assert "audit_log_path must be a nonempty string" in event["details"]["error"]
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_invalid_runtime_status_audit_path_without_fallback(
@@ -1175,6 +1276,11 @@ def test_harness_rejects_invalid_runtime_status_audit_path_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"audit_log_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1182,6 +1288,7 @@ def test_harness_rejects_invalid_runtime_status_audit_path_without_fallback(
     assert "output_summary" not in event["details"]
     assert "audit_log_path must be a nonempty string" in event["details"]["error"]
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
     assert not (tmp_path / "state").exists()
     assert not (tmp_path / "   ").exists()
 
@@ -1219,6 +1326,11 @@ def test_harness_rejects_runtime_status_audit_path_type_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"audit_log_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1226,6 +1338,7 @@ def test_harness_rejects_runtime_status_audit_path_type_with_failure_audit(
     assert "output_summary" not in event["details"]
     assert "audit_log_path must be a nonempty string" in event["details"]["error"]
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_status_ledger_path_type_with_failure_audit(
@@ -1260,6 +1373,9 @@ def test_harness_rejects_runtime_status_ledger_path_type_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert '"ledger_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1301,6 +1417,9 @@ def test_harness_rejects_invalid_runtime_status_ledger_path_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert '"ledger_path": "   "' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
     assert event["outcome"] == "failure"
@@ -1314,6 +1433,7 @@ def test_harness_rejects_invalid_runtime_status_ledger_path_with_failure_audit(
 def test_harness_rejects_runtime_path_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
     invalid_audit_path = f"{audit_path}\n"
@@ -1333,7 +1453,8 @@ def test_harness_rejects_runtime_path_control_character_with_failure_audit(
             str(audit_path),
         ],
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
         text=True,
         capture_output=True,
     )
@@ -1343,7 +1464,11 @@ def test_harness_rejects_runtime_path_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
     assert invalid_audit_path not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
     assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
@@ -1354,6 +1479,7 @@ def test_harness_rejects_runtime_path_control_character_with_failure_audit(
         "error"
     ]
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_status_audit_path_control_character_without_fallback(
@@ -1391,7 +1517,9 @@ def test_harness_rejects_runtime_status_audit_path_control_character_without_fal
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
     assert str(malformed_audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
     assert "bad" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
     assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
@@ -1439,8 +1567,11 @@ def test_harness_rejects_runtime_status_ledger_path_control_character_without_fa
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must not contain control characters" in result.stderr
+    assert str(audit_path) not in result.stderr
     assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
     assert "bad" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
     assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "get_runtime_status"
@@ -1739,6 +1870,7 @@ def test_runtime_checkpoint_rejects_env_checkpoint_path_without_fallback(
 def test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit(
     tmp_path: Path,
 ) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
     checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
@@ -1760,7 +1892,8 @@ def test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit(
             str(audit_path),
         ],
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
         text=True,
         capture_output=True,
     )
@@ -1770,6 +1903,12 @@ def test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "include_readiness must be a boolean" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -1778,6 +1917,7 @@ def test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit(
     assert "include_readiness must be a boolean" in event["details"]["error"]
     assert not checkpoint_path.exists()
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_harness_rejects_runtime_checkpoint_include_readiness_numeric_without_checkpoint(
@@ -1816,6 +1956,13 @@ def test_harness_rejects_runtime_checkpoint_include_readiness_numeric_without_ch
     assert result.returncode != 0
     assert result.stdout == ""
     assert "include_readiness must be a boolean" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"include_readiness": 1' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -1863,6 +2010,13 @@ def test_harness_rejects_runtime_checkpoint_include_readiness_zero_without_check
     assert result.returncode != 0
     assert result.stdout == ""
     assert "include_readiness must be a boolean" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"include_readiness": 0' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -1910,6 +2064,13 @@ def test_harness_rejects_runtime_checkpoint_include_readiness_null_without_check
     assert result.returncode != 0
     assert result.stdout == ""
     assert "include_readiness must be a boolean" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"include_readiness": null' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -1958,6 +2119,13 @@ def test_harness_rejects_invalid_runtime_checkpoint_run_id_without_checkpoint(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "run_id must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"run_id": "   "' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2006,6 +2174,13 @@ def test_harness_rejects_runtime_checkpoint_run_id_type_without_checkpoint(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "run_id must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"run_id": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2054,6 +2229,16 @@ def test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "run_id must not contain control characters" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "run\x7fruntime" not in result.stderr
+    assert "\x7f" not in result.stderr
+    assert "\\x7f" not in result.stderr
+    assert "run\\u007fruntime" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2100,6 +2285,11 @@ def test_harness_rejects_invalid_runtime_checkpoint_path_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "checkpoint_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"checkpoint_path": ""' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2145,6 +2335,11 @@ def test_harness_rejects_runtime_checkpoint_path_type_without_fallback(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "checkpoint_path must be a nonempty string" in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"checkpoint_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2192,8 +2387,14 @@ def test_harness_rejects_runtime_checkpoint_path_control_character_without_fallb
     assert result.stdout == ""
     assert "checkpoint_path must not contain control characters" in result.stderr
     assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
     assert "bad" not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
     assert "\\x7f" not in result.stderr
+    assert "bad\\u007fruntime_checkpoints.jsonl" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2243,6 +2444,13 @@ def test_harness_rejects_invalid_runtime_checkpoint_audit_path_without_checkpoin
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"audit_log_path": "   "' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2290,6 +2498,13 @@ def test_harness_rejects_runtime_checkpoint_audit_path_type_without_checkpoint(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert '"audit_log_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2338,6 +2553,16 @@ def test_harness_rejects_runtime_checkpoint_audit_path_control_character_without
     assert result.returncode != 0
     assert result.stdout == ""
     assert "audit_log_path must not contain control characters" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(failure_audit_path) not in result.stderr
+    assert str(runtime_audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\x7f" not in result.stderr
+    assert "\\u007f" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2387,6 +2612,11 @@ def test_harness_rejects_invalid_runtime_checkpoint_ledger_path_without_checkpoi
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert '"ledger_path": "   "' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2433,6 +2663,11 @@ def test_harness_rejects_runtime_checkpoint_ledger_path_type_without_checkpoint(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must be a nonempty string" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert '"ledger_path": 123' not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2479,6 +2714,15 @@ def test_harness_rejects_runtime_checkpoint_ledger_path_control_character_withou
     assert result.returncode != 0
     assert result.stdout == ""
     assert "ledger_path must not contain control characters" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "ledger.jsonl" not in result.stderr
+    assert "bad" not in result.stderr
+    assert "\\x7f" not in result.stderr
+    assert "\\u007f" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2495,6 +2739,7 @@ def test_harness_rejects_runtime_checkpoint_ledger_path_control_character_withou
 def test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit(
     tmp_path: Path,
 ) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
     checkpoint_path = tmp_path / "runtime_checkpoints.jsonl"
     audit_path = tmp_path / "audit.jsonl"
     ledger_path = tmp_path / "signal_ledger.jsonl"
@@ -2517,7 +2762,8 @@ def test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit
             str(audit_path),
         ],
         check=False,
-        cwd=Path(__file__).resolve().parents[1],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(repo_root / "src")},
         text=True,
         capture_output=True,
     )
@@ -2527,6 +2773,14 @@ def test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit
     assert result.returncode != 0
     assert result.stdout == ""
     assert "run_id must not contain control characters" in result.stderr
+    assert str(checkpoint_path) not in result.stderr
+    assert str(audit_path) not in result.stderr
+    assert str(ledger_path) not in result.stderr
+    assert "runtime_checkpoints.jsonl" not in result.stderr
+    assert "audit.jsonl" not in result.stderr
+    assert "signal_ledger.jsonl" not in result.stderr
+    assert "run_runtime" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "record_runtime_checkpoint"
     assert event["outcome"] == "failure"
@@ -2535,6 +2789,7 @@ def test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit
     assert "run_id must not contain control characters" in event["details"]["error"]
     assert not checkpoint_path.exists()
     assert not ledger_path.exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets(

@@ -1,6 +1,7 @@
 import json
 import hashlib
 import hmac
+import os
 import subprocess
 import sys
 from io import BytesIO
@@ -480,6 +481,8 @@ def test_harness_rejects_invalid_btc_order_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "reduce_only must be a boolean" in result.stderr
+    assert "BUY" not in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "preview_btc_order"
     assert event["outcome"] == "failure"
@@ -515,6 +518,8 @@ def test_harness_rejects_btc_order_text_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "side must not contain control characters" in result.stderr
+    assert "BUY" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "preview_btc_order"
     assert event["outcome"] == "failure"
@@ -979,6 +984,10 @@ def test_harness_rejects_invalid_save_credentials_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "api_key must be a nonempty string" in result.stderr
+    assert "super-secret" not in result.stderr
+    assert "local-passphrase" not in result.stderr
+    assert str(credentials_path) not in result.stderr
+    assert "binance_credentials.enc.json" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "save_binance_credentials"
     assert event["outcome"] == "failure"
@@ -1028,6 +1037,10 @@ def test_harness_rejects_secret_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "api_key must not contain control characters" in result.stderr
+    assert "abcde12345key" not in result.stderr
+    assert "super-secret" not in result.stderr
+    assert "local-passphrase" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "save_binance_credentials"
     assert event["outcome"] == "failure"
@@ -1078,6 +1091,9 @@ def test_harness_rejects_credentials_path_control_character_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "credentials_path must not contain control characters" in result.stderr
+    assert str(credentials_path) not in result.stderr
+    assert "binance_credentials.enc.json" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "save_binance_credentials"
     assert event["outcome"] == "failure"
@@ -1376,6 +1392,7 @@ def test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "balance must be a list of objects" in result.stderr
+    assert "BTC" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "normalize_binance_coinm_account_snapshot"
     assert event["outcome"] == "failure"
@@ -1411,6 +1428,8 @@ def test_harness_rejects_portfolio_snapshot_text_control_character_with_failure_
     assert result.returncode != 0
     assert result.stdout == ""
     assert "balance.asset must not contain control characters" in result.stderr
+    assert "BTC" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "normalize_binance_coinm_account_snapshot"
     assert event["outcome"] == "failure"
@@ -1803,6 +1822,9 @@ def test_harness_rejects_invalid_risk_settings_input_with_failure_audit(
     assert result.returncode != 0
     assert result.stdout == ""
     assert "emergency_kill_switch_enabled must be a boolean" in result.stderr
+    assert str(settings_path) not in result.stderr
+    assert "risk_settings.json" not in result.stderr
+    assert "false" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "update_btc_risk_settings"
     assert event["outcome"] == "failure"
@@ -1846,6 +1868,9 @@ def test_harness_rejects_risk_settings_path_control_character_with_failure_audit
     assert result.returncode != 0
     assert result.stdout == ""
     assert "settings_path must not contain control characters" in result.stderr
+    assert str(settings_path) not in result.stderr
+    assert "risk_settings.json" not in result.stderr
+    assert "\\n" not in result.stderr
     assert event["actor"] == "harness"
     assert event["resource_id"] == "update_btc_risk_settings"
     assert event["outcome"] == "failure"
@@ -1855,6 +1880,55 @@ def test_harness_rejects_risk_settings_path_control_character_with_failure_audit
         "error"
     ]
     assert not settings_path.exists()
+
+
+def test_harness_rejects_daily_risk_state_path_control_without_fallback(
+    tmp_path: Path,
+) -> None:
+    audit_path = tmp_path / "audit.jsonl"
+    state_path = tmp_path / "risk_state.json"
+    input_payload = {
+        "state_path": f"{state_path}\n",
+        "daily_realized_loss_usd": 0,
+        "daily_order_count": 0,
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "reset_btc_daily_risk_state",
+            "--input-json",
+            json.dumps(input_payload),
+            "--audit-log-path",
+            str(audit_path),
+        ],
+        check=False,
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(ROOT / "src")},
+        text=True,
+        capture_output=True,
+    )
+    events = read_audit_events(audit_log_path=str(audit_path))
+    event = events[0]
+
+    assert result.returncode != 0
+    assert result.stdout == ""
+    assert "state_path must not contain control characters" in result.stderr
+    assert str(state_path) not in result.stderr
+    assert "risk_state.json" not in result.stderr
+    assert "\\n" not in result.stderr
+    assert event["actor"] == "harness"
+    assert event["resource_id"] == "reset_btc_daily_risk_state"
+    assert event["outcome"] == "failure"
+    assert event["details"]["input"] == input_payload
+    assert "output_summary" not in event["details"]
+    assert "state_path must not contain control characters" in event["details"][
+        "error"
+    ]
+    assert not state_path.exists()
+    assert not Path(input_payload["state_path"]).exists()
+    assert not (tmp_path / "state").exists()
 
 
 def test_trading_admin_risk_settings_endpoint_normalizes_form_inputs(

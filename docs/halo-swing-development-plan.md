@@ -9302,6 +9302,3568 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.617 Runtime Checkpoint Invalid Input Failure-Audit No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness failure-audit coverage already rejected
+invalid `include_readiness` values, recorded a failure audit event without
+`output_summary`, avoided checkpoint and ledger creation, and redacted submitted
+path and payload fragments from stderr. This slice aligns the older smoke test
+with the isolated-cwd harness pattern and locks the no-default-state fallback
+behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint invalid include_readiness failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+  - invalid include_readiness failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no checkpoint or ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - stop_guard.py -> passed
+```
+
+## 3.616 Runtime Status Audit Path Control Failure-Audit No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness failure-audit coverage already rejected
+control-character `audit_log_path` values, recorded a failure audit event
+without `output_summary`, avoided ledger creation, and redacted submitted path
+fragments from stderr. This slice aligns the older smoke test with the
+isolated-cwd harness pattern and locks the no-default-state fallback behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status control-character audit_log_path failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+  - control-character audit_log_path failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - stop_guard.py -> passed
+```
+
+## 3.615 Runtime Status Audit Path Blank Failure-Audit No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness failure-audit coverage already rejected blank
+`audit_log_path` values, recorded a failure audit event without
+`output_summary`, avoided ledger creation, and redacted submitted path fragments
+from stderr. This slice aligns the older smoke test with the isolated-cwd
+harness pattern and locks the no-default-state fallback behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status blank audit_log_path failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+  - blank audit_log_path failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_path_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - stop_guard.py -> passed
+```
+
+## 3.614 Runtime Status Invalid Input Failure-Audit No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness failure-audit coverage already rejected invalid
+`apply_retention` values, recorded a failure audit event without
+`output_summary`, avoided ledger creation, and redacted submitted path and
+payload fragments from stderr. This slice aligns the smoke test with the
+isolated-cwd harness pattern and locks the no-default-state fallback behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status invalid apply_retention failure-audit coverage now runs from an isolated tmp_path cwd with explicit PYTHONPATH
+  - invalid apply_retention failure-audit coverage now asserts no default state fallback while preserving no stdout, redacted stderr, failure audit input, no output_summary, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.613 Runtime Status Ledger Path Control No-Fallback Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected
+control-character `ledger_path` inputs, recorded a failure audit event without
+`output_summary`, avoided malformed ledger creation, and redacted path
+fragments from stderr. This slice locks the no-default-state fallback behavior
+in the same focused case.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status control-character ledger_path failures now assert no default state fallback
+  - control-character ledger_path coverage continues to assert no stdout, redacted stderr, failure audit input, no output_summary, and no malformed ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.612 Runtime Status Audit Path Control Failure-Audit Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness failure-audit coverage already rejected
+control-character `audit_log_path` inputs, recorded a failure audit event
+without `output_summary`, and avoided ledger creation. This slice strengthens
+stderr coverage in that smoke path so harness audit path, ledger path, raw
+`audit_log_path`, and escaped control-character fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status control-character audit_log_path failure-audit coverage now asserts harness audit path, ledger path, raw audit_log_path, and escaped control-character fragments stay out of stderr
+  - control-character audit_log_path failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.611 Runtime Status Audit Path Type Failure-Audit Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness failure-audit coverage already rejected non-string
+`audit_log_path` inputs, recorded a failure audit event without
+`output_summary`, and avoided ledger creation. This slice strengthens stderr
+coverage in that path so harness audit path, ledger path, and serialized
+`audit_log_path` fragments are not printed on harness failure, while also
+locking the no-default-state fallback behavior.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status non-string audit_log_path failure-audit coverage now asserts harness audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+  - non-string audit_log_path failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, no ledger creation, and now asserts no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_type_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.610 Runtime Checkpoint Run ID Newline Failure-Audit Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness failure-audit coverage already rejected a
+newline `run_id`, recorded a failure audit event without `output_summary`,
+avoided checkpoint creation, and avoided ledger creation. This slice
+strengthens stderr coverage in that smoke path so submitted checkpoint path,
+audit path, ledger path, and escaped newline `run_id` fragments are not printed
+on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint newline run_id failure-audit coverage now asserts submitted checkpoint path, audit path, ledger path, and escaped run_id fragments stay out of stderr
+  - newline run_id failure-audit coverage continues to assert no stdout, failure audit input, no output_summary, no checkpoint creation, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.609 Runtime Checkpoint Ledger Path Control Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+control-character `ledger_path` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided malformed ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, harness audit
+path, ledger path, and escaped `ledger_path` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character ledger_path failures now assert submitted checkpoint path, harness audit path, ledger path, and escaped ledger_path fragments stay out of stderr
+  - isolated runtime checkpoint control-character ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no malformed ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.608 Runtime Checkpoint Ledger Path Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+non-string `ledger_path` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, and avoided default `state/`
+fallback. This slice strengthens stderr coverage in that isolated path so
+submitted checkpoint path, harness audit path, and serialized `ledger_path`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string ledger_path failures now assert submitted checkpoint path, harness audit path, and serialized ledger_path fragments stay out of stderr
+  - isolated runtime checkpoint non-string ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_type_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.607 Runtime Checkpoint Ledger Path Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected blank
+`ledger_path` inputs, recorded a failure audit event without `output_summary`,
+avoided checkpoint creation, avoided malformed ledger creation, and avoided
+default `state/` fallback. This slice strengthens stderr coverage in that
+isolated path so submitted checkpoint path, harness audit path, and serialized
+blank `ledger_path` fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint blank ledger_path failures now assert submitted checkpoint path, harness audit path, and serialized ledger_path fragments stay out of stderr
+  - isolated runtime checkpoint blank ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no malformed ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_ledger_path_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.606 Runtime Checkpoint Audit Path Control Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+control-character `audit_log_path` inputs, recorded a failure audit event
+without `output_summary`, avoided malformed audit creation, avoided checkpoint
+creation, avoided requested ledger creation, and avoided default `state/`
+fallback. This slice strengthens stderr coverage in that isolated path so
+submitted checkpoint path, harness audit path, ledger path, and escaped
+control-character `audit_log_path` fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character audit_log_path failures now assert submitted checkpoint path, harness audit path, ledger path, and escaped audit_log_path fragments stay out of stderr
+  - isolated runtime checkpoint control-character audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no malformed audit creation, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_control_character_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.605 Runtime Checkpoint Audit Path Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+non-string `audit_log_path` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, harness audit
+path, ledger path, and serialized `audit_log_path` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string audit_log_path failures now assert submitted checkpoint path, harness audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+  - isolated runtime checkpoint non-string audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_type_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.604 Runtime Checkpoint Audit Path Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected blank
+`audit_log_path` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, harness audit
+path, ledger path, and serialized blank `audit_log_path` fragments are not
+printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint blank audit_log_path failures now assert submitted checkpoint path, harness audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+  - isolated runtime checkpoint blank audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_audit_path_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.603 Runtime Checkpoint Path Control Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+control-character `checkpoint_path` inputs, recorded a failure audit event
+without `output_summary`, avoided malformed checkpoint creation, avoided
+requested ledger creation, and avoided default `state/` fallback. This slice
+strengthens stderr coverage in that isolated path so submitted checkpoint path,
+audit path, ledger path, raw malformed path fragments, and escaped malformed
+path fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character checkpoint_path failures now assert submitted checkpoint path, audit path, ledger path, raw path fragments, and escaped path fragments stay out of stderr
+  - isolated runtime checkpoint control-character checkpoint_path failures continue to assert no stdout, failure audit input, no output_summary, no malformed checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.602 Runtime Checkpoint Path Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+non-string `checkpoint_path` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `checkpoint_path`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string checkpoint_path failures now assert submitted audit path, ledger path, and serialized checkpoint_path fragments stay out of stderr
+  - isolated runtime checkpoint non-string checkpoint_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_path_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.601 Runtime Checkpoint Path Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected blank
+`checkpoint_path` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized blank `checkpoint_path`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint blank checkpoint_path failures now assert submitted audit path, ledger path, and serialized checkpoint_path fragments stay out of stderr
+  - isolated runtime checkpoint blank checkpoint_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_path_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.600 Runtime Checkpoint Run Id Control Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+control-character `run_id` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, audit path, ledger
+path, raw control-character `run_id`, and escaped `run_id` fragments are not
+printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint control-character run_id failures now assert submitted checkpoint path, audit path, ledger path, raw run_id fragments, and escaped run_id fragments stay out of stderr
+  - isolated runtime checkpoint control-character run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.599 Runtime Checkpoint Run Id Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+non-string `run_id` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, audit path, ledger
+path, and serialized `run_id` fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint non-string run_id failures now assert submitted checkpoint path, audit path, ledger path, and serialized run_id fragments stay out of stderr
+  - isolated runtime checkpoint non-string run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_run_id_type_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.598 Runtime Checkpoint Run Id Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected blank
+`run_id` inputs, recorded a failure audit event without `output_summary`,
+avoided checkpoint creation, avoided requested ledger creation, and avoided
+default `state/` fallback. This slice strengthens stderr coverage in that
+isolated path so submitted checkpoint path, audit path, ledger path, and
+serialized blank `run_id` fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint blank run_id failures now assert submitted checkpoint path, audit path, ledger path, and serialized run_id fragments stay out of stderr
+  - isolated runtime checkpoint blank run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_run_id_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.597 Runtime Checkpoint Include Readiness Null Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected null
+`include_readiness` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, audit path, ledger
+path, and serialized `include_readiness` fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint null include_readiness failures now assert submitted checkpoint path, audit path, ledger path, and serialized include_readiness fragments stay out of stderr
+  - isolated runtime checkpoint null include_readiness failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_include_readiness_null_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.596 Runtime Checkpoint Include Readiness Zero Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected zero
+`include_readiness` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, audit path, ledger
+path, and serialized `include_readiness` fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint zero include_readiness failures now assert submitted checkpoint path, audit path, ledger path, and serialized include_readiness fragments stay out of stderr
+  - isolated runtime checkpoint zero include_readiness failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_include_readiness_zero_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.595 Runtime Checkpoint Include Readiness Numeric Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` isolated-cwd harness coverage already rejected
+numeric `include_readiness` inputs, recorded a failure audit event without
+`output_summary`, avoided checkpoint creation, avoided requested ledger
+creation, and avoided default `state/` fallback. This slice strengthens stderr
+coverage in that isolated path so submitted checkpoint path, audit path, ledger
+path, and serialized `include_readiness` fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness record_runtime_checkpoint numeric include_readiness failures now assert submitted checkpoint path, audit path, ledger path, and serialized include_readiness fragments stay out of stderr
+  - isolated runtime checkpoint numeric include_readiness failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_include_readiness_numeric_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.594 Runtime Status Ledger Path Control Audit Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected
+control-character `ledger_path` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so the valid submitted audit path is not printed on harness failure alongside
+the malformed ledger path.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status control-character ledger_path failures now assert submitted audit path fragments stay out of stderr
+  - isolated runtime status control-character ledger_path failures continue to assert no stdout, malformed ledger path redaction, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.593 Runtime Status Audit Path Control Ledger Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected
+control-character `audit_log_path` inputs, recorded a failure audit event
+without `output_summary`, avoided malformed audit creation, avoided requested
+ledger creation, and avoided default `state/` fallback. This slice strengthens
+stderr coverage in that isolated path so the valid submitted ledger path is not
+printed on harness failure alongside the malformed audit path.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status control-character audit_log_path failures now assert submitted ledger path fragments stay out of stderr
+  - isolated runtime status control-character audit_log_path failures continue to assert no stdout, malformed audit path redaction, failure audit input, no output_summary, no malformed audit creation, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.592 Runtime Status Ledger Path Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected blank
+`ledger_path` inputs, recorded a failure audit event without `output_summary`,
+avoided default `state/` fallback, and avoided blank-path artifact creation.
+This slice strengthens stderr coverage in that isolated path so submitted audit
+path and serialized `ledger_path` fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status blank ledger_path failures now assert submitted audit path and serialized ledger_path fragments stay out of stderr
+  - isolated runtime status blank ledger_path failures continue to assert no stdout, failure audit input, no output_summary, no default state fallback, and no blank-path artifact creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_ledger_path_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.591 Runtime Status Ledger Path Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected non-string
+`ledger_path` inputs, recorded a failure audit event without `output_summary`,
+and avoided default `state/` fallback. This slice strengthens stderr coverage
+in that isolated path so submitted audit path and serialized `ledger_path`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status non-string ledger_path failures now assert submitted audit path and serialized ledger_path fragments stay out of stderr
+  - isolated runtime status non-string ledger_path failures continue to assert no stdout, failure audit input, no output_summary, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_ledger_path_type_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.590 Runtime Status Audit Path Type Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected non-string
+`audit_log_path` inputs, recorded a failure audit event without
+`output_summary`, and avoided requested ledger creation. This slice strengthens
+stderr and fallback coverage in that isolated path so submitted audit path,
+ledger path, and serialized `audit_log_path` fragments are not printed on
+harness failure and default `state/` fallback is not created.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status non-string audit_log_path failures now assert submitted audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+  - isolated runtime status non-string audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and now explicitly assert no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_audit_path_type_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.589 Runtime Status Audit Path Blank Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected blank
+`audit_log_path` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `audit_log_path` fragments
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status blank audit_log_path failures now assert submitted audit path, ledger path, and serialized audit_log_path fragments stay out of stderr
+  - isolated runtime status blank audit_log_path failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_audit_path_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.588 Runtime Status Failure Threshold True Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected true
+`failure_threshold` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_threshold`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold true failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+  - isolated runtime status failure_threshold true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_boolean_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.587 Runtime Status Failure Threshold String Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected string
+`failure_threshold` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_threshold`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold string failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+  - isolated runtime status failure_threshold string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.586 Runtime Status Failure Threshold Negative Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected negative
+`failure_threshold` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_threshold`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_threshold negative failures now assert submitted audit path, ledger path, and serialized failure_threshold fragments stay out of stderr
+  - isolated runtime status failure_threshold negative failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_threshold_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.585 Runtime Status Failure Window True Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected true
+`failure_window` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_window` fragments
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_window true failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+  - isolated runtime status failure_window true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_boolean_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.584 Runtime Status Failure Window Zero Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected zero
+`failure_window` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_window` fragments
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_window zero failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+  - isolated runtime status failure_window zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_nonpositive_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.583 Runtime Status Failure Window String Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected string
+`failure_window` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized `failure_window` fragments
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status failure_window string failures now assert submitted audit path, ledger path, and serialized failure_window fragments stay out of stderr
+  - isolated runtime status failure_window string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_failure_window_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.582 Runtime Status Max Bytes True Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected true
+`max_bytes` inputs, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_bytes` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_bytes true failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+  - isolated runtime status max_bytes true failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_boolean_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.581 Runtime Status Max Bytes String Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected string
+`max_bytes` inputs, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_bytes` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_bytes string failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+  - isolated runtime status max_bytes string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.580 Runtime Status Max Bytes Zero Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected
+`max_bytes=0`, recorded a failure audit event without `output_summary`, avoided
+requested ledger creation, and avoided default `state/` fallback. This slice
+strengthens stderr coverage in that isolated path so submitted audit path,
+ledger path, and serialized `max_bytes` fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_bytes zero failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+  - isolated runtime status max_bytes zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_nonpositive_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.579 Runtime Status Max Bytes Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected boolean
+`max_bytes` inputs, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_bytes` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_bytes boolean failures now assert submitted audit path, ledger path, and serialized max_bytes fragments stay out of stderr
+  - isolated runtime status max_bytes boolean failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_bytes_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.578 Runtime Status Max Records Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected boolean
+`max_records` inputs, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_records` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_records boolean failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+  - isolated runtime status max_records boolean failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_boolean_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.577 Runtime Status Max Records String Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected string
+`max_records` inputs, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_records` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_records string failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+  - isolated runtime status max_records string failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.576 Runtime Status Max Records Zero Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected
+`max_records=0`, recorded a failure audit event without `output_summary`,
+avoided requested ledger creation, and avoided default `state/` fallback. This
+slice strengthens stderr coverage in that isolated path so submitted audit
+path, ledger path, and serialized `max_records` fragments are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status max_records zero failures now assert submitted audit path, ledger path, and serialized max_records fragments stay out of stderr
+  - isolated runtime status max_records zero failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_max_records_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.575 Runtime Status Null Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected null
+`apply_retention` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized null `apply_retention`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status null apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+  - isolated runtime status null apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_null_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.574 Runtime Status Zero Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected zero
+`apply_retention` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized zero `apply_retention`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status zero apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+  - isolated runtime status zero apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_zero_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.573 Runtime Status Numeric Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected numeric
+`apply_retention` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and serialized numeric `apply_retention`
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status numeric apply_retention failures now assert submitted audit path, ledger path, and serialized apply_retention fragments stay out of stderr
+  - isolated runtime status numeric apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_numeric_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.572 Runtime Status Isolated Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` isolated-cwd harness coverage already rejected invalid
+`apply_retention` inputs, recorded a failure audit event without
+`output_summary`, avoided requested ledger creation, and avoided default
+`state/` fallback. This slice strengthens stderr coverage in that isolated path
+so submitted audit path, ledger path, and invalid boolean-like value fragments
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; isolated-cwd harness get_runtime_status invalid apply_retention failures now assert submitted audit path, ledger path, and invalid boolean-like fragments stay out of stderr
+  - isolated runtime status invalid apply_retention failures continue to assert no stdout, failure audit input, no output_summary, no ledger creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_status_apply_retention_type_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.571 Runtime Status Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_runtime_status` harness coverage already rejected invalid
+`apply_retention` inputs, recorded a failure audit event without
+`output_summary`, and avoided requested ledger creation. This slice strengthens
+stderr coverage so submitted audit path, ledger path, and invalid boolean-like
+value fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_runtime_status invalid apply_retention failures now assert submitted audit path, ledger path, and invalid boolean-like fragments stay out of stderr
+  - runtime status invalid apply_retention failures continue to assert no stdout, failure audit input, no output_summary, and no ledger creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_status_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.570 Audit Summary Invalid Path Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_audit_summary` direct coverage already rejected blank audit log paths and
+control-character harness coverage already proved sanitized stderr for malformed
+paths. This slice adds the adjacent harness proof so blank explicit audit paths
+emit no stdout, keep submitted audit path field fragments out of stderr, and
+record a failure audit event without `output_summary`.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_audit_summary blank audit_log_path failures now assert submitted audit_log_path field fragments stay out of stderr
+  - audit summary invalid path failures assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_summary_path_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 672 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.569 Audit Log Invalid Path Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_audit_log` harness coverage already rejected blank audit log paths and
+recorded a failure audit event without `output_summary`. This slice strengthens
+stderr coverage so submitted audit path and limit field fragments are not
+printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_audit_log blank audit_log_path failures now assert submitted audit_log_path and limit field fragments stay out of stderr
+  - audit log invalid path failures continue to assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_log_path_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.568 Audit Log Invalid Limit Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_audit_log` harness coverage already rejected invalid audit query limits
+and recorded a failure audit event without `output_summary`. This slice
+strengthens stderr coverage so submitted audit path and serialized limit
+fragments are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_audit_log invalid limit failures now assert submitted audit_log_path and serialized limit fragments stay out of stderr
+  - audit log invalid limit failures continue to assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_invalid_audit_log_limit_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.567 Readiness Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_integration_readiness` harness coverage already rejected invalid boolean
+readiness inputs and recorded a failure audit event without `output_summary`.
+This slice strengthens stderr coverage so submitted boolean fragments are not
+printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_integration_readiness invalid migration_go_approved failures now assert submitted boolean fragments stay out of stderr
+  - readiness invalid boolean failures continue to assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_invalid_readiness_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.566 Runtime Checkpoint Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness coverage already rejected invalid
+`include_readiness` inputs, recorded a failure audit event without
+`output_summary`, and created no checkpoint or ledger file. This slice
+strengthens stderr coverage so submitted runtime path and boolean fragments are
+not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint invalid include_readiness failures now assert submitted checkpoint, audit, ledger, and boolean fragments stay out of stderr
+  - runtime checkpoint invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, and no ledger write
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_invalid_runtime_checkpoint_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.565 BTC Risk Settings Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`update_btc_risk_settings` harness coverage already rejected invalid boolean
+risk settings inputs, recorded a failure audit event without `output_summary`,
+and created no settings file. This slice strengthens stderr coverage so
+submitted settings path and boolean fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness update_btc_risk_settings invalid emergency_kill_switch_enabled failures now assert submitted settings_path and boolean fragments stay out of stderr
+  - BTC risk settings invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, and no settings file creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_risk_settings_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.564 Portfolio Snapshot Invalid Shape Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`normalize_binance_coinm_account_snapshot` harness coverage already rejected
+invalid portfolio snapshot shapes, recorded a failure audit event without
+`output_summary`, and performed no network or credential work. This slice
+strengthens stderr coverage so submitted nested asset fragments are not printed
+on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness normalize_binance_coinm_account_snapshot invalid balance shape failures now assert submitted nested asset fragments stay out of stderr
+  - portfolio snapshot invalid shape failures continue to assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_portfolio_snapshot_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.563 BTC Order Invalid Boolean Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`preview_btc_order` harness coverage already rejected invalid boolean order
+inputs, recorded a failure audit event without `output_summary`, and performed
+no credential, network, or order work. This slice strengthens stderr coverage so
+submitted order text and invalid boolean fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness preview_btc_order invalid reduce_only failures now assert submitted side and invalid boolean fragments stay out of stderr
+  - BTC order invalid boolean failures continue to assert no stdout, failure audit input, no output_summary, and no order execution side effects
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_btc_order_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.562 Portfolio Snapshot Text Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`normalize_binance_coinm_account_snapshot` harness coverage already rejected
+control-character portfolio snapshot text inputs, recorded a failure audit event
+without `output_summary`, and performed no network or credential work. This
+slice strengthens stderr coverage so raw malformed asset text and escaped
+control markers are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness normalize_binance_coinm_account_snapshot control-character balance.asset failures now assert raw malformed asset text stays out of stderr
+  - portfolio snapshot text failures continue to assert no stdout, failure audit input, and no output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_portfolio_snapshot_text_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.561 Binance Invalid Credential Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`save_binance_credentials` harness coverage already rejected invalid credential
+inputs, redacted submitted secret fields in failure audit events, and created no
+encrypted credential file. This slice strengthens stderr coverage so submitted
+secret, passphrase, and credential path fragments are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness save_binance_credentials blank api_key failures now assert submitted api_secret, passphrase, and credentials_path fragments stay out of stderr
+  - invalid Binance credential failures continue to assert no stdout, redacted failure audit input, no output_summary, and no credential file creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_invalid_save_credentials_input_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.560 Binance Secret Text Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`save_binance_credentials` harness coverage already rejected control-character
+secret inputs, redacted submitted credential fields in failure audit events, and
+created no encrypted credential file. This slice strengthens stderr coverage so
+raw secret fragments and escaped control markers are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness save_binance_credentials control-character api_key failures now assert submitted secret fragments stay out of stderr
+  - Binance secret text failures continue to assert no stdout, redacted failure audit input, no output_summary, and no credential file creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_secret_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.559 BTC Order Text Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`preview_btc_order` harness coverage already rejected control-character order
+text inputs, recorded a failure audit event without `output_summary`, and
+performed no credential, network, or order work. This slice strengthens stderr
+coverage so raw malformed order text and escaped control markers are not
+printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness preview_btc_order control-character side failures now assert raw malformed order text stays out of stderr
+  - BTC order text failures continue to assert no stdout, failure audit input, no output_summary, and no order execution side effects
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_btc_order_text_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.558 Runtime Checkpoint Newline Run ID Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness failure-audit coverage already rejected
+newline-bearing `run_id` inputs, recorded a failure audit event without
+`output_summary`, and created no checkpoint or ledger file. This slice
+strengthens stderr coverage so raw run identifiers and escaped newline markers
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint newline run_id failures now assert raw malformed run_id fragments stay out of stderr
+  - runtime checkpoint newline run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, and no ledger write
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.557 Runtime Checkpoint Run ID Harness Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`record_runtime_checkpoint` harness coverage already rejected
+control-character `run_id` inputs, recorded a failure audit event without
+`output_summary`, and created no checkpoint, ledger, or default state fallback.
+This slice strengthens stderr coverage so raw malformed run identifiers and
+escaped control markers are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint control-character run_id failures now assert raw malformed run_id fragments stay out of stderr
+  - runtime checkpoint run_id failures continue to assert no stdout, failure audit input, no output_summary, no checkpoint write, no ledger write, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_run_id_control_without_checkpoint -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.556 BTC Daily Risk State Harness Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`reset_btc_daily_risk_state` harness coverage already rejected
+control-character `state_path` inputs, recorded a failure audit event without
+`output_summary`, and created no state file or default state fallback. This
+slice strengthens stderr coverage so raw state path fragments and escaped
+control markers are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness reset_btc_daily_risk_state control-character state_path failures now assert raw malformed path fragments stay out of stderr
+  - daily risk state path failures continue to assert no stdout, failure audit input, no output_summary, no state file creation, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_daily_risk_state_path_control_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 671 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.555 BTC Risk Settings Harness Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`update_btc_risk_settings` harness coverage already rejected control-character
+`settings_path` inputs, recorded a failure audit event without `output_summary`,
+and created no settings file. This slice strengthens stderr coverage so raw
+settings path fragments and escaped control markers are not printed on harness
+failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness update_btc_risk_settings control-character settings_path failures now assert raw malformed path fragments stay out of stderr
+  - risk settings path failures continue to assert no stdout, failure audit input, no output_summary, and no settings file creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_risk_settings_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 670 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.554 Binance Credentials Harness Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`save_binance_credentials` harness coverage already rejected control-character
+`credentials_path` inputs, redacted secret inputs and credential paths in audit
+events, and created no credential file. This slice strengthens stderr coverage
+so raw credential path fragments and escaped control markers are not printed on
+harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness save_binance_credentials control-character credentials_path failures now assert raw malformed path fragments stay out of stderr
+  - credential path failures continue to assert no stdout, redacted secret inputs, redacted credential path audit input, no output_summary, and no credential file creation
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_binance_btc.py::test_harness_rejects_credentials_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_binance_btc.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 670 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.553 Readiness Harness BTC Risk Settings Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_integration_readiness` direct coverage already rejected control-character
+`btc_risk_settings_path` inputs before credential or risk reads. This slice adds
+harness-level coverage proving the same failure emits no stdout, keeps raw risk
+settings path fragments out of stderr, preserves Binance credential path audit
+redaction, and creates no malformed path or default state fallback.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_integration_readiness control-character btc_risk_settings_path failures now assert raw malformed path fragments stay out of stderr
+  - harness failure audit preserves btc_risk_settings_path error evidence while redacting binance_credentials_path input
+  - BTC risk settings path failures create no malformed risk settings path and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_risk_settings_path_control_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 670 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.552 Readiness Harness Hermes Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_integration_readiness` direct coverage already rejected control-character
+`hermes_config_path` inputs before credential or risk reads. This slice adds
+harness-level coverage proving the same failure emits no stdout, keeps raw
+Hermes config path fragments out of stderr, preserves Binance credential path
+audit redaction, and creates no malformed path or default state fallback.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_integration_readiness control-character hermes_config_path failures now assert raw malformed path fragments stay out of stderr
+  - harness failure audit preserves hermes_config_path error evidence while redacting binance_credentials_path input
+  - Hermes path failures create no malformed Hermes config path and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_hermes_path_control_character_without_fallback -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 669 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.551 Readiness Harness Credential Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_integration_readiness` harness coverage already rejected control-character
+`binance_credentials_path` inputs, redacted the credential path in the failure
+audit event, and created no requested or malformed credential files. This slice
+strengthens stderr coverage so raw path fragments and escaped control markers
+are not printed on harness failure.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_integration_readiness control-character binance_credentials_path failures now assert raw malformed path fragments stay out of stderr
+  - readiness credential path failures continue to assert no stdout, redacted failure audit input, no output_summary, and no requested or malformed credential files
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_harness_rejects_readiness_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 668 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.550 Audit Web Endpoint Env Path Response Redaction Guard Record - 2026-05-14
+### A. 목적
+
+Audit web `/api/events` and `/api/summary` endpoints already returned JSON 400
+for blank environment-backed audit log paths. This slice extends that endpoint
+coverage to control-character `HALO_SWING_AUDIT_LOG_PATH` values and proves
+malformed path fragments are not echoed in JSON responses or created on disk.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; audit web events endpoint rejects environment-backed control-character audit paths with JSON 400 before audit reads
+  - audit web summary endpoint rejects environment-backed control-character audit paths with JSON 400 before audit reads
+  - endpoint responses do not expose malformed path fragments and do not create malformed audit paths or default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_events_endpoint_returns_bad_request_for_invalid_env_audit_path tests/test_audit.py::test_audit_web_summary_endpoint_returns_bad_request_for_invalid_env_audit_path -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 668 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.549 Audit Web Main Env Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`audit_web.main` already rejected blank environment-backed
+`HALO_SWING_AUDIT_LOG_PATH` values before HTTP server construction. This slice
+extends that CLI guard coverage to control-character environment paths and
+proves malformed path fragments are not echoed to stderr or created on disk.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; audit web main environment-backed control-character audit path failures now assert raw malformed path fragments stay out of stderr
+  - environment-backed invalid path coverage continues to assert exit code 2 before server construction and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_env_audit_log_path_without_server -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 668 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.548 Audit Web Main Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`audit_web.main` already rejected invalid `--audit-log-path` values before HTTP
+server construction. This slice strengthens the CLI guard proof so
+control-character path failures return exit code 2 without echoing malformed
+path fragments into stderr or creating the malformed audit path.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; audit web main control-character --audit-log-path failures now assert raw malformed path fragments stay out of stderr
+  - audit web main invalid path coverage continues to assert exit code 2 before server construction
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_audit_web_main_rejects_invalid_audit_log_path_without_server -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 668 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.547 Audit Summary Harness Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_audit_summary` direct coverage already rejected control-character
+`audit_log_path` inputs. This slice adds harness-level coverage proving the
+same failure emits no stdout, records a failure audit event without
+`output_summary`, and does not echo malformed path fragments into stderr.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_audit_summary control-character audit_log_path failures now assert raw malformed path fragments stay out of stderr
+  - summary path failures continue to assert no stdout and failure audit events without output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_audit_summary_path_control_character_with_failure_audit -q -> 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 668 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.546 Audit Harness Control Path Stderr Redaction Guard Record - 2026-05-14
+### A. 목적
+
+`get_audit_log` harness control-character failure coverage already verified
+nonzero exit, empty stdout, failure audit events, and no `output_summary`.
+This slice strengthens the proof so malformed audit log paths and malformed
+filter values are not echoed into stderr.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness get_audit_log control-character audit_log_path failures now assert raw malformed path fragments stay out of stderr
+  - harness get_audit_log control-character resource_id filter failures now assert raw malformed filter fragments stay out of stderr
+  - audit control-character failures continue to assert no stdout and failure audit events without output_summary
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_rejects_audit_log_path_control_character_with_failure_audit tests/test_audit.py::test_harness_rejects_audit_log_filter_control_character_with_failure_audit -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 667 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
+## 3.545 Runtime Checkpoint Dependency Path Stderr Redaction Guard Record - 2026-05-13
+### A. 목적
+
+`record_runtime_checkpoint` already rejected control-character `audit_log_path`
+and `ledger_path` inputs before checkpoint, ledger, or default state fallback.
+This slice strengthens the harness proof so those dependency path failures also
+keep the raw malformed path fragments out of stderr.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only slice; harness record_runtime_checkpoint control-character audit_log_path failures now assert raw malformed paths stay out of stderr
+  - harness record_runtime_checkpoint control-character ledger_path failures now assert raw malformed paths stay out of stderr
+  - checkpoint dependency path failures continue to assert no stdout, no checkpoint file, no malformed dependency path file, and no default state fallback
+  - no source files changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler
+  - Telegram send
+  - Hermes runtime call
+  - live data adapter
+  - Binance network call
+  - migration or repository persistence
+  - live trading
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_audit_path_control_character_without_checkpoint tests/test_runtime_guard.py::test_harness_rejects_runtime_checkpoint_ledger_path_control_character_without_checkpoint -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_runtime_guard.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 667 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed, no blocked-path changes
+  - git status --short --ignored state -> ignored local state/ only
+```
+
 ## 3.544 Runtime Harness Control Path No-Fallback Guard Record - 2026-05-13
 ### A. 목적
 
