@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.623 Live Data Readiness Market Source Alignment Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key/config 값만 넣으면 실제 연동되는 범위와 readiness가 어긋나지
+않게 한다. 현재 구현된 market OHLCV live provider는 Polygon이므로, 아직
+구현되지 않은 Alpaca/Tiingo 키만으로 market live data가 준비됐다고 표시하지
+않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness no longer treats ALPACA_API_KEY or TIINGO_API_KEY values alone as implemented market live data readiness
+  - get_integration_readiness still treats HALO_SWING_MARKET_DATA_API_KEY and POLYGON_API_KEY as implemented market live data readiness signals
+  - audit and runtime checkpoint secret-boundary tests now include HALO_SWING_MACRO_API_KEY
+  - readiness, audit, and runtime checkpoint outputs keep live data env names and values out of serialized payloads
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - Alpaca or Tiingo provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary tests/test_runtime_guard.py::test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py tests/test_audit.py tests/test_runtime_guard.py -> passed
+  - ALPACA_API_KEY=alpaca-secret TIINGO_API_KEY=tiingo-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data blocked on market_ohlcv_source_or_api_key_decision
+  - POLYGON_API_KEY=polygon-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data ready without serialized secret names or values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 684 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.622 Live Data Readiness Macro Alias Gate Record - 2026-05-16
 
 ### A. 목적

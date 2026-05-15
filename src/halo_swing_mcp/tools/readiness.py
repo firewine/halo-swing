@@ -424,8 +424,6 @@ def _market_data_env_configured() -> bool:
         "HALO_SWING_MARKET_DATA_SOURCE",
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
-        "ALPACA_API_KEY",
-        "TIINGO_API_KEY",
     )
 
 

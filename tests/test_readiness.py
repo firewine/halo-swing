@@ -22,6 +22,7 @@ READINESS_ENV_KEYS = (
     "TELEGRAM_BOT_TOKEN",
     "FRED_API_KEY",
     "NEWS_API_KEY",
+    "HALO_SWING_MACRO_API_KEY",
     "HALO_SWING_FRED_API_KEY",
     "HALO_SWING_NEWS_API_KEY",
     "HALO_SWING_BINANCE_TESTNET",
@@ -1218,6 +1219,38 @@ def test_integration_readiness_accepts_project_macro_api_key_alias(
     assert live_data_gate["evidence"]["news_source_configured"] is True
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "live_data: provide" not in payload["next_actions"]
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
+
+
+def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "ALPACA_API_KEY": "alpaca-secret-key",
+        "TIINGO_API_KEY": "tiingo-secret-key",
+        "HALO_SWING_MACRO_API_KEY": "macro-project-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-secret-key",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == ["market_ohlcv_source_or_api_key_decision"]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is True
+    assert live_data_gate["evidence"]["news_source_configured"] is True
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
+    assert "live_data: provide market_ohlcv_source_or_api_key_decision" in payload[
+        "next_actions"
+    ]
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized

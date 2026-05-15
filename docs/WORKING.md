@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_READINESS_MACRO_ALIAS_GATE_VERIFIED
-gate_id: LIVE_DATA_READINESS_MACRO_ALIAS_GATE
+status: LIVE_DATA_READINESS_MARKET_SOURCE_ALIGNMENT_GATE_VERIFIED
+gate_id: LIVE_DATA_READINESS_MARKET_SOURCE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: align live data readiness with the project-specific FRED macro API-key alias while keeping readiness secret-free and offline
+next_atomic_step: align live data readiness market signals with implemented Polygon provider support while keeping readiness secret-free and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -252,6 +252,8 @@ done_means:
   - get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal
   - readiness output keeps macro API-key env names and values out of serialized payloads
   - blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready
+  - get_integration_readiness does not treat unimplemented ALPACA_API_KEY or TIINGO_API_KEY values alone as implemented market live data readiness
+  - readiness, audit, and runtime checkpoint outputs keep live data env names and values out of serialized payloads
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -601,15 +603,17 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.622
-gate_packet: docs/halo-swing-development-plan.md#3.622
+portable_mirror: docs/halo-swing-development-plan.md#3.623
+gate_packet: docs/halo-swing-development-plan.md#3.623
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.622
+  - docs/halo-swing-development-plan.md#3.623
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_audit.py
   - tests/test_readiness.py
+  - tests/test_runtime_guard.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -912,14 +916,48 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Data Readiness Macro Alias Gate is verified.
-`get_integration_readiness` now treats `HALO_SWING_MACRO_API_KEY` as the
-project-specific FRED macro API-key readiness signal, matching the live macro
-provider. Readiness remains offline and secret-free. Focused readiness tests
-passed with 3 tests, full pytest passed with 683 tests, and ruff and
-health_check passed.
+Summary: Live Data Readiness Market Source Alignment Gate is verified.
+`get_integration_readiness` no longer treats unimplemented `ALPACA_API_KEY` or
+`TIINGO_API_KEY` values alone as implemented market live data readiness.
+Polygon readiness via `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`
+still works. Focused readiness/audit/runtime tests passed with 7 tests, full
+pytest passed with 684 tests, and ruff and health_check passed.
 
 ```yaml
+live_data_readiness_market_source_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_audit.py
+    - tests/test_readiness.py
+    - tests/test_runtime_guard.py
+  implementation:
+    - get_integration_readiness no longer treats unimplemented ALPACA_API_KEY or TIINGO_API_KEY values alone as implemented market live data readiness
+    - get_integration_readiness still treats HALO_SWING_MARKET_DATA_API_KEY and POLYGON_API_KEY as implemented market live data readiness signals
+    - readiness, audit, and runtime checkpoint outputs keep live data env names and values out of serialized payloads
+    - no network calls, Telegram sends, migrations, repository persistence, broker path changes, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_audit_read_surfaces_preserve_readiness_env_secret_boundary tests/test_audit.py::test_audit_summary_surfaces_preserve_readiness_env_secret_boundary tests/test_runtime_guard.py::test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py tests/test_audit.py tests/test_runtime_guard.py
+      result: passed
+    - command: ALPACA_API_KEY=alpaca-secret TIINGO_API_KEY=tiingo-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, live_data gate blocked on market_ohlcv_source_or_api_key_decision"
+    - command: POLYGON_API_KEY=polygon-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, live_data gate ready without serialized secret names or values"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "684 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+
 live_data_readiness_macro_alias_gate:
   status: verified
   changed_files:

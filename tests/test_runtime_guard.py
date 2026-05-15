@@ -2811,6 +2811,7 @@ def test_runtime_checkpoint_readiness_snapshot_does_not_persist_env_secrets(
         "ALPACA_API_KEY": "alpaca-secret-key",
         "TIINGO_API_KEY": "tiingo-secret-key",
         "HALO_SWING_MACRO_SOURCE": "macro-secret-source",
+        "HALO_SWING_MACRO_API_KEY": "halo-macro-secret-key",
         "FRED_API_KEY": "fred-secret-key",
         "HALO_SWING_FRED_API_KEY": "halo-fred-secret-key",
         "HALO_SWING_NEWS_SOURCE": "news-secret-source",

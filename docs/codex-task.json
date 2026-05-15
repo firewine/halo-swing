@@ -1,22 +1,26 @@
 {
-  "gate_id": "LIVE_DATA_READINESS_MACRO_ALIAS_GATE",
+  "gate_id": "LIVE_DATA_READINESS_MARKET_SOURCE_ALIGNMENT_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.622",
-  "next_atomic_step": "align live data readiness with the project-specific FRED macro API-key alias while keeping readiness secret-free and offline",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.623",
+  "next_atomic_step": "align live data readiness market signals with implemented Polygon provider support while keeping readiness secret-free and offline",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_audit.py",
+    "tests/test_runtime_guard.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.622",
+    "docs/halo-swing-development-plan.md#3.623",
     "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_audit.py",
+    "tests/test_runtime_guard.py",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -43,9 +47,9 @@
     "read_only": true
   },
   "done_means": [
-    "get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal",
-    "readiness output keeps macro API-key env names and values out of serialized payloads",
-    "blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready",
+    "get_integration_readiness no longer treats unimplemented ALPACA_API_KEY or TIINGO_API_KEY values alone as implemented market live data readiness",
+    "get_integration_readiness still treats HALO_SWING_MARKET_DATA_API_KEY and POLYGON_API_KEY as implemented market live data readiness signals",
+    "readiness, audit, and runtime checkpoint outputs keep live data env names and values out of serialized payloads",
     "default readiness remains offline and performs no network calls",
     "all required verification passes",
     "WORKING.md records result and verification status only"
