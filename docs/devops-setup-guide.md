@@ -327,6 +327,17 @@ export FRED_API_KEY=<fred-api-key>
 project-specific aliases. Default macro data remains fixture-backed unless live
 macro mode is explicitly enabled.
 
+News live mode is wired through NewsAPI:
+
+```bash
+export HALO_SWING_NEWS_DATA_MODE=live
+export NEWS_API_KEY=<newsapi-key>
+```
+
+`HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Default
+news evidence remains fixture-backed unless live news mode is explicitly
+enabled.
+
 The Telegram gate returns `telegram_delivery_readiness.v1`. It accepts either a
 bot-token readiness signal or a gateway readiness signal, exposes only booleans,
 and keeps `send_call=false`, `network_call=false`, and

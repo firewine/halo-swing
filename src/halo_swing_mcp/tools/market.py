@@ -243,45 +243,69 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
     normalized_topic = _normalize_topic_identity(topic)
     provider = get_market_data_provider()
     cards = provider.news_cards(normalized_topic)
+    live_collection_enabled = any(card.get("source") == "newsapi" for card in cards)
+    collection_mode = "live" if live_collection_enabled else provider.data_mode
     average_strength = _average_strength(cards)
     covered_source_groups = sorted(
         {str(card.get("source_group")) for card in cards if card.get("source_group")}
     )
+    required_source_groups = (
+        ["newsapi"] if live_collection_enabled else REQUIRED_NEWS_SOURCE_GROUPS
+    )
     source_policy_contract = {
         "schema_version": "news_source_policy.v1",
-        "required_source_groups": REQUIRED_NEWS_SOURCE_GROUPS,
+        "required_source_groups": required_source_groups,
         "covered_source_groups": covered_source_groups,
-        "collection_mode": provider.data_mode,
-        "live_collection_enabled": False,
-        "network_call": False,
-        "live_data_required": False,
+        "collection_mode": collection_mode,
+        "live_collection_enabled": live_collection_enabled,
+        "network_call": live_collection_enabled,
+        "live_data_required": live_collection_enabled,
     }
     source_policy_guard_checks = [
         {
             "name": "required_source_groups_covered",
             "passed": all(
                 source_group in covered_source_groups
-                for source_group in REQUIRED_NEWS_SOURCE_GROUPS
+                for source_group in required_source_groups
             ),
         },
         {
             "name": "source_group_present_on_cards",
             "passed": all(card.get("source_group") for card in cards),
         },
-        {
-            "name": "no_live_collection",
-            "passed": source_policy_contract["live_collection_enabled"] is False,
-        },
-        {
-            "name": "no_network_call",
-            "passed": source_policy_contract["network_call"] is False,
-        },
     ]
+    if live_collection_enabled:
+        source_policy_guard_checks.extend(
+            [
+                {
+                    "name": "live_collection_explicit",
+                    "passed": source_policy_contract["collection_mode"] == "live",
+                },
+                {
+                    "name": "network_call_declared",
+                    "passed": source_policy_contract["network_call"] is True,
+                },
+            ]
+        )
+    else:
+        source_policy_guard_checks.extend(
+            [
+                {
+                    "name": "no_live_collection",
+                    "passed": source_policy_contract["live_collection_enabled"]
+                    is False,
+                },
+                {
+                    "name": "no_network_call",
+                    "passed": source_policy_contract["network_call"] is False,
+                },
+            ]
+        )
     return {
         "as_of": provider.as_of,
         "topic": normalized_topic,
-        "data_mode": provider.data_mode,
-        "live_data_required": provider.live_data_required,
+        "data_mode": collection_mode,
+        "live_data_required": live_collection_enabled or provider.live_data_required,
         "news_source_policy_contract": source_policy_contract,
         "news_source_policy_guard": {
             "status": "ok"
@@ -299,8 +323,8 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
             ],
             "required_card_fields": ["bias", "strength", "confidence"],
             "scoring_usage": "score_leverage_swing.component_scores.theme",
-            "network_call": False,
-            "live_data_required": False,
+            "network_call": live_collection_enabled,
+            "live_data_required": live_collection_enabled,
         },
         "average_strength": round(average_strength, 4),
         "news_score": round(average_strength, 4),

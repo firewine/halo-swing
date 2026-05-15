@@ -13,6 +13,7 @@ BINANCE_BOOLEAN_ENV_NAMES = {
 }
 MARKET_DATA_MODE_ENV_NAME = "HALO_SWING_MARKET_DATA_MODE"
 MACRO_DATA_MODE_ENV_NAME = "HALO_SWING_MACRO_DATA_MODE"
+NEWS_DATA_MODE_ENV_NAME = "HALO_SWING_NEWS_DATA_MODE"
 
 
 class Settings(BaseSettings):
@@ -46,6 +47,9 @@ class Settings(BaseSettings):
     macro_data_mode: str = "fixture"
     macro_source: str = "fred"
     macro_api_key: str | None = None
+    news_data_mode: str = "fixture"
+    news_source: str = "newsapi"
+    news_api_key: str | None = None
 
     @field_validator(
         "binance_testnet",
@@ -79,6 +83,11 @@ class Settings(BaseSettings):
     @classmethod
     def _validate_macro_data_mode(cls, value: str) -> str:
         return _validate_data_mode(value, MACRO_DATA_MODE_ENV_NAME)
+
+    @field_validator("news_data_mode", mode="before")
+    @classmethod
+    def _validate_news_data_mode(cls, value: str) -> str:
+        return _validate_data_mode(value, NEWS_DATA_MODE_ENV_NAME)
 
     model_config = SettingsConfigDict(
         env_file=".env",

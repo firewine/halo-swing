@@ -150,8 +150,10 @@ the provider boundary with Polygon by setting `HALO_SWING_MARKET_DATA_MODE=live`
 and either `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; default runs
 remain fixture-backed and offline. Macro live mode is available through FRED by
 setting `HALO_SWING_MACRO_DATA_MODE=live` and one of
-`HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`. It
-includes `hermes_mcp_config_readiness.v1`
+`HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`.
+News live mode is available through NewsAPI by setting
+`HALO_SWING_NEWS_DATA_MODE=live` and `HALO_SWING_NEWS_API_KEY` or
+`NEWS_API_KEY`. It includes `hermes_mcp_config_readiness.v1`
 for config path and MCP registration evidence. It also exposes
 `telegram_delivery_readiness.v1` for bot-token/gateway readiness while keeping
 `send_call=false`, and a separate `live_order_submission` gate that requires

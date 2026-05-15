@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.621 Live News API-Key Provider Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key/config 값만 넣으면 실제 news 연동이 가능한 방향으로 진행한다.
+이번 slice는 NewsAPI provider를 기존 MarketDataProvider boundary 뒤에 추가한다.
+기본 실행은 계속 fixture/replay offline이며, live news는 명시 env로만 켜진다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - NewsApiDataProvider added as a wrapper behind MarketDataProvider
+  - HALO_SWING_NEWS_DATA_MODE=live selects live news-card behavior
+  - HALO_SWING_NEWS_API_KEY or NEWS_API_KEY supplies the API key
+  - provider maps NewsAPI articles to evidence-card shaped payloads
+  - get_news_bundle marks NewsAPI cards as live collection with network_call=true
+  - get_news_bundle returns an ok source-policy guard for explicit NewsAPI live collection
+  - default provider and market/macro/event/news fixture behavior stay offline
+  - provider tests cover missing key, provider selection, NewsAPI parsing, live bundle marking, and no returned secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - scheduler or cron runner
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_mvp_tools.py::test_market_macro_event_and_news_tools_are_offline -q -> 13 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/market.py tests/test_providers.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 682 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
+  - git status --short --ignored state -> ignored local state/ only
+  - stop_guard.py -> passed
+```
+
 ## 3.620 Live Macro API-Key Provider Gate Record - 2026-05-16
 
 ### A. 목적

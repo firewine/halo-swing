@@ -301,6 +301,79 @@ class FredMacroDataProvider:
         return values
 
 
+class NewsApiDataProvider:
+    """NewsAPI evidence-card wrapper selected only by explicit live news mode."""
+
+    _BASE_URL = "https://newsapi.org/v2/everything"
+
+    def __init__(
+        self,
+        base_provider: MarketDataProvider,
+        *,
+        api_key: str,
+        http_get: Any | None = None,
+    ) -> None:
+        self._base_provider = base_provider
+        self._api_key = _normalize_secret(api_key, "news API key")
+        self._http_get = http_get or _default_http_get
+
+    @property
+    def as_of(self) -> str:
+        return self._base_provider.as_of
+
+    @property
+    def data_mode(self) -> str:
+        return self._base_provider.data_mode
+
+    @property
+    def live_data_required(self) -> bool:
+        return self._base_provider.live_data_required
+
+    def supported_assets(self) -> list[str]:
+        return self._base_provider.supported_assets()
+
+    def supported_timeframes(self) -> list[str]:
+        return self._base_provider.supported_timeframes()
+
+    def resolve_asset(self, asset: str) -> tuple[str, int]:
+        return self._base_provider.resolve_asset(asset)
+
+    def ohlcv(
+        self,
+        symbol: str,
+        periods: int = 220,
+        timeframe: str = "1d",
+    ) -> tuple[dict[str, Any], ...]:
+        return self._base_provider.ohlcv(symbol, periods, timeframe)
+
+    def macro_snapshot(self) -> dict[str, Any]:
+        return self._base_provider.macro_snapshot()
+
+    def event_calendar(self, days: int = 14) -> list[dict[str, Any]]:
+        return self._base_provider.event_calendar(days)
+
+    def news_cards(self, topic: str = "macro") -> list[dict[str, Any]]:
+        normalized_topic = _normalize_news_topic(topic)
+        query = parse.urlencode(
+            {
+                "q": normalized_topic,
+                "language": "en",
+                "sortBy": "publishedAt",
+                "pageSize": 10,
+                "apiKey": self._api_key,
+            }
+        )
+        payload = self._http_get(f"{self._BASE_URL}?{query}")
+        articles = payload.get("articles")
+        if not isinstance(articles, list) or not articles:
+            raise ValueError("NewsAPI response did not include articles")
+        return [
+            _newsapi_card(article, index=index, topic=normalized_topic)
+            for index, article in enumerate(articles[:10], start=1)
+            if isinstance(article, dict)
+        ]
+
+
 DEFAULT_MARKET_DATA_PROVIDER = ReplayMarketDataProvider()
 
 
@@ -315,6 +388,9 @@ def get_market_data_provider() -> MarketDataProvider:
     if settings.macro_data_mode == "live":
         _validate_live_macro_source(settings.macro_source)
         provider = FredMacroDataProvider(provider, api_key=_resolve_fred_api_key())
+    if settings.news_data_mode == "live":
+        _validate_live_news_source(settings.news_source)
+        provider = NewsApiDataProvider(provider, api_key=_resolve_news_api_key())
 
     return provider
 
@@ -333,6 +409,14 @@ def _validate_live_macro_source(source: str) -> None:
     normalized = source.strip().lower()
     if normalized != "fred":
         raise ValueError("HALO_SWING_MACRO_SOURCE must be fred")
+
+
+def _validate_live_news_source(source: str) -> None:
+    if not isinstance(source, str):
+        raise ValueError("HALO_SWING_NEWS_SOURCE must be newsapi")
+    normalized = source.strip().lower()
+    if normalized != "newsapi":
+        raise ValueError("HALO_SWING_NEWS_SOURCE must be newsapi")
 
 
 def _resolve_polygon_api_key() -> str:
@@ -363,6 +447,85 @@ def _resolve_fred_api_key() -> str:
         "live macro data requires HALO_SWING_MACRO_API_KEY, "
         "HALO_SWING_FRED_API_KEY, or FRED_API_KEY"
     )
+
+
+def _resolve_news_api_key() -> str:
+    settings = get_settings()
+    candidates = (
+        settings.news_api_key,
+        os.environ.get("HALO_SWING_NEWS_API_KEY"),
+        os.environ.get("NEWS_API_KEY"),
+    )
+    for candidate in candidates:
+        if isinstance(candidate, str) and candidate.strip():
+            return _normalize_secret(candidate, "news API key")
+    raise ValueError(
+        "live news data requires HALO_SWING_NEWS_API_KEY or NEWS_API_KEY"
+    )
+
+
+def _normalize_news_topic(value: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError("topic must be a nonempty string")
+    if not _has_no_control_characters(value):
+        raise ValueError("topic must not contain control characters")
+    normalized = value.strip().lower()
+    if not normalized:
+        raise ValueError("topic must be a nonempty string")
+    if normalized in {"all", "*"}:
+        return "market OR macro OR policy OR semiconductor"
+    return normalized
+
+
+def _newsapi_card(article: dict[str, Any], *, index: int, topic: str) -> dict[str, Any]:
+    title = _safe_article_text(article.get("title"), fallback="Untitled market news")
+    description = _safe_article_text(article.get("description"), fallback="")
+    source = article.get("source") if isinstance(article.get("source"), dict) else {}
+    source_name = _safe_article_text(source.get("name"), fallback="newsapi")
+    published_at = _safe_article_text(article.get("publishedAt"), fallback=fixtures.AS_OF)
+    url = _safe_article_text(article.get("url"), fallback="https://example.invalid/newsapi")
+    summary = f"{title}. {description}".strip()
+    return {
+        "evidence_id": f"ev_newsapi_{index:03d}",
+        "category": _news_category(topic),
+        "source": "newsapi",
+        "source_group": "newsapi",
+        "modality": "news_text",
+        "observed_at": published_at,
+        "asset_scope": ["QQQ", "SPY", "TQQQ", "QLD", "BTC", "SMH", "SOXX", "SOXL"],
+        "bias": "neutral",
+        "strength": 0.5,
+        "confidence": 0.55,
+        "summary": summary[:900],
+        "buy_impact": "context_only",
+        "sell_impact": "watch_if_headline_conflicts_with_signal",
+        "invalidating_condition": "Live headline context changes materially.",
+        "artifact_ref": {
+            "ref_type": "NEWS",
+            "ref": url,
+            "metadata": {
+                "description": f"NewsAPI article from {source_name}",
+                "portable": True,
+            },
+        },
+    }
+
+
+def _news_category(topic: str) -> str:
+    if "semiconductor" in topic or "ai" in topic:
+        return "ai_semiconductor"
+    if "oil" in topic or "energy" in topic or "geopolitical" in topic:
+        return "geopolitical_oil"
+    return "macro_policy"
+
+
+def _safe_article_text(value: Any, *, fallback: str) -> str:
+    if not isinstance(value, str):
+        return fallback
+    if not _has_no_control_characters(value):
+        return fallback
+    normalized = value.strip()
+    return normalized or fallback
 
 
 def _fred_indicator(values_descending: list[float], *, change_field: str) -> dict[str, Any]:

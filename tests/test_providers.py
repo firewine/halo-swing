@@ -7,6 +7,7 @@ from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.providers import (
     FredMacroDataProvider,
     MarketDataProvider,
+    NewsApiDataProvider,
     PolygonMarketDataProvider,
     ReplayMarketDataProvider,
     get_market_data_provider,
@@ -103,6 +104,32 @@ def test_live_macro_provider_uses_fred_api_key(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def test_live_news_provider_requires_api_key(monkeypatch) -> None:
+    monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
+    monkeypatch.delenv("HALO_SWING_NEWS_API_KEY", raising=False)
+    monkeypatch.delenv("NEWS_API_KEY", raising=False)
+    get_settings.cache_clear()
+
+    with pytest.raises(ValueError, match="live news data requires"):
+        get_market_data_provider()
+
+    get_settings.cache_clear()
+
+
+def test_live_news_provider_uses_newsapi_key(monkeypatch) -> None:
+    monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert provider.data_mode == "fixture"
+    assert provider.live_data_required is False
+
+    get_settings.cache_clear()
+
+
 def test_polygon_market_data_provider_fetches_ohlcv_without_returning_secret() -> None:
     requested_urls: list[str] = []
 
@@ -179,6 +206,87 @@ def test_fred_macro_provider_fetches_macro_snapshot_without_returning_secret() -
     assert set(snapshot["indicators"]) == {"vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"}
     assert query["api_key"] == ["fred-secret"]
     assert "fred-secret" not in serialized
+
+
+def test_newsapi_provider_fetches_news_cards_without_returning_secret() -> None:
+    requested_urls: list[str] = []
+
+    def fake_http_get(url: str) -> dict[str, Any]:
+        requested_urls.append(url)
+        return {
+            "articles": [
+                {
+                    "title": "Semiconductor shares extend AI rally",
+                    "description": "Chip leadership remains constructive.",
+                    "publishedAt": "2026-05-16T12:00:00Z",
+                    "url": "https://example.invalid/news/ai-rally",
+                    "source": {"name": "Example Markets"},
+                }
+            ]
+        }
+
+    provider = NewsApiDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="news-secret",
+        http_get=fake_http_get,
+    )
+
+    cards = provider.news_cards("ai semiconductor")
+    serialized = repr(cards)
+    query = parse.parse_qs(parse.urlparse(requested_urls[0]).query)
+
+    assert len(cards) == 1
+    assert cards[0]["source"] == "newsapi"
+    assert cards[0]["source_group"] == "newsapi"
+    assert cards[0]["category"] == "ai_semiconductor"
+    assert cards[0]["artifact_ref"]["ref_type"] == "NEWS"
+    assert query["apiKey"] == ["news-secret"]
+    assert "news-secret" not in serialized
+
+
+def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        return {
+            "articles": [
+                {
+                    "title": "Policy headline",
+                    "description": "Market policy context changed.",
+                    "publishedAt": "2026-05-16T13:00:00Z",
+                    "url": "https://example.invalid/news/policy",
+                    "source": {"name": "Example Policy"},
+                }
+            ]
+        }
+
+    provider = NewsApiDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="news-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    bundle = get_news_bundle("macro")
+
+    assert bundle["data_mode"] == "live"
+    assert bundle["live_data_required"] is True
+    assert bundle["news_source_policy_contract"]["collection_mode"] == "live"
+    assert bundle["news_source_policy_contract"]["required_source_groups"] == [
+        "newsapi"
+    ]
+    assert bundle["news_source_policy_contract"]["live_collection_enabled"] is True
+    assert bundle["news_source_policy_contract"]["network_call"] is True
+    assert bundle["news_source_policy_guard"]["status"] == "ok"
+    source_policy_checks = {
+        check["name"]: check["passed"]
+        for check in bundle["news_source_policy_guard"]["checks"]
+    }
+    assert source_policy_checks["live_collection_explicit"] is True
+    assert source_policy_checks["network_call_declared"] is True
+    assert bundle["news_score_contract"]["network_call"] is True
+    assert bundle["evidence_cards"][0]["source"] == "newsapi"
 
 
 def test_market_tools_keep_replay_payload_contract() -> None:
