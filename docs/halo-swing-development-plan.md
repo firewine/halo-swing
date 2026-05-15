@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.622 Live Data Readiness Macro Alias Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key/config 값만 넣으면 실제 macro 연동 준비 상태도 정확히
+표시되도록 readiness를 provider와 맞춘다. FRED provider는
+`HALO_SWING_MACRO_API_KEY`를 project-specific alias로 이미 수용하므로,
+`get_integration_readiness`도 같은 env를 macro live data source signal로
+인식해야 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal
+  - readiness output keeps macro API-key env names and values out of serialized payloads
+  - blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_accepts_project_macro_api_key_alias tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - HALO_SWING_MARKET_DATA_API_KEY=market-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data ready without serialized secret names or values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 683 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - git diff --check -> passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
+  - git status --short --ignored state -> ignored local state/ only
+  - stop_guard.py -> passed
+```
+
 ## 3.621 Live News API-Key Provider Gate Record - 2026-05-16
 
 ### A. 목적

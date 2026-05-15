@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_NEWS_API_KEY_PROVIDER_GATE_VERIFIED
-gate_id: LIVE_NEWS_API_KEY_PROVIDER_GATE
+status: LIVE_DATA_READINESS_MACRO_ALIAS_GATE_VERIFIED
+gate_id: LIVE_DATA_READINESS_MACRO_ALIAS_GATE
 review_tier: S1_small
 
-next_atomic_step: add NewsAPI live provider behind the provider boundary while keeping default execution fixture-backed and offline
+next_atomic_step: align live data readiness with the project-specific FRED macro API-key alias while keeping readiness secret-free and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -249,6 +249,9 @@ done_means:
   - NewsAPI live provider exists behind the MarketDataProvider boundary
   - live news provider selection requires HALO_SWING_NEWS_DATA_MODE=live and HALO_SWING_NEWS_API_KEY or NEWS_API_KEY
   - provider tests cover missing key, provider selection, NewsAPI parsing, live bundle marking, and no returned secret values
+  - get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal
+  - readiness output keeps macro API-key env names and values out of serialized payloads
+  - blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -598,19 +601,14 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.621
-gate_packet: docs/halo-swing-development-plan.md#3.621
+portable_mirror: docs/halo-swing-development-plan.md#3.622
+gate_packet: docs/halo-swing-development-plan.md#3.622
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.621
-  - src/halo_swing_mcp/config.py
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/market.py
+  - docs/halo-swing-development-plan.md#3.622
   - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_providers.py
-  - tests/test_mvp_tools.py
   - tests/test_readiness.py
 
 implementation_rule:
@@ -914,14 +912,56 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live News API-Key Provider Gate is verified. A NewsAPI provider is
-added behind the MarketDataProvider boundary, selected only by
-`HALO_SWING_NEWS_DATA_MODE=live` with `HALO_SWING_NEWS_API_KEY` or
-`NEWS_API_KEY`; default market/macro/event/news tool behavior remains
-fixture-backed and offline. Focused provider/offline tests passed with 13 tests,
-full pytest passed with 682 tests, and ruff and health_check passed.
+Summary: Live Data Readiness Macro Alias Gate is verified.
+`get_integration_readiness` now treats `HALO_SWING_MACRO_API_KEY` as the
+project-specific FRED macro API-key readiness signal, matching the live macro
+provider. Readiness remains offline and secret-free. Focused readiness tests
+passed with 3 tests, full pytest passed with 683 tests, and ruff and
+health_check passed.
 
 ```yaml
+live_data_readiness_macro_alias_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness now treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal
+    - readiness output keeps macro API-key env names and values out of serialized payloads
+    - blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready
+    - no network calls, Telegram sends, migrations, repository persistence, broker path changes, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_accepts_project_macro_api_key_alias tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: HALO_SWING_MARKET_DATA_API_KEY=market-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, live_data gate ready without serialized secret names or values"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "683 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+
 live_news_api_key_provider_gate:
   status: verified
   changed_files:

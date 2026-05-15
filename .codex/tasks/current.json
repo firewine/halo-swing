@@ -1,34 +1,22 @@
 {
-  "gate_id": "LIVE_NEWS_API_KEY_PROVIDER_GATE",
+  "gate_id": "LIVE_DATA_READINESS_MACRO_ALIAS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.621",
-  "next_atomic_step": "add NewsAPI live provider behind the provider boundary while keeping default execution fixture-backed and offline",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.622",
+  "next_atomic_step": "align live data readiness with the project-specific FRED macro API-key alias while keeping readiness secret-free and offline",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
-    "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/config.py",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/market.py",
     "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_providers.py",
-    "tests/test_mvp_tools.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.621",
-    "src/halo_swing_mcp/config.py",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/market.py",
+    "docs/halo-swing-development-plan.md#3.622",
     "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_providers.py",
-    "tests/test_mvp_tools.py",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -55,11 +43,10 @@
     "read_only": true
   },
   "done_means": [
-    "NewsAPI provider exists behind MarketDataProvider boundary",
-    "default provider remains fixture-backed ReplayMarketDataProvider",
-    "live news selection requires HALO_SWING_NEWS_DATA_MODE=live and HALO_SWING_NEWS_API_KEY or NEWS_API_KEY",
-    "provider tests cover missing key, provider selection, NewsAPI parsing, live bundle marking, and no returned secret values",
-    "default market, macro, event, and news tool contracts remain fixture-backed and offline",
+    "get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal",
+    "readiness output keeps macro API-key env names and values out of serialized payloads",
+    "blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready",
+    "default readiness remains offline and performs no network calls",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],

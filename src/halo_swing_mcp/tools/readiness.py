@@ -432,6 +432,7 @@ def _market_data_env_configured() -> bool:
 def _macro_env_configured() -> bool:
     return _env_value_configured(
         "HALO_SWING_MACRO_SOURCE",
+        "HALO_SWING_MACRO_API_KEY",
         "FRED_API_KEY",
         "HALO_SWING_FRED_API_KEY",
     )

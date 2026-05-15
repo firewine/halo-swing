@@ -1194,6 +1194,35 @@ def test_integration_readiness_env_secret_aliases_are_boolean_only(
         assert value not in serialized
 
 
+def test_integration_readiness_accepts_project_macro_api_key_alias(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-secret-key",
+        "HALO_SWING_MACRO_API_KEY": "macro-project-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-secret-key",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert live_data_gate["status"] == "ready"
+    assert live_data_gate["missing"] == []
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
+    assert live_data_gate["evidence"]["macro_source_configured"] is True
+    assert live_data_gate["evidence"]["news_source_configured"] is True
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
+    assert "live_data: provide" not in payload["next_actions"]
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
+
+
 def test_integration_readiness_ignores_invalid_env_secret_values_without_exposure(
     monkeypatch,
 ) -> None:
@@ -1204,6 +1233,7 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
         "HALO_SWING_TELEGRAM_GATEWAY": "\n",
         "HALO_SWING_TELEGRAM_GATEWAY_URL": "https://gateway.example/\x7fsecret",
         "HALO_SWING_MARKET_DATA_API_KEY": " market\x7fsecret ",
+        "HALO_SWING_MACRO_API_KEY": "macro\x7fsecret",
         "FRED_API_KEY": "   ",
         "HALO_SWING_FRED_API_KEY": "fred\nsecret",
         "NEWS_API_KEY": "\x7f",
