@@ -420,16 +420,20 @@ def _live_data_readiness(
 
 
 def _market_data_env_configured() -> bool:
-    return _env_value_configured(
+    return _source_env_configured(
         "HALO_SWING_MARKET_DATA_SOURCE",
+        "polygon",
+    ) or _env_value_configured(
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     )
 
 
 def _macro_env_configured() -> bool:
-    return _env_value_configured(
+    return _source_env_configured(
         "HALO_SWING_MACRO_SOURCE",
+        "fred",
+    ) or _env_value_configured(
         "HALO_SWING_MACRO_API_KEY",
         "FRED_API_KEY",
         "HALO_SWING_FRED_API_KEY",
@@ -437,10 +441,21 @@ def _macro_env_configured() -> bool:
 
 
 def _news_env_configured() -> bool:
-    return _env_value_configured(
+    return _source_env_configured(
         "HALO_SWING_NEWS_SOURCE",
+        "newsapi",
+    ) or _env_value_configured(
         "NEWS_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
+    )
+
+
+def _source_env_configured(key: str, supported_source: str) -> bool:
+    value = os.environ.get(key)
+    return bool(
+        _is_env_value_configured(value)
+        and isinstance(value, str)
+        and value.strip().lower() == supported_source
     )
 
 

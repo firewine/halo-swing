@@ -1306,9 +1306,9 @@ def test_integration_readiness_live_data_source_env_values_are_boolean_only(
 ) -> None:
     clear_readiness_env(monkeypatch)
     source_env = {
-        "HALO_SWING_MARKET_DATA_SOURCE": "polygon-live-source",
-        "HALO_SWING_MACRO_SOURCE": "fred-live-source",
-        "HALO_SWING_NEWS_SOURCE": "newsapi-live-source",
+        "HALO_SWING_MARKET_DATA_SOURCE": " polygon ",
+        "HALO_SWING_MACRO_SOURCE": " FRED ",
+        "HALO_SWING_NEWS_SOURCE": " newsapi ",
     }
     for key, value in source_env.items():
         monkeypatch.setenv(key, value)
@@ -1327,6 +1327,37 @@ def test_integration_readiness_live_data_source_env_values_are_boolean_only(
     assert live_data_gate["evidence"]["network_call"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "live_data: provide" not in payload["next_actions"]
+    for key, value in source_env.items():
+        assert key not in serialized
+        assert value not in serialized
+
+
+def test_integration_readiness_ignores_unsupported_live_data_source_env_values(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    source_env = {
+        "HALO_SWING_MARKET_DATA_SOURCE": "alpaca",
+        "HALO_SWING_MACRO_SOURCE": "bea",
+        "HALO_SWING_NEWS_SOURCE": "rss",
+    }
+    for key, value in source_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_source_or_api_key_decision",
+        "macro_source_or_api_key_decision",
+        "news_source_or_api_key_decision",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
     for key, value in source_env.items():
         assert key not in serialized
         assert value not in serialized

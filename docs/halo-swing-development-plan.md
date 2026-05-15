@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.624 Live Data Readiness Source Value Alignment Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 source config 값을 넣었을 때 readiness가 실제 구현된 provider 이름과
+어긋나지 않게 한다. 현재 구현된 live data sources는 market `polygon`, macro
+`fred`, news `newsapi`이므로, source env 값도 이 이름과 일치할 때만 준비
+신호로 본다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - HALO_SWING_MARKET_DATA_SOURCE is configured only when it matches polygon
+  - HALO_SWING_MACRO_SOURCE is configured only when it matches fred
+  - HALO_SWING_NEWS_SOURCE is configured only when it matches newsapi
+  - source env checks trim and lowercase valid provider names
+  - unsupported source env values do not mark live_data ready and are not serialized
+  - API-key readiness aliases still work through their existing secret-free boolean checks
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_are_boolean_only tests/test_readiness.py::test_integration_readiness_ignores_unsupported_live_data_source_env_values tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - HALO_SWING_MARKET_DATA_SOURCE=alpaca HALO_SWING_MACRO_SOURCE=bea HALO_SWING_NEWS_SOURCE=rss PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data blocked on all unsupported source values
+  - HALO_SWING_MARKET_DATA_SOURCE=' polygon ' HALO_SWING_MACRO_SOURCE=' FRED ' HALO_SWING_NEWS_SOURCE=' newsapi ' PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data ready without serialized source names or values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 685 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.623 Live Data Readiness Market Source Alignment Gate Record - 2026-05-16
 
 ### A. 목적

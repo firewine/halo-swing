@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_READINESS_MARKET_SOURCE_ALIGNMENT_GATE_VERIFIED
-gate_id: LIVE_DATA_READINESS_MARKET_SOURCE_ALIGNMENT_GATE
+status: LIVE_DATA_READINESS_SOURCE_VALUE_ALIGNMENT_GATE_VERIFIED
+gate_id: LIVE_DATA_READINESS_SOURCE_VALUE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: align live data readiness market signals with implemented Polygon provider support while keeping readiness secret-free and offline
+next_atomic_step: align live data readiness source env values with implemented provider names while keeping readiness secret-free and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -254,6 +254,8 @@ done_means:
   - blank or control-character HALO_SWING_MACRO_API_KEY values do not mark macro live data ready
   - get_integration_readiness does not treat unimplemented ALPACA_API_KEY or TIINGO_API_KEY values alone as implemented market live data readiness
   - readiness, audit, and runtime checkpoint outputs keep live data env names and values out of serialized payloads
+  - live data source env values count as configured only when they match implemented provider names polygon, fred, and newsapi
+  - unsupported live data source env values do not mark live_data ready and are not serialized
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -603,17 +605,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.623
-gate_packet: docs/halo-swing-development-plan.md#3.623
+portable_mirror: docs/halo-swing-development-plan.md#3.624
+gate_packet: docs/halo-swing-development-plan.md#3.624
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.623
+  - docs/halo-swing-development-plan.md#3.624
   - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_audit.py
   - tests/test_readiness.py
-  - tests/test_runtime_guard.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -916,14 +916,45 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Data Readiness Market Source Alignment Gate is verified.
-`get_integration_readiness` no longer treats unimplemented `ALPACA_API_KEY` or
-`TIINGO_API_KEY` values alone as implemented market live data readiness.
-Polygon readiness via `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`
-still works. Focused readiness/audit/runtime tests passed with 7 tests, full
-pytest passed with 684 tests, and ruff and health_check passed.
+Summary: Live Data Readiness Source Value Alignment Gate is verified.
+`get_integration_readiness` now treats source env values as configured only
+when they match implemented provider names: `polygon`, `fred`, and `newsapi`.
+Unsupported source env values remain blocked and are not serialized. Focused
+readiness tests passed with 3 tests, full pytest passed with 685 tests, and
+ruff and health_check passed.
 
 ```yaml
+live_data_readiness_source_value_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - get_integration_readiness treats HALO_SWING_MARKET_DATA_SOURCE, HALO_SWING_MACRO_SOURCE, and HALO_SWING_NEWS_SOURCE as configured only when they match implemented provider names polygon, fred, and newsapi
+    - source env value checks trim and lowercase valid provider names without returning env key names or values
+    - unsupported source env values do not mark live_data ready and are not serialized
+    - default readiness remains offline and performs no network calls
+    - no network calls, Telegram sends, migrations, repository persistence, broker path changes, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_are_boolean_only tests/test_readiness.py::test_integration_readiness_ignores_unsupported_live_data_source_env_values tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py
+      result: passed
+    - command: HALO_SWING_MARKET_DATA_SOURCE=alpaca HALO_SWING_MACRO_SOURCE=bea HALO_SWING_NEWS_SOURCE=rss PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, live_data gate blocked on all unsupported source values"
+    - command: "HALO_SWING_MARKET_DATA_SOURCE=' polygon ' HALO_SWING_MACRO_SOURCE=' FRED ' HALO_SWING_NEWS_SOURCE=' newsapi ' PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness"
+      result: "passed, live_data gate ready without serialized source names or values"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "685 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+
 live_data_readiness_market_source_alignment_gate:
   status: verified
   changed_files:
