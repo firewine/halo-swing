@@ -4330,6 +4330,60 @@ verification:
   - git status --short --ignored state -> ignored local state/ only
 ```
 
+## 3.619 Live Market Data API-Key Provider Gate Record - 2026-05-14
+
+### A. 목적
+
+사용자 지시로 실제 연동은 사용자가 API key/config 값만 넣으면 연결 가능한
+방향으로 진행한다. 첫 slice는 market OHLCV live source를 provider boundary 뒤에
+추가하되, 기본 실행과 테스트는 계속 fixture/replay offline 경로를 사용한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - PolygonMarketDataProvider added behind MarketDataProvider boundary
+  - HALO_SWING_MARKET_DATA_MODE=live selects the Polygon provider
+  - HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY supplies the API key
+  - default get_market_data_provider remains ReplayMarketDataProvider
+  - get_integration_readiness live_data evidence now reports live_adapter_added=true
+  - provider tests cover missing key, provider selection, Polygon OHLCV parsing, and no returned secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - macro live adapter
+  - news live adapter
+  - scheduler or cron runner
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q -> 36 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/readiness.py tests/test_providers.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 675 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected with live_adapter_added=true
+  - git diff --check -> passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
+  - git status --short --ignored state -> ignored local state/ only
+  - stop_guard.py -> passed
+```
+
 ## 3.68 Phase 3 Event Policy Contract Record - 2026-05-10
 
 ### A. 목적

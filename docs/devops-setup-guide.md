@@ -304,8 +304,17 @@ stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
 The live data gate returns `live_data_source_readiness.v1` and tracks market
 OHLCV, macro, and news source/API-key decisions separately. The check may use
-non-secret booleans or environment presence, but it does not return key values
-and does not add a live adapter.
+non-secret booleans or environment presence, but it does not return key values.
+Market OHLCV live mode is wired behind the provider boundary for Polygon:
+
+```bash
+export HALO_SWING_MARKET_DATA_MODE=live
+export POLYGON_API_KEY=<polygon-api-key>
+```
+
+`HALO_SWING_MARKET_DATA_API_KEY` is accepted as the project-specific alias for
+the same key. Default mode remains fixture-backed and offline unless live mode
+is explicitly enabled.
 
 The Telegram gate returns `telegram_delivery_readiness.v1`. It accepts either a
 bot-token readiness signal or a gateway readiness signal, exposes only booleans,

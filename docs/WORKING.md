@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD_VERIFIED
-gate_id: RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD
+status: LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE_VERIFIED
+gate_id: LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE
 review_tier: S1_small
 
-next_atomic_step: commit and push verified runtime checkpoint run_id guard, then open the next API-key-only integration gate
+next_atomic_step: add Polygon market OHLCV live provider behind the provider boundary while keeping default execution fixture-backed and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -238,6 +238,11 @@ done_means:
   - harness get_event_calendar invalid days failures exit nonzero, emit no stdout payload, and record failure audit events without output_summary
   - get_event_calendar exposes event_window_summary and per-event danger_window contracts
   - get_news_bundle exposes news_score_contract and score_leverage_swing uses explicit news_score
+  - Polygon market OHLCV live provider exists behind the MarketDataProvider boundary
+  - default market data provider remains fixture-backed and offline
+  - live market provider selection requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY
+  - provider tests cover missing key, provider selection, Polygon OHLCV parsing, and no returned secret values
+  - get_integration_readiness live_data evidence reflects live_adapter_added=true without network calls or secret values
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -312,7 +317,7 @@ done_means:
   - Phase 8 document summary input normalizes caller-supplied PDF/document summaries without file parsing or network calls
   - create_document_evidence_card validates and normalizes document summary text, artifact refs, scalar fields, asset_scope, and score inputs before evidence card construction
   - create_document_evidence_card rejects ASCII control characters in document summary text, artifact refs, scalar fields, and asset_scope before evidence card construction
-  - no migrations, DDL, DB connection, live adapter, scheduler, credential, or runtime artifact is added
+  - no migrations, DDL, DB connection, scheduler, credential, or runtime artifact is added
   - get_audit_log and get_audit_summary expose audit_log.v1/audit_summary.v1 with no-network/no-secret evidence
   - get_audit_log validates limit as a positive integer, caps it at 1000, and trims optional string filters before audit reads
   - get_audit_log rejects ASCII control characters in optional filter inputs before audit reads
@@ -587,16 +592,18 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.618
-gate_packet: docs/halo-swing-development-plan.md#3.618
+portable_mirror: docs/halo-swing-development-plan.md#3.619
+gate_packet: docs/halo-swing-development-plan.md#3.619
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.618
-  - src/halo_swing_mcp/harness.py
-  - src/halo_swing_mcp/tools/runtime.py
-  - tests/test_runtime_guard.py
+  - docs/halo-swing-development-plan.md#3.619
+  - src/halo_swing_mcp/config.py
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_providers.py
+  - tests/test_readiness.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -615,7 +622,7 @@ implementation_rule:
   - actual integrations must be built so local setup requires only user-provided API keys/config values plus documented approval flags
   - after each gate passes verification, commit and push the scoped gate changes before opening the next gate
   - do not add migrations, DDL, schema runners, or DB connection code
-  - do not add live adapters, schedulers, alerting integrations, Telegram credentials, or committed runtime/chart artifacts
+  - do not add schedulers, alerting integrations, Telegram credentials, or committed runtime/chart artifacts
   - verify through tests and CLI harness
 ```
 
@@ -899,18 +906,62 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Runtime Checkpoint Run ID Control Failure-Audit No-Fallback Guard is
-verified. Harness `record_runtime_checkpoint` control-character `run_id`
-failure-audit coverage proves no stdout, redacted stderr, failure audit input,
-no output_summary, no checkpoint or ledger creation, and no default state
-fallback. Focused runtime checkpoint run_id control-character failure-audit
-coverage passed with 1 test, full pytest passed with 672 tests, and ruff and
-health_check passed. User follow-up directive recorded: actual integrations
-should require only user-provided API keys/config values plus documented
-approval flags, and verified gate changes should be committed and pushed before
-opening the next gate.
+Summary: Live Market Data API-Key Provider Gate is verified. A Polygon OHLCV
+provider is added behind the MarketDataProvider boundary, selected only by
+`HALO_SWING_MARKET_DATA_MODE=live` with `HALO_SWING_MARKET_DATA_API_KEY` or
+`POLYGON_API_KEY`; the default provider remains fixture-backed and offline.
+Focused provider/readiness tests passed with 36 tests, full pytest passed with
+675 tests, and ruff and health_check passed.
 
 ```yaml
+live_market_data_api_key_provider_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_providers.py
+    - tests/test_readiness.py
+  implementation:
+    - PolygonMarketDataProvider added behind provider boundary
+    - default get_market_data_provider remains ReplayMarketDataProvider unless live mode is explicitly enabled
+    - live market provider requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY
+    - get_integration_readiness live_data evidence now reports live_adapter_added=true without network calls or secret values
+    - no macro live adapter, news live adapter, scheduler, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+      result: "36 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/readiness.py tests/test_providers.py tests/test_readiness.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "675 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected with live_adapter_added=true"
+    - command: git diff --check
+      result: passed
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+
 runtime_checkpoint_run_id_control_failure_audit_no_fallback_guard:
   status: verified
   changed_files:

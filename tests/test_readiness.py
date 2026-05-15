@@ -231,7 +231,7 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["gates"]["live_data"]["evidence"]["schema_version"] == (
         "live_data_source_readiness.v1"
     )
-    assert payload["gates"]["live_data"]["evidence"]["live_adapter_added"] is False
+    assert payload["gates"]["live_data"]["evidence"]["live_adapter_added"] is True
     assert payload["gates"]["live_data"]["evidence"]["network_call"] is False
     assert payload["live_data_required"] is False
 
@@ -1111,7 +1111,7 @@ def test_live_data_readiness_requires_market_macro_and_news_sources() -> None:
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is True
-    assert live_data_gate["evidence"]["live_adapter_added"] is False
+    assert live_data_gate["evidence"]["live_adapter_added"] is True
     assert live_data_gate["evidence"]["network_call"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
 
@@ -1260,7 +1260,7 @@ def test_integration_readiness_live_data_source_env_values_are_boolean_only(
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
     assert live_data_gate["evidence"]["macro_source_configured"] is True
     assert live_data_gate["evidence"]["news_source_configured"] is True
-    assert live_data_gate["evidence"]["live_adapter_added"] is False
+    assert live_data_gate["evidence"]["live_adapter_added"] is True
     assert live_data_gate["evidence"]["network_call"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "live_data: provide" not in payload["next_actions"]

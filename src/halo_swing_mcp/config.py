@@ -11,6 +11,7 @@ BINANCE_BOOLEAN_ENV_NAMES = {
     "binance_force_testnet_execution": "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "binance_enable_live_trading": "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
 }
+MARKET_DATA_MODE_ENV_NAME = "HALO_SWING_MARKET_DATA_MODE"
 
 
 class Settings(BaseSettings):
@@ -38,6 +39,9 @@ class Settings(BaseSettings):
     runtime_retention_max_bytes: int = 5_000_000
     runtime_failure_window: int = 20
     runtime_failure_threshold: int = 3
+    market_data_mode: str = "fixture"
+    market_data_source: str = "polygon"
+    market_data_api_key: str | None = None
 
     @field_validator(
         "binance_testnet",
@@ -61,6 +65,16 @@ class Settings(BaseSettings):
             if normalized == "false":
                 return False
         raise ValueError(f"{env_name} must be 'true' or 'false'")
+
+    @field_validator("market_data_mode", mode="before")
+    @classmethod
+    def _validate_market_data_mode(cls, value: str) -> str:
+        if not isinstance(value, str):
+            raise ValueError(f"{MARKET_DATA_MODE_ENV_NAME} must be fixture or live")
+        normalized = value.strip().lower()
+        if normalized not in {"fixture", "live"}:
+            raise ValueError(f"{MARKET_DATA_MODE_ENV_NAME} must be fixture or live")
+        return normalized
 
     model_config = SettingsConfigDict(
         env_file=".env",

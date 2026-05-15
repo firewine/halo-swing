@@ -1,37 +1,31 @@
 {
-  "gate_id": "RUNTIME_CHECKPOINT_RUN_ID_CONTROL_FAILURE_AUDIT_NO_FALLBACK_GUARD",
+  "gate_id": "LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.618",
-  "next_atomic_step": "verify record_runtime_checkpoint harness control-character run_id failure-audit creates no default state fallback without changing runtime checkpoint validation behavior",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.619",
+  "next_atomic_step": "add Polygon market OHLCV live provider behind the provider boundary while keeping default execution fixture-backed and offline",
   "allowed_edit_paths": [
-    ".codex/agents/ai-llm.toml",
-    ".codex/agents/be.toml",
-    ".codex/agents/ceo.toml",
-    ".codex/agents/cto.toml",
-    ".codex/agents/db.toml",
-    ".codex/agents/devops.toml",
-    ".codex/agents/docs-gardener.toml",
-    ".codex/agents/fe.toml",
-    ".codex/agents/fintech-vc.toml",
-    ".codex/agents/qc.toml",
-    ".codex/agents/security.toml",
     ".codex/tasks/current.json",
+    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
+    "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "tests/test_audit.py",
-    "tests/test_binance_btc.py",
-    "tests/test_readiness.py",
-    "tests/test_runtime_guard.py"
+    "src/halo_swing_mcp/config.py",
+    "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_providers.py",
+    "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.618",
-    "src/halo_swing_mcp/harness.py",
-    "src/halo_swing_mcp/tools/runtime.py",
-    "tests/test_runtime_guard.py"
+    "docs/halo-swing-development-plan.md#3.619",
+    "src/halo_swing_mcp/config.py",
+    "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_providers.py",
+    "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -57,11 +51,13 @@
     "read_only": true
   },
   "done_means": [
-    "record_runtime_checkpoint harness control-character run_id failure-audit failures emit no stdout",
-    "record_runtime_checkpoint harness control-character run_id failure-audit failures redact harness checkpoint path, audit path, ledger path, and serialized run_id fragments from stderr",
-    "record_runtime_checkpoint harness control-character run_id failure-audit failures record failure audit without output_summary, without checkpoint or ledger creation, and without default state fallback",
+    "Polygon market OHLCV provider exists behind MarketDataProvider boundary",
+    "default provider remains fixture-backed ReplayMarketDataProvider",
+    "live provider selection requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY",
+    "provider tests cover missing key, provider selection, OHLCV parsing, and no returned secret values",
+    "get_integration_readiness live_data evidence reflects live_adapter_added=true without network calls or secret values",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified gate, then open the next API-key-only integration gate so live setup requires only user-provided API keys/config values plus documented approval flags"
+  "next_state_after_success": "commit and push this verified gate, then open the next API-key-only macro or news integration gate"
 }

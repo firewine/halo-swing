@@ -145,7 +145,10 @@ realized R are calculated only inside `price_path[:time_barrier_days]`.
 run/config traceability, an idempotency key, and no-network/no-DB guards.
 `get_integration_readiness` reports blocked deployment gates without network
 calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
-macro, and news source decisions. It includes `hermes_mcp_config_readiness.v1`
+macro, and news source decisions. Market OHLCV live mode is available through
+the provider boundary with Polygon by setting `HALO_SWING_MARKET_DATA_MODE=live`
+and either `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; default runs
+remain fixture-backed and offline. It includes `hermes_mcp_config_readiness.v1`
 for config path and MCP registration evidence. It also exposes
 `telegram_delivery_readiness.v1` for bot-token/gateway readiness while keeping
 `send_call=false`, and a separate `live_order_submission` gate that requires

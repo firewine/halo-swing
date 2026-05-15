@@ -412,7 +412,7 @@ def _live_data_readiness(
             "market_ohlcv_source_configured": market_configured,
             "macro_source_configured": macro_configured,
             "news_source_configured": news_configured,
-            "live_adapter_added": False,
+            "live_adapter_added": True,
             "network_call": False,
             "secret_values_returned": False,
         },
