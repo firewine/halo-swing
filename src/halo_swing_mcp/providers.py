@@ -188,6 +188,119 @@ class PolygonMarketDataProvider:
         return self._replay.news_cards(topic)
 
 
+class FredMacroDataProvider:
+    """FRED macro provider wrapper selected only by explicit live macro mode."""
+
+    _BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
+    _SERIES = {
+        "vix": ("VIXCLS", "change_5d"),
+        "vxn": ("VXNCLS", "change_5d"),
+        "dxy": ("DTWEXBGS", "change_5d"),
+        "us_2y": ("DGS2", "change_5d_bps"),
+        "us_10y": ("DGS10", "change_5d_bps"),
+        "oil_wti": ("DCOILWTICO", "change_5d"),
+    }
+
+    def __init__(
+        self,
+        base_provider: MarketDataProvider,
+        *,
+        api_key: str,
+        http_get: Any | None = None,
+    ) -> None:
+        self._base_provider = base_provider
+        self._api_key = _normalize_secret(api_key, "macro API key")
+        self._http_get = http_get or _default_http_get
+
+    @property
+    def as_of(self) -> str:
+        return self._base_provider.as_of
+
+    @property
+    def data_mode(self) -> str:
+        return self._base_provider.data_mode
+
+    @property
+    def live_data_required(self) -> bool:
+        return self._base_provider.live_data_required
+
+    def supported_assets(self) -> list[str]:
+        return self._base_provider.supported_assets()
+
+    def supported_timeframes(self) -> list[str]:
+        return self._base_provider.supported_timeframes()
+
+    def resolve_asset(self, asset: str) -> tuple[str, int]:
+        return self._base_provider.resolve_asset(asset)
+
+    def ohlcv(
+        self,
+        symbol: str,
+        periods: int = 220,
+        timeframe: str = "1d",
+    ) -> tuple[dict[str, Any], ...]:
+        return self._base_provider.ohlcv(symbol, periods, timeframe)
+
+    def macro_snapshot(self) -> dict[str, Any]:
+        indicators = {
+            name: _fred_indicator(
+                self._fetch_series(series_id),
+                change_field=change_field,
+            )
+            for name, (series_id, change_field) in self._SERIES.items()
+        }
+        risk_score = _macro_risk_score(indicators)
+        macro_score = round(max(0.0, min(1.0, 1.0 - risk_score)), 4)
+        return {
+            "as_of": self.as_of,
+            "data_mode": "live",
+            "live_data_required": True,
+            "macro_score": macro_score,
+            "risk_score": risk_score,
+            "indicators": indicators,
+            "summary": "Live FRED macro snapshot built from configured API-key sources.",
+            "source_policy": {
+                "schema_version": "fred_macro_source_policy.v1",
+                "provider": "fred",
+                "network_call": True,
+                "secret_values_returned": False,
+            },
+        }
+
+    def event_calendar(self, days: int = 14) -> list[dict[str, Any]]:
+        return self._base_provider.event_calendar(days)
+
+    def news_cards(self, topic: str = "macro") -> list[dict[str, Any]]:
+        return self._base_provider.news_cards(topic)
+
+    def _fetch_series(self, series_id: str) -> list[float]:
+        query = parse.urlencode(
+            {
+                "series_id": series_id,
+                "api_key": self._api_key,
+                "file_type": "json",
+                "sort_order": "desc",
+                "limit": 10,
+            }
+        )
+        payload = self._http_get(f"{self._BASE_URL}?{query}")
+        observations = payload.get("observations")
+        if not isinstance(observations, list):
+            raise ValueError("FRED response did not include observations")
+        values: list[float] = []
+        for observation in observations:
+            if not isinstance(observation, dict):
+                continue
+            raw_value = observation.get("value")
+            try:
+                values.append(float(raw_value))
+            except (TypeError, ValueError):
+                continue
+        if len(values) < 2:
+            raise ValueError("FRED response must include at least two numeric observations")
+        return values
+
+
 DEFAULT_MARKET_DATA_PROVIDER = ReplayMarketDataProvider()
 
 
@@ -195,11 +308,15 @@ def get_market_data_provider() -> MarketDataProvider:
     """Return the configured market data provider."""
 
     settings = get_settings()
+    provider: MarketDataProvider = DEFAULT_MARKET_DATA_PROVIDER
     if settings.market_data_mode == "live":
         _validate_live_market_data_source(settings.market_data_source)
-        return PolygonMarketDataProvider(api_key=_resolve_polygon_api_key())
+        provider = PolygonMarketDataProvider(api_key=_resolve_polygon_api_key())
+    if settings.macro_data_mode == "live":
+        _validate_live_macro_source(settings.macro_source)
+        provider = FredMacroDataProvider(provider, api_key=_resolve_fred_api_key())
 
-    return DEFAULT_MARKET_DATA_PROVIDER
+    return provider
 
 
 def _validate_live_market_data_source(source: str) -> None:
@@ -208,6 +325,14 @@ def _validate_live_market_data_source(source: str) -> None:
     normalized = source.strip().lower()
     if normalized != "polygon":
         raise ValueError("HALO_SWING_MARKET_DATA_SOURCE must be polygon")
+
+
+def _validate_live_macro_source(source: str) -> None:
+    if not isinstance(source, str):
+        raise ValueError("HALO_SWING_MACRO_SOURCE must be fred")
+    normalized = source.strip().lower()
+    if normalized != "fred":
+        raise ValueError("HALO_SWING_MACRO_SOURCE must be fred")
 
 
 def _resolve_polygon_api_key() -> str:
@@ -222,6 +347,54 @@ def _resolve_polygon_api_key() -> str:
     raise ValueError(
         "live market data requires HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY"
     )
+
+
+def _resolve_fred_api_key() -> str:
+    settings = get_settings()
+    candidates = (
+        settings.macro_api_key,
+        os.environ.get("HALO_SWING_FRED_API_KEY"),
+        os.environ.get("FRED_API_KEY"),
+    )
+    for candidate in candidates:
+        if isinstance(candidate, str) and candidate.strip():
+            return _normalize_secret(candidate, "macro API key")
+    raise ValueError(
+        "live macro data requires HALO_SWING_MACRO_API_KEY, "
+        "HALO_SWING_FRED_API_KEY, or FRED_API_KEY"
+    )
+
+
+def _fred_indicator(values_descending: list[float], *, change_field: str) -> dict[str, Any]:
+    latest = values_descending[0]
+    comparison = values_descending[min(5, len(values_descending) - 1)]
+    change = latest - comparison
+    if change_field == "change_5d_bps":
+        change *= 100
+    return {
+        "value": round(latest, 4),
+        change_field: round(change, 4),
+        "state": _macro_indicator_state(latest, change_field),
+    }
+
+
+def _macro_indicator_state(value: float, change_field: str) -> str:
+    if change_field == "change_5d_bps":
+        return "easing" if value < 4.5 else "firm"
+    if value >= 25:
+        return "elevated"
+    if value <= 18:
+        return "contained"
+    return "stable"
+
+
+def _macro_risk_score(indicators: dict[str, dict[str, Any]]) -> float:
+    vix = float(indicators["vix"]["value"])
+    vxn = float(indicators["vxn"]["value"])
+    us_10y = float(indicators["us_10y"]["value"])
+    oil = float(indicators["oil_wti"]["value"])
+    raw = (vix / 40 * 0.35) + (vxn / 45 * 0.25) + (us_10y / 6 * 0.25) + (oil / 120 * 0.15)
+    return round(max(0.0, min(1.0, raw)), 4)
 
 
 def _normalize_secret(value: str, field_name: str) -> str:

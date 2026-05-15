@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE_VERIFIED
-gate_id: LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE
+status: LIVE_MACRO_API_KEY_PROVIDER_GATE_VERIFIED
+gate_id: LIVE_MACRO_API_KEY_PROVIDER_GATE
 review_tier: S1_small
 
-next_atomic_step: add Polygon market OHLCV live provider behind the provider boundary while keeping default execution fixture-backed and offline
+next_atomic_step: add FRED macro live provider behind the provider boundary while keeping default execution fixture-backed and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -243,6 +243,9 @@ done_means:
   - live market provider selection requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY
   - provider tests cover missing key, provider selection, Polygon OHLCV parsing, and no returned secret values
   - get_integration_readiness live_data evidence reflects live_adapter_added=true without network calls or secret values
+  - FRED macro live provider exists behind the MarketDataProvider boundary
+  - live macro provider selection requires HALO_SWING_MACRO_DATA_MODE=live and HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY
+  - provider tests cover missing key, provider selection, FRED macro parsing, and no returned secret values
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -592,17 +595,19 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.619
-gate_packet: docs/halo-swing-development-plan.md#3.619
+portable_mirror: docs/halo-swing-development-plan.md#3.620
+gate_packet: docs/halo-swing-development-plan.md#3.620
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.619
+  - docs/halo-swing-development-plan.md#3.620
   - src/halo_swing_mcp/config.py
   - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/market.py
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_providers.py
+  - tests/test_mvp_tools.py
   - tests/test_readiness.py
 
 implementation_rule:
@@ -906,14 +911,61 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Market Data API-Key Provider Gate is verified. A Polygon OHLCV
-provider is added behind the MarketDataProvider boundary, selected only by
-`HALO_SWING_MARKET_DATA_MODE=live` with `HALO_SWING_MARKET_DATA_API_KEY` or
-`POLYGON_API_KEY`; the default provider remains fixture-backed and offline.
-Focused provider/readiness tests passed with 36 tests, full pytest passed with
-675 tests, and ruff and health_check passed.
+Summary: Live Macro API-Key Provider Gate is verified. A FRED macro provider
+is added behind the MarketDataProvider boundary, selected only by
+`HALO_SWING_MACRO_DATA_MODE=live` with `HALO_SWING_MACRO_API_KEY`,
+`HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`; default market/macro/event/news
+tool behavior remains fixture-backed and offline. Focused provider/offline macro
+tests passed with 9 tests, full pytest passed with 678 tests, and ruff and
+health_check passed.
 
 ```yaml
+live_macro_api_key_provider_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  implementation:
+    - FredMacroDataProvider added as a wrapper behind MarketDataProvider
+    - default provider and default market, macro, event, and news tool contracts remain fixture-backed and offline
+    - live macro provider requires HALO_SWING_MACRO_DATA_MODE=live and HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY
+    - no news live adapter, scheduler, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_mvp_tools.py::test_market_macro_event_and_news_tools_are_offline -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/market.py tests/test_providers.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "678 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, status blocked as expected"
+    - command: git diff --check
+      result: passed
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: "passed, no blocked-path changes"
+    - command: git status --short --ignored state
+      result: "ignored local state/ only"
+    - command: "printf '{\"cwd\":\"/Users/june/Documents/New project 2\"}' | /usr/bin/python3 .codex/hooks/stop_guard.py"
+      result: passed
+
 live_market_data_api_key_provider_gate:
   status: verified
   changed_files:

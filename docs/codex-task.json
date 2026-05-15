@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_MARKET_DATA_API_KEY_PROVIDER_GATE",
+  "gate_id": "LIVE_MACRO_API_KEY_PROVIDER_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.619",
-  "next_atomic_step": "add Polygon market OHLCV live provider behind the provider boundary while keeping default execution fixture-backed and offline",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.620",
+  "next_atomic_step": "add FRED macro live provider behind the provider boundary while keeping default execution fixture-backed and offline",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -13,18 +13,22 @@
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/config.py",
     "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/tools/market.py",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_providers.py",
+    "tests/test_mvp_tools.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.619",
+    "docs/halo-swing-development-plan.md#3.620",
     "src/halo_swing_mcp/config.py",
     "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/tools/market.py",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_providers.py",
+    "tests/test_mvp_tools.py",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -51,13 +55,13 @@
     "read_only": true
   },
   "done_means": [
-    "Polygon market OHLCV provider exists behind MarketDataProvider boundary",
+    "FRED macro provider exists behind MarketDataProvider boundary",
     "default provider remains fixture-backed ReplayMarketDataProvider",
-    "live provider selection requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY",
-    "provider tests cover missing key, provider selection, OHLCV parsing, and no returned secret values",
-    "get_integration_readiness live_data evidence reflects live_adapter_added=true without network calls or secret values",
+    "live macro selection requires HALO_SWING_MACRO_DATA_MODE=live and HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY",
+    "provider tests cover missing key, provider selection, FRED macro parsing, and no returned secret values",
+    "default market, macro, event, and news tool contracts remain fixture-backed and offline",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified gate, then open the next API-key-only macro or news integration gate"
+  "next_state_after_success": "commit and push this verified gate, then open the next API-key-only news integration gate"
 }

@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.620 Live Macro API-Key Provider Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key/config 값만 넣으면 실제 macro 연동이 가능한 방향으로 진행한다.
+이번 slice는 FRED macro provider를 기존 MarketDataProvider boundary 뒤에 추가한다.
+기본 실행은 계속 fixture/replay offline이며, live macro는 명시 env로만 켜진다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - FredMacroDataProvider added as a wrapper behind MarketDataProvider
+  - HALO_SWING_MACRO_DATA_MODE=live selects live macro snapshot behavior
+  - HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY supplies the API key
+  - macro provider fetches VIX, VXN, dollar, 2Y, 10Y, and WTI series from FRED observations
+  - default provider and market/news/event fixture behavior stay offline
+  - provider tests cover missing key, provider selection, FRED macro parsing, and no returned secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - news live adapter
+  - scheduler or cron runner
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_mvp_tools.py::test_market_macro_event_and_news_tools_are_offline -q -> 9 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/config.py src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/market.py tests/test_providers.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 678 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, status blocked as expected
+  - git diff --check -> passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations -> passed
+  - git status --short --ignored state -> ignored local state/ only
+  - stop_guard.py -> passed
+```
+
 ## 2. 시스템 정의
 
 ### 2.1 시스템의 역할

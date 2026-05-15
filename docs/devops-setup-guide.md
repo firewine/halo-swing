@@ -316,6 +316,17 @@ export POLYGON_API_KEY=<polygon-api-key>
 the same key. Default mode remains fixture-backed and offline unless live mode
 is explicitly enabled.
 
+Macro live mode is wired behind the same provider boundary for FRED:
+
+```bash
+export HALO_SWING_MACRO_DATA_MODE=live
+export FRED_API_KEY=<fred-api-key>
+```
+
+`HALO_SWING_MACRO_API_KEY` and `HALO_SWING_FRED_API_KEY` are accepted as
+project-specific aliases. Default macro data remains fixture-backed unless live
+macro mode is explicitly enabled.
+
 The Telegram gate returns `telegram_delivery_readiness.v1`. It accepts either a
 bot-token readiness signal or a gateway readiness signal, exposes only booleans,
 and keeps `send_call=false`, `network_call=false`, and

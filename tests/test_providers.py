@@ -5,6 +5,7 @@ import pytest
 
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.providers import (
+    FredMacroDataProvider,
     MarketDataProvider,
     PolygonMarketDataProvider,
     ReplayMarketDataProvider,
@@ -16,6 +17,13 @@ from halo_swing_mcp.tools.market import (
     get_market_snapshot,
     get_news_bundle,
 )
+
+
+@pytest.fixture(autouse=True)
+def clear_provider_settings_cache() -> None:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def assert_market_data_provider(provider: MarketDataProvider) -> None:
@@ -68,6 +76,33 @@ def test_live_market_data_provider_uses_polygon_api_key(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def test_live_macro_provider_requires_api_key(monkeypatch) -> None:
+    monkeypatch.setenv("HALO_SWING_MACRO_DATA_MODE", "live")
+    monkeypatch.delenv("HALO_SWING_MACRO_API_KEY", raising=False)
+    monkeypatch.delenv("HALO_SWING_FRED_API_KEY", raising=False)
+    monkeypatch.delenv("FRED_API_KEY", raising=False)
+    get_settings.cache_clear()
+
+    with pytest.raises(ValueError, match="live macro data requires"):
+        get_market_data_provider()
+
+    get_settings.cache_clear()
+
+
+def test_live_macro_provider_uses_fred_api_key(monkeypatch) -> None:
+    monkeypatch.setenv("HALO_SWING_MACRO_DATA_MODE", "live")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, FredMacroDataProvider)
+    assert provider.data_mode == "fixture"
+    assert provider.live_data_required is False
+
+    get_settings.cache_clear()
+
+
 def test_polygon_market_data_provider_fetches_ohlcv_without_returning_secret() -> None:
     requested_urls: list[str] = []
 
@@ -108,6 +143,42 @@ def test_polygon_market_data_provider_fetches_ohlcv_without_returning_secret() -
     assert bars[-1]["close"] == 102.5
     assert query["apiKey"] == ["polygon-secret"]
     assert "polygon-secret" not in serialized_bars
+
+
+def test_fred_macro_provider_fetches_macro_snapshot_without_returning_secret() -> None:
+    requested_urls: list[str] = []
+
+    def fake_http_get(url: str) -> dict[str, Any]:
+        requested_urls.append(url)
+        return {
+            "observations": [
+                {"value": "20.0"},
+                {"value": "19.5"},
+                {"value": "19.0"},
+                {"value": "18.5"},
+                {"value": "18.0"},
+                {"value": "17.5"},
+            ]
+        }
+
+    provider = FredMacroDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="fred-secret",
+        http_get=fake_http_get,
+    )
+
+    snapshot = provider.macro_snapshot()
+    serialized = repr(snapshot)
+    query = parse.parse_qs(parse.urlparse(requested_urls[0]).query)
+
+    assert snapshot["data_mode"] == "live"
+    assert snapshot["live_data_required"] is True
+    assert snapshot["source_policy"]["provider"] == "fred"
+    assert snapshot["source_policy"]["network_call"] is True
+    assert snapshot["source_policy"]["secret_values_returned"] is False
+    assert set(snapshot["indicators"]) == {"vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"}
+    assert query["api_key"] == ["fred-secret"]
+    assert "fred-secret" not in serialized
 
 
 def test_market_tools_keep_replay_payload_contract() -> None:

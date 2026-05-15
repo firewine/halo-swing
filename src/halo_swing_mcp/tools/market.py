@@ -134,22 +134,27 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
 def get_macro_snapshot() -> dict[str, Any]:
     """Return deterministic macro state."""
 
-    snapshot = get_market_data_provider().macro_snapshot()
+    provider = get_market_data_provider()
+    snapshot = provider.macro_snapshot()
     indicators = snapshot["indicators"]
+    live_data_required = bool(snapshot["live_data_required"])
     return {
         **snapshot,
         "macro_filter_contract": {
             "schema_version": "macro_filter.v1",
             "required_indicators": ["vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"],
             "change_window": "5d",
-            "network_call": False,
-            "live_data_required": False,
+            "network_call": live_data_required,
+            "live_data_required": live_data_required,
             "policy": (
-                "Macro blocks are derived from fixture VIX/VXN, DXY, rates, "
-                "and oil change fields until a live macro source is approved."
+                "Macro blocks are derived from fixture or configured FRED VIX/VXN, "
+                "DXY, rates, and oil change fields."
             ),
         },
-        "macro_filter_summary": _macro_filter_summary(indicators),
+        "macro_filter_summary": _macro_filter_summary(
+            indicators,
+            live_data_required=live_data_required,
+        ),
     }
 
 
@@ -313,7 +318,11 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
     }
 
 
-def _macro_filter_summary(indicators: dict[str, Any]) -> dict[str, Any]:
+def _macro_filter_summary(
+    indicators: dict[str, Any],
+    *,
+    live_data_required: bool = False,
+) -> dict[str, Any]:
     vix_value = _indicator_value(indicators, "vix")
     vxn_value = _indicator_value(indicators, "vxn")
     dxy_change = _indicator_change(indicators, "dxy")
@@ -352,7 +361,7 @@ def _macro_filter_summary(indicators: dict[str, Any]) -> dict[str, Any]:
             for name in ("vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti")
         },
         "change_window": "5d",
-        "live_data_required": False,
+        "live_data_required": live_data_required,
     }
 
 
