@@ -899,6 +899,9 @@ def run_api_key_pipeline_smoke(
                 api_key_command_summary=api_key_command_summary,
             )
         ),
+        "api_key_provider_recovery_checklist": (
+            _api_key_provider_recovery_checklist(live_data_smoke_summary)
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -1868,6 +1871,63 @@ def _api_key_pipeline_provider_route_summary(route: dict[str, Any]) -> dict[str,
         "missing": route.get("missing"),
         "network_call": route.get("network_call"),
         "secret_values_returned": route.get("secret_values_returned"),
+    }
+
+
+def _api_key_provider_recovery_checklist(
+    live_data_smoke_summary: dict[str, Any],
+) -> dict[str, Any]:
+    provider_errors = live_data_smoke_summary.get("provider_error_summaries")
+    provider_error_rows = (
+        [row for row in provider_errors if isinstance(row, dict)]
+        if isinstance(provider_errors, list)
+        else []
+    )
+    recovery_smokes = live_data_smoke_summary.get("provider_recovery_smokes")
+    recovery_smoke_rows = (
+        [row for row in recovery_smokes if isinstance(row, dict)]
+        if isinstance(recovery_smokes, list)
+        else []
+    )
+    recovery_smokes_by_name = {
+        row["smoke_command_name"]: row
+        for row in recovery_smoke_rows
+        if isinstance(row.get("smoke_command_name"), str)
+    }
+    items: list[dict[str, Any]] = []
+    for provider_error in provider_error_rows:
+        smoke_command_name = provider_error.get("smoke_command_name")
+        recovery_smoke = (
+            recovery_smokes_by_name.get(smoke_command_name)
+            if isinstance(smoke_command_name, str)
+            else None
+        )
+        items.append(
+            {
+                "provider_family": provider_error.get("provider_family"),
+                "provider": provider_error.get("provider"),
+                "smoke_command_name": smoke_command_name,
+                "exception_type": provider_error.get("exception_type"),
+                "next_setup_action": provider_error.get("next_setup_action"),
+                "recovery_smoke": recovery_smoke,
+                "recovery_smoke_command": (
+                    recovery_smoke.get("command")
+                    if recovery_smoke is not None
+                    else None
+                ),
+                "recovery_smoke_available": recovery_smoke is not None,
+                "secret_values_returned": False,
+            }
+        )
+
+    return {
+        "schema_version": "api_key_provider_recovery_checklist.v1",
+        "status": "conflict" if items else "ok",
+        "provider_error_count": len(provider_error_rows),
+        "provider_recovery_smoke_count": len(recovery_smoke_rows),
+        "item_count": len(items),
+        "items": items,
+        "secret_values_returned": False,
     }
 
 

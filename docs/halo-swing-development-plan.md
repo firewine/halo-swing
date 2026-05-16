@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.719 API Key Provider Recovery Checklist Gate Record - 2026-05-17
+
+### A. 목적
+
+`provider_error_summaries`와 `provider_recovery_smokes`는 각각 실패 metadata와
+재실행 command를 제공하지만, 사용자가 provider별로 어떤 실패와 어떤 command가
+대응되는지 보려면 두 목록을 머릿속에서 매칭해야 한다. 이번 slice는
+`run_api_key_pipeline_smoke` top-level에 no-secret provider recovery checklist를
+추가해, 각 실패 provider의 error metadata와 rerunnable smoke command를 한 행에서
+확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now exposes api_key_provider_recovery_checklist with one row per provider_error_summary
+  - each recovery checklist row pairs provider_family, provider, smoke_command_name, exception_type, next_setup_action, and the matching no-secret recovery smoke command
+  - fake-key one-shot smoke runs surface three checklist rows for market, macro, and news provider failures
+  - fixture-default/no-key smoke paths keep the recovery checklist ok/empty when no provider error summaries exist
+  - recovery checklist rows do not include exception messages, URLs, API key values, or secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider recovery checklist readiness pytest: 2 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with three no-secret recovery checklist rows
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0; recovery checklist ok/empty while setup remains blocked at prepare_dotenv
+```
+
 ## 3.718 API Key Provider Recovery Docs Gate Record - 2026-05-17
 
 ### A. 목적

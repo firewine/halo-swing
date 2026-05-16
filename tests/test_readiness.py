@@ -2296,6 +2296,40 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["live_data_smoke_summary"]["provider_recovery_smokes"]
     )
     assert payload["provider_recovery_smoke_count"] == 3
+    recovery_checklist = payload["api_key_provider_recovery_checklist"]
+    assert recovery_checklist["schema_version"] == (
+        "api_key_provider_recovery_checklist.v1"
+    )
+    assert recovery_checklist["status"] == "conflict"
+    assert recovery_checklist["provider_error_count"] == 3
+    assert recovery_checklist["provider_recovery_smoke_count"] == 3
+    assert recovery_checklist["item_count"] == 3
+    assert [
+        item["provider_family"] for item in recovery_checklist["items"]
+    ] == ["market", "macro", "news"]
+    assert [
+        item["smoke_command_name"] for item in recovery_checklist["items"]
+    ] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert recovery_checklist["items"][0]["exception_type"] == "RuntimeError"
+    assert recovery_checklist["items"][0]["next_setup_action"] == (
+        "verify_provider_credentials_or_network"
+    )
+    assert recovery_checklist["items"][0]["recovery_smoke_available"] is True
+    assert recovery_checklist["items"][0]["recovery_smoke"] == (
+        payload["provider_recovery_smokes"][0]
+    )
+    assert recovery_checklist["items"][0]["recovery_smoke_command"] == (
+        payload["provider_recovery_smokes"][0]["command"]
+    )
+    assert recovery_checklist["secret_values_returned"] is False
+    assert all(
+        item["secret_values_returned"] is False
+        for item in recovery_checklist["items"]
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -3617,6 +3651,15 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "command": "cp .env.example .env",
         "mutates_local_state": True,
         "network_call": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_provider_recovery_checklist"] == {
+        "schema_version": "api_key_provider_recovery_checklist.v1",
+        "status": "ok",
+        "provider_error_count": 0,
+        "provider_recovery_smoke_count": 0,
+        "item_count": 0,
+        "items": [],
         "secret_values_returned": False,
     }
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
