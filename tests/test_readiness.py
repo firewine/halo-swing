@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 READINESS_ENV_KEYS = (
     "HALO_SWING_HERMES_CONFIG_PATH",
     "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED",
+    "HALO_SWING_DISABLE_DOTENV",
     "HALO_SWING_TELEGRAM_BOT_TOKEN",
     "HALO_SWING_TELEGRAM_GATEWAY",
     "HALO_SWING_TELEGRAM_GATEWAY_URL",
@@ -1629,6 +1630,76 @@ def test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_r
     assert "news-exported-secret" not in serialized
 
 
+def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secrets(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_env = tmp_path / ".env"
+    repo_env.with_name(".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWS_API_KEY=\n",
+        encoding="utf-8",
+    )
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-dotenv-secret",
+        "FRED_API_KEY": "fred-dotenv-secret",
+        "NEWS_API_KEY": "news-dotenv-secret",
+    }
+    repo_env.write_text(
+        "\n".join(f"{key}={value}" for key, value in secret_env.items()),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.setenv(local_env.DOTENV_DISABLED_ENV, "true")
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "conflict"
+    assert payload["api_key_dotenv_loading_summary"] == {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": True,
+        "dotenv_loading_enabled": False,
+        "disabled": True,
+        "disabled_env_key": "HALO_SWING_DISABLE_DOTENV",
+        "configuration_precedence": [
+            "exported environment variables",
+            "launch-directory .env",
+            "repo-root .env",
+        ],
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": True,
+        "copy_required": False,
+        "next_setup_step": "fill_live_data_api_keys",
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_file_summary"]["target_exists"] is True
+    assert payload["api_key_setup_file_summary"]["copy_required"] is False
+    assert payload["api_key_setup_file_summary"]["missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_next_action_summary"]["next_action_name"] == (
+        "fill_live_data_api_keys"
+    )
+    assert payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
+    for value in secret_env.values():
+        assert value not in serialized
+
+
 def test_live_data_provider_route_reports_blocked_defaults(monkeypatch) -> None:
     clear_readiness_env(monkeypatch)
 
@@ -2371,6 +2442,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_dotenv_loading_summary"] == {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": True,
+        "dotenv_loading_enabled": True,
+        "disabled": False,
+        "disabled_env_key": "HALO_SWING_DISABLE_DOTENV",
+        "configuration_precedence": [
+            "exported environment variables",
+            "launch-directory .env",
+            "repo-root .env",
+        ],
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": False,
+        "copy_required": True,
+        "next_setup_step": "run_provider_smokes",
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
     assert payload["live_data_smoke_summary"]["failed_provider_families"] == [
         "market",
@@ -2648,6 +2741,16 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
                 "news": {"configured": True},
             },
             "missing": [],
+            "dotenv": {
+                "supported": True,
+                "disabled": False,
+                "precedence": [
+                    "exported environment variables",
+                    "launch-directory .env",
+                    "repo-root .env",
+                ],
+                "mutation": False,
+            },
             "one_shot_smoke_command": {
                 "name": "run_api_key_pipeline_smoke",
                 "command": (
@@ -2868,6 +2971,16 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
                 "news": {"configured": True},
             },
             "missing": [],
+            "dotenv": {
+                "supported": True,
+                "disabled": False,
+                "precedence": [
+                    "exported environment variables",
+                    "launch-directory .env",
+                    "repo-root .env",
+                ],
+                "mutation": False,
+            },
             "one_shot_smoke_command": {
                 "name": "run_api_key_pipeline_smoke",
                 "command": (
@@ -3519,6 +3632,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
                 "news": fake_provider_setup_actions["news"],
             },
             "missing": [],
+            "dotenv": {
+                "supported": True,
+                "disabled": False,
+                "precedence": [
+                    "exported environment variables",
+                    "launch-directory .env",
+                    "repo-root .env",
+                ],
+                "mutation": False,
+            },
             "one_shot_smoke_command": {
                 "name": "run_api_key_pipeline_smoke",
                 "command": (
@@ -3766,6 +3889,28 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "missing_provider_families": [],
         "configured_provider_family_count": 3,
         "required_provider_family_count": 3,
+        "next_setup_step": "run_provider_smokes",
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_dotenv_loading_summary"] == {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": True,
+        "dotenv_loading_enabled": True,
+        "disabled": False,
+        "disabled_env_key": "HALO_SWING_DISABLE_DOTENV",
+        "configuration_precedence": [
+            "exported environment variables",
+            "launch-directory .env",
+            "repo-root .env",
+        ],
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": True,
+        "copy_required": False,
         "next_setup_step": "run_provider_smokes",
         "ready_to_run_live_smoke": True,
         "network_call": False,
@@ -4193,6 +4338,19 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     )
     assert payload["api_key_setup_file_summary"]["ready_to_run_live_smoke"] is False
     assert payload["api_key_setup_file_summary"]["secret_values_returned"] is False
+    assert payload["api_key_dotenv_loading_summary"]["dotenv_supported"] is True
+    assert payload["api_key_dotenv_loading_summary"]["dotenv_loading_enabled"] is True
+    assert payload["api_key_dotenv_loading_summary"]["disabled"] is False
+    assert payload["api_key_dotenv_loading_summary"]["next_setup_step"] == (
+        "prepare_dotenv"
+    )
+    assert (
+        payload["api_key_dotenv_loading_summary"]["ready_to_run_live_smoke"]
+        is False
+    )
+    assert (
+        payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
+    )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

@@ -107,6 +107,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "target_exists" in guide
     assert "copy_required" in guide
     assert "preferred_env_keys" in guide
+    assert "api_key_dotenv_loading_summary" in guide
+    assert "api_key_dotenv_loading_summary.v1" in guide
+    assert "dotenv_supported" in guide
+    assert "dotenv_loading_enabled" in guide
+    assert "disabled_env_key" in guide
+    assert "configuration_precedence" in guide
     assert "readiness_summary.next_operator_action" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide

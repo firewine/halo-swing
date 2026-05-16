@@ -497,7 +497,12 @@ visible with `source_path`, `target_path`, `source_exists`, `target_exists`,
 `copy_required`, `copy_command`, `preferred_env_keys`,
 `configured_provider_families`, `missing_provider_families`,
 `next_setup_step`, and `ready_to_run_live_smoke`, without returning secret
-values or mutating files. The
+values or mutating files. The top-level `api_key_dotenv_loading_summary`
+(`api_key_dotenv_loading_summary.v1`) shows `dotenv_supported`,
+`dotenv_loading_enabled`, `disabled`, `disabled_env_key`,
+`configuration_precedence`, `.env.example`/`.env` file status,
+`next_setup_step`, and `ready_to_run_live_smoke`, so disabled dotenv loading or
+precedence issues are visible without returning key values. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

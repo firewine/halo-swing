@@ -927,6 +927,10 @@ def run_api_key_pipeline_smoke(
         "api_key_setup_file_summary": _api_key_setup_file_summary(
             live_data_setup_summary
         ),
+        "api_key_dotenv_loading_summary": _api_key_dotenv_loading_summary(
+            live_data_api_key_status,
+            live_data_setup_summary,
+        ),
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
         "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
         "api_key_pipeline_failure_summary": _api_key_pipeline_failure_summary(
@@ -1806,7 +1810,7 @@ def _api_key_pipeline_next_action_summary(
 ) -> dict[str, Any]:
     next_provider_smoke = _optional_mapping(
         next_operator_action.get("next_provider_smoke")
-    )
+    ) or {}
     next_action_command = (
         next_operator_action.get("recovery_smoke_command")
         or next_operator_action.get("command")
@@ -2080,6 +2084,41 @@ def _api_key_setup_file_summary(
         "required_provider_family_count": provider_family_summary.get(
             "required_count"
         ),
+        "next_setup_step": live_data_setup_steps.get("next_step"),
+        "ready_to_run_live_smoke": (
+            live_data_setup_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_dotenv_loading_summary(
+    live_data_api_key_status: dict[str, Any],
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    dotenv = _optional_mapping(live_data_api_key_status.get("dotenv")) or {}
+    dotenv_file_status = _optional_mapping(
+        live_data_setup_summary.get("dotenv_file_status")
+    ) or {}
+    live_data_setup_steps = _optional_mapping(
+        live_data_setup_summary.get("live_data_setup_steps")
+    ) or {}
+    disabled = dotenv.get("disabled") is True
+    supported = dotenv.get("supported") is True
+    return {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": supported,
+        "dotenv_loading_enabled": supported and not disabled,
+        "disabled": disabled,
+        "disabled_env_key": local_env.DOTENV_DISABLED_ENV,
+        "configuration_precedence": _string_list(dotenv.get("precedence")),
+        "source_path": dotenv_file_status.get("source_path"),
+        "target_path": dotenv_file_status.get("target_path"),
+        "source_exists": dotenv_file_status.get("source_exists") is True,
+        "target_exists": dotenv_file_status.get("target_exists") is True,
+        "copy_required": dotenv_file_status.get("copy_required") is True,
         "next_setup_step": live_data_setup_steps.get("next_step"),
         "ready_to_run_live_smoke": (
             live_data_setup_summary.get("ready_to_run_live_smoke") is True

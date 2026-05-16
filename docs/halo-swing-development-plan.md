@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.730 API Key Dotenv Loading Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only 연동에서 사용자는 `.env`에 키를 채우기만 하면 provider smoke로
+넘어가야 한다. 다만 `HALO_SWING_DISABLE_DOTENV`가 켜져 있거나 exported env와
+`.env` precedence를 착각하면 `.env` 파일이 있어도 키가 로드되지 않는다. 이번
+slice는 `run_api_key_pipeline_smoke` top-level
+`api_key_dotenv_loading_summary`를 추가해 dotenv 지원 여부, 로딩 활성화 상태,
+precedence, `.env.example`/`.env` 파일 상태, 다음 setup step을 한 곳에서
+확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_dotenv_loading_summary using schema api_key_dotenv_loading_summary.v1
+  - api_key_dotenv_loading_summary exposes dotenv_supported, dotenv_loading_enabled, disabled, disabled_env_key, configuration_precedence, source_path, target_path, source_exists, target_exists, copy_required, next_setup_step, and ready_to_run_live_smoke without secret values
+  - cover the disabled-dotenv path where .env exists but keys are intentionally ignored
+  - document the compact dotenv loading summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_dotenv_loading_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secrets tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; dotenv loading summary present without secret values
+  - fake-key direct summary check -> api_key_dotenv_loading_summary.v1 True ['exported environment variables', 'launch-directory .env', 'repo-root .env'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 776 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.729 API Key Setup File Summary Gate Record - 2026-05-17
 
 ### A. 목적

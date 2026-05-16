@@ -315,6 +315,12 @@ state visible with `source_path`, `target_path`, `source_exists`,
 `configured_provider_families`, `missing_provider_families`,
 `next_setup_step`, and `ready_to_run_live_smoke`, without returning secret
 values or mutating files.
+The top-level `api_key_dotenv_loading_summary`
+(`api_key_dotenv_loading_summary.v1`) shows whether dotenv loading is supported
+and enabled with `dotenv_supported`, `dotenv_loading_enabled`, `disabled`,
+`disabled_env_key`, `configuration_precedence`, `.env.example`/`.env` file
+status, `next_setup_step`, and `ready_to_run_live_smoke`, so a disabled dotenv
+loader is visible without exposing key values.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,
