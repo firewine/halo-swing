@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.722 API Key Operator Checklist Provider Recovery Blocker Gate Record - 2026-05-17
+
+### A. 목적
+
+fake API key로 `run_api_key_pipeline_smoke`를 실행하면 provider recovery가 필요한데도
+`api_key_operator_checklist.ready=true`, `blocking_step_count=0`으로 보일 수 있다.
+이번 slice는 provider/network 실패 복구가 필요한 경우 operator checklist의 다음
+blocking action을 `recover_failed_providers`로 승격해, 사용자가 API 키만 넣은 뒤
+one-shot smoke 결과만 보고도 바로 다음 rerun command를 실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - provider recovery required state now appends a recover_failed_providers operator checklist step with status pending
+  - api_key_operator_checklist ready becomes false and next_blocking_action points to recover_failed_providers when provider recovery is required
+  - recover_failed_providers carries recovery_smoke_command, recovery_smoke_available, provider_recovery_item_count, and next_provider_recovery_action without secret values
+  - no-recovery ready/blocked setup paths keep existing operator checklist behavior and step counts
+  - README and DevOps setup guide document recover_failed_providers as the recovery blocking step
+  - tests/test_setup_docs.py asserts recover_failed_providers, blocking_step_names, and next_blocking_action
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 4 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with provider recovery required, recover_failed_providers next_blocking_action, and no secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.721 API Key Operator Checklist Provider Recovery Gate Record - 2026-05-17
 
 ### A. 목적

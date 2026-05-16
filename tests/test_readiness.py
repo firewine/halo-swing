@@ -2366,6 +2366,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ]
         is True
     )
+    assert operator_checklist["ready"] is False
+    assert operator_checklist["blocking_step_names"] == ["recover_failed_providers"]
+    assert operator_checklist["blocking_step_count"] == 1
+    assert operator_checklist["next_blocking_step"] == "recover_failed_providers"
+    assert operator_checklist["step_count"] == 5
+    assert operator_checklist["next_blocking_action"] == {
+        "name": "recover_failed_providers",
+        "status": "pending",
+        "provider_recovery_item_count": 3,
+        "next_provider_recovery_action": recovery_checklist["items"][0],
+        "recovery_smoke_command": payload["provider_recovery_smokes"][0][
+            "command"
+        ],
+        "recovery_smoke_available": True,
+        "network_call": True,
+        "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert operator_checklist["steps"][-1] == operator_checklist[
+        "next_blocking_action"
+    ]
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized

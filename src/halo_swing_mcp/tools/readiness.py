@@ -2151,6 +2151,16 @@ def _api_key_pipeline_operator_checklist(
     dotenv_setup_ready = (
         ready_to_run_live_smoke or copy_dotenv_command.get("required") is not True
     )
+    provider_recovery_items = api_key_provider_recovery_checklist.get("items")
+    provider_recovery_rows = (
+        [row for row in provider_recovery_items if isinstance(row, dict)]
+        if isinstance(provider_recovery_items, list)
+        else []
+    )
+    provider_recovery_required = bool(provider_recovery_rows)
+    next_provider_recovery_action = (
+        provider_recovery_rows[0] if provider_recovery_rows else None
+    )
     steps = [
         {
             "name": "prepare_dotenv",
@@ -2207,6 +2217,29 @@ def _api_key_pipeline_operator_checklist(
             ),
         },
     ]
+    if provider_recovery_required:
+        steps.append(
+            {
+                "name": "recover_failed_providers",
+                "status": "pending",
+                "provider_recovery_item_count": len(provider_recovery_rows),
+                "next_provider_recovery_action": next_provider_recovery_action,
+                "recovery_smoke_command": next_provider_recovery_action.get(
+                    "recovery_smoke_command"
+                )
+                if next_provider_recovery_action is not None
+                else None,
+                "recovery_smoke_available": next_provider_recovery_action.get(
+                    "recovery_smoke_available"
+                )
+                if next_provider_recovery_action is not None
+                else False,
+                "network_call": True,
+                "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            }
+        )
     blocking_step_names = [
         str(step["name"]) for step in steps if step.get("status") != "ready"
     ]
@@ -2216,16 +2249,6 @@ def _api_key_pipeline_operator_checklist(
     next_blocking_action = next(
         (step for step in steps if step.get("status") != "ready"),
         None,
-    )
-    provider_recovery_items = api_key_provider_recovery_checklist.get("items")
-    provider_recovery_rows = (
-        [row for row in provider_recovery_items if isinstance(row, dict)]
-        if isinstance(provider_recovery_items, list)
-        else []
-    )
-    provider_recovery_required = bool(provider_recovery_rows)
-    next_provider_recovery_action = (
-        provider_recovery_rows[0] if provider_recovery_rows else None
     )
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
