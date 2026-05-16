@@ -42,6 +42,7 @@ from halo_swing_mcp.tools.recording import (
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    get_live_data_api_key_status,
     run_api_key_pipeline_smoke,
     run_integration_smoke,
     run_live_data_smoke,
@@ -202,6 +203,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_integration_setup_checklist",
         get_integration_setup_checklist,
         "Return local setup requirements for integration readiness.",
+    ),
+    ToolSpec(
+        "get_live_data_api_key_status",
+        get_live_data_api_key_status,
+        "Return live data API-key readiness without network calls.",
     ),
     ToolSpec(
         "validate_live_data_smoke_result",

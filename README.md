@@ -198,6 +198,14 @@ setup checklist of `.env` keys, durable gate approvals, and harness commands:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 ```
 
+To check only live data API-key setup before making provider network calls, use
+`get_live_data_api_key_status`; it reports configured alias names, missing
+provider families, and the one-shot smoke command without returning secrets:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+```
+
 After running the live data smoke commands from the checklist, pass the returned
 payloads to `validate_live_data_smoke_result` to verify the market, macro, and
 news live boundary contracts offline:

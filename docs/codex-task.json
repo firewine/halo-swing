@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_SMOKE_GATE",
+  "gate_id": "LIVE_DATA_API_KEY_STATUS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.659",
-  "next_atomic_step": "add a one-shot API-key pipeline smoke runner that combines readiness, live data, signal workflow, and recording smoke checks without Hermes, Telegram, orders, migrations, repositories, or retained state by default",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.660",
+  "next_atomic_step": "add a no-network live data API-key status tool that shows whether Polygon, FRED, and NewsAPI keys are configured from supported env or dotenv aliases without returning secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,8 @@
     "tests/golden/mvp_tool_contracts.json",
     "tests/test_readiness.py",
     "tests/test_mvp_tools.py",
-    "tests/test_tool_registry.py"
+    "tests/test_tool_registry.py",
+    "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
@@ -44,11 +45,11 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\",\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit"
   ],
   "post_implementation_review": {
     "roles": [
@@ -61,16 +62,16 @@
     "read_only": true
   },
   "done_means": [
-    "run_api_key_pipeline_smoke is registered for MCP and harness use",
-    "runner combines get_integration_readiness, run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke",
-    "runner returns ok only when live data readiness is ready and live data, workflow, and recording smokes all pass",
-    "fixture defaults remain offline and produce conflict rather than pretending API-key integration passed",
-    "runner starts no Hermes runtime, sends no Telegram message, submits no order, writes no retained state by default, and returns no secrets",
-    "setup checklist, README, and DevOps guide document the one-shot API-key pipeline smoke command after API keys are filled",
+    "get_live_data_api_key_status is registered for MCP and harness use",
+    "tool reports Polygon, FRED, and NewsAPI API-key readiness from supported env and dotenv aliases without network calls",
+    "tool returns configured alias names only, never secret values",
+    "tool includes missing provider families and the one-shot API-key pipeline smoke command",
+    "fixture defaults remain offline and blocked without pretending live integration is configured",
+    "README and DevOps guide document the no-network API-key status command",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data API-key status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

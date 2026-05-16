@@ -21,6 +21,7 @@
     "generate_cron_prompt_pack",
     "get_integration_readiness",
     "get_integration_setup_checklist",
+    "get_live_data_api_key_status",
     "validate_live_data_smoke_result",
     "run_live_data_smoke",
     "run_integration_smoke",

@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.660 Live Data API-Key Status Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 채운 뒤 바로 provider smoke를 호출하기 전에, Polygon/FRED/NewsAPI
+각 provider family가 어떤 지원 alias로 준비됐는지 비밀값 없이 확인할 수 있어야 한다.
+이번 slice는 `get_live_data_api_key_status`를 추가해 exported env와 `.env` 기반 API-key
+상태를 네트워크 호출 없이 보고하고, 누락된 provider family와 다음 one-shot smoke command를
+명확히 반환한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status is registered for MCP and harness use
+  - tool reports Polygon, FRED, and NewsAPI API-key readiness from supported env and dotenv aliases without network calls
+  - tool returns configured alias names only, never secret values
+  - tool includes missing provider families and the one-shot API-key pipeline smoke command
+  - fixture defaults remain offline and blocked without pretending live integration is configured
+  - README and DevOps guide document the no-network API-key status command
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q -> 12 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 756 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit -> passed, status blocked without API keys as expected
+```
+
 ## 3.659 API-Key Pipeline Smoke Gate Record - 2026-05-16
 
 ### A. 목적

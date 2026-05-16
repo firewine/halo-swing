@@ -200,6 +200,71 @@ def get_integration_setup_checklist() -> dict[str, Any]:
     }
 
 
+def get_live_data_api_key_status() -> dict[str, Any]:
+    """Return no-network live data API-key readiness without exposing secrets."""
+
+    providers = {
+        "market": _live_data_api_key_provider_status(
+            provider_family="market",
+            provider="polygon",
+            accepted_env_keys=["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+            missing_name="market_ohlcv_api_key",
+            smoke_command_name="get_market_snapshot_live_smoke",
+            optional_live_mode_env="HALO_SWING_MARKET_DATA_MODE",
+        ),
+        "macro": _live_data_api_key_provider_status(
+            provider_family="macro",
+            provider="fred",
+            accepted_env_keys=[
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+            ],
+            missing_name="macro_api_key",
+            smoke_command_name="get_macro_snapshot_live_smoke",
+            optional_live_mode_env="HALO_SWING_MACRO_DATA_MODE",
+        ),
+        "news": _live_data_api_key_provider_status(
+            provider_family="news",
+            provider="newsapi",
+            accepted_env_keys=["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            missing_name="news_api_key",
+            smoke_command_name="get_news_bundle_live_smoke",
+            optional_live_mode_env="HALO_SWING_NEWS_DATA_MODE",
+        ),
+    }
+    missing = [
+        missing
+        for provider_status in providers.values()
+        for missing in provider_status["missing"]
+    ]
+    return {
+        "schema_version": "live_data_api_key_status.v1",
+        "status": "ready" if not missing else "blocked",
+        "providers": providers,
+        "missing": missing,
+        "one_shot_smoke_command": _local_command("run_api_key_pipeline_smoke"),
+        "dotenv": {
+            "supported": True,
+            "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
+            "precedence": [
+                "exported environment variables",
+                "repo-root .env",
+                "launch-directory .env",
+            ],
+            "mutation": False,
+        },
+        "live_mode_required": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+    }
+
+
 def validate_live_data_smoke_result(
     *,
     market_snapshot: dict[str, Any] | None = None,
@@ -668,6 +733,20 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
                 "get_integration_setup_checklist --no-audit"
+            ),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_live_data_api_key_status",
+            "purpose": (
+                "show live data API-key readiness and configured alias names "
+                "without network calls or secret values"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_live_data_api_key_status --no-audit"
             ),
             "network_call": False,
             "mutates_local_state": False,
@@ -1442,6 +1521,60 @@ def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:
             "secret_values_returned": False,
         },
     ]
+
+
+def _live_data_api_key_provider_status(
+    *,
+    provider_family: str,
+    provider: str,
+    accepted_env_keys: list[str],
+    missing_name: str,
+    smoke_command_name: str,
+    optional_live_mode_env: str,
+) -> dict[str, Any]:
+    configured_env_keys = _configured_env_keys(accepted_env_keys)
+    configured = bool(configured_env_keys)
+    return {
+        "provider_family": provider_family,
+        "provider": provider,
+        "configured": configured,
+        "configured_env_keys": configured_env_keys,
+        "accepted_env_keys": accepted_env_keys,
+        "missing": [] if configured else [missing_name],
+        "auto_selects_live_provider": configured,
+        "live_mode_required": False,
+        "optional_live_mode_env": optional_live_mode_env,
+        "smoke_command": _live_data_smoke_command(smoke_command_name),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _configured_env_keys(keys: list[str]) -> list[str]:
+    return [
+        key
+        for key in keys
+        if _is_env_value_configured(get_config_value(key))
+    ]
+
+
+def _live_data_smoke_command(name: str) -> dict[str, Any]:
+    for command in _setup_live_data_smoke_commands():
+        if command["name"] == name:
+            return command
+    raise ValueError(f"unknown live data smoke command: {name}")
+
+
+def _local_command(name: str) -> dict[str, Any]:
+    for command in _setup_local_commands():
+        if command["name"] == name:
+            return command
+    raise ValueError(f"unknown local command: {name}")
+
+
+def _truthy_config_value(value: str | None) -> bool:
+    return isinstance(value, str) and value.strip().lower() in {"1", "true", "yes"}
 
 
 def _hermes_readiness(

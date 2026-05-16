@@ -524,6 +524,13 @@ def get_integration_setup_checklist() -> dict[str, Any]:
 
 
 @mcp.tool()
+def get_live_data_api_key_status() -> dict[str, Any]:
+    """Return live data API-key readiness without network calls."""
+
+    return _call_registered_tool("get_live_data_api_key_status")
+
+
+@mcp.tool()
 def validate_live_data_smoke_result(
     market_snapshot: dict[str, Any] | None = None,
     macro_snapshot: dict[str, Any] | None = None,

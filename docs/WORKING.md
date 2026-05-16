@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_SMOKE_VERIFIED
-gate_id: API_KEY_PIPELINE_SMOKE_GATE
+status: LIVE_DATA_API_KEY_STATUS_VERIFIED
+gate_id: LIVE_DATA_API_KEY_STATUS_GATE
 review_tier: S1_small
 
-next_atomic_step: add a one-shot API-key pipeline smoke runner that combines readiness, live data, signal workflow, and recording smoke checks without Hermes, Telegram, orders, migrations, repositories, or retained state by default
+next_atomic_step: add a no-network live data API-key status tool that shows whether Polygon, FRED, and NewsAPI keys are configured from supported env or dotenv aliases without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -63,6 +63,7 @@ allowed_edit_paths:
   - tests/test_readiness.py
   - tests/test_mvp_tools.py
   - tests/test_tool_registry.py
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -79,25 +80,36 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke is registered for MCP and harness use
-  - runner combines get_integration_readiness, run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke
-  - runner returns ok only when live data readiness is ready and live data, workflow, and recording smokes all pass
-  - fixture defaults remain offline and produce conflict rather than pretending API-key integration passed
-  - runner starts no Hermes runtime, sends no Telegram message, submits no order, writes no retained state by default, and returns no secrets
-  - setup checklist, README, and DevOps guide document the one-shot API-key pipeline smoke command after API keys are filled
+  - get_live_data_api_key_status is registered for MCP and harness use
+  - tool reports Polygon, FRED, and NewsAPI API-key readiness from supported env and dotenv aliases without network calls
+  - tool returns configured alias names only, never secret values
+  - tool includes missing provider families and the one-shot API-key pipeline smoke command
+  - fixture defaults remain offline and blocked without pretending live integration is configured
+  - README and DevOps guide document the no-network API-key status command
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data API-key status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_SMOKE_VERIFIED
+gate_id: API_KEY_PIPELINE_SMOKE_GATE
+review_tier: S1_small
+
+next_atomic_step: add a one-shot API-key pipeline smoke runner that combines readiness, live data, signal workflow, and recording smoke checks without Hermes, Telegram, orders, migrations, repositories, or retained state by default
 ```
 
 Previous completed directive:
@@ -1201,6 +1213,63 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data API-Key Status Gate is verified.
+`get_live_data_api_key_status` is registered for MCP and harness use. It reports
+Polygon, FRED, and NewsAPI API-key readiness from exported environment variables
+or supported `.env` aliases without calling provider networks, mutating state, or
+returning secret values. Fixture defaults remain offline and blocked until keys
+are filled. Focused tests passed with 12 tests, full pytest passed with 756
+tests, and ruff, health_check, and the harness status command passed.
+
+```yaml
+live_data_api_key_status_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/server.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_readiness.py
+    - tests/test_mvp_tools.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_api_key_status is registered for MCP and harness use
+    - tool reports Polygon, FRED, and NewsAPI API-key readiness from supported env and dotenv aliases without network calls
+    - tool returns configured alias names only, never secret values
+    - tool includes missing provider families and the one-shot API-key pipeline smoke command
+    - fixture defaults remain offline and blocked without pretending live integration is configured
+    - README and DevOps guide document the no-network API-key status command
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
+      result: "12 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "756 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: "passed, status blocked without API keys as expected"
+```
+
+Previous verification:
 
 Summary: API-Key Pipeline Smoke Gate is verified.
 `run_api_key_pipeline_smoke` is registered for MCP and harness use. It combines

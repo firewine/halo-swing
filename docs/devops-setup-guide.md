@@ -323,6 +323,12 @@ local setup checklist:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 ```
 
+live data API-key status, without network calls:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+```
+
 live data smoke result validation:
 
 ```bash
@@ -373,7 +379,10 @@ read-only and return no secret values, but they can call provider networks when
 the configured keys select live providers. Use
 `validate_live_data_smoke_result` on the collected smoke payloads to verify
 `live_data_required`, `network_call`, live guard checks, and secret-return
-metadata offline. Use `run_live_data_smoke` for the same validation in one
+metadata offline. Use `get_live_data_api_key_status` before the first live smoke
+when you only need to confirm that supported Polygon, FRED, and NewsAPI aliases
+are configured; it reports key names and missing provider families but never
+secret values. Use `run_live_data_smoke` for the same validation in one
 command after filling the market, macro, and news API keys. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting

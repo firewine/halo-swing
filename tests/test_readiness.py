@@ -16,6 +16,7 @@ from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    get_live_data_api_key_status,
     run_api_key_pipeline_smoke,
     run_integration_smoke,
     run_live_data_smoke,
@@ -345,6 +346,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "save_binance_credentials",
         "get_integration_readiness",
         "get_integration_setup_checklist",
+        "get_live_data_api_key_status",
         "validate_live_data_smoke_result",
         "run_live_data_smoke",
         "run_integration_smoke",
@@ -404,6 +406,101 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             "missing": ["MIGRATION_GO", "REPOSITORY_GO"],
         },
     ]
+
+
+def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = get_live_data_api_key_status()
+
+    assert payload["schema_version"] == "live_data_api_key_status.v1"
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["network_call"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["live_mode_required"] is False
+    assert payload["one_shot_smoke_command"]["name"] == "run_api_key_pipeline_smoke"
+    assert payload["one_shot_smoke_command"]["network_call"] is True
+    assert payload["providers"]["market"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert payload["providers"]["macro"]["accepted_env_keys"] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
+    assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    for provider_status in payload["providers"].values():
+        assert provider_status["configured"] is False
+        assert provider_status["configured_env_keys"] == []
+        assert provider_status["auto_selects_live_provider"] is False
+        assert provider_status["live_mode_required"] is False
+        assert provider_status["network_call"] is False
+        assert provider_status["mutates_local_state"] is False
+        assert provider_status["secret_values_returned"] is False
+        assert provider_status["smoke_command"]["network_call_policy"] == (
+            "only_when_matching_api_key_selects_live_provider"
+        )
+
+
+def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_dir = tmp_path / "repo"
+    run_dir = tmp_path / "runner"
+    repo_dir.mkdir()
+    run_dir.mkdir()
+    repo_env = repo_dir / ".env"
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-local-secret-key",
+        "HALO_SWING_FRED_API_KEY": "fred-local-secret-key",
+        "NEWS_API_KEY": "news-local-secret-key",
+    }
+    repo_env.write_text(
+        "\n".join(f"{key}={value}" for key, value in secret_env.items()),
+        encoding="utf-8",
+    )
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_live_data_api_key_status()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "ready"
+    assert payload["missing"] == []
+    assert payload["providers"]["market"]["configured"] is True
+    assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
+    assert payload["providers"]["macro"]["configured"] is True
+    assert payload["providers"]["macro"]["configured_env_keys"] == [
+        "HALO_SWING_FRED_API_KEY"
+    ]
+    assert payload["providers"]["news"]["configured"] is True
+    assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
+    assert payload["dotenv"]["supported"] is True
+    assert payload["dotenv"]["disabled"] is False
+    assert payload["dotenv"]["mutation"] is False
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+    for key, value in secret_env.items():
+        assert key in serialized
+        assert value not in serialized
 
 
 def test_validate_live_data_smoke_result_accepts_live_boundaries() -> None:
