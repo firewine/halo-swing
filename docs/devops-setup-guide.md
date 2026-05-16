@@ -482,8 +482,10 @@ The live data gate returns `live_data_source_readiness.v1` and tracks market
 OHLCV, macro, and news API-key readiness separately. The check may use
 non-secret booleans or environment presence, but it does not return key values.
 Live data providers auto-select when their supported API-key aliases are
-present. Market OHLCV live data is wired behind the provider boundary for
-Polygon:
+present. Exported environment variables satisfy setup even when repo-root
+`.env` has not been copied, so the next setup action moves directly to provider
+smokes once all required provider keys are configured. Market OHLCV live data is
+wired behind the provider boundary for Polygon:
 
 ```bash
 POLYGON_API_KEY=your_polygon_key

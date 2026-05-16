@@ -1433,6 +1433,49 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
         assert value not in serialized
 
 
+def test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_env = tmp_path / ".env"
+    repo_env.with_name(".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWS_API_KEY=\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-exported-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-exported-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-exported-secret")
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_live_data_api_key_status()
+    serialized = json.dumps(payload, sort_keys=True)
+    setup_steps = payload["live_data_setup_steps"]
+    prepare_dotenv_step = setup_steps["steps"][0]
+
+    assert payload["status"] == "ready"
+    assert payload["missing"] == []
+    assert payload["dotenv_file_status"]["target_exists"] is False
+    assert payload["dotenv_file_status"]["copy_required"] is True
+    assert prepare_dotenv_step["name"] == "prepare_dotenv"
+    assert prepare_dotenv_step["status"] == "ready"
+    assert setup_steps["next_step"] == "run_provider_smokes"
+    assert payload["next_operator_action"]["name"] == "run_provider_smokes"
+    assert payload["next_operator_action"]["status"] == "ready"
+    assert payload["next_operator_action"]["provider_smoke_count"] == 3
+    assert (
+        payload["next_operator_action"]["next_provider_smoke_command_name"]
+        == "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_operator_action"]["network_call"] is True
+    assert payload["next_operator_action"]["secret_values_returned"] is False
+    assert "polygon-exported-secret" not in serialized
+    assert "fred-exported-secret" not in serialized
+    assert "news-exported-secret" not in serialized
+
+
 def test_live_data_provider_route_reports_blocked_defaults(monkeypatch) -> None:
     clear_readiness_env(monkeypatch)
 

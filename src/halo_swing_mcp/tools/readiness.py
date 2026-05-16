@@ -2217,10 +2217,10 @@ def _live_data_setup_steps(
         and required_count > 0
         and configured_count == required_count
     )
-    if not source_exists and not target_exists:
+    if not source_exists and not target_exists and not keys_ready:
         next_step = "restore_env_example"
         dotenv_status = "blocked"
-    elif copy_required:
+    elif copy_required and not keys_ready:
         next_step = "prepare_dotenv"
         dotenv_status = "pending"
     else:

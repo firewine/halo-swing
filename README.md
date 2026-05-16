@@ -156,8 +156,10 @@ macro, and news API-key readiness. Live data providers auto-select when their
 supported API-key aliases are present: Polygon uses
 `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; FRED uses
 `HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`; and
-NewsAPI uses `HALO_SWING_NEWS_API_KEY` or `NEWS_API_KEY`. Without those keys,
-runs remain fixture-backed and offline. When a NewsAPI key selects live news,
+NewsAPI uses `HALO_SWING_NEWS_API_KEY` or `NEWS_API_KEY`. Exported environment
+variables satisfy setup even if repo-root `.env` has not been copied, so the
+next setup action moves directly to provider smokes. Without those keys, runs
+remain fixture-backed and offline. When a NewsAPI key selects live news,
 `get_news_bundle` declares `live_data_required=true`, `network_call=true`, and
 `secret_values_returned=false`, with guard checks for the live data boundary and
 network call declaration. The optional `*_DATA_MODE=live` env values are still

@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.707 API Key Exported Env Dotenv Bypass Gate Record - 2026-05-17
+
+### A. 목적
+
+API key가 이미 exported environment에 모두 설정되어 있으면 live-data setup은 준비된
+상태지만, repo-root `.env` 파일이 없다는 이유로 `next_operator_action`이 여전히
+`prepare_dotenv`를 가리킬 수 있었다. 이번 slice는 사용자가 API key를 환경변수로
+이미 넣은 경우 `.env` 복사를 다음 blocker로 보이지 않게 해, API-key-only 연동의
+실제 다음 action이 provider smoke 실행으로 드러나게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - fully configured exported live-data API keys make live_data_setup_steps.next_step run_provider_smokes even when repo-root .env is absent
+  - exported-key setup keeps dotenv_file_status.copy_required visible for operators who prefer .env, but prepare_dotenv is no longer the next blocker
+  - next_operator_action becomes run_provider_smokes and includes provider smoke command payloads without secret values
+  - blocked no-key setup still points to prepare_dotenv when .env is absent and remains non-mutating
+  - README and DevOps guide document that exported env keys can satisfy setup without copying .env
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused readiness/setup-docs pytest: 6 passed
+  - exported-env CLI smoke with fake POLYGON_API_KEY/FRED_API_KEY/NEWS_API_KEY: next_step=run_provider_smokes and next_operator_action=run_provider_smokes without secret values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 763 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - run_api_key_pipeline_smoke fixture-default path: exit 0, blocked at prepare_dotenv, no secrets returned
+```
+
 ## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
 
 ### A. 목적

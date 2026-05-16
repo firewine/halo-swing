@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_VERIFIED
-gate_id: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_GATE
+status: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_VERIFIED
+gate_id: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror the no-secret next_operator_action in top-level readiness_summary so API-key-only readiness includes the next runnable local action
+next_atomic_step: treat fully configured exported live-data API keys as setup-ready even when repo-root .env is absent so dotenv copy is not the next blocker
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,24 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - top-level readiness_summary exposes the same no-secret next_operator_action as the pipeline payload
-  - ready API-key setup readiness_summary points to run_provider_smokes and includes the provider smoke action payload
-  - blocked setup readiness_summary points to prepare_dotenv and includes the copy command action payload
-  - blocked or partial setup paths do not return secret values and remain non-mutating
-  - README and DevOps setup guide mention that readiness_summary mirrors next_operator_action separately from broader integration gates
+  - with all required live-data API keys configured via exported env and no repo-root .env file, live_data_setup_steps.next_step is run_provider_smokes
+  - with all required live-data API keys configured via exported env and no repo-root .env file, next_operator_action is run_provider_smokes and includes provider smoke command payloads
+  - dotenv_file_status may still report copy_required for operators who prefer a local .env, but prepare_dotenv is not the blocking next step when exported keys already satisfy setup
+  - blocked no-key setup still points to prepare_dotenv when .env is absent and remains non-mutating
+  - README and DevOps setup guide mention that exported env keys can satisfy setup without copying .env
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline readiness next-operator-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified exported-env dotenv bypass gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_VERIFIED
+gate_id: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror the no-secret next_operator_action in top-level readiness_summary so API-key-only readiness includes the next runnable local action
 ```
 
 Previous completed directive:
@@ -1712,6 +1723,63 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Exported Env Dotenv Bypass Gate is verified. When all
+required live-data API keys are configured through exported environment
+variables and repo-root `.env` is absent, setup now treats `prepare_dotenv` as
+ready and moves `live_data_setup_steps.next_step` plus
+`next_operator_action.name` to `run_provider_smokes`. `dotenv_file_status` still
+reports `copy_required=true` for operators who prefer local `.env`, but it is
+not the blocking next action once exported keys satisfy setup. Blocked no-key
+setup still points to `prepare_dotenv`, remains non-mutating, and returns no
+secret values. Focused tests passed with 6 tests, full pytest passed with 763
+tests, and ruff, health_check, exported-env CLI smoke, and the one-shot
+pipeline harness passed.
+
+```yaml
+api_key_exported_env_dotenv_bypass_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - fully configured exported live-data API keys make live_data_setup_steps.next_step run_provider_smokes even when repo-root .env is absent
+    - exported-key setup keeps dotenv_file_status.copy_required visible for operators who prefer .env, but prepare_dotenv is no longer the next blocker
+    - next_operator_action becomes run_provider_smokes and includes provider smoke command payloads without secret values
+    - blocked no-key setup still points to prepare_dotenv when .env is absent and remains non-mutating
+    - README and DevOps guide document that exported env keys can satisfy setup without copying .env
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "6 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: "exit 0; next_step=run_provider_smokes and next_operator_action.name=run_provider_smokes without secret values"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "763 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Readiness Next Operator Action Gate is verified.
 Top-level `readiness_summary` now mirrors the same no-secret
