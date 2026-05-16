@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.631 Live Data Env Template Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 `.env.example`을 복사해 API key만 채우면 구현된 live data provider가
+자동 선택될 수 있도록, live data key alias placeholder를 template에 맞춘다.
+Template은 실제 secret 값을 포함하지 않고 blank placeholder만 제공한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - .env.example now includes blank Polygon market key placeholders
+  - .env.example now includes blank FRED macro key placeholders
+  - .env.example now includes blank NewsAPI key placeholders
+  - .env.example states blank keys preserve fixture-backed offline defaults
+  - .env.example states DATA_MODE live flags are optional and not required for API-key auto-select
+  - task contract and portable mirror point at this env-template gate
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - real secret values
+  - source code changes
+  - test behavior changes
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.630 Live Data API-Key Setup Docs Gate Record - 2026-05-16
 
 ### A. 목적

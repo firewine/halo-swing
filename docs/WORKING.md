@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_API_KEY_SETUP_DOCS_GATE_VERIFIED
-gate_id: LIVE_DATA_API_KEY_SETUP_DOCS_GATE
+status: LIVE_DATA_ENV_TEMPLATE_GATE_VERIFIED
+gate_id: LIVE_DATA_ENV_TEMPLATE_GATE
 review_tier: S1_small
 
-next_atomic_step: update user-facing setup docs so live data integration requires only supported API-key aliases while preserving offline default warnings
+next_atomic_step: update the local env template with secret-free live data API-key placeholders that match provider auto-select behavior
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -261,6 +261,7 @@ done_means:
   - live market, macro, and news providers auto-select from implemented API-key aliases without requiring live mode env values
   - live_data readiness reports implemented API-key aliases as ready without requiring live mode env values
   - README and DevOps setup guide describe API-key-only live data setup for Polygon, FRED, and NewsAPI
+  - .env.example exposes blank live data API-key placeholders for Polygon, FRED, and NewsAPI aliases
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -610,15 +611,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.630
-gate_packet: docs/halo-swing-development-plan.md#3.630
+portable_mirror: docs/halo-swing-development-plan.md#3.631
+gate_packet: docs/halo-swing-development-plan.md#3.631
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.630
-  - README.md
-  - docs/devops-setup-guide.md
+  - docs/halo-swing-development-plan.md#3.631
+  - .env.example
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/readiness.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -921,14 +923,48 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Data API-Key Setup Docs Gate is verified. README and DevOps setup
-guide now tell operators that live data providers auto-select from supported
-API-key aliases: Polygon, FRED, and NewsAPI no longer require a matching
-`*_DATA_MODE=live` env value when the API key is present. The docs preserve that
-no-key defaults remain fixture-backed and offline, and state that optional
-`*_DATA_MODE=live` values are still accepted for explicit operator intent/source
-validation. Task mirrors match, JSON validation passed, focused
-provider/readiness tests passed with 52 tests, and ruff and health_check passed.
+Summary: Live Data Env Template Gate is verified. `.env.example` now includes
+blank placeholders for Polygon market, FRED macro, and NewsAPI live data key
+aliases, states blank keys preserve fixture-backed offline defaults, and states
+optional `*_DATA_MODE=live` flags are accepted but not required for API-key
+auto-select. The template contains no real secret values. Task mirrors match,
+JSON validation passed, focused provider/readiness tests passed with 52 tests,
+and ruff and health_check passed.
+
+```yaml
+live_data_env_template_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+  implementation:
+    - .env.example contains blank placeholders for Polygon market, FRED macro, and NewsAPI key aliases
+    - .env.example does not contain real secret values
+    - .env.example states blank keys preserve fixture-backed offline defaults
+    - .env.example states DATA_MODE live flags are optional and not required for API-key auto-select
+    - task contract and portable mirror match
+    - no source code, tests, providers, network behavior, migrations, repository persistence, broker path, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: rg -n 'secret|token|key|passphrase|password' .env.example
+      result: "passed, only placeholder comments and blank key names matched"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 live_data_api_key_setup_docs_gate:
