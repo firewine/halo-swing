@@ -110,7 +110,8 @@ environment variables take precedence, then a launch-directory `.env`, then the
 repo-root `.env`. For the normal local path, copy `.env.example` to the
 repository root as `.env` and fill only the API keys or config values you need.
 Set `HALO_SWING_DISABLE_DOTENV=true` for isolated offline runs that must ignore
-local operator secrets, such as tests or CI.
+local operator secrets, such as tests or CI. This isolation flag may be
+exported or set in `.env`; when it is true, other dotenv values are ignored.
 Fixture OHLCV supports `1d`, `4h`, and `1h` timeframes for indicator and chart
 tools; unsupported timeframes are rejected before any live adapter is involved.
 `get_market_snapshot` returns `market_snapshot.v1` with QQQ, SPY, SMH, SOXX,

@@ -24,6 +24,7 @@ TELEGRAM_DELIVERY_KEYS = {
     "HALO_SWING_TELEGRAM_GATEWAY",
     "HALO_SWING_TELEGRAM_GATEWAY_URL",
 }
+DOTENV_ISOLATION_KEY = "HALO_SWING_DISABLE_DOTENV"
 
 
 def _env_template_lines() -> list[str]:
@@ -55,6 +56,12 @@ def test_env_example_telegram_delivery_keys_are_blank_placeholders() -> None:
     for key in TELEGRAM_DELIVERY_KEYS:
         assert key in assignments
         assert assignments[key] == ""
+
+
+def test_env_example_dotenv_isolation_key_is_blank_placeholder() -> None:
+    assignments = _env_assignments()
+
+    assert assignments[DOTENV_ISOLATION_KEY] == ""
 
 
 def test_env_example_live_modes_are_optional_comments() -> None:

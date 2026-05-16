@@ -1,24 +1,32 @@
 {
-  "gate_id": "SETUP_DOCS_DOTENV_GATE",
+  "gate_id": "DOTENV_DISABLE_FLAG_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.637",
-  "next_atomic_step": "align setup docs with repo-root dotenv loading, API-key-only live setup, and offline dotenv isolation",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.638",
+  "next_atomic_step": "make HALO_SWING_DISABLE_DOTENV usable from dotenv files and expose the blank template placeholder",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
+    ".env.example",
     "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
+    "src/halo_swing_mcp/env.py",
+    "tests/test_env.py",
+    "tests/test_env_template.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.637",
+    "docs/halo-swing-development-plan.md#3.638",
+    ".env.example",
     "README.md",
     "docs/devops-setup-guide.md",
+    "src/halo_swing_mcp/env.py",
+    "tests/test_env.py",
+    "tests/test_env_template.py",
     "tests/test_setup_docs.py"
   ],
   "blocked_path_prefixes": [
@@ -35,7 +43,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_env_template.py tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -50,14 +58,14 @@
     "read_only": true
   },
   "done_means": [
-    "README explains repo-root .env setup and dotenv precedence",
-    "README mentions HALO_SWING_DISABLE_DOTENV=true for isolated offline runs",
-    "DevOps guide explains exported env, launch-directory .env, and repo-root .env precedence",
-    "DevOps guide shows key-only dotenv examples for Polygon, FRED, and NewsAPI without requiring export commands",
-    "tests/test_setup_docs.py locks the setup docs contract",
+    "HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when exported",
+    "HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when set in repo-root .env or launch-directory .env",
+    ".env.example exposes a blank HALO_SWING_DISABLE_DOTENV placeholder",
+    "setup docs explain that the isolation flag may be exported or set in .env",
+    "tests lock dotenv disable behavior, env template placeholder, and setup docs text",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified setup-docs dotenv gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified dotenv disable flag gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

@@ -45,18 +45,19 @@ def get_local_env_files() -> tuple[Path, ...]:
 
     if dotenv_loading_disabled():
         return ()
-    paths: list[Path] = []
-    for path in (REPO_ROOT_ENV_PATH, Path(LOCAL_ENV_PATH).resolve()):
-        if path not in paths:
-            paths.append(path)
-    return tuple(paths)
+    return _candidate_env_files()
 
 
 def dotenv_loading_disabled() -> bool:
     """Return whether dotenv loading is disabled for isolated runs."""
 
     value = os.environ.get(DOTENV_DISABLED_ENV)
-    return isinstance(value, str) and value.strip().lower() in {"1", "true", "yes"}
+    if _truthy(value):
+        return True
+    for env_path in reversed(_candidate_env_files()):
+        if env_path.is_file() and _truthy(dotenv_values(env_path).get(DOTENV_DISABLED_ENV)):
+            return True
+    return False
 
 
 def clear_local_env_cache() -> None:
@@ -72,3 +73,15 @@ def _local_env_values() -> dict[str, str | None]:
         if env_path.is_file():
             values.update(dotenv_values(env_path))
     return values
+
+
+def _candidate_env_files() -> tuple[Path, ...]:
+    paths: list[Path] = []
+    for path in (REPO_ROOT_ENV_PATH, Path(LOCAL_ENV_PATH).resolve()):
+        if path not in paths:
+            paths.append(path)
+    return tuple(paths)
+
+
+def _truthy(value: str | None) -> bool:
+    return isinstance(value, str) and value.strip().lower() in {"1", "true", "yes"}

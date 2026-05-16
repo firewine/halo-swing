@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: SETUP_DOCS_DOTENV_GATE_VERIFIED
-gate_id: SETUP_DOCS_DOTENV_GATE
+status: DOTENV_DISABLE_FLAG_GATE_VERIFIED
+gate_id: DOTENV_DISABLE_FLAG_GATE
 review_tier: S1_small
 
-next_atomic_step: align setup docs with repo-root dotenv loading, API-key-only live setup, and offline dotenv isolation
+next_atomic_step: make HALO_SWING_DISABLE_DOTENV usable from dotenv files and expose the blank template placeholder
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -268,6 +268,7 @@ done_means:
   - readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets
   - repo-root .env values work when Hermes or MCP starts from a different working directory
   - README and DevOps setup docs explain repo-root .env, dotenv precedence, and offline dotenv isolation
+  - HALO_SWING_DISABLE_DOTENV works when exported or set in repo-root/launch-directory .env
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -617,15 +618,19 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.637
-gate_packet: docs/halo-swing-development-plan.md#3.637
+portable_mirror: docs/halo-swing-development-plan.md#3.638
+gate_packet: docs/halo-swing-development-plan.md#3.638
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.637
+  - docs/halo-swing-development-plan.md#3.638
+  - .env.example
   - README.md
   - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/env.py
+  - tests/test_env.py
+  - tests/test_env_template.py
   - tests/test_setup_docs.py
 
 implementation_rule:
@@ -929,12 +934,53 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Setup Docs Dotenv Gate is verified. README and DevOps setup guide now
-describe repo-root `.env`, launch-directory `.env`, exported-env precedence,
-`HALO_SWING_DISABLE_DOTENV=true` isolation, and API-key-only live data setup
-without requiring `export` commands. `tests/test_setup_docs.py` locks the docs
-contract. Focused setup-doc tests passed with 2 tests, full pytest passed with
-705 tests, and ruff and health_check passed.
+Summary: Dotenv Disable Flag Gate is verified. `HALO_SWING_DISABLE_DOTENV=true`
+now disables dotenv loading when exported or set in repo-root/launch-directory
+`.env`. `.env.example` exposes a blank placeholder, and setup docs now state the
+flag may be exported or set in `.env`. Focused env/template/setup-doc tests
+passed with 13 tests, full pytest passed with 708 tests, and ruff and
+health_check passed.
+
+```yaml
+dotenv_disable_flag_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/env.py
+    - tests/test_env.py
+    - tests/test_env_template.py
+    - tests/test_setup_docs.py
+  implementation:
+    - HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when exported
+    - HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when set in repo-root .env or launch-directory .env
+    - .env.example exposes a blank HALO_SWING_DISABLE_DOTENV placeholder
+    - setup docs explain that the isolation flag may be exported or set in .env
+    - tests lock dotenv disable behavior, env template placeholder, and setup docs text
+    - no committed .env file, real secret value, network call, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_env_template.py tests/test_setup_docs.py -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "708 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 setup_docs_dotenv_gate:

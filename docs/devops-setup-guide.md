@@ -92,7 +92,8 @@ may start from another working directory; repo-root `.env` values are still
 read. A launch-directory `.env` can override repo-root values for local runner
 experiments. Default pytest runs set `HALO_SWING_DISABLE_DOTENV=true` so
 operator secrets in local dotenv files cannot trigger live providers or network
-calls during offline tests.
+calls during offline tests. The isolation flag may be exported or placed in
+`.env`; when it is true, the runtime ignores other dotenv values.
 
 ## Offline MVP Server And Harness Commands
 

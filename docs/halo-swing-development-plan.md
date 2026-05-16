@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.638 Dotenv Disable Flag Gate Record - 2026-05-16
+
+### A. 목적
+
+Setup docs는 `HALO_SWING_DISABLE_DOTENV=true`를 isolated offline run에 쓰라고
+안내하지만, 기존 구현은 exported environment variable만 인식했다. 사용자가
+`.env` 중심으로 설정을 관리하는 흐름과 맞도록 repo-root `.env` 또는
+launch-directory `.env`에 둔 disable flag도 dotenv 로딩 차단 신호로 인정하고,
+`.env.example`에 blank placeholder를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when exported
+  - HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when set in repo-root .env
+  - HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when set in launch-directory .env
+  - .env.example exposes a blank HALO_SWING_DISABLE_DOTENV placeholder
+  - README and DevOps guide say the isolation flag may be exported or set in .env
+  - tests lock dotenv disable behavior, env template placeholder, and setup docs text
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - committed .env file
+  - real secret values
+  - network call
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_env_template.py tests/test_setup_docs.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.637 Setup Docs Dotenv Gate Record - 2026-05-16
 
 ### A. 목적

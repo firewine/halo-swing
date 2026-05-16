@@ -19,6 +19,8 @@ def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:
         assert "exported environment variables" in document
         assert "launch-directory `.env`" in document or "launch-directory .env" in document
         assert "HALO_SWING_DISABLE_DOTENV=true" in document
+        assert "exported or set in `.env`" in document or "exported or placed in `.env`" in document
+        assert "other dotenv values are ignored" in document or "ignores other dotenv values" in document
 
 
 def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
