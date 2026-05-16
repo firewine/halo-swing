@@ -328,7 +328,12 @@ future gates are still blocked for Hermes, Telegram, DB migration/repository,
 Binance testnet read-only smoke, live order submission, and live data adapters.
 It can read readiness inputs from exported environment variables, a
 launch-directory `.env`, or the repo-root `.env` using the precedence documented
-above.
+above. The payload also includes `live_data_smoke_commands` for
+`get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`. After
+filling the matching API keys, run those repo-local harness commands to verify
+the live provider outputs and boundary contracts. The smoke commands are
+read-only and return no secret values, but they can call provider networks when
+the configured keys select live providers.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

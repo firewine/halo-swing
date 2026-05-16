@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_NEWS_BUNDLE_BOUNDARY_VERIFIED
-gate_id: LIVE_NEWS_BUNDLE_BOUNDARY_GATE
+status: LIVE_DATA_SMOKE_CHECKLIST_VERIFIED
+gate_id: LIVE_DATA_SMOKE_CHECKLIST_GATE
 review_tier: S1_small
 
-next_atomic_step: make get_news_bundle declare NewsAPI live-data and secret-return boundaries consistently with market and macro tools
+next_atomic_step: add live data smoke command metadata to get_integration_setup_checklist so users can verify API-key-backed market, macro, and news integrations after filling .env
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,9 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_providers.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -73,22 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_news_bundle source and score contracts include secret_values_returned=false
-  - fixture/replay news payloads keep no_live_collection and no_network_call checks
-  - API-key-backed NewsAPI payloads declare live_data_required=true and network_call=true with live_data_boundary_declared and network_call_declared checks
-  - tests prove fake NewsAPI bundle output returns live boundary metadata without exposing API-key values
-  - README and DevOps setup docs describe the news live boundary guard
+  - get_integration_setup_checklist includes live_data_smoke_commands for market, macro, and news
+  - each smoke command is a repo-local harness command that does not mutate local state, start Hermes, send Telegram, submit orders, or return secrets
+  - smoke command metadata declares that network calls happen only when matching API keys select live providers
+  - tests cover the checklist schema and command metadata without using live network or real API keys
+  - README and DevOps setup docs show how to use the checklist and live smoke commands after filling .env
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live news bundle boundary gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data smoke checklist gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_NEWS_BUNDLE_BOUNDARY_VERIFIED
+gate_id: LIVE_NEWS_BUNDLE_BOUNDARY_GATE
+review_tier: S1_small
+
+next_atomic_step: make get_news_bundle declare NewsAPI live-data and secret-return boundaries consistently with market and macro tools
 ```
 
 Previous completed directive:
@@ -760,16 +772,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.648
-gate_packet: docs/halo-swing-development-plan.md#3.648
+portable_mirror: docs/halo-swing-development-plan.md#3.649
+gate_packet: docs/halo-swing-development-plan.md#3.649
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.648
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_providers.py
+  - docs/halo-swing-development-plan.md#3.649
+  - src/halo_swing_mcp/harness.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -1071,6 +1083,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Smoke Checklist Gate is verified.
+`get_integration_setup_checklist` now returns `live_data_smoke_commands` for
+market, macro, and news live provider smoke checks after `.env` API keys are
+filled. Each command is a repo-local harness command, read-only, no Hermes
+runtime start, no Telegram send, no order submission, and no secret return;
+metadata states network calls happen only when matching API keys select live
+providers. Focused tests passed with 2 tests, full pytest passed with 736
+tests, and ruff and health_check passed.
+
+```yaml
+live_data_smoke_checklist_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_integration_setup_checklist includes live_data_smoke_commands for market, macro, and news
+    - smoke command metadata is repo-local, read-only, no Hermes runtime start, no Telegram send, no order submission, and secret_values_returned=false
+    - smoke command metadata declares network calls only when matching API keys select live providers
+    - README and DevOps guide document using the checklist commands after filling .env
+    - no new live adapter module, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or secret exposure added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "736 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: passed, live_data_smoke_commands present with no secret values returned
+```
+
+Previous verification:
 
 Summary: Live News Bundle Boundary Gate is verified. `get_news_bundle` now
 declares `secret_values_returned=false` in source and score contracts;

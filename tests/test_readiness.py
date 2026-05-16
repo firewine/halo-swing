@@ -296,6 +296,10 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         for requirement in payload["env_requirements"]
     }
     command_names = {command["name"] for command in payload["local_commands"]}
+    live_smoke_commands = {
+        command["name"]: command
+        for command in payload["live_data_smoke_commands"]
+    }
 
     assert payload["schema_version"] == "integration_setup_checklist.v1"
     assert payload["status"] == "blocked"
@@ -330,6 +334,42 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "get_integration_readiness",
         "get_integration_setup_checklist",
     }
+    assert set(live_smoke_commands) == {
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    }
+    for command in live_smoke_commands.values():
+        assert command["command"].startswith(
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        )
+        assert command["command"].endswith("--no-audit")
+        assert command["network_call_policy"] == (
+            "only_when_matching_api_key_selects_live_provider"
+        )
+        assert command["mutates_local_state"] is False
+        assert command["hermes_runtime_started"] is False
+        assert command["telegram_send_call"] is False
+        assert command["order_submission"] is False
+        assert command["secret_values_returned"] is False
+    assert live_smoke_commands["get_market_snapshot_live_smoke"][
+        "expected_live_contract"
+    ] == "market_snapshot_contract"
+    assert live_smoke_commands["get_macro_snapshot_live_smoke"][
+        "expected_live_contract"
+    ] == "macro_filter_contract"
+    assert live_smoke_commands["get_news_bundle_live_smoke"][
+        "expected_live_contract"
+    ] == "news_source_policy_contract"
+    assert "POLYGON_API_KEY" in live_smoke_commands[
+        "get_market_snapshot_live_smoke"
+    ]["required_env_key_groups"][0]
+    assert "FRED_API_KEY" in live_smoke_commands[
+        "get_macro_snapshot_live_smoke"
+    ]["required_env_key_groups"][0]
+    assert "NEWS_API_KEY" in live_smoke_commands[
+        "get_news_bundle_live_smoke"
+    ]["required_env_key_groups"][0]
     assert payload["durable_gate_requirements"] == [
         {
             "gate": "migration",

@@ -166,6 +166,7 @@ def get_integration_setup_checklist() -> dict[str, Any]:
         "next_actions": readiness["next_actions"],
         "env_requirements": _setup_env_requirements(gates),
         "local_commands": _setup_local_commands(),
+        "live_data_smoke_commands": _setup_live_data_smoke_commands(),
         "durable_gate_requirements": [
             {
                 "gate": "migration",
@@ -326,6 +327,77 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             ),
             "network_call": False,
             "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+    ]
+
+
+def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:
+    return [
+        {
+            "name": "get_market_snapshot_live_smoke",
+            "provider": "polygon",
+            "required_env_key_groups": [
+                ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+            ],
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_market_snapshot --input-json '{\"symbols\":[\"QQQ\"]}' --no-audit"
+            ),
+            "expected_live_contract": "market_snapshot_contract",
+            "expected_live_checks": ["live_data_boundary_declared"],
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "hermes_runtime_started": False,
+            "telegram_send_call": False,
+            "order_submission": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_macro_snapshot_live_smoke",
+            "provider": "fred",
+            "required_env_key_groups": [
+                [
+                    "HALO_SWING_MACRO_API_KEY",
+                    "HALO_SWING_FRED_API_KEY",
+                    "FRED_API_KEY",
+                ]
+            ],
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_macro_snapshot --no-audit"
+            ),
+            "expected_live_contract": "macro_filter_contract",
+            "expected_live_checks": [
+                "live_data_boundary_declared",
+                "network_call_declared",
+            ],
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "hermes_runtime_started": False,
+            "telegram_send_call": False,
+            "order_submission": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_news_bundle_live_smoke",
+            "provider": "newsapi",
+            "required_env_key_groups": [["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]],
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_news_bundle --input-json '{\"topic\":\"macro\"}' --no-audit"
+            ),
+            "expected_live_contract": "news_source_policy_contract",
+            "expected_live_checks": [
+                "live_data_boundary_declared",
+                "network_call_declared",
+                "secret_values_not_returned",
+            ],
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "hermes_runtime_started": False,
+            "telegram_send_call": False,
+            "order_submission": False,
             "secret_values_returned": False,
         },
     ]

@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_NEWS_BUNDLE_BOUNDARY_GATE",
+  "gate_id": "LIVE_DATA_SMOKE_CHECKLIST_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.648",
-  "next_atomic_step": "make get_news_bundle declare NewsAPI live-data and secret-return boundaries consistently with market and macro tools",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.649",
+  "next_atomic_step": "add live data smoke command metadata to get_integration_setup_checklist so users can verify API-key-backed market, macro, and news integrations after filling .env",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -11,16 +11,17 @@
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/market.py",
-    "tests/test_providers.py"
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_readiness.py",
+    "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.648",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/market.py",
-    "tests/test_providers.py"
+    "docs/halo-swing-development-plan.md#3.649",
+    "src/halo_swing_mcp/harness.py",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -36,7 +37,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -52,14 +53,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_news_bundle source and score contracts include secret_values_returned=false",
-    "fixture/replay news payloads keep no_live_collection and no_network_call checks",
-    "API-key-backed NewsAPI payloads declare live_data_required=true and network_call=true with live_data_boundary_declared and network_call_declared checks",
-    "tests prove fake NewsAPI bundle output returns live boundary metadata without exposing API-key values",
-    "README and DevOps setup docs describe the news live boundary guard",
+    "get_integration_setup_checklist includes live_data_smoke_commands for market, macro, and news",
+    "each smoke command is a repo-local harness command that does not mutate local state, start Hermes, send Telegram, submit orders, or return secrets",
+    "smoke command metadata declares that network calls happen only when matching API keys select live providers",
+    "tests cover the checklist schema and command metadata without using live network or real API keys",
+    "README and DevOps setup docs show how to use the checklist and live smoke commands after filling .env",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live news bundle boundary gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data smoke checklist gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

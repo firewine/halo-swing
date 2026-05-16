@@ -200,7 +200,12 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setu
 
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
-orders, or return secret values.
+orders, or return secret values. It also returns `live_data_smoke_commands` for
+`get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
+repo-local harness commands after filling the matching API keys to verify the
+live providers and boundary contracts. Those smoke commands are read-only and
+return no secret values, but they can call provider networks when the configured
+API keys select live providers.
 When a market data API key selects the live Polygon provider, market snapshot
 payloads declare `live_data_required=true` and `network_call=true` in
 `market_snapshot_contract`, and the guard uses

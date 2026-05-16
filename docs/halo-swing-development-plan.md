@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.649 Live Data Smoke Checklist Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 `.env`에 API key를 넣은 뒤 실제 market/macro/news live provider를
+어떤 명령으로 확인해야 하는지 checklist payload가 구조화해서 안내하지 않았다.
+이번 slice는 `get_integration_setup_checklist`에 live data smoke command metadata를
+추가해 API-key-backed 연동 확인 경로를 repo-local harness 명령으로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_setup_checklist includes live_data_smoke_commands for market, macro, and news
+  - each smoke command is a repo-local harness command that does not mutate local state, start Hermes, send Telegram, submit orders, or return secrets
+  - smoke command metadata declares that network calls happen only when matching API keys select live providers
+  - tests cover the checklist schema and command metadata without using live network or real API keys
+  - README and DevOps setup docs show how to use the checklist and live smoke commands after filling .env
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 736 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed, live_data_smoke_commands present with no secret values returned
+```
+
 ## 3.648 Live News Bundle Boundary Gate Record - 2026-05-16
 
 ### A. 목적
