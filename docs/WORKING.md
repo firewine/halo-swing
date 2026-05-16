@@ -42,19 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_VERIFIED
-gate_id: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_GATE
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_GATE
 review_tier: S1_small
 
-next_atomic_step: make selected FRED and NewsAPI provider route entries report family live data boundaries even when market OHLCV remains fixture-backed
+next_atomic_step: make top-level API-key operator checklist stop treating missing repo-root .env as a blocker when exported live-data API keys already make setup ready
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - tests/test_providers.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,23 +71,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key tests/test_providers.py::test_describe_market_data_provider_route_marks_newsapi_entry_live_without_market_key -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_ready_without_dotenv -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - describe_market_data_provider_route marks selected FredMacroDataProvider route entries data_mode=live and live_data_required=true when a macro API key selects FRED
-  - describe_market_data_provider_route marks selected NewsApiDataProvider route entries data_mode=live and live_data_required=true when a news API key selects NewsAPI
-  - fixture base route entries remain fixture/no-network/no-live and provider route inspection still performs no network calls
-  - selected provider route metadata stays no-secret and does not change provider runtime semantics
+  - run_api_key_pipeline_smoke top-level api_key_operator_checklist reports ready=true when exported POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY are configured even if repo-root .env is absent
+  - api_key_operator_checklist blocking_step_names is empty, blocking_step_count is 0, next_blocking_step is null, and next_blocking_action is null for exported-key-ready setup
+  - api_key_operator_checklist current_step remains run_provider_smokes and ready_step_names includes prepare_dotenv as ready because exported env satisfies setup without automatic .env mutation
+  - blocked no-key fixture-default setup still reports prepare_dotenv as the next blocking action
+  - API-key-only setup payloads remain non-mutating and no-secret
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider route family live-boundary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key operator checklist exported-env bypass gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_VERIFIED
+gate_id: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_GATE
+review_tier: S1_small
+
+next_atomic_step: make selected FRED and NewsAPI provider route entries report family live data boundaries even when market OHLCV remains fixture-backed
 ```
 
 Previous completed directive:
@@ -1763,6 +1775,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Operator Checklist Exported Env Bypass Gate is
+verified. `run_api_key_pipeline_smoke` now keeps the top-level
+`api_key_operator_checklist` aligned with setup readiness: when exported
+POLYGON/FRED/NewsAPI keys are configured and repo-root `.env` is absent, the
+checklist reports ready with no blocking action and current_step
+`run_provider_smokes`. The no-key fixture default still blocks on
+`prepare_dotenv`. Focused tests passed, full pytest passed with 773 tests, and
+ruff, health_check, and fixture-default API-key pipeline CLI passed.
+
+```yaml
+api_key_pipeline_operator_checklist_exported_env_bypass_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - top-level api_key_operator_checklist treats prepare_dotenv as ready when ready_to_run_live_smoke is true from exported live-data API keys
+    - exported POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY without repo-root .env now produce ready=true, empty blocking_step_names, blocking_step_count=0, next_blocking_step=null, and next_blocking_action=null
+    - current_step remains run_provider_smokes and ready_step_names includes all four API-key setup steps
+    - blocked no-key fixture-default setup still reports prepare_dotenv as next_blocking_action
+    - API-key-only setup payloads remain non-mutating and no-secret
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_ready_without_dotenv -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_ready_without_dotenv -q
+      result: "2 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; operator checklist ready=true with no blocking action and no secrets returned"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "773 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Provider Route Family Live Boundary Gate is verified.
 `get_live_data_provider_route` now reports selected FRED and NewsAPI route

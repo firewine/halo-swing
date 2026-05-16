@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.712 API Key Pipeline Operator Checklist Exported Env Bypass Gate Record - 2026-05-17
+
+### A. 목적
+
+`API_KEY_EXPORTED_ENV_DOTENV_BYPASS_GATE` 이후 exported environment에 Polygon,
+FRED, NewsAPI key가 모두 있으면 setup steps와 `next_operator_action`은
+`run_provider_smokes`를 가리킨다. 그러나 top-level `api_key_operator_checklist`는
+repo-root `.env`가 없다는 이유로 `prepare_dotenv`를 `next_blocking_action`으로 남길
+수 있다. 이번 slice는 사용자가 API key를 이미 환경변수로 넣은 경우 operator checklist도
+동일하게 setup-ready 상태를 보고하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level api_key_operator_checklist treats prepare_dotenv as ready when exported API keys make ready_to_run_live_smoke true
+  - exported POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY without repo-root .env produce ready=true, empty blocking_step_names, blocking_step_count=0, next_blocking_step=null, and next_blocking_action=null
+  - current_step remains run_provider_smokes and ready_step_names includes prepare_dotenv, fill_live_data_api_keys, run_provider_smokes, and run_api_key_pipeline_smoke
+  - blocked no-key fixture-default setup still reports prepare_dotenv as the next blocking action
+  - API-key-only setup payloads remain non-mutating and no-secret
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused operator-checklist pytest: 1 passed
+  - no-key plus exported-env checklist regression pytest: 2 passed
+  - exported fake-key API-key pipeline CLI: exit 0; operator checklist ready=true with no blocking action
+  - full pytest: 773 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0
+```
+
 ## 3.707 API Key Exported Env Dotenv Bypass Gate Record - 2026-05-17
 
 ### A. 목적

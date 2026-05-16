@@ -765,10 +765,13 @@ def expected_api_key_operator_checklist(
         missing_provider_families=missing_provider_families,
     )
     copy_command = command_summary["copy_dotenv_command"]
+    dotenv_setup_ready = (
+        ready_to_run_live_smoke or copy_command["required"] is not True
+    )
     steps = [
         {
             "name": "prepare_dotenv",
-            "status": "pending" if copy_command["required"] is True else "ready",
+            "status": "ready" if dotenv_setup_ready else "pending",
             "command": copy_command["command"],
             "mutates_local_state": copy_command["mutates_local_state"],
             "network_call": False,
@@ -1486,6 +1489,117 @@ def test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_f
     )
     assert payload["next_operator_action"]["network_call"] is True
     assert payload["next_operator_action"]["secret_values_returned"] is False
+    assert "polygon-exported-secret" not in serialized
+    assert "fred-exported-secret" not in serialized
+    assert "news-exported-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_ready_without_dotenv(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    clear_readiness_env(monkeypatch)
+    repo_env = tmp_path / ".env"
+    repo_env.with_name(".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWS_API_KEY=\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-exported-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-exported-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-exported-secret")
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    def fake_live_data_smoke(
+        symbols: list[str] | None = None,
+        topic: str = "macro",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_data_smoke_run.v1",
+            "status": "conflict",
+            "input": {
+                "symbols": symbols if symbols is not None else ["QQQ"],
+                "topic": topic,
+            },
+            "provider_route": readiness_tools.get_live_data_provider_route(),
+            "network_call": False,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_workflow_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_signal_workflow_smoke_run.v1",
+            "status": "conflict",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": False,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_recording_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_recording_smoke_run.v1",
+            "status": "conflict",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": False,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_signal_workflow_smoke",
+        fake_workflow_smoke,
+    )
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_recording_smoke",
+        fake_recording_smoke,
+    )
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+    serialized = json.dumps(payload, sort_keys=True)
+    checklist = payload["api_key_operator_checklist"]
+
+    assert payload["setup_status_summary"]["next_setup_step"] == "run_provider_smokes"
+    assert payload["setup_status_summary"]["ready_to_run_live_smoke"] is True
+    assert checklist["status"] == "ready"
+    assert checklist["current_step"] == "run_provider_smokes"
+    assert checklist["ready"] is True
+    assert checklist["ready_step_names"] == [
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+        "run_provider_smokes",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert checklist["ready_step_count"] == 4
+    assert checklist["blocking_step_names"] == []
+    assert checklist["blocking_step_count"] == 0
+    assert checklist["next_blocking_step"] is None
+    assert checklist["next_blocking_action"] is None
+    assert checklist["steps"][0]["name"] == "prepare_dotenv"
+    assert checklist["steps"][0]["status"] == "ready"
+    assert checklist["mutates_local_state"] is False
+    assert checklist["secret_values_returned"] is False
     assert "polygon-exported-secret" not in serialized
     assert "fred-exported-secret" not in serialized
     assert "news-exported-secret" not in serialized

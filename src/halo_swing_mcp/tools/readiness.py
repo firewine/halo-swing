@@ -1876,12 +1876,13 @@ def _api_key_pipeline_operator_checklist(
     ready_to_run_live_smoke = (
         setup_status_summary.get("ready_to_run_live_smoke") is True
     )
+    dotenv_setup_ready = (
+        ready_to_run_live_smoke or copy_dotenv_command.get("required") is not True
+    )
     steps = [
         {
             "name": "prepare_dotenv",
-            "status": "pending"
-            if copy_dotenv_command.get("required") is True
-            else "ready",
+            "status": "ready" if dotenv_setup_ready else "pending",
             "command": copy_dotenv_command.get("command"),
             "mutates_local_state": copy_dotenv_command.get("mutates_local_state"),
             "network_call": False,
