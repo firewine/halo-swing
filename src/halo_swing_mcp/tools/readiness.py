@@ -10,7 +10,10 @@ from typing import Any
 from halo_swing_mcp import MCP_SERVER_NAME
 import halo_swing_mcp.env as local_env
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
-from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.config import (
+    LIVE_HTTP_TIMEOUT_SECONDS_ENV_NAME,
+    get_settings,
+)
 from halo_swing_mcp.env import get_config_value
 from halo_swing_mcp.providers import describe_market_data_provider_route
 from halo_swing_mcp.risk_settings import load_btc_risk_settings, resolve_settings_path
@@ -918,6 +921,7 @@ def run_api_key_pipeline_smoke(
         api_key_dotenv_loading_summary=api_key_dotenv_loading_summary,
         api_key_provider_selection_summary=api_key_provider_selection_summary,
     )
+    api_key_live_http_timeout_summary = _api_key_live_http_timeout_summary()
 
     payload = {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -961,6 +965,7 @@ def run_api_key_pipeline_smoke(
         "api_key_integration_status_summary": (
             api_key_integration_status_summary
         ),
+        "api_key_live_http_timeout_summary": api_key_live_http_timeout_summary,
         "live_data_smoke_summary": live_data_smoke_summary,
         "failed_provider_families": live_data_smoke_summary[
             "failed_provider_families"
@@ -2063,6 +2068,23 @@ def _api_key_pipeline_failure_category(
     return "smoke_failure"
 
 
+def _api_key_live_http_timeout_summary() -> dict[str, Any]:
+    return {
+        "schema_version": "api_key_live_http_timeout_summary.v1",
+        "timeout_seconds": get_settings().live_http_timeout_seconds,
+        "env_key": LIVE_HTTP_TIMEOUT_SECONDS_ENV_NAME,
+        "default_timeout_seconds": 10.0,
+        "applies_to": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 def _api_key_pipeline_summary_only_payload(
     payload: dict[str, Any],
 ) -> dict[str, Any]:
@@ -2097,6 +2119,10 @@ def _api_key_pipeline_summary_only_payload(
         or {},
         "api_key_provider_selection_summary": _optional_mapping(
             payload.get("api_key_provider_selection_summary")
+        )
+        or {},
+        "api_key_live_http_timeout_summary": _optional_mapping(
+            payload.get("api_key_live_http_timeout_summary")
         )
         or {},
         "api_key_provider_recovery_summary": (

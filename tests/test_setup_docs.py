@@ -126,6 +126,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "live_providers_selected" in guide
     assert "dotenv_target_exists" in guide
     assert "failure_category" in guide
+    assert "api_key_live_http_timeout_summary" in guide
+    assert "api_key_live_http_timeout_summary.v1" in guide
+    assert "timeout_seconds" in guide
+    assert "default_timeout_seconds" in guide
+    assert "applies_to" in guide
     assert "summary_only" in guide
     assert "api_key_pipeline_smoke_summary_only.v1" in guide
     assert '"summary_only":true' in guide

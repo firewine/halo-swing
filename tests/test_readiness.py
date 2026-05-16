@@ -60,6 +60,7 @@ READINESS_ENV_KEYS = (
     "HALO_SWING_MACRO_SOURCE",
     "HALO_SWING_NEWS_DATA_MODE",
     "HALO_SWING_NEWS_SOURCE",
+    "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS",
     "POLYGON_API_KEY",
     "ALPACA_API_KEY",
     "TIINGO_API_KEY",
@@ -4330,6 +4331,20 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
     )
     assert payload["api_key_provider_selection_summary"]["status"] == "blocked"
+    assert payload["api_key_live_http_timeout_summary"] == {
+        "schema_version": "api_key_live_http_timeout_summary.v1",
+        "timeout_seconds": 10.0,
+        "env_key": "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS",
+        "default_timeout_seconds": 10.0,
+        "applies_to": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["api_key_provider_recovery_summary"] == {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": "ok",
@@ -4367,6 +4382,29 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS", "2.5")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+
+    assert payload["api_key_live_http_timeout_summary"][
+        "schema_version"
+    ] == "api_key_live_http_timeout_summary.v1"
+    assert payload["api_key_live_http_timeout_summary"]["timeout_seconds"] == 2.5
+    assert payload["api_key_live_http_timeout_summary"]["env_key"] == (
+        "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS"
+    )
+    assert (
+        payload["api_key_live_http_timeout_summary"]["secret_values_returned"]
+        is False
+    )
 
 
 def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
@@ -4654,6 +4692,20 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "next_action_name": "prepare_dotenv",
         "next_action_is_recovery": False,
         "next_action_network_call": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_live_http_timeout_summary"] == {
+        "schema_version": "api_key_live_http_timeout_summary.v1",
+        "timeout_seconds": 10.0,
+        "env_key": "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS",
+        "default_timeout_seconds": 10.0,
+        "applies_to": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

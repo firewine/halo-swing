@@ -472,8 +472,13 @@ The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `api_key_integration_status_summary`, `api_key_next_action_summary`,
 `setup_status_summary`, `api_key_pipeline_failure_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
-`provider_route_summary`, `checks`, and safety flags while omitting nested full
-smoke sections. `api_key_provider_recovery_summary`
+`api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
+safety flags while omitting nested full smoke sections.
+`api_key_live_http_timeout_summary`
+(`api_key_live_http_timeout_summary.v1`) exposes the configured
+`timeout_seconds`, `env_key`, `default_timeout_seconds`, and provider classes
+listed in `applies_to`, so API-key smoke calls show the active live HTTP
+timeout without returning secret values. `api_key_provider_recovery_summary`
 (`api_key_provider_recovery_summary.v1`) exposes
 `provider_recovery_required`, `provider_error_count`,
 `provider_recovery_smoke_count`, `item_count`,

@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.736 API Key Live HTTP Timeout Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS`는 provider HTTP 호출에 적용되지만,
+`run_api_key_pipeline_smoke(summary_only=true)`의 compact 결과에는 현재 timeout이
+보이지 않았다. 실제 API 키만 넣어 smoke를 실행하는 운영자는 provider recovery가
+어떤 timeout 설정 아래에서 발생했는지 한 화면에서 확인해야 한다. 이번 slice는
+no-secret `api_key_live_http_timeout_summary`를 full/summary-only payload에 추가해
+환경 timeout 적용값을 명확히 노출한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_live_http_timeout_summary in full payloads
+  - summary_only=true returns api_key_live_http_timeout_summary without nested smoke sections
+  - api_key_live_http_timeout_summary exposes schema_version, timeout_seconds, env_key, default_timeout_seconds, applies_to, and safety flags without secret values
+  - focused tests cover default and configured HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS summary values
+  - README and DevOps setup guide document api_key_live_http_timeout_summary
+  - tests/test_setup_docs.py asserts api_key_live_http_timeout_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; no-secret api_key_live_http_timeout_summary returned with timeout_seconds=10.0
+  - HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=2.5 PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_live_http_timeout_summary"]; print(summary["schema_version"], summary["timeout_seconds"], summary["env_key"], summary["secret_values_returned"])' -> api_key_live_http_timeout_summary.v1 2.5 HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 780 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.735 API Key Live HTTP Timeout Gate Record - 2026-05-17
 
 ### A. 목적
