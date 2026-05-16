@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.637 Setup Docs Dotenv Gate Record - 2026-05-16
+
+### A. 목적
+
+Repo-root `.env` fallback과 `HALO_SWING_DISABLE_DOTENV`가 구현됐지만 README와
+DevOps setup guide는 아직 `export` 중심 설명에 머물러 있었다. 사용자가
+`.env.example`을 repo-root `.env`로 복사해 API key만 채우는 흐름을 정확히 알 수
+있도록 setup 문서를 구현과 맞추고 문서 회귀 테스트로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README explains repo-root .env setup and dotenv precedence
+  - README mentions HALO_SWING_DISABLE_DOTENV=true for isolated offline runs
+  - DevOps guide documents exported env, launch-directory .env, and repo-root .env precedence
+  - DevOps guide shows key-only dotenv examples for Polygon, FRED, and NewsAPI
+  - tests/test_setup_docs.py locks the setup docs contract
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - committed .env file
+  - real secret values
+  - source code changes
+  - network call
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.636 Repo Root Env Fallback Gate Record - 2026-05-16
 
 ### A. 목적

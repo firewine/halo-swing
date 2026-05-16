@@ -1,34 +1,25 @@
 {
-  "gate_id": "REPO_ROOT_ENV_FALLBACK_GATE",
+  "gate_id": "SETUP_DOCS_DOTENV_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.636",
-  "next_atomic_step": "make repo-root .env values work when Hermes or MCP starts from a different working directory",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.637",
+  "next_atomic_step": "align setup docs with repo-root dotenv loading, API-key-only live setup, and offline dotenv isolation",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
+    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
+    "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/config.py",
-    "src/halo_swing_mcp/env.py",
-    "src/halo_swing_mcp/providers.py",
-    "tests/conftest.py",
-    "tests/test_env.py",
-    "tests/test_providers.py",
-    "tests/test_readiness.py"
+    "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.636",
-    "src/halo_swing_mcp/config.py",
-    "src/halo_swing_mcp/env.py",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/readiness.py",
-    "tests/conftest.py",
-    "tests/test_env.py",
-    "tests/test_providers.py",
-    "tests/test_readiness.py"
+    "docs/halo-swing-development-plan.md#3.637",
+    "README.md",
+    "docs/devops-setup-guide.md",
+    "tests/test_setup_docs.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -44,7 +35,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_providers.py tests/test_readiness.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -59,16 +50,14 @@
     "read_only": true
   },
   "done_means": [
-    "repo-root .env values are available when the current working directory is different",
-    "current working directory .env can still override repo-root .env",
-    "exported environment variables keep precedence over both dotenv files",
-    "default pytest runs disable dotenv loading so local operator secrets cannot trigger live network providers",
-    "pydantic settings and direct alias lookups use the shared dotenv path resolution",
-    "provider auto-selection honors HALO_SWING_* and provider-specific API-key aliases from repo-root .env without DATA_MODE live flags",
-    "readiness honors repo-root .env Hermes, Telegram, and live data values without serializing secrets",
+    "README explains repo-root .env setup and dotenv precedence",
+    "README mentions HALO_SWING_DISABLE_DOTENV=true for isolated offline runs",
+    "DevOps guide explains exported env, launch-directory .env, and repo-root .env precedence",
+    "DevOps guide shows key-only dotenv examples for Polygon, FRED, and NewsAPI without requiring export commands",
+    "tests/test_setup_docs.py locks the setup docs contract",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified repo-root .env fallback gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified setup-docs dotenv gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

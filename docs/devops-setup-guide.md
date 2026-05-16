@@ -74,6 +74,26 @@ commit_forbidden:
 
 `.gitignore` must continue to exclude `.venv/`, local `.env` files, local data, artifacts, reports, state dumps, checkpoints, and logs.
 
+Runtime dotenv loading:
+
+```text
+precedence:
+  1. exported environment variables
+  2. launch-directory .env
+  3. repo-root .env
+
+offline_test_isolation:
+  - set HALO_SWING_DISABLE_DOTENV=true to ignore dotenv files
+```
+
+Normal local setup is to copy `.env.example` to the repository root as `.env`
+and fill only the required API keys or config values. Hermes or MCP launchers
+may start from another working directory; repo-root `.env` values are still
+read. A launch-directory `.env` can override repo-root values for local runner
+experiments. Default pytest runs set `HALO_SWING_DISABLE_DOTENV=true` so
+operator secrets in local dotenv files cannot trigger live providers or network
+calls during offline tests.
+
 ## Offline MVP Server And Harness Commands
 
 Verified offline smoke commands:
@@ -299,6 +319,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_read
 This command does not call networks or return secret values. It reports which
 future gates are still blocked for Hermes, Telegram, DB migration/repository,
 Binance testnet read-only smoke, live order submission, and live data adapters.
+It can read readiness inputs from exported environment variables, a
+launch-directory `.env`, or the repo-root `.env` using the precedence documented
+above.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
@@ -310,7 +333,7 @@ present. Market OHLCV live data is wired behind the provider boundary for
 Polygon:
 
 ```bash
-export POLYGON_API_KEY=<polygon-api-key>
+POLYGON_API_KEY=your_polygon_key
 ```
 
 `HALO_SWING_MARKET_DATA_API_KEY` is accepted as the project-specific alias for
@@ -320,7 +343,7 @@ offline.
 Macro live data is wired behind the same provider boundary for FRED:
 
 ```bash
-export FRED_API_KEY=<fred-api-key>
+FRED_API_KEY=your_fred_key
 ```
 
 `HALO_SWING_MACRO_API_KEY` and `HALO_SWING_FRED_API_KEY` are accepted as
@@ -330,7 +353,7 @@ fixture-backed.
 News live data is wired through NewsAPI:
 
 ```bash
-export NEWS_API_KEY=<newsapi-key>
+NEWS_API_KEY=your_newsapi_key
 ```
 
 `HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Without

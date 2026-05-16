@@ -105,6 +105,12 @@ All default tests are offline and require no market data API keys. Runtime
 ledger, runtime checkpoint, and chart artifacts are written only when those
 tools are called and should stay under ignored runtime locations such as
 `state/` or `artifacts/`.
+Local setup reads ignored dotenv files without mutating `os.environ`: exported
+environment variables take precedence, then a launch-directory `.env`, then the
+repo-root `.env`. For the normal local path, copy `.env.example` to the
+repository root as `.env` and fill only the API keys or config values you need.
+Set `HALO_SWING_DISABLE_DOTENV=true` for isolated offline runs that must ignore
+local operator secrets, such as tests or CI.
 Fixture OHLCV supports `1d`, `4h`, and `1h` timeframes for indicator and chart
 tools; unsupported timeframes are rejected before any live adapter is involved.
 `get_market_snapshot` returns `market_snapshot.v1` with QQQ, SPY, SMH, SOXX,
