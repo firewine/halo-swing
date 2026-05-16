@@ -223,7 +223,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_s
 ```
 
 For a one-shot API-key-backed check, use `run_live_data_smoke`; it runs the
-market, macro, and news smoke paths and validates the combined payload:
+market, macro, and news smoke paths, includes no-network provider route evidence,
+and validates the combined payload:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
@@ -254,7 +255,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_s
 
 For a single post-setup check after filling API keys, use
 `run_api_key_pipeline_smoke`; it combines readiness, provider live data, signal
-workflow, and recording smoke checks:
+workflow, and recording smoke checks. Its payload includes the same provider
+route summary so the one-shot smoke records which provider factory route was
+selected:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit

@@ -666,6 +666,13 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
 ) -> None:
     from halo_swing_mcp.tools import market as market_tools
 
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret-key")
+    monkeypatch.setenv("HALO_SWING_FRED_API_KEY", "fred-secret-key")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret-key")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
     def fake_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         return {
             "live_data_required": True,
@@ -732,6 +739,14 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert payload["send_call"] is False
     assert payload["order_submission"] is False
     assert payload["secret_values_returned"] is False
+    assert payload["provider_route"]["status"] == "ready"
+    assert payload["provider_route"]["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["provider_route"]["network_call"] is False
+    assert payload["provider_route"]["secret_values_returned"] is False
     assert payload["validation"]["status"] == "ok"
     assert all(check["passed"] for check in payload["validation"]["checks"])
 
@@ -749,6 +764,12 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["order_submission"] is False
     assert payload["secret_values_returned"] is False
     assert payload["validation"]["status"] == "conflict"
+    assert payload["provider_route"]["status"] == "blocked"
+    assert payload["provider_route"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert payload["provider_route"]["network_call"] is False
+    assert payload["provider_route"]["secret_values_returned"] is False
     assert payload["market_snapshot"]["data_mode"] == "fixture"
     assert payload["macro_snapshot"]["data_mode"] == "fixture"
     assert payload["news_bundle"]["data_mode"] == "fixture"
@@ -1129,6 +1150,19 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "schema_version": "live_data_smoke_run.v1",
             "status": "ok",
             "input": {"symbols": symbols, "topic": topic},
+            "provider_route": {
+                "schema_version": "live_data_provider_route.v1",
+                "status": "ready",
+                "provider_factory": "get_market_data_provider",
+                "selected_provider_classes": [
+                    "PolygonMarketDataProvider",
+                    "FredMacroDataProvider",
+                    "NewsApiDataProvider",
+                ],
+                "missing": [],
+                "network_call": False,
+                "secret_values_returned": False,
+            },
             "network_call": True,
             "live_data_required": True,
             "mutates_local_state": False,
@@ -1190,9 +1224,23 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["executed_tools"] == [
         "get_integration_readiness",
         "run_live_data_smoke",
+        "get_live_data_provider_route",
         "run_live_signal_workflow_smoke",
         "run_live_recording_smoke",
     ]
+    assert payload["provider_route_summary"] == {
+        "schema_version": "live_data_provider_route.v1",
+        "status": "ready",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "missing": [],
+        "network_call": False,
+        "secret_values_returned": False,
+    }
     assert payload["network_call"] is True
     assert payload["live_data_required"] is True
     assert payload["hermes_runtime_started"] is False
@@ -1226,6 +1274,10 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["status"] == "conflict"
     assert payload["readiness_summary"]["live_data_ready"] is False
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["provider_route_summary"]["status"] == "blocked"
+    assert payload["provider_route_summary"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
     assert payload["signal_workflow_smoke_summary"]["status"] == "conflict"
     assert payload["recording_smoke_summary"]["status"] == "conflict"
     assert payload["network_call"] is False
@@ -1241,6 +1293,7 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "live_data_readiness_ready",
     ) in failed_checks
     assert ("run_live_data_smoke", "live_data_smoke_status_ok") in failed_checks
+    assert ("run_live_data_smoke", "provider_route_status_ok") in failed_checks
     assert (
         "run_live_signal_workflow_smoke",
         "signal_workflow_smoke_status_ok",

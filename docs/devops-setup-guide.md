@@ -391,8 +391,9 @@ are configured; it reports key names and missing provider families but never
 secret values. Use `get_live_data_provider_route` when you need to confirm that
 the actual `get_market_data_provider` factory selected Polygon, FRED, and
 NewsAPI from those keys without making provider network calls. Use
-`run_live_data_smoke` for the same validation in one
-command after filling the market, macro, and news API keys. Use
+`run_live_data_smoke` for the same validation in one command after filling the
+market, macro, and news API keys; its payload now includes the same no-network
+provider route evidence before provider smoke outputs. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting
 orders, or returning secrets. After provider-level smoke passes, use
@@ -407,7 +408,9 @@ By default it uses an ephemeral JSONL ledger and leaves no runtime file; provide
 Use `run_api_key_pipeline_smoke` as the single post-setup check after filling
 API keys; it combines live-data readiness, provider smoke, signal workflow smoke,
 and recording smoke while still avoiding Hermes runtime starts, Telegram sends,
-order submissions, retained state, and secret returns.
+order submissions, retained state, and secret returns. The pipeline payload also
+includes a provider route summary and fails the route readiness check until all
+supported live-data provider keys are configured.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

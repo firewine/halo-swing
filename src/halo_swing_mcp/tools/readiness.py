@@ -339,6 +339,7 @@ def run_live_data_smoke(
     from halo_swing_mcp.tools import market as market_tools
 
     smoke_symbols = symbols if symbols is not None else ["QQQ"]
+    provider_route = get_live_data_provider_route()
     market_snapshot = market_tools.get_market_snapshot(smoke_symbols)
     macro_snapshot = market_tools.get_macro_snapshot()
     news_bundle = market_tools.get_news_bundle(topic)
@@ -381,6 +382,7 @@ def run_live_data_smoke(
         "market_snapshot": market_snapshot,
         "macro_snapshot": macro_snapshot,
         "news_bundle": news_bundle,
+        "provider_route": provider_route,
         "validation": validation,
         "network_call": network_call,
         "live_data_required": live_data_required,
@@ -570,6 +572,7 @@ def run_api_key_pipeline_smoke(
 
     readiness = get_integration_readiness()
     live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
+    provider_route = _optional_mapping(live_data_smoke.get("provider_route")) or {}
     signal_workflow_smoke = run_live_signal_workflow_smoke(
         asset=asset,
         timeframe=timeframe,
@@ -594,10 +597,14 @@ def run_api_key_pipeline_smoke(
         "executed_tools": [
             "get_integration_readiness",
             "run_live_data_smoke",
+            "get_live_data_provider_route",
             "run_live_signal_workflow_smoke",
             "run_live_recording_smoke",
         ],
         "readiness_summary": _api_key_pipeline_readiness_summary(readiness),
+        "provider_route_summary": _api_key_pipeline_provider_route_summary(
+            provider_route,
+        ),
         "live_data_smoke_summary": _api_key_pipeline_smoke_summary(
             live_data_smoke,
         ),
@@ -1251,6 +1258,7 @@ def _api_key_pipeline_checks(
     live_data_gate = _optional_mapping(
         _mapping_value(_optional_mapping(readiness.get("gates")), "live_data")
     )
+    provider_route = _optional_mapping(live_data_smoke.get("provider_route"))
     checks: list[dict[str, Any]] = []
     _add_smoke_check(
         checks,
@@ -1259,6 +1267,30 @@ def _api_key_pipeline_checks(
         passed=_mapping_value(live_data_gate, "ready") is True,
         expected=True,
         actual=_mapping_value(live_data_gate, "ready"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_data_smoke",
+        name="provider_route_status_ok",
+        passed=_mapping_value(provider_route, "status") == "ready",
+        expected="ready",
+        actual=_mapping_value(provider_route, "status"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_data_smoke",
+        name="provider_route_no_network_call",
+        passed=_mapping_value(provider_route, "network_call") is False,
+        expected=False,
+        actual=_mapping_value(provider_route, "network_call"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_data_smoke",
+        name="provider_route_no_secret_values",
+        passed=_mapping_value(provider_route, "secret_values_returned") is False,
+        expected=False,
+        actual=_mapping_value(provider_route, "secret_values_returned"),
     )
     _add_smoke_check(
         checks,
@@ -1339,6 +1371,18 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "live_data_required": smoke.get("live_data_required"),
         "mutates_local_state": smoke.get("mutates_local_state", False),
         "secret_values_returned": smoke.get("secret_values_returned"),
+    }
+
+
+def _api_key_pipeline_provider_route_summary(route: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": route.get("schema_version"),
+        "status": route.get("status"),
+        "provider_factory": route.get("provider_factory"),
+        "selected_provider_classes": route.get("selected_provider_classes"),
+        "missing": route.get("missing"),
+        "network_call": route.get("network_call"),
+        "secret_values_returned": route.get("secret_values_returned"),
     }
 
 

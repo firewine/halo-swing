@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.662 Live Data Smoke Route Evidence Gate Record - 2026-05-16
+
+### A. 목적
+
+별도 `get_live_data_provider_route` 명령으로 route를 확인할 수 있어도, 사용자가 실제
+API-key smoke를 실행했을 때 그 결과 payload 안에 같은 route evidence가 남아야
+나중에 어떤 provider factory 경로로 검증했는지 재현할 수 있다. 이번 slice는
+`run_live_data_smoke`와 `run_api_key_pipeline_smoke`에 no-network provider route
+evidence를 포함한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke includes no-network provider_route evidence from the actual provider factory
+  - run_api_key_pipeline_smoke includes provider_route_summary and checks provider route readiness
+  - fixture defaults remain offline and conflict without pretending API-key integration passed
+  - provider route evidence returns provider and env key names only, never secret values
+  - README and DevOps guide document provider route evidence in smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status conflict with fixture route without API keys as expected
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status conflict with blocked provider route without API keys as expected
+```
+
 ## 3.661 Live Data Provider Route Gate Record - 2026-05-16
 
 ### A. 목적

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_PROVIDER_ROUTE_VERIFIED
-gate_id: LIVE_DATA_PROVIDER_ROUTE_GATE
+status: LIVE_DATA_SMOKE_ROUTE_EVIDENCE_VERIFIED
+gate_id: LIVE_DATA_SMOKE_ROUTE_EVIDENCE_GATE
 review_tier: S1_small
 
-next_atomic_step: add a no-network live data provider route tool that proves the actual provider factory auto-selects Polygon, FRED, and NewsAPI from API keys without returning secrets
+next_atomic_step: include no-network provider route evidence in live data and API-key pipeline smoke payloads so one-shot API-key smokes prove the selected provider factory route without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,17 +55,8 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/tools/readiness.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/server.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
-  - tests/test_providers.py
   - tests/test_readiness.py
-  - tests/test_mvp_tools.py
-  - tests/test_tool_registry.py
-  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -82,25 +73,36 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_reports_fixture_default tests/test_providers.py::test_describe_market_data_provider_route_reports_full_api_key_route tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - get_live_data_provider_route is registered for MCP and harness use
-  - tool reports actual provider factory route without calling provider networks
-  - route shows fixture default when no API keys are configured
-  - route shows Polygon, FRED, and NewsAPI selected when supported API-key aliases are configured
-  - tool returns provider and env key names only, never secret values
-  - README and DevOps guide document the no-network provider route command
+  - run_live_data_smoke includes no-network provider_route evidence from the actual provider factory
+  - run_api_key_pipeline_smoke includes provider_route_summary and checks provider route readiness
+  - fixture defaults remain offline and conflict without pretending API-key integration passed
+  - provider route evidence returns provider and env key names only, never secret values
+  - README and DevOps guide document provider route evidence in smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data provider route gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data smoke route evidence gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_PROVIDER_ROUTE_VERIFIED
+gate_id: LIVE_DATA_PROVIDER_ROUTE_GATE
+review_tier: S1_small
+
+next_atomic_step: add a no-network live data provider route tool that proves the actual provider factory auto-selects Polygon, FRED, and NewsAPI from API keys without returning secrets
 ```
 
 Previous completed directive:
@@ -1226,6 +1228,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Smoke Route Evidence Gate is verified.
+`run_live_data_smoke` now includes no-network `provider_route` evidence from
+the actual provider factory, and `run_api_key_pipeline_smoke` includes
+`provider_route_summary` plus provider route checks. Fixture defaults remain
+offline and return `conflict` with `ReplayMarketDataProvider` route evidence
+until API keys are filled. Focused tests passed with 4 tests, full pytest passed
+with 760 tests, and ruff, health_check, `run_live_data_smoke`, and
+`run_api_key_pipeline_smoke` harness commands passed.
+
+```yaml
+live_data_smoke_route_evidence_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_live_data_smoke includes no-network provider_route evidence from the actual provider factory
+    - run_api_key_pipeline_smoke includes provider_route_summary and checks provider route readiness
+    - fixture defaults remain offline and conflict without pretending API-key integration passed
+    - provider route evidence returns provider and env key names only, never secret values
+    - README and DevOps guide document provider route evidence in smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "passed, status conflict with fixture route without API keys as expected"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "passed, status conflict with blocked provider route without API keys as expected"
+```
+
+Previous verification:
 
 Summary: Live Data Provider Route Gate is verified.
 `get_live_data_provider_route` is registered for MCP and harness use. It calls
