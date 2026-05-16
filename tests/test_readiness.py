@@ -275,6 +275,77 @@ def expected_live_data_setup_steps(
     }
 
 
+def expected_provider_setup_actions(
+    *,
+    market_configured_env_keys: list[str],
+    macro_configured_env_keys: list[str],
+    news_configured_env_keys: list[str],
+) -> dict[str, dict[str, Any]]:
+    provider_rows = [
+        (
+            "market",
+            "polygon",
+            market_configured_env_keys,
+            "POLYGON_API_KEY",
+            ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+            "POLYGON_API_KEY=your_polygon_key",
+            "get_market_snapshot_live_smoke",
+        ),
+        (
+            "macro",
+            "fred",
+            macro_configured_env_keys,
+            "FRED_API_KEY",
+            [
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+            ],
+            "FRED_API_KEY=your_fred_key",
+            "get_macro_snapshot_live_smoke",
+        ),
+        (
+            "news",
+            "newsapi",
+            news_configured_env_keys,
+            "NEWS_API_KEY",
+            ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            "NEWS_API_KEY=your_newsapi_key",
+            "get_news_bundle_live_smoke",
+        ),
+    ]
+    return {
+        provider_family: {
+            "provider": provider,
+            "configured": bool(configured_env_keys),
+            "configured_env_keys": configured_env_keys,
+            "preferred_env_key": preferred_env_key,
+            "accepted_env_keys": accepted_env_keys,
+            "setup_status": "ready" if configured_env_keys else "pending",
+            "next_setup_action": (
+                "run_provider_smoke"
+                if configured_env_keys
+                else "fill_preferred_env_key"
+            ),
+            "dotenv_target_path": ".env",
+            "example": example,
+            "smoke_command_name": smoke_command_name,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+        for (
+            provider_family,
+            provider,
+            configured_env_keys,
+            preferred_env_key,
+            accepted_env_keys,
+            example,
+            smoke_command_name,
+        ) in provider_rows
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -493,6 +564,11 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        "provider_setup_actions": expected_provider_setup_actions(
+            market_configured_env_keys=[],
+            macro_configured_env_keys=[],
+            news_configured_env_keys=[],
+        ),
         "missing": [
             "market_ohlcv_api_key",
             "macro_api_key",
@@ -3651,6 +3727,13 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["live_data_setup_summary"][
+        "provider_setup_actions"
+    ] == expected_provider_setup_actions(
+        market_configured_env_keys=["HALO_SWING_MARKET_DATA_API_KEY"],
+        macro_configured_env_keys=["HALO_SWING_MACRO_API_KEY"],
+        news_configured_env_keys=["HALO_SWING_NEWS_API_KEY"],
+    )
     assert payload["live_data_setup_summary"][
         "dotenv_file_status"
     ] == expected_dotenv_file_status(repo_env)

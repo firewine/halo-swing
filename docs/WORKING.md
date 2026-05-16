@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SETUP_ACTIONS_VERIFIED
-gate_id: API_KEY_PROVIDER_SETUP_ACTIONS_GATE
+status: LIVE_DATA_SETUP_SUMMARY_PROVIDER_ACTIONS_VERIFIED
+gate_id: LIVE_DATA_SETUP_SUMMARY_PROVIDER_ACTIONS_GATE
 review_tier: S1_small
 
-next_atomic_step: add provider-level no-secret setup action fields to live data API-key status so each provider shows the preferred .env key to fill or the next smoke to run
+next_atomic_step: propagate provider-level no-secret setup actions into live_data_setup_summary so checklist and smoke setup payloads show each provider key action without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,22 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - get_live_data_api_key_status provider entries include preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and no-secret example values
-  - blocked defaults and ready repo-dotenv alias paths assert provider-level setup action fields without leaking secret values
-  - README and DevOps guide document provider-level preferred_env_key and next_setup_action fields
+  - live_data_setup_summary includes provider_setup_actions for market, macro, and news with preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and smoke_command_name
+  - blocked defaults and ready repo-dotenv checklist paths assert provider_setup_actions without leaking secret values
+  - README and DevOps guide document provider_setup_actions in setup summaries
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified provider setup action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data setup summary provider actions gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SETUP_ACTIONS_VERIFIED
+gate_id: API_KEY_PROVIDER_SETUP_ACTIONS_GATE
+review_tier: S1_small
+
+next_atomic_step: add provider-level no-secret setup action fields to live data API-key status so each provider shows the preferred .env key to fill or the next smoke to run
 ```
 
 Previous completed directive:
@@ -1435,6 +1446,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Setup Summary Provider Actions Gate is verified.
+`live_data_setup_summary` now includes `provider_setup_actions` for market,
+macro, and news. Checklist and smoke setup payloads can show each provider's
+preferred `.env` key, setup status, next setup action, target path, example, and
+smoke command name without returning secret values. Focused tests passed with 3
+tests, full pytest passed with 760 tests, and ruff, health_check, and setup
+checklist harness commands passed.
+
+```yaml
+live_data_setup_summary_provider_actions_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - live_data_setup_summary includes provider_setup_actions for market, macro, and news with preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and smoke_command_name
+    - blocked defaults and ready repo-dotenv checklist paths assert provider_setup_actions without leaking secret values
+    - README and DevOps guide document provider_setup_actions in setup summaries
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: "passed, blocked fixture defaults returned live_data_setup_summary.provider_setup_actions without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Provider Setup Actions Gate is verified.
 `get_live_data_api_key_status` provider entries now include no-secret

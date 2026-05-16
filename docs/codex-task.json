@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SETUP_ACTIONS_GATE",
+  "gate_id": "LIVE_DATA_SETUP_SUMMARY_PROVIDER_ACTIONS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.681",
-  "next_atomic_step": "add provider-level no-secret setup action fields to live data API-key status so each provider shows the preferred .env key to fill or the next smoke to run",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.682",
+  "next_atomic_step": "propagate provider-level no-secret setup actions into live_data_setup_summary so checklist and smoke setup payloads show each provider key action without returning secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.680",
+    "docs/halo-swing-development-plan.md#3.681",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -36,11 +36,11 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit"
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit"
   ],
   "post_implementation_review": {
     "roles": [
@@ -53,13 +53,13 @@
     "read_only": true
   },
   "done_means": [
-    "get_live_data_api_key_status provider entries include preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and no-secret example values",
-    "blocked defaults and ready repo-dotenv alias paths assert provider-level setup action fields without leaking secret values",
-    "README and DevOps guide document provider-level preferred_env_key and next_setup_action fields",
+    "live_data_setup_summary includes provider_setup_actions for market, macro, and news with preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and smoke_command_name",
+    "blocked defaults and ready repo-dotenv checklist paths assert provider_setup_actions without leaking secret values",
+    "README and DevOps guide document provider_setup_actions in setup summaries",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified provider setup action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data setup summary provider actions gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

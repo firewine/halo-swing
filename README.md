@@ -284,7 +284,8 @@ orders, or return secret values. It also returns `live_data_setup_summary` so
 API-key-only setup shows key readiness, provider route status, selected provider
 classes, missing keys, and the one-shot pipeline smoke command without exposing
 secret values. The summary includes `ready_to_run_live_smoke`,
-`next_smoke_command`, `provider_family_summary`, and a no-secret
+`next_smoke_command`, `provider_family_summary`, `provider_setup_actions`, and
+a no-secret
 `dotenv_template` for the repo-root `.env` entries to fill before running smoke
 commands. It also returns `dotenv_file_status` so the setup payload shows
 whether `.env.example` and `.env` exist, the next setup action, and the

@@ -1538,6 +1538,7 @@ def _live_data_setup_summary(
         "provider_route_status": provider_route.get("status"),
         "configured_provider_families": configured_provider_families,
         "provider_family_summary": provider_family_summary,
+        "provider_setup_actions": _live_data_provider_setup_actions(api_key_status),
         "missing": missing,
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
@@ -1597,6 +1598,32 @@ def _live_data_provider_family_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+
+
+def _live_data_provider_setup_actions(
+    api_key_status: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    providers = _optional_mapping(api_key_status.get("providers")) or {}
+    actions: dict[str, dict[str, Any]] = {}
+    for provider_family, raw_provider_status in providers.items():
+        provider_status = _optional_mapping(raw_provider_status) or {}
+        smoke_command = _optional_mapping(provider_status.get("smoke_command")) or {}
+        actions[provider_family] = {
+            "provider": provider_status.get("provider"),
+            "configured": provider_status.get("configured"),
+            "configured_env_keys": provider_status.get("configured_env_keys"),
+            "preferred_env_key": provider_status.get("preferred_env_key"),
+            "accepted_env_keys": provider_status.get("accepted_env_keys"),
+            "setup_status": provider_status.get("setup_status"),
+            "next_setup_action": provider_status.get("next_setup_action"),
+            "dotenv_target_path": provider_status.get("dotenv_target_path"),
+            "example": provider_status.get("example"),
+            "smoke_command_name": smoke_command.get("name"),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+    return actions
 
 
 def _string_list(values: Any) -> list[str]:
