@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_DOTENV_FILE_STATUS_GATE",
+  "gate_id": "LIVE_DATA_DOTENV_SETUP_ACTION_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.677",
-  "next_atomic_step": "add no-write dotenv file status to live data API-key setup payloads so users can see whether repo-root .env exists before filling API keys without returning secrets",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.678",
+  "next_atomic_step": "add no-write dotenv setup action hints to live data API-key setup payloads so users can see the repo-local .env preparation step before filling API keys without returning secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.676",
+    "docs/halo-swing-development-plan.md#3.677",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -54,14 +54,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_live_data_api_key_status includes dotenv_file_status with repo-relative source/target paths, target_exists, source_exists, copy_required, and no secret values",
-    "live_data_setup_summary exposes the same dotenv_file_status for checklist and smoke setup payloads",
-    "blocked defaults and ready repo-dotenv paths assert no-write dotenv file status without leaking .env values",
-    "README and DevOps guide document dotenv_file_status in API-key setup payloads",
-    "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or .env mutation changes are added",
+    "dotenv_file_status includes next_action, copy_command, and fill_keys_after_copy metadata without reading or returning .env secret values",
+    "copy_command uses repo-relative .env.example and .env paths and is marked as a user-run local mutation, while the payload itself remains no-write",
+    "blocked defaults and ready repo-dotenv paths assert the correct next_action without leaking .env values",
+    "README and DevOps guide document dotenv_file_status setup action hints",
+    "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live data dotenv file status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data dotenv setup action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

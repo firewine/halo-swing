@@ -1639,13 +1639,37 @@ def _live_data_dotenv_file_status() -> dict[str, Any]:
     source_path = target_path.with_name(".env.example")
     target_exists = target_path.is_file()
     source_exists = source_path.is_file()
+    copy_required = source_exists and not target_exists
+    next_action = (
+        "copy_env_example_to_env"
+        if copy_required
+        else "fill_live_data_api_keys"
+        if target_exists
+        else "restore_env_example"
+    )
     return {
         "schema_version": "live_data_dotenv_file_status.v1",
         "target_path": ".env",
         "source_path": ".env.example",
         "target_exists": target_exists,
         "source_exists": source_exists,
-        "copy_required": source_exists and not target_exists,
+        "copy_required": copy_required,
+        "next_action": next_action,
+        "copy_command": {
+            "name": "copy_env_example_to_env",
+            "command": "cp .env.example .env",
+            "required": copy_required,
+            "source_path": ".env.example",
+            "target_path": ".env",
+            "network_call": False,
+            "mutates_local_state": True,
+            "secret_values_returned": False,
+        },
+        "fill_keys_after_copy": {
+            "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+            "secret": True,
+            "secret_values_returned": False,
+        },
         "mutation": False,
         "network_call": False,
         "mutates_local_state": False,

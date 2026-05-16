@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.678 Live Data Dotenv Setup Action Gate Record - 2026-05-17
+
+### A. 목적
+
+`dotenv_file_status`는 `.env.example`과 `.env` 존재 여부를 보여주지만, `.env`가 없을
+때 다음 repo-local 준비 action을 구조화해서 제공하지 않았다. 이번 slice는 payload가
+자동으로 파일을 쓰지 않으면서도 `next_action`, `copy_command`, `fill_keys_after_copy`
+metadata를 반환해, 사용자가 API key를 넣기 전 필요한 `.env` 준비 단계를 바로 확인하게
+한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - dotenv_file_status includes next_action, copy_command, and fill_keys_after_copy metadata without reading or returning .env secret values
+  - copy_command uses repo-relative .env.example and .env paths and is marked as a user-run local mutation, while the payload itself remains no-write
+  - README and DevOps guide document dotenv_file_status setup action hints
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed
+```
+
 ## 3.677 Live Data Dotenv File Status Gate Record - 2026-05-17
 
 ### A. 목적

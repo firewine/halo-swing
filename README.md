@@ -284,8 +284,8 @@ secret values. The summary includes `ready_to_run_live_smoke`,
 `next_smoke_command`, `provider_family_summary`, and a no-secret
 `dotenv_template` for the repo-root `.env` entries to fill before running smoke
 commands. It also returns `dotenv_file_status` so the setup payload shows
-whether `.env.example` and `.env` exist without writing files or returning
-secret values. It also returns
+whether `.env.example` and `.env` exist, the next setup action, and the
+repo-local copy command hint without writing files or returning secret values. It also returns
 `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the
