@@ -455,8 +455,8 @@ provider keys are configured. The checklist includes `ready`,
 its command or key guidance are visible without reading every step. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
-ready, and `setup_status_summary` mirrors `next_provider_smoke_command_name`,
-without returning secret values.
+ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`
+object and `next_provider_smoke_command_name`, without returning secret values.
 Its live data, signal workflow, and recording sub-smoke summaries include
 stage-level setup fields such as `live_data_setup_summary_status`,
 `ready_to_run_live_smoke`, `provider_route_status`, `provider_family_summary`,

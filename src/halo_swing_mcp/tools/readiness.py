@@ -1580,6 +1580,9 @@ def _api_key_pipeline_setup_status_summary(
     next_operator_action = _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
     ) or {}
+    next_provider_smoke = _optional_mapping(
+        next_operator_action.get("next_provider_smoke")
+    )
     next_smoke_command = _optional_mapping(
         live_data_setup_summary.get("next_smoke_command")
     ) or {}
@@ -1615,6 +1618,7 @@ def _api_key_pipeline_setup_status_summary(
         "next_setup_step": live_data_setup_steps.get("next_step"),
         "next_operator_action_name": next_operator_action.get("name"),
         "next_smoke_command_name": next_smoke_command.get("name"),
+        "next_provider_smoke": next_provider_smoke,
         "next_provider_smoke_command_name": next_operator_action.get(
             "next_provider_smoke_command_name"
         ),

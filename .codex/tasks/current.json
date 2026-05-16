@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_SETUP_STATUS_NEXT_PROVIDER_SMOKE_GATE",
+  "gate_id": "API_KEY_PIPELINE_SETUP_STATUS_NEXT_PROVIDER_SMOKE_OBJECT_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.703",
-  "next_atomic_step": "surface next_provider_smoke_command_name in the top-level setup_status_summary so API-key-only setup status shows the next provider smoke target",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.704",
+  "next_atomic_step": "surface the no-secret next_provider_smoke command object in top-level setup_status_summary so compact API-key-only setup status includes the runnable provider smoke command",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -55,15 +55,15 @@
     "read_only": true
   },
   "done_means": [
-    "top-level setup_status_summary exposes next_provider_smoke_command_name",
-    "ready setup status shows the first ready provider smoke command name",
-    "blocked setup status returns next_provider_smoke_command_name=null",
+    "top-level setup_status_summary exposes next_provider_smoke and next_provider_smoke_command_name",
+    "ready setup status shows the first ready provider smoke command object and name",
+    "blocked setup status returns next_provider_smoke=null and next_provider_smoke_command_name=null",
     "blocked or partial setup paths do not return secret values and remain non-mutating",
-    "README and DevOps setup guide mention that setup_status_summary mirrors the next provider smoke command name once API keys are ready",
+    "README and DevOps setup guide mention that setup_status_summary mirrors the next provider smoke command object and name once API keys are ready",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline setup-status next-provider-smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key pipeline setup-status next-provider-smoke object gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

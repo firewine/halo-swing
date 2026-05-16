@@ -2656,6 +2656,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_setup_step": "run_provider_smokes",
         "next_operator_action_name": "run_provider_smokes",
         "next_smoke_command_name": "run_api_key_pipeline_smoke",
+        "next_provider_smoke": fake_next_operator_action["next_provider_smoke"],
         "next_provider_smoke_command_name": "get_market_snapshot_live_smoke",
         "selected_provider_classes": [
             "PolygonMarketDataProvider",
@@ -2841,6 +2842,7 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "next_setup_step": "prepare_dotenv",
         "next_operator_action_name": "prepare_dotenv",
         "next_smoke_command_name": "get_live_data_api_key_status",
+        "next_provider_smoke": None,
         "next_provider_smoke_command_name": None,
         "selected_provider_classes": ["ReplayMarketDataProvider"],
         "network_call": False,

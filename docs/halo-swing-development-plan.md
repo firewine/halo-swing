@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.704 API Key Pipeline Setup Status Next Provider Smoke Object Gate Record - 2026-05-17
+
+### A. 목적
+
+`setup_status_summary`에는 다음 provider smoke command name이 보이지만, 실제 실행할
+command object는 여전히 더 자세한 command summary나 checklist를 읽어야 했다. 이번 slice는
+compact setup status만 봐도 API key 입력 후 첫 provider smoke command를 바로 실행할 수
+있도록 no-secret `next_provider_smoke` object를 함께 노출한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level setup_status_summary exposes next_provider_smoke and next_provider_smoke_command_name
+  - ready setup status shows the first ready provider smoke command object and name
+  - blocked setup status returns next_provider_smoke=null and next_provider_smoke_command_name=null
+  - README and DevOps guide document setup_status_summary next-provider-smoke object visibility in the API-key setup path
+  - no runtime .env mutation, secret value output, live adapter, broker, DB, Telegram, or Hermes runtime changes added
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 762 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; fixture-default local setup remained blocked at prepare_dotenv, setup_status_summary.next_provider_smoke and next_provider_smoke_command_name returned null, and no secrets were returned
+```
+
 ## 3.703 API Key Pipeline Setup Status Next Provider Smoke Gate Record - 2026-05-17
 
 ### A. 목적
