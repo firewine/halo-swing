@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_PROVIDER_API_KEY_AUTO_SELECT_GATE_VERIFIED
-gate_id: LIVE_PROVIDER_API_KEY_AUTO_SELECT_GATE
+status: DOCS_LIVE_PROVIDER_STATE_ALIGNMENT_GATE_VERIFIED
+gate_id: DOCS_LIVE_PROVIDER_STATE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: allow implemented live data providers to be selected by API-key presence while preserving offline defaults and secret-free readiness
+next_atomic_step: align current WORKING state with API-key auto-select live provider behavior while preserving historical gate records
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -240,14 +240,14 @@ done_means:
   - get_news_bundle exposes news_score_contract and score_leverage_swing uses explicit news_score
   - Polygon market OHLCV live provider exists behind the MarketDataProvider boundary
   - default market data provider remains fixture-backed and offline
-  - live market provider selection requires HALO_SWING_MARKET_DATA_MODE=live and HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY
+  - live market provider auto-selects when HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY is configured
   - provider tests cover missing key, provider selection, Polygon OHLCV parsing, and no returned secret values
   - get_integration_readiness live_data evidence reflects live_adapter_added=true without network calls or secret values
   - FRED macro live provider exists behind the MarketDataProvider boundary
-  - live macro provider selection requires HALO_SWING_MACRO_DATA_MODE=live and HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY
+  - live macro provider auto-selects when HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY is configured
   - provider tests cover missing key, provider selection, FRED macro parsing, and no returned secret values
   - NewsAPI live provider exists behind the MarketDataProvider boundary
-  - live news provider selection requires HALO_SWING_NEWS_DATA_MODE=live and HALO_SWING_NEWS_API_KEY or NEWS_API_KEY
+  - live news provider auto-selects when HALO_SWING_NEWS_API_KEY or NEWS_API_KEY is configured
   - provider tests cover missing key, provider selection, NewsAPI parsing, live bundle marking, and no returned secret values
   - get_integration_readiness treats HALO_SWING_MACRO_API_KEY as a configured macro live data source signal
   - readiness output keeps macro API-key env names and values out of serialized payloads
@@ -258,9 +258,6 @@ done_means:
   - unsupported live data source env values do not mark live_data ready and are not serialized
   - live data readiness requires implemented API-key aliases because source names alone cannot perform provider live calls
   - live_data missing reasons use market_ohlcv_api_key, macro_api_key, and news_api_key
-  - live_data readiness requires implemented live mode plus API-key alias for market, macro, and news env-backed readiness
-  - API keys without live modes keep live_data blocked with live-mode missing reasons
-  - live modes without API keys keep live_data blocked with API-key missing reasons
   - live market, macro, and news providers auto-select from implemented API-key aliases without requiring live mode env values
   - live_data readiness reports implemented API-key aliases as ready without requiring live mode env values
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
@@ -612,19 +609,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.628
-gate_packet: docs/halo-swing-development-plan.md#3.628
+portable_mirror: docs/halo-swing-development-plan.md#3.629
+gate_packet: docs/halo-swing-development-plan.md#3.629
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.628
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_providers.py
-  - tests/test_readiness.py
-  - tests/test_audit.py
-  - tests/test_tool_registry.py
+  - docs/halo-swing-development-plan.md#3.629
+  - .codex/tasks/current.json
+  - docs/codex-task.json
 
 implementation_rule:
   - keep reusable module boundaries
@@ -690,7 +683,7 @@ offline_mvp:
     - tests/test_mvp_tools.py
     - tests/golden/mvp_tool_contracts.json
   not_implemented_by_design:
-    - default live market/macro/news collection without explicit API-key live modes
+    - default live market/macro/news collection without user-provided API keys
     - broker or automatic order execution
     - SQLite migrations/repository persistence
 
@@ -927,15 +920,46 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Provider API-Key Auto-Select Gate is verified. Implemented live
-data providers now auto-select when their supported API-key aliases are present,
-without requiring `*_DATA_MODE=live`. No-key defaults remain fixture-backed and
-offline; explicit live modes without API keys still fail with the existing
-missing-key errors. `get_integration_readiness` now reports live_data ready from
-implemented API-key aliases alone, while readiness/audit outputs remain
-secret-free and omit env key names and values. Focused provider/readiness
-tests passed with 51 tests, full pytest passed with 691 tests, and ruff and
-health_check passed.
+Summary: Docs Live Provider State Alignment Gate is verified. Current
+`WORKING.md` state now reflects the API-key auto-select behavior: market, macro,
+and news live providers auto-select from supported API-key aliases, current
+readiness state no longer claims live mode env values are required, and
+offline_mvp now states live collection is unavailable only without
+user-provided API keys. Historical gate records remain preserved as historical
+evidence. Task mirrors match, JSON validation passed, focused provider/readiness
+tests passed with 52 tests, and ruff and health_check passed.
+
+```yaml
+docs_live_provider_state_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+  implementation:
+    - current WORKING done_means describes live market, macro, and news provider auto-select by API-key aliases
+    - current WORKING done_means no longer claims live_data readiness requires live mode env values
+    - current WORKING offline_mvp state says live collection remains unavailable only without user-provided API keys
+    - historical gate records remain historical and were not rewritten as current directives
+    - task contract and portable mirror match
+    - no source code, tests, providers, network behavior, migrations, repository persistence, broker path, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 live_provider_api_key_auto_select_gate:
