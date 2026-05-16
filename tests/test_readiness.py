@@ -1485,6 +1485,30 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
 ) -> None:
     from halo_swing_mcp.tools import readiness as readiness_tools
 
+    fake_setup_summary = {
+        "schema_version": "live_data_setup_summary.v1",
+        "status": "ready",
+        "ready_to_run_live_smoke": True,
+        "api_key_status": "ready",
+        "provider_route_status": "ready",
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing": [],
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "next_smoke_command": {
+            "name": "run_api_key_pipeline_smoke",
+            "network_call": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
     def fake_readiness() -> dict[str, Any]:
         return {
             "status": "blocked",
@@ -1548,6 +1572,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             },
             "network_call": True,
             "live_data_required": True,
+            "live_data_setup_summary": fake_setup_summary,
             "mutates_local_state": False,
             "secret_values_returned": False,
         }
@@ -1562,6 +1587,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "input": {"asset": asset, "timeframe": timeframe},
             "network_call": True,
             "live_data_required": True,
+            "live_data_setup_summary": fake_setup_summary,
             "mutates_local_state": False,
             "secret_values_returned": False,
         }
@@ -1576,6 +1602,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "input": {"asset": asset, "timeframe": timeframe},
             "network_call": True,
             "live_data_required": True,
+            "live_data_setup_summary": fake_setup_summary,
             "mutates_local_state": False,
             "secret_values_returned": False,
         }
@@ -1650,6 +1677,18 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "network_call": False,
         "secret_values_returned": False,
     }
+    for summary_name in (
+        "live_data_smoke_summary",
+        "signal_workflow_smoke_summary",
+        "recording_smoke_summary",
+    ):
+        assert payload[summary_name]["live_data_setup_summary_status"] == "ready"
+        assert payload[summary_name]["ready_to_run_live_smoke"] is True
+        assert payload[summary_name]["provider_route_status"] == "ready"
+        assert (
+            payload[summary_name]["next_smoke_command_name"]
+            == "run_api_key_pipeline_smoke"
+        )
     assert payload["network_call"] is True
     assert payload["live_data_required"] is True
     assert payload["hermes_runtime_started"] is False
@@ -1683,6 +1722,15 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["status"] == "conflict"
     assert payload["readiness_summary"]["live_data_ready"] is False
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
+        "blocked"
+    )
+    assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["live_data_smoke_summary"]["provider_route_status"] == "blocked"
+    assert (
+        payload["live_data_smoke_summary"]["next_smoke_command_name"]
+        == "get_live_data_api_key_status"
+    )
     assert payload["live_data_setup_summary"]["status"] == "blocked"
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
@@ -1705,7 +1753,28 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "ReplayMarketDataProvider"
     ]
     assert payload["signal_workflow_smoke_summary"]["status"] == "conflict"
+    assert payload["signal_workflow_smoke_summary"][
+        "live_data_setup_summary_status"
+    ] == "blocked"
+    assert payload["signal_workflow_smoke_summary"]["ready_to_run_live_smoke"] is False
+    assert (
+        payload["signal_workflow_smoke_summary"]["provider_route_status"]
+        == "blocked"
+    )
+    assert (
+        payload["signal_workflow_smoke_summary"]["next_smoke_command_name"]
+        == "get_live_data_api_key_status"
+    )
     assert payload["recording_smoke_summary"]["status"] == "conflict"
+    assert payload["recording_smoke_summary"]["live_data_setup_summary_status"] == (
+        "blocked"
+    )
+    assert payload["recording_smoke_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["recording_smoke_summary"]["provider_route_status"] == "blocked"
+    assert (
+        payload["recording_smoke_summary"]["next_smoke_command_name"]
+        == "get_live_data_api_key_status"
+    )
     assert payload["network_call"] is False
     assert payload["live_data_required"] is False
     assert payload["hermes_runtime_started"] is False

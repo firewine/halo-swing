@@ -424,6 +424,11 @@ and recording smoke while still avoiding Hermes runtime starts, Telegram sends,
 order submissions, retained state, and secret returns. The pipeline payload also
 includes `live_data_setup_summary` and a provider route summary, then fails the
 route readiness check until all supported live-data provider keys are configured.
+Its live data, signal workflow, and recording sub-smoke summaries include
+stage-level setup fields such as `live_data_setup_summary_status`,
+`ready_to_run_live_smoke`, `provider_route_status`, and
+`next_smoke_command_name` so the blocked stage is visible without returning
+secret values.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

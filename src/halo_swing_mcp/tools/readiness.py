@@ -1411,6 +1411,12 @@ def _api_key_pipeline_readiness_summary(readiness: dict[str, Any]) -> dict[str, 
 
 
 def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
+    live_data_setup_summary = _optional_mapping(
+        smoke.get("live_data_setup_summary")
+    ) or {}
+    next_smoke_command = _optional_mapping(
+        live_data_setup_summary.get("next_smoke_command")
+    ) or {}
     return {
         "schema_version": smoke.get("schema_version"),
         "status": smoke.get("status"),
@@ -1418,6 +1424,14 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "live_data_required": smoke.get("live_data_required"),
         "mutates_local_state": smoke.get("mutates_local_state", False),
         "secret_values_returned": smoke.get("secret_values_returned"),
+        "live_data_setup_summary_status": live_data_setup_summary.get("status"),
+        "ready_to_run_live_smoke": live_data_setup_summary.get(
+            "ready_to_run_live_smoke"
+        ),
+        "provider_route_status": live_data_setup_summary.get(
+            "provider_route_status"
+        ),
+        "next_smoke_command_name": next_smoke_command.get("name"),
     }
 
 

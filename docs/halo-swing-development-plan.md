@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.671 API Key Pipeline Stage Setup Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`는 live data, signal workflow, recording smoke를 한 번에
+실행하지만, 하위 smoke summary는 각 단계의 setup readiness를 축약해서 보여주지 않았다.
+이번 slice는 하위 summary에 stage-level `live_data_setup_summary` 상태 필드를 추가해,
+one-shot API-key smoke output만 봐도 어느 단계가 setup-ready인지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke sub-smoke summaries include live_data_setup_summary_status, ready_to_run_live_smoke, provider_route_status, and next_smoke_command_name when available
+  - ready fake pipeline smoke reports each stage setup summary ready with next_smoke_command run_api_key_pipeline_smoke
+  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values
+  - README and DevOps guide document stage-level setup summary fields in pipeline smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed
+```
+
 ## 3.670 Live Recording Setup Summary Gate Record - 2026-05-17
 
 ### A. 목적
