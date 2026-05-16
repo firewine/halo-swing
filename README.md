@@ -267,7 +267,9 @@ workflow, and recording smoke checks. Its payload includes
 smoke records API-key readiness and which provider factory route was selected.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
-`provider_route_status`, and `next_smoke_command_name`:
+`provider_route_status`, `provider_family_summary`,
+`configured_provider_family_count`, `missing_provider_families`, and
+`next_smoke_command_name`:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit

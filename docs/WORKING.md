@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_SETUP_PROVIDER_PROGRESS_VERIFIED
-gate_id: LIVE_DATA_SETUP_PROVIDER_PROGRESS_GATE
+status: API_KEY_PIPELINE_STAGE_PROVIDER_PROGRESS_VERIFIED
+gate_id: API_KEY_PIPELINE_STAGE_PROVIDER_PROGRESS_GATE
 review_tier: S1_small
 
-next_atomic_step: add provider family progress fields to live_data_setup_summary so checklist and smoke outputs show configured and missing live data provider families without returning secrets
+next_atomic_step: add provider family progress fields to run_api_key_pipeline_smoke sub-smoke summaries so each stage shows configured and missing live data provider families without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,24 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - live_data_setup_summary includes provider_family_summary with required, configured, and missing provider families plus configured count
-  - blocked defaults report zero configured families and ready repo-dotenv paths report market, macro, and news configured without secret values
-  - checklist, live data smoke, and API-key pipeline smoke tests assert provider family progress in live_data_setup_summary
-  - README and DevOps guide document provider_family_summary in live_data_setup_summary payloads
+  - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include provider_family_summary from live_data_setup_summary
+  - stage summaries expose configured_count, required_count, and missing_provider_families without returning secret values
+  - ready fake pipeline smoke and blocked fixture defaults assert stage-level provider family progress
+  - README and DevOps guide document provider_family_summary in API-key pipeline stage summaries
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data setup provider progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline stage provider progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_SETUP_PROVIDER_PROGRESS_VERIFIED
+gate_id: LIVE_DATA_SETUP_PROVIDER_PROGRESS_GATE
+review_tier: S1_small
+
+next_atomic_step: add provider family progress fields to live_data_setup_summary so checklist and smoke outputs show configured and missing live data provider families without returning secrets
 ```
 
 Previous completed directive:
@@ -1371,6 +1381,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Stage Provider Progress Gate is verified.
+`run_api_key_pipeline_smoke` sub-smoke summaries now include
+`provider_family_summary`, configured and required provider family counts, and
+missing provider families so live data, signal workflow, and recording stages
+show market/macro/news setup progress without returning secret values. Focused
+tests passed with 3 tests, full pytest passed with 760 tests, and ruff,
+health_check, and the API-key pipeline harness command passed.
+
+```yaml
+api_key_pipeline_stage_provider_progress_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include provider_family_summary from live_data_setup_summary
+    - stage summaries expose configured_count, required_count, and missing_provider_families without returning secret values
+    - ready fake pipeline smoke and blocked fixture defaults assert stage-level provider family progress
+    - README and DevOps guide document provider_family_summary in API-key pipeline stage summaries
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "passed, blocked fixture defaults returned stage provider_family_summary without secrets"
+```
+
+Previous verification:
 
 Summary: Live Data Setup Provider Progress Gate is verified.
 `live_data_setup_summary` now includes `provider_family_summary` with required,

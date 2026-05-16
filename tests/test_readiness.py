@@ -1870,6 +1870,20 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         assert payload[summary_name]["live_data_setup_summary_status"] == "ready"
         assert payload[summary_name]["ready_to_run_live_smoke"] is True
         assert payload[summary_name]["provider_route_status"] == "ready"
+        assert payload[summary_name]["provider_family_summary"] == {
+            "required_provider_families": ["market", "macro", "news"],
+            "configured_provider_families": ["market", "macro", "news"],
+            "missing_provider_families": [],
+            "configured_count": 3,
+            "required_count": 3,
+            "ready_to_run_live_smoke": True,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+        assert payload[summary_name]["configured_provider_family_count"] == 3
+        assert payload[summary_name]["required_provider_family_count"] == 3
+        assert payload[summary_name]["missing_provider_families"] == []
         assert (
             payload[summary_name]["next_smoke_command_name"]
             == "run_api_key_pipeline_smoke"
@@ -1916,6 +1930,24 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["live_data_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
     )
+    assert payload["live_data_smoke_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["live_data_smoke_summary"]["configured_provider_family_count"] == 0
+    assert payload["live_data_smoke_summary"]["required_provider_family_count"] == 3
+    assert payload["live_data_smoke_summary"]["missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
     assert payload["live_data_setup_summary"]["status"] == "blocked"
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
@@ -1961,6 +1993,17 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["signal_workflow_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
     )
+    assert (
+        payload["signal_workflow_smoke_summary"][
+            "configured_provider_family_count"
+        ]
+        == 0
+    )
+    assert payload["signal_workflow_smoke_summary"]["missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
     assert payload["recording_smoke_summary"]["status"] == "conflict"
     assert payload["recording_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"
@@ -1971,6 +2014,18 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["recording_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
     )
+    assert payload["recording_smoke_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["recording_smoke_summary"]["required_provider_family_count"] == 3
     assert payload["network_call"] is False
     assert payload["live_data_required"] is False
     assert payload["hermes_runtime_started"] is False

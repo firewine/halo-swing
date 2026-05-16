@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.676 API Key Pipeline Stage Provider Progress Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`의 최상위 `live_data_setup_summary`는 provider family 진행률을
+보여주지만, live data, signal workflow, recording 하위 smoke summary에는 status와 next
+command만 있어 stage별 진행률을 보려면 다시 중첩 payload를 따라가야 했다. 이번 slice는
+각 하위 summary에 `provider_family_summary`를 추가해 API key를 넣은 뒤 어느 stage가
+market/macro/news setup progress를 보고 있는지 바로 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke sub-smoke summaries include provider_family_summary from live_data_setup_summary
+  - stage summaries expose configured provider family count, required provider family count, and missing provider families without secret values
+  - README and DevOps guide document provider_family_summary in API-key pipeline stage summaries
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status conflict without API keys as expected
+```
+
 ## 3.675 Live Data Setup Provider Progress Gate Record - 2026-05-17
 
 ### A. 목적
