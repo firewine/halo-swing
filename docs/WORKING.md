@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_SIGNAL_WORKFLOW_SMOKE_VERIFIED
-gate_id: LIVE_SIGNAL_WORKFLOW_SMOKE_GATE
+status: LIVE_RECORDING_SMOKE_VERIFIED
+gate_id: LIVE_RECORDING_SMOKE_GATE
 review_tier: S1_small
 
-next_atomic_step: add a one-shot live signal workflow smoke runner that verifies API-key-backed scoring, reporting, guide, and position review metadata without Hermes, Telegram, orders, or state mutation
+next_atomic_step: add a one-shot live recording smoke runner that verifies an API-key-backed signal can be recorded with live run-journal metadata using an ephemeral ledger by default
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -79,24 +79,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_readiness.py::test_run_live_recording_smoke_can_use_caller_supplied_ledger tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 
 done_means:
-  - run_live_signal_workflow_smoke is registered for MCP and harness use
-  - runner executes score_leverage_swing, generate_trade_guide, evaluate_position, and generate_latest_signal_report
-  - runner returns ok only when scoring, guide, position review, and report all preserve live_data_required metadata and signal source network_call metadata
-  - fixture defaults remain offline and produce conflict rather than pretending live integration passed
-  - setup checklist, README, and DevOps guide document the one-shot workflow smoke command after API keys are filled
+  - run_live_recording_smoke is registered for MCP and harness use
+  - runner generates a signal and records it through record_signal
+  - runner returns ok only when the generated signal and stored run_journal preserve live_data_required and network_call metadata
+  - default runner uses an ephemeral ledger and leaves no committed runtime artifact
+  - caller-supplied ledger_path is supported for an explicit retained local smoke ledger
+  - fixture defaults remain offline and produce conflict rather than pretending live recording passed
+  - setup checklist, README, and DevOps guide document the one-shot live recording smoke command after API keys are filled
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live signal workflow smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live recording smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_SIGNAL_WORKFLOW_SMOKE_VERIFIED
+gate_id: LIVE_SIGNAL_WORKFLOW_SMOKE_GATE
+review_tier: S1_small
+
+next_atomic_step: add a one-shot live signal workflow smoke runner that verifies API-key-backed scoring, reporting, guide, and position review metadata without Hermes, Telegram, orders, or state mutation
 ```
 
 Previous completed directive:
@@ -1178,6 +1191,64 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Recording Smoke Gate is verified. `run_live_recording_smoke` is
+registered for MCP and harness use. It generates a signal, records it through
+`record_signal`, and returns `ok` only when the generated signal plus stored
+run journal preserve live-data and network-call metadata. The default path uses
+an ephemeral ledger and leaves no runtime artifact; caller-supplied
+`ledger_path` is supported for explicit retained smoke ledgers. Focused tests
+passed with 4 tests, full pytest passed with 752 tests, and ruff, health_check,
+and the harness smoke command passed.
+
+```yaml
+live_recording_smoke_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/server.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_readiness.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - run_live_recording_smoke is registered for MCP and harness use
+    - runner generates a signal and records it through record_signal
+    - runner returns ok only when the generated signal and stored run_journal preserve live_data_required and network_call metadata
+    - default runner uses an ephemeral ledger and leaves no committed runtime artifact
+    - caller-supplied ledger_path is supported for an explicit retained local smoke ledger
+    - fixture defaults remain offline and produce conflict rather than pretending live recording passed
+    - setup checklist, README, and DevOps guide document the one-shot live recording smoke command after API keys are filled
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_readiness.py::test_run_live_recording_smoke_can_use_caller_supplied_ledger tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "752 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+      result: "passed, status conflict without API keys as expected"
+```
+
+Previous verification:
 
 Summary: Live Signal Workflow Smoke Gate is verified.
 `run_live_signal_workflow_smoke` is registered for MCP and harness use. It runs

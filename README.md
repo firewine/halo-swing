@@ -228,6 +228,14 @@ review, and the latest signal report:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 ```
 
+To verify the live signal can also pass through the JSONL recording path without
+leaving a runtime file, use `run_live_recording_smoke`; it uses an ephemeral
+ledger unless you explicitly provide `ledger_path`:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+```
+
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_smoke_commands` for

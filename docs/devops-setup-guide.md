@@ -347,6 +347,12 @@ one-shot live signal workflow smoke runner:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 ```
 
+one-shot live recording smoke runner:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+```
+
 The readiness and checklist commands do not call networks or return secret
 values. They report which future gates are still blocked for Hermes, Telegram,
 DB migration/repository, Binance testnet read-only smoke, live order submission,
@@ -370,7 +376,10 @@ orders, or returning secrets. After provider-level smoke passes, use
 boundary reaches `score_leverage_swing`, `generate_trade_guide`,
 `evaluate_position`, and `generate_latest_signal_report` without starting
 Hermes, sending Telegram messages, submitting orders, mutating state, or
-returning secrets.
+returning secrets. Use `run_live_recording_smoke` to verify that a generated
+live signal can also pass through `record_signal` with live run-journal metadata.
+By default it uses an ephemeral JSONL ledger and leaves no runtime file; provide
+`ledger_path` only when you intentionally want a retained local smoke ledger.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

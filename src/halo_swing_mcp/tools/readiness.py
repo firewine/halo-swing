@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -410,6 +411,73 @@ def run_live_signal_workflow_smoke(
     }
 
 
+def run_live_recording_smoke(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+    ledger_path: str | None = None,
+) -> dict[str, Any]:
+    """Record a generated signal and verify live run-journal boundaries."""
+
+    if ledger_path is None:
+        with tempfile.TemporaryDirectory(prefix="halo_swing_recording_smoke_") as tmpdir:
+            temporary_ledger_path = str(Path(tmpdir) / "signal_ledger.jsonl")
+            return _run_live_recording_smoke_with_ledger(
+                asset=asset,
+                timeframe=timeframe,
+                ledger_path=temporary_ledger_path,
+                ledger_persisted=False,
+            )
+
+    return _run_live_recording_smoke_with_ledger(
+        asset=asset,
+        timeframe=timeframe,
+        ledger_path=ledger_path,
+        ledger_persisted=True,
+    )
+
+
+def _run_live_recording_smoke_with_ledger(
+    *,
+    asset: str,
+    timeframe: str,
+    ledger_path: str,
+    ledger_persisted: bool,
+) -> dict[str, Any]:
+    from halo_swing_mcp.tools import recording as recording_tools
+    from halo_swing_mcp.tools import scoring as scoring_tools
+
+    signal = scoring_tools.score_leverage_swing(asset=asset, timeframe=timeframe)
+    recorded = recording_tools.record_signal(signal=signal, ledger_path=ledger_path)
+    checks: list[dict[str, Any]] = []
+    _extend_live_recording_checks(checks, signal=signal, recorded=recorded)
+
+    return {
+        "schema_version": "live_recording_smoke_run.v1",
+        "status": "ok" if checks and all(check["passed"] for check in checks) else "conflict",
+        "input": {
+            "asset": asset,
+            "timeframe": timeframe,
+            "ledger_path_provided": ledger_persisted,
+        },
+        "executed_tools": [
+            "score_leverage_swing",
+            "record_signal",
+        ],
+        "signal_summary": _workflow_signal_summary(signal),
+        "recording_summary": _recording_summary(recorded, ledger_persisted),
+        "checks": checks,
+        "network_call": _recording_network_call(recorded),
+        "live_data_required": recorded.get("live_data_required") is True,
+        "ledger_persisted": ledger_persisted,
+        "mutates_local_state": ledger_persisted,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -592,6 +660,23 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "network_call": True,
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_live_recording_smoke",
+            "purpose": (
+                "generate a signal, record it to an ephemeral or explicit JSONL "
+                "ledger, and verify live run-journal boundaries"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_live_recording_smoke --input-json "
+                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "state_policy": "uses an ephemeral ledger unless ledger_path is supplied",
             "secret_values_returned": False,
         },
     ]
@@ -850,6 +935,118 @@ def _workflow_report_summary(payload: dict[str, Any]) -> dict[str, Any]:
         "guard_status": _mapping_value(guard, "status"),
         "live_data_required": payload.get("live_data_required"),
     }
+
+
+def _extend_live_recording_checks(
+    checks: list[dict[str, Any]],
+    *,
+    signal: dict[str, Any],
+    recorded: dict[str, Any],
+) -> None:
+    source_contract = _optional_mapping(signal.get("source_data_contract"))
+    record = _optional_mapping(recorded.get("record"))
+    run_journal = _optional_mapping(_mapping_value(record, "run_journal"))
+    run_journal_contract = _optional_mapping(recorded.get("run_journal_contract"))
+    stored_signal = _optional_mapping(_mapping_value(record, "signal"))
+    _add_smoke_check(
+        checks,
+        tool="score_leverage_swing",
+        name="payload_live_data_required",
+        passed=signal.get("live_data_required") is True,
+        expected=True,
+        actual=signal.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="score_leverage_swing",
+        name="source_contract_network_call",
+        passed=_mapping_value(source_contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(source_contract, "network_call"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="recording_live_data_required",
+        passed=recorded.get("live_data_required") is True,
+        expected=True,
+        actual=recorded.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="stored_signal_live_data_required",
+        passed=_mapping_value(stored_signal, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(stored_signal, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="run_journal_live_data_required",
+        passed=_mapping_value(run_journal, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(run_journal, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="run_journal_network_call",
+        passed=_mapping_value(run_journal, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(run_journal, "network_call"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="run_journal_contract_network_call",
+        passed=_mapping_value(run_journal_contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(run_journal_contract, "network_call"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="record_signal",
+        name="no_db_required",
+        passed=_mapping_value(run_journal, "db_required") is False,
+        expected=False,
+        actual=_mapping_value(run_journal, "db_required"),
+    )
+
+
+def _recording_summary(
+    recorded: dict[str, Any],
+    ledger_persisted: bool,
+) -> dict[str, Any]:
+    record = _optional_mapping(recorded.get("record"))
+    run_journal = _optional_mapping(_mapping_value(record, "run_journal"))
+    run_journal_contract = _optional_mapping(recorded.get("run_journal_contract"))
+    return {
+        "status": recorded.get("status"),
+        "signal_id": recorded.get("signal_id"),
+        "ledger_ref": recorded.get("ledger_ref") if ledger_persisted else "ephemeral",
+        "ledger_persisted": ledger_persisted,
+        "run_journal": {
+            "schema_version": _mapping_value(run_journal, "schema_version"),
+            "run_id": _mapping_value(run_journal, "run_id"),
+            "signal_id": _mapping_value(run_journal, "signal_id"),
+            "network_call": _mapping_value(run_journal, "network_call"),
+            "db_required": _mapping_value(run_journal, "db_required"),
+            "secret_values_returned": _mapping_value(
+                run_journal,
+                "secret_values_returned",
+            ),
+            "live_data_required": _mapping_value(run_journal, "live_data_required"),
+        },
+        "run_journal_contract": run_journal_contract,
+        "live_data_required": recorded.get("live_data_required"),
+    }
+
+
+def _recording_network_call(recorded: dict[str, Any]) -> bool:
+    record = _optional_mapping(recorded.get("record"))
+    run_journal = _optional_mapping(_mapping_value(record, "run_journal"))
+    return _mapping_value(run_journal, "network_call") is True
 
 
 def _extend_workflow_contract_checks(

@@ -18,6 +18,7 @@ from halo_swing_mcp.tools.readiness import (
     get_integration_setup_checklist,
     run_integration_smoke,
     run_live_data_smoke,
+    run_live_recording_smoke,
     run_live_signal_workflow_smoke,
     validate_live_data_smoke_result,
 )
@@ -347,6 +348,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "run_live_data_smoke",
         "run_integration_smoke",
         "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -802,6 +804,133 @@ def test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys(
         "generate_latest_signal_report",
         "payload_live_data_required",
     ) in failed_checks
+
+
+def test_run_live_recording_smoke_executes_with_fake_live_metadata(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import recording as recording_tools
+    from halo_swing_mcp.tools import scoring as scoring_tools
+
+    fake_signal = {
+        "signal_id": "sig_live_recording_tqqq",
+        "run_id": "run_live_recording_smoke",
+        "asset": "TQQQ",
+        "underlying": "QQQ",
+        "timeframe": "swing_3d_10d",
+        "action": "BUY_WATCH",
+        "source_data_contract": {
+            "schema_version": "scoring_source_data.v1",
+            "network_call": True,
+            "live_data_required": True,
+        },
+        "live_data_required": True,
+    }
+    fake_recorded = {
+        "status": "recorded",
+        "signal_id": "sig_live_recording_tqqq",
+        "ledger_ref": "not-returned-for-ephemeral-ledger",
+        "run_journal_contract": {
+            "schema_version": "run_journal.v1",
+            "network_call": True,
+            "db_required": False,
+            "secret_values_returned": False,
+        },
+        "record": {
+            "signal": fake_signal,
+            "run_journal": {
+                "schema_version": "run_journal.v1",
+                "run_id": "run_live_recording_smoke",
+                "signal_id": "sig_live_recording_tqqq",
+                "network_call": True,
+                "db_required": False,
+                "secret_values_returned": False,
+                "live_data_required": True,
+            },
+        },
+        "live_data_required": True,
+    }
+
+    monkeypatch.setattr(
+        scoring_tools,
+        "score_leverage_swing",
+        lambda asset="TQQQ", timeframe="swing_3d_10d": fake_signal,
+    )
+    monkeypatch.setattr(
+        recording_tools,
+        "record_signal",
+        lambda signal=None, ledger_path=None: fake_recorded,
+    )
+
+    payload = run_live_recording_smoke(asset="TQQQ", timeframe="swing_3d_10d")
+
+    assert payload["schema_version"] == "live_recording_smoke_run.v1"
+    assert payload["status"] == "ok"
+    assert payload["executed_tools"] == ["score_leverage_swing", "record_signal"]
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["ledger_persisted"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["recording_summary"]["ledger_ref"] == "ephemeral"
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert all(check["passed"] for check in payload["checks"])
+    assert "api_key=" not in repr(payload).lower()
+
+
+def test_run_live_recording_smoke_uses_ephemeral_ledger_by_default(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_live_recording_smoke(asset="TQQQ", timeframe="swing_3d_10d")
+    failed_checks = {
+        (check["tool"], check["name"])
+        for check in payload["checks"]
+        if not check["passed"]
+    }
+
+    assert payload["schema_version"] == "live_recording_smoke_run.v1"
+    assert payload["status"] == "conflict"
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["ledger_persisted"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["recording_summary"]["ledger_ref"] == "ephemeral"
+    assert payload["recording_summary"]["status"] == "recorded"
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert (
+        "score_leverage_swing",
+        "payload_live_data_required",
+    ) in failed_checks
+    assert ("record_signal", "run_journal_network_call") in failed_checks
+
+
+def test_run_live_recording_smoke_can_use_caller_supplied_ledger(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    ledger_path = tmp_path / "live_recording_smoke.jsonl"
+
+    payload = run_live_recording_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        ledger_path=str(ledger_path),
+    )
+
+    assert payload["status"] == "conflict"
+    assert payload["ledger_persisted"] is True
+    assert payload["mutates_local_state"] is True
+    assert payload["recording_summary"]["ledger_ref"] == str(ledger_path)
+    assert ledger_path.exists()
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(

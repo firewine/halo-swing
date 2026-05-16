@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.658 Live Recording Smoke Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 넣어 live signal을 만들 수 있어도, 그 signal이 `record_signal`의
+JSONL recording path에서 live run-journal metadata를 보존하는지 한 번에 확인할 수
+있어야 한다. 이번 slice는 `run_live_recording_smoke`를 추가해 signal 생성 후 기록까지
+검증하고, 기본값은 ephemeral ledger를 사용해 runtime artifact를 남기지 않도록 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_recording_smoke is registered for MCP and harness use
+  - runner generates a signal and records it through record_signal
+  - runner returns ok only when the generated signal and stored run_journal preserve live_data_required and network_call metadata
+  - default runner uses an ephemeral ledger and leaves no committed runtime artifact
+  - caller-supplied ledger_path is supported for an explicit retained local smoke ledger
+  - fixture defaults remain offline and produce conflict rather than pretending live recording passed
+  - setup checklist, README, and DevOps guide document the one-shot live recording smoke command after API keys are filled
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_readiness.py::test_run_live_recording_smoke_can_use_caller_supplied_ledger tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 752 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit -> passed, status conflict without API keys as expected
+```
+
 ## 3.657 Live Signal Workflow Smoke Gate Record - 2026-05-16
 
 ### A. 목적
