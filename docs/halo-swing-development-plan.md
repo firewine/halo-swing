@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.681 API Key Provider Setup Actions Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key status payload는 provider별 configured 여부와 accepted key 목록을 제공하지만,
+각 provider 항목 자체에는 사용자가 바로 따라야 할 preferred `.env` key와 다음 setup
+action이 없었다. 이번 slice는 provider별 no-secret setup fields를 추가해 market,
+macro, news 각각에 어떤 key를 채우거나 어떤 smoke를 실행해야 하는지 payload만으로
+확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status provider entries include preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and no-secret example values
+  - blocked defaults and ready repo-dotenv alias paths assert provider-level setup action fields without leaking secret values
+  - README and DevOps guide document provider-level preferred_env_key and next_setup_action fields
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit -> passed
+```
+
 ## 3.680 API Key Pipeline Stage Setup Steps Gate Record - 2026-05-17
 
 ### A. 목적

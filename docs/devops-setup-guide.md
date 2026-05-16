@@ -400,6 +400,7 @@ providers. Use
 metadata offline. Use `get_live_data_api_key_status` before the first live smoke
 when you only need to confirm that supported Polygon, FRED, and NewsAPI aliases
 are configured; it reports key names, missing provider families,
+provider-level `preferred_env_key`, `setup_status`, `next_setup_action`,
 `provider_family_summary`, the no-secret `dotenv_template`, and
 `dotenv_file_status` with the next setup action, plus `live_data_setup_steps`,
 but never secret values. Use

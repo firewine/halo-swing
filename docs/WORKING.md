@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_STAGE_SETUP_STEPS_VERIFIED
-gate_id: API_KEY_PIPELINE_STAGE_SETUP_STEPS_GATE
+status: API_KEY_PROVIDER_SETUP_ACTIONS_VERIFIED
+gate_id: API_KEY_PROVIDER_SETUP_ACTIONS_GATE
 review_tier: S1_small
 
-next_atomic_step: add ordered live data setup step fields to run_api_key_pipeline_smoke sub-smoke summaries so each stage shows the next API-key setup action without returning secrets
+next_atomic_step: add provider-level no-secret setup action fields to live data API-key status so each provider shows the preferred .env key to fill or the next smoke to run
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,22 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include live_data_setup_steps, next_setup_step, and setup_step_count
-  - ready fake-live and blocked fixture-default paths assert next_setup_step and setup_step_count without leaking secret values
-  - README and DevOps guide document stage-level live_data_setup_steps and next_setup_step fields
+  - get_live_data_api_key_status provider entries include preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and no-secret example values
+  - blocked defaults and ready repo-dotenv alias paths assert provider-level setup action fields without leaking secret values
+  - README and DevOps guide document provider-level preferred_env_key and next_setup_action fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline stage setup steps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider setup action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_STAGE_SETUP_STEPS_VERIFIED
+gate_id: API_KEY_PIPELINE_STAGE_SETUP_STEPS_GATE
+review_tier: S1_small
+
+next_atomic_step: add ordered live data setup step fields to run_api_key_pipeline_smoke sub-smoke summaries so each stage shows the next API-key setup action without returning secrets
 ```
 
 Previous completed directive:
@@ -1424,6 +1435,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Setup Actions Gate is verified.
+`get_live_data_api_key_status` provider entries now include no-secret
+`preferred_env_key`, `setup_status`, `next_setup_action`, `dotenv_target_path`,
+and example values. The blocked default path tells the user to fill the preferred
+`.env` key per provider, while configured paths point to provider smoke
+execution without returning secret values. Focused tests passed with 3 tests,
+full pytest passed with 760 tests, and ruff, health_check, and API-key status
+harness commands passed.
+
+```yaml
+api_key_provider_setup_actions_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_api_key_status provider entries include preferred_env_key, setup_status, next_setup_action, dotenv_target_path, and no-secret example values
+    - blocked defaults and ready repo-dotenv alias paths assert provider-level setup action fields without leaking secret values
+    - README and DevOps guide document provider-level preferred_env_key and next_setup_action fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: "passed, blocked fixture defaults returned provider-level preferred_env_key and next_setup_action fields without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Stage Setup Steps Gate is verified.
 `run_api_key_pipeline_smoke` live data, signal workflow, and recording sub-smoke

@@ -215,6 +215,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "market": _live_data_api_key_provider_status(
             provider_family="market",
             provider="polygon",
+            preferred_env_key="POLYGON_API_KEY",
             accepted_env_keys=["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
             missing_name="market_ohlcv_api_key",
             smoke_command_name="get_market_snapshot_live_smoke",
@@ -223,6 +224,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "macro": _live_data_api_key_provider_status(
             provider_family="macro",
             provider="fred",
+            preferred_env_key="FRED_API_KEY",
             accepted_env_keys=[
                 "HALO_SWING_MACRO_API_KEY",
                 "HALO_SWING_FRED_API_KEY",
@@ -235,6 +237,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "news": _live_data_api_key_provider_status(
             provider_family="news",
             provider="newsapi",
+            preferred_env_key="NEWS_API_KEY",
             accepted_env_keys=["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
             missing_name="news_api_key",
             smoke_command_name="get_news_bundle_live_smoke",
@@ -1998,6 +2001,7 @@ def _live_data_api_key_provider_status(
     *,
     provider_family: str,
     provider: str,
+    preferred_env_key: str,
     accepted_env_keys: list[str],
     missing_name: str,
     smoke_command_name: str,
@@ -2005,13 +2009,21 @@ def _live_data_api_key_provider_status(
 ) -> dict[str, Any]:
     configured_env_keys = _configured_env_keys(accepted_env_keys)
     configured = bool(configured_env_keys)
+    setup_status = "ready" if configured else "pending"
     return {
         "provider_family": provider_family,
         "provider": provider,
         "configured": configured,
         "configured_env_keys": configured_env_keys,
+        "preferred_env_key": preferred_env_key,
         "accepted_env_keys": accepted_env_keys,
         "missing": [] if configured else [missing_name],
+        "setup_status": setup_status,
+        "next_setup_action": (
+            "run_provider_smoke" if configured else "fill_preferred_env_key"
+        ),
+        "dotenv_target_path": ".env",
+        "example": f"{preferred_env_key}=your_{provider}_key",
         "auto_selects_live_provider": configured,
         "live_mode_required": False,
         "optional_live_mode_env": optional_live_mode_env,

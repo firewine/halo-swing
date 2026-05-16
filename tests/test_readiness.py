@@ -717,9 +717,20 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
     ]
-    for provider_status in payload["providers"].values():
+    expected_provider_setup = {
+        "market": ("POLYGON_API_KEY", "POLYGON_API_KEY=your_polygon_key"),
+        "macro": ("FRED_API_KEY", "FRED_API_KEY=your_fred_key"),
+        "news": ("NEWS_API_KEY", "NEWS_API_KEY=your_newsapi_key"),
+    }
+    for provider_family, provider_status in payload["providers"].items():
+        preferred_env_key, example = expected_provider_setup[provider_family]
         assert provider_status["configured"] is False
         assert provider_status["configured_env_keys"] == []
+        assert provider_status["preferred_env_key"] == preferred_env_key
+        assert provider_status["setup_status"] == "pending"
+        assert provider_status["next_setup_action"] == "fill_preferred_env_key"
+        assert provider_status["dotenv_target_path"] == ".env"
+        assert provider_status["example"] == example
         assert provider_status["auto_selects_live_provider"] is False
         assert provider_status["live_mode_required"] is False
         assert provider_status["network_call"] is False
@@ -775,12 +786,27 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     }
     assert payload["providers"]["market"]["configured"] is True
     assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
+    assert payload["providers"]["market"]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert payload["providers"]["market"]["setup_status"] == "ready"
+    assert (
+        payload["providers"]["market"]["next_setup_action"] == "run_provider_smoke"
+    )
+    assert payload["providers"]["market"]["example"] == (
+        "POLYGON_API_KEY=your_polygon_key"
+    )
     assert payload["providers"]["macro"]["configured"] is True
     assert payload["providers"]["macro"]["configured_env_keys"] == [
         "HALO_SWING_FRED_API_KEY"
     ]
+    assert payload["providers"]["macro"]["preferred_env_key"] == "FRED_API_KEY"
+    assert payload["providers"]["macro"]["setup_status"] == "ready"
+    assert payload["providers"]["macro"]["next_setup_action"] == "run_provider_smoke"
+    assert payload["providers"]["macro"]["dotenv_target_path"] == ".env"
     assert payload["providers"]["news"]["configured"] is True
     assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
+    assert payload["providers"]["news"]["preferred_env_key"] == "NEWS_API_KEY"
+    assert payload["providers"]["news"]["setup_status"] == "ready"
+    assert payload["providers"]["news"]["next_setup_action"] == "run_provider_smoke"
     assert payload["dotenv_template"]["target_path"] == ".env"
     assert payload["dotenv_template"]["entries"][2]["example"] == (
         "NEWS_API_KEY = your_newsapi_key"
