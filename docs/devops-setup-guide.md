@@ -393,7 +393,8 @@ the repo-local copy command hint without writing files or returning secret
 values. `next_operator_action` summarizes the single local action to copy
 `.env`, fill API keys, or run the one-shot smoke without returning secret
 values. `live_data_setup_steps` orders the local setup path as dotenv
-preparation, live data API-key entry, and the one-shot pipeline smoke. It also
+preparation, live data API-key entry, provider smoke verification, and the
+one-shot pipeline smoke. It also
 includes `live_data_smoke_commands` for `get_market_snapshot`,
 `get_macro_snapshot`, and `get_news_bundle`. After filling the matching API keys,
 run those repo-local harness commands to verify the live provider outputs and

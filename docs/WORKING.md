@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_KEY_ALIGNMENT_VERIFIED
-gate_id: API_KEY_PROVIDER_KEY_ALIGNMENT_GATE
+status: LIVE_DATA_SETUP_STEPS_PROVIDER_SMOKES_VERIFIED
+gate_id: LIVE_DATA_SETUP_STEPS_PROVIDER_SMOKES_GATE
 review_tier: S1_small
 
-next_atomic_step: add an offline provider key alignment test so readiness dotenv_template accepted live-data keys stay synchronized with provider auto-select env key constants
+next_atomic_step: add a run_provider_smokes ordered step to live_data_setup_steps so API-key-only local setup exposes provider smoke verification before the one-shot pipeline smoke
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -58,7 +58,6 @@ allowed_edit_paths:
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-  - tests/test_env_template.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -75,21 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - readiness dotenv_template accepted live-data env keys are asserted against provider auto-select env key constants
-  - the new provider key alignment test is offline, reads no secret values, and does not mutate .env or local state
+  - live_data_setup_steps includes an ordered run_provider_smokes step between fill_live_data_api_keys and run_api_key_pipeline_smoke
+  - the provider-smoke setup step exposes no-secret provider smoke commands, counts, and readiness without reading or returning API key values
+  - pipeline stage summaries report setup_step_count=4 and retain no-secret provider smoke readiness
+  - README and DevOps setup guide describe the provider smoke step in the API-key-only setup path
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider key alignment gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data setup provider-smokes gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_KEY_ALIGNMENT_VERIFIED
+gate_id: API_KEY_PROVIDER_KEY_ALIGNMENT_GATE
+review_tier: S1_small
+
+next_atomic_step: add an offline provider key alignment test so readiness dotenv_template accepted live-data keys stay synchronized with provider auto-select env key constants
 ```
 
 Previous completed directive:
@@ -1622,6 +1634,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Setup Steps Provider Smokes Gate is verified.
+`live_data_setup_steps` now includes an ordered `run_provider_smokes` step
+between API-key entry and the one-shot pipeline smoke. The new step exposes
+provider smoke commands, counts, and readiness without reading or returning API
+key values. Pipeline stage summaries now report `setup_step_count=4`. Focused
+tests passed with 5 tests, full pytest passed with 762 tests, and ruff,
+health_check, and the one-shot pipeline harness passed. With local `.env`
+absent, the one-shot pipeline harness exits 0 and returns blocked fixture-default
+API-key setup with `run_provider_smokes`, `setup_step_count=4`, and no secrets.
+
+```yaml
+live_data_setup_steps_provider_smokes_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - live_data_setup_steps includes run_provider_smokes between fill_live_data_api_keys and run_api_key_pipeline_smoke
+    - provider-smoke setup step exposes no-secret provider smoke commands, counts, and readiness
+    - pipeline stage summaries report setup_step_count=4
+    - README and DevOps guide describe provider smoke verification in the API-key-only setup path
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "762 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned blocked API-key setup with run_provider_smokes and setup_step_count=4 without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Provider Key Alignment Gate is verified.
 Readiness `dotenv_template` accepted live-data env keys are now asserted against

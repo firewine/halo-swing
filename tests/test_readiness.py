@@ -236,6 +236,18 @@ def expected_live_data_setup_steps(
     configured_count = len(configured_provider_families)
     required_count = 3
     keys_ready = configured_count == required_count
+    provider_smoke_plan = expected_provider_smoke_plan(
+        market_configured_env_keys=(
+            ["POLYGON_API_KEY"] if "market" in configured_provider_families else []
+        ),
+        macro_configured_env_keys=(
+            ["FRED_API_KEY"] if "macro" in configured_provider_families else []
+        ),
+        news_configured_env_keys=(
+            ["NEWS_API_KEY"] if "news" in configured_provider_families else []
+        ),
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
     if (
         dotenv_file_status["source_exists"] is False
         and dotenv_file_status["target_exists"] is False
@@ -274,6 +286,22 @@ def expected_live_data_setup_steps(
                 "required_count": required_count,
                 "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
                 "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_provider_smokes",
+                "status": "ready" if ready_to_run_live_smoke else "blocked",
+                "provider_smokes": provider_smoke_plan["provider_smokes"],
+                "provider_smoke_count": 3,
+                "ready_provider_smoke_count": provider_smoke_plan[
+                    "ready_provider_smoke_count"
+                ],
+                "blocked_provider_smoke_count": provider_smoke_plan[
+                    "blocked_provider_smoke_count"
+                ],
+                "network_call": True,
+                "network_call_policy": "only_when_matching_api_key_selects_live_provider",
                 "mutates_local_state": False,
                 "secret_values_returned": False,
             },
@@ -2692,7 +2720,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         assert payload[summary_name]["next_setup_step"] == (
             "run_api_key_pipeline_smoke"
         )
-        assert payload[summary_name]["setup_step_count"] == 3
+        assert payload[summary_name]["setup_step_count"] == 4
         assert (
             payload[summary_name]["provider_setup_actions"]
             == fake_provider_setup_actions
@@ -2819,7 +2847,7 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["live_data_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
     )
-    assert payload["live_data_smoke_summary"]["setup_step_count"] == 3
+    assert payload["live_data_smoke_summary"]["setup_step_count"] == 4
     assert payload["live_data_smoke_summary"]["provider_setup_actions"] == (
         payload["live_data_setup_summary"]["provider_setup_actions"]
     )
@@ -2906,7 +2934,7 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["signal_workflow_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
     )
-    assert payload["signal_workflow_smoke_summary"]["setup_step_count"] == 3
+    assert payload["signal_workflow_smoke_summary"]["setup_step_count"] == 4
     assert payload["signal_workflow_smoke_summary"]["provider_setup_actions"] == (
         payload["live_data_setup_summary"]["provider_setup_actions"]
     )
@@ -2956,7 +2984,7 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["recording_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
     )
-    assert payload["recording_smoke_summary"]["setup_step_count"] == 3
+    assert payload["recording_smoke_summary"]["setup_step_count"] == 4
     assert payload["recording_smoke_summary"]["provider_setup_actions"] == (
         payload["live_data_setup_summary"]["provider_setup_actions"]
     )

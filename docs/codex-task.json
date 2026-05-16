@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_KEY_ALIGNMENT_GATE",
+  "gate_id": "LIVE_DATA_SETUP_STEPS_PROVIDER_SMOKES_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.698",
-  "next_atomic_step": "add an offline provider key alignment test so readiness dotenv_template accepted live-data keys stay synchronized with provider auto-select env key constants",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.699",
+  "next_atomic_step": "add a run_provider_smokes ordered step to live_data_setup_steps so API-key-only local setup exposes provider smoke verification before the one-shot pipeline smoke",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -13,17 +13,16 @@
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
-    "tests/test_setup_docs.py",
-    "tests/test_env_template.py"
+    "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.696",
-    ".env.example",
-    "src/halo_swing_mcp/providers.py",
+    "docs/halo-swing-development-plan.md#3.698",
     "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_env_template.py"
+    "tests/test_readiness.py",
+    "README.md",
+    "docs/devops-setup-guide.md"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -39,7 +38,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
@@ -56,12 +55,14 @@
     "read_only": true
   },
   "done_means": [
-    "readiness dotenv_template accepted live-data env keys are asserted against provider auto-select env key constants",
-    "the new provider key alignment test is offline, reads no secret values, and does not mutate .env or local state",
+    "live_data_setup_steps includes an ordered run_provider_smokes step between fill_live_data_api_keys and run_api_key_pipeline_smoke",
+    "the provider-smoke setup step exposes no-secret provider smoke commands, counts, and readiness without reading or returning API key values",
+    "pipeline stage summaries report setup_step_count=4 and retain no-secret provider smoke readiness",
+    "README and DevOps setup guide describe the provider smoke step in the API-key-only setup path",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key provider key alignment gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data setup provider-smokes gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

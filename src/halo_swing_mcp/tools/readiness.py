@@ -275,9 +275,15 @@ def get_live_data_api_key_status() -> dict[str, Any]:
     provider_setup_actions = _live_data_provider_setup_actions_from_providers(
         providers
     )
+    provider_smoke_plan = _live_data_provider_smoke_plan(
+        provider_setup_actions=provider_setup_actions,
+        one_shot_smoke_command=one_shot_smoke_command,
+        ready_to_run_live_smoke=not missing,
+    )
     live_data_setup_steps = _live_data_setup_steps(
         dotenv_file_status=dotenv_file_status,
         provider_family_summary=provider_family_summary,
+        provider_smoke_plan=provider_smoke_plan,
         one_shot_smoke_command=one_shot_smoke_command,
         ready_to_run_live_smoke=not missing,
     )
@@ -286,11 +292,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "status": "ready" if not missing else "blocked",
         "providers": providers,
         "provider_family_summary": provider_family_summary,
-        "provider_smoke_plan": _live_data_provider_smoke_plan(
-            provider_setup_actions=provider_setup_actions,
-            one_shot_smoke_command=one_shot_smoke_command,
-            ready_to_run_live_smoke=not missing,
-        ),
+        "provider_smoke_plan": provider_smoke_plan,
         "missing": missing,
         "one_shot_smoke_command": one_shot_smoke_command,
         "dotenv_template": _live_data_dotenv_template(),
@@ -1866,9 +1868,16 @@ def _live_data_setup_summary(
     )
     dotenv_file_status = _live_data_dotenv_file_status()
     one_shot_smoke_command = api_key_status.get("one_shot_smoke_command")
+    provider_setup_actions = _live_data_provider_setup_actions(api_key_status)
+    provider_smoke_plan = _live_data_provider_smoke_plan(
+        provider_setup_actions=provider_setup_actions,
+        one_shot_smoke_command=one_shot_smoke_command,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
     live_data_setup_steps = _live_data_setup_steps(
         dotenv_file_status=dotenv_file_status,
         provider_family_summary=provider_family_summary,
+        provider_smoke_plan=provider_smoke_plan,
         one_shot_smoke_command=one_shot_smoke_command,
         ready_to_run_live_smoke=ready_to_run_live_smoke,
     )
@@ -1880,12 +1889,8 @@ def _live_data_setup_summary(
         "provider_route_status": provider_route.get("status"),
         "configured_provider_families": configured_provider_families,
         "provider_family_summary": provider_family_summary,
-        "provider_setup_actions": _live_data_provider_setup_actions(api_key_status),
-        "provider_smoke_plan": _live_data_provider_smoke_plan(
-            provider_setup_actions=_live_data_provider_setup_actions(api_key_status),
-            one_shot_smoke_command=one_shot_smoke_command,
-            ready_to_run_live_smoke=ready_to_run_live_smoke,
-        ),
+        "provider_setup_actions": provider_setup_actions,
+        "provider_smoke_plan": provider_smoke_plan,
         "missing": missing,
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
@@ -2147,10 +2152,13 @@ def _live_data_setup_steps(
     *,
     dotenv_file_status: dict[str, Any],
     provider_family_summary: dict[str, Any],
+    provider_smoke_plan: dict[str, Any],
     one_shot_smoke_command: Any,
     ready_to_run_live_smoke: bool,
 ) -> dict[str, Any]:
     smoke_command = _optional_mapping(one_shot_smoke_command)
+    raw_provider_smokes = provider_smoke_plan.get("provider_smokes")
+    provider_smokes = raw_provider_smokes if isinstance(raw_provider_smokes, list) else []
     target_exists = dotenv_file_status.get("target_exists") is True
     source_exists = dotenv_file_status.get("source_exists") is True
     copy_required = dotenv_file_status.get("copy_required") is True
@@ -2204,6 +2212,24 @@ def _live_data_setup_steps(
                     {},
                 ).get("required_env_keys"),
                 "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_provider_smokes",
+                "status": "ready" if ready_to_run_live_smoke else "blocked",
+                "provider_smokes": provider_smokes,
+                "provider_smoke_count": len(provider_smokes),
+                "ready_provider_smoke_count": provider_smoke_plan.get(
+                    "ready_provider_smoke_count"
+                ),
+                "blocked_provider_smoke_count": provider_smoke_plan.get(
+                    "blocked_provider_smoke_count"
+                ),
+                "network_call": True,
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
                 "mutates_local_state": False,
                 "secret_values_returned": False,
             },
