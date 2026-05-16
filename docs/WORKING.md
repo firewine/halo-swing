@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_VERIFIED
-gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_GATE
+status: API_KEY_ENV_TEMPLATE_ALIGNMENT_VERIFIED
+gate_id: API_KEY_ENV_TEMPLATE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: add ready_step_names, ready_step_count, and blocking_step_count to the top-level api_key_operator_checklist so API-key-only setup progress is visible without counting every step
+next_atomic_step: add an offline env-template alignment test so .env.example blank API-key slots stay synchronized with readiness dotenv_template preferred and accepted live-data keys
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -58,6 +58,7 @@ allowed_edit_paths:
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
+  - tests/test_env_template.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -74,22 +75,32 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke top-level api_key_operator_checklist includes ready_step_names, ready_step_count, and blocking_step_count without returning secrets
-  - ready fake-live and blocked fixture-default paths assert checklist progress counts and ready step names
-  - README and DevOps guide document checklist progress fields in pipeline smoke payloads
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
+  - .env.example blank live-data API-key slots are asserted against readiness dotenv_template preferred and accepted env keys
+  - the new env-template alignment test is offline, reads no secret values, and does not mutate .env or local state
+  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline operator checklist progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key env-template alignment gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_GATE
+review_tier: S1_small
+
+next_atomic_step: add ready_step_names, ready_step_count, and blocking_step_count to the top-level api_key_operator_checklist so API-key-only setup progress is visible without counting every step
 ```
 
 Previous completed directive:
@@ -1600,6 +1611,51 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Env Template Alignment Gate is verified.
+`.env.example` blank live-data API-key slots are now asserted against
+`get_live_data_api_key_status()["dotenv_template"]` preferred and accepted env
+keys. The new alignment test is offline, reads no secret values, and does not
+mutate `.env` or local state. Focused tests passed with 4 tests, full pytest
+passed with 761 tests, and ruff, health_check, and one-shot pipeline harness
+commands passed. With local `.env` absent, the one-shot pipeline harness still
+exits 0 and returns blocked fixture-default API-key setup without secrets.
+
+```yaml
+api_key_env_template_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_env_template.py
+  implementation:
+    - .env.example blank live-data API-key slots are asserted against readiness dotenv_template preferred and accepted env keys
+    - the new env-template alignment test is offline, reads no secret values, and does not mutate .env or local state
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "761 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned blocked API-key setup and no secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Operator Checklist Progress Gate is verified.
 `run_api_key_pipeline_smoke` top-level `api_key_operator_checklist` now exposes

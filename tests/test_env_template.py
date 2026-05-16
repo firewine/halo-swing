@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from halo_swing_mcp.tools.readiness import get_live_data_api_key_status
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV_TEMPLATE = ROOT / ".env.example"
@@ -55,6 +57,22 @@ def test_env_example_live_data_api_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 
     for key in LIVE_DATA_KEY_NAMES:
+        assert key in assignments
+        assert assignments[key] == ""
+
+
+def test_env_example_live_data_keys_match_readiness_dotenv_template() -> None:
+    assignments = _env_assignments()
+    payload = get_live_data_api_key_status()
+    entries = payload["dotenv_template"]["entries"]
+    template_keys = {
+        key
+        for entry in entries
+        for key in [entry["preferred_env_key"], *entry["accepted_env_keys"]]
+    }
+
+    assert template_keys == LIVE_DATA_KEY_NAMES
+    for key in template_keys:
         assert key in assignments
         assert assignments[key] == ""
 
