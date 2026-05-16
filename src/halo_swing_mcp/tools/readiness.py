@@ -2356,6 +2356,8 @@ def _api_key_provider_recovery_summary_item(
         "recovery_smoke_available": item.get("recovery_smoke_available") is True,
         "next_setup_action": item.get("next_setup_action"),
         "exception_type": item.get("exception_type"),
+        "exception_message_returned": item.get("exception_message_returned") is True,
+        "url_returned": item.get("url_returned") is True,
         "secret_values_returned": False,
     }
 
@@ -2780,6 +2782,10 @@ def _api_key_provider_recovery_checklist(
                 "provider": provider_error.get("provider"),
                 "smoke_command_name": smoke_command_name,
                 "exception_type": provider_error.get("exception_type"),
+                "exception_message_returned": (
+                    provider_error.get("exception_message_returned") is True
+                ),
+                "url_returned": provider_error.get("url_returned") is True,
                 "next_setup_action": provider_error.get("next_setup_action"),
                 "recovery_smoke": recovery_smoke,
                 "recovery_smoke_command": (

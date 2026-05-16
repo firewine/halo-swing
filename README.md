@@ -351,7 +351,8 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`, and compact
 provider-family recovery items with `provider_family`, `provider`,
 `smoke_command_name`, `recovery_smoke_command`, `recovery_smoke_available`,
-`next_setup_action`, and `exception_type`.
+`next_setup_action`, `exception_type`, `exception_message_returned`, and
+`url_returned`.
 It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in

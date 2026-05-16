@@ -2640,6 +2640,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
                 "exception_type": "RuntimeError",
+                "exception_message_returned": False,
+                "url_returned": False,
                 "secret_values_returned": False,
             },
             {
@@ -2652,6 +2654,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
                 "exception_type": "RuntimeError",
+                "exception_message_returned": False,
+                "url_returned": False,
                 "secret_values_returned": False,
             },
             {
@@ -2664,6 +2668,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
                 "exception_type": "RuntimeError",
+                "exception_message_returned": False,
+                "url_returned": False,
                 "secret_values_returned": False,
             },
         ],

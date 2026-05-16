@@ -523,7 +523,8 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`, and compact
 provider-family recovery items with `provider_family`, `provider`,
 `smoke_command_name`, `recovery_smoke_command`, `recovery_smoke_available`,
-`next_setup_action`, and `exception_type`.
+`next_setup_action`, `exception_type`, `exception_message_returned`, and
+`url_returned`.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
