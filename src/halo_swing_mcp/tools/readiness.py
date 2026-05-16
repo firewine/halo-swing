@@ -2355,6 +2355,8 @@ def _api_key_provider_recovery_summary_item(
         "recovery_smoke_command": item.get("recovery_smoke_command"),
         "recovery_smoke_available": item.get("recovery_smoke_available") is True,
         "next_setup_action": item.get("next_setup_action"),
+        "preferred_env_key": item.get("preferred_env_key"),
+        "accepted_env_keys": _string_list(item.get("accepted_env_keys")),
         "exception_type": item.get("exception_type"),
         "exception_message_returned": item.get("exception_message_returned") is True,
         "url_returned": item.get("url_returned") is True,
@@ -2768,17 +2770,29 @@ def _api_key_provider_recovery_checklist(
         for row in recovery_smoke_rows
         if isinstance(row.get("smoke_command_name"), str)
     }
+    live_data_setup_summary = _optional_mapping(
+        live_data_smoke_summary.get("live_data_setup_summary")
+    ) or {}
+    provider_setup_actions = _optional_mapping(
+        live_data_setup_summary.get("provider_setup_actions")
+    ) or _optional_mapping(live_data_smoke_summary.get("provider_setup_actions")) or {}
     items: list[dict[str, Any]] = []
     for provider_error in provider_error_rows:
+        provider_family = provider_error.get("provider_family")
         smoke_command_name = provider_error.get("smoke_command_name")
         recovery_smoke = (
             recovery_smokes_by_name.get(smoke_command_name)
             if isinstance(smoke_command_name, str)
             else None
         )
+        provider_setup_action = (
+            _optional_mapping(provider_setup_actions.get(provider_family))
+            if isinstance(provider_family, str)
+            else None
+        ) or {}
         items.append(
             {
-                "provider_family": provider_error.get("provider_family"),
+                "provider_family": provider_family,
                 "provider": provider_error.get("provider"),
                 "smoke_command_name": smoke_command_name,
                 "exception_type": provider_error.get("exception_type"),
@@ -2786,6 +2800,15 @@ def _api_key_provider_recovery_checklist(
                     provider_error.get("exception_message_returned") is True
                 ),
                 "url_returned": provider_error.get("url_returned") is True,
+                "preferred_env_key": provider_setup_action.get("preferred_env_key")
+                or (
+                    recovery_smoke.get("preferred_env_key")
+                    if recovery_smoke is not None
+                    else None
+                ),
+                "accepted_env_keys": _string_list(
+                    provider_setup_action.get("accepted_env_keys")
+                ),
                 "next_setup_action": provider_error.get("next_setup_action"),
                 "recovery_smoke": recovery_smoke,
                 "recovery_smoke_command": (

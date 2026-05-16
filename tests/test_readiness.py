@@ -2596,6 +2596,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert recovery_checklist["items"][0]["next_setup_action"] == (
         "verify_provider_credentials_or_network"
     )
+    assert recovery_checklist["items"][0]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert recovery_checklist["items"][0]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
     assert recovery_checklist["items"][0]["recovery_smoke_available"] is True
     assert recovery_checklist["items"][0]["recovery_smoke"] == (
         payload["provider_recovery_smokes"][0]
@@ -2639,6 +2644,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 ],
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
+                "preferred_env_key": "POLYGON_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MARKET_DATA_API_KEY",
+                    "POLYGON_API_KEY",
+                ],
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2653,6 +2663,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 ],
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
+                "preferred_env_key": "FRED_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MACRO_API_KEY",
+                    "HALO_SWING_FRED_API_KEY",
+                    "FRED_API_KEY",
+                ],
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2667,6 +2683,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 ],
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
+                "preferred_env_key": "NEWS_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_NEWS_API_KEY",
+                    "NEWS_API_KEY",
+                ],
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
