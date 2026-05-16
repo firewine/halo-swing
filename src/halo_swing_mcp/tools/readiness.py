@@ -272,11 +272,19 @@ def get_live_data_api_key_status() -> dict[str, Any]:
     }
     one_shot_smoke_command = _local_command("run_api_key_pipeline_smoke")
     dotenv_file_status = _live_data_dotenv_file_status()
+    provider_setup_actions = _live_data_provider_setup_actions_from_providers(
+        providers
+    )
     return {
         "schema_version": "live_data_api_key_status.v1",
         "status": "ready" if not missing else "blocked",
         "providers": providers,
         "provider_family_summary": provider_family_summary,
+        "provider_smoke_plan": _live_data_provider_smoke_plan(
+            provider_setup_actions=provider_setup_actions,
+            one_shot_smoke_command=one_shot_smoke_command,
+            ready_to_run_live_smoke=not missing,
+        ),
         "missing": missing,
         "one_shot_smoke_command": one_shot_smoke_command,
         "dotenv_template": _live_data_dotenv_template(),
@@ -1544,6 +1552,11 @@ def _live_data_setup_summary(
         "configured_provider_families": configured_provider_families,
         "provider_family_summary": provider_family_summary,
         "provider_setup_actions": _live_data_provider_setup_actions(api_key_status),
+        "provider_smoke_plan": _live_data_provider_smoke_plan(
+            provider_setup_actions=_live_data_provider_setup_actions(api_key_status),
+            one_shot_smoke_command=one_shot_smoke_command,
+            ready_to_run_live_smoke=ready_to_run_live_smoke,
+        ),
         "missing": missing,
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
@@ -1609,6 +1622,12 @@ def _live_data_provider_setup_actions(
     api_key_status: dict[str, Any],
 ) -> dict[str, dict[str, Any]]:
     providers = _optional_mapping(api_key_status.get("providers")) or {}
+    return _live_data_provider_setup_actions_from_providers(providers)
+
+
+def _live_data_provider_setup_actions_from_providers(
+    providers: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
     actions: dict[str, dict[str, Any]] = {}
     for provider_family, raw_provider_status in providers.items():
         provider_status = _optional_mapping(raw_provider_status) or {}
@@ -1630,6 +1649,62 @@ def _live_data_provider_setup_actions(
             "secret_values_returned": False,
         }
     return actions
+
+
+def _live_data_provider_smoke_plan(
+    *,
+    provider_setup_actions: dict[str, dict[str, Any]],
+    one_shot_smoke_command: Any,
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    provider_smokes: list[dict[str, Any]] = []
+    for provider_family, action in provider_setup_actions.items():
+        smoke_command = _optional_mapping(action.get("smoke_command")) or {}
+        configured = action.get("configured") is True
+        provider_smokes.append(
+            {
+                "provider_family": provider_family,
+                "provider": action.get("provider"),
+                "status": "ready" if configured else "blocked",
+                "preferred_env_key": action.get("preferred_env_key"),
+                "next_setup_action": action.get("next_setup_action"),
+                "smoke_command_name": smoke_command.get("name"),
+                "command": smoke_command.get("command"),
+                "expected_live_contract": smoke_command.get(
+                    "expected_live_contract"
+                ),
+                "expected_live_checks": smoke_command.get("expected_live_checks"),
+                "network_call_policy": smoke_command.get("network_call_policy"),
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            }
+        )
+    ready_provider_smoke_count = sum(
+        1 for provider_smoke in provider_smokes if provider_smoke["status"] == "ready"
+    )
+    one_shot_command = _optional_mapping(one_shot_smoke_command) or {}
+    return {
+        "schema_version": "live_data_provider_smoke_plan.v1",
+        "provider_smokes": provider_smokes,
+        "provider_smoke_count": len(provider_smokes),
+        "ready_provider_smoke_count": ready_provider_smoke_count,
+        "blocked_provider_smoke_count": len(provider_smokes)
+        - ready_provider_smoke_count,
+        "one_shot_pipeline_smoke": {
+            "name": one_shot_command.get("name"),
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "command": one_shot_command.get("command"),
+            "network_call": one_shot_command.get("network_call"),
+            "network_call_policy": one_shot_command.get("network_call_policy"),
+            "mutates_local_state": one_shot_command.get("mutates_local_state"),
+            "secret_values_returned": one_shot_command.get(
+                "secret_values_returned"
+            ),
+        },
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
 
 
 def _string_list(values: Any) -> list[str]:

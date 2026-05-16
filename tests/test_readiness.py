@@ -420,6 +420,61 @@ def expected_provider_setup_actions(
     }
 
 
+def expected_provider_smoke_plan(
+    *,
+    market_configured_env_keys: list[str],
+    macro_configured_env_keys: list[str],
+    news_configured_env_keys: list[str],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    provider_setup_actions = expected_provider_setup_actions(
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+    )
+    provider_smokes = [
+        {
+            "provider_family": provider_family,
+            "provider": action["provider"],
+            "status": "ready" if action["configured"] else "blocked",
+            "preferred_env_key": action["preferred_env_key"],
+            "next_setup_action": action["next_setup_action"],
+            "smoke_command_name": action["smoke_command"]["name"],
+            "command": action["smoke_command"]["command"],
+            "expected_live_contract": action["smoke_command"][
+                "expected_live_contract"
+            ],
+            "expected_live_checks": action["smoke_command"]["expected_live_checks"],
+            "network_call_policy": action["smoke_command"]["network_call_policy"],
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+        for provider_family, action in provider_setup_actions.items()
+    ]
+    ready_provider_smoke_count = sum(
+        1 for provider_smoke in provider_smokes if provider_smoke["status"] == "ready"
+    )
+    return {
+        "schema_version": "live_data_provider_smoke_plan.v1",
+        "provider_smokes": provider_smokes,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": ready_provider_smoke_count,
+        "blocked_provider_smoke_count": 3 - ready_provider_smoke_count,
+        "one_shot_pipeline_smoke": {
+            "name": "run_api_key_pipeline_smoke",
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "command": expected_pipeline_smoke_command()["command"],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -643,6 +698,12 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             macro_configured_env_keys=[],
             news_configured_env_keys=[],
         ),
+        "provider_smoke_plan": expected_provider_smoke_plan(
+            market_configured_env_keys=[],
+            macro_configured_env_keys=[],
+            news_configured_env_keys=[],
+            ready_to_run_live_smoke=False,
+        ),
         "missing": [
             "market_ohlcv_api_key",
             "macro_api_key",
@@ -823,6 +884,12 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["provider_smoke_plan"] == expected_provider_smoke_plan(
+        market_configured_env_keys=[],
+        macro_configured_env_keys=[],
+        news_configured_env_keys=[],
+        ready_to_run_live_smoke=False,
+    )
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
@@ -934,6 +1001,12 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["provider_smoke_plan"] == expected_provider_smoke_plan(
+        market_configured_env_keys=["POLYGON_API_KEY"],
+        macro_configured_env_keys=["HALO_SWING_FRED_API_KEY"],
+        news_configured_env_keys=["NEWS_API_KEY"],
+        ready_to_run_live_smoke=True,
+    )
     assert payload["providers"]["market"]["configured"] is True
     assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
     assert payload["providers"]["market"]["preferred_env_key"] == "POLYGON_API_KEY"
@@ -3842,6 +3915,14 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
         market_configured_env_keys=["HALO_SWING_MARKET_DATA_API_KEY"],
         macro_configured_env_keys=["HALO_SWING_MACRO_API_KEY"],
         news_configured_env_keys=["HALO_SWING_NEWS_API_KEY"],
+    )
+    assert payload["live_data_setup_summary"][
+        "provider_smoke_plan"
+    ] == expected_provider_smoke_plan(
+        market_configured_env_keys=["HALO_SWING_MARKET_DATA_API_KEY"],
+        macro_configured_env_keys=["HALO_SWING_MACRO_API_KEY"],
+        news_configured_env_keys=["HALO_SWING_NEWS_API_KEY"],
+        ready_to_run_live_smoke=True,
     )
     assert payload["live_data_setup_summary"][
         "dotenv_file_status"
