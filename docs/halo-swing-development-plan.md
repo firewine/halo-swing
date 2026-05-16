@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.720 API Key Provider Recovery Checklist Docs Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke` top-level `api_key_provider_recovery_checklist`는
+실패 provider error row와 재실행 smoke command를 한 행으로 묶지만, README와 DevOps
+setup guide는 아직 이 최신 체크리스트 필드명을 설명하지 않는다. 이번 slice는
+API-key-only setup 사용자가 키를 넣고 one-shot smoke를 실행한 뒤
+`api_key_provider_recovery_checklist`만 보고 어떤 provider smoke를 다시 실행할지
+판단할 수 있게 문서화하고, 문서 테스트로 필드명이 계속 유지되게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README now documents api_key_provider_recovery_checklist and api_key_provider_recovery_checklist.v1 as the one-row-per-failed-provider recovery triage payload
+  - DevOps setup guide now documents recovery_smoke_command and recovery_smoke_available for no-secret provider smoke reruns
+  - tests/test_setup_docs.py asserts the checklist field names so setup docs stay aligned with one-shot smoke payloads
+  - no source behavior changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - source behavior change
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused setup docs pytest: 1 passed
+  - setup docs pytest: 8 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.719 API Key Provider Recovery Checklist Gate Record - 2026-05-17
 
 ### A. 목적

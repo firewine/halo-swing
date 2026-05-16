@@ -297,7 +297,12 @@ messages, URLs, or API key values. When provider failures occur,
 `first_provider_error_summary`, `next_provider_recovery_action`,
 `next_provider_recovery_smoke`, `next_provider_recovery_smoke_command_name`,
 `provider_recovery_smokes`, and `provider_recovery_smoke_count` identify the
-failed providers and list the no-secret provider smoke commands to rerun:
+failed providers and list the no-secret provider smoke commands to rerun.
+The top-level `api_key_provider_recovery_checklist`
+(`api_key_provider_recovery_checklist.v1`) pairs each failed provider row with
+its matching no-secret `recovery_smoke_command` and
+`recovery_smoke_available` flag so a failed API-key-backed smoke can be rerun
+without manually matching error and recovery arrays:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit

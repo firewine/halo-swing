@@ -42,19 +42,20 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_GATE
+status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface a no-secret provider recovery checklist that pairs each failed provider error with its rerunnable smoke command
+next_atomic_step: document the no-secret API-key provider recovery checklist fields in setup docs and lock them with docs tests
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
+  - README.md
+  - docs/devops-setup-guide.md
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,24 +72,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke exposes api_key_provider_recovery_checklist with one row per provider_error_summary
-  - each recovery checklist row pairs provider_family, provider, smoke_command_name, exception_type, next_setup_action, and the matching no-secret recovery smoke command
-  - the recovery checklist is ok/empty when no provider error summaries exist
-  - recovery checklist rows do not return exception messages, URLs, API key values, or secret values
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
+  - README documents api_key_provider_recovery_checklist as the one-row-per-failed-provider pairing of provider errors and rerunnable smoke commands
+  - DevOps setup guide documents api_key_provider_recovery_checklist, api_key_provider_recovery_checklist.v1, recovery_smoke_command, and recovery_smoke_available
+  - setup docs tests assert the checklist field names so docs stay aligned with the one-shot smoke payload
+  - no source behavior, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery checklist gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider recovery checklist docs gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_GATE
+review_tier: S1_small
+
+next_atomic_step: surface a no-secret provider recovery checklist that pairs each failed provider error with its rerunnable smoke command
 ```
 
 Previous completed directive:
@@ -1852,6 +1862,53 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Recovery Checklist Docs Gate is verified. README and
+the DevOps setup guide now document `api_key_provider_recovery_checklist` as the
+one-row-per-failed-provider pairing of provider error summaries and rerunnable
+no-secret recovery smoke commands. The DevOps setup docs test asserts
+`api_key_provider_recovery_checklist`, `api_key_provider_recovery_checklist.v1`,
+`recovery_smoke_command`, and `recovery_smoke_available`. Focused docs tests,
+full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_provider_recovery_checklist_docs_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - tests/test_setup_docs.py
+  implementation:
+    - README documents api_key_provider_recovery_checklist and api_key_provider_recovery_checklist.v1 for one-shot API-key recovery triage
+    - DevOps setup guide documents recovery_smoke_command and recovery_smoke_available as no-secret rerun guidance fields
+    - tests/test_setup_docs.py asserts the checklist fields so setup docs stay aligned with payload names
+    - no source behavior, live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Checklist Gate is verified.
 `run_api_key_pipeline_smoke` now exposes

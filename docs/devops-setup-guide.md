@@ -484,6 +484,12 @@ payload and live-data sub-smoke summary also expose `provider_error_summaries`,
 `provider_recovery_smoke_count` so failed provider families and their no-secret
 recovery smoke commands are visible immediately after API-key-backed smoke
 failures.
+The top-level `api_key_provider_recovery_checklist`
+(`api_key_provider_recovery_checklist.v1`) pairs each failed provider error row
+with its matching no-secret `recovery_smoke_command` and
+`recovery_smoke_available` flag, so API-key-only recovery can rerun the right
+provider smoke without manually matching `provider_error_summaries` to
+`provider_recovery_smokes`.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
