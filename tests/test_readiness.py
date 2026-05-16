@@ -2464,6 +2464,34 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_provider_selection_summary"] == {
+        "schema_version": "api_key_provider_selection_summary.v1",
+        "status": "ready",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "selected_provider_class_count": 3,
+        "configured_provider_families": ["market", "macro", "news"],
+        "configured_provider_family_count": 3,
+        "missing_provider_families": [],
+        "configured_env_keys_by_provider_family": {
+            "market": ["POLYGON_API_KEY"],
+            "macro": ["FRED_API_KEY"],
+            "news": ["NEWS_API_KEY"],
+        },
+        "selected_provider_by_family": {
+            "market": "polygon",
+            "macro": "fred",
+            "news": "newsapi",
+        },
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
     assert payload["live_data_smoke_summary"]["failed_provider_families"] == [
         "market",
@@ -3917,6 +3945,34 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_provider_selection_summary"] == {
+        "schema_version": "api_key_provider_selection_summary.v1",
+        "status": "ready",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "selected_provider_class_count": 3,
+        "configured_provider_families": ["market", "macro", "news"],
+        "configured_provider_family_count": 3,
+        "missing_provider_families": [],
+        "configured_env_keys_by_provider_family": {
+            "market": ["POLYGON_API_KEY"],
+            "macro": ["FRED_API_KEY"],
+            "news": ["NEWS_API_KEY"],
+        },
+        "selected_provider_by_family": {
+            "market": "polygon",
+            "macro": "fred",
+            "news": "newsapi",
+        },
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["api_key_next_action_summary"] == {
         "schema_version": "api_key_next_action_summary.v1",
         "status": "ready",
@@ -4351,6 +4407,30 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert (
         payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
     )
+    assert payload["api_key_provider_selection_summary"] == {
+        "schema_version": "api_key_provider_selection_summary.v1",
+        "status": "blocked",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "selected_provider_class_count": 1,
+        "configured_provider_families": [],
+        "configured_provider_family_count": 0,
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_env_keys_by_provider_family": {
+            "market": [],
+            "macro": [],
+            "news": [],
+        },
+        "selected_provider_by_family": {
+            "market": None,
+            "macro": None,
+            "news": None,
+        },
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

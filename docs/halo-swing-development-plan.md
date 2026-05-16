@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.731 API Key Provider Selection Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only 연동의 핵심은 키를 넣으면 실제 provider factory가 fixture에서
+Polygon/FRED/NewsAPI live provider route로 전환되는 것이다. 기존 payload에도
+`provider_route_summary`가 있지만, configured alias와 provider family별 선택
+상태를 한 번에 보려면 nested route/provider 자료를 다시 훑어야 한다. 이번
+slice는 `run_api_key_pipeline_smoke` top-level
+`api_key_provider_selection_summary`를 추가해 선택된 provider class, configured
+env key 이름, provider family별 selected provider를 compact하게 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_provider_selection_summary using schema api_key_provider_selection_summary.v1
+  - api_key_provider_selection_summary exposes status, provider_factory, selected_provider_classes, selected_provider_class_count, configured_provider_families, configured_provider_family_count, missing_provider_families, configured_env_keys_by_provider_family, selected_provider_by_family, and ready_to_run_live_smoke without secret values
+  - cover ok, missing-key, and provider-recovery paths with focused tests
+  - document the compact provider selection summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_provider_selection_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; provider selection summary present without secret values
+  - fake-key direct summary check -> api_key_provider_selection_summary.v1 ready ['market', 'macro', 'news'] ['PolygonMarketDataProvider', 'FredMacroDataProvider', 'NewsApiDataProvider'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 776 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.730 API Key Dotenv Loading Summary Gate Record - 2026-05-17
 
 ### A. 목적

@@ -941,6 +941,12 @@ def run_api_key_pipeline_smoke(
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
+        "api_key_provider_selection_summary": (
+            _api_key_provider_selection_summary(
+                provider_route,
+                live_data_setup_summary,
+            )
+        ),
         "live_data_smoke_summary": live_data_smoke_summary,
         "failed_provider_families": live_data_smoke_summary[
             "failed_provider_families"
@@ -2246,6 +2252,92 @@ def _api_key_pipeline_provider_route_summary(route: dict[str, Any]) -> dict[str,
         "missing": route.get("missing"),
         "network_call": route.get("network_call"),
         "secret_values_returned": route.get("secret_values_returned"),
+    }
+
+
+def _api_key_provider_selection_summary(
+    provider_route: dict[str, Any],
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    providers = _optional_mapping(provider_route.get("providers")) or {}
+    providers_from_route = bool(providers)
+    if not providers:
+        providers = (
+            _optional_mapping(live_data_setup_summary.get("provider_setup_actions"))
+            or {}
+        )
+    provider_rows: list[tuple[str, dict[str, Any]]] = []
+    for family, provider in providers.items():
+        row = _optional_mapping(provider)
+        if row is None:
+            continue
+        provider_family = row.get("provider_family")
+        if isinstance(provider_family, str):
+            provider_rows.append((provider_family, row))
+        elif isinstance(family, str):
+            provider_rows.append((family, row))
+    raw_route_entries = provider_route.get("route")
+    route_entries = (
+        [entry for entry in raw_route_entries if isinstance(entry, dict)]
+        if isinstance(raw_route_entries, list)
+        else []
+    )
+    selected_provider_by_route = {
+        str(entry["provider_family"]): entry.get("provider")
+        for entry in route_entries
+        if isinstance(entry.get("provider_family"), str)
+        and entry.get("provider_family") != "fixture"
+    }
+    configured_provider_families = [
+        family for family, row in provider_rows if row.get("configured") is True
+    ]
+    required_provider_families = [family for family, _row in provider_rows]
+    missing_provider_families = [
+        family
+        for family in required_provider_families
+        if family not in configured_provider_families
+    ]
+    configured_env_keys_by_provider_family = {
+        family: _string_list(row.get("configured_env_keys"))
+        for family, row in provider_rows
+    }
+    selected_provider_classes = _string_list(
+        provider_route.get("selected_provider_classes")
+    )
+    selected_provider_by_family = {
+        family: selected_provider_by_route.get(family)
+        or (
+            row.get("provider")
+            if row.get("selected") is True
+            or (
+                not providers_from_route
+                and row.get("configured") is True
+                and selected_provider_classes
+            )
+            else None
+        )
+        for family, row in provider_rows
+    }
+    return {
+        "schema_version": "api_key_provider_selection_summary.v1",
+        "status": provider_route.get("status"),
+        "provider_factory": provider_route.get("provider_factory"),
+        "selected_provider_classes": selected_provider_classes,
+        "selected_provider_class_count": len(selected_provider_classes),
+        "configured_provider_families": configured_provider_families,
+        "configured_provider_family_count": len(configured_provider_families),
+        "missing_provider_families": missing_provider_families,
+        "configured_env_keys_by_provider_family": (
+            configured_env_keys_by_provider_family
+        ),
+        "selected_provider_by_family": selected_provider_by_family,
+        "ready_to_run_live_smoke": (
+            provider_route.get("status") == "ready"
+            and live_data_setup_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
     }
 
 

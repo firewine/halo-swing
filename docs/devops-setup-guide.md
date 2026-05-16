@@ -502,7 +502,14 @@ values or mutating files. The top-level `api_key_dotenv_loading_summary`
 `dotenv_loading_enabled`, `disabled`, `disabled_env_key`,
 `configuration_precedence`, `.env.example`/`.env` file status,
 `next_setup_step`, and `ready_to_run_live_smoke`, so disabled dotenv loading or
-precedence issues are visible without returning key values. The
+precedence issues are visible without returning key values. The top-level
+`api_key_provider_selection_summary`
+(`api_key_provider_selection_summary.v1`) shows the actual provider factory
+selection with `provider_factory`, `selected_provider_classes`,
+`configured_provider_families`, `missing_provider_families`,
+`configured_env_keys_by_provider_family`, `selected_provider_by_family`, and
+`ready_to_run_live_smoke`, so API-key auto-selection can be verified without
+secret values. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

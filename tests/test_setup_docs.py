@@ -113,6 +113,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "dotenv_loading_enabled" in guide
     assert "disabled_env_key" in guide
     assert "configuration_precedence" in guide
+    assert "api_key_provider_selection_summary" in guide
+    assert "api_key_provider_selection_summary.v1" in guide
+    assert "selected_provider_classes" in guide
+    assert "configured_env_keys_by_provider_family" in guide
+    assert "selected_provider_by_family" in guide
     assert "readiness_summary.next_operator_action" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
