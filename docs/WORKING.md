@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_LIVE_HTTP_TIMEOUT_SUMMARY_VERIFIED
-gate_id: API_KEY_LIVE_HTTP_TIMEOUT_SUMMARY_GATE
+status: API_KEY_SUMMARY_ONLY_REQUIREMENTS_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_REQUIREMENTS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface configured live HTTP timeout seconds in API-key pipeline summary-only output
+next_atomic_step: keep API-key requirements summary in API-key pipeline summary-only output
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,27 +74,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=2.5 PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_live_http_timeout_summary"]; print(summary["schema_version"], summary["timeout_seconds"], summary["env_key"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_requirements_summary"]; print(summary["schema_version"], summary["configured_env_keys"], summary["missing_provider_families"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - run_api_key_pipeline_smoke returns top-level api_key_live_http_timeout_summary in full payloads
-  - summary_only=true returns top-level api_key_live_http_timeout_summary without nested smoke sections
-  - api_key_live_http_timeout_summary exposes schema_version, timeout_seconds, env_key, default_timeout_seconds, applies_to, and safety flags without secret values
-  - focused tests cover default and configured HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS summary values
-  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_live_http_timeout_summary
-  - README and DevOps setup guide document api_key_live_http_timeout_summary
-  - setup docs tests assert api_key_live_http_timeout_summary guidance
+  - summary_only=true returns top-level api_key_requirements_summary without nested full smoke sections
+  - api_key_requirements_summary exposes required_env_keys, configured_env_keys, missing_provider_families, configured_provider_families, provider_requirements, preferred_env_key, accepted_env_keys, and safety flags without secret values
+  - summary_only=true no longer lists api_key_requirements_summary in omitted_sections
+  - focused tests cover default missing-key and one configured API-key summary-only requirements output
+  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_requirements_summary
+  - README and DevOps setup guide document summary-only api_key_requirements_summary
+  - setup docs tests assert summary-only api_key_requirements_summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key live HTTP timeout summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only requirements gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_LIVE_HTTP_TIMEOUT_SUMMARY_VERIFIED
+gate_id: API_KEY_LIVE_HTTP_TIMEOUT_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: surface configured live HTTP timeout seconds in API-key pipeline summary-only output
 ```
 
 Previous completed directive:
@@ -2046,15 +2057,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Live HTTP Timeout Summary Gate is verified.
-`run_api_key_pipeline_smoke` now returns
-`api_key_live_http_timeout_summary` in full and `summary_only=true` payloads,
-including the active timeout seconds, env key, default value, provider classes,
-and no-secret safety flags. Focused tests, fake-key CLI, full pytest, ruff, and
-health_check passed.
+Summary: API Key Summary-Only Requirements Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now keeps the no-secret
+`api_key_requirements_summary`, including required env keys, configured env-key
+names, missing/configured provider families, and provider requirements. Focused
+tests, fake-key CLI, full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_live_http_timeout_summary_gate:
+api_key_summary_only_requirements_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2067,13 +2077,13 @@ api_key_live_http_timeout_summary_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - run_api_key_pipeline_smoke returns top-level api_key_live_http_timeout_summary in full payloads
-    - summary_only=true returns top-level api_key_live_http_timeout_summary without nested smoke sections
-    - api_key_live_http_timeout_summary exposes schema_version, timeout_seconds, env_key, default_timeout_seconds, applies_to, and safety flags without secret values
-    - focused tests cover default and configured HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS summary values
-    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_live_http_timeout_summary
-    - README and DevOps setup guide document api_key_live_http_timeout_summary
-    - tests/test_setup_docs.py asserts api_key_live_http_timeout_summary guidance
+    - summary_only=true returns top-level api_key_requirements_summary without nested full smoke sections
+    - api_key_requirements_summary exposes required_env_keys, configured_env_keys, missing_provider_families, configured_provider_families, provider_requirements, preferred_env_key, accepted_env_keys, and safety flags without secret values
+    - summary_only=true no longer lists api_key_requirements_summary in omitted_sections
+    - focused tests cover default missing-key and one configured API-key summary-only requirements output
+    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_requirements_summary
+    - README and DevOps setup guide document summary-only api_key_requirements_summary
+    - tests/test_setup_docs.py asserts summary-only api_key_requirements_summary guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2084,14 +2094,14 @@ api_key_live_http_timeout_summary_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; no-secret api_key_live_http_timeout_summary returned with timeout_seconds=10.0"
-    - command: HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=2.5 PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_live_http_timeout_summary"]; print(summary["schema_version"], summary["timeout_seconds"], summary["env_key"], summary["secret_values_returned"])'
-      result: "api_key_live_http_timeout_summary.v1 2.5 HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS False"
+      result: "exit 0; no-secret api_key_requirements_summary returned with all three configured env-key names"
+    - command: POLYGON_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_requirements_summary"]; print(summary["schema_version"], summary["configured_env_keys"], summary["missing_provider_families"], summary["secret_values_returned"])'
+      result: "api_key_pipeline_api_key_requirements_summary.v1 ['POLYGON_API_KEY'] ['macro', 'news'] False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "780 passed"
+      result: "781 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check

@@ -2113,6 +2113,10 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("setup_status_summary")
         )
         or {},
+        "api_key_requirements_summary": _optional_mapping(
+            payload.get("api_key_requirements_summary")
+        )
+        or {},
         "api_key_pipeline_failure_summary": _optional_mapping(
             payload.get("api_key_pipeline_failure_summary")
         )
@@ -2155,7 +2159,6 @@ def _api_key_pipeline_summary_only_payload(
             "live_data_setup_summary",
             "api_key_operator_checklist",
             "api_key_command_summary",
-            "api_key_requirements_summary",
             "api_key_provider_recovery_checklist",
             "api_key_setup_file_summary",
             "api_key_dotenv_loading_summary",
