@@ -4403,6 +4403,28 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert (
         payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
     )
+    assert payload["api_key_pipeline_stage_summary"]["schema_version"] == (
+        "api_key_pipeline_stage_summary.v1"
+    )
+    assert payload["api_key_pipeline_stage_summary"]["status"] == "conflict"
+    assert payload["api_key_pipeline_stage_summary"]["stage_count"] == 3
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_count"] == 3
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_names"] == [
+        "run_live_data_smoke",
+        "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
+    ]
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
+        "stage_name"
+    ] == "run_live_data_smoke"
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
+        "provider_route_status"
+    ] == "blocked"
+    assert all(
+        stage["secret_values_returned"] is False
+        for stage in payload["api_key_pipeline_stage_summary"]["stages"]
+    )
+    assert payload["api_key_pipeline_stage_summary"]["secret_values_returned"] is False
     assert payload["api_key_provider_selection_summary"]["status"] == "blocked"
     assert payload["api_key_live_http_timeout_summary"] == {
         "schema_version": "api_key_live_http_timeout_summary.v1",
@@ -4444,6 +4466,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "api_key_command_summary" not in payload["omitted_sections"]
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
+    assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
@@ -4493,6 +4516,45 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
     assert setup_file_summary["ready_to_run_live_smoke"] is True
     assert setup_file_summary["secret_values_returned"] is False
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    stage_summary = payload["api_key_pipeline_stage_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert stage_summary["schema_version"] == (
+        "api_key_pipeline_stage_summary.v1"
+    )
+    assert stage_summary["status"] == "conflict"
+    assert stage_summary["stage_count"] == 3
+    assert stage_summary["failed_stage_count"] == 3
+    assert stage_summary["failed_stage_names"] == [
+        "run_live_data_smoke",
+        "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
+    ]
+    assert stage_summary["first_failed_stage"]["stage_name"] == (
+        "run_live_data_smoke"
+    )
+    assert all(
+        stage["secret_values_returned"] is False
+        for stage in stage_summary["stages"]
+    )
+    assert stage_summary["secret_values_returned"] is False
+    assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

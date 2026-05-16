@@ -473,6 +473,7 @@ The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `setup_status_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`, `api_key_setup_file_summary`,
 `api_key_dotenv_loading_summary`, `api_key_pipeline_failure_summary`,
+`api_key_pipeline_stage_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
@@ -522,9 +523,8 @@ top-level `api_key_next_action_summary`
 `next_action_name`, `next_action_command`, `next_action_is_recovery`,
 `next_action_network_call`, and `next_action_mutates_local_state` fields so the
 single next setup or recovery command is visible without reading nested
-payloads. The
-top-level `api_key_pipeline_stage_summary`
-(`api_key_pipeline_stage_summary.v1`) lists the `run_live_data_smoke`,
+payloads. It keeps `api_key_pipeline_stage_summary`
+(`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in
 execution order with `status`, `stage_count`, `failed_stage_count`,
 `failed_stage_names`, `first_failed_stage`, and per-stage `stage_name`,
