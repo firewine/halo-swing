@@ -224,7 +224,7 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_s
 
 For a one-shot API-key-backed check, use `run_live_data_smoke`; it runs the
 market, macro, and news smoke paths, includes no-network provider route evidence,
-and validates the combined payload:
+includes `live_data_setup_summary`, and validates the combined payload:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit

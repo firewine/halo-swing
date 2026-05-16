@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.667 Live Data Smoke Setup Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_live_data_smoke`는 API-key-backed market/macro/news smoke를 직접 실행하는
+첫 provider-level 확인 명령이지만, setup readiness 요약은 별도 명령이나 상위 smoke에서
+확인해야 했다. 이번 slice는 live data smoke payload 자체에 `live_data_setup_summary`를
+포함해, API key를 채운 뒤 provider smoke 한 번으로 API-key readiness와 provider route
+evidence를 같이 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke includes live_data_setup_summary derived from get_live_data_api_key_status and provider_route
+  - summary shows API-key readiness, provider route status, selected provider classes, missing keys, and run_api_key_pipeline_smoke command without returning secret values
+  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence
+  - README and DevOps guide document live_data_setup_summary in live data smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status conflict with blocked live_data_setup_summary without API keys as expected
+```
+
 ## 3.666 Integration Smoke Setup Summary Gate Record - 2026-05-17
 
 ### A. 목적

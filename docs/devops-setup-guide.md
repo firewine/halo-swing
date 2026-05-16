@@ -396,7 +396,8 @@ the actual `get_market_data_provider` factory selected Polygon, FRED, and
 NewsAPI from those keys without making provider network calls. Use
 `run_live_data_smoke` for the same validation in one command after filling the
 market, macro, and news API keys; its payload now includes the same no-network
-provider route evidence before provider smoke outputs. Use
+provider route evidence and `live_data_setup_summary` before provider smoke
+outputs. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting
 orders, or returning secrets. Its top-level `provider_route_summary` mirrors the

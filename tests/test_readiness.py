@@ -795,6 +795,26 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     ]
     assert payload["provider_route"]["network_call"] is False
     assert payload["provider_route"]["secret_values_returned"] is False
+    assert payload["live_data_setup_summary"]["status"] == "ready"
+    assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
+    assert payload["live_data_setup_summary"]["configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["live_data_setup_summary"]["missing"] == []
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert (
+        payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["validation"]["status"] == "ok"
     assert all(check["passed"] for check in payload["validation"]["checks"])
 
@@ -818,6 +838,23 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     ]
     assert payload["provider_route"]["network_call"] is False
     assert payload["provider_route"]["secret_values_returned"] is False
+    assert payload["live_data_setup_summary"]["status"] == "blocked"
+    assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert (
+        payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["market_snapshot"]["data_mode"] == "fixture"
     assert payload["macro_snapshot"]["data_mode"] == "fixture"
     assert payload["news_bundle"]["data_mode"] == "fixture"

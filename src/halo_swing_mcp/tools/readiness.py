@@ -346,6 +346,10 @@ def run_live_data_smoke(
 
     smoke_symbols = symbols if symbols is not None else ["QQQ"]
     provider_route = get_live_data_provider_route()
+    api_key_status = (
+        _optional_mapping(provider_route.get("api_key_status"))
+        or get_live_data_api_key_status()
+    )
     market_snapshot = market_tools.get_market_snapshot(smoke_symbols)
     macro_snapshot = market_tools.get_macro_snapshot()
     news_bundle = market_tools.get_news_bundle(topic)
@@ -389,6 +393,10 @@ def run_live_data_smoke(
         "macro_snapshot": macro_snapshot,
         "news_bundle": news_bundle,
         "provider_route": provider_route,
+        "live_data_setup_summary": _live_data_setup_summary(
+            api_key_status,
+            provider_route,
+        ),
         "validation": validation,
         "network_call": network_call,
         "live_data_required": live_data_required,
