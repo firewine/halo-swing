@@ -4425,6 +4425,94 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         for stage in payload["api_key_pipeline_stage_summary"]["stages"]
     )
     assert payload["api_key_pipeline_stage_summary"]["secret_values_returned"] is False
+    assert payload["api_key_pipeline_check_summary"] == {
+        "schema_version": "api_key_pipeline_check_summary.v1",
+        "status": "conflict",
+        "check_count": 9,
+        "passed_check_count": 4,
+        "failed_check_count": 5,
+        "failed_check_keys": [
+            "get_integration_readiness.live_data_readiness_ready",
+            "run_live_data_smoke.provider_route_status_ok",
+            "run_live_data_smoke.live_data_smoke_status_ok",
+            "run_live_signal_workflow_smoke.signal_workflow_smoke_status_ok",
+            "run_live_recording_smoke.recording_smoke_status_ok",
+        ],
+        "tools_with_failures": [
+            "get_integration_readiness",
+            "run_live_data_smoke",
+            "run_live_signal_workflow_smoke",
+            "run_live_recording_smoke",
+        ],
+        "tool_failure_counts": {
+            "get_integration_readiness": 1,
+            "run_live_data_smoke": 2,
+            "run_live_signal_workflow_smoke": 1,
+            "run_live_recording_smoke": 1,
+        },
+        "first_failed_check": {
+            "tool": "get_integration_readiness",
+            "name": "live_data_readiness_ready",
+            "key": "get_integration_readiness.live_data_readiness_ready",
+            "passed": False,
+            "expected": True,
+            "actual": False,
+            "secret_values_returned": False,
+        },
+        "failed_checks": [
+            {
+                "tool": "get_integration_readiness",
+                "name": "live_data_readiness_ready",
+                "key": "get_integration_readiness.live_data_readiness_ready",
+                "passed": False,
+                "expected": True,
+                "actual": False,
+                "secret_values_returned": False,
+            },
+            {
+                "tool": "run_live_data_smoke",
+                "name": "provider_route_status_ok",
+                "key": "run_live_data_smoke.provider_route_status_ok",
+                "passed": False,
+                "expected": "ready",
+                "actual": "blocked",
+                "secret_values_returned": False,
+            },
+            {
+                "tool": "run_live_data_smoke",
+                "name": "live_data_smoke_status_ok",
+                "key": "run_live_data_smoke.live_data_smoke_status_ok",
+                "passed": False,
+                "expected": "ok",
+                "actual": "conflict",
+                "secret_values_returned": False,
+            },
+            {
+                "tool": "run_live_signal_workflow_smoke",
+                "name": "signal_workflow_smoke_status_ok",
+                "key": (
+                    "run_live_signal_workflow_smoke."
+                    "signal_workflow_smoke_status_ok"
+                ),
+                "passed": False,
+                "expected": "ok",
+                "actual": "conflict",
+                "secret_values_returned": False,
+            },
+            {
+                "tool": "run_live_recording_smoke",
+                "name": "recording_smoke_status_ok",
+                "key": "run_live_recording_smoke.recording_smoke_status_ok",
+                "passed": False,
+                "expected": "ok",
+                "actual": "conflict",
+                "secret_values_returned": False,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["api_key_provider_selection_summary"]["status"] == "blocked"
     assert payload["api_key_live_http_timeout_summary"] == {
         "schema_version": "api_key_live_http_timeout_summary.v1",
@@ -4467,6 +4555,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
     assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
+    assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
@@ -4555,6 +4644,51 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
     )
     assert stage_summary["secret_values_returned"] is False
     assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    check_summary = payload["api_key_pipeline_check_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert check_summary["schema_version"] == (
+        "api_key_pipeline_check_summary.v1"
+    )
+    assert check_summary["status"] == "conflict"
+    assert check_summary["check_count"] == 9
+    assert check_summary["passed_check_count"] == 6
+    assert check_summary["failed_check_count"] == 3
+    assert check_summary["failed_check_keys"] == [
+        "run_live_data_smoke.live_data_smoke_status_ok",
+        "run_live_signal_workflow_smoke.signal_workflow_smoke_status_ok",
+        "run_live_recording_smoke.recording_smoke_status_ok",
+    ]
+    assert check_summary["tools_with_failures"] == [
+        "run_live_data_smoke",
+        "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
+    ]
+    assert check_summary["first_failed_check"]["key"] == (
+        "run_live_data_smoke.live_data_smoke_status_ok"
+    )
+    assert all(
+        failed_check["secret_values_returned"] is False
+        for failed_check in check_summary["failed_checks"]
+    )
+    assert check_summary["secret_values_returned"] is False
+    assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

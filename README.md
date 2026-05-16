@@ -301,7 +301,7 @@ The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `setup_status_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`, `api_key_setup_file_summary`,
 `api_key_dotenv_loading_summary`, `api_key_pipeline_failure_summary`,
-`api_key_pipeline_stage_summary`,
+`api_key_pipeline_stage_summary`, `api_key_pipeline_check_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
@@ -349,8 +349,8 @@ execution order with `status`, `stage_count`, `failed_stage_count`,
 `provider_recovery_smoke_count`, `network_call`, `mutates_local_state`, and
 `secret_values_returned` fields, so the failed smoke stage is visible without
 reading every nested summary.
-The compact `api_key_pipeline_check_summary`
-(`api_key_pipeline_check_summary.v1`) summarizes the top-level `checks` array
+It keeps `api_key_pipeline_check_summary`
+(`api_key_pipeline_check_summary.v1`) summarizing the top-level `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,
 `failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
 `first_failed_check`, and no-secret `failed_checks` rows containing `tool`,

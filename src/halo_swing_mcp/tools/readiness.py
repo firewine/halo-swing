@@ -2137,6 +2137,10 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_pipeline_stage_summary")
         )
         or {},
+        "api_key_pipeline_check_summary": _optional_mapping(
+            payload.get("api_key_pipeline_check_summary")
+        )
+        or {},
         "api_key_provider_selection_summary": _optional_mapping(
             payload.get("api_key_provider_selection_summary")
         )
@@ -2175,7 +2179,6 @@ def _api_key_pipeline_summary_only_payload(
             "live_data_setup_summary",
             "api_key_operator_checklist",
             "api_key_provider_recovery_checklist",
-            "api_key_pipeline_check_summary",
             "live_data_smoke_summary",
             "signal_workflow_smoke_summary",
             "recording_smoke_summary",

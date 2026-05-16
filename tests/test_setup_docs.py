@@ -155,6 +155,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "disabled_env_key" in guide
     assert "configuration_precedence" in guide
     assert "keeps `api_key_pipeline_stage_summary`" in guide
+    assert "keeps `api_key_pipeline_check_summary`" in guide
     assert "omitting nested full" in guide
     assert "smoke sections" in guide
     assert "api_key_provider_recovery_summary" in guide

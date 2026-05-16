@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.742 API Key Summary-Only Check Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 full payload에
+`api_key_pipeline_check_summary`를 만들지만, compact 결과에서는 해당 section을 omit해서
+사용자가 실패한 readiness/check 항목을 보려면 nested full payload나 raw `checks` 배열을
+다시 확인해야 했다. 이번 slice는 summary-only payload에도 no-secret pipeline check
+summary를 유지해, API key를 넣은 뒤 compact 결과만으로 실패 check key와 첫 실패 check를
+확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only=true returns top-level api_key_pipeline_check_summary without nested full smoke sections
+  - api_key_pipeline_check_summary exposes check_count, passed_check_count, failed_check_count, failed_check_keys, tools_with_failures, tool_failure_counts, first_failed_check, failed_checks rows, and safety flags without secret values
+  - summary_only=true no longer lists api_key_pipeline_check_summary in omitted_sections
+  - focused tests cover default blocked check summary and fully configured fake-key API-key check summary-only output
+  - README and DevOps setup guide document summary-only api_key_pipeline_check_summary
+  - tests/test_setup_docs.py asserts summary-only api_key_pipeline_check_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; no-secret api_key_pipeline_check_summary returned with failed check keys
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_pipeline_check_summary"]; print(summary["schema_version"], summary["check_count"], summary["failed_check_count"], summary["secret_values_returned"])' -> api_key_pipeline_check_summary.v1 9 3 False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 786 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.741 API Key Summary-Only Stage Summary Gate Record - 2026-05-17
 
 ### A. 목적
