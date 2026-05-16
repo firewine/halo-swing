@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.650 Live Data Smoke Result Validator Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 넣고 live smoke command를 실행한 뒤 결과가 live boundary를
+제대로 선언했는지 사람이 직접 눈으로만 확인해야 했다. 이번 slice는 market,
+macro, news smoke 출력 payload를 입력받아 live_data/network/guard metadata와
+secret-return policy를 offline으로 검증하는 `validate_live_data_smoke_result`
+tool을 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - validate_live_data_smoke_result is registered for MCP and harness use
+  - the validator accepts market, macro, and news smoke outputs and checks live_data_required/network_call/live guard metadata
+  - the validator keeps network_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+  - tests prove live-shaped payloads pass and fixture/replay payloads are flagged without live network or real API keys
+  - health and MVP golden tool manifests include validate_live_data_smoke_result
+  - README and DevOps setup docs describe validating smoke outputs after running API-key-backed commands
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - live network call from the validator
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_validate_live_data_smoke_result_accepts_live_boundaries tests/test_readiness.py::test_validate_live_data_smoke_result_flags_fixture_payloads tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 738 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_smoke_result --input-json '{"market_snapshot":{"live_data_required":true,"market_snapshot_contract":{"live_data_required":true,"network_call":true},"market_snapshot_guard":{"status":"ok","checks":[{"name":"live_data_boundary_declared","passed":true}]}}}' --no-audit -> passed, status ok with network_call=false and secret_values_returned=false
+```
+
 ## 3.649 Live Data Smoke Checklist Gate Record - 2026-05-16
 
 ### A. 목적

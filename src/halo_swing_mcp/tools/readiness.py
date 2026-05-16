@@ -199,6 +199,54 @@ def get_integration_setup_checklist() -> dict[str, Any]:
     }
 
 
+def validate_live_data_smoke_result(
+    *,
+    market_snapshot: dict[str, Any] | None = None,
+    macro_snapshot: dict[str, Any] | None = None,
+    news_bundle: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate caller-supplied live data smoke outputs without calling networks."""
+
+    payloads = {
+        "market": _normalize_optional_smoke_payload(market_snapshot, "market_snapshot"),
+        "macro": _normalize_optional_smoke_payload(macro_snapshot, "macro_snapshot"),
+        "news": _normalize_optional_smoke_payload(news_bundle, "news_bundle"),
+    }
+    checks: list[dict[str, Any]] = []
+    checked_tools: list[str] = []
+
+    if payloads["market"] is not None:
+        checked_tools.append("get_market_snapshot")
+        _extend_market_smoke_checks(checks, payloads["market"])
+    if payloads["macro"] is not None:
+        checked_tools.append("get_macro_snapshot")
+        _extend_macro_smoke_checks(checks, payloads["macro"])
+    if payloads["news"] is not None:
+        checked_tools.append("get_news_bundle")
+        _extend_news_smoke_checks(checks, payloads["news"])
+    if not checked_tools:
+        _add_smoke_check(
+            checks,
+            tool="live_data_smoke",
+            name="at_least_one_payload_provided",
+            passed=False,
+            expected=True,
+            actual=False,
+        )
+
+    return {
+        "schema_version": "live_data_smoke_validation.v1",
+        "status": "ok" if checks and all(check["passed"] for check in checks) else "conflict",
+        "checked_tools": checked_tools,
+        "checks": checks,
+        "network_call": False,
+        "live_data_required": False,
+        "send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -329,7 +377,258 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        {
+            "name": "validate_live_data_smoke_result",
+            "purpose": "validate collected live data smoke payloads without calling networks",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "validate_live_data_smoke_result --input-file "
+                "/path/to/live_data_smoke_payloads.json --no-audit"
+            ),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
     ]
+
+
+def _normalize_optional_smoke_payload(
+    payload: dict[str, Any] | None,
+    field_name: str,
+) -> dict[str, Any] | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, dict):
+        raise ValueError(f"{field_name} must be an object when provided")
+    return payload
+
+
+def _extend_market_smoke_checks(
+    checks: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    contract = _optional_mapping(payload.get("market_snapshot_contract"))
+    guard = _optional_mapping(payload.get("market_snapshot_guard"))
+    _add_smoke_check(
+        checks,
+        tool="get_market_snapshot",
+        name="payload_live_data_required",
+        passed=payload.get("live_data_required") is True,
+        expected=True,
+        actual=payload.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_market_snapshot",
+        name="contract_live_data_required",
+        passed=_mapping_value(contract, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(contract, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_market_snapshot",
+        name="contract_network_call",
+        passed=_mapping_value(contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(contract, "network_call"),
+    )
+    _add_guard_status_check(checks, "get_market_snapshot", guard)
+    _add_guard_check(
+        checks,
+        "get_market_snapshot",
+        guard,
+        "live_data_boundary_declared",
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_market_snapshot",
+        name="secret_values_not_returned",
+        passed=_contract_secret_values_returned(contract) is False,
+        expected=False,
+        actual=_contract_secret_values_returned(contract),
+    )
+
+
+def _extend_macro_smoke_checks(
+    checks: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    contract = _optional_mapping(payload.get("macro_filter_contract"))
+    guard = _optional_mapping(payload.get("macro_filter_guard"))
+    _add_smoke_check(
+        checks,
+        tool="get_macro_snapshot",
+        name="payload_live_data_required",
+        passed=payload.get("live_data_required") is True,
+        expected=True,
+        actual=payload.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_macro_snapshot",
+        name="contract_live_data_required",
+        passed=_mapping_value(contract, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(contract, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_macro_snapshot",
+        name="contract_network_call",
+        passed=_mapping_value(contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(contract, "network_call"),
+    )
+    _add_guard_status_check(checks, "get_macro_snapshot", guard)
+    _add_guard_check(
+        checks,
+        "get_macro_snapshot",
+        guard,
+        "live_data_boundary_declared",
+    )
+    _add_guard_check(checks, "get_macro_snapshot", guard, "network_call_declared")
+    _add_smoke_check(
+        checks,
+        tool="get_macro_snapshot",
+        name="secret_values_not_returned",
+        passed=_contract_secret_values_returned(contract) is False,
+        expected=False,
+        actual=_contract_secret_values_returned(contract),
+    )
+
+
+def _extend_news_smoke_checks(
+    checks: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    contract = _optional_mapping(payload.get("news_source_policy_contract"))
+    score_contract = _optional_mapping(payload.get("news_score_contract"))
+    guard = _optional_mapping(payload.get("news_source_policy_guard"))
+    _add_smoke_check(
+        checks,
+        tool="get_news_bundle",
+        name="payload_live_data_required",
+        passed=payload.get("live_data_required") is True,
+        expected=True,
+        actual=payload.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_news_bundle",
+        name="contract_live_data_required",
+        passed=_mapping_value(contract, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(contract, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_news_bundle",
+        name="contract_network_call",
+        passed=_mapping_value(contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(contract, "network_call"),
+    )
+    _add_guard_status_check(checks, "get_news_bundle", guard)
+    _add_guard_check(checks, "get_news_bundle", guard, "live_data_boundary_declared")
+    _add_guard_check(checks, "get_news_bundle", guard, "network_call_declared")
+    _add_guard_check(checks, "get_news_bundle", guard, "secret_values_not_returned")
+    _add_smoke_check(
+        checks,
+        tool="get_news_bundle",
+        name="source_contract_secret_values_not_returned",
+        passed=_contract_secret_values_returned(contract) is False,
+        expected=False,
+        actual=_contract_secret_values_returned(contract),
+    )
+    _add_smoke_check(
+        checks,
+        tool="get_news_bundle",
+        name="score_contract_secret_values_not_returned",
+        passed=_contract_secret_values_returned(score_contract) is False,
+        expected=False,
+        actual=_contract_secret_values_returned(score_contract),
+    )
+
+
+def _add_guard_status_check(
+    checks: list[dict[str, Any]],
+    tool: str,
+    guard: dict[str, Any] | None,
+) -> None:
+    _add_smoke_check(
+        checks,
+        tool=tool,
+        name="guard_status_ok",
+        passed=_mapping_value(guard, "status") == "ok",
+        expected="ok",
+        actual=_mapping_value(guard, "status"),
+    )
+
+
+def _add_guard_check(
+    checks: list[dict[str, Any]],
+    tool: str,
+    guard: dict[str, Any] | None,
+    check_name: str,
+) -> None:
+    actual = _guard_check_passed(guard, check_name)
+    _add_smoke_check(
+        checks,
+        tool=tool,
+        name=check_name,
+        passed=actual is True,
+        expected=True,
+        actual=actual,
+    )
+
+
+def _add_smoke_check(
+    checks: list[dict[str, Any]],
+    *,
+    tool: str,
+    name: str,
+    passed: bool,
+    expected: Any,
+    actual: Any,
+) -> None:
+    checks.append(
+        {
+            "tool": tool,
+            "name": name,
+            "passed": passed,
+            "expected": expected,
+            "actual": actual,
+        }
+    )
+
+
+def _optional_mapping(value: Any) -> dict[str, Any] | None:
+    return value if isinstance(value, dict) else None
+
+
+def _mapping_value(mapping: dict[str, Any] | None, key: str) -> Any:
+    if mapping is None:
+        return None
+    return mapping.get(key)
+
+
+def _contract_secret_values_returned(contract: dict[str, Any] | None) -> bool | None:
+    if contract is None:
+        return None
+    return bool(contract.get("secret_values_returned", False))
+
+
+def _guard_check_passed(guard: dict[str, Any] | None, check_name: str) -> bool | None:
+    checks = _mapping_value(guard, "checks")
+    if not isinstance(checks, list):
+        return None
+    for check in checks:
+        if not isinstance(check, dict):
+            continue
+        if check.get("name") == check_name:
+            return check.get("passed") is True
+    return None
 
 
 def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:

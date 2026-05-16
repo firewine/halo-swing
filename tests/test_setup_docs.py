@@ -30,6 +30,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "FRED_API_KEY=your_fred_key" in guide
     assert "NEWS_API_KEY=your_newsapi_key" in guide
     assert "live_data_smoke_commands" in guide
+    assert "validate_live_data_smoke_result" in guide
     assert "get_market_snapshot" in guide
     assert "get_macro_snapshot" in guide
     assert "get_news_bundle" in guide

@@ -323,6 +323,12 @@ local setup checklist:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 ```
 
+live data smoke result validation:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_smoke_result --input-file /path/to/live_data_smoke_payloads.json --no-audit
+```
+
 This command does not call networks or return secret values. It reports which
 future gates are still blocked for Hermes, Telegram, DB migration/repository,
 Binance testnet read-only smoke, live order submission, and live data adapters.
@@ -333,7 +339,10 @@ above. The payload also includes `live_data_smoke_commands` for
 filling the matching API keys, run those repo-local harness commands to verify
 the live provider outputs and boundary contracts. The smoke commands are
 read-only and return no secret values, but they can call provider networks when
-the configured keys select live providers.
+the configured keys select live providers. Use
+`validate_live_data_smoke_result` on the collected smoke payloads to verify
+`live_data_required`, `network_call`, live guard checks, and secret-return
+metadata offline.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

@@ -524,6 +524,26 @@ def get_integration_setup_checklist() -> dict[str, Any]:
 
 
 @mcp.tool()
+def validate_live_data_smoke_result(
+    market_snapshot: dict[str, Any] | None = None,
+    macro_snapshot: dict[str, Any] | None = None,
+    news_bundle: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate live data smoke outputs without calling networks."""
+
+    payload = {
+        "market_snapshot": market_snapshot,
+        "macro_snapshot": macro_snapshot,
+        "news_bundle": news_bundle,
+    }
+    return _audited_tool_call(
+        "validate_live_data_smoke_result",
+        payload,
+        call_tool("validate_live_data_smoke_result", payload),
+    )
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 

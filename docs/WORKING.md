@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_SMOKE_CHECKLIST_VERIFIED
-gate_id: LIVE_DATA_SMOKE_CHECKLIST_GATE
+status: LIVE_DATA_SMOKE_RESULT_VALIDATOR_VERIFIED
+gate_id: LIVE_DATA_SMOKE_RESULT_VALIDATOR_GATE
 review_tier: S1_small
 
-next_atomic_step: add live data smoke command metadata to get_integration_setup_checklist so users can verify API-key-backed market, macro, and news integrations after filling .env
+next_atomic_step: add an offline validate_live_data_smoke_result tool that verifies API-key-backed market, macro, and news smoke outputs declare live boundaries without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,9 +55,15 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
+  - tests/test_mvp_tools.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -74,22 +80,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_validate_live_data_smoke_result_accepts_live_boundaries tests/test_readiness.py::test_validate_live_data_smoke_result_flags_fixture_payloads tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_integration_setup_checklist includes live_data_smoke_commands for market, macro, and news
-  - each smoke command is a repo-local harness command that does not mutate local state, start Hermes, send Telegram, submit orders, or return secrets
-  - smoke command metadata declares that network calls happen only when matching API keys select live providers
-  - tests cover the checklist schema and command metadata without using live network or real API keys
-  - README and DevOps setup docs show how to use the checklist and live smoke commands after filling .env
+  - validate_live_data_smoke_result is registered for MCP and harness use
+  - the validator accepts market, macro, and news smoke outputs and checks live_data_required/network_call/live guard metadata
+  - the validator keeps network_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+  - tests prove live-shaped payloads pass and fixture/replay payloads are flagged without live network or real API keys
+  - health and MVP golden tool manifests include validate_live_data_smoke_result
+  - README and DevOps setup docs describe validating smoke outputs after running API-key-backed commands
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data smoke checklist gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data smoke result validator gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_SMOKE_CHECKLIST_VERIFIED
+gate_id: LIVE_DATA_SMOKE_CHECKLIST_GATE
+review_tier: S1_small
+
+next_atomic_step: add live data smoke command metadata to get_integration_setup_checklist so users can verify API-key-backed market, macro, and news integrations after filling .env
 ```
 
 Previous completed directive:
@@ -772,14 +790,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.649
-gate_packet: docs/halo-swing-development-plan.md#3.649
+portable_mirror: docs/halo-swing-development-plan.md#3.650
+gate_packet: docs/halo-swing-development-plan.md#3.650
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.649
+  - docs/halo-swing-development-plan.md#3.650
   - src/halo_swing_mcp/harness.py
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_readiness.py
 
@@ -1083,6 +1103,63 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Smoke Result Validator Gate is verified.
+`validate_live_data_smoke_result` is now registered for MCP and harness use. It
+validates caller-supplied market, macro, and news live smoke outputs for
+`live_data_required`, `network_call`, live guard checks, and secret-return
+metadata without making network calls or starting Hermes/Telegram/order flows.
+Focused tests passed with 3 tests, full pytest passed with 738 tests, and ruff
+and health_check passed.
+
+```yaml
+live_data_smoke_result_validator_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+    - tests/test_tool_registry.py
+  implementation:
+    - validate_live_data_smoke_result is registered for MCP and harness use
+    - validator checks market, macro, and news smoke outputs for live_data_required/network_call/live guard metadata
+    - validator reports network_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+    - health and MVP golden tool manifests include validate_live_data_smoke_result
+    - README and DevOps guide document validating smoke outputs after running API-key-backed commands
+    - no live network call from validator, new live adapter module, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or secret exposure added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_validate_live_data_smoke_result_accepts_live_boundaries tests/test_readiness.py::test_validate_live_data_smoke_result_flags_fixture_payloads tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "738 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_smoke_result --input-json '{"market_snapshot":{"live_data_required":true,"market_snapshot_contract":{"live_data_required":true,"network_call":true},"market_snapshot_guard":{"status":"ok","checks":[{"name":"live_data_boundary_declared","passed":true}]}}}' --no-audit
+      result: passed, status ok with network_call=false and secret_values_returned=false
+```
+
+Previous verification:
 
 Summary: Live Data Smoke Checklist Gate is verified.
 `get_integration_setup_checklist` now returns `live_data_smoke_commands` for

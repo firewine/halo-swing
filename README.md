@@ -198,6 +198,14 @@ setup checklist of `.env` keys, durable gate approvals, and harness commands:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 ```
 
+After running the live data smoke commands from the checklist, pass the returned
+payloads to `validate_live_data_smoke_result` to verify the market, macro, and
+news live boundary contracts offline:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_smoke_result --input-file /path/to/live_data_smoke_payloads.json --no-audit
+```
+
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_smoke_commands` for

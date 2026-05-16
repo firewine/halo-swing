@@ -15,6 +15,12 @@ from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    validate_live_data_smoke_result,
+)
+from halo_swing_mcp.tools.market import (
+    get_macro_snapshot,
+    get_market_snapshot,
+    get_news_bundle,
 )
 
 
@@ -333,6 +339,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "save_binance_credentials",
         "get_integration_readiness",
         "get_integration_setup_checklist",
+        "validate_live_data_smoke_result",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -386,6 +393,94 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             "missing": ["MIGRATION_GO", "REPOSITORY_GO"],
         },
     ]
+
+
+def test_validate_live_data_smoke_result_accepts_live_boundaries() -> None:
+    payload = validate_live_data_smoke_result(
+        market_snapshot={
+            "live_data_required": True,
+            "market_snapshot_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "market_snapshot_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True}
+                ],
+            },
+        },
+        macro_snapshot={
+            "live_data_required": True,
+            "macro_filter_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "macro_filter_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                ],
+            },
+        },
+        news_bundle={
+            "live_data_required": True,
+            "news_source_policy_contract": {
+                "live_data_required": True,
+                "network_call": True,
+                "secret_values_returned": False,
+            },
+            "news_source_policy_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "secret_values_not_returned", "passed": True},
+                ],
+            },
+            "news_score_contract": {"secret_values_returned": False},
+        },
+    )
+
+    assert payload["schema_version"] == "live_data_smoke_validation.v1"
+    assert payload["status"] == "ok"
+    assert payload["checked_tools"] == [
+        "get_market_snapshot",
+        "get_macro_snapshot",
+        "get_news_bundle",
+    ]
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert all(check["passed"] for check in payload["checks"])
+
+
+def test_validate_live_data_smoke_result_flags_fixture_payloads(monkeypatch) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = validate_live_data_smoke_result(
+        market_snapshot=get_market_snapshot(["QQQ"]),
+        macro_snapshot=get_macro_snapshot(),
+        news_bundle=get_news_bundle("all"),
+    )
+    failed_checks = {
+        (check["tool"], check["name"])
+        for check in payload["checks"]
+        if not check["passed"]
+    }
+
+    assert payload["status"] == "conflict"
+    assert ("get_market_snapshot", "payload_live_data_required") in failed_checks
+    assert ("get_market_snapshot", "contract_network_call") in failed_checks
+    assert ("get_macro_snapshot", "payload_live_data_required") in failed_checks
+    assert ("get_macro_snapshot", "network_call_declared") in failed_checks
+    assert ("get_news_bundle", "payload_live_data_required") in failed_checks
+    assert ("get_news_bundle", "network_call_declared") in failed_checks
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(
