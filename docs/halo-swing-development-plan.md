@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.661 Live Data Provider Route Gate Record - 2026-05-16
+
+### A. 목적
+
+API-key 상태 도구가 key alias를 직접 검사하는 것만으로는 실제 provider factory가 같은
+경로를 선택한다는 증거가 약하다. 이번 slice는 `get_live_data_provider_route`를 추가해
+`get_market_data_provider`가 API key만으로 Polygon, FRED, NewsAPI provider route를
+선택하는지 네트워크 호출 없이 보여준다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_provider_route is registered for MCP and harness use
+  - tool reports actual provider factory route without calling provider networks
+  - route shows fixture default when no API keys are configured
+  - route shows Polygon, FRED, and NewsAPI selected when supported API-key aliases are configured
+  - tool returns provider and env key names only, never secret values
+  - README and DevOps guide document the no-network provider route command
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - provider network call during route inspection
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_reports_fixture_default tests/test_providers.py::test_describe_market_data_provider_route_reports_full_api_key_route tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q -> 13 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit -> passed, status blocked with fixture route without API keys as expected
+```
+
 ## 3.660 Live Data API-Key Status Gate Record - 2026-05-16
 
 ### A. 목적

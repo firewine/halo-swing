@@ -206,6 +206,14 @@ provider families, and the one-shot smoke command without returning secrets:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
 ```
 
+To confirm the actual provider factory route selected by those keys, use
+`get_live_data_provider_route`; it instantiates the configured provider chain
+without calling provider networks:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
+```
+
 After running the live data smoke commands from the checklist, pass the returned
 payloads to `validate_live_data_smoke_result` to verify the market, macro, and
 news live boundary contracts offline:

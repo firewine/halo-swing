@@ -13,6 +13,7 @@ from halo_swing_mcp.providers import (
     NewsApiDataProvider,
     PolygonMarketDataProvider,
     ReplayMarketDataProvider,
+    describe_market_data_provider_route,
     get_market_data_provider,
 )
 from halo_swing_mcp.tools.market import (
@@ -50,11 +51,110 @@ def assert_market_data_provider(provider: MarketDataProvider) -> None:
     assert provider.news_cards("all")
 
 
+def clear_live_data_provider_env(monkeypatch) -> None:
+    for key in (
+        "HALO_SWING_MARKET_DATA_MODE",
+        "HALO_SWING_MARKET_DATA_SOURCE",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_DATA_MODE",
+        "HALO_SWING_MACRO_SOURCE",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_DATA_MODE",
+        "HALO_SWING_NEWS_SOURCE",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+
 def test_default_market_data_provider_is_replay_only() -> None:
     provider = get_market_data_provider()
 
     assert isinstance(provider, ReplayMarketDataProvider)
     assert_market_data_provider(provider)
+
+
+def test_describe_market_data_provider_route_reports_fixture_default(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+
+    payload = describe_market_data_provider_route()
+
+    assert payload["schema_version"] == "live_data_provider_route.v1"
+    assert payload["status"] == "blocked"
+    assert payload["provider_factory"] == "get_market_data_provider"
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["route"] == [
+        {
+            "provider_family": "fixture",
+            "provider": "fixture",
+            "provider_class": "ReplayMarketDataProvider",
+            "data_mode": "fixture",
+            "live_data_required": False,
+            "network_call": False,
+            "secret_values_returned": False,
+        }
+    ]
+    assert payload["selected_provider_classes"] == ["ReplayMarketDataProvider"]
+    assert payload["providers"]["market"]["selected"] is False
+    assert payload["providers"]["macro"]["selected"] is False
+    assert payload["providers"]["news"]["selected"] is False
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+
+
+def test_describe_market_data_provider_route_reports_full_api_key_route(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-secret",
+        "HALO_SWING_FRED_API_KEY": "fred-secret",
+        "NEWS_API_KEY": "news-secret",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+    get_settings.cache_clear()
+
+    payload = describe_market_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "ready"
+    assert payload["missing"] == []
+    assert payload["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert [entry["provider"] for entry in payload["route"]] == [
+        "polygon",
+        "fred",
+        "newsapi",
+    ]
+    assert all(entry["network_call"] is False for entry in payload["route"])
+    assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
+    assert payload["providers"]["macro"]["configured_env_keys"] == [
+        "HALO_SWING_FRED_API_KEY"
+    ]
+    assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
+    assert payload["providers"]["market"]["selected"] is True
+    assert payload["providers"]["macro"]["selected"] is True
+    assert payload["providers"]["news"]["selected"] is True
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+    for key, value in secret_env.items():
+        assert key in serialized
+        assert value not in serialized
 
 
 def test_live_market_data_provider_requires_api_key(monkeypatch) -> None:

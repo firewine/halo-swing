@@ -329,6 +329,12 @@ live data API-key status, without network calls:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
 ```
 
+live data provider route, without provider network calls:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
+```
+
 live data smoke result validation:
 
 ```bash
@@ -382,7 +388,10 @@ the configured keys select live providers. Use
 metadata offline. Use `get_live_data_api_key_status` before the first live smoke
 when you only need to confirm that supported Polygon, FRED, and NewsAPI aliases
 are configured; it reports key names and missing provider families but never
-secret values. Use `run_live_data_smoke` for the same validation in one
+secret values. Use `get_live_data_provider_route` when you need to confirm that
+the actual `get_market_data_provider` factory selected Polygon, FRED, and
+NewsAPI from those keys without making provider network calls. Use
+`run_live_data_smoke` for the same validation in one
 command after filling the market, macro, and news API keys. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting

@@ -17,6 +17,7 @@ from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
     get_live_data_api_key_status,
+    get_live_data_provider_route,
     run_api_key_pipeline_smoke,
     run_integration_smoke,
     run_live_data_smoke,
@@ -347,6 +348,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "get_integration_readiness",
         "get_integration_setup_checklist",
         "get_live_data_api_key_status",
+        "get_live_data_provider_route",
         "validate_live_data_smoke_result",
         "run_live_data_smoke",
         "run_integration_smoke",
@@ -497,6 +499,74 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     assert payload["dotenv"]["disabled"] is False
     assert payload["dotenv"]["mutation"] is False
     assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+    for key, value in secret_env.items():
+        assert key in serialized
+        assert value not in serialized
+
+
+def test_live_data_provider_route_reports_blocked_defaults(monkeypatch) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = get_live_data_provider_route()
+
+    assert payload["schema_version"] == "live_data_provider_route.v1"
+    assert payload["status"] == "blocked"
+    assert payload["provider_factory"] == "get_market_data_provider"
+    assert payload["selected_provider_classes"] == ["ReplayMarketDataProvider"]
+    assert payload["route"][0]["provider_class"] == "ReplayMarketDataProvider"
+    assert payload["route"][0]["network_call"] is False
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["api_key_status"]["status"] == "blocked"
+    assert payload["network_call"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["order_submission"] is False
+
+
+def test_live_data_provider_route_accepts_api_key_aliases_without_secret_values(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-secret-key",
+        "FRED_API_KEY": "fred-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-secret-key",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = get_live_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "ready"
+    assert payload["missing"] == []
+    assert payload["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert [entry["provider"] for entry in payload["route"]] == [
+        "polygon",
+        "fred",
+        "newsapi",
+    ]
+    assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
+    assert payload["providers"]["macro"]["configured_env_keys"] == ["FRED_API_KEY"]
+    assert payload["providers"]["news"]["configured_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY"
+    ]
+    assert payload["api_key_status"]["status"] == "ready"
+    assert payload["network_call"] is False
+    assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
     for key, value in secret_env.items():
         assert key in serialized

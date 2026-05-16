@@ -375,6 +375,13 @@ class NewsApiDataProvider:
 
 
 DEFAULT_MARKET_DATA_PROVIDER = ReplayMarketDataProvider()
+MARKET_API_KEY_ENV_KEYS = ("HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY")
+MACRO_API_KEY_ENV_KEYS = (
+    "HALO_SWING_MACRO_API_KEY",
+    "HALO_SWING_FRED_API_KEY",
+    "FRED_API_KEY",
+)
+NEWS_API_KEY_ENV_KEYS = ("HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY")
 
 
 def get_market_data_provider() -> MarketDataProvider:
@@ -396,6 +403,67 @@ def get_market_data_provider() -> MarketDataProvider:
         provider = NewsApiDataProvider(provider, api_key=_resolve_news_api_key())
 
     return provider
+
+
+def describe_market_data_provider_route() -> dict[str, Any]:
+    """Describe provider factory selection without making provider network calls."""
+
+    provider: MarketDataProvider | None
+    selection_error: str | None = None
+    try:
+        provider = get_market_data_provider()
+    except ValueError as exc:
+        provider = None
+        selection_error = str(exc)
+
+    providers = {
+        "market": _provider_family_status(
+            provider_family="market",
+            provider="polygon",
+            provider_class="PolygonMarketDataProvider",
+            env_keys=MARKET_API_KEY_ENV_KEYS,
+            missing_name="market_ohlcv_api_key",
+        ),
+        "macro": _provider_family_status(
+            provider_family="macro",
+            provider="fred",
+            provider_class="FredMacroDataProvider",
+            env_keys=MACRO_API_KEY_ENV_KEYS,
+            missing_name="macro_api_key",
+        ),
+        "news": _provider_family_status(
+            provider_family="news",
+            provider="newsapi",
+            provider_class="NewsApiDataProvider",
+            env_keys=NEWS_API_KEY_ENV_KEYS,
+            missing_name="news_api_key",
+        ),
+    }
+    route = _provider_route(provider) if provider is not None else []
+    selected_provider_classes = [entry["provider_class"] for entry in route]
+    missing = [
+        missing
+        for provider_status in providers.values()
+        for missing in provider_status["missing"]
+    ]
+
+    for provider_status in providers.values():
+        provider_status["selected"] = (
+            provider_status["provider_class"] in selected_provider_classes
+        )
+
+    return {
+        "schema_version": "live_data_provider_route.v1",
+        "status": "ready" if not selection_error and not missing else "blocked",
+        "provider_factory": "get_market_data_provider",
+        "route": route,
+        "selected_provider_classes": selected_provider_classes,
+        "providers": providers,
+        "missing": missing,
+        "selection_error": selection_error,
+        "network_call": False,
+        "secret_values_returned": False,
+    }
 
 
 def _validate_live_market_data_source(source: str) -> None:
@@ -494,6 +562,99 @@ def _news_api_key_configured(settings: Any) -> bool:
         or _secret_candidate_configured(get_config_value("HALO_SWING_NEWS_API_KEY"))
         or _secret_candidate_configured(get_config_value("NEWS_API_KEY"))
     )
+
+
+def _provider_family_status(
+    *,
+    provider_family: str,
+    provider: str,
+    provider_class: str,
+    env_keys: tuple[str, ...],
+    missing_name: str,
+) -> dict[str, Any]:
+    configured_env_keys = [
+        key
+        for key in env_keys
+        if _secret_candidate_configured(get_config_value(key))
+    ]
+    configured = bool(configured_env_keys)
+    return {
+        "provider_family": provider_family,
+        "provider": provider,
+        "provider_class": provider_class,
+        "configured": configured,
+        "configured_env_keys": configured_env_keys,
+        "accepted_env_keys": list(env_keys),
+        "missing": [] if configured else [missing_name],
+        "auto_selects_live_provider": configured,
+        "selected": False,
+        "secret_values_returned": False,
+    }
+
+
+def _provider_route(provider: MarketDataProvider | None) -> list[dict[str, Any]]:
+    if provider is None:
+        return []
+    if isinstance(provider, NewsApiDataProvider):
+        return [
+            *_provider_route(provider._base_provider),
+            _provider_route_entry(
+                provider_family="news",
+                provider="newsapi",
+                provider_class="NewsApiDataProvider",
+                data_mode=provider.data_mode,
+                live_data_required=provider.live_data_required,
+            ),
+        ]
+    if isinstance(provider, FredMacroDataProvider):
+        return [
+            *_provider_route(provider._base_provider),
+            _provider_route_entry(
+                provider_family="macro",
+                provider="fred",
+                provider_class="FredMacroDataProvider",
+                data_mode=provider.data_mode,
+                live_data_required=provider.live_data_required,
+            ),
+        ]
+    if isinstance(provider, PolygonMarketDataProvider):
+        return [
+            _provider_route_entry(
+                provider_family="market",
+                provider="polygon",
+                provider_class="PolygonMarketDataProvider",
+                data_mode=provider.data_mode,
+                live_data_required=provider.live_data_required,
+            )
+        ]
+    return [
+        _provider_route_entry(
+            provider_family="fixture",
+            provider="fixture",
+            provider_class=provider.__class__.__name__,
+            data_mode=provider.data_mode,
+            live_data_required=provider.live_data_required,
+        )
+    ]
+
+
+def _provider_route_entry(
+    *,
+    provider_family: str,
+    provider: str,
+    provider_class: str,
+    data_mode: str,
+    live_data_required: bool,
+) -> dict[str, Any]:
+    return {
+        "provider_family": provider_family,
+        "provider": provider,
+        "provider_class": provider_class,
+        "data_mode": data_mode,
+        "live_data_required": live_data_required,
+        "network_call": False,
+        "secret_values_returned": False,
+    }
 
 
 def _secret_candidate_configured(value: str | None) -> bool:

@@ -10,6 +10,7 @@ from halo_swing_mcp import MCP_SERVER_NAME
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import get_config_value
+from halo_swing_mcp.providers import describe_market_data_provider_route
 from halo_swing_mcp.risk_settings import load_btc_risk_settings, resolve_settings_path
 from halo_swing_mcp.secret_store import get_binance_credentials_status
 
@@ -258,6 +259,22 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+    }
+
+
+def get_live_data_provider_route() -> dict[str, Any]:
+    """Return the actual live data provider factory route without network calls."""
+
+    route = describe_market_data_provider_route()
+    return {
+        **route,
+        "api_key_status": get_live_data_api_key_status(),
+        "live_mode_required": False,
+        "mutates_local_state": False,
         "hermes_runtime_started": False,
         "telegram_send_call": False,
         "send_call": False,
@@ -747,6 +764,20 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
                 "get_live_data_api_key_status --no-audit"
+            ),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_live_data_provider_route",
+            "purpose": (
+                "show the actual provider factory route selected by configured "
+                "live data API keys without provider network calls"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_live_data_provider_route --no-audit"
             ),
             "network_call": False,
             "mutates_local_state": False,

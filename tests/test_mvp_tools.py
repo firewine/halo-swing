@@ -70,6 +70,7 @@ def test_phase9_btc_tools_are_manifested() -> None:
     assert {
         "get_integration_setup_checklist",
         "get_live_data_api_key_status",
+        "get_live_data_provider_route",
         "validate_live_data_smoke_result",
         "run_live_data_smoke",
         "run_integration_smoke",

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_API_KEY_STATUS_VERIFIED
-gate_id: LIVE_DATA_API_KEY_STATUS_GATE
+status: LIVE_DATA_PROVIDER_ROUTE_VERIFIED
+gate_id: LIVE_DATA_PROVIDER_ROUTE_GATE
 review_tier: S1_small
 
-next_atomic_step: add a no-network live data API-key status tool that shows whether Polygon, FRED, and NewsAPI keys are configured from supported env or dotenv aliases without returning secrets
+next_atomic_step: add a no-network live data provider route tool that proves the actual provider factory auto-selects Polygon, FRED, and NewsAPI from API keys without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,11 +55,13 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/tools/readiness.py
   - src/halo_swing_mcp/tool_registry.py
   - src/halo_swing_mcp/server.py
   - tests/golden/health_check.json
   - tests/golden/mvp_tool_contracts.json
+  - tests/test_providers.py
   - tests/test_readiness.py
   - tests/test_mvp_tools.py
   - tests/test_tool_registry.py
@@ -80,25 +82,36 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_reports_fixture_default tests/test_providers.py::test_describe_market_data_provider_route_reports_full_api_key_route tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
 
 done_means:
-  - get_live_data_api_key_status is registered for MCP and harness use
-  - tool reports Polygon, FRED, and NewsAPI API-key readiness from supported env and dotenv aliases without network calls
-  - tool returns configured alias names only, never secret values
-  - tool includes missing provider families and the one-shot API-key pipeline smoke command
-  - fixture defaults remain offline and blocked without pretending live integration is configured
-  - README and DevOps guide document the no-network API-key status command
+  - get_live_data_provider_route is registered for MCP and harness use
+  - tool reports actual provider factory route without calling provider networks
+  - route shows fixture default when no API keys are configured
+  - route shows Polygon, FRED, and NewsAPI selected when supported API-key aliases are configured
+  - tool returns provider and env key names only, never secret values
+  - README and DevOps guide document the no-network provider route command
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data API-key status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data provider route gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_API_KEY_STATUS_VERIFIED
+gate_id: LIVE_DATA_API_KEY_STATUS_GATE
+review_tier: S1_small
+
+next_atomic_step: add a no-network live data API-key status tool that shows whether Polygon, FRED, and NewsAPI keys are configured from supported env or dotenv aliases without returning secrets
 ```
 
 Previous completed directive:
@@ -1213,6 +1226,66 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Provider Route Gate is verified.
+`get_live_data_provider_route` is registered for MCP and harness use. It calls
+the actual `get_market_data_provider` factory and reports the selected provider
+route without executing provider network methods, mutating state, or returning
+secret values. Fixture defaults show `ReplayMarketDataProvider`; configured API
+key aliases are tested to select Polygon, FRED, and NewsAPI. Focused tests
+passed with 13 tests, full pytest passed with 760 tests, and ruff, health_check,
+and the harness provider route command passed.
+
+```yaml
+live_data_provider_route_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/server.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_providers.py
+    - tests/test_readiness.py
+    - tests/test_mvp_tools.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_provider_route is registered for MCP and harness use
+    - tool reports actual provider factory route without calling provider networks
+    - route shows fixture default when no API keys are configured
+    - route shows Polygon, FRED, and NewsAPI selected when supported API-key aliases are configured
+    - tool returns provider and env key names only, never secret values
+    - README and DevOps guide document the no-network provider route command
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_reports_fixture_default tests/test_providers.py::test_describe_market_data_provider_route_reports_full_api_key_route tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_setup_docs.py -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
+      result: "passed, status blocked with fixture route without API keys as expected"
+```
+
+Previous verification:
 
 Summary: Live Data API-Key Status Gate is verified.
 `get_live_data_api_key_status` is registered for MCP and harness use. It reports
