@@ -2342,6 +2342,31 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["next_operator_action"] == fake_next_operator_action
+    assert payload["setup_status_summary"] == {
+        "schema_version": "api_key_pipeline_setup_status_summary.v1",
+        "status": "ready",
+        "ready_to_run_live_smoke": True,
+        "api_key_status": "ready",
+        "provider_route_status": "ready",
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_provider_family_count": 3,
+        "required_provider_family_count": 3,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 3,
+        "blocked_provider_smoke_count": 0,
+        "next_setup_step": "run_api_key_pipeline_smoke",
+        "next_operator_action_name": "run_api_key_pipeline_smoke",
+        "next_smoke_command_name": "run_api_key_pipeline_smoke",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
@@ -2461,6 +2486,27 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["schema_version"] == "api_key_pipeline_smoke_run.v1"
     assert payload["status"] == "conflict"
     assert payload["readiness_summary"]["live_data_ready"] is False
+    assert payload["setup_status_summary"] == {
+        "schema_version": "api_key_pipeline_setup_status_summary.v1",
+        "status": "blocked",
+        "ready_to_run_live_smoke": False,
+        "api_key_status": "blocked",
+        "provider_route_status": "blocked",
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_provider_family_count": 0,
+        "required_provider_family_count": 3,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 0,
+        "blocked_provider_smoke_count": 3,
+        "next_setup_step": "prepare_dotenv",
+        "next_operator_action_name": "prepare_dotenv",
+        "next_smoke_command_name": "get_live_data_api_key_status",
+        "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

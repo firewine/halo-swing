@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_TOP_LEVEL_NEXT_OPERATOR_ACTION_VERIFIED
-gate_id: API_KEY_PIPELINE_TOP_LEVEL_NEXT_OPERATOR_ACTION_GATE
+status: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_VERIFIED
+gate_id: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_GATE
 review_tier: S1_small
 
-next_atomic_step: add a top-level next_operator_action to run_api_key_pipeline_smoke so the one-shot payload shows the single next local action before users inspect nested summaries
+next_atomic_step: add a top-level setup_status_summary to run_api_key_pipeline_smoke so API-key-only setup readiness, provider family counts, and the next smoke command are visible before nested summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,15 +81,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke includes top-level next_operator_action copied from live_data_setup_summary without returning secrets
-  - ready fake-live and blocked fixture-default paths assert top-level next_operator_action
-  - README and DevOps guide document top-level next_operator_action in pipeline smoke payloads
+  - run_api_key_pipeline_smoke includes top-level setup_status_summary copied from live_data_setup_summary without returning secrets
+  - ready fake-live and blocked fixture-default paths assert top-level setup_status_summary provider counts, readiness, missing families, and next smoke command name
+  - README and DevOps guide document top-level setup_status_summary in pipeline smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline top-level next operator action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline top-level setup status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_TOP_LEVEL_NEXT_OPERATOR_ACTION_VERIFIED
+gate_id: API_KEY_PIPELINE_TOP_LEVEL_NEXT_OPERATOR_ACTION_GATE
+review_tier: S1_small
+
+next_atomic_step: add a top-level next_operator_action to run_api_key_pipeline_smoke so the one-shot payload shows the single next local action before users inspect nested summaries
 ```
 
 Previous completed directive:
@@ -1523,6 +1534,58 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Top-Level Setup Status Gate is verified.
+`run_api_key_pipeline_smoke` now exposes a compact top-level
+`setup_status_summary` copied from `live_data_setup_summary`, so API-key-only
+setup readiness, provider family counts, provider smoke counts, missing
+families, and the next smoke command are visible before nested summaries. Ready
+fake-live and blocked fixture-default paths assert the top-level summary without
+secret values. README and DevOps guide document it. Focused tests passed with 3
+tests, full pytest passed with 760 tests, and ruff, health_check, and one-shot
+pipeline harness commands passed. With local `.env` absent, the one-shot
+pipeline harness exits 0 and correctly returns top-level `status=blocked`,
+provider count `0/3`, `next_setup_step=prepare_dotenv`, and no secrets.
+
+```yaml
+api_key_pipeline_top_level_setup_status_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_api_key_pipeline_smoke includes top-level setup_status_summary copied from live_data_setup_summary
+    - ready fake-live and blocked fixture-default paths assert setup_status_summary provider counts, missing families, next setup step, next smoke command name, and no secret values
+    - README and DevOps guide document top-level setup_status_summary in pipeline smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned top-level setup_status_summary with status=blocked, provider count 0/3, next_setup_step=prepare_dotenv, and no secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Top-Level Next Operator Action Gate is verified.
 `run_api_key_pipeline_smoke` now exposes a top-level no-secret

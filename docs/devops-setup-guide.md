@@ -440,9 +440,9 @@ Use `run_api_key_pipeline_smoke` as the single post-setup check after filling
 API keys; it combines live-data readiness, provider smoke, signal workflow smoke,
 and recording smoke while still avoiding Hermes runtime starts, Telegram sends,
 order submissions, retained state, and secret returns. The pipeline payload also
-includes top-level `next_operator_action`, `live_data_setup_summary`, and a
-provider route summary, then fails the route readiness check until all supported
-live-data provider keys are configured.
+includes top-level `next_operator_action`, `setup_status_summary`,
+`live_data_setup_summary`, and a provider route summary, then fails the route
+readiness check until all supported live-data provider keys are configured.
 Its live data, signal workflow, and recording sub-smoke summaries include
 stage-level setup fields such as `live_data_setup_summary_status`,
 `ready_to_run_live_smoke`, `provider_route_status`, `provider_family_summary`,

@@ -706,6 +706,9 @@ def run_api_key_pipeline_smoke(
             live_data_setup_summary.get("next_operator_action")
         )
         or {},
+        "setup_status_summary": _api_key_pipeline_setup_status_summary(
+            live_data_setup_summary,
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -1541,6 +1544,65 @@ def _api_key_pipeline_provider_route_summary(route: dict[str, Any]) -> dict[str,
         "missing": route.get("missing"),
         "network_call": route.get("network_call"),
         "secret_values_returned": route.get("secret_values_returned"),
+    }
+
+
+def _api_key_pipeline_setup_status_summary(
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    provider_family_summary = _optional_mapping(
+        live_data_setup_summary.get("provider_family_summary")
+    ) or {}
+    provider_smoke_plan = _optional_mapping(
+        live_data_setup_summary.get("provider_smoke_plan")
+    ) or {}
+    live_data_setup_steps = _optional_mapping(
+        live_data_setup_summary.get("live_data_setup_steps")
+    ) or {}
+    next_operator_action = _optional_mapping(
+        live_data_setup_summary.get("next_operator_action")
+    ) or {}
+    next_smoke_command = _optional_mapping(
+        live_data_setup_summary.get("next_smoke_command")
+    ) or {}
+    return {
+        "schema_version": "api_key_pipeline_setup_status_summary.v1",
+        "status": live_data_setup_summary.get("status"),
+        "ready_to_run_live_smoke": live_data_setup_summary.get(
+            "ready_to_run_live_smoke"
+        ),
+        "api_key_status": live_data_setup_summary.get("api_key_status"),
+        "provider_route_status": live_data_setup_summary.get(
+            "provider_route_status"
+        ),
+        "configured_provider_families": live_data_setup_summary.get(
+            "configured_provider_families"
+        ),
+        "missing_provider_families": provider_family_summary.get(
+            "missing_provider_families"
+        ),
+        "configured_provider_family_count": provider_family_summary.get(
+            "configured_count"
+        ),
+        "required_provider_family_count": provider_family_summary.get(
+            "required_count"
+        ),
+        "provider_smoke_count": provider_smoke_plan.get("provider_smoke_count"),
+        "ready_provider_smoke_count": provider_smoke_plan.get(
+            "ready_provider_smoke_count"
+        ),
+        "blocked_provider_smoke_count": provider_smoke_plan.get(
+            "blocked_provider_smoke_count"
+        ),
+        "next_setup_step": live_data_setup_steps.get("next_step"),
+        "next_operator_action_name": next_operator_action.get("name"),
+        "next_smoke_command_name": next_smoke_command.get("name"),
+        "selected_provider_classes": live_data_setup_summary.get(
+            "selected_provider_classes"
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
     }
 
 
