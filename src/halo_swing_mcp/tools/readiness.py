@@ -2057,7 +2057,7 @@ def _api_key_pipeline_stage_row(
     stage_summary: dict[str, Any],
 ) -> dict[str, Any]:
     status = stage_summary.get("status")
-    return {
+    row = {
         "stage_name": stage_name,
         "status": status,
         "failed": status != "ok",
@@ -2080,6 +2080,33 @@ def _api_key_pipeline_stage_row(
         "mutates_local_state": stage_summary.get("mutates_local_state") is True,
         "secret_values_returned": stage_summary.get("secret_values_returned"),
     }
+    next_provider_recovery_smoke = _optional_mapping(
+        stage_summary.get("next_provider_recovery_smoke")
+    ) or {}
+    provider_family = next_provider_recovery_smoke.get("provider_family")
+    live_data_setup_summary = _optional_mapping(
+        stage_summary.get("live_data_setup_summary")
+    ) or {}
+    provider_setup_actions = _optional_mapping(
+        live_data_setup_summary.get("provider_setup_actions")
+    ) or _optional_mapping(stage_summary.get("provider_setup_actions")) or {}
+    provider_setup_action = (
+        _optional_mapping(provider_setup_actions.get(provider_family))
+        if isinstance(provider_family, str)
+        else None
+    ) or {}
+    preferred_env_key = next_provider_recovery_smoke.get(
+        "preferred_env_key"
+    ) or provider_setup_action.get("preferred_env_key")
+    accepted_env_keys = _string_list(
+        next_provider_recovery_smoke.get("accepted_env_keys")
+        or provider_setup_action.get("accepted_env_keys")
+    )
+    if isinstance(preferred_env_key, str):
+        row["preferred_env_key"] = preferred_env_key
+    if accepted_env_keys:
+        row["accepted_env_keys"] = accepted_env_keys
+    return row
 
 
 def _api_key_pipeline_check_summary(

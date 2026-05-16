@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.750 API Key Stage Recovery Env Hint Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_pipeline_stage_summary`는 실패 stage와 provider recovery smoke command
+이름을 보여주지만, stage row 자체에는 어떤 env key를 확인해야 하는지 이름이 없었다.
+이번 slice는 provider recovery smoke metadata가 있는 실패 stage row와
+`first_failed_stage`에 `preferred_env_key`와 `accepted_env_keys`를 조건부로 유지해,
+API key를 넣은 뒤 compact stage summary만 보아도 다음에 확인할 key 이름을 알 수
+있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_pipeline_stage_summary failed live-data stage rows include preferred_env_key and accepted_env_keys when provider recovery smoke metadata exists
+  - api_key_pipeline_stage_summary first_failed_stage carries the same no-secret recovery env-key hints
+  - setup stage summaries remain unchanged and do not add irrelevant recovery env-key fields
+  - focused tests cover stage summary recovery env-key hints in full and summary_only API-key pipeline output
+  - fake-key API-key pipeline summary-only CLI returns first failed stage recovery env-key names without secret values
+  - README and DevOps setup guide document stage summary recovery env-key hints
+  - tests/test_setup_docs.py asserts stage recovery env-key hint guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only first failed stage returned preferred_env_key and accepted_env_keys without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); stage=payload["api_key_pipeline_stage_summary"]["first_failed_stage"]; print(stage["stage_name"], stage["preferred_env_key"], stage["accepted_env_keys"], stage["secret_values_returned"])' -> run_live_data_smoke POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 788 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.749 API Key Summary-Only Integration Recovery Env Hint Gate Record - 2026-05-17
 
 ### A. 목적

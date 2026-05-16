@@ -361,9 +361,11 @@ It keeps `api_key_pipeline_stage_summary`
 execution order with `status`, `stage_count`, `failed_stage_count`,
 `failed_stage_names`, `first_failed_stage`, and per-stage `stage_name`,
 `failed`, `error_summary`, `provider_error_summary_count`,
-`provider_recovery_smoke_count`, `network_call`, `mutates_local_state`, and
-`secret_values_returned` fields, so the failed smoke stage is visible without
-reading every nested summary.
+`provider_recovery_smoke_count`, `preferred_env_key`, `accepted_env_keys`,
+`network_call`, `mutates_local_state`, and `secret_values_returned` fields.
+When provider recovery smoke metadata exists, the stage summary includes stage
+recovery env-key hints without returning key values, so the failed smoke stage
+is visible without reading every nested summary.
 It keeps `api_key_pipeline_check_summary`
 (`api_key_pipeline_check_summary.v1`) summarizing the top-level `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,

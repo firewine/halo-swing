@@ -2354,6 +2354,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_provider_recovery_smoke_command_name": (
             "get_market_snapshot_live_smoke"
         ),
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
         "ready_to_run_live_smoke": True,
         "provider_route_status": "ready",
         "network_call": True,
@@ -4617,6 +4622,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
         "provider_route_status"
     ] == "blocked"
+    assert (
+        "preferred_env_key"
+        not in payload["api_key_pipeline_stage_summary"]["first_failed_stage"]
+    )
+    assert (
+        "accepted_env_keys"
+        not in payload["api_key_pipeline_stage_summary"]["first_failed_stage"]
+    )
     assert all(
         stage["secret_values_returned"] is False
         for stage in payload["api_key_pipeline_stage_summary"]["stages"]
@@ -4884,6 +4897,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
     assert stage_summary["first_failed_stage"]["stage_name"] == (
         "run_live_data_smoke"
     )
+    assert stage_summary["first_failed_stage"]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert stage_summary["first_failed_stage"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert stage_summary["stages"][0]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert stage_summary["stages"][0]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
     assert all(
         stage["secret_values_returned"] is False
         for stage in stage_summary["stages"]
