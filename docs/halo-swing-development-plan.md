@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.714 API Key Live Data Smoke Provider Error Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+개별 provider smoke conflict payload에는 provider/recovery metadata가 들어가지만,
+사용자가 주로 실행하는 `run_live_data_smoke`와 `run_api_key_pipeline_smoke` 요약에서는
+각 provider의 `error_summary`를 상단에서 바로 찾기 어렵다. 이번 slice는 live-data
+smoke 계층과 API-key pipeline summary 계층에 no-secret `provider_error_summaries`를
+노출해, 어떤 provider smoke가 실패했는지와 다음 조치를 한 번에 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke now returns provider_error_summaries and provider_error_summary_count collected from market, macro, and news provider conflict payloads
+  - run_api_key_pipeline_smoke live_data_smoke_summary now mirrors provider_error_summaries and provider_error_summary_count from the live-data smoke payload
+  - fake-key one-shot smoke runs surface three no-secret provider recovery summaries with provider_family, provider, smoke_command_name, next_setup_action, and exception_type
+  - ok and fixture-default/no-key smoke paths keep provider_error_summaries empty when no provider error summaries exist
+  - provider error summaries do not include exception messages, URLs, API key values, or secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider error summary readiness pytest: 2 passed
+  - fake Polygon/FRED/NewsAPI run_live_data_smoke CLI: exit 0 with provider_error_summary_count=3 and no secrets
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with live_data_smoke_summary provider_error_summary_count=3 and no secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0; provider_error_summaries empty while setup remains blocked at prepare_dotenv
+```
+
 ## 3.713 API Key Provider Smoke Recovery Metadata Gate Record - 2026-05-17
 
 ### A. 목적

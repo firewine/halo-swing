@@ -1,23 +1,23 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_GATE",
+  "gate_id": "API_KEY_LIVE_DATA_SMOKE_PROVIDER_ERROR_SUMMARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.713",
-  "next_atomic_step": "add no-secret provider and recovery metadata to individual provider smoke conflict error summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.714",
+  "next_atomic_step": "surface individual provider smoke error summaries at the live-data smoke and API-key pipeline summary layers",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/market.py",
-    "tests/test_providers.py"
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.713",
-    "src/halo_swing_mcp/tools/market.py",
-    "tests/test_providers.py",
+    "docs/halo-swing-development-plan.md#3.714",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_readiness.py",
     "README.md",
     "docs/devops-setup-guide.md"
   ],
@@ -35,7 +35,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_surfaces_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
@@ -52,14 +52,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_market_snapshot live provider exception payload error_summary includes provider_family=market, provider=polygon, smoke_command_name=get_market_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets",
-    "get_macro_snapshot live provider exception payload error_summary includes provider_family=macro, provider=fred, smoke_command_name=get_macro_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets",
-    "get_news_bundle live provider exception payload error_summary includes provider_family=news, provider=newsapi, smoke_command_name=get_news_bundle_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets",
-    "individual provider smoke conflict payloads remain no-secret, network boundary declared, and do not mutate local state",
+    "run_live_data_smoke includes provider_error_summaries and provider_error_summary_count collected from market, macro, and news provider conflict payloads",
+    "run_api_key_pipeline_smoke live_data_smoke_summary mirrors provider_error_summaries and provider_error_summary_count from the live-data smoke payload",
+    "provider_error_summaries preserve provider_family, provider, smoke_command_name, next_setup_action, exception_type, and no-secret flags without returning exception messages, URLs, or secret values",
+    "ok and fixture-default smoke paths remain no-secret and keep provider_error_summaries empty when no provider error summaries exist",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key provider smoke recovery metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key live-data smoke provider error summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -42,19 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_GATE
+status: API_KEY_LIVE_DATA_SMOKE_PROVIDER_ERROR_SUMMARY_VERIFIED
+gate_id: API_KEY_LIVE_DATA_SMOKE_PROVIDER_ERROR_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: add no-secret provider and recovery metadata to individual provider smoke conflict error summaries
+next_atomic_step: surface individual provider smoke error summaries at the live-data smoke and API-key pipeline summary layers
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_providers.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,23 +71,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_surfaces_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - get_market_snapshot live provider exception payload error_summary includes provider_family=market, provider=polygon, smoke_command_name=get_market_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
-  - get_macro_snapshot live provider exception payload error_summary includes provider_family=macro, provider=fred, smoke_command_name=get_macro_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
-  - get_news_bundle live provider exception payload error_summary includes provider_family=news, provider=newsapi, smoke_command_name=get_news_bundle_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
-  - individual provider smoke conflict payloads remain no-secret, network boundary declared, and do not mutate local state
+  - run_live_data_smoke includes provider_error_summaries and provider_error_summary_count collected from market, macro, and news provider conflict payloads
+  - run_api_key_pipeline_smoke live_data_smoke_summary mirrors provider_error_summaries and provider_error_summary_count from the live-data smoke payload
+  - provider_error_summaries preserve provider_family, provider, smoke_command_name, next_setup_action, exception_type, and no-secret flags without returning exception messages, URLs, or secret values
+  - ok and fixture-default smoke paths remain no-secret and keep provider_error_summaries empty when no provider error summaries exist
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider smoke recovery metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key live-data smoke provider error summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_GATE
+review_tier: S1_small
+
+next_atomic_step: add no-secret provider and recovery metadata to individual provider smoke conflict error summaries
 ```
 
 Previous completed directive:
@@ -1785,6 +1796,61 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Live Data Smoke Provider Error Summary Gate is verified.
+`run_live_data_smoke` now returns `provider_error_summaries` and
+`provider_error_summary_count` collected from market, macro, and news provider
+conflict payloads. `run_api_key_pipeline_smoke` mirrors the same fields in
+`live_data_smoke_summary`. Fake-key smoke runs surfaced three provider recovery
+summaries with provider family, provider, smoke command name,
+`next_setup_action=verify_provider_credentials_or_network`, and exception type,
+without returning exception messages, URLs, API key values, or secret values.
+Focused tests passed with 2 tests, full pytest passed with 775 tests, and ruff,
+health_check, fixture-default API-key pipeline CLI, and fake-key live smoke
+evidence passed.
+
+```yaml
+api_key_live_data_smoke_provider_error_summary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_live_data_smoke includes provider_error_summaries and provider_error_summary_count collected from market, macro, and news provider conflict payloads
+    - run_api_key_pipeline_smoke live_data_smoke_summary mirrors provider_error_summaries and provider_error_summary_count from the live-data smoke payload
+    - fake POLYGON/FRED/NEWS keys surface three no-secret provider recovery summaries at the one-shot smoke layers
+    - fixture-default/no-key smoke keeps provider_error_summaries empty while reporting the normal prepare_dotenv/key setup blockers
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_surfaces_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q
+      result: "2 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; provider_error_summary_count=3 and no secrets"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; live_data_smoke_summary provider_error_summary_count=3 and no secrets"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv, provider_error_summaries stayed empty, and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Provider Smoke Recovery Metadata Gate is verified.
 Individual live provider smoke conflict payloads now include no-secret

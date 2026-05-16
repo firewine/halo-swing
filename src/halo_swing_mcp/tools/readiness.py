@@ -436,6 +436,11 @@ def run_live_data_smoke(
         payload.get("live_data_required") is True
         for payload in [market_snapshot, macro_snapshot, news_bundle]
     )
+    provider_error_summaries = _provider_error_summaries(
+        market_snapshot=market_snapshot,
+        macro_snapshot=macro_snapshot,
+        news_bundle=news_bundle,
+    )
 
     return {
         "schema_version": "live_data_smoke_run.v1",
@@ -452,6 +457,8 @@ def run_live_data_smoke(
             api_key_status,
             provider_route,
         ),
+        "provider_error_summaries": provider_error_summaries,
+        "provider_error_summary_count": len(provider_error_summaries),
         "validation": validation,
         "network_call": network_call,
         "live_data_required": live_data_required,
@@ -459,6 +466,20 @@ def run_live_data_smoke(
         "order_submission": False,
         "secret_values_returned": False,
     }
+
+
+def _provider_error_summaries(
+    *,
+    market_snapshot: dict[str, Any],
+    macro_snapshot: dict[str, Any],
+    news_bundle: dict[str, Any],
+) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for payload in [market_snapshot, macro_snapshot, news_bundle]:
+        summary = _optional_mapping(payload.get("error_summary"))
+        if summary is not None:
+            summaries.append(summary)
+    return summaries
 
 
 def run_integration_smoke(
@@ -1606,6 +1627,10 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
     provider_smoke_plan = _optional_mapping(
         live_data_setup_summary.get("provider_smoke_plan")
     ) or {}
+    provider_error_summaries = smoke.get("provider_error_summaries")
+    provider_error_rows = (
+        provider_error_summaries if isinstance(provider_error_summaries, list) else []
+    )
     next_operator_action = _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
     ) or {}
@@ -1648,6 +1673,8 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "blocked_provider_smoke_count": provider_smoke_plan.get(
             "blocked_provider_smoke_count"
         ),
+        "provider_error_summaries": provider_error_rows,
+        "provider_error_summary_count": len(provider_error_rows),
         "next_smoke_command_name": next_smoke_command.get("name"),
     }
 

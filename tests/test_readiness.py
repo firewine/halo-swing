@@ -1886,6 +1886,325 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["validation"]["status"] == "ok"
     assert all(check["passed"] for check in payload["validation"]["checks"])
+    assert payload["provider_error_summaries"] == []
+    assert payload["provider_error_summary_count"] == 0
+
+
+def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> None:
+    from halo_swing_mcp.tools import market as market_tools
+
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret-key")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret-key")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret-key")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    market_error = {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_market_snapshot",
+        "provider_family": "market",
+        "provider": "polygon",
+        "smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    macro_error = {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_macro_snapshot",
+        "provider_family": "macro",
+        "provider": "fred",
+        "smoke_command_name": "get_macro_snapshot_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    news_error = {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_news_bundle",
+        "provider_family": "news",
+        "provider": "newsapi",
+        "smoke_command_name": "get_news_bundle_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+
+    def fake_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "live_data_required": True,
+            "market_snapshot_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "market_snapshot_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "error_summary": market_error,
+            "secret_values_returned": False,
+        }
+
+    def fake_macro_snapshot() -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "live_data_required": True,
+            "macro_filter_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "macro_filter_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "error_summary": macro_error,
+            "secret_values_returned": False,
+        }
+
+    def fake_news_bundle(topic: str = "macro") -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "topic": topic,
+            "live_data_required": True,
+            "news_source_policy_contract": {
+                "live_data_required": True,
+                "network_call": True,
+                "secret_values_returned": False,
+            },
+            "news_source_policy_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "secret_values_not_returned", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "news_score_contract": {"secret_values_returned": False},
+            "error_summary": news_error,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(market_tools, "get_market_snapshot", fake_market_snapshot)
+    monkeypatch.setattr(market_tools, "get_macro_snapshot", fake_macro_snapshot)
+    monkeypatch.setattr(market_tools, "get_news_bundle", fake_news_bundle)
+
+    payload = run_live_data_smoke(symbols=["QQQ"], topic="macro")
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "conflict"
+    assert payload["provider_error_summaries"] == [
+        market_error,
+        macro_error,
+        news_error,
+    ]
+    assert payload["provider_error_summary_count"] == 3
+    assert payload["secret_values_returned"] is False
+    assert "polygon-secret-key" not in serialized
+    assert "fred-secret-key" not in serialized
+    assert "news-secret-key" not in serialized
+    assert "provider.example" not in serialized
+    assert "apiKey" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import market as market_tools
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret-key")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret-key")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret-key")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    provider_errors = [
+        {
+            "schema_version": "provider_smoke_error.v1",
+            "tool": "get_market_snapshot",
+            "provider_family": "market",
+            "provider": "polygon",
+            "smoke_command_name": "get_market_snapshot_live_smoke",
+            "next_setup_action": "verify_provider_credentials_or_network",
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "exception_type": "RuntimeError",
+            "exception_message_returned": False,
+            "url_returned": False,
+            "secret_values_returned": False,
+        },
+        {
+            "schema_version": "provider_smoke_error.v1",
+            "tool": "get_macro_snapshot",
+            "provider_family": "macro",
+            "provider": "fred",
+            "smoke_command_name": "get_macro_snapshot_live_smoke",
+            "next_setup_action": "verify_provider_credentials_or_network",
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "exception_type": "RuntimeError",
+            "exception_message_returned": False,
+            "url_returned": False,
+            "secret_values_returned": False,
+        },
+        {
+            "schema_version": "provider_smoke_error.v1",
+            "tool": "get_news_bundle",
+            "provider_family": "news",
+            "provider": "newsapi",
+            "smoke_command_name": "get_news_bundle_live_smoke",
+            "next_setup_action": "verify_provider_credentials_or_network",
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "exception_type": "RuntimeError",
+            "exception_message_returned": False,
+            "url_returned": False,
+            "secret_values_returned": False,
+        },
+    ]
+
+    def fake_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "live_data_required": True,
+            "market_snapshot_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "market_snapshot_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "error_summary": provider_errors[0],
+            "secret_values_returned": False,
+        }
+
+    def fake_macro_snapshot() -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "live_data_required": True,
+            "macro_filter_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "macro_filter_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "error_summary": provider_errors[1],
+            "secret_values_returned": False,
+        }
+
+    def fake_news_bundle(topic: str = "macro") -> dict[str, Any]:
+        return {
+            "status": "conflict",
+            "topic": topic,
+            "live_data_required": True,
+            "news_source_policy_contract": {
+                "live_data_required": True,
+                "network_call": True,
+                "secret_values_returned": False,
+            },
+            "news_source_policy_guard": {
+                "status": "conflict",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "secret_values_not_returned", "passed": True},
+                    {"name": "provider_smoke_completed", "passed": False},
+                ],
+            },
+            "news_score_contract": {"secret_values_returned": False},
+            "error_summary": provider_errors[2],
+            "secret_values_returned": False,
+        }
+
+    def fake_signal_workflow_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_signal_workflow_smoke_run.v1",
+            "status": "ok",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": False,
+            "live_data_required": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_recording_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_recording_smoke_run.v1",
+            "status": "ok",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": False,
+            "live_data_required": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(market_tools, "get_market_snapshot", fake_market_snapshot)
+    monkeypatch.setattr(market_tools, "get_macro_snapshot", fake_macro_snapshot)
+    monkeypatch.setattr(market_tools, "get_news_bundle", fake_news_bundle)
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_signal_workflow_smoke",
+        fake_signal_workflow_smoke,
+    )
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_recording_smoke",
+        fake_recording_smoke,
+    )
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "conflict"
+    assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["live_data_smoke_summary"]["provider_error_summaries"] == (
+        provider_errors
+    )
+    assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
+    assert payload["secret_values_returned"] is False
+    assert "polygon-secret-key" not in serialized
+    assert "fred-secret-key" not in serialized
+    assert "news-secret-key" not in serialized
+    assert "provider.example" not in serialized
+    assert "apiKey" not in serialized
 
 
 def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) -> None:
@@ -1900,6 +2219,8 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["send_call"] is False
     assert payload["order_submission"] is False
     assert payload["secret_values_returned"] is False
+    assert payload["provider_error_summaries"] == []
+    assert payload["provider_error_summary_count"] == 0
     assert payload["validation"]["status"] == "conflict"
     assert payload["provider_route"]["status"] == "blocked"
     assert payload["provider_route"]["selected_provider_classes"] == [
