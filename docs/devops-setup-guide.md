@@ -497,7 +497,9 @@ The `api_key_operator_checklist` mirrors provider recovery state as
 stays visible beside the setup steps. When recovery is required, the checklist
 adds a `recover_failed_providers` blocking step so `ready=false`,
 `blocking_step_names`, and `next_blocking_action` point at the rerunnable
-no-secret recovery smoke command.
+no-secret recovery smoke command. In that recovery state,
+`api_key_operator_checklist.status` becomes `conflict` and `current_step`
+becomes `recover_failed_providers`.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

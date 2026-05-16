@@ -836,12 +836,17 @@ def expected_api_key_operator_checklist(
     next_provider_recovery_action = (
         provider_recovery_items[0] if provider_recovery_items else None
     )
+    provider_recovery_required = bool(provider_recovery_items)
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
-        "status": status,
-        "current_step": current_step,
+        "status": "conflict" if provider_recovery_required else status,
+        "current_step": (
+            "recover_failed_providers"
+            if provider_recovery_required
+            else current_step
+        ),
         "provider_recovery_status": provider_recovery_checklist["status"],
-        "provider_recovery_required": bool(provider_recovery_items),
+        "provider_recovery_required": provider_recovery_required,
         "provider_recovery_item_count": len(provider_recovery_items),
         "next_provider_recovery_action": next_provider_recovery_action,
         "provider_recovery_checklist": provider_recovery_checklist,
@@ -2367,6 +2372,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         is True
     )
     assert operator_checklist["ready"] is False
+    assert operator_checklist["status"] == "conflict"
+    assert operator_checklist["current_step"] == "recover_failed_providers"
     assert operator_checklist["blocking_step_names"] == ["recover_failed_providers"]
     assert operator_checklist["blocking_step_count"] == 1
     assert operator_checklist["next_blocking_step"] == "recover_failed_providers"
@@ -3721,6 +3728,8 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "secret_values_returned": False,
     }
     assert payload["api_key_operator_checklist"]["provider_recovery_status"] == "ok"
+    assert payload["api_key_operator_checklist"]["status"] == "blocked"
+    assert payload["api_key_operator_checklist"]["current_step"] == "prepare_dotenv"
     assert (
         payload["api_key_operator_checklist"]["provider_recovery_required"] is False
     )

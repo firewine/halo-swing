@@ -67,6 +67,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "recover_failed_providers" in guide
     assert "blocking_step_names" in guide
     assert "next_blocking_action" in guide
+    assert "api_key_operator_checklist.status" in guide
+    assert "current_step" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
     assert "run_api_key_pipeline_smoke" in guide

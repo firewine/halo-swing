@@ -2250,10 +2250,20 @@ def _api_key_pipeline_operator_checklist(
         (step for step in steps if step.get("status") != "ready"),
         None,
     )
+    checklist_status = (
+        "conflict"
+        if provider_recovery_required
+        else setup_status_summary.get("status")
+    )
+    current_step = (
+        "recover_failed_providers"
+        if provider_recovery_required
+        else setup_status_summary.get("next_setup_step")
+    )
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
-        "status": setup_status_summary.get("status"),
-        "current_step": setup_status_summary.get("next_setup_step"),
+        "status": checklist_status,
+        "current_step": current_step,
         "provider_recovery_status": api_key_provider_recovery_checklist.get(
             "status"
         ),

@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.723 API Key Operator Checklist Recovery Status Gate Record - 2026-05-17
+
+### A. 목적
+
+`recover_failed_providers`가 blocking action으로 추가되어도
+`api_key_operator_checklist.status=ready`, `current_step=run_provider_smokes`로
+남으면 operator가 provider recovery 필요 상태를 setup ready 상태로 오해할 수 있다.
+이번 slice는 provider recovery가 필요한 경우 operator checklist의 top-level
+`status`와 `current_step`도 각각 `conflict`, `recover_failed_providers`로 맞춰
+API-key-only one-shot smoke 결과의 다음 작업을 명확히 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - provider recovery required state now makes api_key_operator_checklist.status conflict
+  - provider recovery required state now makes api_key_operator_checklist.current_step recover_failed_providers
+  - no-recovery ready/blocked setup paths keep their existing setup status and current_step values
+  - README and DevOps setup guide document the recovery status/current_step behavior
+  - tests/test_setup_docs.py asserts api_key_operator_checklist.status and current_step guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 4 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with api_key_operator_checklist status=conflict and current_step=recover_failed_providers without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.722 API Key Operator Checklist Provider Recovery Blocker Gate Record - 2026-05-17
 
 ### A. 목적

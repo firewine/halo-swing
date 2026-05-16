@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_BLOCKER_GATE",
+  "gate_id": "API_KEY_OPERATOR_CHECKLIST_RECOVERY_STATUS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.722",
-  "next_atomic_step": "make provider recovery required state become an explicit API-key operator checklist blocking action",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.723",
+  "next_atomic_step": "make API-key operator checklist status and current step reflect provider recovery blockers",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.721",
+    "docs/halo-swing-development-plan.md#3.722",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,16 +56,15 @@
     "read_only": true
   },
   "done_means": [
-    "when provider_recovery_required is true, api_key_operator_checklist ready is false and blocking_step_names includes recover_failed_providers",
-    "next_blocking_action points to a no-secret recover_failed_providers action with recovery_smoke_command and recovery_smoke_available from next_provider_recovery_action",
-    "when no provider recovery is required, existing setup ready/blocked checklist behavior remains unchanged",
-    "README and DevOps setup guide document recover_failed_providers as the recovery blocking step",
-    "setup docs tests assert recover_failed_providers and provider recovery blocking fields",
-    "fake-key API-key pipeline CLI demonstrates provider recovery required with a recover_failed_providers blocking action and no secrets",
+    "when provider_recovery_required is true, api_key_operator_checklist status is conflict and current_step is recover_failed_providers",
+    "when no provider recovery is required, api_key_operator_checklist status and current_step keep existing setup behavior",
+    "fake-key API-key pipeline CLI demonstrates status=conflict and current_step=recover_failed_providers without secrets",
+    "README and DevOps setup guide document the recovery status/current_step behavior",
+    "setup docs tests assert the recovery status/current_step field guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key operator checklist provider recovery blocker gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key operator checklist recovery status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

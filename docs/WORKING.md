@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_BLOCKER_VERIFIED
-gate_id: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_BLOCKER_GATE
+status: API_KEY_OPERATOR_CHECKLIST_RECOVERY_STATUS_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_RECOVERY_STATUS_GATE
 review_tier: S1_small
 
-next_atomic_step: make provider recovery required state become an explicit API-key operator checklist blocking action
+next_atomic_step: make API-key operator checklist status and current step reflect provider recovery blockers
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,18 +81,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - when provider_recovery_required is true, api_key_operator_checklist ready is false and blocking_step_names includes recover_failed_providers
-  - next_blocking_action points to a no-secret recover_failed_providers action with recovery_smoke_command and recovery_smoke_available from next_provider_recovery_action
-  - when no provider recovery is required, existing setup ready/blocked checklist behavior remains unchanged
-  - README and DevOps setup guide document recover_failed_providers as the recovery blocking step
-  - setup docs tests assert recover_failed_providers and provider recovery blocking fields
-  - fake-key API-key pipeline CLI demonstrates provider recovery required with a recover_failed_providers blocking action and no secrets
+  - when provider_recovery_required is true, api_key_operator_checklist status is conflict and current_step is recover_failed_providers
+  - when no provider recovery is required, api_key_operator_checklist status and current_step keep existing setup behavior
+  - fake-key API-key pipeline CLI demonstrates status=conflict and current_step=recover_failed_providers without secrets
+  - README and DevOps setup guide document the recovery status/current_step behavior
+  - setup docs tests assert the recovery status/current_step field guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key operator checklist provider recovery blocker gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key operator checklist recovery status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_BLOCKER_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_BLOCKER_GATE
+review_tier: S1_small
+
+next_atomic_step: make provider recovery required state become an explicit API-key operator checklist blocking action
 ```
 
 Previous completed directive:
@@ -1889,6 +1899,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Operator Checklist Recovery Status Gate is verified. When
+provider recovery is required, `api_key_operator_checklist.status` now reports
+`conflict` and `current_step` reports `recover_failed_providers`, matching the
+existing recovery blocking action. No-recovery setup paths preserve their prior
+status/current_step behavior. Focused tests, fake-key CLI, full pytest, ruff,
+and health_check passed.
+
+```yaml
+api_key_operator_checklist_recovery_status_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - provider recovery required state now makes api_key_operator_checklist.status conflict
+    - provider recovery required state now makes api_key_operator_checklist.current_step recover_failed_providers
+    - no-recovery ready/blocked setup paths keep their existing setup status and current_step values
+    - README and DevOps setup guide document the recovery status/current_step behavior
+    - tests/test_setup_docs.py asserts api_key_operator_checklist.status and current_step guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; api_key_operator_checklist status=conflict and current_step=recover_failed_providers with no secret values"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Operator Checklist Provider Recovery Blocker Gate is verified.
 Provider recovery required state now affects the operator checklist blocking

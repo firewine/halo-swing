@@ -309,7 +309,9 @@ without manually matching error and recovery arrays. The
 next recovery command visible in the same setup checklist. When recovery is
 required, the checklist adds a `recover_failed_providers` blocking step so
 `ready=false`, `blocking_step_names`, and `next_blocking_action` point at the
-rerunnable no-secret recovery smoke command:
+rerunnable no-secret recovery smoke command. In that recovery state,
+`api_key_operator_checklist.status` becomes `conflict` and `current_step`
+becomes `recover_failed_providers`:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
