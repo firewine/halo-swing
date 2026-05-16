@@ -471,8 +471,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `api_key_integration_status_summary`, `api_key_next_action_summary`,
 `setup_status_summary`, `api_key_requirements_summary`,
-`api_key_command_summary`, `api_key_dotenv_loading_summary`,
-`api_key_pipeline_failure_summary`,
+`api_key_command_summary`, `api_key_setup_file_summary`,
+`api_key_dotenv_loading_summary`, `api_key_pipeline_failure_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
@@ -488,6 +488,12 @@ It also keeps `api_key_command_summary`
 `provider_smoke_commands`, `provider_smoke_command_count`, and
 `next_provider_smoke_command_name`, so the compact response still shows the
 exact local smoke commands to run after API keys are configured.
+It keeps `api_key_setup_file_summary`
+(`api_key_setup_file_summary.v1`) with `.env.example`/`.env` source and target
+status, `copy_required`, `copy_command`, `preferred_env_keys`,
+configured/missing provider families, and `ready_to_run_live_smoke`, so the
+compact response still shows whether the local setup file must be copied before
+API keys are filled.
 It keeps `api_key_dotenv_loading_summary`
 (`api_key_dotenv_loading_summary.v1`) with `dotenv_loading_enabled`,
 `disabled`, `disabled_env_key`, `configuration_precedence`, `.env` file status,

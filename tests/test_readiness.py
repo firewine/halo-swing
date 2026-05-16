@@ -4345,6 +4345,39 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         news_configured_env_keys=[],
         ready_to_run_live_smoke=False,
     )
+    assert payload["api_key_setup_file_summary"] == {
+        "schema_version": "api_key_setup_file_summary.v1",
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": False,
+        "copy_required": True,
+        "copy_command": {
+            "name": "copy_env_example_to_env",
+            "command": "cp .env.example .env",
+            "required": True,
+            "source_path": ".env.example",
+            "target_path": ".env",
+            "network_call": False,
+            "mutates_local_state": True,
+            "secret_values_returned": False,
+        },
+        "preferred_env_keys": [
+            "POLYGON_API_KEY",
+            "FRED_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "preferred_env_key_count": 3,
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_provider_family_count": 0,
+        "required_provider_family_count": 3,
+        "next_setup_step": "prepare_dotenv",
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["api_key_dotenv_loading_summary"] == {
         "schema_version": "api_key_dotenv_loading_summary.v1",
         "dotenv_supported": True,
@@ -4409,6 +4442,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "recording_smoke_summary" in payload["omitted_sections"]
     assert "api_key_requirements_summary" not in payload["omitted_sections"]
     assert "api_key_command_summary" not in payload["omitted_sections"]
+    assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
@@ -4422,6 +4456,43 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["order_submission"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    setup_file_summary = payload["api_key_setup_file_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert setup_file_summary["schema_version"] == "api_key_setup_file_summary.v1"
+    assert setup_file_summary["source_path"] == ".env.example"
+    assert setup_file_summary["target_path"] == ".env"
+    assert setup_file_summary["copy_command"]["command"] == "cp .env.example .env"
+    assert setup_file_summary["preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert setup_file_summary["configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert setup_file_summary["missing_provider_families"] == []
+    assert setup_file_summary["ready_to_run_live_smoke"] is True
+    assert setup_file_summary["secret_values_returned"] is False
+    assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

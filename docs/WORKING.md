@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_DOTENV_LOADING_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_DOTENV_LOADING_GATE
+status: API_KEY_SUMMARY_ONLY_SETUP_FILE_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_SETUP_FILE_GATE
 review_tier: S1_small
 
-next_atomic_step: keep API-key dotenv loading summary in API-key pipeline summary-only output
+next_atomic_step: keep API-key setup file summary in API-key pipeline summary-only output
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,27 +74,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - HALO_SWING_DISABLE_DOTENV=true PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_dotenv_loading_summary"]; print(summary["schema_version"], summary["dotenv_loading_enabled"], summary["disabled_env_key"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_setup_file_summary"]; print(summary["schema_version"], summary["preferred_env_key_count"], summary["ready_to_run_live_smoke"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary_only=true returns top-level api_key_dotenv_loading_summary without nested full smoke sections
-  - api_key_dotenv_loading_summary exposes dotenv_supported, dotenv_loading_enabled, disabled, disabled_env_key, configuration_precedence, .env file status, next_setup_step, ready_to_run_live_smoke, and safety flags without secret values
-  - summary_only=true no longer lists api_key_dotenv_loading_summary in omitted_sections
-  - focused tests cover default dotenv loading summary and disabled dotenv summary-only output
-  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_dotenv_loading_summary
-  - README and DevOps setup guide document summary-only api_key_dotenv_loading_summary
-  - setup docs tests assert summary-only api_key_dotenv_loading_summary guidance
+  - summary_only=true returns top-level api_key_setup_file_summary without nested full smoke sections
+  - api_key_setup_file_summary exposes source_path, target_path, source_exists, target_exists, copy_required, copy_command, preferred_env_keys, configured_provider_families, missing_provider_families, next_setup_step, ready_to_run_live_smoke, and safety flags without secret values
+  - summary_only=true no longer lists api_key_setup_file_summary in omitted_sections
+  - focused tests cover default blocked setup file summary and fully configured API-key setup file summary-only output
+  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_setup_file_summary
+  - README and DevOps setup guide document summary-only api_key_setup_file_summary
+  - setup docs tests assert summary-only api_key_setup_file_summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only dotenv loading gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only setup file gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_DOTENV_LOADING_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_DOTENV_LOADING_GATE
+review_tier: S1_small
+
+next_atomic_step: keep API-key dotenv loading summary in API-key pipeline summary-only output
 ```
 
 Previous completed directive:
@@ -2079,14 +2090,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Summary-Only Dotenv Loading Gate is verified.
+Summary: API Key Summary-Only Setup File Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now keeps the no-secret
-`api_key_dotenv_loading_summary`, including dotenv enabled/disabled state,
-precedence, `.env` file status, and setup readiness. Focused tests, fake-key
-CLI, full pytest, ruff, and health_check passed.
+`api_key_setup_file_summary`, including `.env.example`/`.env` file state, copy
+command, preferred env keys, configured/missing provider families, and setup
+readiness. Focused tests, fake-key CLI, full pytest, ruff, and health_check
+passed.
 
 ```yaml
-api_key_summary_only_dotenv_loading_gate:
+api_key_summary_only_setup_file_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2099,13 +2111,13 @@ api_key_summary_only_dotenv_loading_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary_only=true returns top-level api_key_dotenv_loading_summary without nested full smoke sections
-    - api_key_dotenv_loading_summary exposes dotenv_supported, dotenv_loading_enabled, disabled, disabled_env_key, configuration_precedence, .env file status, next_setup_step, ready_to_run_live_smoke, and safety flags without secret values
-    - summary_only=true no longer lists api_key_dotenv_loading_summary in omitted_sections
-    - focused tests cover default dotenv loading summary and disabled dotenv summary-only output
-    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_dotenv_loading_summary
-    - README and DevOps setup guide document summary-only api_key_dotenv_loading_summary
-    - tests/test_setup_docs.py asserts summary-only api_key_dotenv_loading_summary guidance
+    - summary_only=true returns top-level api_key_setup_file_summary without nested full smoke sections
+    - api_key_setup_file_summary exposes source_path, target_path, source_exists, target_exists, copy_required, copy_command, preferred_env_keys, configured_provider_families, missing_provider_families, next_setup_step, ready_to_run_live_smoke, and safety flags without secret values
+    - summary_only=true no longer lists api_key_setup_file_summary in omitted_sections
+    - focused tests cover default blocked setup file summary and fully configured API-key setup file summary-only output
+    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_setup_file_summary
+    - README and DevOps setup guide document summary-only api_key_setup_file_summary
+    - tests/test_setup_docs.py asserts summary-only api_key_setup_file_summary guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2116,14 +2128,14 @@ api_key_summary_only_dotenv_loading_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; no-secret api_key_dotenv_loading_summary returned with dotenv_loading_enabled=true"
-    - command: HALO_SWING_DISABLE_DOTENV=true PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_dotenv_loading_summary"]; print(summary["schema_version"], summary["dotenv_loading_enabled"], summary["disabled_env_key"], summary["secret_values_returned"])'
-      result: "api_key_dotenv_loading_summary.v1 False HALO_SWING_DISABLE_DOTENV False"
+      result: "exit 0; no-secret api_key_setup_file_summary returned with preferred key names"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_setup_file_summary"]; print(summary["schema_version"], summary["preferred_env_key_count"], summary["ready_to_run_live_smoke"], summary["secret_values_returned"])'
+      result: "api_key_setup_file_summary.v1 3 True False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "783 passed"
+      result: "784 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
