@@ -729,6 +729,9 @@ def expected_api_key_operator_checklist(
     blocking_step_names = [
         str(step["name"]) for step in steps if step.get("status") != "ready"
     ]
+    ready_step_names = [
+        str(step["name"]) for step in steps if step.get("status") == "ready"
+    ]
     next_blocking_action = next(
         (step for step in steps if step.get("status") != "ready"),
         None,
@@ -738,7 +741,10 @@ def expected_api_key_operator_checklist(
         "status": status,
         "current_step": current_step,
         "ready": not blocking_step_names,
+        "ready_step_names": ready_step_names,
+        "ready_step_count": len(ready_step_names),
         "blocking_step_names": blocking_step_names,
+        "blocking_step_count": len(blocking_step_names),
         "next_blocking_step": blocking_step_names[0] if blocking_step_names else None,
         "next_blocking_action": next_blocking_action,
         "steps": steps,
@@ -2607,6 +2613,14 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             ready_to_run_live_smoke=True,
         )
     )
+    assert payload["api_key_operator_checklist"]["ready_step_names"] == [
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+        "run_provider_smokes",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert payload["api_key_operator_checklist"]["ready_step_count"] == 4
+    assert payload["api_key_operator_checklist"]["blocking_step_count"] == 0
     assert payload["api_key_operator_checklist"]["next_blocking_action"] is None
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
@@ -2779,6 +2793,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
             ready_to_run_live_smoke=False,
         )
     )
+    assert payload["api_key_operator_checklist"]["ready_step_names"] == []
+    assert payload["api_key_operator_checklist"]["ready_step_count"] == 0
+    assert payload["api_key_operator_checklist"]["blocking_step_count"] == 4
     assert payload["api_key_operator_checklist"]["next_blocking_action"] == {
         "name": "prepare_dotenv",
         "status": "pending",

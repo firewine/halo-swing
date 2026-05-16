@@ -1813,6 +1813,9 @@ def _api_key_pipeline_operator_checklist(
     blocking_step_names = [
         str(step["name"]) for step in steps if step.get("status") != "ready"
     ]
+    ready_step_names = [
+        str(step["name"]) for step in steps if step.get("status") == "ready"
+    ]
     next_blocking_action = next(
         (step for step in steps if step.get("status") != "ready"),
         None,
@@ -1822,7 +1825,10 @@ def _api_key_pipeline_operator_checklist(
         "status": setup_status_summary.get("status"),
         "current_step": setup_status_summary.get("next_setup_step"),
         "ready": not blocking_step_names,
+        "ready_step_names": ready_step_names,
+        "ready_step_count": len(ready_step_names),
         "blocking_step_names": blocking_step_names,
+        "blocking_step_count": len(blocking_step_names),
         "next_blocking_step": blocking_step_names[0] if blocking_step_names else None,
         "next_blocking_action": next_blocking_action,
         "steps": steps,

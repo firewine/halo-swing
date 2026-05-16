@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_NEXT_ACTION_VERIFIED
-gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_NEXT_ACTION_GATE
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_PROGRESS_GATE
 review_tier: S1_small
 
-next_atomic_step: add next_blocking_action to the top-level api_key_operator_checklist so the first blocked API-key-only setup action includes its no-secret command or key guidance without reading every step
+next_atomic_step: add ready_step_names, ready_step_count, and blocking_step_count to the top-level api_key_operator_checklist so API-key-only setup progress is visible without counting every step
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,15 +81,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke top-level api_key_operator_checklist includes next_blocking_action without returning secrets
-  - ready fake-live path asserts next_blocking_action is null and blocked fixture-default path asserts prepare_dotenv action details
-  - README and DevOps guide document checklist next_blocking_action in pipeline smoke payloads
+  - run_api_key_pipeline_smoke top-level api_key_operator_checklist includes ready_step_names, ready_step_count, and blocking_step_count without returning secrets
+  - ready fake-live and blocked fixture-default paths assert checklist progress counts and ready step names
+  - README and DevOps guide document checklist progress fields in pipeline smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline operator checklist next-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline operator checklist progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_NEXT_ACTION_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_NEXT_ACTION_GATE
+review_tier: S1_small
+
+next_atomic_step: add next_blocking_action to the top-level api_key_operator_checklist so the first blocked API-key-only setup action includes its no-secret command or key guidance without reading every step
 ```
 
 Previous completed directive:
@@ -1589,6 +1600,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Operator Checklist Progress Gate is verified.
+`run_api_key_pipeline_smoke` top-level `api_key_operator_checklist` now exposes
+`ready_step_names`, `ready_step_count`, and `blocking_step_count` so API-key-only
+setup progress is visible without counting every step. Ready fake-live and
+blocked fixture-default paths assert progress counts and ready step names
+without secret values. README and DevOps guide document the new fields. Focused
+tests passed with 3 tests, full pytest passed with 760 tests, and ruff,
+health_check, and one-shot pipeline harness commands passed. With local `.env`
+absent, the one-shot pipeline harness exits 0 and returns `ready_step_count=0`
+and `blocking_step_count=4` without secrets.
+
+```yaml
+api_key_pipeline_operator_checklist_progress_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_api_key_pipeline_smoke top-level api_key_operator_checklist includes ready_step_names, ready_step_count, and blocking_step_count without returning secrets
+    - ready fake-live and blocked fixture-default paths assert checklist progress counts and ready step names
+    - README and DevOps guide document checklist progress fields in pipeline smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned api_key_operator_checklist ready_step_count=0, blocking_step_count=4, and no ready step names without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Operator Checklist Next-Action Gate is verified.
 `run_api_key_pipeline_smoke` top-level `api_key_operator_checklist` now exposes
