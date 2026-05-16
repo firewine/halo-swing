@@ -251,7 +251,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_work
 
 To verify the live signal can also pass through the JSONL recording path without
 leaving a runtime file, use `run_live_recording_smoke`; it uses an ephemeral
-ledger unless you explicitly provide `ledger_path`:
+ledger unless you explicitly provide `ledger_path`. Its payload includes
+`live_data_setup_summary` so recording smoke runs show API-key setup readiness
+and next smoke guidance before any retained ledger is requested:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit

@@ -412,7 +412,10 @@ returning secrets. Its payload also includes `live_data_setup_summary` so direct
 workflow smoke runs show API-key setup readiness, selected provider route
 evidence, and the next smoke command without exposing secret values. Use
 `run_live_recording_smoke` to verify that a generated live signal can also pass
-through `record_signal` with live run-journal metadata.
+through `record_signal` with live run-journal metadata. Its payload also
+includes `live_data_setup_summary` so recording smoke runs show API-key setup
+readiness, selected provider route evidence, and the next smoke command without
+exposing secret values.
 By default it uses an ephemeral JSONL ledger and leaves no runtime file; provide
 `ledger_path` only when you intentionally want a retained local smoke ledger.
 Use `run_api_key_pipeline_smoke` as the single post-setup check after filling

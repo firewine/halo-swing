@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_SIGNAL_WORKFLOW_SETUP_SUMMARY_VERIFIED
-gate_id: LIVE_SIGNAL_WORKFLOW_SETUP_SUMMARY_GATE
+status: LIVE_RECORDING_SETUP_SUMMARY_VERIFIED
+gate_id: LIVE_RECORDING_SETUP_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: add live_data_setup_summary to run_live_signal_workflow_smoke so direct workflow smoke runs show API-key setup readiness and next smoke guidance without returning secrets
+next_atomic_step: add live_data_setup_summary to run_live_recording_smoke so recording smoke runs show API-key setup readiness and next smoke guidance without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,23 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 
 done_means:
-  - run_live_signal_workflow_smoke includes live_data_setup_summary derived from get_live_data_provider_route
-  - ready fake workflow smoke reports ready_to_run_live_smoke true and next_smoke_command run_api_key_pipeline_smoke
+  - run_live_recording_smoke includes live_data_setup_summary derived from get_live_data_provider_route
+  - ready fake recording smoke reports ready_to_run_live_smoke true and next_smoke_command run_api_key_pipeline_smoke
   - fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values
-  - README and DevOps guide document live_data_setup_summary in workflow smoke payloads
+  - README and DevOps guide document live_data_setup_summary in recording smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live signal workflow setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live recording setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_SIGNAL_WORKFLOW_SETUP_SUMMARY_VERIFIED
+gate_id: LIVE_SIGNAL_WORKFLOW_SETUP_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add live_data_setup_summary to run_live_signal_workflow_smoke so direct workflow smoke runs show API-key setup readiness and next smoke guidance without returning secrets
 ```
 
 Previous completed directive:
@@ -1304,6 +1315,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Recording Setup Summary Gate is verified.
+`run_live_recording_smoke` now includes `live_data_setup_summary` derived from
+`get_live_data_provider_route`, so recording smoke runs show API-key readiness,
+provider route evidence, and the next smoke command without returning secret
+values. Focused tests passed with 3 tests, full pytest passed with 760 tests,
+and ruff, health_check, and the recording smoke harness command passed.
+
+```yaml
+live_recording_setup_summary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - run_live_recording_smoke includes live_data_setup_summary derived from get_live_data_provider_route
+    - ready fake recording smoke reports ready_to_run_live_smoke true and next_smoke_command run_api_key_pipeline_smoke
+    - fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values
+    - README and DevOps guide document live_data_setup_summary in recording smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+      result: "passed, fixture defaults returned blocked live_data_setup_summary with ReplayMarketDataProvider route evidence"
+```
+
+Previous verification:
 
 Summary: Live Signal Workflow Setup Summary Gate is verified.
 `run_live_signal_workflow_smoke` now includes `live_data_setup_summary` derived

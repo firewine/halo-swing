@@ -562,6 +562,11 @@ def _run_live_recording_smoke_with_ledger(
     from halo_swing_mcp.tools import recording as recording_tools
     from halo_swing_mcp.tools import scoring as scoring_tools
 
+    provider_route = get_live_data_provider_route()
+    api_key_status = (
+        _optional_mapping(provider_route.get("api_key_status"))
+        or get_live_data_api_key_status()
+    )
     signal = scoring_tools.score_leverage_swing(asset=asset, timeframe=timeframe)
     recorded = recording_tools.record_signal(signal=signal, ledger_path=ledger_path)
     checks: list[dict[str, Any]] = []
@@ -579,6 +584,10 @@ def _run_live_recording_smoke_with_ledger(
             "score_leverage_swing",
             "record_signal",
         ],
+        "live_data_setup_summary": _live_data_setup_summary(
+            api_key_status,
+            provider_route,
+        ),
         "signal_summary": _workflow_signal_summary(signal),
         "recording_summary": _recording_summary(recorded, ledger_persisted),
         "checks": checks,
