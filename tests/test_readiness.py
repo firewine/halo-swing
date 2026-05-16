@@ -31,6 +31,7 @@ READINESS_ENV_KEYS = (
     "HALO_SWING_BINANCE_TESTNET",
     "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+    "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED",
     "HALO_SWING_MARKET_DATA_MODE",
     "HALO_SWING_MARKET_DATA_SOURCE",
     "HALO_SWING_MARKET_DATA_API_KEY",
@@ -1390,6 +1391,7 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
             [
                 f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
                 "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true",
+                "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true",
                 *(f"{key}={value}" for key, value in secret_env.items()),
             ]
         ),
@@ -1400,6 +1402,7 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     hermes_gate = payload["gates"]["hermes"]
     telegram_gate = payload["gates"]["telegram"]
+    binance_gate = payload["gates"]["binance_testnet_read_only"]
     live_data_gate = payload["gates"]["live_data"]
     serialized = json.dumps(payload, sort_keys=True)
 
@@ -1413,6 +1416,9 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
     assert telegram_gate["evidence"]["bot_token_configured"] is True
     assert telegram_gate["evidence"]["gateway_configured"] is True
     assert telegram_gate["evidence"]["secret_values_returned"] is False
+    assert binance_gate["status"] == "blocked"
+    assert binance_gate["missing"] == ["encrypted_binance_testnet_credentials"]
+    assert binance_gate["evidence"]["manual_passphrase_confirmed"] is True
     assert live_data_gate["status"] == "ready"
     assert live_data_gate["missing"] == []
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
@@ -1713,6 +1719,87 @@ def test_binance_readiness_requires_passphrase_confirmation(tmp_path: Path) -> N
     assert "abcde12345key" not in serialized
     assert "super-secret" not in serialized
     assert "local-passphrase" not in serialized
+
+
+def test_binance_readiness_accepts_env_passphrase_confirmation(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED", " true ")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(binance_credentials_path=str(credentials_path))
+    binance_gate = payload["gates"]["binance_testnet_read_only"]
+    serialized = json.dumps(payload)
+
+    assert binance_gate["status"] == "ready"
+    assert binance_gate["missing"] == []
+    assert binance_gate["evidence"]["credentials"]["configured"] is True
+    assert binance_gate["evidence"]["manual_passphrase_confirmed"] is True
+    assert "abcde12345key" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+
+
+def test_binance_readiness_explicit_passphrase_confirmation_overrides_env(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED", "true")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        binance_credentials_path=str(credentials_path),
+        binance_passphrase_confirmed=False,
+    )
+    binance_gate = payload["gates"]["binance_testnet_read_only"]
+
+    assert binance_gate["status"] == "blocked"
+    assert binance_gate["missing"] == ["manual_credential_passphrase_at_smoke_time"]
+    assert binance_gate["evidence"]["manual_passphrase_confirmed"] is False
+
+
+def test_binance_readiness_rejects_env_passphrase_confirmation_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED", "yes")
+    get_settings.cache_clear()
+
+    def fail_credential_status(*_args, **_kwargs):
+        raise AssertionError(
+            "credential status must not run before Binance passphrase env validation"
+        )
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credential_status,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED must be 'true' or 'false'",
+    ):
+        get_integration_readiness(
+            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+        )
 
 
 def test_live_order_submission_requires_explicit_approval(

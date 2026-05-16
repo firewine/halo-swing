@@ -482,7 +482,7 @@ def get_integration_readiness(
     migration_go_approved: bool = False,
     repository_go_approved: bool = False,
     binance_credentials_path: str | None = None,
-    binance_passphrase_confirmed: bool = False,
+    binance_passphrase_confirmed: bool | None = None,
     binance_trade_only_permission_attested: bool = False,
     live_order_approved: bool = False,
     btc_risk_settings_path: str | None = None,

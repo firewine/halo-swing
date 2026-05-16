@@ -28,6 +28,9 @@ HERMES_READINESS_KEYS = {
     "HALO_SWING_HERMES_CONFIG_PATH",
     "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED",
 }
+BINANCE_READINESS_KEYS = {
+    "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED",
+}
 DOTENV_ISOLATION_KEY = "HALO_SWING_DISABLE_DOTENV"
 
 
@@ -66,6 +69,14 @@ def test_env_example_hermes_readiness_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 
     for key in HERMES_READINESS_KEYS:
+        assert key in assignments
+        assert assignments[key] == ""
+
+
+def test_env_example_binance_readiness_keys_are_blank_placeholders() -> None:
+    assignments = _env_assignments()
+
+    for key in BINANCE_READINESS_KEYS:
         assert key in assignments
         assert assignments[key] == ""
 

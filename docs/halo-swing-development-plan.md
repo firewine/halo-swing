@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.641 Binance Passphrase Confirmation Env Flag Gate Record - 2026-05-16
+
+### A. 목적
+
+Binance testnet read-only smoke readiness는 encrypted credential과 수동
+passphrase 준비 확인을 둘 다 요구한다. Credential path는 `.env`에서 재현할 수
+있지만, passphrase 준비 확인은 public input으로만 전달할 수 있었다. 이번 slice는
+passphrase 자체를 저장하지 않고, non-secret boolean
+`HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true`만 local env/dotenv에서 읽어
+readiness를 재현할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness accepts HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true from exported env or local dotenv when the public input is omitted
+  - explicit binance_passphrase_confirmed input still overrides the environment flag
+  - invalid HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED values are rejected before Binance credential status reads
+  - .env.example includes a blank HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED placeholder
+  - README and DevOps setup docs describe the non-secret Binance passphrase confirmation flag without storing the passphrase
+  - tests lock env-backed Binance read-only smoke passphrase readiness without exposing secrets
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - passphrase persistence
+  - real secret values
+  - Binance network call
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q -> 56 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_passphrase_env.enc.json"}' --no-audit -> passed, safe credential status returned without secret values
+  - HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_credentials_path":"/private/tmp/halo_swing_binance_passphrase_env.enc.json"}' --no-audit -> passed, Binance testnet read-only gate ready without storing passphrase
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 720 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.640 Hermes Registration Env Flag Gate Record - 2026-05-16
 
 ### A. 목적

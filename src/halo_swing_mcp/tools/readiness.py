@@ -16,6 +16,7 @@ from halo_swing_mcp.secret_store import get_binance_credentials_status
 HERMES_SERVER_COMMAND = "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.server"
 HERMES_CONFIG_PATH_ENV = "HALO_SWING_HERMES_CONFIG_PATH"
 HERMES_MCP_CONFIG_REGISTERED_ENV = "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED"
+BINANCE_PASSPHRASE_CONFIRMED_ENV = "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED"
 
 
 def get_integration_readiness(
@@ -28,7 +29,7 @@ def get_integration_readiness(
     migration_go_approved: bool = False,
     repository_go_approved: bool = False,
     binance_credentials_path: str | None = None,
-    binance_passphrase_confirmed: bool = False,
+    binance_passphrase_confirmed: bool | None = None,
     binance_trade_only_permission_attested: bool = False,
     live_order_approved: bool = False,
     btc_risk_settings_path: str | None = None,
@@ -68,9 +69,8 @@ def get_integration_readiness(
         binance_credentials_path,
         "binance_credentials_path",
     )
-    normalized_binance_passphrase_confirmed = _normalize_boolean(
+    normalized_binance_passphrase_confirmed = _resolve_binance_passphrase_confirmed(
         binance_passphrase_confirmed,
-        "binance_passphrase_confirmed",
     )
     normalized_binance_trade_only_permission_attested = _normalize_boolean(
         binance_trade_only_permission_attested,
@@ -202,6 +202,15 @@ def _resolve_hermes_mcp_config_registered(value: bool | None) -> bool:
     if env_value is None or not env_value.strip():
         return False
     return _normalize_env_boolean(env_value, HERMES_MCP_CONFIG_REGISTERED_ENV)
+
+
+def _resolve_binance_passphrase_confirmed(value: bool | None) -> bool:
+    if value is not None:
+        return _normalize_boolean(value, "binance_passphrase_confirmed")
+    env_value = get_config_value(BINANCE_PASSPHRASE_CONFIRMED_ENV)
+    if env_value is None or not env_value.strip():
+        return False
+    return _normalize_env_boolean(env_value, BINANCE_PASSPHRASE_CONFIRMED_ENV)
 
 
 def _telegram_readiness(

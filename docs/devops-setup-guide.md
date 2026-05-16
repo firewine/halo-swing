@@ -382,6 +382,17 @@ not sufficient. Confirm passphrase availability with a non-secret boolean only:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_passphrase_confirmed":true}'
 ```
 
+For reproducible local readiness, set the same non-secret confirmation in
+`.env` after verifying that the credential passphrase is available at smoke
+time:
+
+```bash
+HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true
+```
+
+This flag does not store or reveal the passphrase; the read-only account
+snapshot still requires the passphrase to be typed at smoke time.
+
 Live BTC order submission readiness is separate from read-only smoke readiness.
 It remains blocked unless all order-specific approvals are represented without
 secrets: explicit live-order approval, `HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true`,

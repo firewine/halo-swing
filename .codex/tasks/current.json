@@ -1,9 +1,9 @@
 {
-  "gate_id": "HERMES_REGISTRATION_ENV_FLAG_GATE",
+  "gate_id": "BINANCE_PASSPHRASE_CONFIRMATION_ENV_FLAG_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.640",
-  "next_atomic_step": "let get_integration_readiness read Hermes MCP registration from a non-secret dotenv/env flag",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.641",
+  "next_atomic_step": "let get_integration_readiness read Binance read-only smoke passphrase confirmation from a non-secret dotenv/env flag",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     ".env.example",
@@ -21,7 +21,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.640",
+    "docs/halo-swing-development-plan.md#3.641",
     "src/halo_swing_mcp/tools/readiness.py",
     "src/halo_swing_mcp/server.py",
     ".env.example",
@@ -58,15 +58,15 @@
     "read_only": true
   },
   "done_means": [
-    "get_integration_readiness accepts HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true from exported env or local dotenv when the public input is omitted",
-    "explicit hermes_mcp_config_registered input still overrides the environment flag",
-    "invalid HALO_SWING_HERMES_MCP_CONFIG_REGISTERED values are rejected before Binance credential status reads",
-    ".env.example includes a blank HALO_SWING_HERMES_MCP_CONFIG_REGISTERED placeholder",
-    "README and DevOps setup docs describe the non-secret Hermes registration flag",
-    "tests lock env-backed Hermes readiness without exposing secrets",
+    "get_integration_readiness accepts HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true from exported env or local dotenv when the public input is omitted",
+    "explicit binance_passphrase_confirmed input still overrides the environment flag",
+    "invalid HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED values are rejected before Binance credential status reads",
+    ".env.example includes a blank HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED placeholder",
+    "README and DevOps setup docs describe the non-secret Binance passphrase confirmation flag without storing the passphrase",
+    "tests lock env-backed Binance read-only smoke passphrase readiness without exposing secrets",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified Hermes registration env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified Binance passphrase confirmation env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }
