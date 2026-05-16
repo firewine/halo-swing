@@ -396,7 +396,9 @@ market, macro, and news API keys; its payload now includes the same no-network
 provider route evidence before provider smoke outputs. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting
-orders, or returning secrets. After provider-level smoke passes, use
+orders, or returning secrets. Its top-level `provider_route_summary` mirrors the
+live data smoke route evidence for easier setup triage. After provider-level
+smoke passes, use
 `run_live_signal_workflow_smoke` to verify the same API-key-backed live
 boundary reaches `score_leverage_swing`, `generate_trade_guide`,
 `evaluate_position`, and `generate_latest_signal_report` without starting

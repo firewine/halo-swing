@@ -796,6 +796,19 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
             "schema_version": "live_data_smoke_run.v1",
             "status": "ok",
             "input": {"symbols": symbols, "topic": topic},
+            "provider_route": {
+                "schema_version": "live_data_provider_route.v1",
+                "status": "ready",
+                "provider_factory": "get_market_data_provider",
+                "selected_provider_classes": [
+                    "PolygonMarketDataProvider",
+                    "FredMacroDataProvider",
+                    "NewsApiDataProvider",
+                ],
+                "missing": [],
+                "network_call": False,
+                "secret_values_returned": False,
+            },
             "network_call": True,
             "live_data_required": True,
             "send_call": False,
@@ -812,6 +825,19 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
     assert payload["status"] == "blocked"
     assert payload["readiness_status"] == "blocked"
     assert payload["live_data_smoke_status"] == "ok"
+    assert payload["provider_route_summary"] == {
+        "schema_version": "live_data_provider_route.v1",
+        "status": "ready",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "missing": [],
+        "network_call": False,
+        "secret_values_returned": False,
+    }
     assert payload["network_call"] is True
     assert payload["live_data_required"] is True
     assert payload["hermes_runtime_started"] is False
@@ -840,6 +866,12 @@ def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effect
     assert payload["status"] == "blocked"
     assert payload["readiness_status"] == "blocked"
     assert payload["live_data_smoke_status"] == "conflict"
+    assert payload["provider_route_summary"]["status"] == "blocked"
+    assert payload["provider_route_summary"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert payload["provider_route_summary"]["network_call"] is False
+    assert payload["provider_route_summary"]["secret_values_returned"] is False
     assert payload["network_call"] is False
     assert payload["live_data_required"] is False
     assert payload["hermes_runtime_started"] is False

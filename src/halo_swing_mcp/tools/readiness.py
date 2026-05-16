@@ -400,6 +400,7 @@ def run_integration_smoke(
 
     readiness = get_integration_readiness()
     live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
+    provider_route = _optional_mapping(live_data_smoke.get("provider_route")) or {}
     readiness_ready = readiness["status"] == "ready"
     live_data_smoke_ok = live_data_smoke["status"] == "ok"
     return {
@@ -409,6 +410,9 @@ def run_integration_smoke(
         "live_data_smoke_status": live_data_smoke["status"],
         "readiness": readiness,
         "live_data_smoke": live_data_smoke,
+        "provider_route_summary": _api_key_pipeline_provider_route_summary(
+            provider_route,
+        ),
         "network_call": live_data_smoke["network_call"],
         "live_data_required": live_data_smoke["live_data_required"],
         "hermes_runtime_started": False,

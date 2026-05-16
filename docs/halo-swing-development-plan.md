@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.663 Integration Smoke Provider Route Summary Gate Record - 2026-05-16
+
+### A. 목적
+
+`run_integration_smoke`가 readiness와 live data smoke를 한 payload로 묶어도, 최상위
+결과만 보면 어떤 provider factory route가 선택됐는지 바로 보이지 않았다. 이번 slice는
+nested live data smoke의 `provider_route` evidence를 `provider_route_summary`로
+노출해 사용자가 API key만 채운 뒤 integration smoke 한 번으로 선택된 route를 확인할 수
+있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_integration_smoke includes provider_route_summary derived from run_live_data_smoke provider_route
+  - integration smoke remains non-mutating and does not start Hermes, send Telegram, submit orders, or return secrets
+  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence
+  - README and DevOps guide document provider route summary in integration smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_integration_smoke_combines_readiness_and_live_data_smoke tests/test_readiness.py::test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status blocked with blocked provider route summary without API keys as expected
+```
+
 ## 3.662 Live Data Smoke Route Evidence Gate Record - 2026-05-16
 
 ### A. 목적
