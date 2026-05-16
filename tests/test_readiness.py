@@ -2607,6 +2607,74 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         item["secret_values_returned"] is False
         for item in recovery_checklist["items"]
     )
+    summary_payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+        summary_only=True,
+    )
+    provider_recovery_summary = summary_payload[
+        "api_key_provider_recovery_summary"
+    ]
+    assert provider_recovery_summary == {
+        "schema_version": "api_key_provider_recovery_summary.v1",
+        "status": "conflict",
+        "provider_recovery_required": True,
+        "provider_error_count": 3,
+        "provider_recovery_smoke_count": 3,
+        "item_count": 3,
+        "next_recovery_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_recovery_smoke_command": payload["provider_recovery_smokes"][0][
+            "command"
+        ],
+        "items": [
+            {
+                "provider_family": "market",
+                "provider": "polygon",
+                "smoke_command_name": "get_market_snapshot_live_smoke",
+                "recovery_smoke_command": payload["provider_recovery_smokes"][0][
+                    "command"
+                ],
+                "recovery_smoke_available": True,
+                "next_setup_action": "verify_provider_credentials_or_network",
+                "exception_type": "RuntimeError",
+                "secret_values_returned": False,
+            },
+            {
+                "provider_family": "macro",
+                "provider": "fred",
+                "smoke_command_name": "get_macro_snapshot_live_smoke",
+                "recovery_smoke_command": payload["provider_recovery_smokes"][1][
+                    "command"
+                ],
+                "recovery_smoke_available": True,
+                "next_setup_action": "verify_provider_credentials_or_network",
+                "exception_type": "RuntimeError",
+                "secret_values_returned": False,
+            },
+            {
+                "provider_family": "news",
+                "provider": "newsapi",
+                "smoke_command_name": "get_news_bundle_live_smoke",
+                "recovery_smoke_command": payload["provider_recovery_smokes"][2][
+                    "command"
+                ],
+                "recovery_smoke_available": True,
+                "next_setup_action": "verify_provider_credentials_or_network",
+                "exception_type": "RuntimeError",
+                "secret_values_returned": False,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert "api_key_provider_recovery_checklist" in summary_payload[
+        "omitted_sections"
+    ]
+    assert "api_key_provider_recovery_checklist" not in summary_payload
+    assert "provider_recovery_smokes" not in summary_payload
     operator_checklist = payload["api_key_operator_checklist"]
     assert operator_checklist["provider_recovery_status"] == "conflict"
     assert operator_checklist["provider_recovery_required"] is True
@@ -4262,6 +4330,20 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
     )
     assert payload["api_key_provider_selection_summary"]["status"] == "blocked"
+    assert payload["api_key_provider_recovery_summary"] == {
+        "schema_version": "api_key_provider_recovery_summary.v1",
+        "status": "ok",
+        "provider_recovery_required": False,
+        "provider_error_count": 0,
+        "provider_recovery_smoke_count": 0,
+        "item_count": 0,
+        "next_recovery_smoke_command_name": None,
+        "next_recovery_smoke_command": None,
+        "items": [],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["provider_route_summary"]["status"] == "blocked"
     assert len(payload["checks"]) == 9
     assert payload["failed_provider_families"] == []
@@ -4273,6 +4355,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
+    assert "api_key_provider_recovery_checklist" not in payload
     assert "provider_recovery_smokes" not in payload
     assert payload["network_call"] is False
     assert payload["live_data_required"] is False

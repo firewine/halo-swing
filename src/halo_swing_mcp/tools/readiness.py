@@ -2099,6 +2099,14 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_provider_selection_summary")
         )
         or {},
+        "api_key_provider_recovery_summary": (
+            _api_key_provider_recovery_summary(
+                _optional_mapping(
+                    payload.get("api_key_provider_recovery_checklist")
+                )
+                or {}
+            )
+        ),
         "provider_route_summary": _optional_mapping(
             payload.get("provider_route_summary")
         )
@@ -2139,6 +2147,55 @@ def _api_key_pipeline_summary_only_payload(
         "send_call": False,
         "order_submission": False,
         "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_provider_recovery_summary(
+    recovery_checklist: dict[str, Any],
+) -> dict[str, Any]:
+    raw_items = recovery_checklist.get("items")
+    items = (
+        [item for item in raw_items if isinstance(item, dict)]
+        if isinstance(raw_items, list)
+        else []
+    )
+    compact_items = [_api_key_provider_recovery_summary_item(item) for item in items]
+    first_item = compact_items[0] if compact_items else None
+    return {
+        "schema_version": "api_key_provider_recovery_summary.v1",
+        "status": recovery_checklist.get("status", "ok"),
+        "provider_recovery_required": bool(compact_items),
+        "provider_error_count": recovery_checklist.get("provider_error_count", 0),
+        "provider_recovery_smoke_count": recovery_checklist.get(
+            "provider_recovery_smoke_count",
+            0,
+        ),
+        "item_count": len(compact_items),
+        "next_recovery_smoke_command_name": (
+            first_item.get("smoke_command_name") if first_item else None
+        ),
+        "next_recovery_smoke_command": (
+            first_item.get("recovery_smoke_command") if first_item else None
+        ),
+        "items": compact_items,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_provider_recovery_summary_item(
+    item: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "provider_family": item.get("provider_family"),
+        "provider": item.get("provider"),
+        "smoke_command_name": item.get("smoke_command_name"),
+        "recovery_smoke_command": item.get("recovery_smoke_command"),
+        "recovery_smoke_available": item.get("recovery_smoke_available") is True,
+        "next_setup_action": item.get("next_setup_action"),
+        "exception_type": item.get("exception_type"),
         "secret_values_returned": False,
     }
 

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_SUMMARY_ONLY_VERIFIED
-gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_GATE
+status: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_GATE
 review_tier: S1_small
 
-next_atomic_step: add a summary_only option to run_api_key_pipeline_smoke for compact key-only live setup checks
+next_atomic_step: add compact provider recovery commands to run_api_key_pipeline_smoke summary_only output
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,27 +75,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(asset="TQQQ", timeframe="swing_3d_10d", symbols=["QQQ"], topic="macro", summary_only=True); print(payload["schema_version"], payload["summary_only"], payload["api_key_integration_status_summary"]["api_keys_configured"], payload["api_key_integration_status_summary"]["live_providers_selected"], payload["secret_values_returned"], "live_data_smoke" in payload)'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(asset="TQQQ", timeframe="swing_3d_10d", symbols=["QQQ"], topic="macro", summary_only=True); s=payload["api_key_provider_recovery_summary"]; print(payload["schema_version"], s["schema_version"], s["item_count"], s["next_recovery_smoke_command_name"], payload["secret_values_returned"], "api_key_provider_recovery_checklist" in payload)'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - run_api_key_pipeline_smoke accepts summary_only with default false and preserves existing full payload behavior when omitted
-  - summary_only=true returns compact schema api_key_pipeline_smoke_summary_only.v1 with api_key_integration_status_summary, api_key_next_action_summary, setup_status_summary, api_key_pipeline_failure_summary, api_key_provider_selection_summary, provider_route_summary, checks, and safety flags without nested full smoke payloads
-  - MCP server wrapper forwards summary_only into the registered tool payload
-  - focused tests cover compact summary_only output and unchanged default full payload path
-  - fake-key API-key pipeline CLI demonstrates summary_only output without secrets or nested full smoke payloads
-  - README and DevOps setup guide document the summary_only option
-  - setup docs tests assert summary_only guidance
+  - summary_only=true returns top-level api_key_provider_recovery_summary using schema api_key_provider_recovery_summary.v1
+  - api_key_provider_recovery_summary exposes provider_recovery_required, provider_error_count, provider_recovery_smoke_count, item_count, next_recovery_smoke_command_name, next_recovery_smoke_command, and compact provider-family recovery items without secret values
+  - summary_only=true still omits api_key_provider_recovery_checklist and provider_recovery_smokes full nested payloads
+  - provider-recovery and no-key summary_only paths are covered by focused tests
+  - fake-key API-key pipeline CLI demonstrates provider recovery summary without secrets or nested full recovery payloads
+  - README and DevOps setup guide document api_key_provider_recovery_summary
+  - setup docs tests assert api_key_provider_recovery_summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline summary-only gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only recovery commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_SUMMARY_ONLY_VERIFIED
+gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_GATE
+review_tier: S1_small
+
+next_atomic_step: add a summary_only option to run_api_key_pipeline_smoke for compact key-only live setup checks
 ```
 
 Previous completed directive:
@@ -2013,6 +2024,60 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Summary-Only Recovery Commands Gate is verified.
+`run_api_key_pipeline_smoke` summary-only output now includes compact
+`api_key_provider_recovery_summary` rows for failed provider families, recovery
+smoke command names, recovery commands, and next setup actions without exposing
+the full recovery checklist or provider recovery smoke payloads. Focused tests,
+fake-key CLI, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_summary_only_recovery_commands_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - summary_only=true returns top-level api_key_provider_recovery_summary using schema api_key_provider_recovery_summary.v1
+    - api_key_provider_recovery_summary exposes provider_recovery_required, provider_error_count, provider_recovery_smoke_count, item_count, next_recovery_smoke_command_name, next_recovery_smoke_command, and compact provider-family recovery items without secret values
+    - summary_only=true still omits api_key_provider_recovery_checklist and provider_recovery_smokes full nested payloads
+    - provider-recovery and no-key summary_only paths are covered by focused tests
+    - fake-key API-key pipeline CLI demonstrates provider recovery summary without secrets or nested full recovery payloads
+    - README and DevOps setup guide document api_key_provider_recovery_summary
+    - tests/test_setup_docs.py asserts api_key_provider_recovery_summary guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; provider recovery summary present without nested full recovery payloads"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(asset=\"TQQQ\", timeframe=\"swing_3d_10d\", symbols=[\"QQQ\"], topic=\"macro\", summary_only=True); s=payload[\"api_key_provider_recovery_summary\"]; print(payload[\"schema_version\"], s[\"schema_version\"], s[\"item_count\"], s[\"next_recovery_smoke_command_name\"], payload[\"secret_values_returned\"], \"api_key_provider_recovery_checklist\" in payload)'
+      result: "api_key_pipeline_smoke_summary_only.v1 api_key_provider_recovery_summary.v1 3 get_market_snapshot_live_smoke False False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "777 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Summary-Only Gate is verified.
 `run_api_key_pipeline_smoke` now accepts `summary_only=true` for a compact

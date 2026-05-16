@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.734 API Key Summary-Only Recovery Commands Gate Record - 2026-05-17
+
+### A. 목적
+
+`summary_only=true`는 API-key pipeline smoke 결과를 compact하게 만들지만, provider
+recovery가 필요한 경우에는 다음 recovery command 하나와 count만 보인다. 실제 키를
+넣은 뒤 Polygon/FRED/NewsAPI 중 어떤 provider가 실패했는지와 각 provider smoke를
+어떤 명령으로 다시 실행할지 한 화면에서 확인해야 한다. 이번 slice는 summary-only
+payload에 compact `api_key_provider_recovery_summary`를 추가해 full checklist나
+full `provider_recovery_smokes` payload 없이 provider family별 recovery command를
+노출한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only=true now returns top-level api_key_provider_recovery_summary using schema api_key_provider_recovery_summary.v1
+  - api_key_provider_recovery_summary exposes provider_recovery_required, provider_error_count, provider_recovery_smoke_count, item_count, next_recovery_smoke_command_name, next_recovery_smoke_command, and compact provider-family recovery items without secret values
+  - summary_only=true still omits api_key_provider_recovery_checklist and provider_recovery_smokes full nested payloads
+  - provider-recovery and no-key summary_only paths are covered by focused tests
+  - README and DevOps setup guide document api_key_provider_recovery_summary
+  - tests/test_setup_docs.py asserts api_key_provider_recovery_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; provider recovery summary present without nested full recovery payloads
+  - fake-key direct recovery summary check -> api_key_pipeline_smoke_summary_only.v1 api_key_provider_recovery_summary.v1 3 get_market_snapshot_live_smoke False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 777 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.733 API Key Pipeline Summary-Only Gate Record - 2026-05-17
 
 ### A. 목적

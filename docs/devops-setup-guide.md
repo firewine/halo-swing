@@ -466,8 +466,16 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `api_key_integration_status_summary`, `api_key_next_action_summary`,
 `setup_status_summary`, `api_key_pipeline_failure_summary`,
-`api_key_provider_selection_summary`, `provider_route_summary`, `checks`, and
-safety flags while omitting nested full smoke sections.
+`api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
+`provider_route_summary`, `checks`, and safety flags while omitting nested full
+smoke sections. `api_key_provider_recovery_summary`
+(`api_key_provider_recovery_summary.v1`) exposes
+`provider_recovery_required`, `provider_error_count`,
+`provider_recovery_smoke_count`, `item_count`,
+`next_recovery_smoke_command_name`, `next_recovery_smoke_command`, and compact
+provider-family recovery items with `provider_family`, `provider`,
+`smoke_command_name`, `recovery_smoke_command`, `recovery_smoke_available`,
+`next_setup_action`, and `exception_type`.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
