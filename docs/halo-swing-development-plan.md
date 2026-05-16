@@ -28,6 +28,53 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.628 Live Provider API-Key Auto-Select Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 실제 연동을 켤 때 별도 mode env까지 기억하지 않아도 되도록, 구현된 live
+data provider는 지원되는 API-key alias가 있으면 자동 선택되게 한다. API key가
+없으면 기존처럼 fixture-backed offline 기본값을 유지한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - Polygon market provider auto-selects when HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY is configured
+  - FRED macro provider auto-selects when HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, or FRED_API_KEY is configured
+  - NewsAPI provider auto-selects when HALO_SWING_NEWS_API_KEY or NEWS_API_KEY is configured
+  - source env validation remains attached to explicit live mode; API-key-only auto-select uses the implemented default provider
+  - explicit live modes without API keys still fail with existing missing-key errors
+  - no-key defaults remain fixture-backed and offline
+  - get_integration_readiness reports live_data ready from implemented API-key aliases without requiring live mode env values
+  - readiness, audit, and registry tests clear settings cache around env-mutating tests so default calls remain offline
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q -> 51 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/providers.py src/halo_swing_mcp/tools/readiness.py tests/test_providers.py tests/test_readiness.py tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 691 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.627 Live Data Readiness Mode Alignment Gate Record - 2026-05-16
 
 ### A. 목적

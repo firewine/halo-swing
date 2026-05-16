@@ -15,6 +15,7 @@ from halo_swing_mcp.audit import (
 from halo_swing_mcp.audit_web import HTML, create_handler, events_payload, summary_payload
 from halo_swing_mcp import server as mcp_server
 from halo_swing_mcp import audit_web, binance_btc
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.audit_tools import get_audit_log, get_audit_summary
 
@@ -56,6 +57,13 @@ def set_readiness_env_secrets(monkeypatch) -> dict[str, str]:
     for key, value in READINESS_LIVE_MODE_ENVS.items():
         monkeypatch.setenv(key, value)
     return READINESS_ENV_SECRETS
+
+
+@pytest.fixture(autouse=True)
+def clear_settings_cache_after_env_tests() -> None:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def test_audit_event_redacts_sensitive_details(tmp_path: Path) -> None:

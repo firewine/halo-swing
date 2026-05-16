@@ -162,11 +162,8 @@ EXPECTED_BINANCE_CREDENTIAL_POLICY_KEYS = [
     "secret_values_returned",
 ]
 EXPECTED_DEFAULT_LIVE_DATA_MISSING = [
-    "market_ohlcv_live_mode",
     "market_ohlcv_api_key",
-    "macro_live_mode",
     "macro_api_key",
-    "news_live_mode",
     "news_api_key",
 ]
 
@@ -174,6 +171,13 @@ EXPECTED_DEFAULT_LIVE_DATA_MISSING = [
 def clear_readiness_env(monkeypatch) -> None:
     for key in READINESS_ENV_KEYS:
         monkeypatch.delenv(key, raising=False)
+    get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def clear_settings_cache_after_readiness_env_tests() -> None:
+    get_settings.cache_clear()
+    yield
     get_settings.cache_clear()
 
 
@@ -199,9 +203,8 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
             "binance_console_trade_only_no_withdraw_attestation"
         ),
         (
-            "live_data: provide market_ohlcv_live_mode, "
-            "market_ohlcv_api_key, macro_live_mode, macro_api_key, "
-            "news_live_mode, news_api_key"
+            "live_data: provide market_ohlcv_api_key, "
+            "macro_api_key, news_api_key"
         ),
     ]
     assert payload["gates"]["hermes"]["missing"] == [
@@ -1261,7 +1264,7 @@ def test_integration_readiness_accepts_project_macro_api_key_alias(
         assert key not in serialized
 
 
-def test_integration_readiness_requires_live_modes_with_api_keys(
+def test_integration_readiness_accepts_api_keys_without_live_modes(
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
@@ -1277,20 +1280,13 @@ def test_integration_readiness_requires_live_modes_with_api_keys(
     live_data_gate = payload["gates"]["live_data"]
     serialized = json.dumps(payload, sort_keys=True)
 
-    assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == [
-        "market_ohlcv_live_mode",
-        "macro_live_mode",
-        "news_live_mode",
-    ]
-    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
-    assert live_data_gate["evidence"]["macro_source_configured"] is False
-    assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["status"] == "ready"
+    assert live_data_gate["missing"] == []
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
+    assert live_data_gate["evidence"]["macro_source_configured"] is True
+    assert live_data_gate["evidence"]["news_source_configured"] is True
     assert live_data_gate["evidence"]["secret_values_returned"] is False
-    assert (
-        "live_data: provide market_ohlcv_live_mode, "
-        "macro_live_mode, news_live_mode"
-    ) in payload["next_actions"]
+    assert "live_data: provide" not in payload["next_actions"]
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized

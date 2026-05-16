@@ -8,12 +8,7 @@ from typing import Any
 
 from halo_swing_mcp import MCP_SERVER_NAME
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
-from halo_swing_mcp.config import (
-    MACRO_DATA_MODE_ENV_NAME,
-    MARKET_DATA_MODE_ENV_NAME,
-    NEWS_DATA_MODE_ENV_NAME,
-    get_settings,
-)
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.risk_settings import load_btc_risk_settings, resolve_settings_path
 from halo_swing_mcp.secret_store import get_binance_credentials_status
 
@@ -382,15 +377,9 @@ def _live_data_readiness(
     macro_source_configured: bool | None,
     news_source_configured: bool | None,
 ) -> dict[str, Any]:
-    env_market_mode_configured = _env_live_mode_configured(MARKET_DATA_MODE_ENV_NAME)
-    env_market_api_key_configured = _market_data_api_key_env_configured()
-    env_market_configured = env_market_mode_configured and env_market_api_key_configured
-    env_macro_mode_configured = _env_live_mode_configured(MACRO_DATA_MODE_ENV_NAME)
-    env_macro_api_key_configured = _macro_api_key_env_configured()
-    env_macro_configured = env_macro_mode_configured and env_macro_api_key_configured
-    env_news_mode_configured = _env_live_mode_configured(NEWS_DATA_MODE_ENV_NAME)
-    env_news_api_key_configured = _news_api_key_env_configured()
-    env_news_configured = env_news_mode_configured and env_news_api_key_configured
+    env_market_configured = _market_data_api_key_env_configured()
+    env_macro_configured = _macro_api_key_env_configured()
+    env_news_configured = _news_api_key_env_configured()
     market_configured = (
         market_data_source_configured
         if market_data_source_configured is not None
@@ -409,20 +398,11 @@ def _live_data_readiness(
     ready = market_configured and macro_configured and news_configured
     missing: list[str] = []
     if not market_configured:
-        if market_data_source_configured is None and not env_market_mode_configured:
-            missing.append("market_ohlcv_live_mode")
-        if market_data_source_configured is not None or not env_market_api_key_configured:
-            missing.append("market_ohlcv_api_key")
+        missing.append("market_ohlcv_api_key")
     if not macro_configured:
-        if macro_source_configured is None and not env_macro_mode_configured:
-            missing.append("macro_live_mode")
-        if macro_source_configured is not None or not env_macro_api_key_configured:
-            missing.append("macro_api_key")
+        missing.append("macro_api_key")
     if not news_configured:
-        if news_source_configured is None and not env_news_mode_configured:
-            missing.append("news_live_mode")
-        if news_source_configured is not None or not env_news_api_key_configured:
-            missing.append("news_api_key")
+        missing.append("news_api_key")
     return {
         "ready": ready,
         "status": "ready" if ready else "blocked",
@@ -458,15 +438,6 @@ def _news_api_key_env_configured() -> bool:
     return _env_value_configured(
         "NEWS_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
-    )
-
-
-def _env_live_mode_configured(key: str) -> bool:
-    value = os.environ.get(key)
-    return bool(
-        isinstance(value, str)
-        and value.strip().lower() == "live"
-        and _has_no_control_characters(value)
     )
 
 

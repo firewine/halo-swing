@@ -77,6 +77,36 @@ def test_live_market_data_provider_uses_polygon_api_key(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def test_market_data_provider_auto_uses_polygon_api_key(monkeypatch) -> None:
+    monkeypatch.delenv("HALO_SWING_MARKET_DATA_MODE", raising=False)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, PolygonMarketDataProvider)
+    assert provider.data_mode == "live"
+    assert provider.live_data_required is True
+
+    get_settings.cache_clear()
+
+
+def test_market_data_provider_auto_key_ignores_source_without_live_mode(
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("HALO_SWING_MARKET_DATA_MODE", raising=False)
+    monkeypatch.setenv("HALO_SWING_MARKET_DATA_SOURCE", "unsupported-source")
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, PolygonMarketDataProvider)
+    assert provider.data_mode == "live"
+
+    get_settings.cache_clear()
+
+
 def test_live_macro_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.setenv("HALO_SWING_MACRO_DATA_MODE", "live")
     monkeypatch.delenv("HALO_SWING_MACRO_API_KEY", raising=False)
@@ -104,6 +134,20 @@ def test_live_macro_provider_uses_fred_api_key(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def test_market_data_provider_auto_uses_fred_api_key(monkeypatch) -> None:
+    monkeypatch.delenv("HALO_SWING_MACRO_DATA_MODE", raising=False)
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, FredMacroDataProvider)
+    assert provider.data_mode == "fixture"
+    assert provider.live_data_required is False
+
+    get_settings.cache_clear()
+
+
 def test_live_news_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
     monkeypatch.delenv("HALO_SWING_NEWS_API_KEY", raising=False)
@@ -118,6 +162,20 @@ def test_live_news_provider_requires_api_key(monkeypatch) -> None:
 
 def test_live_news_provider_uses_newsapi_key(monkeypatch) -> None:
     monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert provider.data_mode == "fixture"
+    assert provider.live_data_required is False
+
+    get_settings.cache_clear()
+
+
+def test_market_data_provider_auto_uses_newsapi_key(monkeypatch) -> None:
+    monkeypatch.delenv("HALO_SWING_NEWS_DATA_MODE", raising=False)
     monkeypatch.setenv("NEWS_API_KEY", "news-secret")
     get_settings.cache_clear()
 

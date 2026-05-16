@@ -10,6 +10,7 @@ import pytest
 
 from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp import server
+from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.harness import build_parser
 from halo_swing_mcp.tool_registry import TOOL_REGISTRY, TOOL_SPECS, call_tool, tool_names
 from halo_swing_mcp.tools.health import health_check
@@ -31,6 +32,13 @@ FORBIDDEN_DEFAULT_IMPORTS = {
     "sqlalchemy",
     "ccxt",
 }
+
+
+@pytest.fixture(autouse=True)
+def clear_settings_cache_after_registry_tests() -> None:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def _is_mcp_tool_decorator(decorator: ast.expr) -> bool:

@@ -382,14 +382,17 @@ def get_market_data_provider() -> MarketDataProvider:
 
     settings = get_settings()
     provider: MarketDataProvider = DEFAULT_MARKET_DATA_PROVIDER
-    if settings.market_data_mode == "live":
-        _validate_live_market_data_source(settings.market_data_source)
+    if settings.market_data_mode == "live" or _polygon_api_key_configured(settings):
+        if settings.market_data_mode == "live":
+            _validate_live_market_data_source(settings.market_data_source)
         provider = PolygonMarketDataProvider(api_key=_resolve_polygon_api_key())
-    if settings.macro_data_mode == "live":
-        _validate_live_macro_source(settings.macro_source)
+    if settings.macro_data_mode == "live" or _fred_api_key_configured(settings):
+        if settings.macro_data_mode == "live":
+            _validate_live_macro_source(settings.macro_source)
         provider = FredMacroDataProvider(provider, api_key=_resolve_fred_api_key())
-    if settings.news_data_mode == "live":
-        _validate_live_news_source(settings.news_source)
+    if settings.news_data_mode == "live" or _news_api_key_configured(settings):
+        if settings.news_data_mode == "live":
+            _validate_live_news_source(settings.news_source)
         provider = NewsApiDataProvider(provider, api_key=_resolve_news_api_key())
 
     return provider
@@ -433,6 +436,12 @@ def _resolve_polygon_api_key() -> str:
     )
 
 
+def _polygon_api_key_configured(settings: Any) -> bool:
+    return _secret_candidate_configured(settings.market_data_api_key) or (
+        _secret_candidate_configured(os.environ.get("POLYGON_API_KEY"))
+    )
+
+
 def _resolve_fred_api_key() -> str:
     settings = get_settings()
     candidates = (
@@ -449,6 +458,14 @@ def _resolve_fred_api_key() -> str:
     )
 
 
+def _fred_api_key_configured(settings: Any) -> bool:
+    return (
+        _secret_candidate_configured(settings.macro_api_key)
+        or _secret_candidate_configured(os.environ.get("HALO_SWING_FRED_API_KEY"))
+        or _secret_candidate_configured(os.environ.get("FRED_API_KEY"))
+    )
+
+
 def _resolve_news_api_key() -> str:
     settings = get_settings()
     candidates = (
@@ -461,6 +478,18 @@ def _resolve_news_api_key() -> str:
             return _normalize_secret(candidate, "news API key")
     raise ValueError(
         "live news data requires HALO_SWING_NEWS_API_KEY or NEWS_API_KEY"
+    )
+
+
+def _news_api_key_configured(settings: Any) -> bool:
+    return _secret_candidate_configured(settings.news_api_key) or (
+        _secret_candidate_configured(os.environ.get("NEWS_API_KEY"))
+    )
+
+
+def _secret_candidate_configured(value: str | None) -> bool:
+    return bool(
+        isinstance(value, str) and value.strip() and _has_no_control_characters(value)
     )
 
 
