@@ -285,7 +285,9 @@ secret values. The summary includes `ready_to_run_live_smoke`,
 `dotenv_template` for the repo-root `.env` entries to fill before running smoke
 commands. It also returns `dotenv_file_status` so the setup payload shows
 whether `.env.example` and `.env` exist, the next setup action, and the
-repo-local copy command hint without writing files or returning secret values. It also returns
+repo-local copy command hint without writing files or returning secret values.
+`live_data_setup_steps` orders the local setup path as dotenv preparation, live
+data API-key entry, and the one-shot pipeline smoke. It also returns
 `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the

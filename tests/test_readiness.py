@@ -188,6 +188,93 @@ def expected_dotenv_file_status(target_path: Path) -> dict[str, Any]:
     }
 
 
+def expected_pipeline_smoke_command() -> dict[str, Any]:
+    return {
+        "name": "run_api_key_pipeline_smoke",
+        "purpose": (
+            "run readiness, provider, signal workflow, and recording smoke "
+            "checks after API keys are configured"
+        ),
+        "command": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "run_api_key_pipeline_smoke --input-json "
+            "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+            "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+        ),
+        "network_call": True,
+        "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def expected_live_data_setup_steps(
+    *,
+    target_path: Path,
+    configured_provider_families: list[str],
+    missing_provider_families: list[str],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    dotenv_file_status = expected_dotenv_file_status(target_path)
+    configured_count = len(configured_provider_families)
+    required_count = 3
+    keys_ready = configured_count == required_count
+    if (
+        dotenv_file_status["source_exists"] is False
+        and dotenv_file_status["target_exists"] is False
+    ):
+        next_step = "restore_env_example"
+        dotenv_status = "blocked"
+    elif dotenv_file_status["copy_required"] is True:
+        next_step = "prepare_dotenv"
+        dotenv_status = "pending"
+    else:
+        next_step = (
+            "run_api_key_pipeline_smoke"
+            if ready_to_run_live_smoke
+            else "fill_live_data_api_keys"
+        )
+        dotenv_status = "ready"
+    return {
+        "schema_version": "live_data_setup_steps.v1",
+        "next_step": next_step,
+        "steps": [
+            {
+                "name": "prepare_dotenv",
+                "status": dotenv_status,
+                "next_action": dotenv_file_status["next_action"],
+                "copy_command": dotenv_file_status["copy_command"],
+                "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "fill_live_data_api_keys",
+                "status": "ready" if keys_ready else "pending",
+                "configured_provider_families": configured_provider_families,
+                "missing_provider_families": missing_provider_families,
+                "configured_count": configured_count,
+                "required_count": required_count,
+                "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+                "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_api_key_pipeline_smoke",
+                "status": "ready" if ready_to_run_live_smoke else "blocked",
+                "command": expected_pipeline_smoke_command()["command"],
+                "network_call": True,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -471,23 +558,13 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             "secret_values_returned": False,
         },
         "dotenv_file_status": expected_dotenv_file_status(ROOT / ".env"),
-        "one_shot_smoke_command": {
-            "name": "run_api_key_pipeline_smoke",
-            "purpose": (
-                "run readiness, provider, signal workflow, and recording smoke "
-                "checks after API keys are configured"
-            ),
-            "command": (
-                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
-                "run_api_key_pipeline_smoke --input-json "
-                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
-            ),
-            "network_call": True,
-            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
-            "mutates_local_state": False,
-            "secret_values_returned": False,
-        },
+        "live_data_setup_steps": expected_live_data_setup_steps(
+            target_path=ROOT / ".env",
+            configured_provider_families=[],
+            missing_provider_families=["market", "macro", "news"],
+            ready_to_run_live_smoke=False,
+        ),
+        "one_shot_smoke_command": expected_pipeline_smoke_command(),
         "next_smoke_command": {
             "name": "get_live_data_api_key_status",
             "purpose": (
@@ -602,6 +679,12 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["dotenv_file_status"] == expected_dotenv_file_status(
         ROOT / ".env"
     )
+    assert payload["live_data_setup_steps"] == expected_live_data_setup_steps(
+        target_path=ROOT / ".env",
+        configured_provider_families=[],
+        missing_provider_families=["market", "macro", "news"],
+        ready_to_run_live_smoke=False,
+    )
     assert payload["hermes_runtime_started"] is False
     assert payload["telegram_send_call"] is False
     assert payload["order_submission"] is False
@@ -704,6 +787,12 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     )
     assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["dotenv_file_status"] == expected_dotenv_file_status(repo_env)
+    assert payload["live_data_setup_steps"] == expected_live_data_setup_steps(
+        target_path=repo_env,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
     assert payload["dotenv"]["supported"] is True
     assert payload["dotenv"]["disabled"] is False
     assert payload["dotenv"]["mutation"] is False
@@ -3496,6 +3585,14 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
     assert payload["live_data_setup_summary"][
         "dotenv_file_status"
     ] == expected_dotenv_file_status(repo_env)
+    assert payload["live_data_setup_summary"][
+        "live_data_setup_steps"
+    ] == expected_live_data_setup_steps(
+        target_path=repo_env,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",

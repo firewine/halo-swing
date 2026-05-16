@@ -387,7 +387,9 @@ FRED, and NewsAPI so the setup payload itself shows what to fill before running
 smoke commands. It also includes `dotenv_file_status` so the payload shows
 whether `.env.example` and repo-root `.env` exist, the next setup action, and
 the repo-local copy command hint without writing files or returning secret
-values. It also includes `live_data_smoke_commands` for `get_market_snapshot`,
+values. `live_data_setup_steps` orders the local setup path as dotenv
+preparation, live data API-key entry, and the one-shot pipeline smoke. It also
+includes `live_data_smoke_commands` for `get_market_snapshot`,
 `get_macro_snapshot`, and `get_news_bundle`. After filling the matching API keys,
 run those repo-local harness commands to verify the live provider outputs and
 boundary contracts. The smoke commands are read-only and return no secret values,
@@ -399,7 +401,8 @@ metadata offline. Use `get_live_data_api_key_status` before the first live smoke
 when you only need to confirm that supported Polygon, FRED, and NewsAPI aliases
 are configured; it reports key names, missing provider families,
 `provider_family_summary`, the no-secret `dotenv_template`, and
-`dotenv_file_status` with the next setup action but never secret values. Use
+`dotenv_file_status` with the next setup action, plus `live_data_setup_steps`,
+but never secret values. Use
 `get_live_data_provider_route` when you need to confirm that the actual
 `get_market_data_provider` factory selected Polygon, FRED, and NewsAPI from
 those keys without making provider network calls. Use

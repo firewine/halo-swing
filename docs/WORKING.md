@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_DOTENV_SETUP_ACTION_VERIFIED
-gate_id: LIVE_DATA_DOTENV_SETUP_ACTION_GATE
+status: LIVE_DATA_SETUP_STEPS_VERIFIED
+gate_id: LIVE_DATA_SETUP_STEPS_GATE
 review_tier: S1_small
 
-next_atomic_step: add no-write dotenv setup action hints to live data API-key setup payloads so users can see the repo-local .env preparation step before filling API keys without returning secrets
+next_atomic_step: add ordered live data setup steps to API-key setup payloads so users can follow dotenv preparation, API-key filling, and one-shot smoke execution without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,16 +82,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - dotenv_file_status includes next_action, copy_command, and fill_keys_after_copy metadata without reading or returning .env secret values
-  - copy_command uses repo-relative .env.example and .env paths and is marked as a user-run local mutation, while the payload itself remains no-write
-  - blocked defaults and ready repo-dotenv paths assert the correct next_action without leaking .env values
-  - README and DevOps guide document dotenv_file_status setup action hints
+  - get_live_data_api_key_status includes live_data_setup_steps with ordered prepare_dotenv, fill_live_data_api_keys, and run_api_key_pipeline_smoke steps
+  - live_data_setup_summary exposes the same setup steps for checklist and smoke setup payloads
+  - blocked defaults and ready repo-dotenv paths assert next_step and step statuses without leaking secret values
+  - README and DevOps guide document live_data_setup_steps in API-key setup payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data dotenv setup action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data setup steps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_DOTENV_SETUP_ACTION_VERIFIED
+gate_id: LIVE_DATA_DOTENV_SETUP_ACTION_GATE
+review_tier: S1_small
+
+next_atomic_step: add no-write dotenv setup action hints to live data API-key setup payloads so users can see the repo-local .env preparation step before filling API keys without returning secrets
 ```
 
 Previous completed directive:
@@ -1404,6 +1415,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Setup Steps Gate is verified.
+`get_live_data_api_key_status` and `live_data_setup_summary` now include
+`live_data_setup_steps`, an ordered no-secret setup path for `prepare_dotenv`,
+`fill_live_data_api_keys`, and `run_api_key_pipeline_smoke`. The payload reports
+the current `next_step` and step statuses without writing files, calling
+networks, or returning secret values. Focused tests passed with 5 tests, full
+pytest passed with 760 tests, and ruff, health_check, API-key status, and setup
+checklist harness commands passed.
+
+```yaml
+live_data_setup_steps_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_api_key_status includes live_data_setup_steps with ordered prepare_dotenv, fill_live_data_api_keys, and run_api_key_pipeline_smoke steps
+    - live_data_setup_summary exposes the same setup steps for checklist and smoke setup payloads
+    - blocked defaults and ready repo-dotenv paths assert next_step and step statuses without leaking secret values
+    - README and DevOps guide document live_data_setup_steps in API-key setup payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: "passed, blocked fixture defaults returned live_data_setup_steps.next_step prepare_dotenv without secrets"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: "passed, checklist live_data_setup_summary returned ordered setup steps without writing files"
+```
+
+Previous verification:
 
 Summary: Live Data Dotenv Setup Action Gate is verified.
 `dotenv_file_status` now includes no-write setup action hints: `next_action`,

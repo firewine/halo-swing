@@ -256,25 +256,34 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         for family, provider_status in providers.items()
         if provider_status["configured"] is not True
     ]
+    provider_family_summary = {
+        "required_provider_families": list(providers),
+        "configured_provider_families": configured_provider_families,
+        "missing_provider_families": missing_provider_families,
+        "configured_count": len(configured_provider_families),
+        "required_count": len(providers),
+        "ready_to_run_live_smoke": not missing,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    one_shot_smoke_command = _local_command("run_api_key_pipeline_smoke")
+    dotenv_file_status = _live_data_dotenv_file_status()
     return {
         "schema_version": "live_data_api_key_status.v1",
         "status": "ready" if not missing else "blocked",
         "providers": providers,
-        "provider_family_summary": {
-            "required_provider_families": list(providers),
-            "configured_provider_families": configured_provider_families,
-            "missing_provider_families": missing_provider_families,
-            "configured_count": len(configured_provider_families),
-            "required_count": len(providers),
-            "ready_to_run_live_smoke": not missing,
-            "network_call": False,
-            "mutates_local_state": False,
-            "secret_values_returned": False,
-        },
+        "provider_family_summary": provider_family_summary,
         "missing": missing,
-        "one_shot_smoke_command": _local_command("run_api_key_pipeline_smoke"),
+        "one_shot_smoke_command": one_shot_smoke_command,
         "dotenv_template": _live_data_dotenv_template(),
-        "dotenv_file_status": _live_data_dotenv_file_status(),
+        "dotenv_file_status": dotenv_file_status,
+        "live_data_setup_steps": _live_data_setup_steps(
+            dotenv_file_status=dotenv_file_status,
+            provider_family_summary=provider_family_summary,
+            one_shot_smoke_command=one_shot_smoke_command,
+            ready_to_run_live_smoke=not missing,
+        ),
         "dotenv": {
             "supported": True,
             "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
@@ -1509,6 +1518,8 @@ def _live_data_setup_summary(
         api_key_status=api_key_status,
         ready_to_run_live_smoke=ready_to_run_live_smoke,
     )
+    dotenv_file_status = _live_data_dotenv_file_status()
+    one_shot_smoke_command = api_key_status.get("one_shot_smoke_command")
     return {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready" if ready_to_run_live_smoke else "blocked",
@@ -1522,8 +1533,14 @@ def _live_data_setup_summary(
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
         "provider_route_summary": route_summary,
         "dotenv_template": _live_data_dotenv_template(),
-        "dotenv_file_status": _live_data_dotenv_file_status(),
-        "one_shot_smoke_command": api_key_status.get("one_shot_smoke_command"),
+        "dotenv_file_status": dotenv_file_status,
+        "live_data_setup_steps": _live_data_setup_steps(
+            dotenv_file_status=dotenv_file_status,
+            provider_family_summary=provider_family_summary,
+            one_shot_smoke_command=one_shot_smoke_command,
+            ready_to_run_live_smoke=ready_to_run_live_smoke,
+        ),
+        "one_shot_smoke_command": one_shot_smoke_command,
         "next_smoke_command": _local_command(
             "run_api_key_pipeline_smoke"
             if ready_to_run_live_smoke
@@ -1671,6 +1688,87 @@ def _live_data_dotenv_file_status() -> dict[str, Any]:
             "secret_values_returned": False,
         },
         "mutation": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _live_data_setup_steps(
+    *,
+    dotenv_file_status: dict[str, Any],
+    provider_family_summary: dict[str, Any],
+    one_shot_smoke_command: Any,
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    smoke_command = _optional_mapping(one_shot_smoke_command)
+    target_exists = dotenv_file_status.get("target_exists") is True
+    source_exists = dotenv_file_status.get("source_exists") is True
+    copy_required = dotenv_file_status.get("copy_required") is True
+    configured_count = provider_family_summary.get("configured_count")
+    required_count = provider_family_summary.get("required_count")
+    keys_ready = (
+        isinstance(configured_count, int)
+        and isinstance(required_count, int)
+        and required_count > 0
+        and configured_count == required_count
+    )
+    if not source_exists and not target_exists:
+        next_step = "restore_env_example"
+        dotenv_status = "blocked"
+    elif copy_required:
+        next_step = "prepare_dotenv"
+        dotenv_status = "pending"
+    else:
+        dotenv_status = "ready"
+        next_step = (
+            "run_api_key_pipeline_smoke"
+            if ready_to_run_live_smoke
+            else "fill_live_data_api_keys"
+        )
+    return {
+        "schema_version": "live_data_setup_steps.v1",
+        "next_step": next_step,
+        "steps": [
+            {
+                "name": "prepare_dotenv",
+                "status": dotenv_status,
+                "next_action": dotenv_file_status.get("next_action"),
+                "copy_command": dotenv_file_status.get("copy_command"),
+                "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "fill_live_data_api_keys",
+                "status": "ready" if keys_ready else "pending",
+                "configured_provider_families": provider_family_summary.get(
+                    "configured_provider_families"
+                ),
+                "missing_provider_families": provider_family_summary.get(
+                    "missing_provider_families"
+                ),
+                "configured_count": configured_count,
+                "required_count": required_count,
+                "required_env_keys": dotenv_file_status.get(
+                    "fill_keys_after_copy",
+                    {},
+                ).get("required_env_keys"),
+                "network_call": False,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_api_key_pipeline_smoke",
+                "status": "ready" if ready_to_run_live_smoke else "blocked",
+                "command": smoke_command.get("command"),
+                "network_call": smoke_command.get("network_call"),
+                "mutates_local_state": smoke_command.get("mutates_local_state"),
+                "secret_values_returned": smoke_command.get(
+                    "secret_values_returned"
+                ),
+            },
+        ],
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
