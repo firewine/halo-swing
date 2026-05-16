@@ -1784,10 +1784,26 @@ def test_run_live_recording_smoke_can_use_caller_supplied_ledger(
 
 
 def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
+    tmp_path: Path,
     monkeypatch,
 ) -> None:
     from halo_swing_mcp.tools import readiness as readiness_tools
 
+    env_path = tmp_path / ".env"
+    env_path.with_name(".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWS_API_KEY=\n",
+        encoding="utf-8",
+    )
+    env_path.write_text(
+        "POLYGON_API_KEY=test\nFRED_API_KEY=test\nNEWS_API_KEY=test\n",
+        encoding="utf-8",
+    )
+    fake_setup_steps = expected_live_data_setup_steps(
+        target_path=env_path,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
     fake_setup_summary = {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready",
@@ -1818,6 +1834,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        "live_data_setup_steps": fake_setup_steps,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -2024,6 +2041,11 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         assert payload[summary_name]["configured_provider_family_count"] == 3
         assert payload[summary_name]["required_provider_family_count"] == 3
         assert payload[summary_name]["missing_provider_families"] == []
+        assert payload[summary_name]["live_data_setup_steps"] == fake_setup_steps
+        assert payload[summary_name]["next_setup_step"] == (
+            "run_api_key_pipeline_smoke"
+        )
+        assert payload[summary_name]["setup_step_count"] == 3
         assert (
             payload[summary_name]["next_smoke_command_name"]
             == "run_api_key_pipeline_smoke"
@@ -2066,6 +2088,13 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     )
     assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is False
     assert payload["live_data_smoke_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_smoke_summary"]["live_data_setup_steps"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]
+    )
+    assert payload["live_data_smoke_summary"]["next_setup_step"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
+    )
+    assert payload["live_data_smoke_summary"]["setup_step_count"] == 3
     assert (
         payload["live_data_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
@@ -2133,6 +2162,13 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["signal_workflow_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
     )
+    assert payload["signal_workflow_smoke_summary"]["live_data_setup_steps"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]
+    )
+    assert payload["signal_workflow_smoke_summary"]["next_setup_step"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
+    )
+    assert payload["signal_workflow_smoke_summary"]["setup_step_count"] == 3
     assert (
         payload["signal_workflow_smoke_summary"][
             "configured_provider_family_count"
@@ -2154,6 +2190,13 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["recording_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
     )
+    assert payload["recording_smoke_summary"]["live_data_setup_steps"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]
+    )
+    assert payload["recording_smoke_summary"]["next_setup_step"] == (
+        payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
+    )
+    assert payload["recording_smoke_summary"]["setup_step_count"] == 3
     assert payload["recording_smoke_summary"]["provider_family_summary"] == {
         "required_provider_families": ["market", "macro", "news"],
         "configured_provider_families": [],

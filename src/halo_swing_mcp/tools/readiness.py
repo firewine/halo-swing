@@ -1453,6 +1453,10 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
     provider_family_summary = _optional_mapping(
         live_data_setup_summary.get("provider_family_summary")
     ) or {}
+    live_data_setup_steps = _optional_mapping(
+        live_data_setup_summary.get("live_data_setup_steps")
+    ) or {}
+    setup_steps = live_data_setup_steps.get("steps")
     return {
         "schema_version": smoke.get("schema_version"),
         "status": smoke.get("status"),
@@ -1477,6 +1481,9 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "missing_provider_families": provider_family_summary.get(
             "missing_provider_families"
         ),
+        "live_data_setup_steps": live_data_setup_steps,
+        "next_setup_step": live_data_setup_steps.get("next_step"),
+        "setup_step_count": len(setup_steps) if isinstance(setup_steps, list) else 0,
         "next_smoke_command_name": next_smoke_command.get("name"),
     }
 

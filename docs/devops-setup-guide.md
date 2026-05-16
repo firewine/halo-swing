@@ -438,9 +438,10 @@ route readiness check until all supported live-data provider keys are configured
 Its live data, signal workflow, and recording sub-smoke summaries include
 stage-level setup fields such as `live_data_setup_summary_status`,
 `ready_to_run_live_smoke`, `provider_route_status`, `provider_family_summary`,
-`configured_provider_family_count`, `missing_provider_families`, and
-`next_smoke_command_name` so the blocked stage is visible without returning
-secret values.
+`configured_provider_family_count`, `missing_provider_families`,
+`live_data_setup_steps`, `next_setup_step`, `setup_step_count`, and
+`next_smoke_command_name` so the blocked stage and next setup action are visible
+without returning secret values.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
