@@ -42,24 +42,20 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_GATE
+status: API_KEY_DOTENV_PRECEDENCE_METADATA_VERIFIED
+gate_id: API_KEY_DOTENV_PRECEDENCE_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: make individual live provider smoke tools return no-secret conflict payloads instead of tracebacks when API-key-backed provider calls fail
+next_atomic_step: make live data API-key status dotenv precedence metadata match the actual exported-env, launch-directory .env, repo-root .env runtime order
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - README.md
-  - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/tools/market.py
   - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_providers.py
+  - tests/test_env.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -76,24 +72,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_fixture_provider_exception_is_not_swallowed tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py::test_get_config_value_uses_launch_directory_env_before_repo_root_env tests/test_readiness.py::test_live_data_api_key_status_reports_runtime_dotenv_precedence -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - get_market_snapshot, get_macro_snapshot, and get_news_bundle catch live provider exceptions only when live data is selected and return status=conflict payloads
-  - provider smoke error summaries include tool name and exception type but do not include exception messages, URLs, API key values, or secret values
-  - returned conflict payloads keep live_data_required and network_call boundaries declared so validate_live_data_smoke_result can flag failed provider completion without crashing
-  - fixture/offline provider errors are not silently swallowed
-  - README and DevOps setup guide mention that individual provider smoke failures are reported as no-secret conflict payloads
+  - get_live_data_api_key_status dotenv.precedence reports exported environment variables, launch-directory .env, then repo-root .env
+  - the metadata matches env.py runtime behavior without changing secret loading semantics
+  - tests prove launch-directory .env overrides repo-root .env after exported env values
+  - API-key-only setup payloads remain non-mutating and no-secret
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider smoke exception payload gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key dotenv precedence metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_GATE
+review_tier: S1_small
+
+next_atomic_step: make individual live provider smoke tools return no-secret conflict payloads instead of tracebacks when API-key-backed provider calls fail
 ```
 
 Previous completed directive:
@@ -1747,6 +1753,53 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Dotenv Precedence Metadata Gate is verified.
+`get_live_data_api_key_status` now reports dotenv precedence in the same order
+used by the runtime loader: exported environment variables, launch-directory
+`.env`, then repo-root `.env`. Runtime secret loading behavior was not changed.
+Focused tests passed with 2 tests, full pytest passed with 770 tests, and ruff,
+health_check, and fixture-default API-key pipeline CLI passed.
+
+```yaml
+api_key_dotenv_precedence_metadata_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_env.py
+    - tests/test_readiness.py
+  implementation:
+    - get_live_data_api_key_status dotenv.precedence reports exported environment variables, launch-directory .env, repo-root .env
+    - env.py runtime loading behavior remains unchanged
+    - tests prove launch-directory .env overrides repo-root .env after exported env values
+    - API-key-only setup payloads remain non-mutating and no-secret
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py::test_get_config_value_uses_launch_directory_env_before_repo_root_env tests/test_readiness.py::test_live_data_api_key_status_reports_runtime_dotenv_precedence -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "770 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Provider Smoke Exception Payload Gate is verified.
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle` now return

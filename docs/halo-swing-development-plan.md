@@ -191,6 +191,57 @@ verification:
   - fake-key get_market_snapshot/get_macro_snapshot/get_news_bundle CLIs: exit 0 with no-secret status=conflict payloads
 ```
 
+## 3.710 API Key Dotenv Precedence Metadata Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only setup payload의 `dotenv.precedence` metadata가 실제 runtime dotenv 로딩
+순서를 정확히 설명해야 한다. 현재 env loader는 exported environment variables를 먼저 보고,
+그 다음 launch-directory `.env`가 repo-root `.env`보다 우선한다. 이번 slice는
+`get_live_data_api_key_status`의 metadata를 이 실제 순서와 맞춰, 사용자가 API key만 넣고
+연동할 때 어떤 `.env` 값이 적용되는지 오해하지 않게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status dotenv.precedence now reports exported environment variables, launch-directory .env, repo-root .env
+  - runtime dotenv loading behavior remains unchanged
+  - tests prove launch-directory .env overrides repo-root .env after exported env values
+  - API-key setup payloads remain non-mutating and no-secret
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+  - runtime dotenv loading behavior change
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused env/readiness pytest: 2 passed
+  - full pytest: 770 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0
+```
+
 ## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
 
 ### A. 목적

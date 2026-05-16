@@ -311,8 +311,8 @@ def get_live_data_api_key_status() -> dict[str, Any]:
             "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
             "precedence": [
                 "exported environment variables",
-                "repo-root .env",
                 "launch-directory .env",
+                "repo-root .env",
             ],
             "mutation": False,
         },

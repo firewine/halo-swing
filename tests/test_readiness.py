@@ -1333,6 +1333,21 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         )
 
 
+def test_live_data_api_key_status_reports_runtime_dotenv_precedence(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = get_live_data_api_key_status()
+
+    assert payload["dotenv"]["precedence"] == [
+        "exported environment variables",
+        "launch-directory .env",
+        "repo-root .env",
+    ]
+    assert payload["dotenv"]["mutation"] is False
+
+
 def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values(
     tmp_path: Path,
     monkeypatch,
