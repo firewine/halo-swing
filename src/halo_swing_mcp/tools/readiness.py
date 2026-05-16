@@ -678,6 +678,10 @@ def run_api_key_pipeline_smoke(
         signal_workflow_smoke=signal_workflow_smoke,
         recording_smoke=recording_smoke,
     )
+    live_data_setup_summary = _live_data_setup_summary(
+        live_data_api_key_status,
+        provider_route,
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -697,10 +701,11 @@ def run_api_key_pipeline_smoke(
             "run_live_recording_smoke",
         ],
         "readiness_summary": _api_key_pipeline_readiness_summary(readiness),
-        "live_data_setup_summary": _live_data_setup_summary(
-            live_data_api_key_status,
-            provider_route,
-        ),
+        "live_data_setup_summary": live_data_setup_summary,
+        "next_operator_action": _optional_mapping(
+            live_data_setup_summary.get("next_operator_action")
+        )
+        or {},
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),

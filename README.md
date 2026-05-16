@@ -267,8 +267,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_s
 For a single post-setup check after filling API keys, use
 `run_api_key_pipeline_smoke`; it combines readiness, provider live data, signal
 workflow, and recording smoke checks. Its payload includes
-`live_data_setup_summary` plus the same provider route summary so the one-shot
-smoke records API-key readiness and which provider factory route was selected.
+top-level `next_operator_action`, `live_data_setup_summary`, and the same
+provider route summary so the one-shot smoke records API-key readiness, the next
+local action, and which provider factory route was selected.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,

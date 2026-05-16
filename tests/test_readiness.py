@@ -2136,6 +2136,8 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "POLYGON_API_KEY=test\nFRED_API_KEY=test\nNEWS_API_KEY=test\n",
         encoding="utf-8",
     )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", env_path)
+    clear_local_env_cache()
     fake_setup_steps = expected_live_data_setup_steps(
         target_path=env_path,
         configured_provider_families=["market", "macro", "news"],
@@ -2336,6 +2338,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["live_data_setup_summary"]["status"] == "ready"
     assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
+    assert payload["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
+    )
+    assert payload["next_operator_action"] == fake_next_operator_action
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
