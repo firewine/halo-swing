@@ -63,3 +63,10 @@ def test_env_example_does_not_include_secret_placeholder_values() -> None:
         normalized = value.lower()
         for fragment in sensitive_fragments:
             assert fragment not in normalized
+
+
+def test_env_example_database_url_stays_blank_until_storage_gates() -> None:
+    assignments = _env_assignments()
+
+    assert assignments["HALO_SWING_DATABASE_URL"] == ""
+    assert "data/halo_swing" not in ENV_TEMPLATE.read_text(encoding="utf-8")

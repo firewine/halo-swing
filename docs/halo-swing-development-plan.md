@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.633 Env Template Storage Gate Alignment Record - 2026-05-16
+
+### A. 목적
+
+`MIGRATION_GO`와 `REPOSITORY_GO`가 아직 기록되지 않았는데 `.env.example`이
+`data/halo_swing.sqlite3` 같은 SQLite 경로를 제안하면 사용자가 승인되지 않은
+storage path를 활성화할 수 있다. Database URL placeholder를 blank로 유지하고,
+그 계약을 테스트로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - .env.example leaves HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
+  - .env.example no longer includes data/halo_swing sqlite paths
+  - tests/test_env_template.py locks the blank database URL and no-data-path contract
+  - task contract and portable mirror point at this env-template storage gate alignment
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - database URL value
+  - SQLite file
+  - migration or repository code
+  - source code changes
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.632 Env Template Contract Test Gate Record - 2026-05-16
 
 ### A. 목적

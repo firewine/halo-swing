@@ -1,11 +1,12 @@
 {
-  "gate_id": "ENV_TEMPLATE_CONTRACT_TEST_GATE",
+  "gate_id": "ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.632",
-  "next_atomic_step": "add a regression test that locks the env template live data API-key placeholders to blank secret-free values",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.633",
+  "next_atomic_step": "keep the env template database URL blank until migration and repository gates are approved",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
+    ".env.example",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -14,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.632",
+    "docs/halo-swing-development-plan.md#3.633",
     ".env.example",
     "tests/test_env_template.py"
   ],
@@ -32,7 +33,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_providers.py tests/test_readiness.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -47,12 +48,12 @@
     "read_only": true
   },
   "done_means": [
-    "tests/test_env_template.py asserts live data API-key placeholders exist and are blank",
-    "tests/test_env_template.py asserts DATA_MODE live flags stay commented optional examples",
-    "tests/test_env_template.py asserts sensitive placeholder values are not committed",
+    ".env.example leaves HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO",
+    ".env.example does not include data/halo_swing sqlite paths",
+    "tests/test_env_template.py locks the blank database URL and no-data-path contract",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified env-template contract test gate, then choose Hermes/Telegram setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified env-template storage gate alignment, then choose Hermes/Telegram setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

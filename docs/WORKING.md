@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: ENV_TEMPLATE_CONTRACT_TEST_GATE_VERIFIED
-gate_id: ENV_TEMPLATE_CONTRACT_TEST_GATE
+status: ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT_VERIFIED
+gate_id: ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT
 review_tier: S1_small
 
-next_atomic_step: add a regression test that locks the env template live data API-key placeholders to blank secret-free values
+next_atomic_step: keep the env template database URL blank until migration and repository gates are approved
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -263,6 +263,7 @@ done_means:
   - README and DevOps setup guide describe API-key-only live data setup for Polygon, FRED, and NewsAPI
   - .env.example exposes blank live data API-key placeholders for Polygon, FRED, and NewsAPI aliases
   - tests/test_env_template.py locks .env.example live data placeholders and optional DATA_MODE examples
+  - .env.example keeps HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -612,13 +613,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.632
-gate_packet: docs/halo-swing-development-plan.md#3.632
+portable_mirror: docs/halo-swing-development-plan.md#3.633
+gate_packet: docs/halo-swing-development-plan.md#3.633
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.632
+  - docs/halo-swing-development-plan.md#3.633
   - .env.example
   - tests/test_env_template.py
 
@@ -923,13 +924,49 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Env Template Contract Test Gate is verified.
-`tests/test_env_template.py` now locks `.env.example` live data placeholders:
-Polygon market, FRED macro, and NewsAPI key aliases must exist and remain blank;
-`*_DATA_MODE=live` examples must remain commented optional lines; and sensitive
-placeholder values must not be committed. Focused env/provider/readiness tests
-passed with 55 tests, full pytest passed with 694 tests, and ruff and
-health_check passed.
+Summary: Env Template Storage Gate Alignment is verified. `.env.example` now
+keeps `HALO_SWING_DATABASE_URL` blank until `MIGRATION_GO` and `REPOSITORY_GO`
+are recorded, and no longer suggests `data/halo_swing.sqlite3`. The
+`tests/test_env_template.py` contract now locks this no-data-path behavior.
+Focused env-template tests passed with 4 tests, full pytest passed with 695
+tests, and ruff and health_check passed.
+
+```yaml
+env_template_storage_gate_alignment:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_env_template.py
+  implementation:
+    - .env.example leaves HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
+    - .env.example does not include data/halo_swing sqlite paths
+    - tests/test_env_template.py locks the blank database URL and no-data-path contract
+    - task contract and portable mirror match
+    - no source code, provider behavior, network behavior, migrations, repository persistence, broker path, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "695 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: rg -n 'HALO_SWING_DATABASE_URL=.+|data/halo_swing|sqlite:///data' .env.example tests/test_env_template.py
+      result: "passed, only the negative test assertion references data/halo_swing"
+```
 
 ```yaml
 env_template_contract_test_gate:
