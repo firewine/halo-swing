@@ -512,6 +512,11 @@ def test_score_and_trade_guide_include_risk_controls() -> None:
         == MVP_CONTRACT["news_fixture"]["required_scoring_usage_schema"]
     )
     assert signal["news_usage_contract"]["news_score_field"] == "news_score"
+    assert signal["news_usage_contract"]["live_data_required"] is False
+    assert signal["source_data_contract"]["schema_version"] == "scoring_source_data.v1"
+    assert signal["source_data_contract"]["network_call"] is False
+    assert signal["source_data_contract"]["live_data_required"] is False
+    assert signal["live_data_required"] is False
     assert (
         signal["strategy_config_contract"]["schema_version"]
         == MVP_CONTRACT["scoring_fixture"]["strategy_config_schema"]
@@ -543,6 +548,7 @@ def test_score_and_trade_guide_include_risk_controls() -> None:
     assert guide["trade_guide_contract"]["order_submission"] is False
     assert guide["trade_guide_contract"]["live_data_required"] is False
     assert guide["trade_guide_contract"]["db_required"] is False
+    assert guide["live_data_required"] is False
     guard_checks = {
         check["name"]: check["passed"]
         for check in guide["trade_guide_guard"]["checks"]
@@ -550,6 +556,95 @@ def test_score_and_trade_guide_include_risk_controls() -> None:
     for check_name in MVP_CONTRACT["trade_guide_fixture"]["required_guard_checks"]:
         assert guard_checks[check_name] is True
     assert guide["trade_guide_guard"]["status"] == "ok"
+
+
+def test_scoring_tools_propagate_live_source_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    indicators = calculate_indicators("QQQ")
+    indicators["data_mode"] = "live"
+    indicators["live_data_required"] = True
+    indicators["timeframe_contract"] = {
+        **indicators["timeframe_contract"],
+        "network_call": True,
+        "live_data_required": True,
+        "fixture_replay_default": False,
+    }
+    indicators["swing_level_contract"] = {
+        **indicators["swing_level_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+    macro = get_macro_snapshot()
+    macro["data_mode"] = "live"
+    macro["live_data_required"] = True
+    macro["macro_filter_contract"] = {
+        **macro["macro_filter_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+    events = get_event_calendar(days=14)
+    news = get_news_bundle(topic="all")
+    news["data_mode"] = "live"
+    news["live_data_required"] = True
+    news["news_source_policy_contract"] = {
+        **news["news_source_policy_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+    news["news_score_contract"] = {
+        **news["news_score_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+
+    monkeypatch.setattr(
+        scoring_tools,
+        "calculate_indicator_payload",
+        lambda _underlying: indicators,
+    )
+    monkeypatch.setattr(scoring_tools, "get_macro_snapshot", lambda: macro)
+    monkeypatch.setattr(scoring_tools, "get_event_calendar", lambda days=14: events)
+    monkeypatch.setattr(scoring_tools, "get_news_bundle", lambda topic="all": news)
+
+    signal = scoring_tools.score_leverage_swing("TQQQ")
+    guide = scoring_tools.generate_trade_guide("TQQQ")
+    position = scoring_tools.evaluate_position("TQQQ")
+    serialized = repr(signal) + repr(guide) + repr(position)
+
+    assert signal["live_data_required"] is True
+    assert signal["source_data_contract"]["network_call"] is True
+    assert signal["source_data_contract"]["live_data_required"] is True
+    assert signal["source_data_contract"]["sources"]["market_indicators"] == {
+        "network_call": True,
+        "live_data_required": True,
+        "data_mode": "live",
+    }
+    assert signal["source_data_contract"]["sources"]["macro"][
+        "live_data_required"
+    ] is True
+    assert signal["source_data_contract"]["sources"]["news"][
+        "network_call"
+    ] is True
+    assert signal["news_usage_contract"]["live_data_required"] is True
+    assert guide["live_data_required"] is True
+    assert guide["trade_guide_contract"]["live_data_required"] is True
+    assert position["live_data_required"] is True
+    assert position["position_management_contract"]["live_data_required"] is True
+    guide_guard_checks = {
+        check["name"]: check["passed"]
+        for check in guide["trade_guide_guard"]["checks"]
+    }
+    position_guard_checks = {
+        check["name"]: check["passed"]
+        for check in position["position_management_guard"]["checks"]
+    }
+    assert guide_guard_checks["live_data_boundary_declared"] is True
+    assert position_guard_checks["live_data_boundary_declared"] is True
+    assert "api_key=" not in serialized.lower()
+    assert "polygon-secret" not in serialized.lower()
+    assert "fred-secret" not in serialized.lower()
+    assert "news-secret" not in serialized.lower()
 
 
 def test_scoring_tools_normalize_asset_and_timeframe_identity() -> None:

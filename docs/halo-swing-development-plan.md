@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.654 Live Scoring Source Metadata Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 market/macro/news API key를 넣으면 scoring 계층도 live provider가 반환한
+입력을 사용한다. 하지만 `score_leverage_swing`, `generate_trade_guide`,
+`evaluate_position`이 live 입력 여부를 상위 payload와 contract/guard에 전파하지
+않으면 downstream report, audit, Hermes prompt consumer가 live boundary를 잘못
+해석할 수 있다. 이번 slice는 scoring source metadata를 명시한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - score_leverage_swing reports source_data_contract with per-source network_call and live_data_required metadata
+  - score_leverage_swing top-level live_data_required and news_usage_contract live_data_required reflect market, macro, and news inputs
+  - generate_trade_guide and evaluate_position propagate signal live_data_required into their contracts, guards, and top-level payloads
+  - fixture defaults remain offline with no_live_data_required guards passing
+  - fake live source metadata test proves propagation without real network or API keys
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - committed runtime artifact
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_and_trade_guide_include_risk_controls tests/test_mvp_tools.py::test_scoring_tools_propagate_live_source_metadata -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 744 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.653 Live Indicator Boundary Metadata Gate Record - 2026-05-16
 
 ### A. 목적

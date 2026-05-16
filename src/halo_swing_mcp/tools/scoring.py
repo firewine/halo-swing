@@ -46,6 +46,8 @@ def score_leverage_swing(
     components = _component_scores(underlying, indicators, macro, events, news)
     final_score = _weighted_score(components, config["weights"])
     macro_filter = macro.get("macro_filter_summary", {})
+    source_data_contract = _source_data_contract(indicators, macro, events, news)
+    live_data_required = source_data_contract["live_data_required"]
     action = _action_for_score(final_score, leverage, components, indicators, config)
     references = _risk_references(indicators, config)
     confidence = _confidence(final_score, components)
@@ -76,8 +78,10 @@ def score_leverage_swing(
             "policy_score_field": "policy_score",
             "geopolitical_score_field": "geopolitical_score",
             "ai_semiconductor_theme_score_field": "ai_semiconductor_theme_score",
-            "live_data_required": False,
+            "live_data_required": bool(news.get("live_data_required"))
+            or bool(source_data_contract["sources"]["news"]["live_data_required"]),
         },
+        "source_data_contract": source_data_contract,
         "entry_summary": _entry_summary(action, underlying, indicators),
         "stop_summary": _stop_summary(underlying, references),
         "take_profit_summary": _take_profit_summary(underlying, references),
@@ -128,6 +132,7 @@ def score_leverage_swing(
         "reason_summary": _reason_summary(action, components),
         "evidence_summary": _evidence_summary(news),
         "label_status": None,
+        "live_data_required": live_data_required,
     }
 
 
@@ -171,7 +176,7 @@ def generate_trade_guide(
         "config_hash": signal["config_hash"],
         "config_hash_matches_signal": True,
         "order_submission": False,
-        "live_data_required": False,
+        "live_data_required": signal["live_data_required"],
         "db_required": False,
     }
     guard_checks = [
@@ -198,10 +203,7 @@ def generate_trade_guide(
             and bool(signal["config_version"]),
         },
         {"name": "no_order_submission", "passed": contract["order_submission"] is False},
-        {
-            "name": "no_live_data_required",
-            "passed": contract["live_data_required"] is False,
-        },
+        _live_data_guard_check(contract["live_data_required"]),
     ]
     return {
         "as_of": AS_OF,
@@ -216,7 +218,7 @@ def generate_trade_guide(
             "checks": guard_checks,
         },
         "signal": signal,
-        "live_data_required": False,
+        "live_data_required": signal["live_data_required"],
     }
 
 
@@ -277,7 +279,7 @@ def evaluate_position(
         "config_hash": signal["config_hash"],
         "numeric_authority": True,
         "order_submission": False,
-        "live_data_required": False,
+        "live_data_required": signal["live_data_required"],
         "db_required": False,
     }
     guard_checks = [
@@ -297,10 +299,7 @@ def evaluate_position(
             and bool(signal["signal_id"]),
         },
         {"name": "no_order_submission", "passed": contract["order_submission"] is False},
-        {
-            "name": "no_live_data_required",
-            "passed": contract["live_data_required"] is False,
-        },
+        _live_data_guard_check(contract["live_data_required"]),
     ]
 
     return {
@@ -321,7 +320,76 @@ def evaluate_position(
             "status": "ok" if all(check["passed"] for check in guard_checks) else "conflict",
             "checks": guard_checks,
         },
-        "live_data_required": False,
+        "live_data_required": signal["live_data_required"],
+    }
+
+
+def _source_data_contract(
+    indicators: dict[str, Any],
+    macro: dict[str, Any],
+    events: dict[str, Any],
+    news: dict[str, Any],
+) -> dict[str, Any]:
+    sources = {
+        "market_indicators": {
+            "network_call": _payload_network_call(indicators),
+            "live_data_required": bool(indicators.get("live_data_required")),
+            "data_mode": indicators.get("data_mode"),
+        },
+        "macro": {
+            "network_call": _payload_network_call(macro),
+            "live_data_required": bool(macro.get("live_data_required")),
+            "data_mode": macro.get("data_mode"),
+        },
+        "events": {
+            "network_call": _payload_network_call(events),
+            "live_data_required": bool(events.get("live_data_required")),
+            "data_mode": events.get("data_mode"),
+        },
+        "news": {
+            "network_call": _payload_network_call(news),
+            "live_data_required": bool(news.get("live_data_required")),
+            "data_mode": news.get("data_mode"),
+        },
+    }
+    return {
+        "schema_version": "scoring_source_data.v1",
+        "sources": sources,
+        "network_call": any(source["network_call"] for source in sources.values()),
+        "live_data_required": any(
+            source["live_data_required"] for source in sources.values()
+        ),
+    }
+
+
+def _payload_network_call(payload: dict[str, Any]) -> bool:
+    for contract_key in (
+        "timeframe_contract",
+        "swing_level_contract",
+        "macro_filter_contract",
+        "event_policy_contract",
+        "news_source_policy_contract",
+        "news_score_contract",
+    ):
+        contract = payload.get(contract_key)
+        if isinstance(contract, dict) and contract.get("network_call") is True:
+            return True
+    return bool(payload.get("network_call"))
+
+
+def _live_data_guard_check(live_data_required: bool) -> dict[str, Any]:
+    if live_data_required:
+        return {
+            "name": "live_data_boundary_declared",
+            "passed": live_data_required is True,
+            "expected": True,
+            "actual": live_data_required,
+        }
+    return {
+        "name": "no_live_data_required",
+        "passed": live_data_required is False,
+        "expected": False,
+        "actual": live_data_required,
     }
 
 
