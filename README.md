@@ -302,7 +302,11 @@ The top-level `api_key_provider_recovery_checklist`
 (`api_key_provider_recovery_checklist.v1`) pairs each failed provider row with
 its matching no-secret `recovery_smoke_command` and
 `recovery_smoke_available` flag so a failed API-key-backed smoke can be rerun
-without manually matching error and recovery arrays:
+without manually matching error and recovery arrays. The
+`api_key_operator_checklist` mirrors this as `provider_recovery_status`,
+`provider_recovery_required`, `provider_recovery_item_count`,
+`next_provider_recovery_action`, and `provider_recovery_checklist`, keeping the
+next recovery command visible in the same setup checklist:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit

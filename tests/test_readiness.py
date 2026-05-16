@@ -747,6 +747,7 @@ def expected_api_key_operator_checklist(
     configured_provider_families: list[str],
     missing_provider_families: list[str],
     ready_to_run_live_smoke: bool,
+    provider_recovery_checklist: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     command_summary = expected_api_key_command_summary(
         status=status,
@@ -822,10 +823,28 @@ def expected_api_key_operator_checklist(
         (step for step in steps if step.get("status") != "ready"),
         None,
     )
+    provider_recovery_checklist = provider_recovery_checklist or {
+        "schema_version": "api_key_provider_recovery_checklist.v1",
+        "status": "ok",
+        "provider_error_count": 0,
+        "provider_recovery_smoke_count": 0,
+        "item_count": 0,
+        "items": [],
+        "secret_values_returned": False,
+    }
+    provider_recovery_items = provider_recovery_checklist["items"]
+    next_provider_recovery_action = (
+        provider_recovery_items[0] if provider_recovery_items else None
+    )
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
         "status": status,
         "current_step": current_step,
+        "provider_recovery_status": provider_recovery_checklist["status"],
+        "provider_recovery_required": bool(provider_recovery_items),
+        "provider_recovery_item_count": len(provider_recovery_items),
+        "next_provider_recovery_action": next_provider_recovery_action,
+        "provider_recovery_checklist": provider_recovery_checklist,
         "ready": not blocking_step_names,
         "ready_step_names": ready_step_names,
         "ready_step_count": len(ready_step_names),
@@ -2330,6 +2349,23 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         item["secret_values_returned"] is False
         for item in recovery_checklist["items"]
     )
+    operator_checklist = payload["api_key_operator_checklist"]
+    assert operator_checklist["provider_recovery_status"] == "conflict"
+    assert operator_checklist["provider_recovery_required"] is True
+    assert operator_checklist["provider_recovery_item_count"] == 3
+    assert operator_checklist["provider_recovery_checklist"] == recovery_checklist
+    assert operator_checklist["next_provider_recovery_action"] == (
+        recovery_checklist["items"][0]
+    )
+    assert operator_checklist["next_provider_recovery_action"][
+        "recovery_smoke_command"
+    ] == payload["provider_recovery_smokes"][0]["command"]
+    assert (
+        operator_checklist["next_provider_recovery_action"][
+            "recovery_smoke_available"
+        ]
+        is True
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -3662,6 +3698,15 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "items": [],
         "secret_values_returned": False,
     }
+    assert payload["api_key_operator_checklist"]["provider_recovery_status"] == "ok"
+    assert (
+        payload["api_key_operator_checklist"]["provider_recovery_required"] is False
+    )
+    assert payload["api_key_operator_checklist"]["provider_recovery_item_count"] == 0
+    assert payload["api_key_operator_checklist"]["next_provider_recovery_action"] is None
+    assert payload["api_key_operator_checklist"]["provider_recovery_checklist"] == (
+        payload["api_key_provider_recovery_checklist"]
+    )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

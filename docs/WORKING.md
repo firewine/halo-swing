@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_GATE
+status: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_PROVIDER_RECOVERY_GATE
 review_tier: S1_small
 
-next_atomic_step: document the no-secret API-key provider recovery checklist fields in setup docs and lock them with docs tests
+next_atomic_step: surface provider recovery checklist status and next recovery action inside the API-key operator checklist
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,6 +55,8 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -72,22 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README documents api_key_provider_recovery_checklist as the one-row-per-failed-provider pairing of provider errors and rerunnable smoke commands
-  - DevOps setup guide documents api_key_provider_recovery_checklist, api_key_provider_recovery_checklist.v1, recovery_smoke_command, and recovery_smoke_available
-  - setup docs tests assert the checklist field names so docs stay aligned with the one-shot smoke payload
-  - no source behavior, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
+  - api_key_operator_checklist exposes provider_recovery_status, provider_recovery_required, provider_recovery_item_count, next_provider_recovery_action, and provider_recovery_checklist copied from api_key_provider_recovery_checklist
+  - when provider recovery is required, next_provider_recovery_action is a no-secret rerunnable recovery item including recovery_smoke_command and recovery_smoke_available
+  - when no provider recovery is required, operator checklist recovery fields are ok/false/zero/null without changing fixture-default setup blockers
+  - README and DevOps setup guide document the operator checklist provider recovery fields
+  - setup docs tests assert the operator checklist recovery field names
+  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery checklist docs gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key operator checklist provider recovery gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_DOCS_GATE
+review_tier: S1_small
+
+next_atomic_step: document the no-secret API-key provider recovery checklist fields in setup docs and lock them with docs tests
 ```
 
 Previous completed directive:
@@ -1862,6 +1876,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Operator Checklist Provider Recovery Gate is verified.
+`api_key_operator_checklist` now mirrors the provider recovery checklist status,
+required flag, item count, next no-secret recovery action, and full no-secret
+provider recovery checklist. Provider failure tests confirm the next recovery
+action includes the rerunnable recovery smoke command and availability flag.
+Fixture-default blocked setup keeps recovery fields ok/false/zero/null without
+changing setup blockers. Focused tests, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_operator_checklist_provider_recovery_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_operator_checklist now exposes provider_recovery_status, provider_recovery_required, provider_recovery_item_count, next_provider_recovery_action, and provider_recovery_checklist from api_key_provider_recovery_checklist
+    - provider recovery failure rows surface no-secret recovery_smoke_command and recovery_smoke_available in the operator checklist next recovery action
+    - fixture-default/no-key setup keeps provider recovery fields ok/false/zero/null while preserving prepare_dotenv as the setup blocker
+    - README and DevOps setup guide document the operator checklist provider recovery fields
+    - tests/test_setup_docs.py asserts the operator checklist recovery field names
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Checklist Docs Gate is verified. README and
 the DevOps setup guide now document `api_key_provider_recovery_checklist` as the

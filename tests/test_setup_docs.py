@@ -59,6 +59,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_provider_recovery_checklist.v1" in guide
     assert "recovery_smoke_command" in guide
     assert "recovery_smoke_available" in guide
+    assert "provider_recovery_status" in guide
+    assert "provider_recovery_required" in guide
+    assert "provider_recovery_item_count" in guide
+    assert "next_provider_recovery_action" in guide
+    assert "provider_recovery_checklist" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
     assert "run_api_key_pipeline_smoke" in guide

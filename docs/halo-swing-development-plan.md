@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.721 API Key Operator Checklist Provider Recovery Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_checklist`는 실패 provider별 rerunnable command를
+제공하지만, 사용자가 주로 보는 `api_key_operator_checklist`에는 provider recovery
+상태와 다음 recovery action이 직접 연결되어 있지 않다. 이번 slice는 API-key-only
+연동 점검 후 provider/network 실패가 발생했을 때 operator checklist에서도
+`provider_recovery_required`와 다음 no-secret recovery command를 바로 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_operator_checklist now exposes provider_recovery_status, provider_recovery_required, provider_recovery_item_count, next_provider_recovery_action, and provider_recovery_checklist
+  - next_provider_recovery_action mirrors the first no-secret recovery checklist item, including recovery_smoke_command and recovery_smoke_available
+  - fixture-default/no-key setup keeps provider recovery fields ok/false/zero/null without changing setup blockers
+  - README and DevOps setup guide document the operator checklist provider recovery fields
+  - tests/test_setup_docs.py asserts the operator checklist recovery field names
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 4 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.720 API Key Provider Recovery Checklist Docs Gate Record - 2026-05-17
 
 ### A. 목적

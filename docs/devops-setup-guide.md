@@ -490,6 +490,11 @@ with its matching no-secret `recovery_smoke_command` and
 `recovery_smoke_available` flag, so API-key-only recovery can rerun the right
 provider smoke without manually matching `provider_error_summaries` to
 `provider_recovery_smokes`.
+The `api_key_operator_checklist` mirrors provider recovery state as
+`provider_recovery_status`, `provider_recovery_required`,
+`provider_recovery_item_count`, `next_provider_recovery_action`, and
+`provider_recovery_checklist`, so the next no-secret provider recovery command
+stays visible beside the setup steps.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

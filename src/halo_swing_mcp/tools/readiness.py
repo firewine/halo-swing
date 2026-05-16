@@ -862,6 +862,9 @@ def run_api_key_pipeline_smoke(
     live_data_smoke_summary = _api_key_pipeline_smoke_summary(
         live_data_smoke,
     )
+    api_key_provider_recovery_checklist = _api_key_provider_recovery_checklist(
+        live_data_smoke_summary
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -897,11 +900,12 @@ def run_api_key_pipeline_smoke(
                 setup_status_summary=setup_status_summary,
                 api_key_requirements_summary=api_key_requirements_summary,
                 api_key_command_summary=api_key_command_summary,
+                api_key_provider_recovery_checklist=(
+                    api_key_provider_recovery_checklist
+                ),
             )
         ),
-        "api_key_provider_recovery_checklist": (
-            _api_key_provider_recovery_checklist(live_data_smoke_summary)
-        ),
+        "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -2120,6 +2124,7 @@ def _api_key_pipeline_operator_checklist(
     setup_status_summary: dict[str, Any],
     api_key_requirements_summary: dict[str, Any],
     api_key_command_summary: dict[str, Any],
+    api_key_provider_recovery_checklist: dict[str, Any],
 ) -> dict[str, Any]:
     copy_dotenv_command = _optional_mapping(
         api_key_command_summary.get("copy_dotenv_command")
@@ -2212,10 +2217,27 @@ def _api_key_pipeline_operator_checklist(
         (step for step in steps if step.get("status") != "ready"),
         None,
     )
+    provider_recovery_items = api_key_provider_recovery_checklist.get("items")
+    provider_recovery_rows = (
+        [row for row in provider_recovery_items if isinstance(row, dict)]
+        if isinstance(provider_recovery_items, list)
+        else []
+    )
+    provider_recovery_required = bool(provider_recovery_rows)
+    next_provider_recovery_action = (
+        provider_recovery_rows[0] if provider_recovery_rows else None
+    )
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
         "status": setup_status_summary.get("status"),
         "current_step": setup_status_summary.get("next_setup_step"),
+        "provider_recovery_status": api_key_provider_recovery_checklist.get(
+            "status"
+        ),
+        "provider_recovery_required": provider_recovery_required,
+        "provider_recovery_item_count": len(provider_recovery_rows),
+        "next_provider_recovery_action": next_provider_recovery_action,
+        "provider_recovery_checklist": api_key_provider_recovery_checklist,
         "ready": not blocking_step_names,
         "ready_step_names": ready_step_names,
         "ready_step_count": len(ready_step_names),
