@@ -2736,6 +2736,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "command"
         ],
         "recovery_smoke_available": True,
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
         "network_call": True,
         "network_call_policy": "only_when_matching_api_key_selects_live_provider",
         "mutates_local_state": False,
@@ -2775,6 +2780,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_blocking_step": "recover_failed_providers",
         "blocking_step_count": 1,
         "ready_step_count": 4,
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -4952,6 +4962,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert checklist_summary["next_blocking_action_network_call"] is True
     assert checklist_summary["next_blocking_action_mutates_local_state"] is False
+    assert checklist_summary["next_blocking_action_preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert checklist_summary["next_blocking_action_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
     assert checklist_summary["provider_recovery_required"] is True
     assert checklist_summary["provider_recovery_item_count"] == 3
     assert checklist_summary["next_provider_recovery_smoke_command_name"] == (
@@ -4963,6 +4980,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert checklist_summary["steps"][-1][
         "next_provider_recovery_smoke_command_name"
     ] == "get_market_snapshot_live_smoke"
+    assert checklist_summary["steps"][-1]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert checklist_summary["steps"][-1]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert payload["api_key_next_action_summary"]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert payload["api_key_next_action_summary"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
     assert checklist_summary["secret_values_returned"] is False
     assert "api_key_operator_checklist" not in payload
     assert "api_key_provider_recovery_checklist" not in payload

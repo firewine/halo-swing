@@ -1845,7 +1845,7 @@ def _api_key_pipeline_next_action_summary(
         or next_provider_smoke.get("command")
     )
     next_action_name = next_operator_action.get("name")
-    return {
+    summary = {
         "schema_version": "api_key_next_action_summary.v1",
         "status": api_key_operator_checklist.get("status"),
         "current_step": api_key_operator_checklist.get("current_step"),
@@ -1879,6 +1879,13 @@ def _api_key_pipeline_next_action_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    preferred_env_key = next_operator_action.get("preferred_env_key")
+    accepted_env_keys = _string_list(next_operator_action.get("accepted_env_keys"))
+    if isinstance(preferred_env_key, str):
+        summary["preferred_env_key"] = preferred_env_key
+    if accepted_env_keys:
+        summary["accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_operator_checklist_summary(
@@ -1908,7 +1915,7 @@ def _api_key_operator_checklist_summary(
         if isinstance(raw_steps, list)
         else []
     )
-    return {
+    summary = {
         "schema_version": "api_key_operator_checklist_summary.v1",
         "status": api_key_operator_checklist.get("status"),
         "current_step": api_key_operator_checklist.get("current_step"),
@@ -1954,6 +1961,13 @@ def _api_key_operator_checklist_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    preferred_env_key = next_blocking_action.get("preferred_env_key")
+    accepted_env_keys = _string_list(next_blocking_action.get("accepted_env_keys"))
+    if isinstance(preferred_env_key, str):
+        summary["next_blocking_action_preferred_env_key"] = preferred_env_key
+    if accepted_env_keys:
+        summary["next_blocking_action_accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_operator_checklist_step_summary(
@@ -1963,7 +1977,7 @@ def _api_key_operator_checklist_step_summary(
     next_provider_recovery_action = _optional_mapping(
         step.get("next_provider_recovery_action")
     ) or {}
-    return {
+    summary = {
         "name": step.get("name"),
         "status": step.get("status"),
         "command": step.get("command") or step.get("recovery_smoke_command"),
@@ -1987,6 +2001,18 @@ def _api_key_operator_checklist_step_summary(
         "mutates_local_state": step.get("mutates_local_state") is True,
         "secret_values_returned": False,
     }
+    preferred_env_key = step.get("preferred_env_key") or (
+        next_provider_recovery_action.get("preferred_env_key")
+    )
+    accepted_env_keys = _string_list(
+        step.get("accepted_env_keys")
+        or next_provider_recovery_action.get("accepted_env_keys")
+    )
+    if isinstance(preferred_env_key, str):
+        summary["preferred_env_key"] = preferred_env_key
+    if accepted_env_keys:
+        summary["accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_pipeline_stage_summary(
@@ -3131,6 +3157,16 @@ def _api_key_pipeline_operator_checklist(
                 )
                 if next_provider_recovery_action is not None
                 else False,
+                "preferred_env_key": next_provider_recovery_action.get(
+                    "preferred_env_key"
+                )
+                if next_provider_recovery_action is not None
+                else None,
+                "accepted_env_keys": next_provider_recovery_action.get(
+                    "accepted_env_keys"
+                )
+                if next_provider_recovery_action is not None
+                else [],
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
                 "mutates_local_state": False,

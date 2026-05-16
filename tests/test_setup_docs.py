@@ -150,6 +150,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_smoke_commands" in guide
     assert "one_shot_pipeline_smoke" in guide
     assert "next_provider_smoke_command_name" in guide
+    assert "next_blocking_action_preferred_env_key" in guide
     assert "keeps `api_key_setup_file_summary`" in guide
     assert "api_key_setup_file_summary.v1" in guide
     assert "preferred_env_keys" in guide
