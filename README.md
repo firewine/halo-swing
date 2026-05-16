@@ -279,8 +279,9 @@ orders, or return secret values. It also returns `live_data_setup_summary` so
 API-key-only setup shows key readiness, provider route status, selected provider
 classes, missing keys, and the one-shot pipeline smoke command without exposing
 secret values. The summary includes `ready_to_run_live_smoke`,
-`next_smoke_command`, and a no-secret `dotenv_template` for the repo-root `.env`
-entries to fill before running smoke commands. It also returns
+`next_smoke_command`, `provider_family_summary`, and a no-secret
+`dotenv_template` for the repo-root `.env` entries to fill before running smoke
+commands. It also returns
 `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the

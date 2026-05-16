@@ -351,6 +351,17 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "api_key_status": "blocked",
         "provider_route_status": "blocked",
         "configured_provider_families": [],
+        "provider_family_summary": {
+            "required_provider_families": ["market", "macro", "news"],
+            "configured_provider_families": [],
+            "missing_provider_families": ["market", "macro", "news"],
+            "configured_count": 0,
+            "required_count": 3,
+            "ready_to_run_live_smoke": False,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
         "missing": [
             "market_ohlcv_api_key",
             "macro_api_key",
@@ -903,6 +914,17 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
         "macro",
         "news",
     ]
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_count": 3,
+        "required_count": 3,
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is True
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
@@ -947,6 +969,17 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is False
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == [
         "market_ohlcv_api_key",
         "macro_api_key",
@@ -1071,6 +1104,17 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
         "macro",
         "news",
     ]
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_count": 3,
+        "required_count": 3,
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",
@@ -1131,6 +1175,17 @@ def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effect
     assert payload["live_data_setup_summary"]["status"] == "blocked"
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == [
         "market_ohlcv_api_key",
         "macro_api_key",
@@ -1600,6 +1655,17 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "api_key_status": "ready",
         "provider_route_status": "ready",
         "configured_provider_families": ["market", "macro", "news"],
+        "provider_family_summary": {
+            "required_provider_families": ["market", "macro", "news"],
+            "configured_provider_families": ["market", "macro", "news"],
+            "missing_provider_families": [],
+            "configured_count": 3,
+            "required_count": 3,
+            "ready_to_run_live_smoke": True,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
         "missing": [],
         "selected_provider_classes": [
             "PolygonMarketDataProvider",
@@ -1760,6 +1826,17 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "macro",
         "news",
     ]
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_count": 3,
+        "required_count": 3,
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",
@@ -1842,6 +1919,17 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["live_data_setup_summary"]["status"] == "blocked"
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == [
         "market_ohlcv_api_key",
         "macro_api_key",
@@ -3286,6 +3374,17 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
         "macro",
         "news",
     ]
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_count": 3,
+        "required_count": 3,
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",

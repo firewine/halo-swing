@@ -381,9 +381,10 @@ precedence documented above. The checklist payload also includes
 route status, selected provider classes, missing keys, and the one-shot
 `run_api_key_pipeline_smoke` command without returning secret values. The
 summary includes `ready_to_run_live_smoke`, `next_smoke_command`, and a no-secret
-`dotenv_template` with repo-root `.env` entries for Polygon, FRED, and NewsAPI so
-the setup payload itself shows what to fill before running smoke commands. It
-also includes `live_data_smoke_commands` for `get_market_snapshot`,
+`provider_family_summary` with configured/missing live data provider families,
+and a no-secret `dotenv_template` with repo-root `.env` entries for Polygon,
+FRED, and NewsAPI so the setup payload itself shows what to fill before running
+smoke commands. It also includes `live_data_smoke_commands` for `get_market_snapshot`,
 `get_macro_snapshot`, and `get_news_bundle`. After filling the matching API keys,
 run those repo-local harness commands to verify the live provider outputs and
 boundary contracts. The smoke commands are read-only and return no secret values,

@@ -1490,6 +1490,10 @@ def _live_data_setup_summary(
         api_key_status.get("status") == "ready"
         and provider_route.get("status") == "ready"
     )
+    provider_family_summary = _live_data_provider_family_summary(
+        api_key_status=api_key_status,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
     return {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready" if ready_to_run_live_smoke else "blocked",
@@ -1497,6 +1501,7 @@ def _live_data_setup_summary(
         "api_key_status": api_key_status.get("status"),
         "provider_route_status": provider_route.get("status"),
         "configured_provider_families": configured_provider_families,
+        "provider_family_summary": provider_family_summary,
         "missing": missing,
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
@@ -1512,6 +1517,49 @@ def _live_data_setup_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+
+
+def _live_data_provider_family_summary(
+    *,
+    api_key_status: dict[str, Any],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    providers = _optional_mapping(api_key_status.get("providers")) or {}
+    summary = _optional_mapping(api_key_status.get("provider_family_summary")) or {}
+    required_provider_families = _string_list(
+        summary.get("required_provider_families")
+    ) or list(providers)
+    configured_provider_families = _string_list(
+        summary.get("configured_provider_families")
+    ) or [
+        family
+        for family, provider in providers.items()
+        if _optional_mapping(provider).get("configured") is True
+    ]
+    missing_provider_families = _string_list(
+        summary.get("missing_provider_families")
+    ) or [
+        family
+        for family in required_provider_families
+        if family not in configured_provider_families
+    ]
+    return {
+        "required_provider_families": required_provider_families,
+        "configured_provider_families": configured_provider_families,
+        "missing_provider_families": missing_provider_families,
+        "configured_count": len(configured_provider_families),
+        "required_count": len(required_provider_families),
+        "ready_to_run_live_smoke": ready_to_run_live_smoke,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _string_list(values: Any) -> list[str]:
+    if not isinstance(values, list):
+        return []
+    return [value for value in values if isinstance(value, str)]
 
 
 def _ordered_unique_strings(values: list[Any]) -> list[str]:
