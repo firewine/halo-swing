@@ -42,23 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_LIVE_ORDER_APPROVAL_ENV_FLAG_VERIFIED
-gate_id: BINANCE_LIVE_ORDER_APPROVAL_ENV_FLAG_GATE
+status: ENV_BACKED_INTEGRATION_READINESS_SMOKE_VERIFIED
+gate_id: ENV_BACKED_INTEGRATION_READINESS_SMOKE_GATE
 review_tier: S1_small
 
-next_atomic_step: let get_integration_readiness read explicit live-order approval from a non-secret dotenv/env flag without enabling order submission
+next_atomic_step: prove get_integration_readiness can reach integration-ready evidence from repo-root dotenv values while migration and repository remain gated
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - .env.example
   - README.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_env_template.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -77,23 +73,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_integration_readiness accepts HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true from exported env or local dotenv when the public input is omitted
-  - explicit live_order_approved input still overrides the environment flag
-  - invalid HALO_SWING_BINANCE_LIVE_ORDER_APPROVED values are rejected before Binance credential status reads
-  - .env.example includes a blank HALO_SWING_BINANCE_LIVE_ORDER_APPROVED placeholder
-  - README and DevOps setup docs describe the non-secret live-order approval readiness flag and preserve execute_btc_order confirmation requirements
-  - tests lock env-backed live-order approval readiness without exposing secrets or implying order submission
+  - repo-root .env can provide Hermes config/registration, Telegram token/gateway, live data API keys, Binance encrypted credential path, live trading, passphrase confirmation, trade-only attestation, and live-order approval without public readiness inputs
+  - get_integration_readiness marks Hermes, Telegram, live_data, Binance testnet read-only, and live_order_submission ready from that local dotenv setup
+  - migration and repository gates remain blocked without explicit durable MIGRATION_GO and REPOSITORY_GO approval
+  - readiness output still returns no secret values, no Telegram send, no Hermes runtime start, no network call, and no order submission
+  - README and DevOps setup docs describe the local all-env readiness smoke boundary
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live-order approval env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+next_state_after_success: commit and push this verified env-backed integration readiness smoke gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: BINANCE_LIVE_ORDER_APPROVAL_ENV_FLAG_VERIFIED
+gate_id: BINANCE_LIVE_ORDER_APPROVAL_ENV_FLAG_GATE
+review_tier: S1_small
+
+next_atomic_step: let get_integration_readiness read explicit live-order approval from a non-secret dotenv/env flag without enabling order submission
 ```
 
 Previous completed directive:
@@ -710,18 +716,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.643
-gate_packet: docs/halo-swing-development-plan.md#3.643
+portable_mirror: docs/halo-swing-development-plan.md#3.644
+gate_packet: docs/halo-swing-development-plan.md#3.644
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.643
+  - docs/halo-swing-development-plan.md#3.644
   - src/halo_swing_mcp/tools/readiness.py
-  - src/halo_swing_mcp/server.py
-  - .env.example
   - tests/test_readiness.py
-  - tests/test_env_template.py
   - tests/test_setup_docs.py
 
 implementation_rule:
@@ -1024,6 +1027,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Env-Backed Integration Readiness Smoke Gate is verified. A repo-root
+`.env` smoke test now proves `get_integration_readiness` can mark Hermes,
+Telegram, live data, Binance testnet read-only, and live-order submission
+readiness evidence ready from local config values and non-secret approval flags
+without public readiness inputs. `MIGRATION_GO` and `REPOSITORY_GO` remain
+blocked without durable gate approval. The readiness payload still returns no
+secret values, starts no Hermes runtime, sends no Telegram message, makes no
+network call, and submits no order. Focused tests passed with 58 tests, full
+pytest passed with 730 tests, and ruff and health_check passed.
+
+```yaml
+env_backed_integration_readiness_smoke_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - repo-root .env readiness smoke covers Hermes config/registration, Telegram token/gateway, live data API keys, Binance encrypted credential path, live trading, passphrase confirmation, trade-only attestation, and live-order approval
+    - Hermes, Telegram, live_data, Binance testnet read-only, and live_order_submission readiness gates become ready from local dotenv values
+    - migration and repository gates remain blocked without explicit MIGRATION_GO and REPOSITORY_GO approval
+    - readiness evidence remains offline and does not expose secrets or imply order submission
+    - README and DevOps setup guide document the all-env readiness smoke boundary
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q
+      result: "58 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py tests/test_setup_docs.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "730 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Binance Live-Order Approval Env Flag Gate is verified.
 `get_integration_readiness` now reads

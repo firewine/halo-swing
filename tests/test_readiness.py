@@ -31,6 +31,7 @@ READINESS_ENV_KEYS = (
     "HALO_SWING_BINANCE_TESTNET",
     "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+    "HALO_SWING_BINANCE_CREDENTIALS_PATH",
     "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED",
     "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED",
     "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED",
@@ -1491,6 +1492,111 @@ def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized
+
+
+def test_integration_readiness_repo_root_env_clears_integration_gates_without_gate_go(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_dir = tmp_path / "repo"
+    run_dir = tmp_path / "runner"
+    repo_dir.mkdir()
+    run_dir.mkdir()
+    repo_env = repo_dir / ".env"
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+
+    hermes_config_path = repo_dir / "hermes.yaml"
+    credentials_path = repo_dir / "credentials.enc.json"
+    risk_settings_path = repo_dir / "risk_settings.json"
+    hermes_config_path.write_text("mcp_servers: {}\n", encoding="utf-8")
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    secret_env = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-env-secret-token",
+        "HALO_SWING_TELEGRAM_GATEWAY": "https://gateway.example/env-secret",
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-env-secret-key",
+        "HALO_SWING_MACRO_API_KEY": "macro-env-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-env-secret-key",
+    }
+    repo_env.write_text(
+        "\n".join(
+            [
+                f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
+                "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true",
+                f"HALO_SWING_BINANCE_CREDENTIALS_PATH={credentials_path}",
+                "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true",
+                "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true",
+                "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true",
+                "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true",
+                *(f"{key}={value}" for key, value in secret_env.items()),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        btc_risk_settings_path=str(risk_settings_path),
+    )
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert payload["next_actions"] == [
+        "migration: provide explicit_MIGRATION_GO",
+        "repository: provide MIGRATION_GO, REPOSITORY_GO",
+    ]
+    for gate_name in (
+        "hermes",
+        "telegram",
+        "binance_testnet_read_only",
+        "live_order_submission",
+        "live_data",
+    ):
+        assert payload["gates"][gate_name]["status"] == "ready"
+        assert payload["gates"][gate_name]["missing"] == []
+    assert payload["gates"]["migration"]["status"] == "blocked"
+    assert payload["gates"]["repository"]["status"] == "blocked"
+    assert payload["gates"]["migration"]["missing"] == ["explicit_MIGRATION_GO"]
+    assert payload["gates"]["repository"]["missing"] == [
+        "MIGRATION_GO",
+        "REPOSITORY_GO",
+    ]
+    assert payload["gates"]["hermes"]["evidence"]["runtime_started"] is False
+    assert payload["gates"]["hermes"]["evidence"]["network_call"] is False
+    assert payload["gates"]["telegram"]["evidence"]["send_call"] is False
+    assert payload["gates"]["telegram"]["evidence"]["network_call"] is False
+    assert (
+        payload["gates"]["live_order_submission"]["evidence"]["order_submission"]
+        is False
+    )
+    assert payload["gates"]["live_order_submission"]["evidence"]["network_call"] is False
+    assert (
+        payload["gates"]["live_order_submission"]["evidence"]["requires_confirmation"]
+        == "CONFIRM_BTC_BINANCE_COINM_ORDER"
+    )
+    assert (
+        payload["gates"]["binance_testnet_read_only"]["evidence"]["credentials"][
+            "api_key_hint"
+        ]
+        == "abcde...5key"
+    )
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
+    assert "abcde12345key" not in serialized
+    assert "api_secret" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
 
 
 def test_integration_readiness_requires_api_keys_with_live_modes(

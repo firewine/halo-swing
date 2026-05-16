@@ -182,6 +182,12 @@ live-order approval decision has been made; it is also readiness evidence only.
 `execute_btc_order` still requires `CONFIRM_BTC_BINANCE_COINM_ORDER`, the live
 trading env flag, encrypted credentials, manual passphrase input, and passing
 risk checks.
+Together, repo-root `.env` values can make Hermes, Telegram, live data,
+Binance testnet read-only, and live-order readiness evidence pass without
+public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` remain blocked until
+their durable gates are approved. This all-env readiness smoke still performs
+no network call, no Hermes runtime start, no Telegram send, and no order
+submission.
 Report tools include an offline `delivery_preview` payload for Hermes and
 Telegram. The preview contains Telegram message chunks and guard checks, but it
 does not send messages or require credentials. Telegram previews expose the

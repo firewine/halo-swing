@@ -425,6 +425,16 @@ This still does not submit orders. `execute_btc_order` continues to require the
 confirmation string `CONFIRM_BTC_BINANCE_COINM_ORDER`, the live trading env
 flag, encrypted credentials, manual passphrase input, and passing risk checks.
 
+At this point a repo-root `.env` can provide the local readiness values for
+Hermes config/registration, Telegram token or gateway, live data API keys,
+Binance encrypted credential path, live trading, passphrase confirmation,
+trade-only/no-withdraw attestation, and live-order approval. With those values,
+`get_integration_readiness` can mark the integration evidence gates ready
+without public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` still stay
+blocked until their durable gates are approved. This all-env readiness smoke is
+offline only: no network call, no Hermes runtime start, no Telegram send, no
+order submission, and no secret values returned.
+
 BTC COIN-M trading admin:
 
 ```bash

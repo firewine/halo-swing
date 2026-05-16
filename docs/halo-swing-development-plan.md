@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.644 Env-Backed Integration Readiness Smoke Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자는 실제 연동을 API key와 로컬 설정값만 넣으면 준비 상태까지 도달할 수
+있도록 요구했다. 기존 slice들은 Hermes registration, Binance passphrase,
+trade-only attestation, live-order approval을 각각 env/dotenv에서 읽도록 만들었다.
+이번 slice는 repo-root `.env` 하나로 Hermes, Telegram, live data, Binance testnet
+read-only, live-order submission readiness evidence가 모두 통과되는지 오프라인
+회귀 테스트로 고정한다. 단, `MIGRATION_GO`와 `REPOSITORY_GO`는 durable gate가
+아직 승인되지 않았으므로 계속 blocked 상태여야 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - repo-root .env can provide Hermes config/registration, Telegram token/gateway, live data API keys, Binance encrypted credential path, live trading, passphrase confirmation, trade-only attestation, and live-order approval without public readiness inputs
+  - get_integration_readiness marks Hermes, Telegram, live_data, Binance testnet read-only, and live_order_submission ready from that local dotenv setup
+  - migration and repository gates remain blocked without explicit durable MIGRATION_GO and REPOSITORY_GO approval
+  - readiness output still returns no secret values, no Telegram send, no Hermes runtime start, no network call, and no order submission
+  - README and DevOps setup docs describe the local all-env readiness smoke boundary
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - order submission
+  - Binance network call
+  - Telegram send call
+  - Hermes runtime call
+  - secret value exposure
+  - DB migration or repository persistence
+  - broker path changes
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q -> 58 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check tests/test_readiness.py tests/test_setup_docs.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 730 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.643 Binance Live-Order Approval Env Flag Gate Record - 2026-05-16
 
 ### A. 목적

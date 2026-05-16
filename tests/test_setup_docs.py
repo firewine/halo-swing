@@ -72,3 +72,16 @@ def test_setup_docs_describe_binance_live_order_approval_env_flag() -> None:
         assert "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true" in document
         assert "readiness evidence only" in document
         assert "CONFIRM_BTC_BINANCE_COINM_ORDER" in document
+
+
+def test_setup_docs_describe_all_env_readiness_smoke_boundary() -> None:
+    text = _normalized_text(README)
+    guide = _normalized_text(DEVOPS_GUIDE)
+
+    for document in (text, guide):
+        assert "repo-root `.env`" in document or "repo-root .env" in document
+        assert "MIGRATION_GO" in document
+        assert "REPOSITORY_GO" in document
+        assert "no network call" in document
+        assert "no Telegram send" in document
+        assert "no order submission" in document
