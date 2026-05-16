@@ -137,6 +137,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "keeps `api_key_operator_checklist_summary`" in guide
     assert "api_key_operator_checklist_summary.v1" in guide
     assert "next_blocking_action_command" in guide
+    assert "keeps `live_data_setup_summary`" in guide
+    assert "live_data_setup_summary.v1" in guide
+    assert "provider smoke plan" in guide
     assert "keeps `api_key_requirements_summary`" in guide
     assert "api_key_pipeline_api_key_requirements_summary.v1" in guide
     assert "required_env_keys" in guide

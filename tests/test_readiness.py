@@ -4440,6 +4440,41 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "secret_values_returned": False,
     }
     assert payload["setup_status_summary"]["next_setup_step"] == "prepare_dotenv"
+    assert payload["live_data_setup_summary"]["schema_version"] == (
+        "live_data_setup_summary.v1"
+    )
+    assert payload["live_data_setup_summary"]["status"] == "blocked"
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["live_data_setup_summary"]["dotenv_template"]["source_path"] == (
+        ".env.example"
+    )
+    assert payload["live_data_setup_summary"]["dotenv_template"]["target_path"] == (
+        ".env"
+    )
+    assert payload["live_data_setup_summary"]["live_data_setup_steps"][
+        "next_step"
+    ] == "prepare_dotenv"
+    assert payload["live_data_setup_summary"]["next_operator_action"][
+        "name"
+    ] == "prepare_dotenv"
+    assert payload["live_data_setup_summary"]["one_shot_smoke_command"][
+        "name"
+    ] == "run_api_key_pipeline_smoke"
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["api_key_requirements_summary"] == (
         expected_api_key_requirements_summary(
             status="blocked",
@@ -4669,6 +4704,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
     assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
     assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
+    assert "live_data_setup_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
@@ -4719,6 +4755,53 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
     assert setup_file_summary["ready_to_run_live_smoke"] is True
     assert setup_file_summary["secret_values_returned"] is False
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    setup_summary = payload["live_data_setup_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert setup_summary["schema_version"] == "live_data_setup_summary.v1"
+    assert setup_summary["status"] == "ready"
+    assert setup_summary["ready_to_run_live_smoke"] is True
+    assert setup_summary["api_key_status"] == "ready"
+    assert setup_summary["provider_route_status"] == "ready"
+    assert setup_summary["configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert setup_summary["provider_family_summary"][
+        "missing_provider_families"
+    ] == []
+    assert setup_summary["provider_smoke_plan"]["provider_smoke_count"] == 3
+    assert setup_summary["provider_smoke_plan"]["ready_provider_smoke_count"] == 3
+    assert setup_summary["live_data_setup_steps"]["next_step"] == (
+        "run_provider_smokes"
+    )
+    assert setup_summary["next_operator_action"]["name"] == "run_provider_smokes"
+    assert setup_summary["next_operator_action"][
+        "next_provider_smoke_command_name"
+    ] == "get_market_snapshot_live_smoke"
+    assert setup_summary["one_shot_smoke_command"]["name"] == (
+        "run_api_key_pipeline_smoke"
+    )
+    assert setup_summary["network_call"] is False
+    assert setup_summary["secret_values_returned"] is False
+    assert "live_data_setup_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

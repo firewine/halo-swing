@@ -2226,6 +2226,10 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("setup_status_summary")
         )
         or {},
+        "live_data_setup_summary": _optional_mapping(
+            payload.get("live_data_setup_summary")
+        )
+        or {},
         "api_key_requirements_summary": _optional_mapping(
             payload.get("api_key_requirements_summary")
         )
@@ -2289,7 +2293,6 @@ def _api_key_pipeline_summary_only_payload(
             "provider_recovery_smoke_count"
         ),
         "omitted_sections": [
-            "live_data_setup_summary",
             "api_key_operator_checklist",
             "api_key_provider_recovery_checklist",
             "live_data_smoke_summary",

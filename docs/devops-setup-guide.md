@@ -471,7 +471,7 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `api_key_integration_status_summary`, `api_key_next_action_summary`,
 `api_key_operator_checklist_summary`, `setup_status_summary`,
-`api_key_requirements_summary`,
+`live_data_setup_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`, `api_key_setup_file_summary`,
 `api_key_dotenv_loading_summary`, `api_key_pipeline_failure_summary`,
 `api_key_pipeline_stage_summary`, `api_key_pipeline_check_summary`,
@@ -490,6 +490,11 @@ ready/blocking step names and counts, `next_blocking_action_name`,
 `next_blocking_action_command`, provider recovery status, and compact setup
 step rows, so the compact response still shows the next local setup or recovery
 action without returning the full checklist payload.
+It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
+API-key setup status, provider family summary, provider smoke plan, dotenv
+template/file status, setup steps, and no-secret next operator action, so the
+compact response shows the same local setup readiness evidence as the full
+one-shot pipeline response without returning secret values.
 It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,
