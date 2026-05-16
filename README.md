@@ -303,7 +303,9 @@ whether `.env.example` and `.env` exist, the next setup action, and the
 repo-local copy command hint without writing files or returning secret values.
 `next_operator_action` summarizes the single next local action for API-key-only
 setup without returning secret values, and points to provider smoke verification
-before the one-shot pipeline smoke once API keys are ready.
+before the one-shot pipeline smoke once API keys are ready. In that ready state,
+it includes `next_provider_smoke` so the first provider smoke command is visible
+without reading the full provider list.
 `live_data_setup_steps` orders the local setup path as dotenv preparation, live
 data API-key entry, provider smoke verification, and the one-shot pipeline
 smoke. It also returns

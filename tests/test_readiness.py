@@ -248,6 +248,14 @@ def expected_live_data_setup_steps(
         ),
         ready_to_run_live_smoke=ready_to_run_live_smoke,
     )
+    next_provider_smoke = next(
+        (
+            provider_smoke
+            for provider_smoke in provider_smoke_plan["provider_smokes"]
+            if provider_smoke["status"] == "ready"
+        ),
+        None,
+    )
     if (
         dotenv_file_status["source_exists"] is False
         and dotenv_file_status["target_exists"] is False
@@ -294,6 +302,12 @@ def expected_live_data_setup_steps(
                 "status": "ready" if ready_to_run_live_smoke else "blocked",
                 "provider_smokes": provider_smoke_plan["provider_smokes"],
                 "provider_smoke_count": 3,
+                "next_provider_smoke": next_provider_smoke,
+                "next_provider_smoke_command_name": (
+                    next_provider_smoke["smoke_command_name"]
+                    if next_provider_smoke
+                    else None
+                ),
                 "ready_provider_smoke_count": provider_smoke_plan[
                     "ready_provider_smoke_count"
                 ],
@@ -370,6 +384,10 @@ def expected_next_operator_action(
             "status": "ready",
             "provider_smokes": provider_smoke_step["provider_smokes"],
             "provider_smoke_count": provider_smoke_step["provider_smoke_count"],
+            "next_provider_smoke": provider_smoke_step["next_provider_smoke"],
+            "next_provider_smoke_command_name": provider_smoke_step[
+                "next_provider_smoke_command_name"
+            ],
             "ready_provider_smoke_count": provider_smoke_step[
                 "ready_provider_smoke_count"
             ],

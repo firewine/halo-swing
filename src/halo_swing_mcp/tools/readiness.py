@@ -2159,6 +2159,7 @@ def _live_data_setup_steps(
     smoke_command = _optional_mapping(one_shot_smoke_command)
     raw_provider_smokes = provider_smoke_plan.get("provider_smokes")
     provider_smokes = raw_provider_smokes if isinstance(raw_provider_smokes, list) else []
+    next_provider_smoke = _next_ready_provider_smoke(provider_smokes)
     target_exists = dotenv_file_status.get("target_exists") is True
     source_exists = dotenv_file_status.get("source_exists") is True
     copy_required = dotenv_file_status.get("copy_required") is True
@@ -2220,6 +2221,12 @@ def _live_data_setup_steps(
                 "status": "ready" if ready_to_run_live_smoke else "blocked",
                 "provider_smokes": provider_smokes,
                 "provider_smoke_count": len(provider_smokes),
+                "next_provider_smoke": next_provider_smoke,
+                "next_provider_smoke_command_name": next_provider_smoke.get(
+                    "smoke_command_name"
+                )
+                if next_provider_smoke
+                else None,
                 "ready_provider_smoke_count": provider_smoke_plan.get(
                     "ready_provider_smoke_count"
                 ),
@@ -2303,6 +2310,10 @@ def _live_data_next_operator_action(
             "status": "ready",
             "provider_smokes": provider_smoke_step.get("provider_smokes", []),
             "provider_smoke_count": provider_smoke_step.get("provider_smoke_count"),
+            "next_provider_smoke": provider_smoke_step.get("next_provider_smoke"),
+            "next_provider_smoke_command_name": provider_smoke_step.get(
+                "next_provider_smoke_command_name"
+            ),
             "ready_provider_smoke_count": provider_smoke_step.get(
                 "ready_provider_smoke_count"
             ),
@@ -2340,6 +2351,14 @@ def _live_data_next_operator_action(
         "next_after_action": "run_provider_smokes",
         "secret_input_required": True,
     }
+
+
+def _next_ready_provider_smoke(provider_smokes: list[Any]) -> dict[str, Any] | None:
+    for provider_smoke in provider_smokes:
+        smoke = _optional_mapping(provider_smoke)
+        if smoke is not None and smoke.get("status") == "ready":
+            return smoke
+    return None
 
 
 def _extend_workflow_contract_checks(

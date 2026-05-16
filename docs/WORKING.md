@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_NEXT_ACTION_PROVIDER_SMOKES_VERIFIED
-gate_id: LIVE_DATA_NEXT_ACTION_PROVIDER_SMOKES_GATE
+status: LIVE_DATA_NEXT_PROVIDER_SMOKE_COMMAND_VERIFIED
+gate_id: LIVE_DATA_NEXT_PROVIDER_SMOKE_COMMAND_GATE
 review_tier: S1_small
 
-next_atomic_step: route ready API-key-only next_step and next_operator_action to run_provider_smokes before the one-shot pipeline smoke
+next_atomic_step: add a no-secret next_provider_smoke command object to the ready run_provider_smokes setup step and next_operator_action
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,17 +81,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - ready API-key-only live_data_setup_steps next_step is run_provider_smokes before run_api_key_pipeline_smoke
-  - ready next_operator_action exposes no-secret provider smoke commands, counts, readiness, and next_after_action=run_api_key_pipeline_smoke
-  - pending fill_live_data_api_keys next_after_action points to run_provider_smokes
-  - pipeline setup_status_summary and operator checklist current_step reflect run_provider_smokes when API keys are ready
-  - README and DevOps setup guide describe provider smokes as the next action before the one-shot smoke
+  - ready run_provider_smokes setup step exposes next_provider_smoke and next_provider_smoke_command_name
+  - ready next_operator_action exposes the same no-secret next_provider_smoke command object
+  - blocked or partial setup paths do not return secret values and remain non-mutating
+  - README and DevOps setup guide mention that next_operator_action surfaces the first provider smoke command once API keys are ready
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data next-action provider-smokes gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data next-provider-smoke command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_NEXT_ACTION_PROVIDER_SMOKES_VERIFIED
+gate_id: LIVE_DATA_NEXT_ACTION_PROVIDER_SMOKES_GATE
+review_tier: S1_small
+
+next_atomic_step: route ready API-key-only next_step and next_operator_action to run_provider_smokes before the one-shot pipeline smoke
 ```
 
 Previous completed directive:
@@ -1646,6 +1656,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Next Provider Smoke Command Gate is verified.
+Ready `run_provider_smokes` setup steps and ready `next_operator_action` now
+include a no-secret `next_provider_smoke` command object and
+`next_provider_smoke_command_name`, so the first provider smoke command is
+visible without reading the full provider list. Blocked local setup remains
+non-mutating and does not return secret values. Focused tests passed with 5
+tests, full pytest passed with 762 tests, and ruff, health_check, and the
+one-shot pipeline harness passed. With local `.env` absent, the one-shot
+pipeline harness exits 0 and remains blocked at `prepare_dotenv` without
+secrets; the provider smoke step returns `next_provider_smoke=null` until keys
+are configured.
+
+```yaml
+live_data_next_provider_smoke_command_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - ready run_provider_smokes setup step exposes next_provider_smoke and next_provider_smoke_command_name
+    - ready next_operator_action exposes the same no-secret next_provider_smoke command object
+    - blocked or partial setup paths do not return secret values and remain non-mutating
+    - README and DevOps guide document next_provider_smoke in the ready API-key setup path
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "762 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv, provider smoke step returned next_provider_smoke=null, and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: Live Data Next Action Provider Smokes Gate is verified.
 Ready API-key-only setup now routes `live_data_setup_steps.next_step` and
