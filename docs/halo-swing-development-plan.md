@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.724 API Key Pipeline Recovery Next Action Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_operator_checklist`는 provider recovery blocker를 정확히 가리키지만,
+`run_api_key_pipeline_smoke` top-level `next_operator_action`과
+`readiness_summary.next_operator_action`은 여전히 setup summary의
+`run_provider_smokes`를 가리킬 수 있다. 이번 slice는 recovery blocker가 있는 경우
+one-shot API-key payload의 대표 next action도 `recover_failed_providers`로 맞춰,
+사용자가 payload 어느 요약을 보더라도 같은 다음 command를 실행하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now computes api_key_operator_checklist once and reuses its recovery next_blocking_action as the effective top-level next_operator_action when provider recovery is required
+  - readiness_summary.next_operator_action and next_operator_action_name now point to recover_failed_providers when provider recovery is required
+  - no-recovery ready/blocked setup paths keep their existing live_data_setup_summary next_operator_action behavior
+  - README and DevOps setup guide document the recovery next_operator_action behavior
+  - tests/test_setup_docs.py asserts readiness_summary.next_operator_action guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 4 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with top-level and readiness_summary next_operator_action pointing to recover_failed_providers without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.723 API Key Operator Checklist Recovery Status Gate Record - 2026-05-17
 
 ### A. 목적

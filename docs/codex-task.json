@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_OPERATOR_CHECKLIST_RECOVERY_STATUS_GATE",
+  "gate_id": "API_KEY_PIPELINE_RECOVERY_NEXT_ACTION_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.723",
-  "next_atomic_step": "make API-key operator checklist status and current step reflect provider recovery blockers",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.724",
+  "next_atomic_step": "make API-key one-shot top-level next_operator_action point to provider recovery blockers when recovery is required",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.722",
+    "docs/halo-swing-development-plan.md#3.723",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,15 +56,16 @@
     "read_only": true
   },
   "done_means": [
-    "when provider_recovery_required is true, api_key_operator_checklist status is conflict and current_step is recover_failed_providers",
-    "when no provider recovery is required, api_key_operator_checklist status and current_step keep existing setup behavior",
-    "fake-key API-key pipeline CLI demonstrates status=conflict and current_step=recover_failed_providers without secrets",
-    "README and DevOps setup guide document the recovery status/current_step behavior",
-    "setup docs tests assert the recovery status/current_step field guidance",
+    "when provider recovery is required, run_api_key_pipeline_smoke top-level next_operator_action is recover_failed_providers",
+    "when provider recovery is required, readiness_summary.next_operator_action and next_operator_action_name point to recover_failed_providers",
+    "when no provider recovery is required, top-level and readiness_summary next_operator_action keep existing setup behavior",
+    "fake-key API-key pipeline CLI demonstrates top-level and readiness_summary next_operator_action recover_failed_providers without secrets",
+    "README and DevOps setup guide document the recovery next_operator_action behavior",
+    "setup docs tests assert the recovery next_operator_action field guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key operator checklist recovery status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key pipeline recovery next-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

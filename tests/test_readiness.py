@@ -2395,6 +2395,20 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert operator_checklist["steps"][-1] == operator_checklist[
         "next_blocking_action"
     ]
+    assert payload["next_operator_action"] == operator_checklist[
+        "next_blocking_action"
+    ]
+    assert payload["next_operator_action"]["name"] == "recover_failed_providers"
+    assert payload["next_operator_action"]["recovery_smoke_command"] == (
+        payload["provider_recovery_smokes"][0]["command"]
+    )
+    assert payload["readiness_summary"]["next_operator_action"] == (
+        operator_checklist["next_blocking_action"]
+    )
+    assert (
+        payload["readiness_summary"]["next_operator_action_name"]
+        == "recover_failed_providers"
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -3737,6 +3751,15 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["api_key_operator_checklist"]["next_provider_recovery_action"] is None
     assert payload["api_key_operator_checklist"]["provider_recovery_checklist"] == (
         payload["api_key_provider_recovery_checklist"]
+    )
+    assert payload["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
+    )
+    assert payload["readiness_summary"]["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
+    )
+    assert payload["readiness_summary"]["next_operator_action_name"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]["name"]
     )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (

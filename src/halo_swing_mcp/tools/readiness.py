@@ -865,6 +865,18 @@ def run_api_key_pipeline_smoke(
     api_key_provider_recovery_checklist = _api_key_provider_recovery_checklist(
         live_data_smoke_summary
     )
+    api_key_operator_checklist = _api_key_pipeline_operator_checklist(
+        setup_status_summary=setup_status_summary,
+        api_key_requirements_summary=api_key_requirements_summary,
+        api_key_command_summary=api_key_command_summary,
+        api_key_provider_recovery_checklist=(
+            api_key_provider_recovery_checklist
+        ),
+    )
+    next_operator_action = _api_key_pipeline_next_operator_action(
+        live_data_setup_summary=live_data_setup_summary,
+        api_key_operator_checklist=api_key_operator_checklist,
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -886,25 +898,14 @@ def run_api_key_pipeline_smoke(
         "readiness_summary": _api_key_pipeline_readiness_summary(
             readiness,
             live_data_setup_summary,
+            next_operator_action=next_operator_action,
         ),
         "live_data_setup_summary": live_data_setup_summary,
-        "next_operator_action": _optional_mapping(
-            live_data_setup_summary.get("next_operator_action")
-        )
-        or {},
+        "next_operator_action": next_operator_action,
         "setup_status_summary": setup_status_summary,
         "api_key_requirements_summary": api_key_requirements_summary,
         "api_key_command_summary": api_key_command_summary,
-        "api_key_operator_checklist": (
-            _api_key_pipeline_operator_checklist(
-                setup_status_summary=setup_status_summary,
-                api_key_requirements_summary=api_key_requirements_summary,
-                api_key_command_summary=api_key_command_summary,
-                api_key_provider_recovery_checklist=(
-                    api_key_provider_recovery_checklist
-                ),
-            )
-        ),
+        "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
@@ -1729,13 +1730,15 @@ def _api_key_pipeline_checks(
 def _api_key_pipeline_readiness_summary(
     readiness: dict[str, Any],
     live_data_setup_summary: dict[str, Any],
+    *,
+    next_operator_action: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     gates = _optional_mapping(readiness.get("gates")) or {}
     live_data_gate = _optional_mapping(gates.get("live_data")) or {}
     live_data_setup_steps = _optional_mapping(
         live_data_setup_summary.get("live_data_setup_steps")
     ) or {}
-    next_operator_action = _optional_mapping(
+    next_operator_action = next_operator_action or _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
     ) or {}
     return {
@@ -1756,6 +1759,21 @@ def _api_key_pipeline_readiness_summary(
         "next_operator_action": next_operator_action,
         "next_actions": readiness.get("next_actions"),
     }
+
+
+def _api_key_pipeline_next_operator_action(
+    *,
+    live_data_setup_summary: dict[str, Any],
+    api_key_operator_checklist: dict[str, Any],
+) -> dict[str, Any]:
+    next_blocking_action = _optional_mapping(
+        api_key_operator_checklist.get("next_blocking_action")
+    ) or {}
+    if next_blocking_action.get("name") == "recover_failed_providers":
+        return next_blocking_action
+    return _optional_mapping(
+        live_data_setup_summary.get("next_operator_action")
+    ) or {}
 
 
 def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
