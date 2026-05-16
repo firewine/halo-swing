@@ -232,7 +232,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke 
 
 To combine offline readiness evidence with the live data smoke result in one
 payload, use `run_integration_smoke`; its top-level `provider_route_summary`
-mirrors the live data smoke route evidence:
+mirrors the live data smoke route evidence, and `live_data_setup_summary` shows
+API-key setup readiness without returning secret values:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit

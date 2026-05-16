@@ -405,6 +405,7 @@ def run_integration_smoke(
     """Run environment readiness and live data smoke in one payload."""
 
     readiness = get_integration_readiness()
+    live_data_api_key_status = get_live_data_api_key_status()
     live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
     provider_route = _optional_mapping(live_data_smoke.get("provider_route")) or {}
     readiness_ready = readiness["status"] == "ready"
@@ -416,6 +417,10 @@ def run_integration_smoke(
         "live_data_smoke_status": live_data_smoke["status"],
         "readiness": readiness,
         "live_data_smoke": live_data_smoke,
+        "live_data_setup_summary": _live_data_setup_summary(
+            live_data_api_key_status,
+            provider_route,
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
