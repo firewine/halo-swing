@@ -284,10 +284,22 @@ def _provider_chain_has(provider: Any, provider_class_name: str) -> bool:
     return False
 
 
-def _provider_smoke_error_summary(tool: str, exc: Exception) -> dict[str, Any]:
+def _provider_smoke_error_summary(
+    tool: str,
+    exc: Exception,
+    *,
+    provider_family: str,
+    provider: str,
+    smoke_command_name: str,
+) -> dict[str, Any]:
     return {
         "schema_version": PROVIDER_SMOKE_ERROR_SCHEMA_VERSION,
         "tool": tool,
+        "provider_family": provider_family,
+        "provider": provider,
+        "smoke_command_name": smoke_command_name,
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
         "exception_type": type(exc).__name__,
         "exception_message_returned": False,
         "url_returned": False,
@@ -357,6 +369,9 @@ def _market_snapshot_provider_exception_payload(
         "error_summary": _provider_smoke_error_summary(
             "get_market_snapshot",
             exc,
+            provider_family="market",
+            provider="polygon",
+            smoke_command_name="get_market_snapshot_live_smoke",
         ),
         "secret_values_returned": False,
         "snapshots": [],
@@ -410,6 +425,9 @@ def _macro_snapshot_provider_exception_payload(
         "error_summary": _provider_smoke_error_summary(
             "get_macro_snapshot",
             exc,
+            provider_family="macro",
+            provider="fred",
+            smoke_command_name="get_macro_snapshot_live_smoke",
         ),
         "secret_values_returned": False,
     }
@@ -470,7 +488,13 @@ def _news_bundle_provider_exception_payload(
                 }
             ],
         },
-        "error_summary": _provider_smoke_error_summary("get_news_bundle", exc),
+        "error_summary": _provider_smoke_error_summary(
+            "get_news_bundle",
+            exc,
+            provider_family="news",
+            provider="newsapi",
+            smoke_command_name="get_news_bundle_live_smoke",
+        ),
         "secret_values_returned": False,
         "evidence_cards": [],
     }

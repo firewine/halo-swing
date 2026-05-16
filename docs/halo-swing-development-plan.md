@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.713 API Key Provider Smoke Recovery Metadata Gate Record - 2026-05-17
+
+### A. 목적
+
+사용자가 API key를 넣고 provider별 smoke를 실행했을 때 DNS, 인증, quota, provider
+장애 등으로 실패하면 현재 conflict payload는 exception type은 보여주지만, 상단
+`error_summary`만 보고 어떤 provider family의 어떤 smoke가 실패했는지와 다음 조치가
+무엇인지 빠르게 구분하기 어렵다. 이번 slice는 individual provider smoke failure
+payload에 no-secret provider/recovery metadata를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_market_snapshot live provider exception error_summary includes provider_family=market, provider=polygon, smoke_command_name=get_market_snapshot_live_smoke, next_setup_action=verify_provider_credentials_or_network, and provider-route network policy
+  - get_macro_snapshot live provider exception error_summary includes provider_family=macro, provider=fred, smoke_command_name=get_macro_snapshot_live_smoke, next_setup_action=verify_provider_credentials_or_network, and provider-route network policy
+  - get_news_bundle live provider exception error_summary includes provider_family=news, provider=newsapi, smoke_command_name=get_news_bundle_live_smoke, next_setup_action=verify_provider_credentials_or_network, and provider-route network policy
+  - conflict payloads still return no exception message, URL, API key value, or secret value
+  - provider smoke conflict payloads remain non-mutating and declare live/network boundaries
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider smoke recovery pytest: 3 passed
+  - fake Polygon/FRED/NewsAPI provider smoke CLIs: exit 0 with recovery metadata and no secrets
+  - full pytest: 773 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0
+```
+
 ## 3.712 API Key Pipeline Operator Checklist Exported Env Bypass Gate Record - 2026-05-17
 
 ### A. 목적

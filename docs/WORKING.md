@@ -42,19 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_VERIFIED
-gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_GATE
+status: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_RECOVERY_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: make top-level API-key operator checklist stop treating missing repo-root .env as a blocker when exported live-data API keys already make setup ready
+next_atomic_step: add no-secret provider and recovery metadata to individual provider smoke conflict error summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,24 +71,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_exported_env_keys_marks_operator_checklist_ready_without_dotenv -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke top-level api_key_operator_checklist reports ready=true when exported POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY are configured even if repo-root .env is absent
-  - api_key_operator_checklist blocking_step_names is empty, blocking_step_count is 0, next_blocking_step is null, and next_blocking_action is null for exported-key-ready setup
-  - api_key_operator_checklist current_step remains run_provider_smokes and ready_step_names includes prepare_dotenv as ready because exported env satisfies setup without automatic .env mutation
-  - blocked no-key fixture-default setup still reports prepare_dotenv as the next blocking action
-  - API-key-only setup payloads remain non-mutating and no-secret
+  - get_market_snapshot live provider exception payload error_summary includes provider_family=market, provider=polygon, smoke_command_name=get_market_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
+  - get_macro_snapshot live provider exception payload error_summary includes provider_family=macro, provider=fred, smoke_command_name=get_macro_snapshot_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
+  - get_news_bundle live provider exception payload error_summary includes provider_family=news, provider=newsapi, smoke_command_name=get_news_bundle_live_smoke, and next_setup_action=verify_provider_credentials_or_network without returning exception messages, URLs, or secrets
+  - individual provider smoke conflict payloads remain no-secret, network boundary declared, and do not mutate local state
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key operator checklist exported-env bypass gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider smoke recovery metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_EXPORTED_ENV_BYPASS_GATE
+review_tier: S1_small
+
+next_atomic_step: make top-level API-key operator checklist stop treating missing repo-root .env as a blocker when exported live-data API keys already make setup ready
 ```
 
 Previous completed directive:
@@ -1775,6 +1785,61 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Smoke Recovery Metadata Gate is verified.
+Individual live provider smoke conflict payloads now include no-secret
+provider/recovery metadata in `error_summary`: provider family, provider,
+smoke command name, `next_setup_action=verify_provider_credentials_or_network`,
+and a provider-route network policy. Exception messages, URLs, API key values,
+and secret values are still not returned. Focused tests passed with 3 tests,
+full pytest passed with 773 tests, and ruff, health_check, and fixture-default
+API-key pipeline CLI passed.
+
+```yaml
+api_key_provider_smoke_recovery_metadata_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  implementation:
+    - get_market_snapshot live provider exception error_summary includes provider_family=market, provider=polygon, smoke_command_name=get_market_snapshot_live_smoke, next_setup_action=verify_provider_credentials_or_network, and network_call_policy=only_when_matching_provider_selects_live_route
+    - get_macro_snapshot live provider exception error_summary includes provider_family=macro, provider=fred, smoke_command_name=get_macro_snapshot_live_smoke, next_setup_action=verify_provider_credentials_or_network, and network_call_policy=only_when_matching_provider_selects_live_route
+    - get_news_bundle live provider exception error_summary includes provider_family=news, provider=newsapi, smoke_command_name=get_news_bundle_live_smoke, next_setup_action=verify_provider_credentials_or_network, and network_call_policy=only_when_matching_provider_selects_live_route
+    - provider smoke conflict payloads still return no exception messages, URLs, API key values, or secret values
+    - individual provider smoke conflict payloads remain non-mutating and declare live/network boundaries
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ"]}' --no-audit
+      result: "exit 0; conflict payload included market/polygon recovery metadata and no secrets"
+    - command: FRED_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit
+      result: "exit 0; conflict payload included macro/fred recovery metadata and no secrets"
+    - command: NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"macro"}' --no-audit
+      result: "exit 0; conflict payload included news/newsapi recovery metadata and no secrets"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "773 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Operator Checklist Exported Env Bypass Gate is
 verified. `run_api_key_pipeline_smoke` now keeps the top-level

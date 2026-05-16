@@ -717,7 +717,7 @@ def test_market_snapshot_declares_live_provider_boundary_without_secret(
     assert "polygon-secret" not in serialized
 
 
-def test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception(
+def test_market_snapshot_live_provider_exception_returns_recovery_metadata(
     monkeypatch,
 ) -> None:
     def fake_http_get(_url: str) -> dict[str, Any]:
@@ -756,6 +756,11 @@ def test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_ex
     assert error_summary == {
         "schema_version": "provider_smoke_error.v1",
         "tool": "get_market_snapshot",
+        "provider_family": "market",
+        "provider": "polygon",
+        "smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
         "exception_type": "RuntimeError",
         "exception_message_returned": False,
         "url_returned": False,
@@ -766,7 +771,7 @@ def test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_ex
     assert "polygon-secret" not in serialized
 
 
-def test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception(
+def test_macro_snapshot_live_provider_exception_returns_recovery_metadata(
     monkeypatch,
 ) -> None:
     def fake_http_get(_url: str) -> dict[str, Any]:
@@ -807,6 +812,11 @@ def test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exc
     assert error_summary == {
         "schema_version": "provider_smoke_error.v1",
         "tool": "get_macro_snapshot",
+        "provider_family": "macro",
+        "provider": "fred",
+        "smoke_command_name": "get_macro_snapshot_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
         "exception_type": "RuntimeError",
         "exception_message_returned": False,
         "url_returned": False,
@@ -817,7 +827,7 @@ def test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exc
     assert "fred-secret" not in serialized
 
 
-def test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_exception(
+def test_news_bundle_live_provider_exception_returns_recovery_metadata(
     monkeypatch,
 ) -> None:
     def fake_http_get(_url: str) -> dict[str, Any]:
@@ -860,6 +870,11 @@ def test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_except
     assert error_summary == {
         "schema_version": "provider_smoke_error.v1",
         "tool": "get_news_bundle",
+        "provider_family": "news",
+        "provider": "newsapi",
+        "smoke_command_name": "get_news_bundle_live_smoke",
+        "next_setup_action": "verify_provider_credentials_or_network",
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
         "exception_type": "RuntimeError",
         "exception_message_returned": False,
         "url_returned": False,
