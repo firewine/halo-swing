@@ -180,6 +180,7 @@ def calculate_indicator_payload(
     underlying, leverage = provider.resolve_asset(normalized)
     indicator_symbol = underlying if leverage > 1 else normalized
     bars = list(provider.ohlcv(indicator_symbol, periods, timeframe=normalized_timeframe))
+    live_data_required = provider.live_data_required
     closes = [float(bar["close"]) for bar in bars]
     latest_close = closes[-1]
     previous_close = closes[-2]
@@ -212,11 +213,12 @@ def calculate_indicator_payload(
             "supported_timeframes": provider.supported_timeframes(),
             "provider_supports_timeframe": normalized_timeframe
             in provider.supported_timeframes(),
-            "fixture_replay_default": True,
-            "live_data_required": False,
+            "fixture_replay_default": not live_data_required,
+            "network_call": live_data_required,
+            "live_data_required": live_data_required,
         },
         "data_mode": provider.data_mode,
-        "live_data_required": provider.live_data_required,
+        "live_data_required": live_data_required,
         "latest_bar": bars[-1],
         "change_pct_1d": _round((latest_close / previous_close - 1) * 100),
         "rsi_14": _round(rsi(closes, 14)),
@@ -236,8 +238,8 @@ def calculate_indicator_payload(
             "gap_detection_lookback": 20,
             "previous_swing_lookback": swing_levels["swing_lookback"],
             "pivot_window": swing_levels["pivot_window"],
-            "network_call": False,
-            "live_data_required": False,
+            "network_call": live_data_required,
+            "live_data_required": live_data_required,
         },
         "support_20": _round(support),
         "resistance_20": _round(resistance),

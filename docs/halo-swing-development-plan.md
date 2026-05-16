@@ -28,6 +28,53 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.653 Live Indicator Boundary Metadata Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 market API key를 넣으면 `calculate_indicators`도 API-key-backed provider가
+반환한 OHLCV를 사용한다. 그런데 nested contract가 fixture-only metadata를 유지하면
+downstream smoke/audit 소비자가 live data boundary를 잘못 해석할 수 있다. 이번 slice는
+indicator payload의 `timeframe_contract`와 `swing_level_contract`가 live provider
+사용 여부에 맞춰 `network_call`과 `live_data_required`를 선언하도록 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - calculate_indicators fixture defaults remain network_call=false and live_data_required=false
+  - calculate_indicators live provider path reports network_call=true and live_data_required=true in nested contracts
+  - fake live Polygon provider test proves metadata without real network or API keys
+  - live indicator metadata does not return API-key values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_calculate_indicators_declares_live_provider_boundaries tests/test_mvp_tools.py::test_calculate_indicators_returns_required_swing_values -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 743 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.652 Integration Environment Smoke Runner Gate Record - 2026-05-16
 
 ### A. 목적

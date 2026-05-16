@@ -471,6 +471,10 @@ def test_calculate_indicators_returns_required_swing_values() -> None:
         payload["swing_level_contract"]["schema_version"]
         == MVP_CONTRACT["indicator_fixture"]["swing_level_schema"]
     )
+    assert payload["timeframe_contract"]["network_call"] is False
+    assert payload["timeframe_contract"]["live_data_required"] is False
+    assert payload["timeframe_contract"]["fixture_replay_default"] is True
+    assert payload["swing_level_contract"]["network_call"] is False
     assert payload["swing_level_contract"]["live_data_required"] is False
     for field in MVP_CONTRACT["indicator_fixture"]["required_swing_level_fields"]:
         assert field in payload

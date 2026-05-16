@@ -16,6 +16,7 @@ from halo_swing_mcp.providers import (
     get_market_data_provider,
 )
 from halo_swing_mcp.tools.market import (
+    calculate_indicators,
     get_event_calendar,
     get_macro_snapshot,
     get_market_snapshot,
@@ -531,6 +532,48 @@ def test_market_snapshot_declares_live_provider_boundary_without_secret(
     assert guard_checks["live_data_boundary_declared"]["passed"] is True
     assert guard_checks["feature_store_not_persisted"]["passed"] is True
     assert payload["snapshots"][0]["last_close"] == 102.5
+    assert "polygon-secret" not in serialized
+
+
+def test_calculate_indicators_declares_live_provider_boundaries(monkeypatch) -> None:
+    def fake_http_get(url: str) -> dict[str, Any]:
+        assert "polygon-secret" in parse.parse_qs(parse.urlparse(url).query)["apiKey"]
+        base_timestamp = 1_700_000_000_000
+        return {
+            "results": [
+                {
+                    "t": base_timestamp + index * 86_400_000,
+                    "o": 100.0 + index,
+                    "h": 101.5 + index,
+                    "l": 99.5 + index,
+                    "c": 100.75 + index,
+                    "v": 1000 + index,
+                }
+                for index in range(220)
+            ]
+        }
+
+    provider = PolygonMarketDataProvider(
+        api_key="polygon-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.indicators.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = calculate_indicators("QQQ")
+    serialized = repr(payload)
+
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["timeframe_contract"]["network_call"] is True
+    assert payload["timeframe_contract"]["live_data_required"] is True
+    assert payload["timeframe_contract"]["fixture_replay_default"] is False
+    assert payload["swing_level_contract"]["network_call"] is True
+    assert payload["swing_level_contract"]["live_data_required"] is True
+    assert payload["rsi_14"] is not None
+    assert payload["latest_bar"]["close"] == 319.75
     assert "polygon-secret" not in serialized
 
 

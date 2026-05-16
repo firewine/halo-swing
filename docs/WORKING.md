@@ -42,28 +42,20 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_VERIFIED
-gate_id: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_GATE
+status: LIVE_INDICATOR_BOUNDARY_METADATA_VERIFIED
+gate_id: LIVE_INDICATOR_BOUNDARY_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: add a run_integration_smoke tool that combines offline integration readiness with the one-shot live data smoke runner without starting Hermes, sending Telegram, submitting orders, or returning secrets
+next_atomic_step: make calculate_indicators declare live data and network-call boundary metadata consistently when API-key-backed market providers are selected
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
+  - src/halo_swing_mcp/indicators.py
   - tests/test_mvp_tools.py
-  - tests/test_readiness.py
-  - tests/test_setup_docs.py
-  - tests/test_tool_registry.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -80,24 +72,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_integration_smoke_combines_readiness_and_live_data_smoke tests/test_readiness.py::test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_calculate_indicators_declares_live_provider_boundaries tests/test_mvp_tools.py::test_calculate_indicators_returns_required_swing_values -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - run_integration_smoke is registered for MCP and harness use
-  - the runner returns integration readiness plus run_live_data_smoke output in one payload
-  - the runner keeps hermes_runtime_started=false, telegram_send_call=false, send_call=false, order_submission=false, and secret_values_returned=false
-  - the runner reports network_call only from live data smoke behavior and never mutates local state
-  - tests prove fake live-data smoke can be combined with readiness and fixture defaults remain blocked without side effects
-  - health and MVP golden tool manifests include run_integration_smoke
-  - README and DevOps setup docs describe the one-shot integration smoke command after filling .env
+  - calculate_indicators keeps fixture defaults offline with network_call=false and live_data_required=false in nested contracts
+  - calculate_indicators reports network_call=true and live_data_required=true in timeframe_contract and swing_level_contract when an API-key-backed live provider supplies bars
+  - live indicator metadata does not return API-key values
+  - tests cover fixture defaults and a fake live Polygon provider path without live network or real API keys
+  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified integration environment smoke runner gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live indicator boundary metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_VERIFIED
+gate_id: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_GATE
+review_tier: S1_small
+
+next_atomic_step: add a run_integration_smoke tool that combines offline integration readiness with the one-shot live data smoke runner without starting Hermes, sending Telegram, submitting orders, or returning secrets
 ```
 
 Previous completed directive:
@@ -813,18 +814,18 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.652
-gate_packet: docs/halo-swing-development-plan.md#3.652
+portable_mirror: docs/halo-swing-development-plan.md#3.653
+gate_packet: docs/halo-swing-development-plan.md#3.653
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.652
-  - src/halo_swing_mcp/harness.py
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
+  - docs/halo-swing-development-plan.md#3.653
+  - src/halo_swing_mcp/indicators.py
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_mvp_tools.py
+  - tests/test_providers.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -1126,6 +1127,50 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Indicator Boundary Metadata Gate is verified.
+`calculate_indicators` now keeps fixture defaults offline while declaring
+`network_call=true` and `live_data_required=true` in nested indicator contracts
+when a live Polygon-backed provider supplies bars. Focused tests passed with 2
+tests, full pytest passed with 743 tests, and ruff and health_check passed.
+
+```yaml
+live_indicator_boundary_metadata_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/indicators.py
+    - tests/test_mvp_tools.py
+    - tests/test_providers.py
+  implementation:
+    - calculate_indicators fixture defaults keep network_call=false and live_data_required=false in timeframe_contract and swing_level_contract
+    - calculate_indicators live provider path reports network_call=true and live_data_required=true in timeframe_contract and swing_level_contract
+    - live indicator metadata does not return API-key values
+    - fake live Polygon provider test covers the path without live network or real API keys
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_calculate_indicators_declares_live_provider_boundaries tests/test_mvp_tools.py::test_calculate_indicators_returns_required_swing_values -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "743 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Integration Environment Smoke Runner Gate is verified.
 `run_integration_smoke` is now registered for MCP and harness use. It returns
