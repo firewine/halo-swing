@@ -363,8 +363,12 @@ FRED_API_KEY=your_fred_key
 ```
 
 `HALO_SWING_MACRO_API_KEY` and `HALO_SWING_FRED_API_KEY` are accepted as
-project-specific aliases. Without one of these keys, macro data remains
-fixture-backed.
+project-specific aliases. When one of these keys selects the live FRED provider,
+`get_macro_snapshot` declares `live_data_required=true` and `network_call=true`
+in `macro_filter_contract`, and `macro_filter_guard` reports
+`live_data_boundary_declared` plus `network_call_declared`. Without one of these
+keys, macro data remains fixture-backed with `no_live_data_required` and
+`no_network_call` guard checks.
 
 News live data is wired through NewsAPI:
 

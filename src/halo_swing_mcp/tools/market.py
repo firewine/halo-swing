@@ -163,23 +163,79 @@ def get_macro_snapshot() -> dict[str, Any]:
     snapshot = provider.macro_snapshot()
     indicators = snapshot["indicators"]
     live_data_required = bool(snapshot["live_data_required"])
+    contract = {
+        "schema_version": "macro_filter.v1",
+        "required_indicators": ["vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"],
+        "change_window": "5d",
+        "network_call": live_data_required,
+        "live_data_required": live_data_required,
+        "policy": (
+            "Macro blocks are derived from fixture or configured FRED VIX/VXN, "
+            "DXY, rates, and oil change fields."
+        ),
+    }
     return {
         **snapshot,
-        "macro_filter_contract": {
-            "schema_version": "macro_filter.v1",
-            "required_indicators": ["vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"],
-            "change_window": "5d",
-            "network_call": live_data_required,
-            "live_data_required": live_data_required,
-            "policy": (
-                "Macro blocks are derived from fixture or configured FRED VIX/VXN, "
-                "DXY, rates, and oil change fields."
-            ),
-        },
+        "macro_filter_contract": contract,
+        "macro_filter_guard": _macro_filter_guard(contract, indicators),
         "macro_filter_summary": _macro_filter_summary(
             indicators,
             live_data_required=live_data_required,
         ),
+    }
+
+
+def _macro_filter_guard(
+    contract: dict[str, Any],
+    indicators: dict[str, Any],
+) -> dict[str, Any]:
+    required_indicators = contract["required_indicators"]
+    live_data_required = contract["live_data_required"]
+    checks = [
+        {
+            "name": "required_indicators_present",
+            "passed": all(indicator in indicators for indicator in required_indicators),
+            "expected": required_indicators,
+            "actual": sorted(indicators),
+        },
+    ]
+    if live_data_required:
+        checks.extend(
+            [
+                {
+                    "name": "live_data_boundary_declared",
+                    "passed": contract["live_data_required"] is True,
+                    "expected": True,
+                    "actual": contract["live_data_required"],
+                },
+                {
+                    "name": "network_call_declared",
+                    "passed": contract["network_call"] is True,
+                    "expected": True,
+                    "actual": contract["network_call"],
+                },
+            ]
+        )
+    else:
+        checks.extend(
+            [
+                {
+                    "name": "no_live_data_required",
+                    "passed": contract["live_data_required"] is False,
+                    "expected": False,
+                    "actual": contract["live_data_required"],
+                },
+                {
+                    "name": "no_network_call",
+                    "passed": contract["network_call"] is False,
+                    "expected": False,
+                    "actual": contract["network_call"],
+                },
+            ]
+        )
+    return {
+        "status": "ok" if all(check["passed"] for check in checks) else "conflict",
+        "checks": checks,
     }
 
 

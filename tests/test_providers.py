@@ -348,6 +348,50 @@ def test_fred_macro_provider_fetches_macro_snapshot_without_returning_secret() -
     assert "fred-secret" not in serialized
 
 
+def test_macro_snapshot_declares_live_fred_boundary_without_secret(
+    monkeypatch,
+) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        return {
+            "observations": [
+                {"value": "20.0"},
+                {"value": "19.5"},
+                {"value": "19.0"},
+                {"value": "18.5"},
+                {"value": "18.0"},
+                {"value": "17.5"},
+            ]
+        }
+
+    provider = FredMacroDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="fred-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = get_macro_snapshot()
+    guard_checks = {
+        check["name"]: check
+        for check in payload["macro_filter_guard"]["checks"]
+    }
+    serialized = repr(payload)
+
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["macro_filter_contract"]["network_call"] is True
+    assert payload["macro_filter_contract"]["live_data_required"] is True
+    assert payload["macro_filter_guard"]["status"] == "ok"
+    assert guard_checks["required_indicators_present"]["passed"] is True
+    assert guard_checks["live_data_boundary_declared"]["passed"] is True
+    assert guard_checks["network_call_declared"]["passed"] is True
+    assert "no_live_data_required" not in guard_checks
+    assert "fred-secret" not in serialized
+
+
 def test_newsapi_provider_fetches_news_cards_without_returning_secret() -> None:
     requested_urls: list[str] = []
 
@@ -493,6 +537,15 @@ def test_market_tools_keep_replay_payload_contract() -> None:
         assert payload["data_mode"] == "fixture"
         assert payload["live_data_required"] is False
 
+    macro_guard_checks = {
+        check["name"]: check
+        for check in macro["macro_filter_guard"]["checks"]
+    }
+    assert macro["macro_filter_contract"]["network_call"] is False
+    assert macro_guard_checks["required_indicators_present"]["passed"] is True
+    assert macro_guard_checks["no_live_data_required"]["passed"] is True
+    assert macro_guard_checks["no_network_call"]["passed"] is True
+    assert "live_data_boundary_declared" not in macro_guard_checks
     market_guard_checks = {
         check["name"]: check
         for check in market["market_snapshot_guard"]["checks"]

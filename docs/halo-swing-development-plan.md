@@ -28,6 +28,53 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.647 Live Macro Snapshot Boundary Gate Record - 2026-05-16
+
+### A. 목적
+
+FRED API key가 있으면 macro provider가 live snapshot을 만들 수 있지만,
+`get_macro_snapshot`에는 market/news tool처럼 boundary guard가 없었다. 이번 slice는
+fixture/replay macro와 API-key-backed FRED macro의 network/live-data boundary를
+명시하는 `macro_filter_guard`를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_macro_snapshot includes macro_filter_guard
+  - fixture/replay macro payloads keep network_call=false and live_data_required=false with no_live_data_required and no_network_call checks
+  - API-key-backed FRED macro payloads declare network_call=true and live_data_required=true with live_data_boundary_declared and network_call_declared checks
+  - tests cover fake FRED live macro tool output without exposing API-key values
+  - README and DevOps setup docs document the macro live boundary guard
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q -> 20 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 736 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.646 Live Market Snapshot Boundary Gate Record - 2026-05-16
 
 ### A. 목적

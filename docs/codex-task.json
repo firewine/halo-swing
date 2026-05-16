@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_MARKET_SNAPSHOT_BOUNDARY_GATE",
+  "gate_id": "LIVE_MACRO_SNAPSHOT_BOUNDARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.646",
-  "next_atomic_step": "make get_market_snapshot declare live provider network boundaries correctly when API-key-backed market data is selected",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.647",
+  "next_atomic_step": "add macro_filter_guard so get_macro_snapshot declares fixture and API-key-backed FRED live boundaries explicitly",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -17,7 +17,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.646",
+    "docs/halo-swing-development-plan.md#3.647",
     "src/halo_swing_mcp/providers.py",
     "src/halo_swing_mcp/tools/market.py",
     "tests/test_providers.py"
@@ -52,14 +52,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_market_snapshot keeps fixture/replay default payloads and MVP no-live guard behavior unchanged",
-    "when a live market-data provider is active, market_snapshot_contract declares network_call=true and live_data_required=true",
-    "live market snapshot guard reports ok with a live_data_boundary_declared check instead of conflicting on the default no-live guard",
-    "tests prove a fake live provider path returns live contract metadata without exposing API-key values",
-    "README and DevOps setup docs clarify that live market snapshots declare network/live-data boundaries when API keys select live providers",
+    "get_macro_snapshot includes macro_filter_guard",
+    "fixture/replay macro payloads keep network_call=false and live_data_required=false with no_live_data_required and no_network_call checks",
+    "API-key-backed FRED macro payloads declare network_call=true and live_data_required=true with live_data_boundary_declared and network_call_declared checks",
+    "tests prove fake FRED live macro tool output returns live boundary metadata without exposing API-key values",
+    "README and DevOps setup docs describe the macro live boundary guard",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live market snapshot boundary gate, then continue with macro/news live boundary hardening, user-provided live API key setup instructions, or explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live macro snapshot boundary gate, then continue with news live boundary hardening, user-provided live API key setup instructions, or explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

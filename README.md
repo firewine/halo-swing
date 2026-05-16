@@ -203,6 +203,11 @@ payloads declare `live_data_required=true` and `network_call=true` in
 `market_snapshot_contract`, and the guard uses
 `live_data_boundary_declared`. Fixture/replay defaults keep
 `network_call=false` and the existing `no_live_data_required` guard.
+When a macro API key selects the live FRED provider, macro snapshots declare
+`live_data_required=true` and `network_call=true` in `macro_filter_contract`,
+and `macro_filter_guard` uses `live_data_boundary_declared` plus
+`network_call_declared`. Fixture/replay macro snapshots keep
+`network_call=false`, `no_live_data_required`, and `no_network_call`.
 Report tools include an offline `delivery_preview` payload for Hermes and
 Telegram. The preview contains Telegram message chunks and guard checks, but it
 does not send messages or require credentials. Telegram previews expose the

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_MARKET_SNAPSHOT_BOUNDARY_VERIFIED
-gate_id: LIVE_MARKET_SNAPSHOT_BOUNDARY_GATE
+status: LIVE_MACRO_SNAPSHOT_BOUNDARY_VERIFIED
+gate_id: LIVE_MACRO_SNAPSHOT_BOUNDARY_GATE
 review_tier: S1_small
 
-next_atomic_step: make get_market_snapshot declare live provider network boundaries correctly when API-key-backed market data is selected
+next_atomic_step: add macro_filter_guard so get_macro_snapshot declares fixture and API-key-backed FRED live boundaries explicitly
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -79,16 +79,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_market_snapshot keeps fixture/replay default payloads and MVP no-live guard behavior unchanged
-  - when a live market-data provider is active, market_snapshot_contract declares network_call=true and live_data_required=true
-  - live market snapshot guard reports ok with a live_data_boundary_declared check instead of conflicting on the default no-live guard
-  - tests prove a fake live provider path returns live contract metadata without exposing API-key values
-  - README and DevOps setup docs clarify that live market snapshots declare network/live-data boundaries when API keys select live providers
+  - get_macro_snapshot includes macro_filter_guard
+  - fixture/replay macro payloads keep network_call=false and live_data_required=false with no_live_data_required and no_network_call checks
+  - API-key-backed FRED macro payloads declare network_call=true and live_data_required=true with live_data_boundary_declared and network_call_declared checks
+  - tests prove fake FRED live macro tool output returns live boundary metadata without exposing API-key values
+  - README and DevOps setup docs describe the macro live boundary guard
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live market snapshot boundary gate, then continue with macro/news live boundary hardening, user-provided live API key setup instructions, or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live macro snapshot boundary gate, then continue with news live boundary hardening, user-provided live API key setup instructions, or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_MARKET_SNAPSHOT_BOUNDARY_VERIFIED
+gate_id: LIVE_MARKET_SNAPSHOT_BOUNDARY_GATE
+review_tier: S1_small
+
+next_atomic_step: make get_market_snapshot declare live provider network boundaries correctly when API-key-backed market data is selected
 ```
 
 Previous completed directive:
@@ -738,13 +749,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.646
-gate_packet: docs/halo-swing-development-plan.md#3.646
+portable_mirror: docs/halo-swing-development-plan.md#3.647
+gate_packet: docs/halo-swing-development-plan.md#3.647
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.646
+  - docs/halo-swing-development-plan.md#3.647
   - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/tools/market.py
   - tests/test_providers.py
@@ -1049,6 +1060,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Macro Snapshot Boundary Gate is verified. `get_macro_snapshot`
+now includes `macro_filter_guard`; fixture/replay macro payloads keep
+`network_call=false` and `live_data_required=false` with `no_live_data_required`
+and `no_network_call` checks, while API-key-backed FRED macro payloads declare
+`network_call=true` and `live_data_required=true` with
+`live_data_boundary_declared` and `network_call_declared` checks. Focused
+provider tests passed with 20 tests, full pytest passed with 736 tests, and
+ruff and health_check passed.
+
+```yaml
+live_macro_snapshot_boundary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  implementation:
+    - get_macro_snapshot includes macro_filter_guard
+    - fixture/replay macro payloads report no_live_data_required and no_network_call guard checks
+    - API-key-backed FRED macro payloads report live_data_boundary_declared and network_call_declared guard checks
+    - provider tests cover fake FRED live macro tool output without exposing API-key values
+    - README and DevOps guide document the macro live boundary guard
+    - no new live adapter module, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or secret exposure added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+      result: "20 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "736 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Live Market Snapshot Boundary Gate is verified. `get_market_snapshot`
 now preserves fixture/replay defaults while declaring `network_call=true` and
