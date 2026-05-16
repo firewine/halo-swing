@@ -15,6 +15,8 @@ from dotenv import dotenv_values
 
 
 LOCAL_ENV_PATH = ".env"
+REPO_ROOT_ENV_PATH = Path(__file__).resolve().parents[2] / LOCAL_ENV_PATH
+DOTENV_DISABLED_ENV = "HALO_SWING_DISABLE_DOTENV"
 
 
 def get_config_value(key: str) -> str | None:
@@ -22,6 +24,8 @@ def get_config_value(key: str) -> str | None:
 
     if key in os.environ:
         return os.environ[key]
+    if dotenv_loading_disabled():
+        return None
     value = _local_env_values().get(key)
     return value if isinstance(value, str) else None
 
@@ -36,6 +40,25 @@ def get_first_config_value(*keys: str) -> str | None:
     return None
 
 
+def get_local_env_files() -> tuple[Path, ...]:
+    """Return local dotenv files from broad to narrow precedence."""
+
+    if dotenv_loading_disabled():
+        return ()
+    paths: list[Path] = []
+    for path in (REPO_ROOT_ENV_PATH, Path(LOCAL_ENV_PATH).resolve()):
+        if path not in paths:
+            paths.append(path)
+    return tuple(paths)
+
+
+def dotenv_loading_disabled() -> bool:
+    """Return whether dotenv loading is disabled for isolated runs."""
+
+    value = os.environ.get(DOTENV_DISABLED_ENV)
+    return isinstance(value, str) and value.strip().lower() in {"1", "true", "yes"}
+
+
 def clear_local_env_cache() -> None:
     """Clear cached `.env` values after tests or cwd changes."""
 
@@ -44,7 +67,8 @@ def clear_local_env_cache() -> None:
 
 @lru_cache(maxsize=1)
 def _local_env_values() -> dict[str, str | None]:
-    env_path = Path(LOCAL_ENV_PATH)
-    if not env_path.is_file():
-        return {}
-    return dict(dotenv_values(env_path))
+    values: dict[str, str | None] = {}
+    for env_path in get_local_env_files():
+        if env_path.is_file():
+            values.update(dotenv_values(env_path))
+    return values

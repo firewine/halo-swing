@@ -5,6 +5,8 @@ from functools import lru_cache
 from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from halo_swing_mcp.env import get_local_env_files
+
 
 BINANCE_BOOLEAN_ENV_NAMES = {
     "binance_testnet": "HALO_SWING_BINANCE_TESTNET",
@@ -90,7 +92,6 @@ class Settings(BaseSettings):
         return _validate_data_mode(value, NEWS_DATA_MODE_ENV_NAME)
 
     model_config = SettingsConfigDict(
-        env_file=".env",
         env_prefix="HALO_SWING_",
         extra="ignore",
     )
@@ -98,7 +99,7 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()
+    return Settings(_env_file=get_local_env_files())
 
 
 def _validate_data_mode(value: str, env_name: str) -> str:

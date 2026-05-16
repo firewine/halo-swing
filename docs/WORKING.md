@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LOCAL_ENV_ALIAS_LOADING_GATE_VERIFIED
-gate_id: LOCAL_ENV_ALIAS_LOADING_GATE
+status: REPO_ROOT_ENV_FALLBACK_GATE_VERIFIED
+gate_id: REPO_ROOT_ENV_FALLBACK_GATE
 review_tier: S1_small
 
-next_atomic_step: make readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets
+next_atomic_step: make repo-root .env values work when Hermes or MCP starts from a different working directory
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -266,6 +266,7 @@ done_means:
   - .env.example keeps HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
   - .env.example exposes blank Telegram bot token and gateway placeholders matching readiness aliases
   - readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets
+  - repo-root .env values work when Hermes or MCP starts from a different working directory
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -615,16 +616,19 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.635
-gate_packet: docs/halo-swing-development-plan.md#3.635
+portable_mirror: docs/halo-swing-development-plan.md#3.636
+gate_packet: docs/halo-swing-development-plan.md#3.636
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.635
+  - docs/halo-swing-development-plan.md#3.636
   - src/halo_swing_mcp/config.py
+  - src/halo_swing_mcp/env.py
   - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/conftest.py
+  - tests/test_env.py
   - tests/test_providers.py
   - tests/test_readiness.py
 
@@ -929,12 +933,58 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Local Env Alias Loading Gate is verified. Readiness and provider
-auto-selection now honor ignored local `.env` API-key and Telegram/Hermes
-aliases without mutating `os.environ` or serializing secret values. Exported
-environment variables keep precedence. Focused provider/readiness tests passed
-with 54 tests, full pytest passed with 698 tests, and ruff and health_check
+Summary: Repo Root Env Fallback Gate is verified. Pydantic settings and direct
+alias lookup now share dotenv path resolution so repo-root `.env` values work
+even when Hermes or MCP starts from a different working directory. Exported env
+keeps precedence, cwd `.env` can override repo-root `.env`, and pytest disables
+dotenv loading by default so local operator secrets cannot trigger live network
+providers during offline tests. Focused env/provider/readiness tests passed
+with 59 tests, full pytest passed with 703 tests, and ruff and health_check
 passed.
+
+```yaml
+repo_root_env_fallback_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/env.py
+    - src/halo_swing_mcp/providers.py
+    - tests/conftest.py
+    - tests/test_env.py
+    - tests/test_providers.py
+    - tests/test_readiness.py
+  implementation:
+    - src/halo_swing_mcp/env.py resolves repo-root .env and current working directory .env without mutating os.environ
+    - exported environment variables keep precedence over both dotenv files
+    - current working directory .env can override repo-root .env for launch-local overrides
+    - HALO_SWING_DISABLE_DOTENV disables dotenv loading for isolated offline runs
+    - get_settings uses the shared dotenv file list
+    - provider auto-selection checks HALO_SWING_* and provider-specific API-key aliases from dotenv values
+    - pytest disables dotenv loading by default so local operator secrets cannot trigger live network providers
+    - tests cover repo-root .env provider auto-selection and readiness when cwd differs
+    - no committed .env file, network call, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_providers.py tests/test_readiness.py -q
+      result: "59 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "703 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 local_env_alias_loading_gate:

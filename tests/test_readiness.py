@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import halo_swing_mcp.env as local_env
 from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import clear_local_env_cache
@@ -1302,6 +1303,7 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
 ) -> None:
     clear_readiness_env(monkeypatch)
     monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
     hermes_config_path = tmp_path / "hermes.yaml"
     hermes_config_path.write_text("mcp_servers: {}\n", encoding="utf-8")
     secret_env = {
@@ -1349,6 +1351,67 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "telegram: provide" not in payload["next_actions"]
     assert "live_data: provide" not in payload["next_actions"]
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
+
+
+def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_dir = tmp_path / "repo"
+    run_dir = tmp_path / "runner"
+    repo_dir.mkdir()
+    run_dir.mkdir()
+    repo_env = repo_dir / ".env"
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+    hermes_config_path = repo_dir / "hermes.yaml"
+    hermes_config_path.write_text("mcp_servers: {}\n", encoding="utf-8")
+    secret_env = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-repo-secret-token",
+        "HALO_SWING_TELEGRAM_GATEWAY": "https://gateway.example/repo-secret",
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-repo-secret-key",
+        "HALO_SWING_MACRO_API_KEY": "macro-repo-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-repo-secret-key",
+    }
+    repo_env.write_text(
+        "\n".join(
+            [
+                f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
+                *(f"{key}={value}" for key, value in secret_env.items()),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        hermes_mcp_config_registered=True,
+        binance_credentials_path="/missing/credentials.json",
+    )
+    hermes_gate = payload["gates"]["hermes"]
+    telegram_gate = payload["gates"]["telegram"]
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert hermes_gate["status"] == "ready"
+    assert hermes_gate["missing"] == []
+    assert hermes_gate["evidence"]["config_path"] == str(hermes_config_path)
+    assert hermes_gate["evidence"]["config_path_exists"] is True
+    assert telegram_gate["status"] == "ready"
+    assert telegram_gate["missing"] == []
+    assert telegram_gate["evidence"]["bot_token_configured"] is True
+    assert telegram_gate["evidence"]["gateway_configured"] is True
+    assert live_data_gate["status"] == "ready"
+    assert live_data_gate["missing"] == []
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
+    assert live_data_gate["evidence"]["macro_source_configured"] is True
+    assert live_data_gate["evidence"]["news_source_configured"] is True
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized

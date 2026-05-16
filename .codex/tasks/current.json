@@ -1,27 +1,32 @@
 {
-  "gate_id": "LOCAL_ENV_ALIAS_LOADING_GATE",
+  "gate_id": "REPO_ROOT_ENV_FALLBACK_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.635",
-  "next_atomic_step": "make readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.636",
+  "next_atomic_step": "make repo-root .env values work when Hermes or MCP starts from a different working directory",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
+    "src/halo_swing_mcp/config.py",
     "src/halo_swing_mcp/env.py",
     "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/conftest.py",
+    "tests/test_env.py",
     "tests/test_providers.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.635",
+    "docs/halo-swing-development-plan.md#3.636",
     "src/halo_swing_mcp/config.py",
+    "src/halo_swing_mcp/env.py",
     "src/halo_swing_mcp/providers.py",
     "src/halo_swing_mcp/tools/readiness.py",
+    "tests/conftest.py",
+    "tests/test_env.py",
     "tests/test_providers.py",
     "tests/test_readiness.py"
   ],
@@ -39,7 +44,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_providers.py tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -54,13 +59,16 @@
     "read_only": true
   },
   "done_means": [
-    "local .env aliases are read without mutating os.environ",
-    "exported environment variables keep precedence over local .env values",
-    "readiness honors local .env Hermes config, Telegram delivery, and live data API-key aliases as boolean evidence without serializing secret values",
-    "provider auto-selection honors local .env API-key aliases without requiring DATA_MODE live flags",
+    "repo-root .env values are available when the current working directory is different",
+    "current working directory .env can still override repo-root .env",
+    "exported environment variables keep precedence over both dotenv files",
+    "default pytest runs disable dotenv loading so local operator secrets cannot trigger live network providers",
+    "pydantic settings and direct alias lookups use the shared dotenv path resolution",
+    "provider auto-selection honors HALO_SWING_* and provider-specific API-key aliases from repo-root .env without DATA_MODE live flags",
+    "readiness honors repo-root .env Hermes, Telegram, and live data values without serializing secrets",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified local .env alias loading gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified repo-root .env fallback gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

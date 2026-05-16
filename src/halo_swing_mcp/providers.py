@@ -426,6 +426,7 @@ def _resolve_polygon_api_key() -> str:
     settings = get_settings()
     candidates = (
         settings.market_data_api_key,
+        get_config_value("HALO_SWING_MARKET_DATA_API_KEY"),
         get_config_value("POLYGON_API_KEY"),
     )
     for candidate in candidates:
@@ -437,8 +438,12 @@ def _resolve_polygon_api_key() -> str:
 
 
 def _polygon_api_key_configured(settings: Any) -> bool:
-    return _secret_candidate_configured(settings.market_data_api_key) or (
-        _secret_candidate_configured(get_config_value("POLYGON_API_KEY"))
+    return (
+        _secret_candidate_configured(settings.market_data_api_key)
+        or _secret_candidate_configured(
+            get_config_value("HALO_SWING_MARKET_DATA_API_KEY")
+        )
+        or _secret_candidate_configured(get_config_value("POLYGON_API_KEY"))
     )
 
 
@@ -446,6 +451,7 @@ def _resolve_fred_api_key() -> str:
     settings = get_settings()
     candidates = (
         settings.macro_api_key,
+        get_config_value("HALO_SWING_MACRO_API_KEY"),
         get_config_value("HALO_SWING_FRED_API_KEY"),
         get_config_value("FRED_API_KEY"),
     )
@@ -461,6 +467,7 @@ def _resolve_fred_api_key() -> str:
 def _fred_api_key_configured(settings: Any) -> bool:
     return (
         _secret_candidate_configured(settings.macro_api_key)
+        or _secret_candidate_configured(get_config_value("HALO_SWING_MACRO_API_KEY"))
         or _secret_candidate_configured(get_config_value("HALO_SWING_FRED_API_KEY"))
         or _secret_candidate_configured(get_config_value("FRED_API_KEY"))
     )

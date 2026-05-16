@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.636 Repo Root Env Fallback Gate Record - 2026-05-16
+
+### A. 목적
+
+Hermes나 MCP runner가 repository root가 아닌 working directory에서 server를 시작해도,
+사용자가 repo-root `.env`에 API key와 설정값을 넣은 흐름이 유지되어야 한다. 이번
+slice는 pydantic settings와 직접 alias lookup이 동일한 dotenv resolution을 쓰게
+하고, exported environment variable의 우선순위는 보존한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - src/halo_swing_mcp/env.py resolves both repo-root .env and current working directory .env
+  - exported environment variables keep precedence over dotenv values
+  - current working directory .env can override repo-root .env for launch-local overrides
+  - HALO_SWING_DISABLE_DOTENV disables dotenv loading for isolated offline runs
+  - get_settings uses the shared dotenv file list
+  - provider auto-selection checks HALO_SWING_* and provider-specific API-key aliases from dotenv values
+  - tests cover repo-root .env provider auto-selection when cwd differs
+  - tests cover repo-root .env readiness for Hermes, Telegram, and live data when cwd differs
+  - pytest disables dotenv loading by default so local operator secrets cannot trigger live network providers
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - committed .env file
+  - real secret values
+  - mutation of os.environ from .env
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_providers.py tests/test_readiness.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.635 Local Env Alias Loading Gate Record - 2026-05-16
 
 ### A. 목적

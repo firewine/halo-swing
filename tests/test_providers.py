@@ -3,6 +3,7 @@ from urllib import parse
 
 import pytest
 
+import halo_swing_mcp.env as local_env
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.providers import (
@@ -196,6 +197,7 @@ def test_market_data_provider_auto_uses_local_env_api_key_aliases(
     monkeypatch,
 ) -> None:
     monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
     for key in (
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
@@ -212,6 +214,48 @@ def test_market_data_provider_auto_uses_local_env_api_key_aliases(
                 "POLYGON_API_KEY=polygon-local-secret",
                 "HALO_SWING_FRED_API_KEY=fred-local-secret",
                 "NEWS_API_KEY=news-local-secret",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert provider.data_mode == "live"
+    assert provider.live_data_required is True
+
+
+def test_market_data_provider_auto_uses_repo_root_env_from_other_cwd(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    repo_dir = tmp_path / "repo"
+    run_dir = tmp_path / "runner"
+    repo_dir.mkdir()
+    run_dir.mkdir()
+    repo_env = repo_dir / ".env"
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+    for key in (
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    repo_env.write_text(
+        "\n".join(
+            [
+                "HALO_SWING_MARKET_DATA_API_KEY=market-repo-secret",
+                "HALO_SWING_MACRO_API_KEY=macro-repo-secret",
+                "HALO_SWING_NEWS_API_KEY=news-repo-secret",
             ]
         ),
         encoding="utf-8",
