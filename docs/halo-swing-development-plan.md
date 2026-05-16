@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.672 API Key Dotenv Template Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`live_data_setup_summary`는 API-key readiness, provider route, 다음 smoke 명령을
+보여주지만, payload 자체에는 사용자가 repo-root `.env`에 어떤 placeholder entry를 채워야
+하는지 구조화해서 담지 않았다. 이번 slice는 no-secret `dotenv_template`를 추가해,
+API-key-only setup payload만으로 `.env.example`에서 `.env`로 옮겨 채울 live data key
+entry를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - live_data_setup_summary includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values
+  - setup checklist and API-key pipeline smoke expose the same no-secret dotenv_template in blocked fixture defaults
+  - README and DevOps guide document dotenv_template in live_data_setup_summary payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed
+```
+
 ## 3.671 API Key Pipeline Stage Setup Summary Gate Record - 2026-05-17
 
 ### A. 목적

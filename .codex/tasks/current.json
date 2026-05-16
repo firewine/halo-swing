@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_STAGE_SETUP_SUMMARY_GATE",
+  "gate_id": "API_KEY_DOTENV_TEMPLATE_SUMMARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.671",
-  "next_atomic_step": "add stage-level live_data_setup_summary status fields to run_api_key_pipeline_smoke sub-smoke summaries so the one-shot API-key smoke shows which stage is setup-ready without returning secrets",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.672",
+  "next_atomic_step": "add a no-secret dotenv_template to live_data_setup_summary so API-key-only setup payloads show the repo-root .env entries to fill before running smokes",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.670",
+    "docs/halo-swing-development-plan.md#3.671",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -36,11 +36,11 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\",\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit"
   ],
   "post_implementation_review": {
     "roles": [
@@ -53,14 +53,13 @@
     "read_only": true
   },
   "done_means": [
-    "run_api_key_pipeline_smoke sub-smoke summaries include live_data_setup_summary_status, ready_to_run_live_smoke, provider_route_status, and next_smoke_command_name when available",
-    "ready fake pipeline smoke reports each stage setup summary ready with next_smoke_command run_api_key_pipeline_smoke",
-    "fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values",
-    "README and DevOps guide document stage-level setup summary fields in pipeline smoke payloads",
+    "live_data_setup_summary includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values",
+    "setup checklist and API-key pipeline smoke expose the same no-secret dotenv_template in blocked fixture defaults",
+    "README and DevOps guide document dotenv_template in live_data_setup_summary payloads",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline stage setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key dotenv template summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

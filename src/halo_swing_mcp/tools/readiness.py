@@ -1479,6 +1479,7 @@ def _live_data_setup_summary(
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
         "provider_route_summary": route_summary,
+        "dotenv_template": _live_data_dotenv_template(),
         "one_shot_smoke_command": api_key_status.get("one_shot_smoke_command"),
         "next_smoke_command": _local_command(
             "run_api_key_pipeline_smoke"
@@ -1498,6 +1499,53 @@ def _ordered_unique_strings(values: list[Any]) -> list[str]:
             continue
         result.append(value)
     return result
+
+
+def _live_data_dotenv_template() -> dict[str, Any]:
+    return {
+        "schema_version": "live_data_dotenv_template.v1",
+        "target_path": ".env",
+        "source_path": ".env.example",
+        "entries": [
+            {
+                "provider_family": "market",
+                "provider": "polygon",
+                "preferred_env_key": "POLYGON_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MARKET_DATA_API_KEY",
+                    "POLYGON_API_KEY",
+                ],
+                "example": "POLYGON_API_KEY = your_polygon_key",
+                "secret": True,
+            },
+            {
+                "provider_family": "macro",
+                "provider": "fred",
+                "preferred_env_key": "FRED_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MACRO_API_KEY",
+                    "HALO_SWING_FRED_API_KEY",
+                    "FRED_API_KEY",
+                ],
+                "example": "FRED_API_KEY = your_fred_key",
+                "secret": True,
+            },
+            {
+                "provider_family": "news",
+                "provider": "newsapi",
+                "preferred_env_key": "NEWS_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_NEWS_API_KEY",
+                    "NEWS_API_KEY",
+                ],
+                "example": "NEWS_API_KEY = your_newsapi_key",
+                "secret": True,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
 
 
 def _extend_workflow_contract_checks(

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_STAGE_SETUP_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_STAGE_SETUP_SUMMARY_GATE
+status: API_KEY_DOTENV_TEMPLATE_SUMMARY_VERIFIED
+gate_id: API_KEY_DOTENV_TEMPLATE_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: add stage-level live_data_setup_summary status fields to run_api_key_pipeline_smoke sub-smoke summaries so the one-shot API-key smoke shows which stage is setup-ready without returning secrets
+next_atomic_step: add a no-secret dotenv_template to live_data_setup_summary so API-key-only setup payloads show the repo-root .env entries to fill before running smokes
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,23 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke sub-smoke summaries include live_data_setup_summary_status, ready_to_run_live_smoke, provider_route_status, and next_smoke_command_name when available
-  - ready fake pipeline smoke reports each stage setup summary ready with next_smoke_command run_api_key_pipeline_smoke
-  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values
-  - README and DevOps guide document stage-level setup summary fields in pipeline smoke payloads
+  - live_data_setup_summary includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values
+  - setup checklist and API-key pipeline smoke expose the same no-secret dotenv_template in blocked fixture defaults
+  - README and DevOps guide document dotenv_template in live_data_setup_summary payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline stage setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key dotenv template summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_STAGE_SETUP_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_STAGE_SETUP_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add stage-level live_data_setup_summary status fields to run_api_key_pipeline_smoke sub-smoke summaries so the one-shot API-key smoke shows which stage is setup-ready without returning secrets
 ```
 
 Previous completed directive:
@@ -1326,6 +1336,54 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Dotenv Template Summary Gate is verified.
+`live_data_setup_summary` now includes a no-secret `dotenv_template` with the
+repo-root `.env` target, `.env.example` source, preferred placeholder entries,
+accepted aliases, and no returned secret values. Focused tests passed with 3
+tests, full pytest passed with 760 tests, and ruff, health_check, and the setup
+checklist harness command passed.
+
+```yaml
+api_key_dotenv_template_summary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - live_data_setup_summary includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values
+    - setup checklist and API-key pipeline smoke expose the same no-secret dotenv_template in blocked fixture defaults
+    - README and DevOps guide document dotenv_template in live_data_setup_summary payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: "passed, blocked fixture defaults returned no-secret live_data_dotenv_template entries"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Stage Setup Summary Gate is verified.
 `run_api_key_pipeline_smoke` sub-smoke summaries now include stage-level
