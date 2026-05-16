@@ -4345,6 +4345,28 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         news_configured_env_keys=[],
         ready_to_run_live_smoke=False,
     )
+    assert payload["api_key_dotenv_loading_summary"] == {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": True,
+        "dotenv_loading_enabled": True,
+        "disabled": False,
+        "disabled_env_key": "HALO_SWING_DISABLE_DOTENV",
+        "configuration_precedence": [
+            "exported environment variables",
+            "launch-directory .env",
+            "repo-root .env",
+        ],
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": False,
+        "copy_required": True,
+        "next_setup_step": "prepare_dotenv",
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert (
         payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
     )
@@ -4387,6 +4409,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "recording_smoke_summary" in payload["omitted_sections"]
     assert "api_key_requirements_summary" not in payload["omitted_sections"]
     assert "api_key_command_summary" not in payload["omitted_sections"]
+    assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
@@ -4402,6 +4425,42 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv(local_env.DOTENV_DISABLED_ENV, "true")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    dotenv_summary = payload["api_key_dotenv_loading_summary"]
+
+    assert dotenv_summary == {
+        "schema_version": "api_key_dotenv_loading_summary.v1",
+        "dotenv_supported": True,
+        "dotenv_loading_enabled": False,
+        "disabled": True,
+        "disabled_env_key": "HALO_SWING_DISABLE_DOTENV",
+        "configuration_precedence": [
+            "exported environment variables",
+            "launch-directory .env",
+            "repo-root .env",
+        ],
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": False,
+        "copy_required": True,
+        "next_setup_step": "prepare_dotenv",
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
 
 
 def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(

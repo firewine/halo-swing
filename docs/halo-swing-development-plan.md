@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.739 API Key Summary-Only Dotenv Loading Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 compact 결과에 requirements와 command를
+남기지만, `.env` loading이 disabled 되었거나 precedence/file 상태 때문에 키가 로드되지
+않는 경우에는 full payload의 `api_key_dotenv_loading_summary`를 다시 확인해야 했다.
+이번 slice는 summary-only payload에도 no-secret dotenv loading summary를 유지해,
+사용자가 API key를 넣은 뒤 compact 결과만 보고 dotenv disabled 상태와 `.env` file
+상태를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only=true now returns top-level api_key_dotenv_loading_summary without nested full smoke sections
+  - api_key_dotenv_loading_summary exposes dotenv_supported, dotenv_loading_enabled, disabled, disabled_env_key, configuration_precedence, .env file status, next_setup_step, ready_to_run_live_smoke, and safety flags without secret values
+  - summary_only=true no longer lists api_key_dotenv_loading_summary in omitted_sections
+  - focused tests cover default dotenv loading summary and disabled dotenv summary-only output
+  - README and DevOps setup guide document summary-only api_key_dotenv_loading_summary
+  - tests/test_setup_docs.py asserts summary-only api_key_dotenv_loading_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; no-secret api_key_dotenv_loading_summary returned with dotenv_loading_enabled=true
+  - HALO_SWING_DISABLE_DOTENV=true PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_dotenv_loading_summary"]; print(summary["schema_version"], summary["dotenv_loading_enabled"], summary["disabled_env_key"], summary["secret_values_returned"])' -> api_key_dotenv_loading_summary.v1 False HALO_SWING_DISABLE_DOTENV False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 783 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.738 API Key Summary-Only Commands Gate Record - 2026-05-17
 
 ### A. 목적
