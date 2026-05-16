@@ -42,20 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_DOTENV_PRECEDENCE_METADATA_VERIFIED
-gate_id: API_KEY_DOTENV_PRECEDENCE_METADATA_GATE
+status: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_VERIFIED
+gate_id: API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_GATE
 review_tier: S1_small
 
-next_atomic_step: make live data API-key status dotenv precedence metadata match the actual exported-env, launch-directory .env, repo-root .env runtime order
+next_atomic_step: make selected FRED and NewsAPI provider route entries report family live data boundaries even when market OHLCV remains fixture-backed
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_env.py
-  - tests/test_readiness.py
+  - src/halo_swing_mcp/providers.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -72,23 +71,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py::test_get_config_value_uses_launch_directory_env_before_repo_root_env tests/test_readiness.py::test_live_data_api_key_status_reports_runtime_dotenv_precedence -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key tests/test_providers.py::test_describe_market_data_provider_route_marks_newsapi_entry_live_without_market_key -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - get_live_data_api_key_status dotenv.precedence reports exported environment variables, launch-directory .env, then repo-root .env
-  - the metadata matches env.py runtime behavior without changing secret loading semantics
-  - tests prove launch-directory .env overrides repo-root .env after exported env values
-  - API-key-only setup payloads remain non-mutating and no-secret
+  - describe_market_data_provider_route marks selected FredMacroDataProvider route entries data_mode=live and live_data_required=true when a macro API key selects FRED
+  - describe_market_data_provider_route marks selected NewsApiDataProvider route entries data_mode=live and live_data_required=true when a news API key selects NewsAPI
+  - fixture base route entries remain fixture/no-network/no-live and provider route inspection still performs no network calls
+  - selected provider route metadata stays no-secret and does not change provider runtime semantics
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key dotenv precedence metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider route family live-boundary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_DOTENV_PRECEDENCE_METADATA_VERIFIED
+gate_id: API_KEY_DOTENV_PRECEDENCE_METADATA_GATE
+review_tier: S1_small
+
+next_atomic_step: make live data API-key status dotenv precedence metadata match the actual exported-env, launch-directory .env, repo-root .env runtime order
 ```
 
 Previous completed directive:
@@ -1753,6 +1763,54 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Route Family Live Boundary Gate is verified.
+`get_live_data_provider_route` now reports selected FRED and NewsAPI route
+entries as family-level live boundaries even when market OHLCV remains
+fixture-backed. Route inspection remains non-networking, no-secret, and does
+not change provider runtime behavior. Focused tests passed with 2 tests, full
+pytest passed with 772 tests, and ruff, health_check, and fixture-default
+API-key pipeline CLI passed.
+
+```yaml
+api_key_provider_route_family_live_boundary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/providers.py
+    - tests/test_providers.py
+  implementation:
+    - selected FredMacroDataProvider route entries report data_mode=live and live_data_required=true when a macro API key selects FRED
+    - selected NewsApiDataProvider route entries report data_mode=live and live_data_required=true when a news API key selects NewsAPI
+    - fixture base route entries remain fixture/no-network/no-live
+    - provider route inspection still performs no network calls and returns no secret values
+    - provider runtime semantics remain unchanged
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key tests/test_providers.py::test_describe_market_data_provider_route_marks_newsapi_entry_live_without_market_key -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "772 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Dotenv Precedence Metadata Gate is verified.
 `get_live_data_api_key_status` now reports dotenv precedence in the same order

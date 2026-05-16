@@ -602,8 +602,8 @@ def _provider_route(provider: MarketDataProvider | None) -> list[dict[str, Any]]
                 provider_family="news",
                 provider="newsapi",
                 provider_class="NewsApiDataProvider",
-                data_mode=provider.data_mode,
-                live_data_required=provider.live_data_required,
+                data_mode="live",
+                live_data_required=True,
             ),
         ]
     if isinstance(provider, FredMacroDataProvider):
@@ -613,8 +613,8 @@ def _provider_route(provider: MarketDataProvider | None) -> list[dict[str, Any]]
                 provider_family="macro",
                 provider="fred",
                 provider_class="FredMacroDataProvider",
-                data_mode=provider.data_mode,
-                live_data_required=provider.live_data_required,
+                data_mode="live",
+                live_data_required=True,
             ),
         ]
     if isinstance(provider, PolygonMarketDataProvider):

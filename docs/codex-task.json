@@ -1,26 +1,23 @@
 {
-  "gate_id": "API_KEY_DOTENV_PRECEDENCE_METADATA_GATE",
+  "gate_id": "API_KEY_PROVIDER_ROUTE_FAMILY_LIVE_BOUNDARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.710",
-  "next_atomic_step": "make live data API-key status dotenv precedence metadata match the actual exported-env, launch-directory .env, repo-root .env runtime order",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.711",
+  "next_atomic_step": "make selected FRED and NewsAPI provider route entries report family live data boundaries even when market OHLCV remains fixture-backed",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_env.py",
-    "tests/test_readiness.py"
+    "src/halo_swing_mcp/providers.py",
+    "tests/test_providers.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.710",
-    "src/halo_swing_mcp/env.py",
-    "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_env.py",
-    "tests/test_readiness.py",
+    "docs/halo-swing-development-plan.md#3.711",
+    "src/halo_swing_mcp/providers.py",
+    "tests/test_providers.py",
     "README.md",
     "docs/devops-setup-guide.md"
   ],
@@ -38,7 +35,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py::test_get_config_value_uses_launch_directory_env_before_repo_root_env tests/test_readiness.py::test_live_data_api_key_status_reports_runtime_dotenv_precedence -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key tests/test_providers.py::test_describe_market_data_provider_route_marks_newsapi_entry_live_without_market_key -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
@@ -55,14 +52,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_live_data_api_key_status dotenv.precedence reports exported environment variables, launch-directory .env, then repo-root .env",
-    "the metadata matches env.py runtime behavior without changing secret loading semantics",
-    "tests prove launch-directory .env overrides repo-root .env after exported env values",
-    "API-key-only setup payloads remain non-mutating and no-secret",
+    "describe_market_data_provider_route marks selected FredMacroDataProvider route entries data_mode=live and live_data_required=true when a macro API key selects FRED",
+    "describe_market_data_provider_route marks selected NewsApiDataProvider route entries data_mode=live and live_data_required=true when a news API key selects NewsAPI",
+    "fixture base route entries remain fixture/no-network/no-live and provider route inspection still performs no network calls",
+    "selected provider route metadata stays no-secret and does not change provider runtime semantics",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key dotenv precedence metadata gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key provider route family live-boundary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

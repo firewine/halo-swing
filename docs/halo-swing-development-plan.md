@@ -242,6 +242,59 @@ verification:
   - run_api_key_pipeline_smoke fixture-default CLI: exit 0
 ```
 
+## 3.711 API Key Provider Route Family Live Boundary Gate Record - 2026-05-17
+
+### A. 목적
+
+`get_live_data_provider_route`는 API key가 어떤 provider wrapper를 선택했는지 네트워크
+호출 없이 보여준다. 그러나 FRED 또는 NewsAPI key만 설정된 부분 setup에서는 해당
+provider family가 live smoke를 실행할 수 있는데도 route entry가 base fixture provider의
+`data_mode`/`live_data_required`를 그대로 보여줄 수 있다. 이번 slice는 selected
+FRED/NewsAPI route entry가 family-level live boundary를 정확히 보고하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - selected FredMacroDataProvider route entries report data_mode=live and live_data_required=true when a macro API key selects FRED
+  - selected NewsApiDataProvider route entries report data_mode=live and live_data_required=true when a news API key selects NewsAPI
+  - fixture base route entries remain fixture/no-network/no-live
+  - route inspection remains no-network and no-secret
+  - provider runtime semantics remain unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+  - provider network call during route inspection
+  - provider runtime behavior change
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider-route pytest: 2 passed
+  - full pytest: 772 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0
+```
+
 ## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
 
 ### A. 목적

@@ -157,6 +157,88 @@ def test_describe_market_data_provider_route_reports_full_api_key_route(
         assert value not in serialized
 
 
+def test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    get_settings.cache_clear()
+
+    payload = describe_market_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == ["market_ohlcv_api_key", "news_api_key"]
+    assert payload["selected_provider_classes"] == [
+        "ReplayMarketDataProvider",
+        "FredMacroDataProvider",
+    ]
+    assert payload["route"] == [
+        {
+            "provider_family": "fixture",
+            "provider": "fixture",
+            "provider_class": "ReplayMarketDataProvider",
+            "data_mode": "fixture",
+            "live_data_required": False,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "provider_family": "macro",
+            "provider": "fred",
+            "provider_class": "FredMacroDataProvider",
+            "data_mode": "live",
+            "live_data_required": True,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+    ]
+    assert payload["providers"]["macro"]["selected"] is True
+    assert payload["providers"]["macro"]["configured_env_keys"] == ["FRED_API_KEY"]
+    assert "fred-secret" not in serialized
+
+
+def test_describe_market_data_provider_route_marks_newsapi_entry_live_without_market_key(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+
+    payload = describe_market_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == ["market_ohlcv_api_key", "macro_api_key"]
+    assert payload["selected_provider_classes"] == [
+        "ReplayMarketDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["route"] == [
+        {
+            "provider_family": "fixture",
+            "provider": "fixture",
+            "provider_class": "ReplayMarketDataProvider",
+            "data_mode": "fixture",
+            "live_data_required": False,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "provider_family": "news",
+            "provider": "newsapi",
+            "provider_class": "NewsApiDataProvider",
+            "data_mode": "live",
+            "live_data_required": True,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+    ]
+    assert payload["providers"]["news"]["selected"] is True
+    assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
+    assert "news-secret" not in serialized
+
+
 def test_live_market_data_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.setenv("HALO_SWING_MARKET_DATA_MODE", "live")
     monkeypatch.delenv("HALO_SWING_MARKET_DATA_API_KEY", raising=False)
