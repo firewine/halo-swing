@@ -51,6 +51,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "readiness_summary" in guide
     assert "api_key_setup_status" in guide
     assert "ready_to_run_live_smoke" in guide
+    assert "next_operator_action_name" in guide
     assert "live_data_smoke_commands" in guide
     assert "get_live_data_api_key_status" in guide
     assert "get_live_data_provider_route" in guide

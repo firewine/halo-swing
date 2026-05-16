@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_READINESS_SETUP_STATUS_GATE",
+  "gate_id": "API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.705",
-  "next_atomic_step": "surface API-key setup status fields in top-level readiness_summary so API-key-only readiness is visible separately from broader integration gates",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.706",
+  "next_atomic_step": "mirror the no-secret next_operator_action in top-level readiness_summary so API-key-only readiness includes the next runnable local action",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -55,15 +55,15 @@
     "read_only": true
   },
   "done_means": [
-    "top-level readiness_summary exposes api_key_setup_status, api_key_status, provider_route_status, ready_to_run_live_smoke, next_setup_step, and next_operator_action_name",
-    "ready API-key setup shows ready status and run_provider_smokes as the next setup step",
-    "blocked setup shows blocked API-key status and prepare_dotenv as the next setup step",
+    "top-level readiness_summary exposes the same no-secret next_operator_action as the pipeline payload",
+    "ready API-key setup readiness_summary points to run_provider_smokes and includes the provider smoke action payload",
+    "blocked setup readiness_summary points to prepare_dotenv and includes the copy command action payload",
     "blocked or partial setup paths do not return secret values and remain non-mutating",
-    "README and DevOps setup guide mention that readiness_summary mirrors API-key setup status separately from broader integration gates",
+    "README and DevOps setup guide mention that readiness_summary mirrors next_operator_action separately from broader integration gates",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline readiness setup-status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key pipeline readiness next-operator-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_READINESS_SETUP_STATUS_VERIFIED
-gate_id: API_KEY_PIPELINE_READINESS_SETUP_STATUS_GATE
+status: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_VERIFIED
+gate_id: API_KEY_PIPELINE_READINESS_NEXT_OPERATOR_ACTION_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key setup status fields in top-level readiness_summary so API-key-only readiness is visible separately from broader integration gates
+next_atomic_step: mirror the no-secret next_operator_action in top-level readiness_summary so API-key-only readiness includes the next runnable local action
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,17 +81,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - top-level readiness_summary exposes api_key_setup_status, api_key_status, provider_route_status, ready_to_run_live_smoke, next_setup_step, and next_operator_action_name
-  - ready API-key setup shows ready status and run_provider_smokes as the next setup step
-  - blocked setup shows blocked API-key status and prepare_dotenv as the next setup step
+  - top-level readiness_summary exposes the same no-secret next_operator_action as the pipeline payload
+  - ready API-key setup readiness_summary points to run_provider_smokes and includes the provider smoke action payload
+  - blocked setup readiness_summary points to prepare_dotenv and includes the copy command action payload
   - blocked or partial setup paths do not return secret values and remain non-mutating
-  - README and DevOps setup guide mention that readiness_summary mirrors API-key setup status separately from broader integration gates
+  - README and DevOps setup guide mention that readiness_summary mirrors next_operator_action separately from broader integration gates
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline readiness setup-status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline readiness next-operator-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_READINESS_SETUP_STATUS_VERIFIED
+gate_id: API_KEY_PIPELINE_READINESS_SETUP_STATUS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key setup status fields in top-level readiness_summary so API-key-only readiness is visible separately from broader integration gates
 ```
 
 Previous completed directive:
@@ -1701,6 +1712,58 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Readiness Next Operator Action Gate is verified.
+Top-level `readiness_summary` now mirrors the same no-secret
+`next_operator_action` as the pipeline payload. Ready API-key setup points to
+`run_provider_smokes` and includes the provider smoke action payload; blocked
+local setup points to `prepare_dotenv` with the copy command payload. Blocked
+and partial setup paths remain non-mutating and return no secret values.
+Focused tests passed with 5 tests, full pytest passed with 762 tests, and ruff,
+health_check, and the one-shot pipeline harness passed.
+
+```yaml
+api_key_pipeline_readiness_next_operator_action_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - top-level readiness_summary exposes the same no-secret next_operator_action as the pipeline payload
+    - ready API-key setup readiness_summary points to run_provider_smokes and includes the provider smoke action payload
+    - blocked setup readiness_summary points to prepare_dotenv and includes the copy command action payload
+    - blocked or partial setup paths do not return secret values and remain non-mutating
+    - README and DevOps guide document readiness_summary next_operator_action visibility separately from broader integration gates
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "762 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv, readiness_summary mirrored next_operator_action, and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Readiness Setup Status Gate is verified. Top-level
 `readiness_summary` now exposes API-key setup status fields separately from

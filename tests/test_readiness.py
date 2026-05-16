@@ -2634,6 +2634,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         payload["readiness_summary"]["next_operator_action_name"]
         == "run_provider_smokes"
     )
+    assert payload["readiness_summary"]["next_operator_action"] == (
+        payload["next_operator_action"]
+    )
     assert payload["executed_tools"] == [
         "get_integration_readiness",
         "get_live_data_api_key_status",
@@ -2843,6 +2846,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert (
         payload["readiness_summary"]["next_operator_action_name"]
         == "prepare_dotenv"
+    )
+    assert payload["readiness_summary"]["next_operator_action"] == (
+        payload["next_operator_action"]
     )
     assert payload["setup_status_summary"] == {
         "schema_version": "api_key_pipeline_setup_status_summary.v1",

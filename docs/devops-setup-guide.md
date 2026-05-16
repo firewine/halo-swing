@@ -450,8 +450,9 @@ includes top-level `next_operator_action`, `setup_status_summary`,
 summary, then fails the route readiness check until all supported live-data
 provider keys are configured. The top-level `readiness_summary` mirrors
 `api_key_setup_status`, `api_key_status`, `provider_route_status`,
-`ready_to_run_live_smoke`, `next_setup_step`, and `next_operator_action_name`
-separately from broader integration gates. The checklist includes `ready`,
+`ready_to_run_live_smoke`, `next_setup_step`, `next_operator_action_name`, and
+the no-secret `next_operator_action` separately from broader integration gates.
+The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
 `next_blocking_action` so setup progress, the first local setup blocker, and

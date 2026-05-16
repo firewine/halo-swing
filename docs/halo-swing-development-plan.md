@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
+
+### A. 목적
+
+`readiness_summary`는 API-key setup 상태와 다음 step 이름을 보여주지만, 실제 다음 local
+action payload는 별도 top-level `next_operator_action`을 확인해야 했다. 이번 slice는
+broader integration gate 상태와 API-key-only setup 상태를 함께 보는 compact summary 안에
+no-secret `next_operator_action`을 mirror해, 사용자가 API key 입력 후 다음 실행 action을
+바로 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level readiness_summary mirrors the same no-secret next_operator_action as the pipeline payload
+  - ready API-key setup readiness_summary points to run_provider_smokes and includes the provider smoke action payload
+  - blocked setup readiness_summary points to prepare_dotenv and includes the copy command action payload
+  - blocked or partial setup paths remain non-mutating and return no secret values
+  - README and DevOps guide document readiness_summary next_operator_action visibility separately from broader integration gates
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused readiness/setup-docs pytest: 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 762 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - run_api_key_pipeline_smoke fixture-default path: exit 0, blocked at prepare_dotenv, readiness_summary mirrored next_operator_action, no secrets returned
+```
+
 ## 3.705 API Key Pipeline Readiness Setup Status Gate Record - 2026-05-17
 
 ### A. 목적

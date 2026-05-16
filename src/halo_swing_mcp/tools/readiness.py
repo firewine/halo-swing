@@ -1506,6 +1506,7 @@ def _api_key_pipeline_readiness_summary(
         ),
         "next_setup_step": live_data_setup_steps.get("next_step"),
         "next_operator_action_name": next_operator_action.get("name"),
+        "next_operator_action": next_operator_action,
         "next_actions": readiness.get("next_actions"),
     }
 

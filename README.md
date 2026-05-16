@@ -274,7 +274,7 @@ route summary so the one-shot smoke records API-key readiness, required env keys
 and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
 provider family counts, API-key setup status inside `readiness_summary`, the
-next local action, the first no-secret
+next local action mirrored inside `readiness_summary`, the first no-secret
 `next_provider_smoke` command in the top-level command summary and checklist
 when a provider smoke is ready, the same no-secret `next_provider_smoke` object
 and command name in `setup_status_summary`, and which provider factory route was
