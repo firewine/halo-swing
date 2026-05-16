@@ -726,10 +726,16 @@ def expected_api_key_operator_checklist(
             "secret_values_returned": False,
         },
     ]
+    blocking_step_names = [
+        str(step["name"]) for step in steps if step.get("status") != "ready"
+    ]
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
         "status": status,
         "current_step": current_step,
+        "ready": not blocking_step_names,
+        "blocking_step_names": blocking_step_names,
+        "next_blocking_step": blocking_step_names[0] if blocking_step_names else None,
         "steps": steps,
         "step_count": 4,
         "network_call": False,

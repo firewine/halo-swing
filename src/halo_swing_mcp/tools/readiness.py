@@ -1810,10 +1810,16 @@ def _api_key_pipeline_operator_checklist(
             ),
         },
     ]
+    blocking_step_names = [
+        str(step["name"]) for step in steps if step.get("status") != "ready"
+    ]
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
         "status": setup_status_summary.get("status"),
         "current_step": setup_status_summary.get("next_setup_step"),
+        "ready": not blocking_step_names,
+        "blocking_step_names": blocking_step_names,
+        "next_blocking_step": blocking_step_names[0] if blocking_step_names else None,
         "steps": steps,
         "step_count": len(steps),
         "network_call": False,

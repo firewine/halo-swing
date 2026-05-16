@@ -444,7 +444,9 @@ includes top-level `next_operator_action`, `setup_status_summary`,
 `api_key_requirements_summary`, `api_key_command_summary`,
 `api_key_operator_checklist`, `live_data_setup_summary`, and a provider route
 summary, then fails the route readiness check until all supported live-data
-provider keys are configured.
+provider keys are configured. The checklist includes `ready`,
+`blocking_step_names`, and `next_blocking_step` so the first local setup blocker
+is visible without reading every step.
 Its live data, signal workflow, and recording sub-smoke summaries include
 stage-level setup fields such as `live_data_setup_summary_status`,
 `ready_to_run_live_smoke`, `provider_route_status`, `provider_family_summary`,
