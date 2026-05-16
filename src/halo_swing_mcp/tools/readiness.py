@@ -398,11 +398,11 @@ def _live_data_readiness(
     ready = market_configured and macro_configured and news_configured
     missing: list[str] = []
     if not market_configured:
-        missing.append("market_ohlcv_source_or_api_key_decision")
+        missing.append("market_ohlcv_api_key")
     if not macro_configured:
-        missing.append("macro_source_or_api_key_decision")
+        missing.append("macro_api_key")
     if not news_configured:
-        missing.append("news_source_or_api_key_decision")
+        missing.append("news_api_key")
     return {
         "ready": ready,
         "status": "ready" if ready else "blocked",

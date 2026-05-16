@@ -28,6 +28,53 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.626 Live Data Readiness Missing Reason Alignment Gate Record - 2026-05-16
+
+### A. 목적
+
+live_data readiness가 API-key required로 바뀐 뒤에도 missing reason과
+next_actions가 아직 source/API-key decision 문구를 사용했다. 사용자가 어떤 값을
+넣어야 하는지 명확히 알 수 있도록 missing reason을 API-key 중심으로 정렬한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - missing market live data readiness now reports market_ohlcv_api_key
+  - missing macro live data readiness now reports macro_api_key
+  - missing news live data readiness now reports news_api_key
+  - get_integration_readiness next_actions mirrors these missing reasons
+  - missing reasons remain non-secret and do not include env key names or values
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults tests/test_readiness.py::test_live_data_readiness_requires_market_macro_and_news_sources tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_do_not_imply_keys tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data next_action requires market_ohlcv_api_key, macro_api_key, and news_api_key
+  - rg -n "source_or_api_key_decision" src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py .codex/tasks/current.json docs/codex-task.json -> no matches
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 685 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.625 Live Data Readiness API-Key Required Gate Record - 2026-05-16
 
 ### A. 목적

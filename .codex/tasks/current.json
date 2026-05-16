@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_READINESS_API_KEY_REQUIRED_GATE",
+  "gate_id": "LIVE_DATA_READINESS_MISSING_REASON_ALIGNMENT_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.625",
-  "next_atomic_step": "require implemented live data API-key aliases for live_data readiness while keeping source env values secret-free and offline",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.626",
+  "next_atomic_step": "align live_data readiness missing reasons with API-key-required provider readiness while keeping output secret-free and offline",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.625",
+    "docs/halo-swing-development-plan.md#3.626",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -43,9 +43,9 @@
     "read_only": true
   },
   "done_means": [
-    "get_integration_readiness requires implemented API-key aliases for market, macro, and news live_data readiness",
-    "source env values alone do not mark live_data ready because provider live calls require API keys",
-    "source env key names and values remain absent from serialized readiness output",
+    "live_data missing reasons use market_ohlcv_api_key, macro_api_key, and news_api_key",
+    "get_integration_readiness next_actions exactly reflect API-key-required live data readiness",
+    "missing reasons remain non-secret and do not include env key names or values",
     "default readiness remains offline and performs no network calls",
     "all required verification passes",
     "WORKING.md records result and verification status only"

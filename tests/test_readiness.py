@@ -188,8 +188,8 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
             "binance_console_trade_only_no_withdraw_attestation"
         ),
         (
-            "live_data: provide market_ohlcv_source_or_api_key_decision, "
-            "macro_source_or_api_key_decision, news_source_or_api_key_decision"
+            "live_data: provide market_ohlcv_api_key, "
+            "macro_api_key, news_api_key"
         ),
     ]
     assert payload["gates"]["hermes"]["missing"] == [
@@ -225,9 +225,9 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
     assert live_order_gate["evidence"]["order_submission"] is False
     assert live_order_gate["evidence"]["network_call"] is False
     assert payload["gates"]["live_data"]["missing"] == [
-        "market_ohlcv_source_or_api_key_decision",
-        "macro_source_or_api_key_decision",
-        "news_source_or_api_key_decision",
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
     ]
     assert payload["gates"]["live_data"]["evidence"]["schema_version"] == (
         "live_data_source_readiness.v1"
@@ -1107,7 +1107,7 @@ def test_live_data_readiness_requires_market_macro_and_news_sources() -> None:
 
     assert payload["status"] == "blocked"
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == ["macro_source_or_api_key_decision"]
+    assert live_data_gate["missing"] == ["macro_api_key"]
     assert live_data_gate["evidence"]["schema_version"] == "live_data_source_readiness.v1"
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
     assert live_data_gate["evidence"]["macro_source_configured"] is False
@@ -1243,12 +1243,12 @@ def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
 
     assert payload["status"] == "blocked"
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == ["market_ohlcv_source_or_api_key_decision"]
+    assert live_data_gate["missing"] == ["market_ohlcv_api_key"]
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is True
     assert live_data_gate["evidence"]["news_source_configured"] is True
     assert live_data_gate["evidence"]["secret_values_returned"] is False
-    assert "live_data: provide market_ohlcv_source_or_api_key_decision" in payload[
+    assert "live_data: provide market_ohlcv_api_key" in payload[
         "next_actions"
     ]
     for key, value in secret_env.items():
@@ -1287,9 +1287,9 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
     assert telegram_gate["evidence"]["secret_values_returned"] is False
     assert live_data_gate["status"] == "blocked"
     assert live_data_gate["missing"] == [
-        "market_ohlcv_source_or_api_key_decision",
-        "macro_source_or_api_key_decision",
-        "news_source_or_api_key_decision",
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
     ]
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
@@ -1320,9 +1320,9 @@ def test_integration_readiness_live_data_source_env_values_do_not_imply_keys(
     assert payload["status"] == "blocked"
     assert live_data_gate["status"] == "blocked"
     assert live_data_gate["missing"] == [
-        "market_ohlcv_source_or_api_key_decision",
-        "macro_source_or_api_key_decision",
-        "news_source_or_api_key_decision",
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
     ]
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
@@ -1354,9 +1354,9 @@ def test_integration_readiness_ignores_unsupported_live_data_source_env_values(
 
     assert live_data_gate["status"] == "blocked"
     assert live_data_gate["missing"] == [
-        "market_ohlcv_source_or_api_key_decision",
-        "macro_source_or_api_key_decision",
-        "news_source_or_api_key_decision",
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
     ]
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
@@ -1388,9 +1388,9 @@ def test_integration_readiness_ignores_invalid_live_data_source_env_values(
 
     assert live_data_gate["status"] == "blocked"
     assert live_data_gate["missing"] == [
-        "market_ohlcv_source_or_api_key_decision",
-        "macro_source_or_api_key_decision",
-        "news_source_or_api_key_decision",
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
     ]
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
