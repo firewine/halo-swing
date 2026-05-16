@@ -470,7 +470,9 @@ stage-level setup fields such as `live_data_setup_summary_status`,
 `provider_smoke_plan`, `provider_smoke_count`,
 `ready_provider_smoke_count`, `blocked_provider_smoke_count`, and
 `next_smoke_command_name` so the blocked stage, next provider setup action, and
-provider smoke readiness are visible without returning secret values.
+provider smoke readiness are visible without returning secret values. Provider
+or network failures during live sub-smokes are reported as no-secret `conflict` payloads
+without returning exception messages, URLs, or API key values.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

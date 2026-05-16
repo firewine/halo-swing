@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_VERIFIED
-gate_id: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_GATE
+status: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_VERIFIED
+gate_id: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_GATE
 review_tier: S1_small
 
-next_atomic_step: treat fully configured exported live-data API keys as setup-ready even when repo-root .env is absent so dotenv copy is not the next blocker
+next_atomic_step: make run_api_key_pipeline_smoke return a no-secret conflict payload instead of raising when live provider sub-smokes hit network or provider exceptions
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,24 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - with all required live-data API keys configured via exported env and no repo-root .env file, live_data_setup_steps.next_step is run_provider_smokes
-  - with all required live-data API keys configured via exported env and no repo-root .env file, next_operator_action is run_provider_smokes and includes provider smoke command payloads
-  - dotenv_file_status may still report copy_required for operators who prefer a local .env, but prepare_dotenv is not the blocking next step when exported keys already satisfy setup
-  - blocked no-key setup still points to prepare_dotenv when .env is absent and remains non-mutating
-  - README and DevOps setup guide mention that exported env keys can satisfy setup without copying .env
+  - run_api_key_pipeline_smoke catches live-data, signal-workflow, and recording sub-smoke exceptions and returns status=conflict
+  - exception summaries include sub-smoke name and exception type but do not include exception messages, URLs, API key values, or secret values
+  - when exported API keys select live providers and a sub-smoke fails, readiness/setup summaries still show API-key setup as ready and next_operator_action as run_provider_smokes
+  - failed sub-smoke summaries expose error_summary and failed checks instead of crashing the harness
+  - README and DevOps setup guide mention that provider/network failures are reported as no-secret conflict payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified exported-env dotenv bypass gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline sub-smoke exception gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_VERIFIED
+gate_id: API_KEY_EXPORTED_ENV_DOTENV_BYPASS_GATE
+review_tier: S1_small
+
+next_atomic_step: treat fully configured exported live-data API keys as setup-ready even when repo-root .env is absent so dotenv copy is not the next blocker
 ```
 
 Previous completed directive:
@@ -1723,6 +1734,62 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Sub-Smoke Exception Gate is verified.
+`run_api_key_pipeline_smoke` now catches live-data, signal-workflow, and
+recording sub-smoke exceptions and returns a no-secret `status=conflict` payload
+instead of raising. Error summaries include the sub-smoke name and exception
+type only; exception messages, URLs, and API key values are not returned. With
+fake exported API keys in the sandbox, the pipeline CLI now exits 0, keeps
+API-key setup ready, preserves `next_operator_action=run_provider_smokes`, and
+reports `URLError` summaries for the live sub-smokes. Focused tests passed with
+7 tests, full pytest passed with 764 tests, and ruff, health_check, fake-key
+pipeline CLI, and default fixture pipeline harness passed.
+
+```yaml
+api_key_pipeline_sub_smoke_exception_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - run_api_key_pipeline_smoke catches live-data, signal-workflow, and recording sub-smoke exceptions and returns status=conflict
+    - exception summaries include sub-smoke name and exception type but do not include exception messages, URLs, API key values, or secret values
+    - exported API-key setup summaries remain ready when provider/network sub-smokes fail, with next_operator_action still pointing to run_provider_smokes
+    - failed sub-smoke summaries expose error_summary and failed checks instead of crashing the harness
+    - README and DevOps guide document no-secret conflict payload behavior for provider/network failures
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "7 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c '... run_api_key_pipeline_smoke summary ...'
+      result: "exit 0; status=conflict, API-key setup ready, next_operator_action=run_provider_smokes, sub-smoke error_summary returned exception_type only with no message/URL/API key value"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "764 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Exported Env Dotenv Bypass Gate is verified. When all
 required live-data API keys are configured through exported environment

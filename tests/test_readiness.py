@@ -2462,6 +2462,112 @@ def test_run_live_recording_smoke_can_use_caller_supplied_ledger(
     assert ledger_path.exists()
 
 
+def test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-secret-value",
+        "FRED_API_KEY": "fred-secret-value",
+        "NEWS_API_KEY": "news-secret-value",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    def fake_live_data_smoke(
+        symbols: list[str] | None = None,
+        topic: str = "macro",
+    ) -> dict[str, Any]:
+        raise RuntimeError(
+            "provider failed at https://provider.example/?apiKey=polygon-secret-value"
+        )
+
+    def fake_signal_workflow_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_signal_workflow_smoke_run.v1",
+            "status": "ok",
+            "network_call": False,
+            "live_data_required": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_recording_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_recording_smoke_run.v1",
+            "status": "ok",
+            "network_call": False,
+            "live_data_required": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_signal_workflow_smoke",
+        fake_signal_workflow_smoke,
+    )
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_recording_smoke",
+        fake_recording_smoke,
+    )
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+    failed_checks = {
+        (check["tool"], check["name"])
+        for check in payload["checks"]
+        if not check["passed"]
+    }
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "conflict"
+    assert payload["readiness_summary"]["api_key_setup_status"] == "ready"
+    assert payload["readiness_summary"]["provider_route_status"] == "ready"
+    assert payload["readiness_summary"]["next_operator_action_name"] == (
+        "run_provider_smokes"
+    )
+    assert payload["next_operator_action"]["name"] == "run_provider_smokes"
+    assert payload["provider_route_summary"]["status"] == "ready"
+    assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["live_data_smoke_summary"]["error_summary"] == {
+        "schema_version": "api_key_pipeline_sub_smoke_error.v1",
+        "tool": "run_live_data_smoke",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is True
+    assert payload["live_data_smoke_summary"]["provider_route_status"] == "ready"
+    assert ("run_live_data_smoke", "live_data_smoke_status_ok") in failed_checks
+    assert ("run_live_data_smoke", "provider_route_status_ok") not in failed_checks
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert "provider.example" not in serialized
+    assert "apiKey" not in serialized
+    for value in secret_env.values():
+        assert value not in serialized
+
+
 def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     tmp_path: Path,
     monkeypatch,

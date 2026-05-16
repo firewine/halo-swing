@@ -82,6 +82,61 @@ verification:
   - run_api_key_pipeline_smoke fixture-default path: exit 0, blocked at prepare_dotenv, no secrets returned
 ```
 
+## 3.708 API Key Pipeline Sub-Smoke Exception Gate Record - 2026-05-17
+
+### A. 목적
+
+API key가 설정되어 live provider가 선택되면 one-shot pipeline smoke가 실제 network/provider
+call을 수행한다. 이때 DNS, provider auth, quota, transient network failure 같은 예외가
+발생하면 `run_api_key_pipeline_smoke`가 no-secret `conflict` payload를 반환하지 못하고
+예외로 종료될 수 있었다. 이번 slice는 API-key-only 연동 확인 경로가 실패 상황에서도
+다음 조치 가능한 구조화 payload를 반환하도록 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke catches live-data, signal-workflow, and recording sub-smoke exceptions and returns status=conflict
+  - exception summaries include sub-smoke name and exception type but do not include exception messages, URLs, API key values, or secret values
+  - exported API-key setup summaries remain ready when provider/network sub-smokes fail, with next_operator_action still pointing to run_provider_smokes
+  - failed sub-smoke summaries expose error_summary and failed checks instead of crashing the harness
+  - README and DevOps guide document no-secret conflict payload behavior for provider/network failures
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+  - exception message, URL, or API key serialization
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused readiness/setup-docs pytest: 7 passed
+  - fake API-key pipeline CLI with provider DNS failure: exit 0, status=conflict, sub-smoke error_summary returned exception_type only, no exception message/URL/API key value
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 764 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - run_api_key_pipeline_smoke fixture-default path: exit 0, blocked at prepare_dotenv, no secrets returned
+```
+
 ## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
 
 ### A. 목적

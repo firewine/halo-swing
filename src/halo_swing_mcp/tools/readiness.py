@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -667,22 +668,45 @@ def run_api_key_pipeline_smoke(
 
     readiness = get_integration_readiness()
     live_data_api_key_status = get_live_data_api_key_status()
-    live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
-    provider_route = _optional_mapping(live_data_smoke.get("provider_route")) or {}
-    signal_workflow_smoke = run_live_signal_workflow_smoke(
-        asset=asset,
-        timeframe=timeframe,
+    provider_route = get_live_data_provider_route()
+    live_data_setup_summary = _live_data_setup_summary(
+        live_data_api_key_status,
+        provider_route,
     )
-    recording_smoke = run_live_recording_smoke(asset=asset, timeframe=timeframe)
+    live_data_smoke = _run_api_key_pipeline_sub_smoke(
+        tool_name="run_live_data_smoke",
+        runner=lambda: run_live_data_smoke(symbols=symbols, topic=topic),
+        live_data_setup_summary=live_data_setup_summary,
+        provider_route=provider_route,
+    )
+    provider_route = (
+        _optional_mapping(live_data_smoke.get("provider_route"))
+        or provider_route
+    )
+    live_data_setup_summary = _live_data_setup_summary(
+        live_data_api_key_status,
+        provider_route,
+    )
+    signal_workflow_smoke = _run_api_key_pipeline_sub_smoke(
+        tool_name="run_live_signal_workflow_smoke",
+        runner=lambda: run_live_signal_workflow_smoke(
+            asset=asset,
+            timeframe=timeframe,
+        ),
+        live_data_setup_summary=live_data_setup_summary,
+        provider_route=provider_route,
+    )
+    recording_smoke = _run_api_key_pipeline_sub_smoke(
+        tool_name="run_live_recording_smoke",
+        runner=lambda: run_live_recording_smoke(asset=asset, timeframe=timeframe),
+        live_data_setup_summary=live_data_setup_summary,
+        provider_route=provider_route,
+    )
     checks = _api_key_pipeline_checks(
         readiness=readiness,
         live_data_smoke=live_data_smoke,
         signal_workflow_smoke=signal_workflow_smoke,
         recording_smoke=recording_smoke,
-    )
-    live_data_setup_summary = _live_data_setup_summary(
-        live_data_api_key_status,
-        provider_route,
     )
     setup_status_summary = _api_key_pipeline_setup_status_summary(
         live_data_setup_summary,
@@ -1376,6 +1400,57 @@ def _recording_network_call(recorded: dict[str, Any]) -> bool:
     return _mapping_value(run_journal, "network_call") is True
 
 
+def _run_api_key_pipeline_sub_smoke(
+    *,
+    tool_name: str,
+    runner: Callable[[], dict[str, Any]],
+    live_data_setup_summary: dict[str, Any],
+    provider_route: dict[str, Any],
+) -> dict[str, Any]:
+    try:
+        return runner()
+    except Exception as exc:
+        return _api_key_pipeline_sub_smoke_exception_payload(
+            tool_name=tool_name,
+            exception=exc,
+            live_data_setup_summary=live_data_setup_summary,
+            provider_route=provider_route,
+        )
+
+
+def _api_key_pipeline_sub_smoke_exception_payload(
+    *,
+    tool_name: str,
+    exception: Exception,
+    live_data_setup_summary: dict[str, Any],
+    provider_route: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "schema_version": "api_key_pipeline_sub_smoke_exception.v1",
+        "status": "conflict",
+        "tool": tool_name,
+        "error_summary": {
+            "schema_version": "api_key_pipeline_sub_smoke_error.v1",
+            "tool": tool_name,
+            "exception_type": type(exception).__name__,
+            "exception_message_returned": False,
+            "url_returned": False,
+            "secret_values_returned": False,
+        },
+        "provider_route": provider_route,
+        "live_data_setup_summary": live_data_setup_summary,
+        "network_call": live_data_setup_summary.get("ready_to_run_live_smoke") is True,
+        "live_data_required": live_data_setup_summary.get("ready_to_run_live_smoke")
+        is True,
+        "mutates_local_state": False,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+    }
+
+
 def _api_key_pipeline_checks(
     *,
     readiness: dict[str, Any],
@@ -1537,6 +1612,7 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": smoke.get("schema_version"),
         "status": smoke.get("status"),
+        "error_summary": _optional_mapping(smoke.get("error_summary")),
         "network_call": smoke.get("network_call"),
         "live_data_required": smoke.get("live_data_required"),
         "mutates_local_state": smoke.get("mutates_local_state", False),

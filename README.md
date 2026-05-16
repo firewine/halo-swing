@@ -289,7 +289,9 @@ Each sub-smoke summary also includes stage-level setup fields such as
 `next_operator_action`, `provider_setup_actions`, `provider_setup_action_count`,
 `provider_smoke_plan`, `provider_smoke_count`,
 `ready_provider_smoke_count`, `blocked_provider_smoke_count`, and
-`next_smoke_command_name`:
+`next_smoke_command_name`. Provider or network failures during live sub-smokes
+are reported as no-secret `conflict` payloads without returning exception
+messages, URLs, or API key values:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
