@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: INTEGRATION_SETUP_CHECKLIST_TOOL_VERIFIED
-gate_id: INTEGRATION_SETUP_CHECKLIST_TOOL_GATE
-review_tier: S2_medium
+status: LIVE_MARKET_SNAPSHOT_BOUNDARY_VERIFIED
+gate_id: LIVE_MARKET_SNAPSHOT_BOUNDARY_GATE
+review_tier: S1_small
 
-next_atomic_step: add a deterministic get_integration_setup_checklist tool that converts readiness state into local dotenv setup requirements without exposing secrets or performing integrations
+next_atomic_step: make get_market_snapshot declare live provider network boundaries correctly when API-key-backed market data is selected
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,15 +55,8 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
-  - tests/test_mvp_tools.py
-  - tests/test_readiness.py
-  - tests/test_setup_docs.py
-  - tests/test_tool_registry.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -79,27 +72,34 @@ required_verification:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
-  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/health_check.json
-  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/mvp_tool_contracts.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_readiness.py tests/test_tool_registry.py tests/test_mvp_tools.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - get_integration_setup_checklist is callable through the shared registry, CLI harness, MCP server wrapper, and health capabilities
-  - the checklist returns stable schema_version, readiness_status, next_actions, env requirements, local setup commands, and offline guardrails
-  - the checklist maps current readiness evidence into configured booleans without returning secret values or raw env values
-  - the checklist keeps MIGRATION_GO and REPOSITORY_GO as durable gate requirements instead of dotenv-only approvals
-  - tests cover blocked defaults, repo-root dotenv integration-ready values with secrets redacted, registry/server/manifest parity, and harness invocation
-  - README and DevOps setup docs describe the setup checklist command as offline and non-mutating
+  - get_market_snapshot keeps fixture/replay default payloads and MVP no-live guard behavior unchanged
+  - when a live market-data provider is active, market_snapshot_contract declares network_call=true and live_data_required=true
+  - live market snapshot guard reports ok with a live_data_boundary_declared check instead of conflicting on the default no-live guard
+  - tests prove a fake live provider path returns live contract metadata without exposing API-key values
+  - README and DevOps setup docs clarify that live market snapshots declare network/live-data boundaries when API keys select live providers
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified integration setup checklist tool gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+next_state_after_success: commit and push this verified live market snapshot boundary gate, then continue with macro/news live boundary hardening, user-provided live API key setup instructions, or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: INTEGRATION_SETUP_CHECKLIST_TOOL_VERIFIED
+gate_id: INTEGRATION_SETUP_CHECKLIST_TOOL_GATE
+review_tier: S2_medium
+
+next_atomic_step: add a deterministic get_integration_setup_checklist tool that converts readiness state into local dotenv setup requirements without exposing secrets or performing integrations
 ```
 
 Previous completed directive:
@@ -738,22 +738,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.645
-gate_packet: docs/halo-swing-development-plan.md#3.645
+portable_mirror: docs/halo-swing-development-plan.md#3.646
+gate_packet: docs/halo-swing-development-plan.md#3.646
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.645
-  - src/halo_swing_mcp/tools/readiness.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/server.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
-  - tests/test_readiness.py
-  - tests/test_tool_registry.py
-  - tests/test_mvp_tools.py
-  - tests/test_setup_docs.py
+  - docs/halo-swing-development-plan.md#3.646
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -1055,6 +1049,54 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Market Snapshot Boundary Gate is verified. `get_market_snapshot`
+now preserves fixture/replay defaults while declaring `network_call=true` and
+`live_data_required=true` when an API-key-backed live market provider is active.
+Live market snapshot guards report `live_data_boundary_declared` instead of
+conflicting on the default no-live guard, while fixture/replay payloads keep
+the existing `no_live_data_required` guard. Focused provider tests passed with
+19 tests, full pytest passed with 735 tests, and ruff and health_check passed.
+
+```yaml
+live_market_snapshot_boundary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  implementation:
+    - get_market_snapshot default fixture/replay contract still reports network_call=false and live_data_required=false
+    - live provider market snapshot contract reports network_call=true and live_data_required=true
+    - live provider market snapshot guard reports ok with live_data_boundary_declared
+    - provider tests cover fake live Polygon path without exposing API-key values
+    - README and DevOps guide document the live market snapshot boundary declaration
+    - no new live adapter module, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or secret exposure added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+      result: "19 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "735 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Integration Setup Checklist Tool Gate is verified.
 `get_integration_setup_checklist` is now registered across the shared tool

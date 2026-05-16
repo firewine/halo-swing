@@ -350,6 +350,11 @@ POLYGON_API_KEY=your_polygon_key
 `HALO_SWING_MARKET_DATA_API_KEY` is accepted as the project-specific alias for
 the same key. Without either key, market data remains fixture-backed and
 offline.
+When one of these keys selects the live Polygon provider, market snapshot
+payloads explicitly declare `live_data_required=true` and `network_call=true`
+in `market_snapshot_contract`, and the guard reports
+`live_data_boundary_declared`. Fixture/replay defaults keep `network_call=false`
+and the `no_live_data_required` guard.
 
 Macro live data is wired behind the same provider boundary for FRED:
 

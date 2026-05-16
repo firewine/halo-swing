@@ -78,6 +78,7 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
 
     supported_assets = provider.supported_assets()
     supported_timeframes = provider.supported_timeframes()
+    live_data_required = provider.live_data_required
     contract = {
         "schema_version": "market_snapshot.v1",
         "core_assets": MARKET_SNAPSHOT_CORE_ASSETS,
@@ -85,8 +86,8 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         "data_mode": provider.data_mode,
         "feature_store_persistence": False,
         "feature_store_gate": "MIGRATION_GO_AND_REPOSITORY_GO",
-        "network_call": False,
-        "live_data_required": provider.live_data_required,
+        "network_call": live_data_required,
+        "live_data_required": live_data_required,
     }
     guard_checks = [
         {
@@ -108,15 +109,12 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
             "name": "feature_store_not_persisted",
             "passed": contract["feature_store_persistence"] is False,
         },
-        {
-            "name": "no_live_data_required",
-            "passed": contract["live_data_required"] is False,
-        },
+        _market_snapshot_live_data_guard_check(live_data_required, contract),
     ]
     return {
         "as_of": provider.as_of,
         "data_mode": provider.data_mode,
-        "live_data_required": provider.live_data_required,
+        "live_data_required": live_data_required,
         "data_freshness_status": DataFreshnessStatus.FRESH.value,
         "degraded_mode": False,
         "data_warnings": [],
@@ -128,6 +126,33 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
             "checks": guard_checks,
         },
         "snapshots": snapshots,
+    }
+
+
+def _market_snapshot_live_data_guard_check(
+    live_data_required: bool,
+    contract: dict[str, Any],
+) -> dict[str, Any]:
+    if not live_data_required:
+        return {
+            "name": "no_live_data_required",
+            "passed": contract["live_data_required"] is False
+            and contract["network_call"] is False,
+            "expected": {"live_data_required": False, "network_call": False},
+            "actual": {
+                "live_data_required": contract["live_data_required"],
+                "network_call": contract["network_call"],
+            },
+        }
+    return {
+        "name": "live_data_boundary_declared",
+        "passed": contract["live_data_required"] is True
+        and contract["network_call"] is True,
+        "expected": {"live_data_required": True, "network_call": True},
+        "actual": {
+            "live_data_required": contract["live_data_required"],
+            "network_call": contract["network_call"],
+        },
     }
 
 

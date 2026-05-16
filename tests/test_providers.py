@@ -429,6 +429,59 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
     assert bundle["evidence_cards"][0]["source"] == "newsapi"
 
 
+def test_market_snapshot_declares_live_provider_boundary_without_secret(
+    monkeypatch,
+) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        return {
+            "results": [
+                {
+                    "t": 1_700_000_000_000,
+                    "o": 100.0,
+                    "h": 102.0,
+                    "l": 99.5,
+                    "c": 101.0,
+                    "v": 1000,
+                },
+                {
+                    "t": 1_700_086_400_000,
+                    "o": 101.0,
+                    "h": 103.0,
+                    "l": 100.5,
+                    "c": 102.5,
+                    "v": 1100,
+                },
+            ]
+        }
+
+    provider = PolygonMarketDataProvider(
+        api_key="polygon-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = get_market_snapshot(["QQQ"])
+    guard_checks = {
+        check["name"]: check
+        for check in payload["market_snapshot_guard"]["checks"]
+    }
+    serialized = repr(payload)
+
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["market_snapshot_contract"]["network_call"] is True
+    assert payload["market_snapshot_contract"]["live_data_required"] is True
+    assert payload["market_snapshot_guard"]["status"] == "ok"
+    assert "no_live_data_required" not in guard_checks
+    assert guard_checks["live_data_boundary_declared"]["passed"] is True
+    assert guard_checks["feature_store_not_persisted"]["passed"] is True
+    assert payload["snapshots"][0]["last_close"] == 102.5
+    assert "polygon-secret" not in serialized
+
+
 def test_market_tools_keep_replay_payload_contract() -> None:
     market = get_market_snapshot(["QQQ"])
     macro = get_macro_snapshot()
@@ -440,6 +493,13 @@ def test_market_tools_keep_replay_payload_contract() -> None:
         assert payload["data_mode"] == "fixture"
         assert payload["live_data_required"] is False
 
+    market_guard_checks = {
+        check["name"]: check
+        for check in market["market_snapshot_guard"]["checks"]
+    }
+    assert market["market_snapshot_contract"]["network_call"] is False
+    assert market_guard_checks["no_live_data_required"]["passed"] is True
+    assert "live_data_boundary_declared" not in market_guard_checks
     assert market["snapshots"][0]["symbol"] == "QQQ"
     assert events["events"]
     assert news["evidence_cards"]

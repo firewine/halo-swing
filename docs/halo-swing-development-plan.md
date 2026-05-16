@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.646 Live Market Snapshot Boundary Gate Record - 2026-05-16
+
+### A. 목적
+
+API key만 넣으면 live provider가 선택되는 경로는 마련되어 있지만,
+`get_market_snapshot` contract는 provider가 live일 때도 `network_call=false`로
+고정되어 있었다. 실제 연동 준비 목표와 맞추려면 fixture/replay 기본값은 그대로
+offline으로 유지하면서, API-key-backed market provider가 활성화된 경우에는
+network/live-data boundary를 명시적으로 선언해야 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_market_snapshot default fixture/replay payloads still report network_call=false and live_data_required=false
+  - API-key-backed live market provider payloads now report network_call=true and live_data_required=true in market_snapshot_contract
+  - live market snapshot guard reports ok with live_data_boundary_declared instead of conflicting on the default no-live guard
+  - tests cover fake live Polygon path without exposing API-key values
+  - README and DevOps setup docs document the live market snapshot boundary declaration
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q -> 19 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 735 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.645 Integration Setup Checklist Tool Gate Record - 2026-05-16
 
 ### A. 목적

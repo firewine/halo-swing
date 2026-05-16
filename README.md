@@ -198,6 +198,11 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setu
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values.
+When a market data API key selects the live Polygon provider, market snapshot
+payloads declare `live_data_required=true` and `network_call=true` in
+`market_snapshot_contract`, and the guard uses
+`live_data_boundary_declared`. Fixture/replay defaults keep
+`network_call=false` and the existing `no_live_data_required` guard.
 Report tools include an offline `delivery_preview` payload for Hermes and
 Telegram. The preview contains Telegram message chunks and guard checks, but it
 does not send messages or require credentials. Telegram previews expose the
