@@ -1615,6 +1615,9 @@ def _api_key_pipeline_setup_status_summary(
         "next_setup_step": live_data_setup_steps.get("next_step"),
         "next_operator_action_name": next_operator_action.get("name"),
         "next_smoke_command_name": next_smoke_command.get("name"),
+        "next_provider_smoke_command_name": next_operator_action.get(
+            "next_provider_smoke_command_name"
+        ),
         "selected_provider_classes": live_data_setup_summary.get(
             "selected_provider_classes"
         ),

@@ -43,6 +43,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
     assert "blocked_provider_smoke_count" in guide
+    assert "next_provider_smoke_command_name" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
     assert "run_api_key_pipeline_smoke" in guide

@@ -275,7 +275,8 @@ and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
 provider family counts, the next local action, the first no-secret
 `next_provider_smoke` command in the top-level command summary and checklist
-when a provider smoke is ready, and which provider factory route was selected.
+when a provider smoke is ready, the next provider smoke command name in
+`setup_status_summary`, and which provider factory route was selected.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,
