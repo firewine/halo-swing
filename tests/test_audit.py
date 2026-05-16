@@ -43,10 +43,17 @@ READINESS_ENV_SECRETS = {
     "NEWS_API_KEY": "news-secret-key",
     "HALO_SWING_NEWS_API_KEY": "halo-news-secret-key",
 }
+READINESS_LIVE_MODE_ENVS = {
+    "HALO_SWING_MARKET_DATA_MODE": "live",
+    "HALO_SWING_MACRO_DATA_MODE": "live",
+    "HALO_SWING_NEWS_DATA_MODE": "live",
+}
 
 
 def set_readiness_env_secrets(monkeypatch) -> dict[str, str]:
     for key, value in READINESS_ENV_SECRETS.items():
+        monkeypatch.setenv(key, value)
+    for key, value in READINESS_LIVE_MODE_ENVS.items():
         monkeypatch.setenv(key, value)
     return READINESS_ENV_SECRETS
 

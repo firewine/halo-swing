@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_READINESS_MISSING_REASON_ALIGNMENT_GATE_VERIFIED
-gate_id: LIVE_DATA_READINESS_MISSING_REASON_ALIGNMENT_GATE
+status: LIVE_DATA_READINESS_MODE_ALIGNMENT_GATE_VERIFIED
+gate_id: LIVE_DATA_READINESS_MODE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: align live_data readiness missing reasons with API-key-required provider readiness while keeping output secret-free and offline
+next_atomic_step: align live_data readiness with actual live provider mode plus API-key selection while keeping output secret-free and offline
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -258,6 +258,9 @@ done_means:
   - unsupported live data source env values do not mark live_data ready and are not serialized
   - live data readiness requires implemented API-key aliases because source names alone cannot perform provider live calls
   - live_data missing reasons use market_ohlcv_api_key, macro_api_key, and news_api_key
+  - live_data readiness requires implemented live mode plus API-key alias for market, macro, and news env-backed readiness
+  - API keys without live modes keep live_data blocked with live-mode missing reasons
+  - live modes without API keys keep live_data blocked with API-key missing reasons
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -607,15 +610,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.626
-gate_packet: docs/halo-swing-development-plan.md#3.626
+portable_mirror: docs/halo-swing-development-plan.md#3.627
+gate_packet: docs/halo-swing-development-plan.md#3.627
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.626
+  - docs/halo-swing-development-plan.md#3.627
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_readiness.py
+  - tests/test_audit.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -918,12 +922,51 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Data Readiness Missing Reason Alignment Gate is verified.
-`get_integration_readiness` now reports API-key-specific live_data missing
-reasons: `market_ohlcv_api_key`, `macro_api_key`, and `news_api_key`. The
-next_actions output now matches the API-key-required provider readiness
-boundary. Focused readiness tests passed with 5 tests, full pytest passed with
-685 tests, and ruff and health_check passed.
+Summary: Live Data Readiness Mode Alignment Gate is verified.
+`get_integration_readiness` now matches the actual provider activation
+boundary: env-backed live_data readiness requires both explicit live data modes
+and implemented API-key aliases for market, macro, and news. API keys alone now
+produce live-mode missing reasons, live modes alone produce API-key missing
+reasons, readiness remains offline, and secret/env key names remain absent from
+readiness and audit outputs. Focused tests passed with 13 tests, full readiness
+tests passed with 36 tests, full pytest passed with 687 tests, and ruff and
+health_check passed.
+
+```yaml
+live_data_readiness_mode_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_audit.py
+    - tests/test_readiness.py
+  implementation:
+    - live_data env readiness requires implemented live mode plus API-key alias for market, macro, and news providers
+    - API keys without live modes keep live_data blocked with live-mode missing reasons
+    - live modes without API keys keep live_data blocked with API-key missing reasons
+    - explicit optional configured booleans preserve existing public readiness behavior
+    - readiness and audit outputs remain secret-free and do not include env key names or values
+    - default readiness remains offline and performs no network calls
+    - no network calls, Telegram sends, migrations, repository persistence, broker path changes, or order submission added
+  verification:
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only tests/test_readiness.py::test_integration_readiness_accepts_project_macro_api_key_alias tests/test_readiness.py::test_integration_readiness_requires_live_modes_with_api_keys tests/test_readiness.py::test_integration_readiness_requires_api_keys_with_live_modes tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_do_not_imply_keys tests/test_readiness.py::test_integration_readiness_ignores_unsupported_live_data_source_env_values tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets -q
+      result: "13 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "36 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py tests/test_audit.py
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
+      result: "passed, live_data next_action requires live modes and API keys"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "687 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 live_data_readiness_missing_reason_alignment_gate:

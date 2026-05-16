@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.627 Live Data Readiness Mode Alignment Gate Record - 2026-05-16
+
+### A. 목적
+
+live_data readiness가 API-key presence만으로 ready가 될 수 있었지만, 실제
+provider 선택은 `HALO_SWING_MARKET_DATA_MODE=live`,
+`HALO_SWING_MACRO_DATA_MODE=live`, `HALO_SWING_NEWS_DATA_MODE=live`와 구현된
+API-key alias를 함께 요구한다. readiness가 실제 provider 활성화 조건과 같은
+경계를 보도록 정렬한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - env-backed market live_data readiness now requires live mode plus market API key alias
+  - env-backed macro live_data readiness now requires live mode plus macro API key alias
+  - env-backed news live_data readiness now requires live mode plus news API key alias
+  - API keys without live modes remain blocked with live-mode missing reasons
+  - live modes without API keys remain blocked with API-key missing reasons
+  - explicit optional configured booleans preserve existing public readiness behavior
+  - readiness and audit outputs remain secret-free and do not include env key names or values
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only tests/test_readiness.py::test_integration_readiness_accepts_project_macro_api_key_alias tests/test_readiness.py::test_integration_readiness_requires_live_modes_with_api_keys tests/test_readiness.py::test_integration_readiness_requires_api_keys_with_live_modes tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases tests/test_readiness.py::test_integration_readiness_ignores_invalid_env_secret_values_without_exposure tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_do_not_imply_keys tests/test_readiness.py::test_integration_readiness_ignores_unsupported_live_data_source_env_values tests/test_readiness.py::test_integration_readiness_ignores_invalid_live_data_source_env_values tests/test_audit.py::test_harness_integration_readiness_audit_redacts_env_secrets tests/test_audit.py::test_mcp_server_integration_readiness_audit_redacts_env_secrets -q -> 13 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q -> 36 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py tests/test_audit.py -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data next_action requires live modes and API keys
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 687 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.626 Live Data Readiness Missing Reason Alignment Gate Record - 2026-05-16
 
 ### A. 목적

@@ -28,9 +28,12 @@ READINESS_ENV_KEYS = (
     "HALO_SWING_BINANCE_TESTNET",
     "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+    "HALO_SWING_MARKET_DATA_MODE",
     "HALO_SWING_MARKET_DATA_SOURCE",
     "HALO_SWING_MARKET_DATA_API_KEY",
+    "HALO_SWING_MACRO_DATA_MODE",
     "HALO_SWING_MACRO_SOURCE",
+    "HALO_SWING_NEWS_DATA_MODE",
     "HALO_SWING_NEWS_SOURCE",
     "POLYGON_API_KEY",
     "ALPACA_API_KEY",
@@ -158,6 +161,14 @@ EXPECTED_BINANCE_CREDENTIAL_POLICY_KEYS = [
     "passphrase_persistence",
     "secret_values_returned",
 ]
+EXPECTED_DEFAULT_LIVE_DATA_MISSING = [
+    "market_ohlcv_live_mode",
+    "market_ohlcv_api_key",
+    "macro_live_mode",
+    "macro_api_key",
+    "news_live_mode",
+    "news_api_key",
+]
 
 
 def clear_readiness_env(monkeypatch) -> None:
@@ -188,8 +199,9 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
             "binance_console_trade_only_no_withdraw_attestation"
         ),
         (
-            "live_data: provide market_ohlcv_api_key, "
-            "macro_api_key, news_api_key"
+            "live_data: provide market_ohlcv_live_mode, "
+            "market_ohlcv_api_key, macro_live_mode, macro_api_key, "
+            "news_live_mode, news_api_key"
         ),
     ]
     assert payload["gates"]["hermes"]["missing"] == [
@@ -224,11 +236,7 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
     assert "binance_console_trade_only_no_withdraw_attestation" in live_order_gate["missing"]
     assert live_order_gate["evidence"]["order_submission"] is False
     assert live_order_gate["evidence"]["network_call"] is False
-    assert payload["gates"]["live_data"]["missing"] == [
-        "market_ohlcv_api_key",
-        "macro_api_key",
-        "news_api_key",
-    ]
+    assert payload["gates"]["live_data"]["missing"] == EXPECTED_DEFAULT_LIVE_DATA_MISSING
     assert payload["gates"]["live_data"]["evidence"]["schema_version"] == (
         "live_data_source_readiness.v1"
     )
@@ -315,6 +323,8 @@ def test_integration_readiness_uses_safe_local_evidence(tmp_path: Path, monkeypa
     )
     monkeypatch.setenv("FRED_API_KEY", "configured")
     monkeypatch.setenv("NEWS_API_KEY", "configured")
+    monkeypatch.setenv("HALO_SWING_MACRO_DATA_MODE", "live")
+    monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
     monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
     get_settings.cache_clear()
 
@@ -1130,6 +1140,13 @@ def test_integration_readiness_env_secrets_are_boolean_only(
     }
     for key, value in secret_env.items():
         monkeypatch.setenv(key, value)
+    live_mode_env = {
+        "HALO_SWING_MARKET_DATA_MODE": "live",
+        "HALO_SWING_MACRO_DATA_MODE": "live",
+        "HALO_SWING_NEWS_DATA_MODE": "live",
+    }
+    for key, value in live_mode_env.items():
+        monkeypatch.setenv(key, value)
 
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     telegram_gate = payload["gates"]["telegram"]
@@ -1153,6 +1170,8 @@ def test_integration_readiness_env_secrets_are_boolean_only(
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized
+    for key in live_mode_env:
+        assert key not in serialized
 
 
 def test_integration_readiness_env_secret_aliases_are_boolean_only(
@@ -1170,6 +1189,13 @@ def test_integration_readiness_env_secret_aliases_are_boolean_only(
     }
     for key, value in env_aliases.items():
         monkeypatch.setenv(key, value)
+    live_mode_env = {
+        "HALO_SWING_MARKET_DATA_MODE": "live",
+        "HALO_SWING_MACRO_DATA_MODE": "live",
+        "HALO_SWING_NEWS_DATA_MODE": "live",
+    }
+    for key, value in live_mode_env.items():
+        monkeypatch.setenv(key, value)
 
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     telegram_gate = payload["gates"]["telegram"]
@@ -1193,6 +1219,8 @@ def test_integration_readiness_env_secret_aliases_are_boolean_only(
     for key, value in env_aliases.items():
         assert key not in serialized
         assert value not in serialized
+    for key in live_mode_env:
+        assert key not in serialized
 
 
 def test_integration_readiness_accepts_project_macro_api_key_alias(
@@ -1205,6 +1233,13 @@ def test_integration_readiness_accepts_project_macro_api_key_alias(
         "HALO_SWING_NEWS_API_KEY": "news-secret-key",
     }
     for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+    live_mode_env = {
+        "HALO_SWING_MARKET_DATA_MODE": "live",
+        "HALO_SWING_MACRO_DATA_MODE": "live",
+        "HALO_SWING_NEWS_DATA_MODE": "live",
+    }
+    for key, value in live_mode_env.items():
         monkeypatch.setenv(key, value)
 
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
@@ -1222,6 +1257,77 @@ def test_integration_readiness_accepts_project_macro_api_key_alias(
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized
+    for key in live_mode_env:
+        assert key not in serialized
+
+
+def test_integration_readiness_requires_live_modes_with_api_keys(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-secret-key",
+        "HALO_SWING_MACRO_API_KEY": "macro-project-secret-key",
+        "HALO_SWING_NEWS_API_KEY": "news-secret-key",
+    }
+    for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_live_mode",
+        "macro_live_mode",
+        "news_live_mode",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
+    assert (
+        "live_data: provide market_ohlcv_live_mode, "
+        "macro_live_mode, news_live_mode"
+    ) in payload["next_actions"]
+    for key, value in secret_env.items():
+        assert key not in serialized
+        assert value not in serialized
+
+
+def test_integration_readiness_requires_api_keys_with_live_modes(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    live_mode_env = {
+        "HALO_SWING_MARKET_DATA_MODE": "live",
+        "HALO_SWING_MACRO_DATA_MODE": "live",
+        "HALO_SWING_NEWS_DATA_MODE": "live",
+    }
+    for key, value in live_mode_env.items():
+        monkeypatch.setenv(key, value)
+
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
+    live_data_gate = payload["gates"]["live_data"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
+    assert live_data_gate["evidence"]["secret_values_returned"] is False
+    assert (
+        "live_data: provide market_ohlcv_api_key, "
+        "macro_api_key, news_api_key"
+    ) in payload["next_actions"]
+    for key in live_mode_env:
+        assert key not in serialized
 
 
 def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
@@ -1235,6 +1341,13 @@ def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
         "HALO_SWING_NEWS_API_KEY": "news-secret-key",
     }
     for key, value in secret_env.items():
+        monkeypatch.setenv(key, value)
+    live_mode_env = {
+        "HALO_SWING_MARKET_DATA_MODE": "live",
+        "HALO_SWING_MACRO_DATA_MODE": "live",
+        "HALO_SWING_NEWS_DATA_MODE": "live",
+    }
+    for key, value in live_mode_env.items():
         monkeypatch.setenv(key, value)
 
     payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
@@ -1254,6 +1367,8 @@ def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
     for key, value in secret_env.items():
         assert key not in serialized
         assert value not in serialized
+    for key in live_mode_env:
+        assert key not in serialized
 
 
 def test_integration_readiness_ignores_invalid_env_secret_values_without_exposure(
@@ -1286,11 +1401,7 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
     assert telegram_gate["evidence"]["gateway_configured"] is False
     assert telegram_gate["evidence"]["secret_values_returned"] is False
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == [
-        "market_ohlcv_api_key",
-        "macro_api_key",
-        "news_api_key",
-    ]
+    assert live_data_gate["missing"] == EXPECTED_DEFAULT_LIVE_DATA_MISSING
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
@@ -1319,11 +1430,7 @@ def test_integration_readiness_live_data_source_env_values_do_not_imply_keys(
 
     assert payload["status"] == "blocked"
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == [
-        "market_ohlcv_api_key",
-        "macro_api_key",
-        "news_api_key",
-    ]
+    assert live_data_gate["missing"] == EXPECTED_DEFAULT_LIVE_DATA_MISSING
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
@@ -1353,11 +1460,7 @@ def test_integration_readiness_ignores_unsupported_live_data_source_env_values(
     serialized = json.dumps(payload, sort_keys=True)
 
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == [
-        "market_ohlcv_api_key",
-        "macro_api_key",
-        "news_api_key",
-    ]
+    assert live_data_gate["missing"] == EXPECTED_DEFAULT_LIVE_DATA_MISSING
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
@@ -1387,11 +1490,7 @@ def test_integration_readiness_ignores_invalid_live_data_source_env_values(
     serialized = json.dumps(payload, sort_keys=True)
 
     assert live_data_gate["status"] == "blocked"
-    assert live_data_gate["missing"] == [
-        "market_ohlcv_api_key",
-        "macro_api_key",
-        "news_api_key",
-    ]
+    assert live_data_gate["missing"] == EXPECTED_DEFAULT_LIVE_DATA_MISSING
     assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
     assert live_data_gate["evidence"]["macro_source_configured"] is False
     assert live_data_gate["evidence"]["news_source_configured"] is False
