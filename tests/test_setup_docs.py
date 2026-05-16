@@ -172,6 +172,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_recovery_smoke_command" in guide
     assert "preferred_env_key" in guide
     assert "failure category is provider recovery" in guide
+    assert "next action is provider recovery" in guide
     assert "exception_message_returned" in guide
     assert "url_returned" in guide
     assert "readiness_summary.next_operator_action" in guide

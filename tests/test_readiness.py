@@ -2518,6 +2518,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_name": "recover_failed_providers",
         "next_action_is_recovery": True,
         "next_action_network_call": True,
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -4368,6 +4373,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
+    assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
+    assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
         "schema_version": "api_key_operator_checklist_summary.v1",
         "status": "blocked",

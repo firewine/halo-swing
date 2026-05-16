@@ -2751,7 +2751,7 @@ def _api_key_integration_status_summary(
         and api_key_provider_selection_summary.get("ready_to_run_live_smoke")
         is True
     )
-    return {
+    summary = {
         "schema_version": "api_key_integration_status_summary.v1",
         "status": api_key_next_action_summary.get("status"),
         "api_keys_configured": api_keys_configured,
@@ -2783,6 +2783,21 @@ def _api_key_integration_status_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    preferred_env_key = api_key_next_action_summary.get("preferred_env_key")
+    accepted_env_keys = _string_list(
+        api_key_next_action_summary.get("accepted_env_keys")
+    )
+    if (
+        api_key_next_action_summary.get("next_action_is_recovery") is True
+        and isinstance(preferred_env_key, str)
+    ):
+        summary["preferred_env_key"] = preferred_env_key
+    if (
+        api_key_next_action_summary.get("next_action_is_recovery") is True
+        and accepted_env_keys
+    ):
+        summary["accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_provider_recovery_checklist(

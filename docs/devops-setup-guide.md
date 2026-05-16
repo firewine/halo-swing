@@ -588,8 +588,10 @@ provider selection, failure, and next-action evidence into one operator row with
 `configured_provider_families`, `missing_provider_families`,
 `selected_provider_classes`, `failure_category`, `has_failures`,
 `next_action_name`, `next_action_is_recovery`, and
-`next_action_network_call`, so key-only live setup status is visible without
-reading every nested summary or returning secret values. The
+`next_action_network_call`. When the next action is provider recovery, it also
+includes `preferred_env_key` and `accepted_env_keys`, so key-only live setup
+status is visible without reading every nested summary or returning secret
+values. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`
