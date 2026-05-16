@@ -729,6 +729,10 @@ def expected_api_key_operator_checklist(
     blocking_step_names = [
         str(step["name"]) for step in steps if step.get("status") != "ready"
     ]
+    next_blocking_action = next(
+        (step for step in steps if step.get("status") != "ready"),
+        None,
+    )
     return {
         "schema_version": "api_key_pipeline_operator_checklist.v1",
         "status": status,
@@ -736,6 +740,7 @@ def expected_api_key_operator_checklist(
         "ready": not blocking_step_names,
         "blocking_step_names": blocking_step_names,
         "next_blocking_step": blocking_step_names[0] if blocking_step_names else None,
+        "next_blocking_action": next_blocking_action,
         "steps": steps,
         "step_count": 4,
         "network_call": False,
@@ -2602,6 +2607,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             ready_to_run_live_smoke=True,
         )
     )
+    assert payload["api_key_operator_checklist"]["next_blocking_action"] is None
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
@@ -2773,6 +2779,14 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
             ready_to_run_live_smoke=False,
         )
     )
+    assert payload["api_key_operator_checklist"]["next_blocking_action"] == {
+        "name": "prepare_dotenv",
+        "status": "pending",
+        "command": "cp .env.example .env",
+        "mutates_local_state": True,
+        "network_call": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

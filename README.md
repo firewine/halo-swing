@@ -272,8 +272,8 @@ top-level `next_operator_action`, `setup_status_summary`,
 `api_key_operator_checklist`, `live_data_setup_summary`, and the same provider
 route summary so the one-shot smoke records API-key readiness, required env keys
 and aliases, copy/smoke commands, ordered local setup steps, checklist
-ready/blocking fields, provider family counts, the next local action, and which
-provider factory route was selected.
+ready/blocking fields, the no-secret `next_blocking_action`, provider family
+counts, the next local action, and which provider factory route was selected.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,
