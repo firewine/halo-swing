@@ -208,6 +208,23 @@ def expected_pipeline_smoke_command() -> dict[str, Any]:
     }
 
 
+def expected_api_key_status_command() -> dict[str, Any]:
+    return {
+        "name": "get_live_data_api_key_status",
+        "purpose": (
+            "show live data API-key readiness and configured alias names "
+            "without network calls or secret values"
+        ),
+        "command": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "get_live_data_api_key_status --no-audit"
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 def expected_live_data_setup_steps(
     *,
     target_path: Path,
@@ -579,6 +596,61 @@ def expected_api_key_requirements_summary(
         "missing_provider_families": missing_provider_families,
         "configured_provider_families": configured_provider_families,
         "provider_requirements": provider_requirements,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def expected_api_key_command_summary(
+    *,
+    status: str,
+    target_path: Path,
+    market_configured_env_keys: list[str],
+    macro_configured_env_keys: list[str],
+    news_configured_env_keys: list[str],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    provider_smoke_plan = expected_provider_smoke_plan(
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
+    provider_smoke_commands = [
+        {
+            "provider_family": provider_smoke["provider_family"],
+            "provider": provider_smoke["provider"],
+            "status": provider_smoke["status"],
+            "smoke_command_name": provider_smoke["smoke_command_name"],
+            "command": provider_smoke["command"],
+            "network_call_policy": provider_smoke["network_call_policy"],
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+        for provider_smoke in provider_smoke_plan["provider_smokes"]
+    ]
+    return {
+        "schema_version": "api_key_pipeline_api_key_command_summary.v1",
+        "status": status,
+        "copy_dotenv_command": expected_dotenv_file_status(target_path)[
+            "copy_command"
+        ],
+        "next_smoke_command": (
+            expected_pipeline_smoke_command()
+            if ready_to_run_live_smoke
+            else expected_api_key_status_command()
+        ),
+        "one_shot_pipeline_smoke": {
+            "name": "run_api_key_pipeline_smoke",
+            "command": expected_pipeline_smoke_command()["command"],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        "provider_smoke_commands": provider_smoke_commands,
+        "provider_smoke_command_count": 3,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -2422,6 +2494,14 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             missing_provider_families=[],
         )
     )
+    assert payload["api_key_command_summary"] == expected_api_key_command_summary(
+        status="ready",
+        target_path=env_path,
+        market_configured_env_keys=["POLYGON_API_KEY"],
+        macro_configured_env_keys=["FRED_API_KEY"],
+        news_configured_env_keys=["NEWS_API_KEY"],
+        ready_to_run_live_smoke=True,
+    )
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
@@ -2571,6 +2651,14 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
             configured_provider_families=[],
             missing_provider_families=["market", "macro", "news"],
         )
+    )
+    assert payload["api_key_command_summary"] == expected_api_key_command_summary(
+        status="blocked",
+        target_path=local_env.REPO_ROOT_ENV_PATH,
+        market_configured_env_keys=[],
+        macro_configured_env_keys=[],
+        news_configured_env_keys=[],
+        ready_to_run_live_smoke=False,
     )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (

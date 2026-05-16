@@ -712,6 +712,9 @@ def run_api_key_pipeline_smoke(
         "api_key_requirements_summary": (
             _api_key_pipeline_api_key_requirements_summary(live_data_setup_summary)
         ),
+        "api_key_command_summary": _api_key_pipeline_api_key_command_summary(
+            live_data_setup_summary,
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -1653,6 +1656,67 @@ def _api_key_pipeline_api_key_requirements_summary(
             "configured_provider_families"
         ),
         "provider_requirements": provider_requirements,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_api_key_command_summary(
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    dotenv_file_status = _optional_mapping(
+        live_data_setup_summary.get("dotenv_file_status")
+    ) or {}
+    copy_dotenv_command = _optional_mapping(
+        dotenv_file_status.get("copy_command")
+    ) or {}
+    provider_smoke_plan = _optional_mapping(
+        live_data_setup_summary.get("provider_smoke_plan")
+    ) or {}
+    raw_provider_smokes = provider_smoke_plan.get("provider_smokes")
+    provider_smoke_rows = raw_provider_smokes if isinstance(raw_provider_smokes, list) else []
+    provider_smokes = [
+        {
+            "provider_family": provider_smoke.get("provider_family"),
+            "provider": provider_smoke.get("provider"),
+            "status": provider_smoke.get("status"),
+            "smoke_command_name": provider_smoke.get("smoke_command_name"),
+            "command": provider_smoke.get("command"),
+            "network_call_policy": provider_smoke.get("network_call_policy"),
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+        for provider_smoke in provider_smoke_rows
+        if isinstance(provider_smoke, dict)
+    ]
+    next_smoke_command = _optional_mapping(
+        live_data_setup_summary.get("next_smoke_command")
+    ) or {}
+    one_shot_smoke_command = _optional_mapping(
+        live_data_setup_summary.get("one_shot_smoke_command")
+    ) or {}
+    return {
+        "schema_version": "api_key_pipeline_api_key_command_summary.v1",
+        "status": live_data_setup_summary.get("status"),
+        "copy_dotenv_command": copy_dotenv_command,
+        "next_smoke_command": next_smoke_command,
+        "one_shot_pipeline_smoke": {
+            "name": one_shot_smoke_command.get("name"),
+            "command": one_shot_smoke_command.get("command"),
+            "network_call": one_shot_smoke_command.get("network_call"),
+            "network_call_policy": one_shot_smoke_command.get(
+                "network_call_policy"
+            ),
+            "mutates_local_state": one_shot_smoke_command.get(
+                "mutates_local_state"
+            ),
+            "secret_values_returned": one_shot_smoke_command.get(
+                "secret_values_returned"
+            ),
+        },
+        "provider_smoke_commands": provider_smokes,
+        "provider_smoke_command_count": len(provider_smokes),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

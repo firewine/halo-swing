@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.692 API Key Pipeline Top-Level Commands Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke` top-level payload에는 필요한 key와 provider smoke command
+name은 보이지만, 실제 copy command, provider smoke command, next smoke command,
+one-shot smoke command는 nested summary를 열어야 확인할 수 있다. 이번 slice는 one-shot
+pipeline 결과 최상단에 no-secret `api_key_command_summary`를 추가해 사용자가 API 키만
+넣고 바로 실행할 로컬 명령들을 한 곳에서 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke includes top-level api_key_command_summary copied from live_data_setup_summary command fields
+  - ready fake-live and blocked fixture-default tests assert dotenv copy, provider smoke, next smoke, and one-shot smoke commands without secret values
+  - README and DevOps guide document top-level api_key_command_summary in pipeline smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; fixture-default local setup returned top-level api_key_command_summary with dotenv copy, provider smoke, next smoke, and one-shot smoke commands without secrets
+```
+
 ## 3.691 API Key Pipeline Top-Level Requirements Gate Record - 2026-05-17
 
 ### A. 목적

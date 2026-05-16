@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_TOP_LEVEL_REQUIREMENTS_GATE",
+  "gate_id": "API_KEY_PIPELINE_TOP_LEVEL_COMMANDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.691",
-  "next_atomic_step": "add a top-level api_key_requirements_summary to run_api_key_pipeline_smoke so required provider env keys, accepted aliases, configured alias names, and provider smoke command names are visible before nested summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.692",
+  "next_atomic_step": "add a top-level api_key_command_summary to run_api_key_pipeline_smoke so dotenv copy, provider smoke, next smoke, and one-shot smoke commands are visible before nested summaries",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.690",
+    "docs/halo-swing-development-plan.md#3.691",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -53,13 +53,13 @@
     "read_only": true
   },
   "done_means": [
-    "run_api_key_pipeline_smoke includes top-level api_key_requirements_summary copied from live_data_setup_summary provider setup actions without returning secrets",
-    "ready fake-live and blocked fixture-default paths assert top-level api_key_requirements_summary required keys, accepted aliases, configured aliases, setup statuses, and smoke command names",
-    "README and DevOps guide document top-level api_key_requirements_summary in pipeline smoke payloads",
+    "run_api_key_pipeline_smoke includes top-level api_key_command_summary copied from live_data_setup_summary command fields without returning secrets",
+    "ready fake-live and blocked fixture-default paths assert top-level api_key_command_summary dotenv copy, provider smoke, next smoke, and one-shot smoke commands",
+    "README and DevOps guide document top-level api_key_command_summary in pipeline smoke payloads",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline top-level requirements gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key pipeline top-level commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
