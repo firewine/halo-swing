@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_ENV_TEMPLATE_GATE_VERIFIED
-gate_id: LIVE_DATA_ENV_TEMPLATE_GATE
+status: ENV_TEMPLATE_CONTRACT_TEST_GATE_VERIFIED
+gate_id: ENV_TEMPLATE_CONTRACT_TEST_GATE
 review_tier: S1_small
 
-next_atomic_step: update the local env template with secret-free live data API-key placeholders that match provider auto-select behavior
+next_atomic_step: add a regression test that locks the env template live data API-key placeholders to blank secret-free values
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -262,6 +262,7 @@ done_means:
   - live_data readiness reports implemented API-key aliases as ready without requiring live mode env values
   - README and DevOps setup guide describe API-key-only live data setup for Polygon, FRED, and NewsAPI
   - .env.example exposes blank live data API-key placeholders for Polygon, FRED, and NewsAPI aliases
+  - tests/test_env_template.py locks .env.example live data placeholders and optional DATA_MODE examples
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -611,16 +612,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.631
-gate_packet: docs/halo-swing-development-plan.md#3.631
+portable_mirror: docs/halo-swing-development-plan.md#3.632
+gate_packet: docs/halo-swing-development-plan.md#3.632
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.631
+  - docs/halo-swing-development-plan.md#3.632
   - .env.example
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_env_template.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -923,13 +923,47 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Live Data Env Template Gate is verified. `.env.example` now includes
-blank placeholders for Polygon market, FRED macro, and NewsAPI live data key
-aliases, states blank keys preserve fixture-backed offline defaults, and states
-optional `*_DATA_MODE=live` flags are accepted but not required for API-key
-auto-select. The template contains no real secret values. Task mirrors match,
-JSON validation passed, focused provider/readiness tests passed with 52 tests,
-and ruff and health_check passed.
+Summary: Env Template Contract Test Gate is verified.
+`tests/test_env_template.py` now locks `.env.example` live data placeholders:
+Polygon market, FRED macro, and NewsAPI key aliases must exist and remain blank;
+`*_DATA_MODE=live` examples must remain commented optional lines; and sensitive
+placeholder values must not be committed. Focused env/provider/readiness tests
+passed with 55 tests, full pytest passed with 694 tests, and ruff and
+health_check passed.
+
+```yaml
+env_template_contract_test_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_env_template.py
+  implementation:
+    - tests/test_env_template.py asserts live data API-key placeholders exist and are blank
+    - tests/test_env_template.py asserts DATA_MODE live flags stay commented optional examples
+    - tests/test_env_template.py asserts sensitive placeholder values are not committed
+    - task contract and portable mirror match
+    - no source code, provider behavior, network behavior, migrations, repository persistence, broker path, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_providers.py tests/test_readiness.py -q
+      result: "55 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "694 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 live_data_env_template_gate:
