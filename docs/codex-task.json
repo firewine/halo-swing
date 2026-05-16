@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_READINESS_SOURCE_VALUE_ALIGNMENT_GATE",
+  "gate_id": "LIVE_DATA_READINESS_API_KEY_REQUIRED_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.624",
-  "next_atomic_step": "align live data readiness source env values with implemented provider names while keeping readiness secret-free and offline",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.625",
+  "next_atomic_step": "require implemented live data API-key aliases for live_data readiness while keeping source env values secret-free and offline",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.624",
+    "docs/halo-swing-development-plan.md#3.625",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -43,9 +43,9 @@
     "read_only": true
   },
   "done_means": [
-    "get_integration_readiness treats HALO_SWING_MARKET_DATA_SOURCE, HALO_SWING_MACRO_SOURCE, and HALO_SWING_NEWS_SOURCE as configured only when they match implemented provider names polygon, fred, and newsapi",
-    "source env value checks trim and lowercase valid provider names without returning env key names or values",
-    "unsupported source env values do not mark live_data ready and are not serialized",
+    "get_integration_readiness requires implemented API-key aliases for market, macro, and news live_data readiness",
+    "source env values alone do not mark live_data ready because provider live calls require API keys",
+    "source env key names and values remain absent from serialized readiness output",
     "default readiness remains offline and performs no network calls",
     "all required verification passes",
     "WORKING.md records result and verification status only"

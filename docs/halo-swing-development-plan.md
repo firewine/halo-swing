@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.625 Live Data Readiness API-Key Required Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key/config 값만 넣으면 실제 연동 가능한 상태가 되도록 readiness를
+실제 provider 요구사항과 맞춘다. Source env 이름만으로는 provider live 호출이
+동작하지 않으므로, live_data readiness는 구현된 API-key alias가 있을 때만
+준비 상태로 본다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - market live_data readiness requires HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY
+  - macro live_data readiness requires HALO_SWING_MACRO_API_KEY, FRED_API_KEY, or HALO_SWING_FRED_API_KEY
+  - news live_data readiness requires NEWS_API_KEY or HALO_SWING_NEWS_API_KEY
+  - source env values alone no longer mark live_data ready
+  - source env key names and values remain absent from serialized readiness output
+  - default readiness remains offline and performs no network calls
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_env_secrets_are_boolean_only tests/test_readiness.py::test_integration_readiness_env_secret_aliases_are_boolean_only tests/test_readiness.py::test_integration_readiness_live_data_source_env_values_do_not_imply_keys tests/test_readiness.py::test_integration_readiness_ignores_unsupported_live_data_source_env_values -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check src/halo_swing_mcp/tools/readiness.py tests/test_readiness.py -> passed
+  - HALO_SWING_MARKET_DATA_SOURCE=polygon HALO_SWING_MACRO_SOURCE=fred HALO_SWING_NEWS_SOURCE=newsapi PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data blocked because source names alone are not API keys
+  - HALO_SWING_MARKET_DATA_API_KEY=market-secret HALO_SWING_MACRO_API_KEY=macro-secret HALO_SWING_NEWS_API_KEY=news-secret PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness -> passed, live_data ready without serialized env key names or values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 685 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.624 Live Data Readiness Source Value Alignment Gate Record - 2026-05-16
 
 ### A. 목적

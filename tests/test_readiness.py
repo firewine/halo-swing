@@ -1301,7 +1301,7 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
             assert value not in serialized
 
 
-def test_integration_readiness_live_data_source_env_values_are_boolean_only(
+def test_integration_readiness_live_data_source_env_values_do_not_imply_keys(
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
@@ -1318,15 +1318,19 @@ def test_integration_readiness_live_data_source_env_values_are_boolean_only(
     serialized = json.dumps(payload, sort_keys=True)
 
     assert payload["status"] == "blocked"
-    assert live_data_gate["status"] == "ready"
-    assert live_data_gate["missing"] == []
-    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is True
-    assert live_data_gate["evidence"]["macro_source_configured"] is True
-    assert live_data_gate["evidence"]["news_source_configured"] is True
+    assert live_data_gate["status"] == "blocked"
+    assert live_data_gate["missing"] == [
+        "market_ohlcv_source_or_api_key_decision",
+        "macro_source_or_api_key_decision",
+        "news_source_or_api_key_decision",
+    ]
+    assert live_data_gate["evidence"]["market_ohlcv_source_configured"] is False
+    assert live_data_gate["evidence"]["macro_source_configured"] is False
+    assert live_data_gate["evidence"]["news_source_configured"] is False
     assert live_data_gate["evidence"]["live_adapter_added"] is True
     assert live_data_gate["evidence"]["network_call"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
-    assert "live_data: provide" not in payload["next_actions"]
+    assert "live_data: provide" in payload["next_actions"][-1]
     for key, value in source_env.items():
         assert key not in serialized
         assert value not in serialized
