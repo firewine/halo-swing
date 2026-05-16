@@ -200,8 +200,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setu
 
 To check only live data API-key setup before making provider network calls, use
 `get_live_data_api_key_status`; it reports configured alias names, missing
-provider families, the no-secret `dotenv_template`, and the one-shot smoke
-command without returning secrets:
+provider families, `provider_family_summary`, the no-secret `dotenv_template`,
+and the one-shot smoke command without returning secrets:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit

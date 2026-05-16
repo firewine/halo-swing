@@ -529,6 +529,17 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         "macro_api_key",
         "news_api_key",
     ]
+    assert payload["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
@@ -607,6 +618,17 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
 
     assert payload["status"] == "ready"
     assert payload["missing"] == []
+    assert payload["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_count": 3,
+        "required_count": 3,
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["providers"]["market"]["configured"] is True
     assert payload["providers"]["market"]["configured_env_keys"] == ["POLYGON_API_KEY"]
     assert payload["providers"]["macro"]["configured"] is True

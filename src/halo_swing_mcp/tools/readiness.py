@@ -245,10 +245,31 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         for provider_status in providers.values()
         for missing in provider_status["missing"]
     ]
+    configured_provider_families = [
+        family
+        for family, provider_status in providers.items()
+        if provider_status["configured"] is True
+    ]
+    missing_provider_families = [
+        family
+        for family, provider_status in providers.items()
+        if provider_status["configured"] is not True
+    ]
     return {
         "schema_version": "live_data_api_key_status.v1",
         "status": "ready" if not missing else "blocked",
         "providers": providers,
+        "provider_family_summary": {
+            "required_provider_families": list(providers),
+            "configured_provider_families": configured_provider_families,
+            "missing_provider_families": missing_provider_families,
+            "configured_count": len(configured_provider_families),
+            "required_count": len(providers),
+            "ready_to_run_live_smoke": not missing,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
         "missing": missing,
         "one_shot_smoke_command": _local_command("run_api_key_pipeline_smoke"),
         "dotenv_template": _live_data_dotenv_template(),

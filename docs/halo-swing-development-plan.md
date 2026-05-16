@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.674 API Key Status Provider Progress Gate Record - 2026-05-17
+
+### A. 목적
+
+`get_live_data_api_key_status`는 provider별 configured 상태를 담지만, 사용자가 전체
+live data setup 진행률을 한눈에 보려면 provider map을 직접 해석해야 했다. 이번 slice는
+`provider_family_summary`를 추가해 required/configured/missing provider family와 configured
+count를 구조화해 반환한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status includes provider_family_summary with required, configured, and missing provider families plus configured count
+  - blocked defaults report zero configured families and ready repo-dotenv alias paths report market, macro, and news configured without secret values
+  - README and DevOps guide document provider_family_summary in get_live_data_api_key_status payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit -> passed
+```
+
 ## 3.673 API Key Status Dotenv Template Gate Record - 2026-05-17
 
 ### A. 목적

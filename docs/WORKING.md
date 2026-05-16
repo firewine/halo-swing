@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_STATUS_DOTENV_TEMPLATE_VERIFIED
-gate_id: API_KEY_STATUS_DOTENV_TEMPLATE_GATE
+status: API_KEY_STATUS_PROVIDER_PROGRESS_VERIFIED
+gate_id: API_KEY_STATUS_PROVIDER_PROGRESS_GATE
 review_tier: S1_small
 
-next_atomic_step: add the no-secret dotenv_template to get_live_data_api_key_status so the blocked next-smoke command itself shows repo-root .env entries to fill
+next_atomic_step: add provider family progress fields to get_live_data_api_key_status so API-key-only setup shows configured and missing live data provider families without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,15 +81,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
 
 done_means:
-  - get_live_data_api_key_status includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values
-  - blocked defaults and ready repo-dotenv alias paths expose the same no-secret dotenv_template
-  - README and DevOps guide document dotenv_template in get_live_data_api_key_status payloads
+  - get_live_data_api_key_status includes provider_family_summary with required, configured, and missing provider families plus configured count
+  - blocked defaults report zero configured families and ready repo-dotenv alias paths report market, macro, and news configured without secret values
+  - README and DevOps guide document provider_family_summary in get_live_data_api_key_status payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key status dotenv template gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key status provider progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_STATUS_DOTENV_TEMPLATE_VERIFIED
+gate_id: API_KEY_STATUS_DOTENV_TEMPLATE_GATE
+review_tier: S1_small
+
+next_atomic_step: add the no-secret dotenv_template to get_live_data_api_key_status so the blocked next-smoke command itself shows repo-root .env entries to fill
 ```
 
 Previous completed directive:
@@ -1347,6 +1358,54 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Status Provider Progress Gate is verified.
+`get_live_data_api_key_status` now includes `provider_family_summary` with
+required, configured, and missing provider families plus configured counts, so
+API-key-only setup shows market/macro/news progress without returning secret
+values. Focused tests passed with 3 tests, full pytest passed with 760 tests,
+and ruff, health_check, and the API key status harness command passed.
+
+```yaml
+api_key_status_provider_progress_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_api_key_status includes provider_family_summary with required, configured, and missing provider families plus configured count
+    - blocked defaults report zero configured families and ready repo-dotenv alias paths report market, macro, and news configured without secret values
+    - README and DevOps guide document provider_family_summary in get_live_data_api_key_status payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: "passed, blocked fixture defaults returned provider_family_summary with zero configured families"
+```
+
+Previous verification:
 
 Summary: API Key Status Dotenv Template Gate is verified.
 `get_live_data_api_key_status` now includes the same no-secret `dotenv_template`

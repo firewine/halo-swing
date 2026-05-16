@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_STATUS_DOTENV_TEMPLATE_GATE",
+  "gate_id": "API_KEY_STATUS_PROVIDER_PROGRESS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.673",
-  "next_atomic_step": "add the no-secret dotenv_template to get_live_data_api_key_status so the blocked next-smoke command itself shows repo-root .env entries to fill",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.674",
+  "next_atomic_step": "add provider family progress fields to get_live_data_api_key_status so API-key-only setup shows configured and missing live data provider families without returning secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.672",
+    "docs/halo-swing-development-plan.md#3.673",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -53,13 +53,13 @@
     "read_only": true
   },
   "done_means": [
-    "get_live_data_api_key_status includes dotenv_template with repo-root .env target, .env.example source, preferred placeholder entries, accepted aliases, and no secret values",
-    "blocked defaults and ready repo-dotenv alias paths expose the same no-secret dotenv_template",
-    "README and DevOps guide document dotenv_template in get_live_data_api_key_status payloads",
+    "get_live_data_api_key_status includes provider_family_summary with required, configured, and missing provider families plus configured count",
+    "blocked defaults report zero configured families and ready repo-dotenv alias paths report market, macro, and news configured without secret values",
+    "README and DevOps guide document provider_family_summary in get_live_data_api_key_status payloads",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key status dotenv template gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key status provider progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
