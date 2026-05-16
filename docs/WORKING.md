@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_ENV_TEMPLATE_ALIGNMENT_VERIFIED
-gate_id: API_KEY_ENV_TEMPLATE_ALIGNMENT_GATE
+status: API_KEY_PROVIDER_KEY_ALIGNMENT_VERIFIED
+gate_id: API_KEY_PROVIDER_KEY_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: add an offline env-template alignment test so .env.example blank API-key slots stay synchronized with readiness dotenv_template preferred and accepted live-data keys
+next_atomic_step: add an offline provider key alignment test so readiness dotenv_template accepted live-data keys stay synchronized with provider auto-select env key constants
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,21 +75,32 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - .env.example blank live-data API-key slots are asserted against readiness dotenv_template preferred and accepted env keys
-  - the new env-template alignment test is offline, reads no secret values, and does not mutate .env or local state
+  - readiness dotenv_template accepted live-data env keys are asserted against provider auto-select env key constants
+  - the new provider key alignment test is offline, reads no secret values, and does not mutate .env or local state
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key env-template alignment gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider key alignment gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_ENV_TEMPLATE_ALIGNMENT_VERIFIED
+gate_id: API_KEY_ENV_TEMPLATE_ALIGNMENT_GATE
+review_tier: S1_small
+
+next_atomic_step: add an offline env-template alignment test so .env.example blank API-key slots stay synchronized with readiness dotenv_template preferred and accepted live-data keys
 ```
 
 Previous completed directive:
@@ -1611,6 +1622,51 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Key Alignment Gate is verified.
+Readiness `dotenv_template` accepted live-data env keys are now asserted against
+the provider auto-select env key constants for market, macro, and news. The new
+provider key alignment test is offline, reads no secret values, and does not
+mutate `.env` or local state. Focused tests passed with 5 tests, full pytest
+passed with 762 tests, and ruff, health_check, and one-shot pipeline harness
+commands passed. With local `.env` absent, the one-shot pipeline harness still
+exits 0 and returns blocked fixture-default API-key setup without secrets.
+
+```yaml
+api_key_provider_key_alignment_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_env_template.py
+  implementation:
+    - readiness dotenv_template accepted live-data env keys are asserted against provider auto-select env key constants
+    - the new provider key alignment test is offline, reads no secret values, and does not mutate .env or local state
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "762 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned blocked API-key setup and no secrets"
+```
+
+Previous verification:
 
 Summary: API Key Env Template Alignment Gate is verified.
 `.env.example` blank live-data API-key slots are now asserted against

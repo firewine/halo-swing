@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.698 API Key Provider Key Alignment Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only setup은 readiness payload가 안내하는 env key를 사용자가 `.env`에 채우면
+provider factory가 같은 key를 읽어 live provider를 auto-select해야 한다. readiness
+`dotenv_template`의 accepted key와 실제 provider auto-select env key constant가 어긋나면
+사용자가 key만 넣어도 fixture provider에 머무를 수 있다. 이번 slice는 offline test로
+readiness accepted live-data key와 provider auto-select key constant의 정합성을 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - readiness dotenv_template accepted live-data env keys are asserted against provider auto-select env key constants
+  - the new provider key alignment test is offline, reads no secret values, and does not mutate .env or local state
+  - no runtime .env mutation, secret value output, live adapter, broker, DB, Telegram, or Hermes runtime changes added
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 762 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; fixture-default local setup returned blocked API-key setup and no secrets
+```
+
 ## 3.697 API Key Env Template Alignment Gate Record - 2026-05-17
 
 ### A. 목적

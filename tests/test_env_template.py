@@ -1,5 +1,10 @@
 from pathlib import Path
 
+from halo_swing_mcp.providers import (
+    MACRO_API_KEY_ENV_KEYS,
+    MARKET_API_KEY_ENV_KEYS,
+    NEWS_API_KEY_ENV_KEYS,
+)
 from halo_swing_mcp.tools.readiness import get_live_data_api_key_status
 
 
@@ -75,6 +80,23 @@ def test_env_example_live_data_keys_match_readiness_dotenv_template() -> None:
     for key in template_keys:
         assert key in assignments
         assert assignments[key] == ""
+
+
+def test_readiness_live_data_keys_match_provider_auto_select_keys() -> None:
+    payload = get_live_data_api_key_status()
+    template_by_family = {
+        entry["provider_family"]: entry for entry in payload["dotenv_template"]["entries"]
+    }
+
+    assert template_by_family["market"]["accepted_env_keys"] == list(
+        MARKET_API_KEY_ENV_KEYS
+    )
+    assert template_by_family["macro"]["accepted_env_keys"] == list(
+        MACRO_API_KEY_ENV_KEYS
+    )
+    assert template_by_family["news"]["accepted_env_keys"] == list(
+        NEWS_API_KEY_ENV_KEYS
+    )
 
 
 def test_env_example_telegram_delivery_keys_are_blank_placeholders() -> None:
