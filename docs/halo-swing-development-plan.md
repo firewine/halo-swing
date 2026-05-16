@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.743 API Key Summary-Only Operator Checklist Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 compact 결과에 next action summary를
+남기지만, 전체 setup checklist 진행 상태와 ordered step 상태를 보려면 full
+`api_key_operator_checklist` payload를 다시 확인해야 했다. 이번 slice는 summary-only
+payload에 no-secret `api_key_operator_checklist_summary`를 추가해, API key를 넣은 뒤
+compact 결과만으로 현재 단계, ready/blocking step, 다음 local command, provider recovery
+상태를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only=true returns top-level api_key_operator_checklist_summary without returning the full api_key_operator_checklist payload
+  - api_key_operator_checklist_summary exposes current_step, ready state, ready/blocking step names and counts, next_blocking_action fields, provider recovery state, compact step rows, and safety flags without secret values
+  - summary_only=true still omits full api_key_operator_checklist and api_key_provider_recovery_checklist payloads
+  - focused tests cover default blocked operator checklist summary and fully configured fake-key API-key operator checklist summary-only output
+  - README and DevOps setup guide document summary-only api_key_operator_checklist_summary
+  - tests/test_setup_docs.py asserts summary-only api_key_operator_checklist_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; no-secret api_key_operator_checklist_summary returned with current_step and next recovery action
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_operator_checklist_summary"]; print(summary["schema_version"], summary["current_step"], summary["blocking_step_count"], summary["secret_values_returned"])' -> api_key_operator_checklist_summary.v1 recover_failed_providers 1 False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 787 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.742 API Key Summary-Only Check Summary Gate Record - 2026-05-17
 
 ### A. 목적

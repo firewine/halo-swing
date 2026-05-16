@@ -1881,6 +1881,114 @@ def _api_key_pipeline_next_action_summary(
     }
 
 
+def _api_key_operator_checklist_summary(
+    api_key_operator_checklist: dict[str, Any],
+) -> dict[str, Any]:
+    next_blocking_action = _optional_mapping(
+        api_key_operator_checklist.get("next_blocking_action")
+    ) or {}
+    next_provider_smoke = _optional_mapping(
+        next_blocking_action.get("next_provider_smoke")
+    ) or {}
+    next_provider_recovery_action = _optional_mapping(
+        api_key_operator_checklist.get("next_provider_recovery_action")
+    ) or {}
+    next_blocking_command = (
+        next_blocking_action.get("recovery_smoke_command")
+        or next_blocking_action.get("command")
+        or next_provider_smoke.get("command")
+    )
+    raw_steps = api_key_operator_checklist.get("steps")
+    steps = (
+        [
+            _api_key_operator_checklist_step_summary(step)
+            for step in raw_steps
+            if isinstance(step, dict)
+        ]
+        if isinstance(raw_steps, list)
+        else []
+    )
+    return {
+        "schema_version": "api_key_operator_checklist_summary.v1",
+        "status": api_key_operator_checklist.get("status"),
+        "current_step": api_key_operator_checklist.get("current_step"),
+        "ready": api_key_operator_checklist.get("ready") is True,
+        "ready_step_names": _string_list(
+            api_key_operator_checklist.get("ready_step_names")
+        ),
+        "ready_step_count": api_key_operator_checklist.get("ready_step_count"),
+        "blocking_step_names": _string_list(
+            api_key_operator_checklist.get("blocking_step_names")
+        ),
+        "blocking_step_count": api_key_operator_checklist.get(
+            "blocking_step_count"
+        ),
+        "next_blocking_step": api_key_operator_checklist.get(
+            "next_blocking_step"
+        ),
+        "next_blocking_action_name": next_blocking_action.get("name"),
+        "next_blocking_action_status": next_blocking_action.get("status"),
+        "next_blocking_action_command": next_blocking_command,
+        "next_blocking_action_network_call": (
+            next_blocking_action.get("network_call") is True
+        ),
+        "next_blocking_action_mutates_local_state": (
+            next_blocking_action.get("mutates_local_state") is True
+        ),
+        "provider_recovery_status": api_key_operator_checklist.get(
+            "provider_recovery_status"
+        ),
+        "provider_recovery_required": api_key_operator_checklist.get(
+            "provider_recovery_required"
+        )
+        is True,
+        "provider_recovery_item_count": api_key_operator_checklist.get(
+            "provider_recovery_item_count"
+        ),
+        "next_provider_recovery_smoke_command_name": (
+            next_provider_recovery_action.get("smoke_command_name")
+        ),
+        "step_count": api_key_operator_checklist.get("step_count"),
+        "steps": steps,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_operator_checklist_step_summary(
+    step: dict[str, Any],
+) -> dict[str, Any]:
+    next_provider_smoke = _optional_mapping(step.get("next_provider_smoke")) or {}
+    next_provider_recovery_action = _optional_mapping(
+        step.get("next_provider_recovery_action")
+    ) or {}
+    return {
+        "name": step.get("name"),
+        "status": step.get("status"),
+        "command": step.get("command") or step.get("recovery_smoke_command"),
+        "required_env_keys": _string_list(step.get("required_env_keys")),
+        "configured_env_keys": _string_list(step.get("configured_env_keys")),
+        "missing_provider_families": _string_list(
+            step.get("missing_provider_families")
+        ),
+        "provider_smoke_command_count": step.get("provider_smoke_command_count"),
+        "next_provider_smoke_command_name": step.get(
+            "next_provider_smoke_command_name"
+        )
+        or next_provider_smoke.get("smoke_command_name"),
+        "provider_recovery_item_count": step.get("provider_recovery_item_count"),
+        "next_provider_recovery_smoke_command_name": (
+            next_provider_recovery_action.get("smoke_command_name")
+        ),
+        "recovery_smoke_available": step.get("recovery_smoke_available"),
+        "network_call": step.get("network_call") is True,
+        "network_call_policy": step.get("network_call_policy"),
+        "mutates_local_state": step.get("mutates_local_state") is True,
+        "secret_values_returned": False,
+    }
+
+
 def _api_key_pipeline_stage_summary(
     *,
     live_data_smoke_summary: dict[str, Any],
@@ -2109,6 +2217,11 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_next_action_summary")
         )
         or {},
+        "api_key_operator_checklist_summary": (
+            _api_key_operator_checklist_summary(
+                _optional_mapping(payload.get("api_key_operator_checklist")) or {}
+            )
+        ),
         "setup_status_summary": _optional_mapping(
             payload.get("setup_status_summary")
         )

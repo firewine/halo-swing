@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_CHECK_SUMMARY_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_CHECK_SUMMARY_GATE
+status: API_KEY_SUMMARY_ONLY_OPERATOR_CHECKLIST_SUMMARY_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_OPERATOR_CHECKLIST_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: keep API-key pipeline check summary in API-key pipeline summary-only output
+next_atomic_step: add compact API-key operator checklist summary to API-key pipeline summary-only output
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,27 +74,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_pipeline_check_summary"]; print(summary["schema_version"], summary["check_count"], summary["failed_check_count"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_operator_checklist_summary"]; print(summary["schema_version"], summary["current_step"], summary["blocking_step_count"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary_only=true returns top-level api_key_pipeline_check_summary without nested full smoke sections
-  - api_key_pipeline_check_summary exposes check_count, passed_check_count, failed_check_count, failed_check_keys, tools_with_failures, tool_failure_counts, first_failed_check, failed_checks rows, and safety flags without secret values
-  - summary_only=true no longer lists api_key_pipeline_check_summary in omitted_sections
-  - focused tests cover default blocked check summary and fully configured fake-key API-key check summary-only output
-  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_pipeline_check_summary
-  - README and DevOps setup guide document summary-only api_key_pipeline_check_summary
-  - setup docs tests assert summary-only api_key_pipeline_check_summary guidance
+  - summary_only=true returns top-level api_key_operator_checklist_summary without returning the full api_key_operator_checklist payload
+  - api_key_operator_checklist_summary exposes current_step, ready state, ready/blocking step names and counts, next_blocking_action fields, provider recovery state, compact step rows, and safety flags without secret values
+  - summary_only=true still omits full api_key_operator_checklist and api_key_provider_recovery_checklist payloads
+  - focused tests cover default blocked operator checklist summary and fully configured fake-key API-key operator checklist summary-only output
+  - fake-key API-key pipeline summary-only CLI returns no-secret api_key_operator_checklist_summary
+  - README and DevOps setup guide document summary-only api_key_operator_checklist_summary
+  - setup docs tests assert summary-only api_key_operator_checklist_summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only check summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only operator checklist summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_CHECK_SUMMARY_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_CHECK_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: keep API-key pipeline check summary in API-key pipeline summary-only output
 ```
 
 Previous completed directive:
@@ -2112,15 +2123,16 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Summary-Only Check Summary Gate is verified.
+Summary: API Key Summary-Only Operator Checklist Summary Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now keeps the no-secret
-`api_key_pipeline_check_summary`, including check counts, failed check keys,
-tools with failures, first failed check, failed check rows, and safety flags
-while nested full smoke sections remain omitted. Focused tests, fake-key CLI,
-full pytest, ruff, and health_check passed.
+`api_key_operator_checklist_summary`, including current step, ready/blocking
+step names and counts, next blocking action command, provider recovery state,
+compact step rows, and safety flags while the full checklist payload remains
+omitted. Focused tests, fake-key CLI, full pytest, ruff, and health_check
+passed.
 
 ```yaml
-api_key_summary_only_check_summary_gate:
+api_key_summary_only_operator_checklist_summary_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2133,13 +2145,13 @@ api_key_summary_only_check_summary_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary_only=true returns top-level api_key_pipeline_check_summary without nested full smoke sections
-    - api_key_pipeline_check_summary exposes check_count, passed_check_count, failed_check_count, failed_check_keys, tools_with_failures, tool_failure_counts, first_failed_check, failed_checks rows, and safety flags without secret values
-    - summary_only=true no longer lists api_key_pipeline_check_summary in omitted_sections
-    - focused tests cover default blocked check summary and fully configured fake-key API-key check summary-only output
-    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_pipeline_check_summary
-    - README and DevOps setup guide document summary-only api_key_pipeline_check_summary
-    - tests/test_setup_docs.py asserts summary-only api_key_pipeline_check_summary guidance
+    - summary_only=true returns top-level api_key_operator_checklist_summary without returning the full api_key_operator_checklist payload
+    - api_key_operator_checklist_summary exposes current_step, ready state, ready/blocking step names and counts, next_blocking_action fields, provider recovery state, compact step rows, and safety flags without secret values
+    - summary_only=true still omits full api_key_operator_checklist and api_key_provider_recovery_checklist payloads
+    - focused tests cover default blocked operator checklist summary and fully configured fake-key API-key operator checklist summary-only output
+    - fake-key API-key pipeline summary-only CLI returns no-secret api_key_operator_checklist_summary
+    - README and DevOps setup guide document summary-only api_key_operator_checklist_summary
+    - tests/test_setup_docs.py asserts summary-only api_key_operator_checklist_summary guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2150,14 +2162,14 @@ api_key_summary_only_check_summary_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; no-secret api_key_pipeline_check_summary returned with failed check keys"
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_pipeline_check_summary"]; print(summary["schema_version"], summary["check_count"], summary["failed_check_count"], summary["secret_values_returned"])'
-      result: "api_key_pipeline_check_summary.v1 9 3 False"
+      result: "exit 0; no-secret api_key_operator_checklist_summary returned with current_step and next recovery action"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_operator_checklist_summary"]; print(summary["schema_version"], summary["current_step"], summary["blocking_step_count"], summary["secret_values_returned"])'
+      result: "api_key_operator_checklist_summary.v1 recover_failed_providers 1 False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "786 passed"
+      result: "787 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check

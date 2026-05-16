@@ -4326,6 +4326,119 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
+    assert payload["api_key_operator_checklist_summary"] == {
+        "schema_version": "api_key_operator_checklist_summary.v1",
+        "status": "blocked",
+        "current_step": "prepare_dotenv",
+        "ready": False,
+        "ready_step_names": [],
+        "ready_step_count": 0,
+        "blocking_step_names": [
+            "prepare_dotenv",
+            "fill_live_data_api_keys",
+            "run_provider_smokes",
+            "run_api_key_pipeline_smoke",
+        ],
+        "blocking_step_count": 4,
+        "next_blocking_step": "prepare_dotenv",
+        "next_blocking_action_name": "prepare_dotenv",
+        "next_blocking_action_status": "pending",
+        "next_blocking_action_command": "cp .env.example .env",
+        "next_blocking_action_network_call": False,
+        "next_blocking_action_mutates_local_state": True,
+        "provider_recovery_status": "ok",
+        "provider_recovery_required": False,
+        "provider_recovery_item_count": 0,
+        "next_provider_recovery_smoke_command_name": None,
+        "step_count": 4,
+        "steps": [
+            {
+                "name": "prepare_dotenv",
+                "status": "pending",
+                "command": "cp .env.example .env",
+                "required_env_keys": [],
+                "configured_env_keys": [],
+                "missing_provider_families": [],
+                "provider_smoke_command_count": None,
+                "next_provider_smoke_command_name": None,
+                "provider_recovery_item_count": None,
+                "next_provider_recovery_smoke_command_name": None,
+                "recovery_smoke_available": None,
+                "network_call": False,
+                "network_call_policy": None,
+                "mutates_local_state": True,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "fill_live_data_api_keys",
+                "status": "pending",
+                "command": None,
+                "required_env_keys": [
+                    "POLYGON_API_KEY",
+                    "FRED_API_KEY",
+                    "NEWS_API_KEY",
+                ],
+                "configured_env_keys": [],
+                "missing_provider_families": ["market", "macro", "news"],
+                "provider_smoke_command_count": None,
+                "next_provider_smoke_command_name": None,
+                "provider_recovery_item_count": None,
+                "next_provider_recovery_smoke_command_name": None,
+                "recovery_smoke_available": None,
+                "network_call": False,
+                "network_call_policy": None,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_provider_smokes",
+                "status": "blocked",
+                "command": None,
+                "required_env_keys": [],
+                "configured_env_keys": [],
+                "missing_provider_families": [],
+                "provider_smoke_command_count": 3,
+                "next_provider_smoke_command_name": None,
+                "provider_recovery_item_count": None,
+                "next_provider_recovery_smoke_command_name": None,
+                "recovery_smoke_available": None,
+                "network_call": True,
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "name": "run_api_key_pipeline_smoke",
+                "status": "blocked",
+                "command": (
+                    "PYTHONPATH=src ./.venv/bin/python -m "
+                    "halo_swing_mcp.harness run_api_key_pipeline_smoke "
+                    "--input-json "
+                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                ),
+                "required_env_keys": [],
+                "configured_env_keys": [],
+                "missing_provider_families": [],
+                "provider_smoke_command_count": None,
+                "next_provider_smoke_command_name": None,
+                "provider_recovery_item_count": None,
+                "next_provider_recovery_smoke_command_name": None,
+                "recovery_smoke_available": None,
+                "network_call": True,
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["setup_status_summary"]["next_setup_step"] == "prepare_dotenv"
     assert payload["api_key_requirements_summary"] == (
         expected_api_key_requirements_summary(
@@ -4559,6 +4672,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
+    assert "api_key_operator_checklist" not in payload
     assert "api_key_provider_recovery_checklist" not in payload
     assert "provider_recovery_smokes" not in payload
     assert payload["network_call"] is False
@@ -4689,6 +4803,59 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     )
     assert check_summary["secret_values_returned"] is False
     assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    checklist_summary = payload["api_key_operator_checklist_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert checklist_summary["schema_version"] == (
+        "api_key_operator_checklist_summary.v1"
+    )
+    assert checklist_summary["status"] == "conflict"
+    assert checklist_summary["current_step"] == "recover_failed_providers"
+    assert checklist_summary["ready"] is False
+    assert checklist_summary["ready_step_names"] == [
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+        "run_provider_smokes",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert checklist_summary["blocking_step_names"] == [
+        "recover_failed_providers"
+    ]
+    assert checklist_summary["next_blocking_action_name"] == (
+        "recover_failed_providers"
+    )
+    assert checklist_summary["next_blocking_action_network_call"] is True
+    assert checklist_summary["next_blocking_action_mutates_local_state"] is False
+    assert checklist_summary["provider_recovery_required"] is True
+    assert checklist_summary["provider_recovery_item_count"] == 3
+    assert checklist_summary["next_provider_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert checklist_summary["step_count"] == 5
+    assert checklist_summary["steps"][-1]["name"] == "recover_failed_providers"
+    assert checklist_summary["steps"][-1]["provider_recovery_item_count"] == 3
+    assert checklist_summary["steps"][-1][
+        "next_provider_recovery_smoke_command_name"
+    ] == "get_market_snapshot_live_smoke"
+    assert checklist_summary["secret_values_returned"] is False
+    assert "api_key_operator_checklist" not in payload
+    assert "api_key_provider_recovery_checklist" not in payload
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
