@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timedelta, timezone
 from urllib import parse, request
 from typing import Any, Protocol
 
-from halo_swing_mcp.config import get_settings
 from halo_swing_mcp import fixtures
+from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.env import get_config_value
 
 
 class MarketDataProvider(Protocol):
@@ -426,7 +426,7 @@ def _resolve_polygon_api_key() -> str:
     settings = get_settings()
     candidates = (
         settings.market_data_api_key,
-        os.environ.get("POLYGON_API_KEY"),
+        get_config_value("POLYGON_API_KEY"),
     )
     for candidate in candidates:
         if isinstance(candidate, str) and candidate.strip():
@@ -438,7 +438,7 @@ def _resolve_polygon_api_key() -> str:
 
 def _polygon_api_key_configured(settings: Any) -> bool:
     return _secret_candidate_configured(settings.market_data_api_key) or (
-        _secret_candidate_configured(os.environ.get("POLYGON_API_KEY"))
+        _secret_candidate_configured(get_config_value("POLYGON_API_KEY"))
     )
 
 
@@ -446,8 +446,8 @@ def _resolve_fred_api_key() -> str:
     settings = get_settings()
     candidates = (
         settings.macro_api_key,
-        os.environ.get("HALO_SWING_FRED_API_KEY"),
-        os.environ.get("FRED_API_KEY"),
+        get_config_value("HALO_SWING_FRED_API_KEY"),
+        get_config_value("FRED_API_KEY"),
     )
     for candidate in candidates:
         if isinstance(candidate, str) and candidate.strip():
@@ -461,8 +461,8 @@ def _resolve_fred_api_key() -> str:
 def _fred_api_key_configured(settings: Any) -> bool:
     return (
         _secret_candidate_configured(settings.macro_api_key)
-        or _secret_candidate_configured(os.environ.get("HALO_SWING_FRED_API_KEY"))
-        or _secret_candidate_configured(os.environ.get("FRED_API_KEY"))
+        or _secret_candidate_configured(get_config_value("HALO_SWING_FRED_API_KEY"))
+        or _secret_candidate_configured(get_config_value("FRED_API_KEY"))
     )
 
 
@@ -470,8 +470,8 @@ def _resolve_news_api_key() -> str:
     settings = get_settings()
     candidates = (
         settings.news_api_key,
-        os.environ.get("HALO_SWING_NEWS_API_KEY"),
-        os.environ.get("NEWS_API_KEY"),
+        get_config_value("HALO_SWING_NEWS_API_KEY"),
+        get_config_value("NEWS_API_KEY"),
     )
     for candidate in candidates:
         if isinstance(candidate, str) and candidate.strip():
@@ -482,8 +482,10 @@ def _resolve_news_api_key() -> str:
 
 
 def _news_api_key_configured(settings: Any) -> bool:
-    return _secret_candidate_configured(settings.news_api_key) or (
-        _secret_candidate_configured(os.environ.get("NEWS_API_KEY"))
+    return (
+        _secret_candidate_configured(settings.news_api_key)
+        or _secret_candidate_configured(get_config_value("HALO_SWING_NEWS_API_KEY"))
+        or _secret_candidate_configured(get_config_value("NEWS_API_KEY"))
     )
 
 

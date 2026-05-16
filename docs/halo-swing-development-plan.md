@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.635 Local Env Alias Loading Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자는 `.env.example`을 `.env`로 복사한 뒤 API key나 Telegram/Hermes 설정값을
+채우는 흐름을 기대한다. 기존 설정 모델은 일부 `HALO_SWING_` 필드를 `.env`에서
+읽지만, readiness와 provider alias 확인은 여러 값을 `os.environ`에서만 읽었다.
+이번 slice는 로컬 `.env` alias를 직접 읽어 readiness와 provider auto-selection에
+반영하되, secret 값을 반환 payload나 전역 환경변수에 노출하지 않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - src/halo_swing_mcp/env.py reads ignored local .env values without mutating os.environ
+  - provider auto-selection checks local .env aliases for Polygon, FRED, and NewsAPI keys
+  - readiness checks local .env aliases for Hermes config path, Telegram delivery, and live data keys
+  - tests cover .env-only readiness for Hermes/Telegram/live data without serializing secrets
+  - tests cover .env-only provider auto-selection without DATA_MODE live flags
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - committed .env file
+  - real secret values
+  - mutation of os.environ from .env
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.634 Telegram Env Template Gate Record - 2026-05-16
 
 ### A. 목적

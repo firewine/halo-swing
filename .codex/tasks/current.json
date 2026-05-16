@@ -1,24 +1,29 @@
 {
-  "gate_id": "TELEGRAM_ENV_TEMPLATE_GATE",
+  "gate_id": "LOCAL_ENV_ALIAS_LOADING_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.634",
-  "next_atomic_step": "add secret-free Telegram bot token and gateway placeholders to the env template matching readiness aliases",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.635",
+  "next_atomic_step": "make readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    ".env.example",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "tests/test_env_template.py"
+    "src/halo_swing_mcp/env.py",
+    "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_providers.py",
+    "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.634",
-    ".env.example",
+    "docs/halo-swing-development-plan.md#3.635",
+    "src/halo_swing_mcp/config.py",
+    "src/halo_swing_mcp/providers.py",
     "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_env_template.py"
+    "tests/test_providers.py",
+    "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -34,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_readiness.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -49,12 +54,13 @@
     "read_only": true
   },
   "done_means": [
-    ".env.example contains blank placeholders for Telegram bot token aliases and gateway aliases",
-    "tests/test_env_template.py locks Telegram delivery placeholders to blank secret-free values",
-    "template still preserves no-send readiness semantics and does not add Telegram send behavior",
+    "local .env aliases are read without mutating os.environ",
+    "exported environment variables keep precedence over local .env values",
+    "readiness honors local .env Hermes config, Telegram delivery, and live data API-key aliases as boolean evidence without serializing secret values",
+    "provider auto-selection honors local .env API-key aliases without requiring DATA_MODE live flags",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified Telegram env-template gate, then choose Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified local .env alias loading gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

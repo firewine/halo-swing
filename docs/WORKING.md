@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: TELEGRAM_ENV_TEMPLATE_GATE_VERIFIED
-gate_id: TELEGRAM_ENV_TEMPLATE_GATE
+status: LOCAL_ENV_ALIAS_LOADING_GATE_VERIFIED
+gate_id: LOCAL_ENV_ALIAS_LOADING_GATE
 review_tier: S1_small
 
-next_atomic_step: add secret-free Telegram bot token and gateway placeholders to the env template matching readiness aliases
+next_atomic_step: make readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -265,6 +265,7 @@ done_means:
   - tests/test_env_template.py locks .env.example live data placeholders and optional DATA_MODE examples
   - .env.example keeps HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
   - .env.example exposes blank Telegram bot token and gateway placeholders matching readiness aliases
+  - readiness and provider auto-selection honor ignored local .env API-key and Telegram/Hermes aliases without exporting secrets
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -614,16 +615,18 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.634
-gate_packet: docs/halo-swing-development-plan.md#3.634
+portable_mirror: docs/halo-swing-development-plan.md#3.635
+gate_packet: docs/halo-swing-development-plan.md#3.635
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.634
-  - .env.example
+  - docs/halo-swing-development-plan.md#3.635
+  - src/halo_swing_mcp/config.py
+  - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_env_template.py
+  - tests/test_providers.py
+  - tests/test_readiness.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -926,14 +929,51 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Telegram Env Template Gate is verified. `.env.example` now includes
-blank Telegram delivery placeholders matching readiness aliases:
-`HALO_SWING_TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_TOKEN`,
-`HALO_SWING_TELEGRAM_GATEWAY`, and `HALO_SWING_TELEGRAM_GATEWAY_URL`.
-`tests/test_env_template.py` locks these placeholders to blank secret-free
-values. No Telegram send behavior or credential storage was added. Focused
-env/readiness tests passed with 41 tests, full pytest passed with 696 tests,
-and ruff and health_check passed.
+Summary: Local Env Alias Loading Gate is verified. Readiness and provider
+auto-selection now honor ignored local `.env` API-key and Telegram/Hermes
+aliases without mutating `os.environ` or serializing secret values. Exported
+environment variables keep precedence. Focused provider/readiness tests passed
+with 54 tests, full pytest passed with 698 tests, and ruff and health_check
+passed.
+
+```yaml
+local_env_alias_loading_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/env.py
+    - src/halo_swing_mcp/providers.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_providers.py
+    - tests/test_readiness.py
+  implementation:
+    - src/halo_swing_mcp/env.py reads ignored local .env values without mutating os.environ
+    - exported environment variables keep precedence over local .env values
+    - provider auto-selection checks local .env aliases for Polygon, FRED, and NewsAPI keys without requiring DATA_MODE live flags
+    - readiness checks local .env aliases for Hermes config path, Telegram delivery, and live data keys as boolean evidence
+    - tests cover .env-only readiness and provider auto-selection without serializing secret values
+    - no committed .env file, network call, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+      result: "54 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "698 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 telegram_env_template_gate:

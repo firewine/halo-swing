@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
 from halo_swing_mcp import MCP_SERVER_NAME
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.env import get_config_value
 from halo_swing_mcp.risk_settings import load_btc_risk_settings, resolve_settings_path
 from halo_swing_mcp.secret_store import get_binance_credentials_status
 
@@ -189,8 +189,9 @@ def _hermes_readiness(
 def _resolve_hermes_config_path(hermes_config_path: str | None) -> str | None:
     if hermes_config_path is not None:
         return _normalize_path(hermes_config_path, "hermes_config_path")
-    if HERMES_CONFIG_PATH_ENV in os.environ:
-        return _normalize_path(os.environ[HERMES_CONFIG_PATH_ENV], HERMES_CONFIG_PATH_ENV)
+    env_value = get_config_value(HERMES_CONFIG_PATH_ENV)
+    if env_value is not None:
+        return _normalize_path(env_value, HERMES_CONFIG_PATH_ENV)
     return None
 
 
@@ -442,7 +443,7 @@ def _news_api_key_env_configured() -> bool:
 
 
 def _env_value_configured(*keys: str) -> bool:
-    return any(_is_env_value_configured(os.environ.get(key)) for key in keys)
+    return any(_is_env_value_configured(get_config_value(key)) for key in keys)
 
 
 def _is_env_value_configured(value: str | None) -> bool:

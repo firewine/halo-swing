@@ -4,6 +4,7 @@ from urllib import parse
 import pytest
 
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.providers import (
     FredMacroDataProvider,
     MarketDataProvider,
@@ -23,7 +24,9 @@ from halo_swing_mcp.tools.market import (
 @pytest.fixture(autouse=True)
 def clear_provider_settings_cache() -> None:
     get_settings.cache_clear()
+    clear_local_env_cache()
     yield
+    clear_local_env_cache()
     get_settings.cache_clear()
 
 
@@ -186,6 +189,41 @@ def test_market_data_provider_auto_uses_newsapi_key(monkeypatch) -> None:
     assert provider.live_data_required is False
 
     get_settings.cache_clear()
+
+
+def test_market_data_provider_auto_uses_local_env_api_key_aliases(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    for key in (
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    (tmp_path / ".env").write_text(
+        "\n".join(
+            [
+                "POLYGON_API_KEY=polygon-local-secret",
+                "HALO_SWING_FRED_API_KEY=fred-local-secret",
+                "NEWS_API_KEY=news-local-secret",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    provider = get_market_data_provider()
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert provider.data_mode == "live"
+    assert provider.live_data_required is True
 
 
 def test_polygon_market_data_provider_fetches_ohlcv_without_returning_secret() -> None:
