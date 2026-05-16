@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_TOP_LEVEL_COMMANDS_VERIFIED
-gate_id: API_KEY_PIPELINE_TOP_LEVEL_COMMANDS_GATE
+status: API_KEY_PIPELINE_OPERATOR_CHECKLIST_VERIFIED
+gate_id: API_KEY_PIPELINE_OPERATOR_CHECKLIST_GATE
 review_tier: S1_small
 
-next_atomic_step: add a top-level api_key_command_summary to run_api_key_pipeline_smoke so dotenv copy, provider smoke, next smoke, and one-shot smoke commands are visible before nested summaries
+next_atomic_step: add a top-level api_key_operator_checklist to run_api_key_pipeline_smoke so the API-key-only local setup sequence is visible as ordered no-secret steps before nested summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,15 +81,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke includes top-level api_key_command_summary copied from live_data_setup_summary command fields without returning secrets
-  - ready fake-live and blocked fixture-default paths assert top-level api_key_command_summary dotenv copy, provider smoke, next smoke, and one-shot smoke commands
-  - README and DevOps guide document top-level api_key_command_summary in pipeline smoke payloads
+  - run_api_key_pipeline_smoke includes top-level api_key_operator_checklist built from setup, requirements, and command summaries without returning secrets
+  - ready fake-live and blocked fixture-default paths assert ordered checklist steps for prepare dotenv, fill API keys, provider smokes, and one-shot smoke
+  - README and DevOps guide document top-level api_key_operator_checklist in pipeline smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline top-level commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline operator checklist gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_TOP_LEVEL_COMMANDS_VERIFIED
+gate_id: API_KEY_PIPELINE_TOP_LEVEL_COMMANDS_GATE
+review_tier: S1_small
+
+next_atomic_step: add a top-level api_key_command_summary to run_api_key_pipeline_smoke so dotenv copy, provider smoke, next smoke, and one-shot smoke commands are visible before nested summaries
 ```
 
 Previous completed directive:
@@ -1556,6 +1567,58 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Operator Checklist Gate is verified.
+`run_api_key_pipeline_smoke` now exposes top-level
+`api_key_operator_checklist`, a no-secret ordered checklist for API-key-only
+local setup: prepare `.env`, fill live data API keys, run provider smokes, and
+run the one-shot pipeline smoke. Ready fake-live and blocked fixture-default
+paths assert the top-level checklist without secret values. README and DevOps
+guide document it. Focused tests passed with 3 tests, full pytest passed with
+760 tests, and ruff, health_check, and one-shot pipeline harness commands
+passed. With local `.env` absent, the one-shot pipeline harness exits 0 and
+returns `current_step=prepare_dotenv` plus the ordered setup steps without
+secrets.
+
+```yaml
+api_key_pipeline_operator_checklist_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_api_key_pipeline_smoke includes top-level api_key_operator_checklist built from setup, requirements, and command summaries
+    - ready fake-live and blocked fixture-default paths assert ordered checklist steps for prepare dotenv, fill API keys, provider smokes, and one-shot smoke without secret values
+    - README and DevOps guide document top-level api_key_operator_checklist in pipeline smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned top-level api_key_operator_checklist with prepare_dotenv, fill_live_data_api_keys, run_provider_smokes, and run_api_key_pipeline_smoke steps without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Top-Level Commands Gate is verified.
 `run_api_key_pipeline_smoke` now exposes top-level `api_key_command_summary`,

@@ -657,6 +657,87 @@ def expected_api_key_command_summary(
     }
 
 
+def expected_api_key_operator_checklist(
+    *,
+    status: str,
+    current_step: str,
+    target_path: Path,
+    market_configured_env_keys: list[str],
+    macro_configured_env_keys: list[str],
+    news_configured_env_keys: list[str],
+    configured_provider_families: list[str],
+    missing_provider_families: list[str],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    command_summary = expected_api_key_command_summary(
+        status=status,
+        target_path=target_path,
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
+    requirements_summary = expected_api_key_requirements_summary(
+        status=status,
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+        configured_provider_families=configured_provider_families,
+        missing_provider_families=missing_provider_families,
+    )
+    copy_command = command_summary["copy_dotenv_command"]
+    steps = [
+        {
+            "name": "prepare_dotenv",
+            "status": "pending" if copy_command["required"] is True else "ready",
+            "command": copy_command["command"],
+            "mutates_local_state": copy_command["mutates_local_state"],
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "fill_live_data_api_keys",
+            "status": "ready" if not missing_provider_families else "pending",
+            "required_env_keys": requirements_summary["required_env_keys"],
+            "configured_env_keys": requirements_summary["configured_env_keys"],
+            "missing_provider_families": missing_provider_families,
+            "provider_requirements": requirements_summary["provider_requirements"],
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_provider_smokes",
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "provider_smoke_commands": command_summary["provider_smoke_commands"],
+            "provider_smoke_command_count": 3,
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_api_key_pipeline_smoke",
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "command": command_summary["one_shot_pipeline_smoke"]["command"],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+    ]
+    return {
+        "schema_version": "api_key_pipeline_operator_checklist.v1",
+        "status": status,
+        "current_step": current_step,
+        "steps": steps,
+        "step_count": 4,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -2502,6 +2583,19 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         news_configured_env_keys=["NEWS_API_KEY"],
         ready_to_run_live_smoke=True,
     )
+    assert payload["api_key_operator_checklist"] == (
+        expected_api_key_operator_checklist(
+            status="ready",
+            current_step="run_api_key_pipeline_smoke",
+            target_path=env_path,
+            market_configured_env_keys=["POLYGON_API_KEY"],
+            macro_configured_env_keys=["FRED_API_KEY"],
+            news_configured_env_keys=["NEWS_API_KEY"],
+            configured_provider_families=["market", "macro", "news"],
+            missing_provider_families=[],
+            ready_to_run_live_smoke=True,
+        )
+    )
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
@@ -2659,6 +2753,19 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         macro_configured_env_keys=[],
         news_configured_env_keys=[],
         ready_to_run_live_smoke=False,
+    )
+    assert payload["api_key_operator_checklist"] == (
+        expected_api_key_operator_checklist(
+            status="blocked",
+            current_step="prepare_dotenv",
+            target_path=local_env.REPO_ROOT_ENV_PATH,
+            market_configured_env_keys=[],
+            macro_configured_env_keys=[],
+            news_configured_env_keys=[],
+            configured_provider_families=[],
+            missing_provider_families=["market", "macro", "news"],
+            ready_to_run_live_smoke=False,
+        )
     )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (

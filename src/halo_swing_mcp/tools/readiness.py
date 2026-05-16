@@ -682,6 +682,15 @@ def run_api_key_pipeline_smoke(
         live_data_api_key_status,
         provider_route,
     )
+    setup_status_summary = _api_key_pipeline_setup_status_summary(
+        live_data_setup_summary,
+    )
+    api_key_requirements_summary = _api_key_pipeline_api_key_requirements_summary(
+        live_data_setup_summary,
+    )
+    api_key_command_summary = _api_key_pipeline_api_key_command_summary(
+        live_data_setup_summary,
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -706,14 +715,15 @@ def run_api_key_pipeline_smoke(
             live_data_setup_summary.get("next_operator_action")
         )
         or {},
-        "setup_status_summary": _api_key_pipeline_setup_status_summary(
-            live_data_setup_summary,
-        ),
-        "api_key_requirements_summary": (
-            _api_key_pipeline_api_key_requirements_summary(live_data_setup_summary)
-        ),
-        "api_key_command_summary": _api_key_pipeline_api_key_command_summary(
-            live_data_setup_summary,
+        "setup_status_summary": setup_status_summary,
+        "api_key_requirements_summary": api_key_requirements_summary,
+        "api_key_command_summary": api_key_command_summary,
+        "api_key_operator_checklist": (
+            _api_key_pipeline_operator_checklist(
+                setup_status_summary=setup_status_summary,
+                api_key_requirements_summary=api_key_requirements_summary,
+                api_key_command_summary=api_key_command_summary,
+            )
         ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
@@ -1717,6 +1727,95 @@ def _api_key_pipeline_api_key_command_summary(
         },
         "provider_smoke_commands": provider_smokes,
         "provider_smoke_command_count": len(provider_smokes),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_operator_checklist(
+    *,
+    setup_status_summary: dict[str, Any],
+    api_key_requirements_summary: dict[str, Any],
+    api_key_command_summary: dict[str, Any],
+) -> dict[str, Any]:
+    copy_dotenv_command = _optional_mapping(
+        api_key_command_summary.get("copy_dotenv_command")
+    ) or {}
+    provider_requirements = _optional_mapping(
+        api_key_requirements_summary.get("provider_requirements")
+    ) or {}
+    provider_smoke_commands = api_key_command_summary.get("provider_smoke_commands")
+    provider_smoke_rows = (
+        provider_smoke_commands if isinstance(provider_smoke_commands, list) else []
+    )
+    one_shot_pipeline_smoke = _optional_mapping(
+        api_key_command_summary.get("one_shot_pipeline_smoke")
+    ) or {}
+    missing_provider_families = _string_list(
+        api_key_requirements_summary.get("missing_provider_families")
+    )
+    ready_to_run_live_smoke = (
+        setup_status_summary.get("ready_to_run_live_smoke") is True
+    )
+    steps = [
+        {
+            "name": "prepare_dotenv",
+            "status": "pending"
+            if copy_dotenv_command.get("required") is True
+            else "ready",
+            "command": copy_dotenv_command.get("command"),
+            "mutates_local_state": copy_dotenv_command.get("mutates_local_state"),
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "fill_live_data_api_keys",
+            "status": "ready" if not missing_provider_families else "pending",
+            "required_env_keys": api_key_requirements_summary.get(
+                "required_env_keys"
+            ),
+            "configured_env_keys": api_key_requirements_summary.get(
+                "configured_env_keys"
+            ),
+            "missing_provider_families": missing_provider_families,
+            "provider_requirements": provider_requirements,
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_provider_smokes",
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "provider_smoke_commands": provider_smoke_rows,
+            "provider_smoke_command_count": len(provider_smoke_rows),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_api_key_pipeline_smoke",
+            "status": "ready" if ready_to_run_live_smoke else "blocked",
+            "command": one_shot_pipeline_smoke.get("command"),
+            "network_call": one_shot_pipeline_smoke.get("network_call"),
+            "network_call_policy": one_shot_pipeline_smoke.get(
+                "network_call_policy"
+            ),
+            "mutates_local_state": one_shot_pipeline_smoke.get(
+                "mutates_local_state"
+            ),
+            "secret_values_returned": one_shot_pipeline_smoke.get(
+                "secret_values_returned"
+            ),
+        },
+    ]
+    return {
+        "schema_version": "api_key_pipeline_operator_checklist.v1",
+        "status": setup_status_summary.get("status"),
+        "current_step": setup_status_summary.get("next_setup_step"),
+        "steps": steps,
+        "step_count": len(steps),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
