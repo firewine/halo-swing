@@ -51,6 +51,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "live_data_setup_summary_status" in guide
     assert "next_setup_step" in guide
     assert "setup_step_count" in guide
+    assert "provider_setup_action_count" in guide
     assert "next_smoke_command_name" in guide
     assert "get_market_snapshot" in guide
     assert "get_macro_snapshot" in guide

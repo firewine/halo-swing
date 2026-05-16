@@ -271,7 +271,8 @@ Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,
 `configured_provider_family_count`, `missing_provider_families`,
-`live_data_setup_steps`, `next_setup_step`, `setup_step_count`, and
+`live_data_setup_steps`, `next_setup_step`, `setup_step_count`,
+`provider_setup_actions`, `provider_setup_action_count`, and
 `next_smoke_command_name`:
 
 ```bash
