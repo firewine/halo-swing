@@ -266,7 +266,10 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
-orders, or return secret values. It also returns `live_data_smoke_commands` for
+orders, or return secret values. It also returns `live_data_setup_summary` so
+API-key-only setup shows key readiness, provider route status, selected provider
+classes, missing keys, and the one-shot pipeline smoke command without exposing
+secret values. It also returns `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the
 live providers and boundary contracts. Those smoke commands are read-only and

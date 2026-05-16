@@ -29,6 +29,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "POLYGON_API_KEY=your_polygon_key" in guide
     assert "FRED_API_KEY=your_fred_key" in guide
     assert "NEWS_API_KEY=your_newsapi_key" in guide
+    assert "live_data_setup_summary" in guide
+    assert "run_api_key_pipeline_smoke" in guide
     assert "live_data_smoke_commands" in guide
     assert "get_live_data_api_key_status" in guide
     assert "get_live_data_provider_route" in guide

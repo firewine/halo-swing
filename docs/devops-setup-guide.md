@@ -377,7 +377,10 @@ DB migration/repository, Binance testnet read-only smoke, live order submission,
 and live data adapters. They can read readiness inputs from exported environment
 variables, a launch-directory `.env`, or the repo-root `.env` using the
 precedence documented above. The checklist payload also includes
-`live_data_smoke_commands` for
+`live_data_setup_summary` so API-key-only setup shows key readiness, provider
+route status, selected provider classes, missing keys, and the one-shot
+`run_api_key_pipeline_smoke` command without returning secret values. It also
+includes `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`. After
 filling the matching API keys, run those repo-local harness commands to verify
 the live provider outputs and boundary contracts. The smoke commands are

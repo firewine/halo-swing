@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.664 Live Data Setup Summary Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 `.env`에 채운 뒤 첫 확인 명령으로 `get_integration_setup_checklist`를
+실행했을 때, live data 준비 상태와 실제 provider route를 따로 여러 명령으로 조합해야
+했다. 이번 slice는 checklist payload에 no-network `live_data_setup_summary`를 추가해
+API-key readiness, provider route status, selected provider classes, missing keys,
+그리고 one-shot pipeline smoke 명령을 한 번에 보여준다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_setup_checklist includes live_data_setup_summary derived from get_live_data_api_key_status and get_live_data_provider_route
+  - summary shows API-key readiness, provider route status, selected provider classes, missing keys, and run_api_key_pipeline_smoke command without returning secret values
+  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence
+  - README and DevOps guide document live_data_setup_summary in setup checklist payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed, status blocked with live_data_setup_summary fixture route without API keys as expected
+```
+
 ## 3.663 Integration Smoke Provider Route Summary Gate Record - 2026-05-16
 
 ### A. 목적

@@ -161,12 +161,18 @@ def get_integration_setup_checklist() -> dict[str, Any]:
 
     readiness = get_integration_readiness()
     gates = readiness["gates"]
+    live_data_api_key_status = get_live_data_api_key_status()
+    live_data_provider_route = get_live_data_provider_route()
     return {
         "schema_version": "integration_setup_checklist.v1",
         "status": readiness["status"],
         "readiness_status": readiness["status"],
         "next_actions": readiness["next_actions"],
         "env_requirements": _setup_env_requirements(gates),
+        "live_data_setup_summary": _live_data_setup_summary(
+            live_data_api_key_status,
+            live_data_provider_route,
+        ),
         "local_commands": _setup_local_commands(),
         "live_data_smoke_commands": _setup_live_data_smoke_commands(),
         "durable_gate_requirements": [
@@ -1388,6 +1394,54 @@ def _api_key_pipeline_provider_route_summary(route: dict[str, Any]) -> dict[str,
         "network_call": route.get("network_call"),
         "secret_values_returned": route.get("secret_values_returned"),
     }
+
+
+def _live_data_setup_summary(
+    api_key_status: dict[str, Any],
+    provider_route: dict[str, Any],
+) -> dict[str, Any]:
+    providers = _optional_mapping(api_key_status.get("providers")) or {}
+    configured_provider_families = [
+        family
+        for family, provider in providers.items()
+        if _optional_mapping(provider).get("configured") is True
+    ]
+    route_summary = _api_key_pipeline_provider_route_summary(provider_route)
+    missing = _ordered_unique_strings(
+        [
+            *(api_key_status.get("missing") or []),
+            *(provider_route.get("missing") or []),
+        ]
+    )
+    return {
+        "schema_version": "live_data_setup_summary.v1",
+        "status": (
+            "ready"
+            if api_key_status.get("status") == "ready"
+            and provider_route.get("status") == "ready"
+            else "blocked"
+        ),
+        "api_key_status": api_key_status.get("status"),
+        "provider_route_status": provider_route.get("status"),
+        "configured_provider_families": configured_provider_families,
+        "missing": missing,
+        "provider_factory": route_summary.get("provider_factory"),
+        "selected_provider_classes": route_summary.get("selected_provider_classes"),
+        "provider_route_summary": route_summary,
+        "one_shot_smoke_command": api_key_status.get("one_shot_smoke_command"),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _ordered_unique_strings(values: list[Any]) -> list[str]:
+    result: list[str] = []
+    for value in values:
+        if not isinstance(value, str) or value in result:
+            continue
+        result.append(value)
+    return result
 
 
 def _extend_workflow_contract_checks(

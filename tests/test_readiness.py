@@ -314,6 +314,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         command["name"]: command
         for command in payload["live_data_smoke_commands"]
     }
+    live_data_setup_summary = payload["live_data_setup_summary"]
 
     assert payload["schema_version"] == "integration_setup_checklist.v1"
     assert payload["status"] == "blocked"
@@ -343,6 +344,53 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     ]
     assert env_requirements["binance_read_only_smoke"]["configured"] is False
     assert env_requirements["binance_live_order_readiness"]["configured"] is False
+    assert live_data_setup_summary == {
+        "schema_version": "live_data_setup_summary.v1",
+        "status": "blocked",
+        "api_key_status": "blocked",
+        "provider_route_status": "blocked",
+        "configured_provider_families": [],
+        "missing": [
+            "market_ohlcv_api_key",
+            "macro_api_key",
+            "news_api_key",
+        ],
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "provider_route_summary": {
+            "schema_version": "live_data_provider_route.v1",
+            "status": "blocked",
+            "provider_factory": "get_market_data_provider",
+            "selected_provider_classes": ["ReplayMarketDataProvider"],
+            "missing": [
+                "market_ohlcv_api_key",
+                "macro_api_key",
+                "news_api_key",
+            ],
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        "one_shot_smoke_command": {
+            "name": "run_api_key_pipeline_smoke",
+            "purpose": (
+                "run readiness, provider, signal workflow, and recording smoke "
+                "checks after API keys are configured"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_api_key_pipeline_smoke --input-json "
+                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+                "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert command_names == {
         "save_binance_credentials",
         "get_integration_readiness",
@@ -2707,6 +2755,26 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
         "migration: provide explicit_MIGRATION_GO",
         "repository: provide MIGRATION_GO, REPOSITORY_GO",
     ]
+    assert payload["live_data_setup_summary"]["status"] == "ready"
+    assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
+    assert payload["live_data_setup_summary"]["configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["live_data_setup_summary"]["missing"] == []
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert (
+        payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert env_requirements["hermes"]["configured"] is True
     assert env_requirements["telegram"]["configured"] is True
     assert env_requirements["live_data"]["configured"] is True
