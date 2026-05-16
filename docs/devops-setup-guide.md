@@ -377,7 +377,11 @@ NEWS_API_KEY=your_newsapi_key
 ```
 
 `HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Without
-either key, news evidence remains fixture-backed.
+either key, news evidence remains fixture-backed. When one of these keys selects
+the live NewsAPI provider, `get_news_bundle` declares `live_data_required=true`,
+`network_call=true`, and `secret_values_returned=false`; the
+`news_source_policy_guard` reports `live_data_boundary_declared` and
+`network_call_declared`.
 
 The optional `HALO_SWING_MARKET_DATA_MODE=live`,
 `HALO_SWING_MACRO_DATA_MODE=live`, and `HALO_SWING_NEWS_DATA_MODE=live` env

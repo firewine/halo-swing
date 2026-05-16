@@ -341,6 +341,7 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
         "live_collection_enabled": live_collection_enabled,
         "network_call": live_collection_enabled,
         "live_data_required": live_collection_enabled,
+        "secret_values_returned": False,
     }
     source_policy_guard_checks = [
         {
@@ -366,6 +367,15 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
                     "name": "network_call_declared",
                     "passed": source_policy_contract["network_call"] is True,
                 },
+                {
+                    "name": "live_data_boundary_declared",
+                    "passed": source_policy_contract["live_data_required"] is True,
+                },
+                {
+                    "name": "secret_values_not_returned",
+                    "passed": source_policy_contract["secret_values_returned"]
+                    is False,
+                },
             ]
         )
     else:
@@ -379,6 +389,11 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
                 {
                     "name": "no_network_call",
                     "passed": source_policy_contract["network_call"] is False,
+                },
+                {
+                    "name": "secret_values_not_returned",
+                    "passed": source_policy_contract["secret_values_returned"]
+                    is False,
                 },
             ]
         )
@@ -406,6 +421,7 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
             "scoring_usage": "score_leverage_swing.component_scores.theme",
             "network_call": live_collection_enabled,
             "live_data_required": live_collection_enabled,
+            "secret_values_returned": False,
         },
         "average_strength": round(average_strength, 4),
         "news_score": round(average_strength, 4),

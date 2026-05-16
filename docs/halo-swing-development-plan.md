@@ -28,6 +28,53 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.648 Live News Bundle Boundary Gate Record - 2026-05-16
+
+### A. 목적
+
+NewsAPI key가 있으면 `get_news_bundle`이 live evidence card를 만들 수 있지만,
+source/score contract에는 secret-return policy가 명시되어 있지 않았다. 이번 slice는
+fixture/replay news와 API-key-backed NewsAPI bundle의 live-data, network, secret
+boundary를 market/macro tool과 같은 수준으로 선언한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_news_bundle source and score contracts include secret_values_returned=false
+  - fixture/replay news payloads keep no_live_collection and no_network_call checks
+  - API-key-backed NewsAPI payloads declare live_data_required=true and network_call=true with live_data_boundary_declared and network_call_declared checks
+  - tests prove fake NewsAPI bundle output returns live boundary metadata without exposing API-key values
+  - README and DevOps setup docs describe the news live boundary guard
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q -> 20 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 736 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.647 Live Macro Snapshot Boundary Gate Record - 2026-05-16
 
 ### A. 목적

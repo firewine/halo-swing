@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from urllib import parse
 
@@ -462,6 +463,8 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
     ]
     assert bundle["news_source_policy_contract"]["live_collection_enabled"] is True
     assert bundle["news_source_policy_contract"]["network_call"] is True
+    assert bundle["news_source_policy_contract"]["live_data_required"] is True
+    assert bundle["news_source_policy_contract"]["secret_values_returned"] is False
     assert bundle["news_source_policy_guard"]["status"] == "ok"
     source_policy_checks = {
         check["name"]: check["passed"]
@@ -469,8 +472,13 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
     }
     assert source_policy_checks["live_collection_explicit"] is True
     assert source_policy_checks["network_call_declared"] is True
+    assert source_policy_checks["live_data_boundary_declared"] is True
+    assert source_policy_checks["secret_values_not_returned"] is True
     assert bundle["news_score_contract"]["network_call"] is True
+    assert bundle["news_score_contract"]["live_data_required"] is True
+    assert bundle["news_score_contract"]["secret_values_returned"] is False
     assert bundle["evidence_cards"][0]["source"] == "newsapi"
+    assert "news-secret" not in json.dumps(bundle, sort_keys=True)
 
 
 def test_market_snapshot_declares_live_provider_boundary_without_secret(
@@ -555,6 +563,18 @@ def test_market_tools_keep_replay_payload_contract() -> None:
     assert "live_data_boundary_declared" not in market_guard_checks
     assert market["snapshots"][0]["symbol"] == "QQQ"
     assert events["events"]
+    news_guard_checks = {
+        check["name"]: check
+        for check in news["news_source_policy_guard"]["checks"]
+    }
+    assert news["news_source_policy_contract"]["network_call"] is False
+    assert news["news_source_policy_contract"]["live_data_required"] is False
+    assert news["news_source_policy_contract"]["secret_values_returned"] is False
+    assert news_guard_checks["no_live_collection"]["passed"] is True
+    assert news_guard_checks["no_network_call"]["passed"] is True
+    assert news_guard_checks["secret_values_not_returned"]["passed"] is True
+    assert "live_data_boundary_declared" not in news_guard_checks
+    assert news["news_score_contract"]["secret_values_returned"] is False
     assert news["evidence_cards"]
     assert news["modality_counts"]["pdf_summary"] >= 1
     assert news["artifact_refs"]
