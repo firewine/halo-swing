@@ -33,6 +33,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "dotenv_template" in guide
     assert "dotenv_file_status" in guide
     assert "next setup action" in guide
+    assert "next_operator_action" in guide
     assert "live_data_setup_steps" in guide
     assert "preferred_env_key" in guide
     assert "next_setup_action" in guide

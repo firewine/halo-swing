@@ -202,8 +202,10 @@ To check only live data API-key setup before making provider network calls, use
 `get_live_data_api_key_status`; it reports configured alias names, missing
 provider families, provider-level `preferred_env_key`, `setup_status`,
 `next_setup_action`, `provider_family_summary`, the no-secret
-`dotenv_template`, `dotenv_file_status`, and the one-shot smoke command without
-returning secrets:
+`dotenv_template`, `dotenv_file_status`, `next_operator_action`, and the
+one-shot smoke command without returning secrets. `next_operator_action` is the
+single local action to take next: copy `.env.example` to `.env`, fill the
+required API keys, or run `run_api_key_pipeline_smoke`:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
@@ -293,6 +295,8 @@ with no-secret `smoke_command` objects, `provider_smoke_plan`, and a no-secret
 commands. It also returns `dotenv_file_status` so the setup payload shows
 whether `.env.example` and `.env` exist, the next setup action, and the
 repo-local copy command hint without writing files or returning secret values.
+`next_operator_action` summarizes the single next local action for API-key-only
+setup without returning secret values.
 `live_data_setup_steps` orders the local setup path as dotenv preparation, live
 data API-key entry, and the one-shot pipeline smoke. It also returns
 `live_data_smoke_commands` for

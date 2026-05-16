@@ -275,6 +275,71 @@ def expected_live_data_setup_steps(
     }
 
 
+def expected_next_operator_action(
+    *,
+    target_path: Path,
+    configured_provider_families: list[str],
+    missing_provider_families: list[str],
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    dotenv_file_status = expected_dotenv_file_status(target_path)
+    setup_steps = expected_live_data_setup_steps(
+        target_path=target_path,
+        configured_provider_families=configured_provider_families,
+        missing_provider_families=missing_provider_families,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
+    base = {
+        "schema_version": "live_data_next_operator_action.v1",
+        "name": setup_steps["next_step"],
+        "dotenv_target_path": ".env",
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    if setup_steps["next_step"] == "restore_env_example":
+        return {
+            **base,
+            "status": "blocked",
+            "reason": "missing_env_example_and_env",
+            "required_file": ".env.example",
+            "secret_input_required": False,
+        }
+    if setup_steps["next_step"] == "prepare_dotenv":
+        copy_command = dotenv_file_status["copy_command"]
+        return {
+            **base,
+            "status": "pending",
+            "command": copy_command["command"],
+            "source_path": copy_command["source_path"],
+            "target_path": copy_command["target_path"],
+            "next_after_action": "fill_live_data_api_keys",
+            "secret_input_required": False,
+            "mutates_local_state": True,
+        }
+    if ready_to_run_live_smoke:
+        smoke_command = expected_pipeline_smoke_command()
+        return {
+            **base,
+            "name": "run_api_key_pipeline_smoke",
+            "status": "ready",
+            "command": smoke_command["command"],
+            "network_call": True,
+            "network_call_policy": smoke_command["network_call_policy"],
+            "secret_input_required": False,
+        }
+    return {
+        **base,
+        "name": "fill_live_data_api_keys",
+        "status": "pending",
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "configured_provider_families": configured_provider_families,
+        "missing_provider_families": missing_provider_families,
+        "next_after_action": "run_api_key_pipeline_smoke",
+        "secret_input_required": True,
+    }
+
+
 def expected_provider_smoke_command(name: str) -> dict[str, Any]:
     commands = {
         "get_market_snapshot_live_smoke": {
@@ -775,6 +840,12 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             missing_provider_families=["market", "macro", "news"],
             ready_to_run_live_smoke=False,
         ),
+        "next_operator_action": expected_next_operator_action(
+            target_path=ROOT / ".env",
+            configured_provider_families=[],
+            missing_provider_families=["market", "macro", "news"],
+            ready_to_run_live_smoke=False,
+        ),
         "one_shot_smoke_command": expected_pipeline_smoke_command(),
         "next_smoke_command": {
             "name": "get_live_data_api_key_status",
@@ -897,6 +968,12 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         ROOT / ".env"
     )
     assert payload["live_data_setup_steps"] == expected_live_data_setup_steps(
+        target_path=ROOT / ".env",
+        configured_provider_families=[],
+        missing_provider_families=["market", "macro", "news"],
+        ready_to_run_live_smoke=False,
+    )
+    assert payload["next_operator_action"] == expected_next_operator_action(
         target_path=ROOT / ".env",
         configured_provider_families=[],
         missing_provider_families=["market", "macro", "news"],
@@ -1037,6 +1114,12 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["dotenv_file_status"] == expected_dotenv_file_status(repo_env)
     assert payload["live_data_setup_steps"] == expected_live_data_setup_steps(
+        target_path=repo_env,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
+    assert payload["next_operator_action"] == expected_next_operator_action(
         target_path=repo_env,
         configured_provider_families=["market", "macro", "news"],
         missing_provider_families=[],
@@ -3965,6 +4048,14 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
     assert payload["live_data_setup_summary"][
         "live_data_setup_steps"
     ] == expected_live_data_setup_steps(
+        target_path=repo_env,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
+    assert payload["live_data_setup_summary"][
+        "next_operator_action"
+    ] == expected_next_operator_action(
         target_path=repo_env,
         configured_provider_families=["market", "macro", "news"],
         missing_provider_families=[],

@@ -275,6 +275,12 @@ def get_live_data_api_key_status() -> dict[str, Any]:
     provider_setup_actions = _live_data_provider_setup_actions_from_providers(
         providers
     )
+    live_data_setup_steps = _live_data_setup_steps(
+        dotenv_file_status=dotenv_file_status,
+        provider_family_summary=provider_family_summary,
+        one_shot_smoke_command=one_shot_smoke_command,
+        ready_to_run_live_smoke=not missing,
+    )
     return {
         "schema_version": "live_data_api_key_status.v1",
         "status": "ready" if not missing else "blocked",
@@ -289,9 +295,11 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "one_shot_smoke_command": one_shot_smoke_command,
         "dotenv_template": _live_data_dotenv_template(),
         "dotenv_file_status": dotenv_file_status,
-        "live_data_setup_steps": _live_data_setup_steps(
+        "live_data_setup_steps": live_data_setup_steps,
+        "next_operator_action": _live_data_next_operator_action(
             dotenv_file_status=dotenv_file_status,
             provider_family_summary=provider_family_summary,
+            live_data_setup_steps=live_data_setup_steps,
             one_shot_smoke_command=one_shot_smoke_command,
             ready_to_run_live_smoke=not missing,
         ),
@@ -1554,6 +1562,12 @@ def _live_data_setup_summary(
     )
     dotenv_file_status = _live_data_dotenv_file_status()
     one_shot_smoke_command = api_key_status.get("one_shot_smoke_command")
+    live_data_setup_steps = _live_data_setup_steps(
+        dotenv_file_status=dotenv_file_status,
+        provider_family_summary=provider_family_summary,
+        one_shot_smoke_command=one_shot_smoke_command,
+        ready_to_run_live_smoke=ready_to_run_live_smoke,
+    )
     return {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready" if ready_to_run_live_smoke else "blocked",
@@ -1574,9 +1588,11 @@ def _live_data_setup_summary(
         "provider_route_summary": route_summary,
         "dotenv_template": _live_data_dotenv_template(),
         "dotenv_file_status": dotenv_file_status,
-        "live_data_setup_steps": _live_data_setup_steps(
+        "live_data_setup_steps": live_data_setup_steps,
+        "next_operator_action": _live_data_next_operator_action(
             dotenv_file_status=dotenv_file_status,
             provider_family_summary=provider_family_summary,
+            live_data_setup_steps=live_data_setup_steps,
             one_shot_smoke_command=one_shot_smoke_command,
             ready_to_run_live_smoke=ready_to_run_live_smoke,
         ),
@@ -1901,6 +1917,72 @@ def _live_data_setup_steps(
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
+    }
+
+
+def _live_data_next_operator_action(
+    *,
+    dotenv_file_status: dict[str, Any],
+    provider_family_summary: dict[str, Any],
+    live_data_setup_steps: dict[str, Any],
+    one_shot_smoke_command: Any,
+    ready_to_run_live_smoke: bool,
+) -> dict[str, Any]:
+    next_step = str(live_data_setup_steps.get("next_step") or "")
+    copy_command = _optional_mapping(dotenv_file_status.get("copy_command")) or {}
+    smoke_command = _optional_mapping(one_shot_smoke_command) or {}
+    base = {
+        "schema_version": "live_data_next_operator_action.v1",
+        "name": next_step,
+        "dotenv_target_path": ".env",
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    if next_step == "restore_env_example":
+        return {
+            **base,
+            "status": "blocked",
+            "reason": "missing_env_example_and_env",
+            "required_file": ".env.example",
+            "secret_input_required": False,
+        }
+    if next_step == "prepare_dotenv":
+        return {
+            **base,
+            "status": "pending",
+            "command": copy_command.get("command"),
+            "source_path": copy_command.get("source_path"),
+            "target_path": copy_command.get("target_path"),
+            "next_after_action": "fill_live_data_api_keys",
+            "secret_input_required": False,
+            "mutates_local_state": True,
+        }
+    if ready_to_run_live_smoke:
+        return {
+            **base,
+            "name": "run_api_key_pipeline_smoke",
+            "status": "ready",
+            "command": smoke_command.get("command"),
+            "network_call": bool(smoke_command.get("network_call")),
+            "network_call_policy": smoke_command.get("network_call_policy"),
+            "secret_input_required": False,
+        }
+    return {
+        **base,
+        "name": "fill_live_data_api_keys",
+        "status": "pending",
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "configured_provider_families": provider_family_summary.get(
+            "configured_provider_families",
+            [],
+        ),
+        "missing_provider_families": provider_family_summary.get(
+            "missing_provider_families",
+            [],
+        ),
+        "next_after_action": "run_api_key_pipeline_smoke",
+        "secret_input_required": True,
     }
 
 
