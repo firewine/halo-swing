@@ -448,7 +448,8 @@ API keys; it combines live-data readiness, provider smoke, signal workflow smoke
 and recording smoke while still avoiding Hermes runtime starts, Telegram sends,
 order submissions, retained state, and secret returns. The pipeline payload also
 includes top-level `next_operator_action`, `setup_status_summary`,
-`api_key_requirements_summary`, `api_key_command_summary`,
+`api_key_next_action_summary`, `api_key_requirements_summary`,
+`api_key_command_summary`,
 `api_key_operator_checklist`, `live_data_setup_summary`, and a provider route
 summary, then fails the route readiness check until all supported live-data
 provider keys are configured. The top-level `readiness_summary` mirrors
@@ -460,6 +461,13 @@ The checklist includes `ready`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
 `next_blocking_action` so setup progress, the first local setup blocker, and
 its command or key guidance are visible without reading every step. The
+top-level `api_key_next_action_summary`
+(`api_key_next_action_summary.v1`) mirrors the checklist `status`,
+`current_step`, `ready`, blocking counts, provider recovery counts, and compact
+`next_action_name`, `next_action_command`, `next_action_is_recovery`,
+`next_action_network_call`, and `next_action_mutates_local_state` fields so the
+single next setup or recovery command is visible without reading nested
+payloads. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

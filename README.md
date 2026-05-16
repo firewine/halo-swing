@@ -270,13 +270,17 @@ For a single post-setup check after filling API keys, use
 `run_api_key_pipeline_smoke`; it combines readiness, provider live data, signal
 workflow, and recording smoke checks. Its payload includes
 top-level `next_operator_action`, `setup_status_summary`,
-`api_key_requirements_summary`, `api_key_command_summary`,
+`api_key_next_action_summary`, `api_key_requirements_summary`,
+`api_key_command_summary`,
 `api_key_operator_checklist`, `live_data_setup_summary`, and the same provider
 route summary so the one-shot smoke records API-key readiness, required env keys
 and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
-provider family counts, API-key setup status inside `readiness_summary`, the
-next local action mirrored inside `readiness_summary`, the first no-secret
+the compact `api_key_next_action_summary.v1` with `next_action_name`,
+`next_action_command`, `next_action_is_recovery`,
+`next_action_network_call`, and `next_action_mutates_local_state`, provider
+family counts, API-key setup status inside `readiness_summary`, the next local
+action mirrored inside `readiness_summary`, the first no-secret
 `next_provider_smoke` command in the top-level command summary and checklist
 when a provider smoke is ready, the same no-secret `next_provider_smoke` object
 and command name in `setup_status_summary`, and which provider factory route was

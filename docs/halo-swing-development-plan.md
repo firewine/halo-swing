@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.725 API Key Pipeline Next Action Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`는 `next_operator_action`,
+`readiness_summary`, `api_key_operator_checklist`에 다음 작업 정보를
+노출하지만, 사용자가 API 키만 넣고 one-shot smoke 결과를 볼 때는 어떤 필드가
+최종 next action인지 빠르게 파악하기 어렵다. 이번 slice는 top-level
+`api_key_next_action_summary`를 추가해 setup, provider smoke, provider
+recovery 경로 모두에서 같은 다음 action 이름과 실행 command를 한 곳에서
+확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_next_action_summary using schema api_key_next_action_summary.v1
+  - mirror api_key_operator_checklist status/current_step/ready/blocking counts/provider recovery counts
+  - expose next_action_name, next_action_command, next_action_is_recovery, next_action_network_call, and next_action_mutates_local_state without secret values
+  - preserve existing next_operator_action and readiness_summary behavior
+  - document the compact summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_next_action_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 4 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with api_key_next_action_summary pointing to recover_failed_providers without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.724 API Key Pipeline Recovery Next Action Gate Record - 2026-05-17
 
 ### A. 목적

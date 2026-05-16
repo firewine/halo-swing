@@ -2409,6 +2409,27 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["readiness_summary"]["next_operator_action_name"]
         == "recover_failed_providers"
     )
+    assert payload["api_key_next_action_summary"] == {
+        "schema_version": "api_key_next_action_summary.v1",
+        "status": "conflict",
+        "current_step": "recover_failed_providers",
+        "ready": False,
+        "next_action_name": "recover_failed_providers",
+        "next_action_status": "pending",
+        "next_action_command": payload["provider_recovery_smokes"][0]["command"],
+        "next_action_is_recovery": True,
+        "next_action_network_call": True,
+        "next_action_mutates_local_state": False,
+        "provider_recovery_status": "conflict",
+        "provider_recovery_required": True,
+        "provider_recovery_item_count": 3,
+        "next_blocking_step": "recover_failed_providers",
+        "blocking_step_count": 1,
+        "ready_step_count": 4,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -3469,6 +3490,29 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["next_operator_action"] == fake_next_operator_action
+    assert payload["api_key_next_action_summary"] == {
+        "schema_version": "api_key_next_action_summary.v1",
+        "status": "ready",
+        "current_step": "run_provider_smokes",
+        "ready": True,
+        "next_action_name": "run_provider_smokes",
+        "next_action_status": "ready",
+        "next_action_command": fake_next_operator_action["next_provider_smoke"][
+            "command"
+        ],
+        "next_action_is_recovery": False,
+        "next_action_network_call": True,
+        "next_action_mutates_local_state": False,
+        "provider_recovery_status": "ok",
+        "provider_recovery_required": False,
+        "provider_recovery_item_count": 0,
+        "next_blocking_step": None,
+        "blocking_step_count": 0,
+        "ready_step_count": 4,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["setup_status_summary"] == {
         "schema_version": "api_key_pipeline_setup_status_summary.v1",
         "status": "ready",
@@ -3761,6 +3805,27 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["readiness_summary"]["next_operator_action_name"] == (
         payload["live_data_setup_summary"]["next_operator_action"]["name"]
     )
+    assert payload["api_key_next_action_summary"] == {
+        "schema_version": "api_key_next_action_summary.v1",
+        "status": "blocked",
+        "current_step": "prepare_dotenv",
+        "ready": False,
+        "next_action_name": "prepare_dotenv",
+        "next_action_status": "pending",
+        "next_action_command": "cp .env.example .env",
+        "next_action_is_recovery": False,
+        "next_action_network_call": False,
+        "next_action_mutates_local_state": True,
+        "provider_recovery_status": "ok",
+        "provider_recovery_required": False,
+        "provider_recovery_item_count": 0,
+        "next_blocking_step": "prepare_dotenv",
+        "blocking_step_count": 4,
+        "ready_step_count": 0,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"
