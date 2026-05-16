@@ -1702,6 +1702,7 @@ def _api_key_pipeline_api_key_command_summary(
         for provider_smoke in provider_smoke_rows
         if isinstance(provider_smoke, dict)
     ]
+    next_provider_smoke = _next_ready_provider_smoke(provider_smokes)
     next_smoke_command = _optional_mapping(
         live_data_setup_summary.get("next_smoke_command")
     ) or {}
@@ -1727,6 +1728,12 @@ def _api_key_pipeline_api_key_command_summary(
                 "secret_values_returned"
             ),
         },
+        "next_provider_smoke": next_provider_smoke,
+        "next_provider_smoke_command_name": next_provider_smoke.get(
+            "smoke_command_name"
+        )
+        if next_provider_smoke
+        else None,
         "provider_smoke_commands": provider_smokes,
         "provider_smoke_command_count": len(provider_smokes),
         "network_call": False,
@@ -1750,6 +1757,9 @@ def _api_key_pipeline_operator_checklist(
     provider_smoke_commands = api_key_command_summary.get("provider_smoke_commands")
     provider_smoke_rows = (
         provider_smoke_commands if isinstance(provider_smoke_commands, list) else []
+    )
+    next_provider_smoke = _optional_mapping(
+        api_key_command_summary.get("next_provider_smoke")
     )
     one_shot_pipeline_smoke = _optional_mapping(
         api_key_command_summary.get("one_shot_pipeline_smoke")
@@ -1791,6 +1801,12 @@ def _api_key_pipeline_operator_checklist(
             "status": "ready" if ready_to_run_live_smoke else "blocked",
             "provider_smoke_commands": provider_smoke_rows,
             "provider_smoke_command_count": len(provider_smoke_rows),
+            "next_provider_smoke": next_provider_smoke,
+            "next_provider_smoke_command_name": next_provider_smoke.get(
+                "smoke_command_name"
+            )
+            if next_provider_smoke
+            else None,
             "network_call": True,
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,

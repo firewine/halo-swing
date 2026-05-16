@@ -695,6 +695,14 @@ def expected_api_key_command_summary(
         }
         for provider_smoke in provider_smoke_plan["provider_smokes"]
     ]
+    next_provider_smoke = next(
+        (
+            provider_smoke
+            for provider_smoke in provider_smoke_commands
+            if provider_smoke["status"] == "ready"
+        ),
+        None,
+    )
     return {
         "schema_version": "api_key_pipeline_api_key_command_summary.v1",
         "status": status,
@@ -714,6 +722,12 @@ def expected_api_key_command_summary(
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        "next_provider_smoke": next_provider_smoke,
+        "next_provider_smoke_command_name": (
+            next_provider_smoke["smoke_command_name"]
+            if next_provider_smoke
+            else None
+        ),
         "provider_smoke_commands": provider_smoke_commands,
         "provider_smoke_command_count": 3,
         "network_call": False,
@@ -776,6 +790,10 @@ def expected_api_key_operator_checklist(
             "status": "ready" if ready_to_run_live_smoke else "blocked",
             "provider_smoke_commands": command_summary["provider_smoke_commands"],
             "provider_smoke_command_count": 3,
+            "next_provider_smoke": command_summary["next_provider_smoke"],
+            "next_provider_smoke_command_name": command_summary[
+                "next_provider_smoke_command_name"
+            ],
             "network_call": True,
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,
