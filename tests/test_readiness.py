@@ -31,6 +31,7 @@ READINESS_ENV_KEYS = (
     "HALO_SWING_BINANCE_TESTNET",
     "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
     "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+    "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED",
     "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED",
     "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED",
     "HALO_SWING_MARKET_DATA_MODE",
@@ -1892,6 +1893,99 @@ def test_live_order_submission_rejects_env_trade_only_attestation_before_credent
             "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED "
             "must be 'true' or 'false'"
         ),
+    ):
+        get_integration_readiness(
+            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+        )
+
+
+def test_live_order_submission_accepts_env_live_order_approval(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_LIVE_ORDER_APPROVED", " true ")
+    monkeypatch.setenv("HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED", "true")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        binance_credentials_path=str(credentials_path),
+        btc_risk_settings_path=str(tmp_path / "risk_settings.json"),
+    )
+    live_order_gate = payload["gates"]["live_order_submission"]
+    serialized = json.dumps(payload)
+
+    assert live_order_gate["status"] == "ready"
+    assert live_order_gate["missing"] == []
+    assert live_order_gate["evidence"]["live_order_approved"] is True
+    assert live_order_gate["evidence"]["order_submission"] is False
+    assert live_order_gate["evidence"]["network_call"] is False
+    assert "abcde12345key" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+
+
+def test_live_order_submission_explicit_live_order_approval_overrides_env(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    credentials_path = tmp_path / "credentials.enc.json"
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    monkeypatch.setenv("HALO_SWING_BINANCE_ENABLE_LIVE_TRADING", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_LIVE_ORDER_APPROVED", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED", "true")
+    monkeypatch.setenv("HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED", "true")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        binance_credentials_path=str(credentials_path),
+        live_order_approved=False,
+        btc_risk_settings_path=str(tmp_path / "risk_settings.json"),
+    )
+    live_order_gate = payload["gates"]["live_order_submission"]
+
+    assert live_order_gate["status"] == "blocked"
+    assert "explicit_live_order_approval" in live_order_gate["missing"]
+    assert live_order_gate["evidence"]["live_order_approved"] is False
+    assert live_order_gate["evidence"]["order_submission"] is False
+
+
+def test_live_order_submission_rejects_env_live_order_approval_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_BINANCE_LIVE_ORDER_APPROVED", "yes")
+    get_settings.cache_clear()
+
+    def fail_credential_status(*_args, **_kwargs):
+        raise AssertionError(
+            "credential status must not run before live-order approval env validation"
+        )
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credential_status,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="HALO_SWING_BINANCE_LIVE_ORDER_APPROVED must be 'true' or 'false'",
     ):
         get_integration_readiness(
             binance_credentials_path=str(tmp_path / "missing.enc.json"),

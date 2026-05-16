@@ -177,6 +177,11 @@ account smoke calls still require the passphrase at call time.
 checking in the Binance console that the key is COIN-M trade-only with
 withdraw/transfer permissions disabled. This is readiness evidence only and
 does not enable order submission.
+`HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true` may be set only after the
+live-order approval decision has been made; it is also readiness evidence only.
+`execute_btc_order` still requires `CONFIRM_BTC_BINANCE_COINM_ORDER`, the live
+trading env flag, encrypted credentials, manual passphrase input, and passing
+risk checks.
 Report tools include an offline `delivery_preview` payload for Hermes and
 Telegram. The preview contains Telegram message chunks and guard checks, but it
 does not send messages or require credentials. Telegram previews expose the

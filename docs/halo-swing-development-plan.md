@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.643 Binance Live-Order Approval Env Flag Gate Record - 2026-05-16
+
+### A. 목적
+
+Live order submission readiness의 explicit approval은 실제 주문 제출 함수의
+confirmation guard와 별개인 readiness evidence다. 기존에는 public input으로만
+전달할 수 있었기 때문에 `.env` 중심 로컬 설정 재현성이 부족했다. 이번 slice는
+`HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true`를 local env/dotenv에서 읽되,
+`execute_btc_order`의 `CONFIRM_BTC_BINANCE_COINM_ORDER` 확인 문자열, live trading
+env flag, credential/passphrase, risk guard 요구는 그대로 유지한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness accepts HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true from exported env or local dotenv when the public input is omitted
+  - explicit live_order_approved input still overrides the environment flag
+  - invalid HALO_SWING_BINANCE_LIVE_ORDER_APPROVED values are rejected before Binance credential status reads
+  - .env.example includes a blank HALO_SWING_BINANCE_LIVE_ORDER_APPROVED placeholder
+  - README and DevOps setup docs describe the non-secret live-order approval readiness flag and preserve execute_btc_order confirmation requirements
+  - tests lock env-backed live-order approval readiness without exposing secrets or implying order submission
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - order submission
+  - Binance network call
+  - passphrase persistence
+  - real secret values
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q -> 64 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_live_order_approval_env.enc.json"}' --no-audit -> passed, safe credential status returned without secret values
+  - HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_credentials_path":"/private/tmp/halo_swing_binance_live_order_approval_env.enc.json"}' --no-audit -> passed, live-order readiness ready while order_submission=false and confirmation requirement remains explicit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 728 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.642 Binance Trade-Only Attestation Env Flag Gate Record - 2026-05-16
 
 ### A. 목적

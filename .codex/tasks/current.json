@@ -1,9 +1,9 @@
 {
-  "gate_id": "BINANCE_TRADE_ONLY_ATTESTATION_ENV_FLAG_GATE",
+  "gate_id": "BINANCE_LIVE_ORDER_APPROVAL_ENV_FLAG_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.642",
-  "next_atomic_step": "let get_integration_readiness read Binance trade-only no-withdraw attestation from a non-secret dotenv/env flag",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.643",
+  "next_atomic_step": "let get_integration_readiness read explicit live-order approval from a non-secret dotenv/env flag without enabling order submission",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     ".env.example",
@@ -21,7 +21,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.642",
+    "docs/halo-swing-development-plan.md#3.643",
     "src/halo_swing_mcp/tools/readiness.py",
     "src/halo_swing_mcp/server.py",
     ".env.example",
@@ -58,15 +58,15 @@
     "read_only": true
   },
   "done_means": [
-    "get_integration_readiness accepts HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true from exported env or local dotenv when the public input is omitted",
-    "explicit binance_trade_only_permission_attested input still overrides the environment flag",
-    "invalid HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED values are rejected before Binance credential status reads",
-    ".env.example includes a blank HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED placeholder",
-    "README and DevOps setup docs describe the non-secret Binance trade-only/no-withdraw attestation flag without enabling order submission",
-    "tests lock env-backed Binance live-order attestation readiness without exposing secrets",
+    "get_integration_readiness accepts HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true from exported env or local dotenv when the public input is omitted",
+    "explicit live_order_approved input still overrides the environment flag",
+    "invalid HALO_SWING_BINANCE_LIVE_ORDER_APPROVED values are rejected before Binance credential status reads",
+    ".env.example includes a blank HALO_SWING_BINANCE_LIVE_ORDER_APPROVED placeholder",
+    "README and DevOps setup docs describe the non-secret live-order approval readiness flag and preserve execute_btc_order confirmation requirements",
+    "tests lock env-backed live-order approval readiness without exposing secrets or implying order submission",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified Binance trade-only attestation env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified live-order approval env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

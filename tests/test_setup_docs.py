@@ -62,3 +62,13 @@ def test_setup_docs_describe_binance_trade_only_attestation_env_flag() -> None:
         assert "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true" in document
         assert "trade-only" in document
         assert "does not enable order submission" in document
+
+
+def test_setup_docs_describe_binance_live_order_approval_env_flag() -> None:
+    text = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+
+    for document in (text, guide):
+        assert "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true" in document
+        assert "readiness evidence only" in document
+        assert "CONFIRM_BTC_BINANCE_COINM_ORDER" in document

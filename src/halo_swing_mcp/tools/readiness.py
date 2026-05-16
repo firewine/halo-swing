@@ -20,6 +20,7 @@ BINANCE_PASSPHRASE_CONFIRMED_ENV = "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED"
 BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV = (
     "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED"
 )
+BINANCE_LIVE_ORDER_APPROVED_ENV = "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED"
 
 
 def get_integration_readiness(
@@ -34,7 +35,7 @@ def get_integration_readiness(
     binance_credentials_path: str | None = None,
     binance_passphrase_confirmed: bool | None = None,
     binance_trade_only_permission_attested: bool | None = None,
-    live_order_approved: bool = False,
+    live_order_approved: bool | None = None,
     btc_risk_settings_path: str | None = None,
     market_data_source_configured: bool | None = None,
     macro_source_configured: bool | None = None,
@@ -80,9 +81,8 @@ def get_integration_readiness(
             binance_trade_only_permission_attested,
         )
     )
-    normalized_live_order_approved = _normalize_boolean(
+    normalized_live_order_approved = _resolve_binance_live_order_approved(
         live_order_approved,
-        "live_order_approved",
     )
     normalized_btc_risk_settings_path = _normalize_optional_path(
         btc_risk_settings_path,
@@ -230,6 +230,15 @@ def _resolve_binance_trade_only_permission_attested(value: bool | None) -> bool:
         env_value,
         BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV,
     )
+
+
+def _resolve_binance_live_order_approved(value: bool | None) -> bool:
+    if value is not None:
+        return _normalize_boolean(value, "live_order_approved")
+    env_value = get_config_value(BINANCE_LIVE_ORDER_APPROVED_ENV)
+    if env_value is None or not env_value.strip():
+        return False
+    return _normalize_env_boolean(env_value, BINANCE_LIVE_ORDER_APPROVED_ENV)
 
 
 def _telegram_readiness(

@@ -414,6 +414,17 @@ live orders still require explicit live-order approval, the live trading env
 flag, valid credentials, manual passphrase input, passing risk checks, and the
 confirmation string.
 
+If and only if you have made the live-order approval decision, record that
+non-secret readiness approval in `.env` as readiness evidence only:
+
+```bash
+HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true
+```
+
+This still does not submit orders. `execute_btc_order` continues to require the
+confirmation string `CONFIRM_BTC_BINANCE_COINM_ORDER`, the live trading env
+flag, encrypted credentials, manual passphrase input, and passing risk checks.
+
 BTC COIN-M trading admin:
 
 ```bash
