@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PIPELINE_CHECK_SUMMARY_GATE",
+  "gate_id": "API_KEY_PIPELINE_FAILURE_SUMMARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.727",
-  "next_atomic_step": "add a compact top-level API-key pipeline check summary for failed readiness and smoke checks",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.728",
+  "next_atomic_step": "add a compact top-level API-key pipeline failure summary that correlates failed stages, failed checks, and the next operator action",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.726",
+    "docs/halo-swing-development-plan.md#3.727",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,18 +56,17 @@
     "read_only": true
   },
   "done_means": [
-    "run_api_key_pipeline_smoke returns top-level api_key_pipeline_check_summary using schema api_key_pipeline_check_summary.v1",
-    "api_key_pipeline_check_summary exposes status, check_count, passed_check_count, failed_check_count, failed_check_keys, tools_with_failures, and first_failed_check without secret values",
-    "failed_checks rows include tool, name, key, expected, actual, and passed false",
-    "tool_failure_counts groups failed check counts by tool",
+    "run_api_key_pipeline_smoke returns top-level api_key_pipeline_failure_summary using schema api_key_pipeline_failure_summary.v1",
+    "api_key_pipeline_failure_summary exposes status, has_failures, failure_category, failed_stage_names, failed_check_keys, and tools_with_failures without secret values",
+    "api_key_pipeline_failure_summary mirrors first_failed_stage_name, first_failed_check_key, next_action_name, next_action_command, next_action_is_recovery, provider_recovery_required, and provider_recovery_item_count",
     "ok, missing-key, provider-recovery, and sub-smoke exception paths are covered by focused tests",
-    "fake-key API-key pipeline CLI demonstrates api_key_pipeline_check_summary with failed checks without secrets",
-    "README and DevOps setup guide document api_key_pipeline_check_summary",
-    "setup docs tests assert api_key_pipeline_check_summary guidance",
+    "fake-key API-key pipeline CLI demonstrates api_key_pipeline_failure_summary with provider_recovery failure category without secrets",
+    "README and DevOps setup guide document api_key_pipeline_failure_summary",
+    "setup docs tests assert api_key_pipeline_failure_summary guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key pipeline check summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key pipeline failure summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

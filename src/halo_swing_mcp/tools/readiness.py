@@ -883,6 +883,16 @@ def run_api_key_pipeline_smoke(
         live_data_setup_summary=live_data_setup_summary,
         api_key_operator_checklist=api_key_operator_checklist,
     )
+    api_key_next_action_summary = _api_key_pipeline_next_action_summary(
+        api_key_operator_checklist=api_key_operator_checklist,
+        next_operator_action=next_operator_action,
+    )
+    api_key_pipeline_stage_summary = _api_key_pipeline_stage_summary(
+        live_data_smoke_summary=live_data_smoke_summary,
+        signal_workflow_smoke_summary=signal_workflow_smoke_summary,
+        recording_smoke_summary=recording_smoke_summary,
+    )
+    api_key_pipeline_check_summary = _api_key_pipeline_check_summary(checks)
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -908,22 +918,18 @@ def run_api_key_pipeline_smoke(
         ),
         "live_data_setup_summary": live_data_setup_summary,
         "next_operator_action": next_operator_action,
-        "api_key_next_action_summary": _api_key_pipeline_next_action_summary(
-            api_key_operator_checklist=api_key_operator_checklist,
-            next_operator_action=next_operator_action,
-        ),
+        "api_key_next_action_summary": api_key_next_action_summary,
         "setup_status_summary": setup_status_summary,
         "api_key_requirements_summary": api_key_requirements_summary,
         "api_key_command_summary": api_key_command_summary,
         "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
-        "api_key_pipeline_stage_summary": _api_key_pipeline_stage_summary(
-            live_data_smoke_summary=live_data_smoke_summary,
-            signal_workflow_smoke_summary=signal_workflow_smoke_summary,
-            recording_smoke_summary=recording_smoke_summary,
-        ),
-        "api_key_pipeline_check_summary": _api_key_pipeline_check_summary(
-            checks
+        "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
+        "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
+        "api_key_pipeline_failure_summary": _api_key_pipeline_failure_summary(
+            api_key_next_action_summary=api_key_next_action_summary,
+            api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
+            api_key_pipeline_check_summary=api_key_pipeline_check_summary,
         ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
@@ -1948,6 +1954,83 @@ def _api_key_pipeline_check_row(check: dict[str, Any]) -> dict[str, Any]:
         "actual": check.get("actual"),
         "secret_values_returned": False,
     }
+
+
+def _api_key_pipeline_failure_summary(
+    *,
+    api_key_next_action_summary: dict[str, Any],
+    api_key_pipeline_stage_summary: dict[str, Any],
+    api_key_pipeline_check_summary: dict[str, Any],
+) -> dict[str, Any]:
+    failed_stage_names = _string_list(
+        api_key_pipeline_stage_summary.get("failed_stage_names")
+    )
+    failed_check_keys = _string_list(
+        api_key_pipeline_check_summary.get("failed_check_keys")
+    )
+    tools_with_failures = _string_list(
+        api_key_pipeline_check_summary.get("tools_with_failures")
+    )
+    has_failures = bool(failed_stage_names or failed_check_keys)
+    first_failed_stage = _optional_mapping(
+        api_key_pipeline_stage_summary.get("first_failed_stage")
+    ) or {}
+    first_failed_check = _optional_mapping(
+        api_key_pipeline_check_summary.get("first_failed_check")
+    ) or {}
+    provider_recovery_required = (
+        api_key_next_action_summary.get("provider_recovery_required") is True
+    )
+    next_action_name = api_key_next_action_summary.get("next_action_name")
+    return {
+        "schema_version": "api_key_pipeline_failure_summary.v1",
+        "status": "conflict" if has_failures else "ok",
+        "has_failures": has_failures,
+        "failure_category": _api_key_pipeline_failure_category(
+            has_failures=has_failures,
+            provider_recovery_required=provider_recovery_required,
+            next_action_name=next_action_name,
+        ),
+        "failed_stage_names": failed_stage_names,
+        "failed_check_keys": failed_check_keys,
+        "tools_with_failures": tools_with_failures,
+        "first_failed_stage_name": first_failed_stage.get("stage_name"),
+        "first_failed_check_key": first_failed_check.get("key"),
+        "next_action_name": next_action_name,
+        "next_action_command": api_key_next_action_summary.get(
+            "next_action_command"
+        ),
+        "next_action_is_recovery": api_key_next_action_summary.get(
+            "next_action_is_recovery"
+        )
+        is True,
+        "provider_recovery_required": provider_recovery_required,
+        "provider_recovery_item_count": api_key_next_action_summary.get(
+            "provider_recovery_item_count"
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_failure_category(
+    *,
+    has_failures: bool,
+    provider_recovery_required: bool,
+    next_action_name: Any,
+) -> str:
+    if not has_failures:
+        return "none"
+    if provider_recovery_required:
+        return "provider_recovery"
+    if next_action_name in {
+        "restore_env_example",
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+    }:
+        return "setup"
+    return "smoke_failure"
 
 
 def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:

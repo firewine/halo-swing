@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.728 API Key Pipeline Failure Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_next_action_summary`, `api_key_pipeline_stage_summary`,
+`api_key_pipeline_check_summary`가 각각 다음 action, 실패 stage, 실패 check를
+보여주지만 사용자는 여전히 세 요약을 조합해야 한다. 이번 slice는 top-level
+`api_key_pipeline_failure_summary`를 추가해 one-shot API-key smoke 결과에서
+실패 여부, 실패 유형, 실패 stage/check, 다음 실행 command를 한 곳에서 확인하게
+한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_pipeline_failure_summary using schema api_key_pipeline_failure_summary.v1
+  - expose status, has_failures, failure_category, failed_stage_names, failed_check_keys, and tools_with_failures without secret values
+  - mirror first_failed_stage_name, first_failed_check_key, next_action_name, next_action_command, next_action_is_recovery, provider_recovery_required, and provider_recovery_item_count
+  - document the compact failure summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_pipeline_failure_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 5 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with api_key_pipeline_failure_summary reporting provider_recovery next action without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.727 API Key Pipeline Check Summary Gate Record - 2026-05-17
 
 ### A. 목적

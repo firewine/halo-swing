@@ -484,6 +484,13 @@ with `check_count`, `passed_check_count`, `failed_check_count`,
 `failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
 `first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
 `name`, `key`, `expected`, `actual`, and `passed=false`. The
+top-level `api_key_pipeline_failure_summary`
+(`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
+operator-facing row with `status`, `has_failures`, `failure_category`,
+`failed_stage_names`, `failed_check_keys`, `tools_with_failures`,
+`first_failed_stage_name`, `first_failed_check_key`, `next_action_name`,
+`next_action_command`, `next_action_is_recovery`,
+`provider_recovery_required`, and `provider_recovery_item_count`. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

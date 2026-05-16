@@ -95,6 +95,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "tool_failure_counts" in guide
     assert "first_failed_check" in guide
     assert "failed_checks" in guide
+    assert "api_key_pipeline_failure_summary" in guide
+    assert "api_key_pipeline_failure_summary.v1" in guide
+    assert "has_failures" in guide
+    assert "failure_category" in guide
+    assert "first_failed_stage_name" in guide
+    assert "first_failed_check_key" in guide
     assert "readiness_summary.next_operator_action" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
