@@ -2064,6 +2064,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         macro_configured_env_keys=["FRED_API_KEY"],
         news_configured_env_keys=["NEWS_API_KEY"],
     )
+    fake_provider_smoke_plan = expected_provider_smoke_plan(
+        market_configured_env_keys=["POLYGON_API_KEY"],
+        macro_configured_env_keys=["FRED_API_KEY"],
+        news_configured_env_keys=["NEWS_API_KEY"],
+        ready_to_run_live_smoke=True,
+    )
     fake_setup_summary = {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready",
@@ -2083,6 +2089,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "secret_values_returned": False,
         },
         "provider_setup_actions": fake_provider_setup_actions,
+        "provider_smoke_plan": fake_provider_smoke_plan,
         "missing": [],
         "selected_provider_classes": [
             "PolygonMarketDataProvider",
@@ -2312,6 +2319,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             == fake_provider_setup_actions
         )
         assert payload[summary_name]["provider_setup_action_count"] == 3
+        assert payload[summary_name]["provider_smoke_plan"] == fake_provider_smoke_plan
+        assert payload[summary_name]["provider_smoke_count"] == 3
+        assert payload[summary_name]["ready_provider_smoke_count"] == 3
+        assert payload[summary_name]["blocked_provider_smoke_count"] == 0
         assert (
             payload[summary_name]["next_smoke_command_name"]
             == "run_api_key_pipeline_smoke"
@@ -2368,6 +2379,12 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["live_data_setup_summary"]["provider_setup_actions"]
     )
     assert payload["live_data_smoke_summary"]["provider_setup_action_count"] == 3
+    assert payload["live_data_smoke_summary"]["provider_smoke_plan"] == (
+        payload["live_data_setup_summary"]["provider_smoke_plan"]
+    )
+    assert payload["live_data_smoke_summary"]["provider_smoke_count"] == 3
+    assert payload["live_data_smoke_summary"]["ready_provider_smoke_count"] == 0
+    assert payload["live_data_smoke_summary"]["blocked_provider_smoke_count"] == 3
     assert (
         payload["live_data_smoke_summary"]["next_smoke_command_name"]
         == "get_live_data_api_key_status"
@@ -2449,6 +2466,18 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["signal_workflow_smoke_summary"]["provider_setup_action_count"]
         == 3
     )
+    assert payload["signal_workflow_smoke_summary"]["provider_smoke_plan"] == (
+        payload["live_data_setup_summary"]["provider_smoke_plan"]
+    )
+    assert payload["signal_workflow_smoke_summary"]["provider_smoke_count"] == 3
+    assert (
+        payload["signal_workflow_smoke_summary"]["ready_provider_smoke_count"]
+        == 0
+    )
+    assert (
+        payload["signal_workflow_smoke_summary"]["blocked_provider_smoke_count"]
+        == 3
+    )
     assert (
         payload["signal_workflow_smoke_summary"][
             "configured_provider_family_count"
@@ -2481,6 +2510,12 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         payload["live_data_setup_summary"]["provider_setup_actions"]
     )
     assert payload["recording_smoke_summary"]["provider_setup_action_count"] == 3
+    assert payload["recording_smoke_summary"]["provider_smoke_plan"] == (
+        payload["live_data_setup_summary"]["provider_smoke_plan"]
+    )
+    assert payload["recording_smoke_summary"]["provider_smoke_count"] == 3
+    assert payload["recording_smoke_summary"]["ready_provider_smoke_count"] == 0
+    assert payload["recording_smoke_summary"]["blocked_provider_smoke_count"] == 3
     assert payload["recording_smoke_summary"]["provider_family_summary"] == {
         "required_provider_families": ["market", "macro", "news"],
         "configured_provider_families": [],

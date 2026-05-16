@@ -1471,6 +1471,9 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
     provider_setup_actions = _optional_mapping(
         live_data_setup_summary.get("provider_setup_actions")
     ) or {}
+    provider_smoke_plan = _optional_mapping(
+        live_data_setup_summary.get("provider_smoke_plan")
+    ) or {}
     return {
         "schema_version": smoke.get("schema_version"),
         "status": smoke.get("status"),
@@ -1500,6 +1503,14 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "setup_step_count": len(setup_steps) if isinstance(setup_steps, list) else 0,
         "provider_setup_actions": provider_setup_actions,
         "provider_setup_action_count": len(provider_setup_actions),
+        "provider_smoke_plan": provider_smoke_plan,
+        "provider_smoke_count": provider_smoke_plan.get("provider_smoke_count"),
+        "ready_provider_smoke_count": provider_smoke_plan.get(
+            "ready_provider_smoke_count"
+        ),
+        "blocked_provider_smoke_count": provider_smoke_plan.get(
+            "blocked_provider_smoke_count"
+        ),
         "next_smoke_command_name": next_smoke_command.get("name"),
     }
 
