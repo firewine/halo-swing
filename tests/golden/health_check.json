@@ -23,6 +23,7 @@
     "get_integration_setup_checklist",
     "validate_live_data_smoke_result",
     "run_live_data_smoke",
+    "run_integration_smoke",
     "get_audit_log",
     "get_audit_summary",
     "get_runtime_status",

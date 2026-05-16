@@ -559,6 +559,21 @@ def run_live_data_smoke(
 
 
 @mcp.tool()
+def run_integration_smoke(
+    symbols: list[str] | None = None,
+    topic: str = "macro",
+) -> dict[str, Any]:
+    """Run readiness and live data smoke checks."""
+
+    payload = {"symbols": symbols, "topic": topic}
+    return _audited_tool_call(
+        "run_integration_smoke",
+        payload,
+        call_tool("run_integration_smoke", payload),
+    )
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 

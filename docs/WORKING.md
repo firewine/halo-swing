@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_SMOKE_RUNNER_VERIFIED
-gate_id: LIVE_DATA_SMOKE_RUNNER_GATE
+status: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_VERIFIED
+gate_id: INTEGRATION_ENVIRONMENT_SMOKE_RUNNER_GATE
 review_tier: S1_small
 
-next_atomic_step: add a one-shot run_live_data_smoke tool that executes market, macro, and news smoke paths and validates their live boundary metadata when API keys are configured
+next_atomic_step: add a run_integration_smoke tool that combines offline integration readiness with the one-shot live data smoke runner without starting Hermes, sending Telegram, submitting orders, or returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -80,23 +80,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_integration_smoke_combines_readiness_and_live_data_smoke tests/test_readiness.py::test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - run_live_data_smoke is registered for MCP and harness use
-  - the runner executes get_market_snapshot, get_macro_snapshot, and get_news_bundle then validates the combined payload with validate_live_data_smoke_result
-  - the runner reports read-only/no-send/no-order/no-secret boundaries and declares network_call according to returned smoke payload contracts
-  - tests prove fake live payloads pass and fixture/replay payloads are flagged without real API keys or live network
-  - health and MVP golden tool manifests include run_live_data_smoke
-  - README and DevOps setup docs describe the one-shot smoke runner after filling API keys
+  - run_integration_smoke is registered for MCP and harness use
+  - the runner returns integration readiness plus run_live_data_smoke output in one payload
+  - the runner keeps hermes_runtime_started=false, telegram_send_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+  - the runner reports network_call only from live data smoke behavior and never mutates local state
+  - tests prove fake live-data smoke can be combined with readiness and fixture defaults remain blocked without side effects
+  - health and MVP golden tool manifests include run_integration_smoke
+  - README and DevOps setup docs describe the one-shot integration smoke command after filling .env
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data smoke runner gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified integration environment smoke runner gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_SMOKE_RUNNER_VERIFIED
+gate_id: LIVE_DATA_SMOKE_RUNNER_GATE
+review_tier: S1_small
+
+next_atomic_step: add a one-shot run_live_data_smoke tool that executes market, macro, and news smoke paths and validates their live boundary metadata when API keys are configured
 ```
 
 Previous completed directive:
@@ -801,13 +813,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.651
-gate_packet: docs/halo-swing-development-plan.md#3.651
+portable_mirror: docs/halo-swing-development-plan.md#3.652
+gate_packet: docs/halo-swing-development-plan.md#3.652
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.651
+  - docs/halo-swing-development-plan.md#3.652
   - src/halo_swing_mcp/harness.py
   - src/halo_swing_mcp/server.py
   - src/halo_swing_mcp/tool_registry.py
@@ -1114,6 +1126,65 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Integration Environment Smoke Runner Gate is verified.
+`run_integration_smoke` is now registered for MCP and harness use. It returns
+offline integration readiness plus `run_live_data_smoke` output in one payload,
+keeps Hermes runtime, Telegram send, order submission, and secret return
+disabled, and reports network calls only from the live data smoke result.
+Focused tests passed with 3 tests, full pytest passed with 742 tests, and ruff
+and health_check passed.
+
+```yaml
+integration_environment_smoke_runner_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+    - tests/test_tool_registry.py
+  implementation:
+    - run_integration_smoke is registered for MCP and harness use
+    - runner returns integration readiness plus run_live_data_smoke output in one payload
+    - runner keeps hermes_runtime_started=false, telegram_send_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+    - runner reports network_call only from live data smoke behavior and never mutates local state
+    - tests prove fake live-data smoke can be combined with readiness and fixture defaults remain blocked without side effects
+    - health and MVP golden tool manifests include run_integration_smoke
+    - README and DevOps setup guide document the one-shot integration smoke command after filling .env
+    - no new live adapter module, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or secret exposure added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_integration_smoke_combines_readiness_and_live_data_smoke tests/test_readiness.py::test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "742 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"all"}' --no-audit
+      result: passed, fixture default returned status blocked with network_call=false, hermes_runtime_started=false, telegram_send_call=false, order_submission=false, and secret_values_returned=false
+```
+
+Previous verification:
 
 Summary: Live Data Smoke Runner Gate is verified. `run_live_data_smoke` is now
 registered for MCP and harness use. It runs `get_market_snapshot`,

@@ -16,6 +16,7 @@ from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    run_integration_smoke,
     run_live_data_smoke,
     validate_live_data_smoke_result,
 )
@@ -343,6 +344,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "get_integration_setup_checklist",
         "validate_live_data_smoke_result",
         "run_live_data_smoke",
+        "run_integration_smoke",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -577,6 +579,83 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["market_snapshot"]["data_mode"] == "fixture"
     assert payload["macro_snapshot"]["data_mode"] == "fixture"
     assert payload["news_bundle"]["data_mode"] == "fixture"
+
+
+def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    def fake_readiness() -> dict[str, Any]:
+        return {
+            "status": "blocked",
+            "gates": {"migration": {"status": "blocked"}},
+            "next_actions": ["migration: provide explicit_MIGRATION_GO"],
+            "live_data_required": False,
+        }
+
+    def fake_live_data_smoke(
+        symbols: list[str] | None = None,
+        topic: str = "macro",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_data_smoke_run.v1",
+            "status": "ok",
+            "input": {"symbols": symbols, "topic": topic},
+            "network_call": True,
+            "live_data_required": True,
+            "send_call": False,
+            "order_submission": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(readiness_tools, "get_integration_readiness", fake_readiness)
+    monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
+
+    payload = run_integration_smoke(symbols=["QQQ"], topic="macro")
+
+    assert payload["schema_version"] == "integration_smoke_run.v1"
+    assert payload["status"] == "blocked"
+    assert payload["readiness_status"] == "blocked"
+    assert payload["live_data_smoke_status"] == "ok"
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["readiness"]["next_actions"] == [
+        "migration: provide explicit_MIGRATION_GO"
+    ]
+    assert payload["live_data_smoke"]["input"] == {
+        "symbols": ["QQQ"],
+        "topic": "macro",
+    }
+
+
+def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_integration_smoke(symbols=["QQQ"], topic="all")
+
+    assert payload["schema_version"] == "integration_smoke_run.v1"
+    assert payload["status"] == "blocked"
+    assert payload["readiness_status"] == "blocked"
+    assert payload["live_data_smoke_status"] == "conflict"
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["readiness"]["gates"]["live_data"]["status"] == "blocked"
+    assert payload["live_data_smoke"]["status"] == "conflict"
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(

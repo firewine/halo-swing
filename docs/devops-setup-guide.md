@@ -335,6 +335,12 @@ one-shot live data smoke runner:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
 ```
 
+one-shot integration environment smoke runner:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+```
+
 This command does not call networks or return secret values. It reports which
 future gates are still blocked for Hermes, Telegram, DB migration/repository,
 Binance testnet read-only smoke, live order submission, and live data adapters.
@@ -349,7 +355,10 @@ the configured keys select live providers. Use
 `validate_live_data_smoke_result` on the collected smoke payloads to verify
 `live_data_required`, `network_call`, live guard checks, and secret-return
 metadata offline. Use `run_live_data_smoke` for the same validation in one
-command after filling the market, macro, and news API keys.
+command after filling the market, macro, and news API keys. Use
+`run_integration_smoke` to combine offline readiness gates and the live data
+smoke result without starting Hermes, sending Telegram messages, submitting
+orders, or returning secrets.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

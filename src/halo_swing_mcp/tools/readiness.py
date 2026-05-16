@@ -307,6 +307,34 @@ def run_live_data_smoke(
     }
 
 
+def run_integration_smoke(
+    symbols: list[str] | None = None,
+    topic: str = "macro",
+) -> dict[str, Any]:
+    """Run environment readiness and live data smoke in one payload."""
+
+    readiness = get_integration_readiness()
+    live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
+    readiness_ready = readiness["status"] == "ready"
+    live_data_smoke_ok = live_data_smoke["status"] == "ok"
+    return {
+        "schema_version": "integration_smoke_run.v1",
+        "status": "ok" if readiness_ready and live_data_smoke_ok else "blocked",
+        "readiness_status": readiness["status"],
+        "live_data_smoke_status": live_data_smoke["status"],
+        "readiness": readiness,
+        "live_data_smoke": live_data_smoke,
+        "network_call": live_data_smoke["network_call"],
+        "live_data_required": live_data_smoke["live_data_required"],
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+        "mutates_local_state": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -455,6 +483,19 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
                 "run_live_data_smoke --input-json "
+                "'{\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_integration_smoke",
+            "purpose": "run readiness plus live data smoke in one payload",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_integration_smoke --input-json "
                 "'{\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
             ),
             "network_call": True,

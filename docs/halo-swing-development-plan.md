@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.652 Integration Environment Smoke Runner Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 `.env`에 API key/config 값을 넣은 뒤 현재 환경이 어디까지 준비됐는지와
+live data smoke가 어떤 상태인지 한 번에 확인할 수 있어야 한다. 이번 slice는
+offline integration readiness와 `run_live_data_smoke` 결과를 한 payload로 묶는
+`run_integration_smoke` tool을 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_integration_smoke is registered for MCP and harness use
+  - the runner returns integration readiness plus run_live_data_smoke output in one payload
+  - the runner keeps hermes_runtime_started=false, telegram_send_call=false, send_call=false, order_submission=false, and secret_values_returned=false
+  - the runner reports network_call only from live data smoke behavior and never mutates local state
+  - tests prove fake live-data smoke can be combined with readiness and fixture defaults remain blocked without side effects
+  - health and MVP golden tool manifests include run_integration_smoke
+  - README and DevOps setup docs describe the one-shot integration smoke command after filling .env
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live adapter module
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - secret value exposure
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_integration_smoke_combines_readiness_and_live_data_smoke tests/test_readiness.py::test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effects tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 742 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"all"}' --no-audit -> passed, fixture default returned status blocked with network_call=false, hermes_runtime_started=false, telegram_send_call=false, order_submission=false, and secret_values_returned=false
+```
+
 ## 3.651 Live Data Smoke Runner Gate Record - 2026-05-16
 
 ### A. 목적
