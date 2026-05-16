@@ -303,40 +303,43 @@ The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
 The live data gate returns `live_data_source_readiness.v1` and tracks market
-OHLCV, macro, and news source/API-key decisions separately. The check may use
+OHLCV, macro, and news API-key readiness separately. The check may use
 non-secret booleans or environment presence, but it does not return key values.
-Market OHLCV live mode is wired behind the provider boundary for Polygon:
+Live data providers auto-select when their supported API-key aliases are
+present. Market OHLCV live data is wired behind the provider boundary for
+Polygon:
 
 ```bash
-export HALO_SWING_MARKET_DATA_MODE=live
 export POLYGON_API_KEY=<polygon-api-key>
 ```
 
 `HALO_SWING_MARKET_DATA_API_KEY` is accepted as the project-specific alias for
-the same key. Default mode remains fixture-backed and offline unless live mode
-is explicitly enabled.
+the same key. Without either key, market data remains fixture-backed and
+offline.
 
-Macro live mode is wired behind the same provider boundary for FRED:
+Macro live data is wired behind the same provider boundary for FRED:
 
 ```bash
-export HALO_SWING_MACRO_DATA_MODE=live
 export FRED_API_KEY=<fred-api-key>
 ```
 
 `HALO_SWING_MACRO_API_KEY` and `HALO_SWING_FRED_API_KEY` are accepted as
-project-specific aliases. Default macro data remains fixture-backed unless live
-macro mode is explicitly enabled.
+project-specific aliases. Without one of these keys, macro data remains
+fixture-backed.
 
-News live mode is wired through NewsAPI:
+News live data is wired through NewsAPI:
 
 ```bash
-export HALO_SWING_NEWS_DATA_MODE=live
 export NEWS_API_KEY=<newsapi-key>
 ```
 
-`HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Default
-news evidence remains fixture-backed unless live news mode is explicitly
-enabled.
+`HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Without
+either key, news evidence remains fixture-backed.
+
+The optional `HALO_SWING_MARKET_DATA_MODE=live`,
+`HALO_SWING_MACRO_DATA_MODE=live`, and `HALO_SWING_NEWS_DATA_MODE=live` env
+values are still accepted for explicit operator intent and source validation,
+but they are not required when the matching API key is present.
 
 The Telegram gate returns `telegram_delivery_readiness.v1`. It accepts either a
 bot-token readiness signal or a gateway readiness signal, exposes only booleans,

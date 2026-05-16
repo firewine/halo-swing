@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.630 Live Data API-Key Setup Docs Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 실제 live data 연동을 설정할 때 `*_DATA_MODE=live`까지 필수로 넣어야
+한다고 오해하지 않도록 README와 DevOps setup guide를 현재 구현과 맞춘다. 구현된
+Polygon/FRED/NewsAPI provider는 지원되는 API-key alias가 있으면 자동 선택된다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README now says live data providers auto-select from supported API-key aliases
+  - DevOps setup guide now shows API-key-only setup commands for Polygon, FRED, and NewsAPI
+  - docs state optional DATA_MODE env values are accepted for explicit operator intent/source validation
+  - docs preserve that no-key defaults remain fixture-backed and offline
+  - task contract and portable mirror point at this setup-docs gate
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - source code changes
+  - test behavior changes
+  - new data provider
+  - network call during readiness
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.629 Docs Live Provider State Alignment Gate Record - 2026-05-16
 
 ### A. 목적

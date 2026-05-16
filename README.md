@@ -145,15 +145,15 @@ realized R are calculated only inside `price_path[:time_barrier_days]`.
 run/config traceability, an idempotency key, and no-network/no-DB guards.
 `get_integration_readiness` reports blocked deployment gates without network
 calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
-macro, and news source decisions. Market OHLCV live mode is available through
-the provider boundary with Polygon by setting `HALO_SWING_MARKET_DATA_MODE=live`
-and either `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; default runs
-remain fixture-backed and offline. Macro live mode is available through FRED by
-setting `HALO_SWING_MACRO_DATA_MODE=live` and one of
-`HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`.
-News live mode is available through NewsAPI by setting
-`HALO_SWING_NEWS_DATA_MODE=live` and `HALO_SWING_NEWS_API_KEY` or
-`NEWS_API_KEY`. It includes `hermes_mcp_config_readiness.v1`
+macro, and news API-key readiness. Live data providers auto-select when their
+supported API-key aliases are present: Polygon uses
+`HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; FRED uses
+`HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`; and
+NewsAPI uses `HALO_SWING_NEWS_API_KEY` or `NEWS_API_KEY`. Without those keys,
+runs remain fixture-backed and offline. The optional `*_DATA_MODE=live` env
+values are still accepted for explicit operator intent/source validation, but
+they are not required when the API key is present. It includes
+`hermes_mcp_config_readiness.v1`
 for config path and MCP registration evidence. It also exposes
 `telegram_delivery_readiness.v1` for bot-token/gateway readiness while keeping
 `send_call=false`, and a separate `live_order_submission` gate that requires

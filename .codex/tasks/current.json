@@ -1,21 +1,23 @@
 {
-  "gate_id": "DOCS_LIVE_PROVIDER_STATE_ALIGNMENT_GATE",
+  "gate_id": "LIVE_DATA_API_KEY_SETUP_DOCS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.629",
-  "next_atomic_step": "align current WORKING state with API-key auto-select live provider behavior while preserving historical gate records",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.630",
+  "next_atomic_step": "update user-facing setup docs so live data integration requires only supported API-key aliases while preserving offline default warnings",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
-    "docs/halo-swing-development-plan.md"
+    "docs/halo-swing-development-plan.md",
+    "docs/devops-setup-guide.md",
+    "README.md"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.629",
-    ".codex/tasks/current.json",
-    "docs/codex-task.json"
+    "docs/halo-swing-development-plan.md#3.630",
+    "README.md",
+    "docs/devops-setup-guide.md"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -45,13 +47,13 @@
     "read_only": true
   },
   "done_means": [
-    "current WORKING done_means describes live market, macro, and news provider auto-select by API-key aliases",
-    "current WORKING done_means no longer claims live_data readiness requires live mode env values",
-    "current WORKING offline_mvp state says live collection remains unavailable only without user-provided API keys",
-    "historical gate records remain historical and are not rewritten as current directives",
+    "README states live data providers auto-select from supported API-key aliases",
+    "DevOps setup guide shows API-key-only live data setup commands for Polygon, FRED, and NewsAPI",
+    "docs state that optional DATA_MODE env values are accepted but not required when the matching API key is present",
+    "docs preserve that no-key defaults remain fixture-backed and offline",
     "task contract and portable mirror match",
     "verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified docs alignment gate, then choose Hermes/Telegram setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified setup-docs gate, then choose Hermes/Telegram setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

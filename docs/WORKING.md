@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOCS_LIVE_PROVIDER_STATE_ALIGNMENT_GATE_VERIFIED
-gate_id: DOCS_LIVE_PROVIDER_STATE_ALIGNMENT_GATE
+status: LIVE_DATA_API_KEY_SETUP_DOCS_GATE_VERIFIED
+gate_id: LIVE_DATA_API_KEY_SETUP_DOCS_GATE
 review_tier: S1_small
 
-next_atomic_step: align current WORKING state with API-key auto-select live provider behavior while preserving historical gate records
+next_atomic_step: update user-facing setup docs so live data integration requires only supported API-key aliases while preserving offline default warnings
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -260,6 +260,7 @@ done_means:
   - live_data missing reasons use market_ohlcv_api_key, macro_api_key, and news_api_key
   - live market, macro, and news providers auto-select from implemented API-key aliases without requiring live mode env values
   - live_data readiness reports implemented API-key aliases as ready without requiring live mode env values
+  - README and DevOps setup guide describe API-key-only live data setup for Polygon, FRED, and NewsAPI
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -609,15 +610,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.629
-gate_packet: docs/halo-swing-development-plan.md#3.629
+portable_mirror: docs/halo-swing-development-plan.md#3.630
+gate_packet: docs/halo-swing-development-plan.md#3.630
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.629
-  - .codex/tasks/current.json
-  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md#3.630
+  - README.md
+  - docs/devops-setup-guide.md
 
 implementation_rule:
   - keep reusable module boundaries
@@ -920,14 +921,50 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Docs Live Provider State Alignment Gate is verified. Current
-`WORKING.md` state now reflects the API-key auto-select behavior: market, macro,
-and news live providers auto-select from supported API-key aliases, current
-readiness state no longer claims live mode env values are required, and
-offline_mvp now states live collection is unavailable only without
-user-provided API keys. Historical gate records remain preserved as historical
-evidence. Task mirrors match, JSON validation passed, focused provider/readiness
-tests passed with 52 tests, and ruff and health_check passed.
+Summary: Live Data API-Key Setup Docs Gate is verified. README and DevOps setup
+guide now tell operators that live data providers auto-select from supported
+API-key aliases: Polygon, FRED, and NewsAPI no longer require a matching
+`*_DATA_MODE=live` env value when the API key is present. The docs preserve that
+no-key defaults remain fixture-backed and offline, and state that optional
+`*_DATA_MODE=live` values are still accepted for explicit operator intent/source
+validation. Task mirrors match, JSON validation passed, focused
+provider/readiness tests passed with 52 tests, and ruff and health_check passed.
+
+```yaml
+live_data_api_key_setup_docs_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+  implementation:
+    - README states live data providers auto-select from supported API-key aliases
+    - DevOps setup guide shows API-key-only live data setup commands for Polygon, FRED, and NewsAPI
+    - docs state optional DATA_MODE env values are accepted but not required when the matching API key is present
+    - docs preserve that no-key defaults remain fixture-backed and offline
+    - task contract and portable mirror match
+    - no source code, tests, providers, network behavior, migrations, repository persistence, broker path, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+      result: "52 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: rg -n 'HALO_SWING_MARKET_DATA_MODE=live|HALO_SWING_MACRO_DATA_MODE=live|HALO_SWING_NEWS_DATA_MODE=live|unless live mode is explicitly|setting `HALO_SWING_.*DATA_MODE=live`' README.md docs/devops-setup-guide.md
+      result: "passed, only optional DATA_MODE guidance remains"
+```
 
 ```yaml
 docs_live_provider_state_alignment_gate:
