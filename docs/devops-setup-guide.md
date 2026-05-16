@@ -341,12 +341,19 @@ one-shot integration environment smoke runner:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
 ```
 
-This command does not call networks or return secret values. It reports which
-future gates are still blocked for Hermes, Telegram, DB migration/repository,
-Binance testnet read-only smoke, live order submission, and live data adapters.
-It can read readiness inputs from exported environment variables, a
-launch-directory `.env`, or the repo-root `.env` using the precedence documented
-above. The payload also includes `live_data_smoke_commands` for
+one-shot live signal workflow smoke runner:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+```
+
+The readiness and checklist commands do not call networks or return secret
+values. They report which future gates are still blocked for Hermes, Telegram,
+DB migration/repository, Binance testnet read-only smoke, live order submission,
+and live data adapters. They can read readiness inputs from exported environment
+variables, a launch-directory `.env`, or the repo-root `.env` using the
+precedence documented above. The checklist payload also includes
+`live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`. After
 filling the matching API keys, run those repo-local harness commands to verify
 the live provider outputs and boundary contracts. The smoke commands are
@@ -358,7 +365,12 @@ metadata offline. Use `run_live_data_smoke` for the same validation in one
 command after filling the market, macro, and news API keys. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting
-orders, or returning secrets.
+orders, or returning secrets. After provider-level smoke passes, use
+`run_live_signal_workflow_smoke` to verify the same API-key-backed live
+boundary reaches `score_leverage_swing`, `generate_trade_guide`,
+`evaluate_position`, and `generate_latest_signal_report` without starting
+Hermes, sending Telegram messages, submitting orders, mutating state, or
+returning secrets.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

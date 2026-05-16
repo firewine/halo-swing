@@ -574,6 +574,21 @@ def run_integration_smoke(
 
 
 @mcp.tool()
+def run_live_signal_workflow_smoke(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+) -> dict[str, Any]:
+    """Run live scoring/report workflow smoke checks."""
+
+    payload = {"asset": asset, "timeframe": timeframe}
+    return _audited_tool_call(
+        "run_live_signal_workflow_smoke",
+        payload,
+        call_tool("run_live_signal_workflow_smoke", payload),
+    )
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 

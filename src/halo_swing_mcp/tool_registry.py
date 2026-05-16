@@ -44,6 +44,7 @@ from halo_swing_mcp.tools.readiness import (
     get_integration_setup_checklist,
     run_integration_smoke,
     run_live_data_smoke,
+    run_live_signal_workflow_smoke,
     validate_live_data_smoke_result,
 )
 from halo_swing_mcp.tools.reporting import (
@@ -214,6 +215,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "run_integration_smoke",
         run_integration_smoke,
         "Run readiness and live data smoke checks.",
+    ),
+    ToolSpec(
+        "run_live_signal_workflow_smoke",
+        run_live_signal_workflow_smoke,
+        "Run live signal/report workflow smoke checks.",
     ),
     ToolSpec("get_audit_log", get_audit_log, "Return recent audit events."),
     ToolSpec("get_audit_summary", get_audit_summary, "Return audit event summary."),

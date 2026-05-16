@@ -335,6 +335,81 @@ def run_integration_smoke(
     }
 
 
+def run_live_signal_workflow_smoke(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+) -> dict[str, Any]:
+    """Run the live-data-backed signal/report workflow and verify boundaries."""
+
+    from halo_swing_mcp.tools import reporting as reporting_tools
+    from halo_swing_mcp.tools import scoring as scoring_tools
+
+    signal = scoring_tools.score_leverage_swing(asset=asset, timeframe=timeframe)
+    trade_guide = scoring_tools.generate_trade_guide(asset=asset, timeframe=timeframe)
+    position_review = scoring_tools.evaluate_position(asset=asset)
+    latest_signal_report = reporting_tools.generate_latest_signal_report(
+        asset=asset,
+        timeframe=timeframe,
+    )
+    checks: list[dict[str, Any]] = []
+    _extend_live_signal_workflow_checks(
+        checks,
+        signal=signal,
+        trade_guide=trade_guide,
+        position_review=position_review,
+        latest_signal_report=latest_signal_report,
+    )
+    source_contract = _optional_mapping(signal.get("source_data_contract"))
+    network_call = _mapping_value(source_contract, "network_call") is True
+    live_data_required = any(
+        payload.get("live_data_required") is True
+        for payload in [
+            signal,
+            trade_guide,
+            position_review,
+            latest_signal_report,
+        ]
+    )
+
+    return {
+        "schema_version": "live_signal_workflow_smoke_run.v1",
+        "status": "ok" if checks and all(check["passed"] for check in checks) else "conflict",
+        "input": {
+            "asset": asset,
+            "timeframe": timeframe,
+        },
+        "executed_tools": [
+            "score_leverage_swing",
+            "generate_trade_guide",
+            "evaluate_position",
+            "generate_latest_signal_report",
+        ],
+        "signal_summary": _workflow_signal_summary(signal),
+        "trade_guide_summary": _workflow_contract_summary(
+            trade_guide,
+            contract_key="trade_guide_contract",
+            guard_key="trade_guide_guard",
+        ),
+        "position_review_summary": _workflow_contract_summary(
+            position_review,
+            contract_key="position_management_contract",
+            guard_key="position_management_guard",
+        ),
+        "latest_signal_report_summary": _workflow_report_summary(
+            latest_signal_report,
+        ),
+        "checks": checks,
+        "network_call": network_call,
+        "live_data_required": live_data_required,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -503,6 +578,22 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        {
+            "name": "run_live_signal_workflow_smoke",
+            "purpose": (
+                "run scoring, guide, position review, and latest report with live "
+                "source-boundary validation"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_live_signal_workflow_smoke --input-json "
+                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
     ]
 
 
@@ -662,6 +753,163 @@ def _extend_news_smoke_checks(
         passed=_contract_secret_values_returned(score_contract) is False,
         expected=False,
         actual=_contract_secret_values_returned(score_contract),
+    )
+
+
+def _extend_live_signal_workflow_checks(
+    checks: list[dict[str, Any]],
+    *,
+    signal: dict[str, Any],
+    trade_guide: dict[str, Any],
+    position_review: dict[str, Any],
+    latest_signal_report: dict[str, Any],
+) -> None:
+    source_contract = _optional_mapping(signal.get("source_data_contract"))
+    _add_smoke_check(
+        checks,
+        tool="score_leverage_swing",
+        name="payload_live_data_required",
+        passed=signal.get("live_data_required") is True,
+        expected=True,
+        actual=signal.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="score_leverage_swing",
+        name="source_contract_live_data_required",
+        passed=_mapping_value(source_contract, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(source_contract, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="score_leverage_swing",
+        name="source_contract_network_call",
+        passed=_mapping_value(source_contract, "network_call") is True,
+        expected=True,
+        actual=_mapping_value(source_contract, "network_call"),
+    )
+    _extend_workflow_contract_checks(
+        checks,
+        tool="generate_trade_guide",
+        payload=trade_guide,
+        contract_key="trade_guide_contract",
+        guard_key="trade_guide_guard",
+        live_check_name="live_data_boundary_declared",
+    )
+    _extend_workflow_contract_checks(
+        checks,
+        tool="evaluate_position",
+        payload=position_review,
+        contract_key="position_management_contract",
+        guard_key="position_management_guard",
+        live_check_name="live_data_boundary_declared",
+    )
+    _extend_latest_signal_report_workflow_checks(checks, latest_signal_report)
+
+
+def _workflow_signal_summary(signal: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "signal_id": signal.get("signal_id"),
+        "run_id": signal.get("run_id"),
+        "asset": signal.get("asset"),
+        "underlying": signal.get("underlying"),
+        "timeframe": signal.get("timeframe"),
+        "action": signal.get("action"),
+        "source_data_contract": signal.get("source_data_contract"),
+        "live_data_required": signal.get("live_data_required"),
+    }
+
+
+def _workflow_contract_summary(
+    payload: dict[str, Any],
+    *,
+    contract_key: str,
+    guard_key: str,
+) -> dict[str, Any]:
+    guard = _optional_mapping(payload.get(guard_key))
+    return {
+        "asset": payload.get("asset"),
+        "underlying": payload.get("underlying"),
+        "action": payload.get("action"),
+        "contract": payload.get(contract_key),
+        "guard_status": _mapping_value(guard, "status"),
+        "live_data_required": payload.get("live_data_required"),
+    }
+
+
+def _workflow_report_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    guard = _optional_mapping(payload.get("report_contract_guard"))
+    return {
+        "schema_version": payload.get("schema_version"),
+        "asset": payload.get("asset"),
+        "underlying": payload.get("underlying"),
+        "timeframe": payload.get("timeframe"),
+        "action": payload.get("action"),
+        "source_signal_ref": payload.get("source_signal_ref"),
+        "guard_status": _mapping_value(guard, "status"),
+        "live_data_required": payload.get("live_data_required"),
+    }
+
+
+def _extend_workflow_contract_checks(
+    checks: list[dict[str, Any]],
+    *,
+    tool: str,
+    payload: dict[str, Any],
+    contract_key: str,
+    guard_key: str,
+    live_check_name: str,
+) -> None:
+    contract = _optional_mapping(payload.get(contract_key))
+    guard = _optional_mapping(payload.get(guard_key))
+    _add_smoke_check(
+        checks,
+        tool=tool,
+        name="payload_live_data_required",
+        passed=payload.get("live_data_required") is True,
+        expected=True,
+        actual=payload.get("live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool=tool,
+        name="contract_live_data_required",
+        passed=_mapping_value(contract, "live_data_required") is True,
+        expected=True,
+        actual=_mapping_value(contract, "live_data_required"),
+    )
+    _add_smoke_check(
+        checks,
+        tool=tool,
+        name="no_order_submission",
+        passed=_mapping_value(contract, "order_submission") is False,
+        expected=False,
+        actual=_mapping_value(contract, "order_submission"),
+    )
+    _add_guard_status_check(checks, tool, guard)
+    _add_guard_check(checks, tool, guard, live_check_name)
+
+
+def _extend_latest_signal_report_workflow_checks(
+    checks: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    guard = _optional_mapping(payload.get("report_contract_guard"))
+    _add_smoke_check(
+        checks,
+        tool="generate_latest_signal_report",
+        name="payload_live_data_required",
+        passed=payload.get("live_data_required") is True,
+        expected=True,
+        actual=payload.get("live_data_required"),
+    )
+    _add_guard_status_check(checks, "generate_latest_signal_report", guard)
+    _add_guard_check(
+        checks,
+        "generate_latest_signal_report",
+        guard,
+        "report_payload_live_data_required_matches_expected",
     )
 
 

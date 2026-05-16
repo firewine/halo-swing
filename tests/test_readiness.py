@@ -18,6 +18,7 @@ from halo_swing_mcp.tools.readiness import (
     get_integration_setup_checklist,
     run_integration_smoke,
     run_live_data_smoke,
+    run_live_signal_workflow_smoke,
     validate_live_data_smoke_result,
 )
 from halo_swing_mcp.tools.market import (
@@ -345,6 +346,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "validate_live_data_smoke_result",
         "run_live_data_smoke",
         "run_integration_smoke",
+        "run_live_signal_workflow_smoke",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -656,6 +658,150 @@ def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effect
     assert payload["mutates_local_state"] is False
     assert payload["readiness"]["gates"]["live_data"]["status"] == "blocked"
     assert payload["live_data_smoke"]["status"] == "conflict"
+
+
+def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import reporting as reporting_tools
+    from halo_swing_mcp.tools import scoring as scoring_tools
+
+    fake_signal = {
+        "signal_id": "sig_live_tqqq",
+        "run_id": "run_live_signal_smoke",
+        "asset": "TQQQ",
+        "underlying": "QQQ",
+        "timeframe": "swing_3d_10d",
+        "source_data_contract": {
+            "schema_version": "scoring_source_data.v1",
+            "network_call": True,
+            "live_data_required": True,
+        },
+        "live_data_required": True,
+    }
+    fake_guide = {
+        "live_data_required": True,
+        "trade_guide_contract": {
+            "live_data_required": True,
+            "order_submission": False,
+        },
+        "trade_guide_guard": {
+            "status": "ok",
+            "checks": [
+                {"name": "live_data_boundary_declared", "passed": True}
+            ],
+        },
+    }
+    fake_position = {
+        "live_data_required": True,
+        "position_management_contract": {
+            "live_data_required": True,
+            "order_submission": False,
+        },
+        "position_management_guard": {
+            "status": "ok",
+            "checks": [
+                {"name": "live_data_boundary_declared", "passed": True}
+            ],
+        },
+    }
+    fake_report = {
+        "live_data_required": True,
+        "report_contract_guard": {
+            "status": "ok",
+            "checks": [
+                {
+                    "name": "report_payload_live_data_required_matches_expected",
+                    "passed": True,
+                }
+            ],
+        },
+    }
+
+    monkeypatch.setattr(
+        scoring_tools,
+        "score_leverage_swing",
+        lambda asset="TQQQ", timeframe="swing_3d_10d": fake_signal,
+    )
+    monkeypatch.setattr(
+        scoring_tools,
+        "generate_trade_guide",
+        lambda asset="TQQQ", timeframe="swing_3d_10d": fake_guide,
+    )
+    monkeypatch.setattr(
+        scoring_tools,
+        "evaluate_position",
+        lambda asset="TQQQ": fake_position,
+    )
+    monkeypatch.setattr(
+        reporting_tools,
+        "generate_latest_signal_report",
+        lambda asset="TQQQ", timeframe="swing_3d_10d": fake_report,
+    )
+
+    payload = run_live_signal_workflow_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+    )
+
+    assert payload["schema_version"] == "live_signal_workflow_smoke_run.v1"
+    assert payload["status"] == "ok"
+    assert payload["executed_tools"] == [
+        "score_leverage_swing",
+        "generate_trade_guide",
+        "evaluate_position",
+        "generate_latest_signal_report",
+    ]
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert all(check["passed"] for check in payload["checks"])
+    serialized = repr(payload).lower()
+    assert "api_key=" not in serialized
+
+
+def test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_live_signal_workflow_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+    )
+    failed_checks = {
+        (check["tool"], check["name"])
+        for check in payload["checks"]
+        if not check["passed"]
+    }
+
+    assert payload["schema_version"] == "live_signal_workflow_smoke_run.v1"
+    assert payload["status"] == "conflict"
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert (
+        "score_leverage_swing",
+        "payload_live_data_required",
+    ) in failed_checks
+    assert (
+        "score_leverage_swing",
+        "source_contract_network_call",
+    ) in failed_checks
+    assert (
+        "generate_latest_signal_report",
+        "payload_live_data_required",
+    ) in failed_checks
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(

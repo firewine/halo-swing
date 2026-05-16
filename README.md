@@ -220,6 +220,14 @@ payload, use `run_integration_smoke`:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
 ```
 
+After the provider smoke passes, use `run_live_signal_workflow_smoke` to verify
+that the API-key-backed live boundary reaches scoring, the trade guide, position
+review, and the latest signal report:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+```
+
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_smoke_commands` for
