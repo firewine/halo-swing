@@ -16,6 +16,7 @@ BINANCE_BOOLEAN_ENV_NAMES = {
 MARKET_DATA_MODE_ENV_NAME = "HALO_SWING_MARKET_DATA_MODE"
 MACRO_DATA_MODE_ENV_NAME = "HALO_SWING_MACRO_DATA_MODE"
 NEWS_DATA_MODE_ENV_NAME = "HALO_SWING_NEWS_DATA_MODE"
+LIVE_HTTP_TIMEOUT_SECONDS_ENV_NAME = "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS"
 
 
 class Settings(BaseSettings):
@@ -52,6 +53,7 @@ class Settings(BaseSettings):
     news_data_mode: str = "fixture"
     news_source: str = "newsapi"
     news_api_key: str | None = None
+    live_http_timeout_seconds: float = 10.0
 
     @field_validator(
         "binance_testnet",
@@ -90,6 +92,21 @@ class Settings(BaseSettings):
     @classmethod
     def _validate_news_data_mode(cls, value: str) -> str:
         return _validate_data_mode(value, NEWS_DATA_MODE_ENV_NAME)
+
+    @field_validator("live_http_timeout_seconds", mode="before")
+    @classmethod
+    def _validate_live_http_timeout_seconds(cls, value: float | int | str) -> float:
+        try:
+            timeout = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"{LIVE_HTTP_TIMEOUT_SECONDS_ENV_NAME} must be a positive number"
+            ) from exc
+        if timeout <= 0:
+            raise ValueError(
+                f"{LIVE_HTTP_TIMEOUT_SECONDS_ENV_NAME} must be a positive number"
+            )
+        return timeout
 
     model_config = SettingsConfigDict(
         env_prefix="HALO_SWING_",

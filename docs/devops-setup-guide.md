@@ -371,6 +371,11 @@ one-shot API-key pipeline smoke runner:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 ```
 
+API-key-backed live provider HTTP calls use
+`HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS` with a default of `10` seconds. Keep the
+default unless your local network needs a shorter or longer provider smoke
+timeout; non-positive values are rejected during settings load.
+
 The readiness and checklist commands do not call networks or return secret
 values. They report which future gates are still blocked for Hermes, Telegram,
 DB migration/repository, Binance testnet read-only smoke, live order submission,

@@ -13,6 +13,7 @@ from halo_swing_mcp.providers import (
     NewsApiDataProvider,
     PolygonMarketDataProvider,
     ReplayMarketDataProvider,
+    _default_http_get,
     describe_market_data_provider_route,
     get_market_data_provider,
 )
@@ -66,6 +67,7 @@ def clear_live_data_provider_env(monkeypatch) -> None:
         "HALO_SWING_NEWS_SOURCE",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS",
     ):
         monkeypatch.delenv(key, raising=False)
     get_settings.cache_clear()
@@ -77,6 +79,46 @@ def test_default_market_data_provider_is_replay_only() -> None:
 
     assert isinstance(provider, ReplayMarketDataProvider)
     assert_market_data_provider(provider)
+
+
+def test_default_http_get_uses_configured_live_http_timeout(monkeypatch) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS", "2.5")
+    get_settings.cache_clear()
+    calls: list[tuple[str, float]] = []
+
+    class FakeResponse:
+        def __enter__(self) -> "FakeResponse":
+            return self
+
+        def __exit__(self, *args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b'{"status":"ok"}'
+
+    def fake_urlopen(url: str, *, timeout: float) -> FakeResponse:
+        calls.append((url, timeout))
+        return FakeResponse()
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.providers.request.urlopen",
+        fake_urlopen,
+    )
+
+    payload = _default_http_get("https://provider.example/smoke")
+
+    assert payload == {"status": "ok"}
+    assert calls == [("https://provider.example/smoke", 2.5)]
+
+
+def test_live_http_timeout_must_be_positive(monkeypatch) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS", "0")
+    get_settings.cache_clear()
+
+    with pytest.raises(ValueError, match="HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS"):
+        get_settings()
 
 
 def test_describe_market_data_provider_route_reports_fixture_default(

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_GATE
+status: API_KEY_LIVE_HTTP_TIMEOUT_VERIFIED
+gate_id: API_KEY_LIVE_HTTP_TIMEOUT_GATE
 review_tier: S1_small
 
-next_atomic_step: add compact provider recovery commands to run_api_key_pipeline_smoke summary_only output
+next_atomic_step: make live provider HTTP timeout configurable for API-key-backed smoke calls
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,12 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
+  - .env.example
+  - src/halo_swing_mcp/config.py
+  - src/halo_swing_mcp/providers.py
   - src/halo_swing_mcp/server.py
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_providers.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -75,27 +79,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_default_http_get_uses_configured_live_http_timeout tests/test_providers.py::test_live_http_timeout_must_be_positive tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(asset="TQQQ", timeframe="swing_3d_10d", symbols=["QQQ"], topic="macro", summary_only=True); s=payload["api_key_provider_recovery_summary"]; print(payload["schema_version"], s["schema_version"], s["item_count"], s["next_recovery_smoke_command_name"], payload["secret_values_returned"], "api_key_provider_recovery_checklist" in payload)'
+  - HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=2.5 PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.config import get_settings; print(get_settings().live_http_timeout_seconds)'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary_only=true returns top-level api_key_provider_recovery_summary using schema api_key_provider_recovery_summary.v1
-  - api_key_provider_recovery_summary exposes provider_recovery_required, provider_error_count, provider_recovery_smoke_count, item_count, next_recovery_smoke_command_name, next_recovery_smoke_command, and compact provider-family recovery items without secret values
-  - summary_only=true still omits api_key_provider_recovery_checklist and provider_recovery_smokes full nested payloads
-  - provider-recovery and no-key summary_only paths are covered by focused tests
-  - fake-key API-key pipeline CLI demonstrates provider recovery summary without secrets or nested full recovery payloads
-  - README and DevOps setup guide document api_key_provider_recovery_summary
-  - setup docs tests assert api_key_provider_recovery_summary guidance
+  - Settings exposes positive live_http_timeout_seconds from HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS with default 10.0
+  - _default_http_get passes Settings.live_http_timeout_seconds into urllib.request.urlopen
+  - .env.example documents HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=10
+  - focused tests cover configured timeout propagation and invalid non-positive timeout rejection
+  - fake-key API-key pipeline summary-only CLI still returns no-secret recovery output with the default timeout
+  - README and DevOps setup guide document live HTTP timeout behavior
+  - setup docs tests assert live HTTP timeout guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only recovery commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key live HTTP timeout gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_COMMANDS_GATE
+review_tier: S1_small
+
+next_atomic_step: add compact provider recovery commands to run_api_key_pipeline_smoke summary_only output
 ```
 
 Previous completed directive:
@@ -2024,6 +2039,62 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Live HTTP Timeout Gate is verified.
+Live provider HTTP calls now read `HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS`
+through `Settings.live_http_timeout_seconds`, preserving the prior 10 second
+default while allowing API-key-backed smokes to fail into provider recovery on
+an operator-controlled timeout. Focused tests, fake-key CLI, full pytest, ruff,
+and health_check passed.
+
+```yaml
+api_key_live_http_timeout_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - .env.example
+    - src/halo_swing_mcp/config.py
+    - src/halo_swing_mcp/providers.py
+    - tests/test_providers.py
+    - tests/test_setup_docs.py
+  implementation:
+    - Settings exposes positive live_http_timeout_seconds from HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS with default 10.0
+    - _default_http_get passes Settings.live_http_timeout_seconds into urllib.request.urlopen
+    - .env.example documents HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=10
+    - focused tests cover configured timeout propagation and invalid non-positive timeout rejection
+    - fake-key API-key pipeline summary-only CLI still returns no-secret recovery output with the default timeout
+    - README and DevOps setup guide document live HTTP timeout behavior
+    - tests/test_setup_docs.py asserts live HTTP timeout guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_default_http_get_uses_configured_live_http_timeout tests/test_providers.py::test_live_http_timeout_must_be_positive tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; no-secret provider recovery summary still returned"
+    - command: HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=2.5 PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.config import get_settings; print(get_settings().live_http_timeout_seconds)'
+      result: "2.5"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "779 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Summary-Only Recovery Commands Gate is verified.
 `run_api_key_pipeline_smoke` summary-only output now includes compact

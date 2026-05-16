@@ -817,7 +817,10 @@ def _polygon_bar(result: Any, timeframe: str) -> dict[str, Any]:
 
 
 def _default_http_get(url: str) -> dict[str, Any]:
-    with request.urlopen(url, timeout=10) as response:
+    with request.urlopen(
+        url,
+        timeout=get_settings().live_http_timeout_seconds,
+    ) as response:
         return json.loads(response.read().decode("utf-8"))
 
 

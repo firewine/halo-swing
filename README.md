@@ -162,7 +162,10 @@ next setup action moves directly to provider smokes. Without those keys, runs
 remain fixture-backed and offline. When a NewsAPI key selects live news,
 `get_news_bundle` declares `live_data_required=true`, `network_call=true`, and
 `secret_values_returned=false`, with guard checks for the live data boundary and
-network call declaration. The optional `*_DATA_MODE=live` env values are still
+network call declaration. Live provider HTTP calls use
+`HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS` with a default of `10` seconds, so
+API-key-backed smokes fail back into no-secret provider recovery instead of
+waiting indefinitely. The optional `*_DATA_MODE=live` env values are still
 accepted for explicit operator intent/source validation, but they are not
 required when the API key is present. It includes
 `hermes_mcp_config_readiness.v1`
