@@ -893,6 +893,30 @@ def run_api_key_pipeline_smoke(
         recording_smoke_summary=recording_smoke_summary,
     )
     api_key_pipeline_check_summary = _api_key_pipeline_check_summary(checks)
+    api_key_setup_file_summary = _api_key_setup_file_summary(
+        live_data_setup_summary
+    )
+    api_key_dotenv_loading_summary = _api_key_dotenv_loading_summary(
+        live_data_api_key_status,
+        live_data_setup_summary,
+    )
+    api_key_pipeline_failure_summary = _api_key_pipeline_failure_summary(
+        api_key_next_action_summary=api_key_next_action_summary,
+        api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
+        api_key_pipeline_check_summary=api_key_pipeline_check_summary,
+    )
+    api_key_provider_selection_summary = _api_key_provider_selection_summary(
+        provider_route,
+        live_data_setup_summary,
+    )
+    api_key_integration_status_summary = _api_key_integration_status_summary(
+        setup_status_summary=setup_status_summary,
+        api_key_next_action_summary=api_key_next_action_summary,
+        api_key_pipeline_failure_summary=api_key_pipeline_failure_summary,
+        api_key_setup_file_summary=api_key_setup_file_summary,
+        api_key_dotenv_loading_summary=api_key_dotenv_loading_summary,
+        api_key_provider_selection_summary=api_key_provider_selection_summary,
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -924,28 +948,17 @@ def run_api_key_pipeline_smoke(
         "api_key_command_summary": api_key_command_summary,
         "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
-        "api_key_setup_file_summary": _api_key_setup_file_summary(
-            live_data_setup_summary
-        ),
-        "api_key_dotenv_loading_summary": _api_key_dotenv_loading_summary(
-            live_data_api_key_status,
-            live_data_setup_summary,
-        ),
+        "api_key_setup_file_summary": api_key_setup_file_summary,
+        "api_key_dotenv_loading_summary": api_key_dotenv_loading_summary,
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
         "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
-        "api_key_pipeline_failure_summary": _api_key_pipeline_failure_summary(
-            api_key_next_action_summary=api_key_next_action_summary,
-            api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
-            api_key_pipeline_check_summary=api_key_pipeline_check_summary,
-        ),
+        "api_key_pipeline_failure_summary": api_key_pipeline_failure_summary,
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
-        "api_key_provider_selection_summary": (
-            _api_key_provider_selection_summary(
-                provider_route,
-                live_data_setup_summary,
-            )
+        "api_key_provider_selection_summary": api_key_provider_selection_summary,
+        "api_key_integration_status_summary": (
+            api_key_integration_status_summary
         ),
         "live_data_smoke_summary": live_data_smoke_summary,
         "failed_provider_families": live_data_smoke_summary[
@@ -2334,6 +2347,83 @@ def _api_key_provider_selection_summary(
         "ready_to_run_live_smoke": (
             provider_route.get("status") == "ready"
             and live_data_setup_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_integration_status_summary(
+    *,
+    setup_status_summary: dict[str, Any],
+    api_key_next_action_summary: dict[str, Any],
+    api_key_pipeline_failure_summary: dict[str, Any],
+    api_key_setup_file_summary: dict[str, Any],
+    api_key_dotenv_loading_summary: dict[str, Any],
+    api_key_provider_selection_summary: dict[str, Any],
+) -> dict[str, Any]:
+    configured_provider_families = _string_list(
+        setup_status_summary.get("configured_provider_families")
+    )
+    missing_provider_families = _string_list(
+        setup_status_summary.get("missing_provider_families")
+    )
+    selected_provider_classes = _string_list(
+        api_key_provider_selection_summary.get("selected_provider_classes")
+    )
+    configured_provider_family_count = setup_status_summary.get(
+        "configured_provider_family_count"
+    )
+    required_provider_family_count = setup_status_summary.get(
+        "required_provider_family_count"
+    )
+    selected_provider_class_count = api_key_provider_selection_summary.get(
+        "selected_provider_class_count"
+    )
+    api_keys_configured = (
+        isinstance(configured_provider_family_count, int)
+        and isinstance(required_provider_family_count, int)
+        and required_provider_family_count > 0
+        and configured_provider_family_count == required_provider_family_count
+        and not missing_provider_families
+    )
+    live_providers_selected = (
+        api_keys_configured
+        and selected_provider_class_count == configured_provider_family_count
+    )
+    ready_to_run_live_smoke = (
+        setup_status_summary.get("ready_to_run_live_smoke") is True
+        and api_key_provider_selection_summary.get("ready_to_run_live_smoke")
+        is True
+    )
+    return {
+        "schema_version": "api_key_integration_status_summary.v1",
+        "status": api_key_next_action_summary.get("status"),
+        "api_keys_configured": api_keys_configured,
+        "dotenv_loading_enabled": (
+            api_key_dotenv_loading_summary.get("dotenv_loading_enabled") is True
+        ),
+        "dotenv_target_exists": (
+            api_key_setup_file_summary.get("target_exists") is True
+        ),
+        "live_providers_selected": live_providers_selected,
+        "ready_to_run_live_smoke": ready_to_run_live_smoke,
+        "configured_provider_families": configured_provider_families,
+        "missing_provider_families": missing_provider_families,
+        "selected_provider_classes": selected_provider_classes,
+        "failure_category": api_key_pipeline_failure_summary.get(
+            "failure_category"
+        ),
+        "has_failures": (
+            api_key_pipeline_failure_summary.get("has_failures") is True
+        ),
+        "next_action_name": api_key_next_action_summary.get("next_action_name"),
+        "next_action_is_recovery": (
+            api_key_next_action_summary.get("next_action_is_recovery") is True
+        ),
+        "next_action_network_call": (
+            api_key_next_action_summary.get("next_action_network_call") is True
         ),
         "network_call": False,
         "mutates_local_state": False,

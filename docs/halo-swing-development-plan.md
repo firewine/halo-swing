@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.732 API Key Integration Status Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only 연동 상태는 setup file, dotenv loading, provider selection,
+pipeline failure, next action summary에 흩어져 있다. 사용자는 키를 넣은 뒤 실제
+live provider가 선택됐는지, provider smoke를 실행할 준비가 됐는지, 실패 시 다음
+조치가 setup인지 provider recovery인지 빠르게 판단해야 한다. 이번 slice는
+`run_api_key_pipeline_smoke` top-level
+`api_key_integration_status_summary`를 추가해 key-only live setup readiness를
+한 줄로 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_integration_status_summary using schema api_key_integration_status_summary.v1
+  - api_key_integration_status_summary exposes status, api_keys_configured, dotenv_loading_enabled, dotenv_target_exists, live_providers_selected, ready_to_run_live_smoke, configured_provider_families, missing_provider_families, selected_provider_classes, failure_category, has_failures, next_action_name, next_action_is_recovery, and next_action_network_call without secret values
+  - cover ok, missing-key, and provider-recovery paths with focused tests
+  - document the compact integration status summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_integration_status_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> exit 0; integration status summary present without secret values
+  - fake-key direct summary check -> api_key_integration_status_summary.v1 conflict True True provider_recovery recover_failed_providers False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 776 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.731 API Key Provider Selection Summary Gate Record - 2026-05-17
 
 ### A. 목적
