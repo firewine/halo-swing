@@ -475,7 +475,15 @@ stage-level setup fields such as `live_data_setup_summary_status`,
 `next_smoke_command_name` so the blocked stage, next provider setup action, and
 provider smoke readiness are visible without returning secret values. Provider
 or network failures during live sub-smokes are reported as no-secret `conflict` payloads
-without returning exception messages, URLs, or API key values.
+without returning exception messages, URLs, or API key values. The one-shot
+payload and live-data sub-smoke summary also expose `provider_error_summaries`,
+`provider_error_summary_count`, `failed_provider_families`,
+`failed_provider_count`, `first_provider_error_summary`,
+`next_provider_recovery_action`, `next_provider_recovery_smoke`,
+`next_provider_recovery_smoke_command_name`, `provider_recovery_smokes`, and
+`provider_recovery_smoke_count` so failed provider families and their no-secret
+recovery smoke commands are visible immediately after API-key-backed smoke
+failures.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

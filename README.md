@@ -291,7 +291,13 @@ Each sub-smoke summary also includes stage-level setup fields such as
 `ready_provider_smoke_count`, `blocked_provider_smoke_count`, and
 `next_smoke_command_name`. Provider or network failures during live sub-smokes
 are reported as no-secret `conflict` payloads without returning exception
-messages, URLs, or API key values:
+messages, URLs, or API key values. When provider failures occur,
+`provider_error_summaries`, `provider_error_summary_count`,
+`failed_provider_families`, `failed_provider_count`,
+`first_provider_error_summary`, `next_provider_recovery_action`,
+`next_provider_recovery_smoke`, `next_provider_recovery_smoke_command_name`,
+`provider_recovery_smokes`, and `provider_recovery_smoke_count` identify the
+failed providers and list the no-secret provider smoke commands to rerun:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit

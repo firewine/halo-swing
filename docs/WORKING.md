@@ -42,19 +42,20 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_GATE
+status: API_KEY_PROVIDER_RECOVERY_DOCS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_DOCS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface runnable recovery smoke commands for all failed API-key providers
+next_atomic_step: document API-key provider error and recovery smoke fields for one-shot live integration checks
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
+  - README.md
+  - docs/devops-setup-guide.md
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,24 +72,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_surfaces_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_live_data_smoke exposes provider_recovery_smokes and provider_recovery_smoke_count matching every provider error summary smoke_command_name
-  - run_api_key_pipeline_smoke mirrors provider_recovery_smokes and provider_recovery_smoke_count in live_data_smoke_summary and top-level one-shot output
-  - provider_recovery_smokes remains empty on ok and fixture-default no-key paths when no provider error summaries exist
-  - provider recovery smoke commands are copied only from existing no-secret provider_smoke_plan command metadata
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
+  - README documents provider error summary, failed-provider compact fields, and provider recovery smoke command fields for API-key one-shot smoke outputs
+  - DevOps setup guide documents the same no-secret recovery fields and how they support API-key-only live integration triage
+  - tests/test_setup_docs.py asserts the new field names so docs stay aligned with readiness payloads
+  - no source behavior, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery smoke commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider recovery docs gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface runnable recovery smoke commands for all failed API-key providers
 ```
 
 Previous completed directive:
@@ -1830,6 +1840,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Recovery Docs Gate is verified. README and the DevOps
+setup guide now document the no-secret provider error and recovery fields that
+operators should inspect after API-key one-shot smoke failures:
+`provider_error_summaries`, `provider_error_summary_count`,
+`failed_provider_families`, `failed_provider_count`,
+`first_provider_error_summary`, `next_provider_recovery_action`,
+`next_provider_recovery_smoke`, `next_provider_recovery_smoke_command_name`,
+`provider_recovery_smokes`, and `provider_recovery_smoke_count`. The DevOps
+setup docs test now asserts those field names. No source behavior changed.
+Focused setup-docs tests passed with 1 and 8 tests, full pytest passed with 775
+tests, and ruff and health_check passed.
+
+```yaml
+api_key_provider_recovery_docs_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - tests/test_setup_docs.py
+  implementation:
+    - README documents provider error summary, failed-provider compact fields, and provider recovery smoke command fields for API-key one-shot smoke outputs
+    - DevOps setup guide documents the same no-secret recovery fields and how they support API-key-only live integration triage
+    - tests/test_setup_docs.py asserts the new field names so docs stay aligned with readiness payloads
+    - no source behavior, live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "8 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Smoke Commands Gate is verified.
 `run_live_data_smoke` now exposes `provider_recovery_smokes` and

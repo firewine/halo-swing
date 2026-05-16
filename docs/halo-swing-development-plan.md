@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.718 API Key Provider Recovery Docs Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key one-shot smoke payload는 provider error summary, compact failed-provider
+fields, and provider recovery smoke commands를 제공하지만 README와 DevOps setup guide는
+아직 최신 필드명을 설명하지 않는다. 이번 slice는 사용자가 API 키를 넣고
+`run_api_key_pipeline_smoke`를 실행한 뒤 어떤 필드로 실패 provider와 재실행 command를
+찾아야 하는지 문서화하고, 문서 테스트로 이 필드명이 계속 유지되게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README now documents provider error summary, failed-provider compact fields, and provider recovery smoke command fields for API-key one-shot smoke outputs
+  - DevOps setup guide now documents the same no-secret recovery fields and how they support API-key-only live integration triage
+  - tests/test_setup_docs.py asserts the new field names so docs stay aligned with readiness payloads
+  - no source behavior changed
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - source behavior change
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused setup docs pytest: 1 passed
+  - setup docs pytest: 8 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.717 API Key Provider Recovery Smoke Commands Gate Record - 2026-05-17
 
 ### A. 목적
