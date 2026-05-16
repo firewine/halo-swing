@@ -85,6 +85,16 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "stage_name" in guide
     assert "run_live_signal_workflow_smoke" in guide
     assert "run_live_recording_smoke" in guide
+    assert "api_key_pipeline_check_summary" in guide
+    assert "api_key_pipeline_check_summary.v1" in guide
+    assert "check_count" in guide
+    assert "passed_check_count" in guide
+    assert "failed_check_count" in guide
+    assert "failed_check_keys" in guide
+    assert "tools_with_failures" in guide
+    assert "tool_failure_counts" in guide
+    assert "first_failed_check" in guide
+    assert "failed_checks" in guide
     assert "readiness_summary.next_operator_action" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide

@@ -273,9 +273,9 @@ top-level `next_operator_action`, `setup_status_summary`,
 `api_key_next_action_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`,
 `api_key_operator_checklist`, `api_key_pipeline_stage_summary`,
-`live_data_setup_summary`, and the same provider route summary so the one-shot
-smoke records API-key readiness, required env keys and aliases, copy/smoke
-commands, ordered local setup steps, checklist
+`api_key_pipeline_check_summary`, `live_data_setup_summary`, and the same
+provider route summary so the one-shot smoke records API-key readiness, required
+env keys and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
 the compact `api_key_next_action_summary.v1` with `next_action_name`,
 `next_action_command`, `next_action_is_recovery`,
@@ -295,6 +295,12 @@ execution order with `status`, `stage_count`, `failed_stage_count`,
 `provider_recovery_smoke_count`, `network_call`, `mutates_local_state`, and
 `secret_values_returned` fields, so the failed smoke stage is visible without
 reading every nested summary.
+The compact `api_key_pipeline_check_summary`
+(`api_key_pipeline_check_summary.v1`) summarizes the top-level `checks` array
+with `check_count`, `passed_check_count`, `failed_check_count`,
+`failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
+`first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
+`name`, `key`, `expected`, `actual`, and `passed=false`.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,

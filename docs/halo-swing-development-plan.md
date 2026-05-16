@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.727 API Key Pipeline Check Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_pipeline_stage_summary`는 실패한 smoke stage를 보여주지만, 실제로
+어떤 readiness/smoke check가 실패했는지는 top-level `checks` 배열을 직접
+훑어야 한다. 이번 slice는 top-level `api_key_pipeline_check_summary`를 추가해
+API 키만 넣고 one-shot smoke를 실행한 사용자가 실패한 check key, 첫 실패
+check, tool별 실패 개수를 한 곳에서 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_pipeline_check_summary using schema api_key_pipeline_check_summary.v1
+  - expose status, check_count, passed_check_count, failed_check_count, failed_check_keys, tools_with_failures, and first_failed_check without secret values
+  - list failed_checks rows with tool, name, key, expected, actual, and passed=false
+  - group failed check counts by tool in tool_failure_counts
+  - document the compact check summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_pipeline_check_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 5 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with api_key_pipeline_check_summary reporting failed checks without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.726 API Key Pipeline Stage Summary Gate Record - 2026-05-17
 
 ### A. 목적

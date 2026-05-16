@@ -922,6 +922,9 @@ def run_api_key_pipeline_smoke(
             signal_workflow_smoke_summary=signal_workflow_smoke_summary,
             recording_smoke_summary=recording_smoke_summary,
         ),
+        "api_key_pipeline_check_summary": _api_key_pipeline_check_summary(
+            checks
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -1901,6 +1904,49 @@ def _api_key_pipeline_stage_row(
         "live_data_required": stage_summary.get("live_data_required") is True,
         "mutates_local_state": stage_summary.get("mutates_local_state") is True,
         "secret_values_returned": stage_summary.get("secret_values_returned"),
+    }
+
+
+def _api_key_pipeline_check_summary(
+    checks: list[dict[str, Any]],
+) -> dict[str, Any]:
+    failed_checks = [
+        _api_key_pipeline_check_row(check)
+        for check in checks
+        if check.get("passed") is not True
+    ]
+    tool_failure_counts: dict[str, int] = {}
+    for check in failed_checks:
+        tool = check["tool"]
+        tool_failure_counts[tool] = tool_failure_counts.get(tool, 0) + 1
+    return {
+        "schema_version": "api_key_pipeline_check_summary.v1",
+        "status": "conflict" if failed_checks else "ok",
+        "check_count": len(checks),
+        "passed_check_count": len(checks) - len(failed_checks),
+        "failed_check_count": len(failed_checks),
+        "failed_check_keys": [check["key"] for check in failed_checks],
+        "tools_with_failures": list(tool_failure_counts),
+        "tool_failure_counts": tool_failure_counts,
+        "first_failed_check": failed_checks[0] if failed_checks else None,
+        "failed_checks": failed_checks,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_check_row(check: dict[str, Any]) -> dict[str, Any]:
+    tool = str(check.get("tool"))
+    name = str(check.get("name"))
+    return {
+        "tool": tool,
+        "name": name,
+        "key": f"{tool}.{name}",
+        "passed": False,
+        "expected": check.get("expected"),
+        "actual": check.get("actual"),
+        "secret_values_returned": False,
     }
 
 

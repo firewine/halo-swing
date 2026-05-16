@@ -451,9 +451,9 @@ includes top-level `next_operator_action`, `setup_status_summary`,
 `api_key_next_action_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`,
 `api_key_operator_checklist`, `api_key_pipeline_stage_summary`,
-`live_data_setup_summary`, and a provider route summary, then fails the route
-readiness check until all supported live-data provider keys are configured. The
-top-level `readiness_summary` mirrors
+`api_key_pipeline_check_summary`, `live_data_setup_summary`, and a provider
+route summary, then fails the route readiness check until all supported
+live-data provider keys are configured. The top-level `readiness_summary` mirrors
 `api_key_setup_status`, `api_key_status`, `provider_route_status`,
 `ready_to_run_live_smoke`, `next_setup_step`, `next_operator_action_name`, and
 the no-secret `next_operator_action` separately from broader integration gates.
@@ -478,6 +478,12 @@ execution order with `status`, `stage_count`, `failed_stage_count`,
 `provider_recovery_smoke_count`, `network_call`, `mutates_local_state`, and
 `secret_values_returned` fields so the failed pipeline stage is visible without
 reading every nested smoke summary. The
+top-level `api_key_pipeline_check_summary`
+(`api_key_pipeline_check_summary.v1`) summarizes the pipeline `checks` array
+with `check_count`, `passed_check_count`, `failed_check_count`,
+`failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
+`first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
+`name`, `key`, `expected`, `actual`, and `passed=false`. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`
