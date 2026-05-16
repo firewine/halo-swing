@@ -441,8 +441,16 @@ def run_live_data_smoke(
         macro_snapshot=macro_snapshot,
         news_bundle=news_bundle,
     )
+    live_data_setup_summary = _live_data_setup_summary(
+        api_key_status,
+        provider_route,
+    )
     provider_error_compact_summary = _provider_error_compact_summary(
-        provider_error_summaries
+        provider_error_summaries,
+        provider_smoke_plan=_optional_mapping(
+            live_data_setup_summary.get("provider_smoke_plan")
+        )
+        or {},
     )
 
     return {
@@ -456,10 +464,7 @@ def run_live_data_smoke(
         "macro_snapshot": macro_snapshot,
         "news_bundle": news_bundle,
         "provider_route": provider_route,
-        "live_data_setup_summary": _live_data_setup_summary(
-            api_key_status,
-            provider_route,
-        ),
+        "live_data_setup_summary": live_data_setup_summary,
         "provider_error_summaries": provider_error_summaries,
         "provider_error_summary_count": len(provider_error_summaries),
         "failed_provider_families": provider_error_compact_summary[
@@ -474,6 +479,14 @@ def run_live_data_smoke(
         "next_provider_recovery_action": provider_error_compact_summary[
             "next_provider_recovery_action"
         ],
+        "next_provider_recovery_smoke": provider_error_compact_summary[
+            "next_provider_recovery_smoke"
+        ],
+        "next_provider_recovery_smoke_command_name": (
+            provider_error_compact_summary[
+                "next_provider_recovery_smoke_command_name"
+            ]
+        ),
         "validation": validation,
         "network_call": network_call,
         "live_data_required": live_data_required,
@@ -499,6 +512,8 @@ def _provider_error_summaries(
 
 def _provider_error_compact_summary(
     provider_error_summaries: list[dict[str, Any]],
+    *,
+    provider_smoke_plan: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     failed_provider_families: list[str] = []
     for summary in provider_error_summaries:
@@ -512,12 +527,44 @@ def _provider_error_compact_summary(
     next_provider_recovery_action = (
         first_summary.get("next_setup_action") if first_summary is not None else None
     )
+    next_provider_recovery_smoke = _provider_recovery_smoke_command(
+        first_summary=first_summary,
+        provider_smoke_plan=provider_smoke_plan,
+    )
     return {
         "failed_provider_families": failed_provider_families,
         "failed_provider_count": len(failed_provider_families),
         "first_provider_error_summary": first_summary,
         "next_provider_recovery_action": next_provider_recovery_action,
+        "next_provider_recovery_smoke": next_provider_recovery_smoke,
+        "next_provider_recovery_smoke_command_name": (
+            next_provider_recovery_smoke.get("smoke_command_name")
+            if next_provider_recovery_smoke is not None
+            else None
+        ),
     }
+
+
+def _provider_recovery_smoke_command(
+    *,
+    first_summary: dict[str, Any] | None,
+    provider_smoke_plan: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if first_summary is None or provider_smoke_plan is None:
+        return None
+    smoke_command_name = first_summary.get("smoke_command_name")
+    if not isinstance(smoke_command_name, str):
+        return None
+    provider_smokes = provider_smoke_plan.get("provider_smokes")
+    if not isinstance(provider_smokes, list):
+        return None
+    for provider_smoke in provider_smokes:
+        provider_smoke_row = _optional_mapping(provider_smoke)
+        if provider_smoke_row is None:
+            continue
+        if provider_smoke_row.get("smoke_command_name") == smoke_command_name:
+            return provider_smoke_row
+    return None
 
 
 def run_integration_smoke(
@@ -830,6 +877,12 @@ def run_api_key_pipeline_smoke(
         "next_provider_recovery_action": live_data_smoke_summary[
             "next_provider_recovery_action"
         ],
+        "next_provider_recovery_smoke": live_data_smoke_summary[
+            "next_provider_recovery_smoke"
+        ],
+        "next_provider_recovery_smoke_command_name": (
+            live_data_smoke_summary["next_provider_recovery_smoke_command_name"]
+        ),
         "signal_workflow_smoke_summary": _api_key_pipeline_smoke_summary(
             signal_workflow_smoke,
         ),
@@ -1687,7 +1740,8 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         else []
     )
     provider_error_compact_summary = _provider_error_compact_summary(
-        provider_error_rows
+        provider_error_rows,
+        provider_smoke_plan=provider_smoke_plan,
     )
     next_operator_action = _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
@@ -1745,6 +1799,14 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "next_provider_recovery_action": provider_error_compact_summary[
             "next_provider_recovery_action"
         ],
+        "next_provider_recovery_smoke": provider_error_compact_summary[
+            "next_provider_recovery_smoke"
+        ],
+        "next_provider_recovery_smoke_command_name": (
+            provider_error_compact_summary[
+                "next_provider_recovery_smoke_command_name"
+            ]
+        ),
         "next_smoke_command_name": next_smoke_command.get("name"),
     }
 

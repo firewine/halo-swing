@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.716 API Key Provider Recovery Smoke Command Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key one-shot smoke가 provider 실패를 compact fields로 보여주더라도, 사용자가
+해당 provider만 다시 검증하려면 `provider_smoke_plan`에서 같은
+`smoke_command_name`을 찾아 command를 직접 매칭해야 한다. 이번 slice는 첫 provider
+failure에 대응하는 runnable provider smoke command를 live-data smoke와 API-key
+pipeline one-shot 출력 상단에 노출해, API 키 입력 후 실패한 provider만 바로 재실행할
+수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke now exposes next_provider_recovery_smoke and next_provider_recovery_smoke_command_name by matching the first provider error summary smoke_command_name to provider_smoke_plan
+  - run_api_key_pipeline_smoke now mirrors the recovery smoke command fields in live_data_smoke_summary and top-level one-shot output
+  - fake-key one-shot smoke runs surface the get_market_snapshot_live_smoke recovery command for the first failed provider
+  - ok and fixture-default/no-key smoke paths keep recovery smoke command fields null when no provider error summaries exist
+  - recovery smoke command fields are copied only from existing no-secret provider_smoke_plan command metadata
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider recovery smoke command readiness pytest: 2 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with next_provider_recovery_smoke and no secrets
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0; recovery smoke command fields null while setup remains blocked at prepare_dotenv
+```
+
 ## 3.715 API Key Provider Error Compact Summary Gate Record - 2026-05-17
 
 ### A. 목적

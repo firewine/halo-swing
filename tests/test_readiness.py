@@ -1892,6 +1892,8 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert payload["failed_provider_count"] == 0
     assert payload["first_provider_error_summary"] is None
     assert payload["next_provider_recovery_action"] is None
+    assert payload["next_provider_recovery_smoke"] is None
+    assert payload["next_provider_recovery_smoke_command_name"] is None
 
 
 def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> None:
@@ -2028,6 +2030,19 @@ def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> N
         payload["next_provider_recovery_action"]
         == "verify_provider_credentials_or_network"
     )
+    assert payload["next_provider_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_provider_recovery_smoke"]["provider_family"] == "market"
+    assert payload["next_provider_recovery_smoke"]["provider"] == "polygon"
+    assert payload["next_provider_recovery_smoke"]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_provider_recovery_smoke"]["command"] == (
+        "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        "get_market_snapshot --input-json '{\"symbols\":[\"QQQ\"]}' --no-audit"
+    )
+    assert payload["next_provider_recovery_smoke"]["secret_values_returned"] is False
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -2224,12 +2239,30 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["live_data_smoke_summary"]["next_provider_recovery_action"]
         == "verify_provider_credentials_or_network"
     )
+    assert (
+        payload["live_data_smoke_summary"][
+            "next_provider_recovery_smoke_command_name"
+        ]
+        == "get_market_snapshot_live_smoke"
+    )
+    assert payload["live_data_smoke_summary"]["next_provider_recovery_smoke"][
+        "provider_family"
+    ] == "market"
+    assert payload["live_data_smoke_summary"]["next_provider_recovery_smoke"][
+        "provider"
+    ] == "polygon"
     assert payload["failed_provider_families"] == ["market", "macro", "news"]
     assert payload["failed_provider_count"] == 3
     assert payload["first_provider_error_summary"] == provider_errors[0]
     assert (
         payload["next_provider_recovery_action"]
         == "verify_provider_credentials_or_network"
+    )
+    assert payload["next_provider_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_provider_recovery_smoke"] == (
+        payload["live_data_smoke_summary"]["next_provider_recovery_smoke"]
     )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
@@ -2257,6 +2290,8 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["failed_provider_count"] == 0
     assert payload["first_provider_error_summary"] is None
     assert payload["next_provider_recovery_action"] is None
+    assert payload["next_provider_recovery_smoke"] is None
+    assert payload["next_provider_recovery_smoke_command_name"] is None
     assert payload["validation"]["status"] == "conflict"
     assert payload["provider_route"]["status"] == "blocked"
     assert payload["provider_route"]["selected_provider_classes"] == [
