@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.717 API Key Provider Recovery Smoke Commands Gate Record - 2026-05-17
+
+### A. 목적
+
+첫 provider recovery smoke command는 one-shot smoke 실패 후 가장 빠른 다음 action을
+보여주지만, Polygon, FRED, NewsAPI가 동시에 실패하면 나머지 provider 재검증 command를
+다시 `provider_smoke_plan`에서 찾아야 한다. 이번 slice는 실패한 모든 provider의
+runnable recovery smoke command 목록을 live-data smoke와 API-key pipeline one-shot
+출력 상단에 노출해, API 키 입력 후 provider별 재실행 순서를 바로 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke now exposes provider_recovery_smokes and provider_recovery_smoke_count by matching every provider error summary smoke_command_name to provider_smoke_plan
+  - run_api_key_pipeline_smoke now mirrors provider_recovery_smokes and provider_recovery_smoke_count in live_data_smoke_summary and top-level one-shot output
+  - fake-key one-shot smoke runs surface three recovery smoke commands for market, macro, and news provider failures
+  - ok and fixture-default/no-key smoke paths keep provider_recovery_smokes empty and provider_recovery_smoke_count=0 when no provider error summaries exist
+  - provider recovery smoke commands are copied only from existing no-secret provider_smoke_plan command metadata
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused provider recovery smoke commands readiness pytest: 2 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with provider_recovery_smoke_count=3 and no secrets
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0; provider_recovery_smokes empty while setup remains blocked at prepare_dotenv
+```
+
 ## 3.716 API Key Provider Recovery Smoke Command Gate Record - 2026-05-17
 
 ### A. 목적

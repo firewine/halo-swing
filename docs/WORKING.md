@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMAND_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMAND_GATE
+status: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMANDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface the runnable provider smoke command for the first failed API-key provider recovery path
+next_atomic_step: surface runnable recovery smoke commands for all failed API-key providers
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -79,16 +79,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_live_data_smoke exposes next_provider_recovery_smoke and next_provider_recovery_smoke_command_name matching the first provider error summary smoke_command_name
-  - run_api_key_pipeline_smoke mirrors the recovery smoke command fields in live_data_smoke_summary and top-level one-shot output
-  - recovery smoke command fields remain null on ok and fixture-default no-key paths when no provider error summaries exist
-  - recovery smoke command fields are copied only from existing no-secret provider_smoke_plan command metadata
+  - run_live_data_smoke exposes provider_recovery_smokes and provider_recovery_smoke_count matching every provider error summary smoke_command_name
+  - run_api_key_pipeline_smoke mirrors provider_recovery_smokes and provider_recovery_smoke_count in live_data_smoke_summary and top-level one-shot output
+  - provider_recovery_smokes remains empty on ok and fixture-default no-key paths when no provider error summaries exist
+  - provider recovery smoke commands are copied only from existing no-secret provider_smoke_plan command metadata
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery smoke command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider recovery smoke commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMAND_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SMOKE_COMMAND_GATE
+review_tier: S1_small
+
+next_atomic_step: surface the runnable provider smoke command for the first failed API-key provider recovery path
 ```
 
 Previous completed directive:
@@ -1819,6 +1830,60 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Recovery Smoke Commands Gate is verified.
+`run_live_data_smoke` now exposes `provider_recovery_smokes` and
+`provider_recovery_smoke_count`, matching each provider
+`error_summary.smoke_command_name` to the existing no-secret
+`provider_smoke_plan`. `run_api_key_pipeline_smoke` mirrors the same fields in
+`live_data_smoke_summary` and at the top level of the one-shot output. Fake-key
+CLI evidence showed three recovery smoke commands for market, macro, and news
+without secret values. Fixture-default no-key smoke kept recovery smoke lists
+empty. Focused tests passed with 2 tests, full pytest passed with 775 tests, and
+ruff, health_check, fake-key CLI, and fixture-default API-key pipeline CLI
+passed.
+
+```yaml
+api_key_provider_recovery_smoke_commands_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_live_data_smoke exposes provider_recovery_smokes and provider_recovery_smoke_count matching every provider error summary smoke_command_name
+    - run_api_key_pipeline_smoke mirrors provider_recovery_smokes and provider_recovery_smoke_count in live_data_smoke_summary and top-level one-shot output
+    - fake POLYGON/FRED/NEWS keys surface three recovery smoke commands for get_market_snapshot_live_smoke, get_macro_snapshot_live_smoke, and get_news_bundle_live_smoke
+    - fixture-default/no-key smoke keeps provider_recovery_smokes empty and provider_recovery_smoke_count=0
+    - provider recovery smoke commands are copied only from existing no-secret provider_smoke_plan command metadata
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_surfaces_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; provider_recovery_smoke_count=3 at top level and live_data_smoke_summary with no secrets"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default provider_recovery_smokes stayed empty and no secrets were returned"
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Smoke Command Gate is verified.
 `run_live_data_smoke` now exposes `next_provider_recovery_smoke` and

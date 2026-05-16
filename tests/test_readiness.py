@@ -1894,6 +1894,8 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert payload["next_provider_recovery_action"] is None
     assert payload["next_provider_recovery_smoke"] is None
     assert payload["next_provider_recovery_smoke_command_name"] is None
+    assert payload["provider_recovery_smokes"] == []
+    assert payload["provider_recovery_smoke_count"] == 0
 
 
 def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> None:
@@ -2043,6 +2045,19 @@ def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> N
         "get_market_snapshot --input-json '{\"symbols\":[\"QQQ\"]}' --no-audit"
     )
     assert payload["next_provider_recovery_smoke"]["secret_values_returned"] is False
+    assert [
+        recovery_smoke["smoke_command_name"]
+        for recovery_smoke in payload["provider_recovery_smokes"]
+    ] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert payload["provider_recovery_smoke_count"] == 3
+    assert all(
+        recovery_smoke["secret_values_returned"] is False
+        for recovery_smoke in payload["provider_recovery_smokes"]
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -2251,6 +2266,19 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert payload["live_data_smoke_summary"]["next_provider_recovery_smoke"][
         "provider"
     ] == "polygon"
+    assert [
+        recovery_smoke["smoke_command_name"]
+        for recovery_smoke in payload["live_data_smoke_summary"][
+            "provider_recovery_smokes"
+        ]
+    ] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert (
+        payload["live_data_smoke_summary"]["provider_recovery_smoke_count"] == 3
+    )
     assert payload["failed_provider_families"] == ["market", "macro", "news"]
     assert payload["failed_provider_count"] == 3
     assert payload["first_provider_error_summary"] == provider_errors[0]
@@ -2264,6 +2292,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert payload["next_provider_recovery_smoke"] == (
         payload["live_data_smoke_summary"]["next_provider_recovery_smoke"]
     )
+    assert payload["provider_recovery_smokes"] == (
+        payload["live_data_smoke_summary"]["provider_recovery_smokes"]
+    )
+    assert payload["provider_recovery_smoke_count"] == 3
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -2292,6 +2324,8 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["next_provider_recovery_action"] is None
     assert payload["next_provider_recovery_smoke"] is None
     assert payload["next_provider_recovery_smoke_command_name"] is None
+    assert payload["provider_recovery_smokes"] == []
+    assert payload["provider_recovery_smoke_count"] == 0
     assert payload["validation"]["status"] == "conflict"
     assert payload["provider_route"]["status"] == "blocked"
     assert payload["provider_route"]["selected_provider_classes"] == [
