@@ -144,6 +144,26 @@ EXPECTED_READINESS_EVIDENCE_KEYS_BY_GATE = {
         "secret_values_returned",
     ],
 }
+
+
+def expected_dotenv_file_status(target_path: Path) -> dict[str, Any]:
+    source_path = target_path.with_name(".env.example")
+    source_exists = source_path.is_file()
+    target_exists = target_path.is_file()
+    return {
+        "schema_version": "live_data_dotenv_file_status.v1",
+        "target_path": ".env",
+        "source_path": ".env.example",
+        "target_exists": target_exists,
+        "source_exists": source_exists,
+        "copy_required": source_exists and not target_exists,
+        "mutation": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -426,6 +446,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
+        "dotenv_file_status": expected_dotenv_file_status(ROOT / ".env"),
         "one_shot_smoke_command": {
             "name": "run_api_key_pipeline_smoke",
             "purpose": (
@@ -554,6 +575,9 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
+    assert payload["dotenv_file_status"] == expected_dotenv_file_status(
+        ROOT / ".env"
+    )
     assert payload["hermes_runtime_started"] is False
     assert payload["telegram_send_call"] is False
     assert payload["order_submission"] is False
@@ -609,6 +633,7 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     repo_dir.mkdir()
     run_dir.mkdir()
     repo_env = repo_dir / ".env"
+    repo_example = repo_dir / ".env.example"
     monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
     monkeypatch.chdir(run_dir)
     monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
@@ -621,6 +646,7 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
         "\n".join(f"{key}={value}" for key, value in secret_env.items()),
         encoding="utf-8",
     )
+    repo_example.write_text("POLYGON_API_KEY=\n", encoding="utf-8")
     clear_local_env_cache()
     get_settings.cache_clear()
 
@@ -653,6 +679,7 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
         "NEWS_API_KEY = your_newsapi_key"
     )
     assert payload["dotenv_template"]["secret_values_returned"] is False
+    assert payload["dotenv_file_status"] == expected_dotenv_file_status(repo_env)
     assert payload["dotenv"]["supported"] is True
     assert payload["dotenv"]["disabled"] is False
     assert payload["dotenv"]["mutation"] is False
@@ -3208,6 +3235,7 @@ def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
     repo_dir.mkdir()
     run_dir.mkdir()
     repo_env = repo_dir / ".env"
+    repo_example = repo_dir / ".env.example"
     monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
     monkeypatch.chdir(run_dir)
     monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
@@ -3230,6 +3258,7 @@ def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
         ),
         encoding="utf-8",
     )
+    repo_example.write_text("POLYGON_API_KEY=\n", encoding="utf-8")
     clear_local_env_cache()
     get_settings.cache_clear()
 
@@ -3440,6 +3469,9 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["live_data_setup_summary"][
+        "dotenv_file_status"
+    ] == expected_dotenv_file_status(repo_env)
     assert payload["live_data_setup_summary"]["missing"] == []
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",

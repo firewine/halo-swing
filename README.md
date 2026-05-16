@@ -201,7 +201,7 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setu
 To check only live data API-key setup before making provider network calls, use
 `get_live_data_api_key_status`; it reports configured alias names, missing
 provider families, `provider_family_summary`, the no-secret `dotenv_template`,
-and the one-shot smoke command without returning secrets:
+`dotenv_file_status`, and the one-shot smoke command without returning secrets:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
@@ -283,7 +283,9 @@ classes, missing keys, and the one-shot pipeline smoke command without exposing
 secret values. The summary includes `ready_to_run_live_smoke`,
 `next_smoke_command`, `provider_family_summary`, and a no-secret
 `dotenv_template` for the repo-root `.env` entries to fill before running smoke
-commands. It also returns
+commands. It also returns `dotenv_file_status` so the setup payload shows
+whether `.env.example` and `.env` exist without writing files or returning
+secret values. It also returns
 `live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the

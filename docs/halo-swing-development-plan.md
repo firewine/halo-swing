@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.677 Live Data Dotenv File Status Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key setup payload는 repo-root `.env`에 채울 key template을 보여주지만, 사용자가
+`.env.example`을 `.env`로 준비했는지 여부는 payload에서 바로 확인할 수 없었다. 이번
+slice는 no-write `dotenv_file_status`를 추가해 `.env.example`과 `.env`의 repo-relative
+존재 상태, copy 필요 여부, mutation/secret 반환 여부를 구조화해서 보여준다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status includes dotenv_file_status with repo-relative source/target paths, target_exists, source_exists, copy_required, and no secret values
+  - live_data_setup_summary exposes the same dotenv_file_status for checklist and smoke setup payloads
+  - README and DevOps guide document dotenv_file_status in API-key setup payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed
+```
+
 ## 3.676 API Key Pipeline Stage Provider Progress Gate Record - 2026-05-17
 
 ### A. 목적

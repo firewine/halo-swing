@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from halo_swing_mcp import MCP_SERVER_NAME
+import halo_swing_mcp.env as local_env
 from halo_swing_mcp.binance_btc import LIVE_CONFIRMATION
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import get_config_value
@@ -273,6 +274,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "missing": missing,
         "one_shot_smoke_command": _local_command("run_api_key_pipeline_smoke"),
         "dotenv_template": _live_data_dotenv_template(),
+        "dotenv_file_status": _live_data_dotenv_file_status(),
         "dotenv": {
             "supported": True,
             "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
@@ -1520,6 +1522,7 @@ def _live_data_setup_summary(
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
         "provider_route_summary": route_summary,
         "dotenv_template": _live_data_dotenv_template(),
+        "dotenv_file_status": _live_data_dotenv_file_status(),
         "one_shot_smoke_command": api_key_status.get("one_shot_smoke_command"),
         "next_smoke_command": _local_command(
             "run_api_key_pipeline_smoke"
@@ -1625,6 +1628,25 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                 "secret": True,
             },
         ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _live_data_dotenv_file_status() -> dict[str, Any]:
+    target_path = local_env.REPO_ROOT_ENV_PATH
+    source_path = target_path.with_name(".env.example")
+    target_exists = target_path.is_file()
+    source_exists = source_path.is_file()
+    return {
+        "schema_version": "live_data_dotenv_file_status.v1",
+        "target_path": ".env",
+        "source_path": ".env.example",
+        "target_exists": target_exists,
+        "source_exists": source_exists,
+        "copy_required": source_exists and not target_exists,
+        "mutation": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
