@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.656 Live Recording Source Metadata Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 넣어 live market/macro/news data로 만든 signal을 JSONL ledger에
+기록하면, recording 계층도 live data boundary를 보존해야 한다. 이번 slice는
+`record_signal`이 supplied signal, generated feature snapshot, generated news bundle의
+`live_data_required`와 `network_call` 값을 합산해 stored run journal, contract, top-level
+response에 반영하도록 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - record_signal computes recording live_data_required from the supplied signal, feature snapshot, and news bundle
+  - run_journal live_data_required and network_call preserve the recording source live boundary
+  - top-level record_signal live_data_required and run_journal_contract network_call reflect the stored JSONL record returned by append_if_absent
+  - fixture defaults and existing JSONL recording behavior remain offline and unchanged
+  - fake live signal and generated live snapshot tests prove propagation without real network or API keys
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - committed runtime artifact
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_preserves_live_source_metadata -q -> 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 747 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.655 Live Report Payload Boundary Metadata Gate Record - 2026-05-16
 
 ### A. 목적

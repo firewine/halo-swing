@@ -35,13 +35,25 @@ def record_signal(
     payload = _normalize_signal_payload(signal)
     signal_id = str(payload["signal_id"])
     repository = get_signal_ledger_repository(normalized_ledger_path)
-    run_journal = _run_journal(payload)
+    feature_snapshot = calculate_indicators(str(payload["underlying"]))
+    news_bundle = get_news_bundle(topic="all")
+    live_data_required = _live_data_required(
+        payload,
+        feature_snapshot,
+        news_bundle,
+    )
+    network_call = _network_call_required(payload, feature_snapshot, news_bundle)
+    run_journal = _run_journal(
+        payload,
+        live_data_required=live_data_required,
+        network_call=network_call,
+    )
 
     record = {
         "recorded_at": AS_OF,
         "signal": payload,
-        "feature_snapshot": calculate_indicators(str(payload["underlying"])),
-        "evidence_cards": get_news_bundle(topic="all")["evidence_cards"],
+        "feature_snapshot": feature_snapshot,
+        "evidence_cards": news_bundle["evidence_cards"],
         "run_journal": run_journal,
         "config_hash": payload.get("config_hash"),
         "labels": [],
@@ -55,9 +67,9 @@ def record_signal(
         "status": status,
         "signal_id": signal_id,
         "ledger_ref": repository.ledger_ref,
-        "run_journal_contract": _run_journal_contract(),
+        "run_journal_contract": _run_journal_contract(stored_record),
         "record": stored_record,
-        "live_data_required": False,
+        "live_data_required": _stored_record_live_data_required(stored_record),
     }
 
 
@@ -380,7 +392,12 @@ def _select_record(
     return None
 
 
-def _run_journal(signal: dict[str, Any]) -> dict[str, Any]:
+def _run_journal(
+    signal: dict[str, Any],
+    *,
+    live_data_required: bool | None = None,
+    network_call: bool | None = None,
+) -> dict[str, Any]:
     run_id = str(signal.get("run_id"))
     signal_id = str(signal.get("signal_id"))
     return {
@@ -394,19 +411,61 @@ def _run_journal(signal: dict[str, Any]) -> dict[str, Any]:
         "config_version": signal.get("config_version"),
         "config_hash": signal.get("config_hash"),
         "idempotency_key": f"{run_id}:{signal_id}:record_signal",
-        "network_call": False,
+        "network_call": _payload_network_call(signal)
+        if network_call is None
+        else network_call,
         "db_required": False,
         "secret_values_returned": False,
-        "live_data_required": False,
+        "live_data_required": bool(signal.get("live_data_required"))
+        if live_data_required is None
+        else live_data_required,
     }
 
 
-def _run_journal_contract() -> dict[str, Any]:
+def _live_data_required(*payloads: dict[str, Any]) -> bool:
+    return any(bool(payload.get("live_data_required")) for payload in payloads)
+
+
+def _network_call_required(*payloads: dict[str, Any]) -> bool:
+    return any(_payload_network_call(payload) for payload in payloads)
+
+
+def _payload_network_call(payload: dict[str, Any]) -> bool:
+    for contract_key in (
+        "source_data_contract",
+        "timeframe_contract",
+        "swing_level_contract",
+        "news_source_policy_contract",
+        "news_score_contract",
+    ):
+        contract = payload.get(contract_key)
+        if isinstance(contract, dict) and contract.get("network_call") is True:
+            return True
+    return bool(payload.get("network_call"))
+
+
+def _stored_record_live_data_required(record: dict[str, Any]) -> bool:
+    run_journal = record.get("run_journal", {})
+    if isinstance(run_journal, dict):
+        return bool(run_journal.get("live_data_required"))
+    return False
+
+
+def _stored_record_network_call(record: dict[str, Any] | None) -> bool:
+    if record is None:
+        return False
+    run_journal = record.get("run_journal", {})
+    if isinstance(run_journal, dict):
+        return bool(run_journal.get("network_call"))
+    return False
+
+
+def _run_journal_contract(record: dict[str, Any] | None = None) -> dict[str, Any]:
     return {
         "schema_version": RUN_JOURNAL_SCHEMA_VERSION,
         "storage": "jsonl_signal_ledger_record",
         "idempotency_key_field": "idempotency_key",
-        "network_call": False,
+        "network_call": _stored_record_network_call(record),
         "db_required": False,
         "secret_values_returned": False,
     }

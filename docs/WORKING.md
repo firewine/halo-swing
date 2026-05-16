@@ -42,19 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_VERIFIED
-gate_id: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_GATE
+status: LIVE_RECORDING_SOURCE_METADATA_VERIFIED
+gate_id: LIVE_RECORDING_SOURCE_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: make latest signal and position review report payloads preserve live_data_required when their scoring or position inputs used API-key-backed live data
+next_atomic_step: make record_signal preserve live_data_required when supplied signals or generated recording snapshots used API-key-backed live data
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/reporting.py
-  - tests/test_reporting.py
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/test_mvp_tools.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,23 +71,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_propagates_live_signal_boundary tests/test_reporting.py::test_position_review_report_propagates_live_review_boundary tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_preserves_live_source_metadata -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - generate_latest_signal_report top-level live_data_required follows the source signal live_data_required value
-  - generate_position_review_report top-level live_data_required follows the position review live_data_required value
-  - report and position payload guards compare live_data_required against the expected nested source value instead of hard-coded false
-  - fixture defaults and golden report remain offline and unchanged
-  - tests cover fake live signal and position review payloads without live network or real API keys
+  - record_signal top-level live_data_required follows supplied signal and generated snapshot live_data_required values
+  - run_journal live_data_required and network_call preserve the recording source live boundary
+  - fixture defaults and existing JSONL recording behavior remain offline and unchanged
+  - test covers fake live signal recording without live network or real API keys
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live report payload boundary metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live recording source metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_VERIFIED
+gate_id: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_GATE
+review_tier: S1_small
+
+next_atomic_step: make latest signal and position review report payloads preserve live_data_required when their scoring or position inputs used API-key-backed live data
 ```
 
 Previous completed directive:
@@ -1147,6 +1157,50 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Recording Source Metadata Gate is verified. `record_signal` now
+preserves `live_data_required` from the supplied signal and from generated
+recording snapshots. The stored run journal and contract now report the stored
+record's live-data and network boundary. Focused tests passed with 2 tests, full
+pytest passed with 747 tests, and ruff and health_check passed.
+
+```yaml
+live_recording_source_metadata_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/recording.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - record_signal computes recording live_data_required from the supplied signal, feature snapshot, and news bundle
+    - run_journal live_data_required and network_call preserve the recording source live boundary
+    - top-level record_signal live_data_required and run_journal_contract network_call reflect the stored JSONL record returned by append_if_absent
+    - fixture defaults and existing JSONL recording behavior remain offline and unchanged
+    - fake live signal and generated live snapshot tests cover the path without live network or real API keys
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_signal_preserves_live_source_metadata -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "747 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Live Report Payload Boundary Metadata Gate is verified.
 `generate_latest_signal_report` now preserves the source signal

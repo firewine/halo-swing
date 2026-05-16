@@ -908,6 +908,81 @@ def test_record_label_and_evaluate_ledger(tmp_path: Path) -> None:
     assert performance["ledger_ref"] == str(ledger_path)
 
 
+def test_record_signal_preserves_live_source_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    signal = score_leverage_swing("TQQQ")
+    live_signal = {
+        **signal,
+        "live_data_required": True,
+        "source_data_contract": {
+            **signal["source_data_contract"],
+            "network_call": True,
+            "live_data_required": True,
+        },
+    }
+    signal_live_record = record_signal(
+        signal=live_signal,
+        ledger_path=str(tmp_path / "signal_live_ledger.jsonl"),
+    )
+
+    assert signal_live_record["status"] == "recorded"
+    assert signal_live_record["live_data_required"] is True
+    assert signal_live_record["record"]["signal"]["live_data_required"] is True
+    assert signal_live_record["run_journal_contract"]["network_call"] is True
+    assert signal_live_record["record"]["run_journal"]["network_call"] is True
+    assert (
+        signal_live_record["record"]["run_journal"]["live_data_required"] is True
+    )
+
+    feature_snapshot = calculate_indicators("QQQ")
+    feature_snapshot["data_mode"] = "live"
+    feature_snapshot["live_data_required"] = True
+    feature_snapshot["timeframe_contract"] = {
+        **feature_snapshot["timeframe_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+    news_bundle = get_news_bundle(topic="all")
+    news_bundle["data_mode"] = "live"
+    news_bundle["live_data_required"] = True
+    news_bundle["news_source_policy_contract"] = {
+        **news_bundle["news_source_policy_contract"],
+        "network_call": True,
+        "live_data_required": True,
+    }
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.recording.calculate_indicators",
+        lambda _symbol: feature_snapshot,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.recording.get_news_bundle",
+        lambda topic="all": news_bundle,
+    )
+
+    snapshot_live_record = record_signal(
+        signal=signal,
+        ledger_path=str(tmp_path / "snapshot_live_ledger.jsonl"),
+    )
+
+    assert snapshot_live_record["status"] == "recorded"
+    assert snapshot_live_record["live_data_required"] is True
+    assert snapshot_live_record["record"]["signal"]["live_data_required"] is False
+    assert (
+        snapshot_live_record["record"]["feature_snapshot"]["live_data_required"]
+        is True
+    )
+    assert (
+        snapshot_live_record["record"]["run_journal"]["live_data_required"] is True
+    )
+    assert snapshot_live_record["run_journal_contract"]["network_call"] is True
+    assert snapshot_live_record["record"]["run_journal"]["network_call"] is True
+    assert "api_key=" not in repr(signal_live_record).lower()
+    assert "api_key=" not in repr(snapshot_live_record).lower()
+
+
 def test_record_signal_normalizes_public_signal_identity(tmp_path: Path) -> None:
     ledger_path = tmp_path / "signal_ledger.jsonl"
     signal = score_leverage_swing("TQQQ")
