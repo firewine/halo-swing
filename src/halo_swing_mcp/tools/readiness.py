@@ -2151,7 +2151,7 @@ def _api_key_pipeline_failure_summary(
         api_key_next_action_summary.get("provider_recovery_required") is True
     )
     next_action_name = api_key_next_action_summary.get("next_action_name")
-    return {
+    summary = {
         "schema_version": "api_key_pipeline_failure_summary.v1",
         "status": "conflict" if has_failures else "ok",
         "has_failures": has_failures,
@@ -2181,6 +2181,15 @@ def _api_key_pipeline_failure_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    preferred_env_key = api_key_next_action_summary.get("preferred_env_key")
+    accepted_env_keys = _string_list(
+        api_key_next_action_summary.get("accepted_env_keys")
+    )
+    if provider_recovery_required and isinstance(preferred_env_key, str):
+        summary["preferred_env_key"] = preferred_env_key
+    if provider_recovery_required and accepted_env_keys:
+        summary["accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_pipeline_failure_category(
