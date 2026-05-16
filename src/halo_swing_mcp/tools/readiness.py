@@ -924,6 +924,9 @@ def run_api_key_pipeline_smoke(
         "api_key_command_summary": api_key_command_summary,
         "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
+        "api_key_setup_file_summary": _api_key_setup_file_summary(
+            live_data_setup_summary
+        ),
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
         "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
         "api_key_pipeline_failure_summary": _api_key_pipeline_failure_summary(
@@ -2031,6 +2034,60 @@ def _api_key_pipeline_failure_category(
     }:
         return "setup"
     return "smoke_failure"
+
+
+def _api_key_setup_file_summary(
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    dotenv_file_status = _optional_mapping(
+        live_data_setup_summary.get("dotenv_file_status")
+    ) or {}
+    dotenv_template = _optional_mapping(
+        live_data_setup_summary.get("dotenv_template")
+    ) or {}
+    live_data_setup_steps = _optional_mapping(
+        live_data_setup_summary.get("live_data_setup_steps")
+    ) or {}
+    provider_family_summary = _optional_mapping(
+        live_data_setup_summary.get("provider_family_summary")
+    ) or {}
+    entries = dotenv_template.get("entries")
+    template_entries = entries if isinstance(entries, list) else []
+    preferred_env_keys = [
+        entry["preferred_env_key"]
+        for entry in template_entries
+        if isinstance(entry, dict) and isinstance(entry.get("preferred_env_key"), str)
+    ]
+    return {
+        "schema_version": "api_key_setup_file_summary.v1",
+        "source_path": dotenv_file_status.get("source_path"),
+        "target_path": dotenv_file_status.get("target_path"),
+        "source_exists": dotenv_file_status.get("source_exists") is True,
+        "target_exists": dotenv_file_status.get("target_exists") is True,
+        "copy_required": dotenv_file_status.get("copy_required") is True,
+        "copy_command": _optional_mapping(dotenv_file_status.get("copy_command")),
+        "preferred_env_keys": preferred_env_keys,
+        "preferred_env_key_count": len(preferred_env_keys),
+        "configured_provider_families": _string_list(
+            provider_family_summary.get("configured_provider_families")
+        ),
+        "missing_provider_families": _string_list(
+            provider_family_summary.get("missing_provider_families")
+        ),
+        "configured_provider_family_count": provider_family_summary.get(
+            "configured_count"
+        ),
+        "required_provider_family_count": provider_family_summary.get(
+            "required_count"
+        ),
+        "next_setup_step": live_data_setup_steps.get("next_step"),
+        "ready_to_run_live_smoke": (
+            live_data_setup_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
 
 
 def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:

@@ -308,6 +308,13 @@ operator-facing row with `status`, `has_failures`, `failure_category`,
 `first_failed_stage_name`, `first_failed_check_key`, `next_action_name`,
 `next_action_command`, `next_action_is_recovery`,
 `provider_recovery_required`, and `provider_recovery_item_count`.
+The top-level `api_key_setup_file_summary`
+(`api_key_setup_file_summary.v1`) keeps the `.env.example` and `.env` setup
+state visible with `source_path`, `target_path`, `source_exists`,
+`target_exists`, `copy_required`, `copy_command`, `preferred_env_keys`,
+`configured_provider_families`, `missing_provider_families`,
+`next_setup_step`, and `ready_to_run_live_smoke`, without returning secret
+values or mutating files.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,

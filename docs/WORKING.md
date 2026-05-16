@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_FAILURE_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_FAILURE_SUMMARY_GATE
+status: API_KEY_SETUP_FILE_SUMMARY_VERIFIED
+gate_id: API_KEY_SETUP_FILE_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: add a compact top-level API-key pipeline failure summary that correlates failed stages, failed checks, and the next operator action
+next_atomic_step: add a compact top-level API-key setup file summary for .env.example, .env, and preferred live-data API keys
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,19 +81,29 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - run_api_key_pipeline_smoke returns top-level api_key_pipeline_failure_summary using schema api_key_pipeline_failure_summary.v1
-  - api_key_pipeline_failure_summary exposes status, has_failures, failure_category, failed_stage_names, failed_check_keys, and tools_with_failures without secret values
-  - api_key_pipeline_failure_summary mirrors first_failed_stage_name, first_failed_check_key, next_action_name, next_action_command, next_action_is_recovery, provider_recovery_required, and provider_recovery_item_count
+  - run_api_key_pipeline_smoke returns top-level api_key_setup_file_summary using schema api_key_setup_file_summary.v1
+  - api_key_setup_file_summary exposes source_path, target_path, source_exists, target_exists, copy_required, copy_command, preferred_env_keys, configured_provider_families, missing_provider_families, next_setup_step, and ready_to_run_live_smoke without secret values
   - ok, missing-key, provider-recovery, and sub-smoke exception paths are covered by focused tests
-  - fake-key API-key pipeline CLI demonstrates api_key_pipeline_failure_summary with provider_recovery failure category without secrets
-  - README and DevOps setup guide document api_key_pipeline_failure_summary
-  - setup docs tests assert api_key_pipeline_failure_summary guidance
+  - fake-key API-key pipeline CLI demonstrates api_key_setup_file_summary ready_to_run_live_smoke true without secrets
+  - README and DevOps setup guide document api_key_setup_file_summary
+  - setup docs tests assert api_key_setup_file_summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline failure summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key setup file summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_FAILURE_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_FAILURE_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add a compact top-level API-key pipeline failure summary that correlates failed stages, failed checks, and the next operator action
 ```
 
 Previous completed directive:
@@ -1956,6 +1966,58 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Setup File Summary Gate is verified.
+`run_api_key_pipeline_smoke` now returns top-level
+`api_key_setup_file_summary` for `.env.example`, `.env`, preferred live-data
+keys, provider family readiness, and the next setup step without secret values.
+Focused tests, fake-key CLI, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_setup_file_summary_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - run_api_key_pipeline_smoke returns top-level api_key_setup_file_summary using schema api_key_setup_file_summary.v1
+    - api_key_setup_file_summary exposes source_path, target_path, source_exists, target_exists, copy_required, copy_command, preferred_env_keys, configured_provider_families, missing_provider_families, next_setup_step, and ready_to_run_live_smoke without secret values
+    - ok, missing-key, provider-recovery, and sub-smoke exception paths are covered by focused tests
+    - fake-key API-key pipeline CLI demonstrates api_key_setup_file_summary ready_to_run_live_smoke true without secrets
+    - README and DevOps setup guide document api_key_setup_file_summary
+    - tests/test_setup_docs.py asserts api_key_setup_file_summary guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; provider calls reached live-network boundary and top-level setup summary was present without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(asset=\"TQQQ\", timeframe=\"swing_3d_10d\", symbols=[\"QQQ\"], topic=\"macro\"); s=payload[\"api_key_setup_file_summary\"]; print(s[\"schema_version\"], s[\"ready_to_run_live_smoke\"], s[\"preferred_env_keys\"], s[\"secret_values_returned\"])'
+      result: "api_key_setup_file_summary.v1 True ['POLYGON_API_KEY', 'FRED_API_KEY', 'NEWS_API_KEY'] False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "775 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Failure Summary Gate is verified.
 `run_api_key_pipeline_smoke` now returns top-level

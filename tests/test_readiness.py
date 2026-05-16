@@ -2342,6 +2342,35 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_setup_file_summary"] == {
+        "schema_version": "api_key_setup_file_summary.v1",
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": False,
+        "copy_required": True,
+        "copy_command": {
+            "name": "copy_env_example_to_env",
+            "command": "cp .env.example .env",
+            "required": True,
+            "source_path": ".env.example",
+            "target_path": ".env",
+            "network_call": False,
+            "mutates_local_state": True,
+            "secret_values_returned": False,
+        },
+        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "preferred_env_key_count": 3,
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_provider_family_count": 3,
+        "required_provider_family_count": 3,
+        "next_setup_step": "run_provider_smokes",
+        "ready_to_run_live_smoke": True,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
     assert payload["live_data_smoke_summary"]["failed_provider_families"] == [
         "market",
@@ -3366,6 +3395,13 @@ def test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_excep
         is False
     )
     assert payload["api_key_pipeline_failure_summary"]["secret_values_returned"] is False
+    assert payload["api_key_setup_file_summary"]["ready_to_run_live_smoke"] is True
+    assert payload["api_key_setup_file_summary"]["preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["api_key_setup_file_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is True
     assert payload["live_data_smoke_summary"]["provider_route_status"] == "ready"
     assert ("run_live_data_smoke", "live_data_smoke_status_ok") in failed_checks
@@ -3703,6 +3739,35 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_is_recovery": False,
         "provider_recovery_required": False,
         "provider_recovery_item_count": 0,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_file_summary"] == {
+        "schema_version": "api_key_setup_file_summary.v1",
+        "source_path": ".env.example",
+        "target_path": ".env",
+        "source_exists": True,
+        "target_exists": True,
+        "copy_required": False,
+        "copy_command": {
+            "name": "copy_env_example_to_env",
+            "command": "cp .env.example .env",
+            "required": False,
+            "source_path": ".env.example",
+            "target_path": ".env",
+            "network_call": False,
+            "mutates_local_state": True,
+            "secret_values_returned": False,
+        },
+        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "preferred_env_key_count": 3,
+        "configured_provider_families": ["market", "macro", "news"],
+        "missing_provider_families": [],
+        "configured_provider_family_count": 3,
+        "required_provider_family_count": 3,
+        "next_setup_step": "run_provider_smokes",
+        "ready_to_run_live_smoke": True,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -4113,6 +4178,21 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         is False
     )
     assert payload["api_key_pipeline_failure_summary"]["secret_values_returned"] is False
+    assert payload["api_key_setup_file_summary"]["preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["api_key_setup_file_summary"]["missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_file_summary"]["next_setup_step"] == (
+        "prepare_dotenv"
+    )
+    assert payload["api_key_setup_file_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["api_key_setup_file_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"
