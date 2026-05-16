@@ -635,6 +635,173 @@ def test_market_snapshot_declares_live_provider_boundary_without_secret(
     assert "polygon-secret" not in serialized
 
 
+def test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception(
+    monkeypatch,
+) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        raise RuntimeError(
+            "provider failed at https://provider.example/?apiKey=polygon-secret"
+        )
+
+    provider = PolygonMarketDataProvider(
+        api_key="polygon-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = get_market_snapshot(["QQQ"])
+    serialized = json.dumps(payload, sort_keys=True)
+    error_summary = payload["error_summary"]
+    guard_checks = {
+        check["name"]: check
+        for check in payload["market_snapshot_guard"]["checks"]
+    }
+
+    assert payload["status"] == "conflict"
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["market_snapshot_contract"]["network_call"] is True
+    assert payload["market_snapshot_contract"]["live_data_required"] is True
+    assert payload["market_snapshot_contract"]["secret_values_returned"] is False
+    assert payload["market_snapshot_guard"]["status"] == "conflict"
+    assert guard_checks["live_data_boundary_declared"]["passed"] is True
+    assert guard_checks["network_call_declared"]["passed"] is True
+    assert guard_checks["secret_values_not_returned"]["passed"] is True
+    assert guard_checks["provider_smoke_completed"]["passed"] is False
+    assert error_summary == {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_market_snapshot",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    assert "provider.example" not in serialized
+    assert "apiKey" not in serialized
+    assert "polygon-secret" not in serialized
+
+
+def test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception(
+    monkeypatch,
+) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        raise RuntimeError(
+            "provider failed at https://provider.example/?api_key=fred-secret"
+        )
+
+    provider = FredMacroDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="fred-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = get_macro_snapshot()
+    serialized = json.dumps(payload, sort_keys=True)
+    error_summary = payload["error_summary"]
+    guard_checks = {
+        check["name"]: check
+        for check in payload["macro_filter_guard"]["checks"]
+    }
+
+    assert payload["status"] == "conflict"
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["macro_filter_contract"]["network_call"] is True
+    assert payload["macro_filter_contract"]["live_data_required"] is True
+    assert payload["macro_filter_contract"]["secret_values_returned"] is False
+    assert payload["source_policy"]["secret_values_returned"] is False
+    assert payload["macro_filter_guard"]["status"] == "conflict"
+    assert guard_checks["live_data_boundary_declared"]["passed"] is True
+    assert guard_checks["network_call_declared"]["passed"] is True
+    assert guard_checks["secret_values_not_returned"]["passed"] is True
+    assert guard_checks["provider_smoke_completed"]["passed"] is False
+    assert error_summary == {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_macro_snapshot",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    assert "provider.example" not in serialized
+    assert "api_key" not in serialized
+    assert "fred-secret" not in serialized
+
+
+def test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_exception(
+    monkeypatch,
+) -> None:
+    def fake_http_get(_url: str) -> dict[str, Any]:
+        raise RuntimeError(
+            "provider failed at https://provider.example/?apiKey=news-secret"
+        )
+
+    provider = NewsApiDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="news-secret",
+        http_get=fake_http_get,
+    )
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        lambda: provider,
+    )
+
+    payload = get_news_bundle("macro")
+    serialized = json.dumps(payload, sort_keys=True)
+    error_summary = payload["error_summary"]
+    guard_checks = {
+        check["name"]: check
+        for check in payload["news_source_policy_guard"]["checks"]
+    }
+
+    assert payload["status"] == "conflict"
+    assert payload["data_mode"] == "live"
+    assert payload["live_data_required"] is True
+    assert payload["news_source_policy_contract"]["network_call"] is True
+    assert payload["news_source_policy_contract"]["live_data_required"] is True
+    assert payload["news_source_policy_contract"]["secret_values_returned"] is False
+    assert payload["news_score_contract"]["network_call"] is True
+    assert payload["news_score_contract"]["live_data_required"] is True
+    assert payload["news_score_contract"]["secret_values_returned"] is False
+    assert payload["news_source_policy_guard"]["status"] == "conflict"
+    assert guard_checks["live_data_boundary_declared"]["passed"] is True
+    assert guard_checks["network_call_declared"]["passed"] is True
+    assert guard_checks["secret_values_not_returned"]["passed"] is True
+    assert guard_checks["provider_smoke_completed"]["passed"] is False
+    assert error_summary == {
+        "schema_version": "provider_smoke_error.v1",
+        "tool": "get_news_bundle",
+        "exception_type": "RuntimeError",
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+    assert "provider.example" not in serialized
+    assert "apiKey" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_fixture_provider_exception_is_not_swallowed(monkeypatch) -> None:
+    class BrokenReplayProvider(ReplayMarketDataProvider):
+        def macro_snapshot(self) -> dict[str, Any]:
+            raise RuntimeError("fixture provider failure")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.market.get_market_data_provider",
+        BrokenReplayProvider,
+    )
+
+    with pytest.raises(RuntimeError, match="fixture provider failure"):
+        get_macro_snapshot()
+
+
 def test_calculate_indicators_declares_live_provider_boundaries(monkeypatch) -> None:
     def fake_http_get(url: str) -> dict[str, Any]:
         assert "polygon-secret" in parse.parse_qs(parse.urlparse(url).query)["apiKey"]

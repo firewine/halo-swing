@@ -322,7 +322,10 @@ smoke. It also returns
 repo-local harness commands after filling the matching API keys to verify the
 live providers and boundary contracts. Those smoke commands are read-only and
 return no secret values, but they can call provider networks when the configured
-API keys select live providers.
+API keys select live providers. If an individual provider smoke hits a provider
+or network exception, it returns a no-secret `conflict` payload with the tool
+name and exception type only, so URLs, exception messages, and API key values do
+not leak into smoke output.
 When a market data API key selects the live Polygon provider, market snapshot
 payloads declare `live_data_required=true` and `network_call=true` in
 `market_snapshot_contract`, and the guard uses

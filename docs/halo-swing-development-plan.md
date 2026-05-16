@@ -137,6 +137,60 @@ verification:
   - run_api_key_pipeline_smoke fixture-default path: exit 0, blocked at prepare_dotenv, no secrets returned
 ```
 
+## 3.709 API Key Provider Smoke Exception Payload Gate Record - 2026-05-17
+
+### A. 목적
+
+`next_operator_action`은 API key가 준비되면 개별 provider smoke 명령
+(`get_market_snapshot`, `get_macro_snapshot`, `get_news_bundle`)을 안내한다. 그러나
+이 명령들이 live provider 네트워크/provider 예외에서 Python traceback으로 종료되면,
+사용자가 API key만 넣고 연동 상태를 확인하는 경로가 끊긴다. 이번 slice는 개별 provider
+smoke도 one-shot pipeline과 같이 no-secret `conflict` payload를 반환하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_market_snapshot returns status=conflict no-secret payloads for selected Polygon provider exceptions
+  - get_macro_snapshot returns status=conflict no-secret payloads for selected FRED provider exceptions
+  - get_news_bundle returns status=conflict no-secret payloads for selected NewsAPI provider exceptions
+  - provider smoke error summaries include tool name and exception type only
+  - fixture/offline provider exceptions are still raised
+  - README and DevOps setup guide document individual provider smoke conflict payload behavior
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+  - exception message, URL, or API key serialization
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused pytest: 6 passed
+  - full pytest: 768 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0
+  - fake-key get_market_snapshot/get_macro_snapshot/get_news_bundle CLIs: exit 0 with no-secret status=conflict payloads
+```
+
 ## 3.706 API Key Pipeline Readiness Next Operator Action Gate Record - 2026-05-17
 
 ### A. 목적

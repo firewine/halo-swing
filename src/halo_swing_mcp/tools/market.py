@@ -42,6 +42,7 @@ REQUIRED_NEWS_SOURCE_GROUPS = [
     "iran_hormuz",
     "ai_semiconductor",
 ]
+PROVIDER_SMOKE_ERROR_SCHEMA_VERSION = "provider_smoke_error.v1"
 
 
 def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
@@ -50,31 +51,48 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
     provider = get_market_data_provider()
     requested = _normalize_symbol_list(symbols)
     snapshots: list[dict[str, Any]] = []
-    for symbol in requested:
-        indicators = calculate_indicator_payload(symbol)
-        underlying, leverage = provider.resolve_asset(symbol)
-        asset_bars = provider.ohlcv(symbol, 220, timeframe=indicators["timeframe"])
-        latest_asset_close = asset_bars[-1]["close"]
-        previous_asset_close = asset_bars[-2]["close"]
-        snapshots.append(
-            {
-                "symbol": symbol,
-                "underlying": underlying,
-                "leverage": leverage,
-                "timeframe": indicators["timeframe"],
-                "last_close": latest_asset_close,
-                "change_pct_1d": round(
-                    (float(latest_asset_close) / float(previous_asset_close) - 1) * 100,
-                    4,
-                ),
-                "judgment_basis": indicators["indicator_symbol"],
-                "trend_state": indicators["trend_state"],
-                "rsi_14": indicators["rsi_14"],
-                "ma_20": indicators["ma_20"],
-                "ma_50": indicators["ma_50"],
-                "atr_percent": indicators["atr_percent"],
-            }
-        )
+    try:
+        for symbol in requested:
+            indicators = calculate_indicator_payload(symbol)
+            underlying, leverage = provider.resolve_asset(symbol)
+            asset_bars = provider.ohlcv(
+                symbol,
+                220,
+                timeframe=indicators["timeframe"],
+            )
+            latest_asset_close = asset_bars[-1]["close"]
+            previous_asset_close = asset_bars[-2]["close"]
+            snapshots.append(
+                {
+                    "symbol": symbol,
+                    "underlying": underlying,
+                    "leverage": leverage,
+                    "timeframe": indicators["timeframe"],
+                    "last_close": latest_asset_close,
+                    "change_pct_1d": round(
+                        (
+                            float(latest_asset_close)
+                            / float(previous_asset_close)
+                            - 1
+                        )
+                        * 100,
+                        4,
+                    ),
+                    "judgment_basis": indicators["indicator_symbol"],
+                    "trend_state": indicators["trend_state"],
+                    "rsi_14": indicators["rsi_14"],
+                    "ma_20": indicators["ma_20"],
+                    "ma_50": indicators["ma_50"],
+                    "atr_percent": indicators["atr_percent"],
+                }
+            )
+    except Exception as exc:
+        if not _provider_smoke_error_payload_enabled(
+            provider,
+            "PolygonMarketDataProvider",
+        ):
+            raise
+        return _market_snapshot_provider_exception_payload(provider, requested, exc)
 
     supported_assets = provider.supported_assets()
     supported_timeframes = provider.supported_timeframes()
@@ -160,7 +178,15 @@ def get_macro_snapshot() -> dict[str, Any]:
     """Return deterministic macro state."""
 
     provider = get_market_data_provider()
-    snapshot = provider.macro_snapshot()
+    try:
+        snapshot = provider.macro_snapshot()
+    except Exception as exc:
+        if not _provider_smoke_error_payload_enabled(
+            provider,
+            "FredMacroDataProvider",
+        ):
+            raise
+        return _macro_snapshot_provider_exception_payload(provider, exc)
     indicators = snapshot["indicators"]
     live_data_required = bool(snapshot["live_data_required"])
     contract = {
@@ -236,6 +262,217 @@ def _macro_filter_guard(
     return {
         "status": "ok" if all(check["passed"] for check in checks) else "conflict",
         "checks": checks,
+    }
+
+
+def _provider_smoke_error_payload_enabled(
+    provider: Any,
+    provider_class_name: str,
+) -> bool:
+    return bool(getattr(provider, "live_data_required", False)) or _provider_chain_has(
+        provider,
+        provider_class_name,
+    )
+
+
+def _provider_chain_has(provider: Any, provider_class_name: str) -> bool:
+    current = provider
+    while current is not None:
+        if current.__class__.__name__ == provider_class_name:
+            return True
+        current = getattr(current, "_base_provider", None)
+    return False
+
+
+def _provider_smoke_error_summary(tool: str, exc: Exception) -> dict[str, Any]:
+    return {
+        "schema_version": PROVIDER_SMOKE_ERROR_SCHEMA_VERSION,
+        "tool": tool,
+        "exception_type": type(exc).__name__,
+        "exception_message_returned": False,
+        "url_returned": False,
+        "secret_values_returned": False,
+    }
+
+
+def _provider_exception_guard() -> dict[str, Any]:
+    checks = [
+        {
+            "name": "live_data_boundary_declared",
+            "passed": True,
+            "expected": True,
+            "actual": True,
+        },
+        {
+            "name": "network_call_declared",
+            "passed": True,
+            "expected": True,
+            "actual": True,
+        },
+        {
+            "name": "secret_values_not_returned",
+            "passed": True,
+            "expected": False,
+            "actual": False,
+        },
+        {
+            "name": "provider_smoke_completed",
+            "passed": False,
+            "expected": True,
+            "actual": False,
+        },
+    ]
+    return {"status": "conflict", "checks": checks}
+
+
+def _market_snapshot_provider_exception_payload(
+    provider: Any,
+    requested: list[str],
+    exc: Exception,
+) -> dict[str, Any]:
+    contract = {
+        "schema_version": "market_snapshot.v1",
+        "core_assets": MARKET_SNAPSHOT_CORE_ASSETS,
+        "required_snapshot_fields": MARKET_SNAPSHOT_FIELDS,
+        "data_mode": "live",
+        "feature_store_persistence": False,
+        "feature_store_gate": "MIGRATION_GO_AND_REPOSITORY_GO",
+        "network_call": True,
+        "live_data_required": True,
+        "secret_values_returned": False,
+    }
+    return {
+        "status": "conflict",
+        "as_of": provider.as_of,
+        "data_mode": "live",
+        "live_data_required": True,
+        "data_freshness_status": DataFreshnessStatus.UNKNOWN.value,
+        "degraded_mode": True,
+        "data_warnings": ["provider_smoke_exception"],
+        "supported_assets": provider.supported_assets(),
+        "supported_timeframes": provider.supported_timeframes(),
+        "requested_symbols": requested,
+        "market_snapshot_contract": contract,
+        "market_snapshot_guard": _provider_exception_guard(),
+        "error_summary": _provider_smoke_error_summary(
+            "get_market_snapshot",
+            exc,
+        ),
+        "secret_values_returned": False,
+        "snapshots": [],
+    }
+
+
+def _macro_snapshot_provider_exception_payload(
+    provider: Any,
+    exc: Exception,
+) -> dict[str, Any]:
+    contract = {
+        "schema_version": "macro_filter.v1",
+        "required_indicators": ["vix", "vxn", "dxy", "us_2y", "us_10y", "oil_wti"],
+        "change_window": "5d",
+        "network_call": True,
+        "live_data_required": True,
+        "secret_values_returned": False,
+        "policy": (
+            "Macro blocks are derived from configured FRED VIX/VXN, DXY, "
+            "rates, and oil change fields."
+        ),
+    }
+    return {
+        "status": "conflict",
+        "as_of": provider.as_of,
+        "data_mode": "live",
+        "live_data_required": True,
+        "macro_score": None,
+        "risk_score": None,
+        "indicators": {},
+        "summary": "Live macro provider smoke did not complete.",
+        "source_policy": {
+            "schema_version": "fred_macro_source_policy.v1",
+            "provider": "fred",
+            "network_call": True,
+            "secret_values_returned": False,
+        },
+        "macro_filter_contract": contract,
+        "macro_filter_guard": _provider_exception_guard(),
+        "macro_filter_summary": {
+            "schema_version": "macro_filter_summary.v1",
+            "status": "conflict",
+            "risk_triggers": [],
+            "blocks_new_longs_now": False,
+            "blocks_new_3x_now": False,
+            "blocks_new_2x_now": False,
+            "indicator_states": {},
+            "change_window": "5d",
+            "live_data_required": True,
+        },
+        "error_summary": _provider_smoke_error_summary(
+            "get_macro_snapshot",
+            exc,
+        ),
+        "secret_values_returned": False,
+    }
+
+
+def _news_bundle_provider_exception_payload(
+    provider: Any,
+    normalized_topic: str,
+    exc: Exception,
+) -> dict[str, Any]:
+    return {
+        "status": "conflict",
+        "as_of": provider.as_of,
+        "topic": normalized_topic,
+        "data_mode": "live",
+        "live_data_required": True,
+        "news_source_policy_contract": {
+            "schema_version": "news_source_policy.v1",
+            "required_source_groups": ["newsapi"],
+            "covered_source_groups": [],
+            "collection_mode": "live",
+            "live_collection_enabled": True,
+            "network_call": True,
+            "live_data_required": True,
+            "secret_values_returned": False,
+        },
+        "news_source_policy_guard": _provider_exception_guard(),
+        "news_score_contract": {
+            "schema_version": "news_score.v1",
+            "required_scores": [
+                "news_score",
+                "policy_score",
+                "geopolitical_score",
+                "ai_semiconductor_theme_score",
+            ],
+            "required_card_fields": ["bias", "strength", "confidence"],
+            "scoring_usage": "score_leverage_swing.component_scores.theme",
+            "network_call": True,
+            "live_data_required": True,
+            "secret_values_returned": False,
+        },
+        "average_strength": 0.0,
+        "news_score": 0.0,
+        "policy_score": 0.0,
+        "geopolitical_score": 0.0,
+        "ai_semiconductor_theme_score": 0.0,
+        "modality_counts": {},
+        "source_group_counts": {},
+        "artifact_refs": [],
+        "multimodal_evidence_guard": {
+            "status": "conflict",
+            "checks": [
+                {
+                    "name": "provider_smoke_completed",
+                    "passed": False,
+                    "expected": True,
+                    "actual": False,
+                }
+            ],
+        },
+        "error_summary": _provider_smoke_error_summary("get_news_bundle", exc),
+        "secret_values_returned": False,
+        "evidence_cards": [],
     }
 
 
@@ -323,7 +560,19 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
 
     normalized_topic = _normalize_topic_identity(topic)
     provider = get_market_data_provider()
-    cards = provider.news_cards(normalized_topic)
+    try:
+        cards = provider.news_cards(normalized_topic)
+    except Exception as exc:
+        if not _provider_smoke_error_payload_enabled(
+            provider,
+            "NewsApiDataProvider",
+        ):
+            raise
+        return _news_bundle_provider_exception_payload(
+            provider,
+            normalized_topic,
+            exc,
+        )
     live_collection_enabled = any(card.get("source") == "newsapi" for card in cards)
     collection_mode = "live" if live_collection_enabled else provider.data_mode
     average_strength = _average_strength(cards)

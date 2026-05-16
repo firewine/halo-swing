@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_VERIFIED
-gate_id: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_GATE
+status: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_EXCEPTION_PAYLOAD_GATE
 review_tier: S1_small
 
-next_atomic_step: make run_api_key_pipeline_smoke return a no-secret conflict payload instead of raising when live provider sub-smokes hit network or provider exceptions
+next_atomic_step: make individual live provider smoke tools return no-secret conflict payloads instead of tracebacks when API-key-backed provider calls fail
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,7 +55,9 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/tools/market.py
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_providers.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -74,24 +76,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_fixture_provider_exception_is_not_swallowed tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke catches live-data, signal-workflow, and recording sub-smoke exceptions and returns status=conflict
-  - exception summaries include sub-smoke name and exception type but do not include exception messages, URLs, API key values, or secret values
-  - when exported API keys select live providers and a sub-smoke fails, readiness/setup summaries still show API-key setup as ready and next_operator_action as run_provider_smokes
-  - failed sub-smoke summaries expose error_summary and failed checks instead of crashing the harness
-  - README and DevOps setup guide mention that provider/network failures are reported as no-secret conflict payloads
+  - get_market_snapshot, get_macro_snapshot, and get_news_bundle catch live provider exceptions only when live data is selected and return status=conflict payloads
+  - provider smoke error summaries include tool name and exception type but do not include exception messages, URLs, API key values, or secret values
+  - returned conflict payloads keep live_data_required and network_call boundaries declared so validate_live_data_smoke_result can flag failed provider completion without crashing
+  - fixture/offline provider errors are not silently swallowed
+  - README and DevOps setup guide mention that individual provider smoke failures are reported as no-secret conflict payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline sub-smoke exception gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider smoke exception payload gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_VERIFIED
+gate_id: API_KEY_PIPELINE_SUB_SMOKE_EXCEPTION_GATE
+review_tier: S1_small
+
+next_atomic_step: make run_api_key_pipeline_smoke return a no-secret conflict payload instead of raising when live provider sub-smokes hit network or provider exceptions
 ```
 
 Previous completed directive:
@@ -1734,6 +1747,66 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Smoke Exception Payload Gate is verified.
+`get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle` now return
+no-secret `status=conflict` payloads instead of tracebacks when selected
+API-key-backed providers hit provider or network exceptions. Error summaries
+include the tool name and exception type only; exception messages, URLs, and API
+key values are not returned. Fixture/offline provider exceptions are still
+raised. Focused tests passed with 6 tests, full pytest passed with 768 tests,
+and ruff, health_check, fixture-default pipeline CLI, and fake-key individual
+provider smoke CLIs passed.
+
+```yaml
+api_key_provider_smoke_exception_payload_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+  implementation:
+    - get_market_snapshot catches selected Polygon provider exceptions and returns status=conflict without exception message, URL, or API key values
+    - get_macro_snapshot catches selected FRED provider exceptions and returns status=conflict without exception message, URL, or API key values
+    - get_news_bundle catches selected NewsAPI provider exceptions and returns status=conflict without exception message, URL, or API key values
+    - returned conflict payloads keep live_data_required=true, network_call=true, and secret_values_returned=false contract evidence
+    - provider smoke guards keep live boundary checks passing while provider_smoke_completed fails for validation visibility
+    - fixture/offline provider exceptions are not swallowed
+    - README and DevOps guide document no-secret conflict payload behavior for individual provider smoke failures
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_macro_snapshot_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_news_bundle_returns_no_secret_conflict_payload_for_live_provider_exception tests/test_providers.py::test_fixture_provider_exception_is_not_swallowed tests/test_readiness.py::test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_exception tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "6 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "768 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup remained blocked at prepare_dotenv and no secrets were returned"
+    - command: POLYGON_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '{"symbols":["QQQ"]}' --no-audit
+      result: "exit 0; status=conflict, exception_type=URLError, no exception message, URL, or API key value returned"
+    - command: FRED_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit
+      result: "exit 0; status=conflict, exception_type=URLError, no exception message, URL, or API key value returned"
+    - command: NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '{"topic":"macro"}' --no-audit
+      result: "exit 0; status=conflict, exception_type=URLError, no exception message, URL, or API key value returned"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Sub-Smoke Exception Gate is verified.
 `run_api_key_pipeline_smoke` now catches live-data, signal-workflow, and

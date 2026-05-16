@@ -402,7 +402,10 @@ includes `live_data_smoke_commands` for `get_market_snapshot`,
 run those repo-local harness commands to verify the live provider outputs and
 boundary contracts. The smoke commands are read-only and return no secret values,
 but they can call provider networks when the configured keys select live
-providers. Use
+providers. If an individual provider smoke hits a provider or network exception,
+it returns a no-secret `conflict` payload with the tool name and exception type
+only, so URLs, exception messages, and API key values do not leak into smoke
+output. Use
 `validate_live_data_smoke_result` on the collected smoke payloads to verify
 `live_data_required`, `network_call`, live guard checks, and secret-return
 metadata offline. Use `get_live_data_api_key_status` before the first live smoke
