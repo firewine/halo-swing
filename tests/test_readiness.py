@@ -1222,6 +1222,32 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "live_data_required": False,
         }
 
+    def fake_api_key_status() -> dict[str, Any]:
+        return {
+            "schema_version": "live_data_api_key_status.v1",
+            "status": "ready",
+            "providers": {
+                "market": {"configured": True},
+                "macro": {"configured": True},
+                "news": {"configured": True},
+            },
+            "missing": [],
+            "one_shot_smoke_command": {
+                "name": "run_api_key_pipeline_smoke",
+                "command": (
+                    "PYTHONPATH=src ./.venv/bin/python -m "
+                    "halo_swing_mcp.harness run_api_key_pipeline_smoke "
+                    "--input-json "
+                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                ),
+                "network_call": True,
+                "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+        }
+
     def fake_live_data_smoke(
         symbols: list[str] | None = None,
         topic: str = "macro",
@@ -1278,6 +1304,11 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         }
 
     monkeypatch.setattr(readiness_tools, "get_integration_readiness", fake_readiness)
+    monkeypatch.setattr(
+        readiness_tools,
+        "get_live_data_api_key_status",
+        fake_api_key_status,
+    )
     monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
     monkeypatch.setattr(
         readiness_tools,
@@ -1303,11 +1334,32 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["readiness_summary"]["status"] == "blocked"
     assert payload["executed_tools"] == [
         "get_integration_readiness",
+        "get_live_data_api_key_status",
         "run_live_data_smoke",
         "get_live_data_provider_route",
         "run_live_signal_workflow_smoke",
         "run_live_recording_smoke",
     ]
+    assert payload["live_data_setup_summary"]["status"] == "ready"
+    assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
+    assert payload["live_data_setup_summary"]["configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["live_data_setup_summary"]["missing"] == []
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert (
+        payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["provider_route_summary"] == {
         "schema_version": "live_data_provider_route.v1",
         "status": "ready",
@@ -1354,6 +1406,23 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["status"] == "conflict"
     assert payload["readiness_summary"]["live_data_ready"] is False
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["live_data_setup_summary"]["status"] == "blocked"
+    assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert (
+        payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["provider_route_summary"]["status"] == "blocked"
     assert payload["provider_route_summary"]["selected_provider_classes"] == [
         "ReplayMarketDataProvider"

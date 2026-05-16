@@ -581,6 +581,7 @@ def run_api_key_pipeline_smoke(
     """Run the API-key-backed local integration pipeline smoke checks."""
 
     readiness = get_integration_readiness()
+    live_data_api_key_status = get_live_data_api_key_status()
     live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
     provider_route = _optional_mapping(live_data_smoke.get("provider_route")) or {}
     signal_workflow_smoke = run_live_signal_workflow_smoke(
@@ -606,12 +607,17 @@ def run_api_key_pipeline_smoke(
         },
         "executed_tools": [
             "get_integration_readiness",
+            "get_live_data_api_key_status",
             "run_live_data_smoke",
             "get_live_data_provider_route",
             "run_live_signal_workflow_smoke",
             "run_live_recording_smoke",
         ],
         "readiness_summary": _api_key_pipeline_readiness_summary(readiness),
+        "live_data_setup_summary": _live_data_setup_summary(
+            live_data_api_key_status,
+            provider_route,
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
