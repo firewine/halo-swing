@@ -393,10 +393,11 @@ providers. Use
 `live_data_required`, `network_call`, live guard checks, and secret-return
 metadata offline. Use `get_live_data_api_key_status` before the first live smoke
 when you only need to confirm that supported Polygon, FRED, and NewsAPI aliases
-are configured; it reports key names and missing provider families but never
-secret values. Use `get_live_data_provider_route` when you need to confirm that
-the actual `get_market_data_provider` factory selected Polygon, FRED, and
-NewsAPI from those keys without making provider network calls. Use
+are configured; it reports key names, missing provider families, and the
+no-secret `dotenv_template` but never secret values. Use
+`get_live_data_provider_route` when you need to confirm that the actual
+`get_market_data_provider` factory selected Polygon, FRED, and NewsAPI from
+those keys without making provider network calls. Use
 `run_live_data_smoke` for the same validation in one command after filling the
 market, macro, and news API keys; its payload now includes the same no-network
 provider route evidence and `live_data_setup_summary` before provider smoke

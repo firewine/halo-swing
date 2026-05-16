@@ -538,6 +538,19 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["live_mode_required"] is False
     assert payload["one_shot_smoke_command"]["name"] == "run_api_key_pipeline_smoke"
     assert payload["one_shot_smoke_command"]["network_call"] is True
+    assert payload["dotenv_template"]["target_path"] == ".env"
+    assert payload["dotenv_template"]["source_path"] == ".env.example"
+    assert payload["dotenv_template"]["entries"][0]["example"] == (
+        "POLYGON_API_KEY = your_polygon_key"
+    )
+    assert payload["dotenv_template"]["entries"][1]["accepted_env_keys"] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
+    assert payload["dotenv_template"]["network_call"] is False
+    assert payload["dotenv_template"]["mutates_local_state"] is False
+    assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["providers"]["market"]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
@@ -602,6 +615,11 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     ]
     assert payload["providers"]["news"]["configured"] is True
     assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
+    assert payload["dotenv_template"]["target_path"] == ".env"
+    assert payload["dotenv_template"]["entries"][2]["example"] == (
+        "NEWS_API_KEY = your_newsapi_key"
+    )
+    assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["dotenv"]["supported"] is True
     assert payload["dotenv"]["disabled"] is False
     assert payload["dotenv"]["mutation"] is False

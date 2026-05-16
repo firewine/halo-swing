@@ -251,6 +251,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "providers": providers,
         "missing": missing,
         "one_shot_smoke_command": _local_command("run_api_key_pipeline_smoke"),
+        "dotenv_template": _live_data_dotenv_template(),
         "dotenv": {
             "supported": True,
             "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
