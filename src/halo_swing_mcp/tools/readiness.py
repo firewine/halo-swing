@@ -247,6 +247,66 @@ def validate_live_data_smoke_result(
     }
 
 
+def run_live_data_smoke(
+    symbols: list[str] | None = None,
+    topic: str = "macro",
+) -> dict[str, Any]:
+    """Run market, macro, and news smoke paths, then validate their outputs."""
+
+    from halo_swing_mcp.tools import market as market_tools
+
+    smoke_symbols = symbols if symbols is not None else ["QQQ"]
+    market_snapshot = market_tools.get_market_snapshot(smoke_symbols)
+    macro_snapshot = market_tools.get_macro_snapshot()
+    news_bundle = market_tools.get_news_bundle(topic)
+    validation = validate_live_data_smoke_result(
+        market_snapshot=market_snapshot,
+        macro_snapshot=macro_snapshot,
+        news_bundle=news_bundle,
+    )
+    network_call = any(
+        [
+            _mapping_value(
+                _optional_mapping(market_snapshot.get("market_snapshot_contract")),
+                "network_call",
+            )
+            is True,
+            _mapping_value(
+                _optional_mapping(macro_snapshot.get("macro_filter_contract")),
+                "network_call",
+            )
+            is True,
+            _mapping_value(
+                _optional_mapping(news_bundle.get("news_source_policy_contract")),
+                "network_call",
+            )
+            is True,
+        ]
+    )
+    live_data_required = any(
+        payload.get("live_data_required") is True
+        for payload in [market_snapshot, macro_snapshot, news_bundle]
+    )
+
+    return {
+        "schema_version": "live_data_smoke_run.v1",
+        "status": validation["status"],
+        "input": {
+            "symbols": smoke_symbols,
+            "topic": topic,
+        },
+        "market_snapshot": market_snapshot,
+        "macro_snapshot": macro_snapshot,
+        "news_bundle": news_bundle,
+        "validation": validation,
+        "network_call": network_call,
+        "live_data_required": live_data_required,
+        "send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -386,6 +446,19 @@ def _setup_local_commands() -> list[dict[str, Any]]:
                 "/path/to/live_data_smoke_payloads.json --no-audit"
             ),
             "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_live_data_smoke",
+            "purpose": "run market, macro, and news smoke paths and validate the combined result",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_live_data_smoke --input-json "
+                "'{\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,
             "secret_values_returned": False,
         },

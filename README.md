@@ -206,6 +206,13 @@ news live boundary contracts offline:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness validate_live_data_smoke_result --input-file /path/to/live_data_smoke_payloads.json --no-audit
 ```
 
+For a one-shot API-key-backed check, use `run_live_data_smoke`; it runs the
+market, macro, and news smoke paths and validates the combined payload:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+```
+
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_smoke_commands` for

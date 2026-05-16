@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -15,6 +16,7 @@ from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    run_live_data_smoke,
     validate_live_data_smoke_result,
 )
 from halo_swing_mcp.tools.market import (
@@ -340,6 +342,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "get_integration_readiness",
         "get_integration_setup_checklist",
         "validate_live_data_smoke_result",
+        "run_live_data_smoke",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -481,6 +484,99 @@ def test_validate_live_data_smoke_result_flags_fixture_payloads(monkeypatch) -> 
     assert ("get_news_bundle", "network_call_declared") in failed_checks
     assert payload["network_call"] is False
     assert payload["secret_values_returned"] is False
+
+
+def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import market as market_tools
+
+    def fake_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
+        return {
+            "live_data_required": True,
+            "market_snapshot_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "market_snapshot_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True}
+                ],
+            },
+            "snapshots": [{"symbol": symbols[0] if symbols else "QQQ"}],
+        }
+
+    def fake_macro_snapshot() -> dict[str, Any]:
+        return {
+            "live_data_required": True,
+            "macro_filter_contract": {
+                "live_data_required": True,
+                "network_call": True,
+            },
+            "macro_filter_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                ],
+            },
+        }
+
+    def fake_news_bundle(topic: str = "macro") -> dict[str, Any]:
+        return {
+            "topic": topic,
+            "live_data_required": True,
+            "news_source_policy_contract": {
+                "live_data_required": True,
+                "network_call": True,
+                "secret_values_returned": False,
+            },
+            "news_source_policy_guard": {
+                "status": "ok",
+                "checks": [
+                    {"name": "live_data_boundary_declared", "passed": True},
+                    {"name": "network_call_declared", "passed": True},
+                    {"name": "secret_values_not_returned", "passed": True},
+                ],
+            },
+            "news_score_contract": {"secret_values_returned": False},
+        }
+
+    monkeypatch.setattr(market_tools, "get_market_snapshot", fake_market_snapshot)
+    monkeypatch.setattr(market_tools, "get_macro_snapshot", fake_macro_snapshot)
+    monkeypatch.setattr(market_tools, "get_news_bundle", fake_news_bundle)
+
+    payload = run_live_data_smoke(symbols=["QQQ"], topic="macro")
+
+    assert payload["schema_version"] == "live_data_smoke_run.v1"
+    assert payload["status"] == "ok"
+    assert payload["input"] == {"symbols": ["QQQ"], "topic": "macro"}
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["validation"]["status"] == "ok"
+    assert all(check["passed"] for check in payload["validation"]["checks"])
+
+
+def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_live_data_smoke(symbols=["QQQ"], topic="all")
+
+    assert payload["schema_version"] == "live_data_smoke_run.v1"
+    assert payload["status"] == "conflict"
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["secret_values_returned"] is False
+    assert payload["validation"]["status"] == "conflict"
+    assert payload["market_snapshot"]["data_mode"] == "fixture"
+    assert payload["macro_snapshot"]["data_mode"] == "fixture"
+    assert payload["news_bundle"]["data_mode"] == "fixture"
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(

@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_SMOKE_RESULT_VALIDATOR_GATE",
+  "gate_id": "LIVE_DATA_SMOKE_RUNNER_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.650",
-  "next_atomic_step": "add an offline validate_live_data_smoke_result tool that verifies API-key-backed market, macro, and news smoke outputs declare live boundaries without returning secrets",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.651",
+  "next_atomic_step": "add a one-shot run_live_data_smoke tool that executes market, macro, and news smoke paths and validates their live boundary metadata when API keys are configured",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -24,7 +24,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.650",
+    "docs/halo-swing-development-plan.md#3.651",
     "src/halo_swing_mcp/harness.py",
     "src/halo_swing_mcp/server.py",
     "src/halo_swing_mcp/tool_registry.py",
@@ -45,7 +45,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_validate_live_data_smoke_result_accepts_live_boundaries tests/test_readiness.py::test_validate_live_data_smoke_result_flags_fixture_payloads tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -61,15 +61,15 @@
     "read_only": true
   },
   "done_means": [
-    "validate_live_data_smoke_result is registered for MCP and harness use",
-    "the validator accepts market, macro, and news smoke outputs and checks live_data_required/network_call/live guard metadata",
-    "the validator keeps network_call=false, send_call=false, order_submission=false, and secret_values_returned=false",
-    "tests prove live-shaped payloads pass and fixture/replay payloads are flagged without live network or real API keys",
-    "health and MVP golden tool manifests include validate_live_data_smoke_result",
-    "README and DevOps setup docs describe validating smoke outputs after running API-key-backed commands",
+    "run_live_data_smoke is registered for MCP and harness use",
+    "the runner executes get_market_snapshot, get_macro_snapshot, and get_news_bundle then validates the combined payload with validate_live_data_smoke_result",
+    "the runner reports read-only/no-send/no-order/no-secret boundaries and declares network_call according to returned smoke payload contracts",
+    "tests prove fake live payloads pass and fixture/replay payloads are flagged without real API keys or live network",
+    "health and MVP golden tool manifests include run_live_data_smoke",
+    "README and DevOps setup docs describe the one-shot smoke runner after filling API keys",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live data smoke result validator gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data smoke runner gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
