@@ -1,33 +1,23 @@
 {
-  "gate_id": "DOTENV_DISABLE_FLAG_GATE",
+  "gate_id": "DOTENV_DISABLE_PRECEDENCE_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.638",
-  "next_atomic_step": "make HALO_SWING_DISABLE_DOTENV usable from dotenv files and expose the blank template placeholder",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.639",
+  "next_atomic_step": "make HALO_SWING_DISABLE_DOTENV follow exported-env, launch-directory dotenv, repo-root dotenv precedence",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    ".env.example",
-    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
-    "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/env.py",
-    "tests/test_env.py",
-    "tests/test_env_template.py",
-    "tests/test_setup_docs.py"
+    "tests/test_env.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.638",
-    ".env.example",
-    "README.md",
-    "docs/devops-setup-guide.md",
+    "docs/halo-swing-development-plan.md#3.639",
     "src/halo_swing_mcp/env.py",
-    "tests/test_env.py",
-    "tests/test_env_template.py",
-    "tests/test_setup_docs.py"
+    "tests/test_env.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -43,7 +33,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py tests/test_env_template.py tests/test_setup_docs.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -58,14 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when exported",
-    "HALO_SWING_DISABLE_DOTENV=true disables dotenv loading when set in repo-root .env or launch-directory .env",
-    ".env.example exposes a blank HALO_SWING_DISABLE_DOTENV placeholder",
-    "setup docs explain that the isolation flag may be exported or set in .env",
-    "tests lock dotenv disable behavior, env template placeholder, and setup docs text",
+    "exported HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true",
+    "launch-directory HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true",
+    "repo-root or launch-directory HALO_SWING_DISABLE_DOTENV=true still disables dotenv loading when no higher-precedence false is set",
+    "tests/test_env.py locks disable flag precedence",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified dotenv disable flag gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified dotenv disable precedence gate, then continue with Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

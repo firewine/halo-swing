@@ -18,6 +18,32 @@ def test_get_config_value_can_disable_dotenv_loading(
     assert get_config_value("NEWS_API_KEY") is None
 
 
+def test_exported_disable_false_overrides_repo_root_disable_true(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    repo_env = tmp_path / "repo" / ".env"
+    run_dir = tmp_path / "runner"
+    repo_env.parent.mkdir()
+    run_dir.mkdir()
+    repo_env.write_text(
+        "\n".join(
+            [
+                "HALO_SWING_DISABLE_DOTENV=true",
+                "NEWS_API_KEY=repo-news-secret",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.setenv("HALO_SWING_DISABLE_DOTENV", "false")
+    monkeypatch.delenv("NEWS_API_KEY", raising=False)
+    clear_local_env_cache()
+
+    assert get_config_value("NEWS_API_KEY") == "repo-news-secret"
+
+
 def test_get_config_value_can_disable_dotenv_loading_from_repo_root_env(
     tmp_path: Path,
     monkeypatch,
@@ -42,6 +68,36 @@ def test_get_config_value_can_disable_dotenv_loading_from_repo_root_env(
     clear_local_env_cache()
 
     assert get_config_value("NEWS_API_KEY") is None
+
+
+def test_cwd_disable_false_overrides_repo_root_disable_true(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    repo_env = tmp_path / "repo" / ".env"
+    run_dir = tmp_path / "runner"
+    repo_env.parent.mkdir()
+    run_dir.mkdir()
+    repo_env.write_text(
+        "\n".join(
+            [
+                "HALO_SWING_DISABLE_DOTENV=true",
+                "NEWS_API_KEY=repo-news-secret",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (run_dir / ".env").write_text(
+        "HALO_SWING_DISABLE_DOTENV=false\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+    monkeypatch.delenv("NEWS_API_KEY", raising=False)
+    clear_local_env_cache()
+
+    assert get_config_value("NEWS_API_KEY") == "repo-news-secret"
 
 
 def test_get_config_value_can_disable_dotenv_loading_from_cwd_env(

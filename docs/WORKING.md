@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOTENV_DISABLE_FLAG_GATE_VERIFIED
-gate_id: DOTENV_DISABLE_FLAG_GATE
+status: DOTENV_DISABLE_PRECEDENCE_GATE_VERIFIED
+gate_id: DOTENV_DISABLE_PRECEDENCE_GATE
 review_tier: S1_small
 
-next_atomic_step: make HALO_SWING_DISABLE_DOTENV usable from dotenv files and expose the blank template placeholder
+next_atomic_step: make HALO_SWING_DISABLE_DOTENV follow exported-env, launch-directory dotenv, repo-root dotenv precedence
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -269,6 +269,7 @@ done_means:
   - repo-root .env values work when Hermes or MCP starts from a different working directory
   - README and DevOps setup docs explain repo-root .env, dotenv precedence, and offline dotenv isolation
   - HALO_SWING_DISABLE_DOTENV works when exported or set in repo-root/launch-directory .env
+  - HALO_SWING_DISABLE_DOTENV follows exported-env, launch-directory dotenv, repo-root dotenv precedence
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -618,20 +619,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.638
-gate_packet: docs/halo-swing-development-plan.md#3.638
+portable_mirror: docs/halo-swing-development-plan.md#3.639
+gate_packet: docs/halo-swing-development-plan.md#3.639
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.638
-  - .env.example
-  - README.md
-  - docs/devops-setup-guide.md
+  - docs/halo-swing-development-plan.md#3.639
   - src/halo_swing_mcp/env.py
   - tests/test_env.py
-  - tests/test_env_template.py
-  - tests/test_setup_docs.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -934,12 +930,48 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Dotenv Disable Flag Gate is verified. `HALO_SWING_DISABLE_DOTENV=true`
-now disables dotenv loading when exported or set in repo-root/launch-directory
-`.env`. `.env.example` exposes a blank placeholder, and setup docs now state the
-flag may be exported or set in `.env`. Focused env/template/setup-doc tests
-passed with 13 tests, full pytest passed with 708 tests, and ruff and
-health_check passed.
+Summary: Dotenv Disable Precedence Gate is verified.
+`HALO_SWING_DISABLE_DOTENV` now follows the same precedence as other local setup
+values: exported env, launch-directory `.env`, then repo-root `.env`. Explicit
+`false` at higher precedence can override lower-precedence dotenv `true`, while
+repo-root or launch-directory `true` still disables dotenv loading when no
+higher-precedence false is set. Focused env tests passed with 7 tests, full
+pytest passed with 710 tests, and ruff and health_check passed.
+
+```yaml
+dotenv_disable_precedence_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/env.py
+    - tests/test_env.py
+  implementation:
+    - exported HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true
+    - launch-directory HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true
+    - repo-root or launch-directory HALO_SWING_DISABLE_DOTENV=true still disables dotenv loading when no higher-precedence false is set
+    - tests/test_env.py locks disable flag precedence
+    - no committed .env file, real secret value, network call, Telegram send, Hermes runtime call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py -q
+      result: "7 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "710 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 dotenv_disable_flag_gate:

@@ -51,13 +51,18 @@ def get_local_env_files() -> tuple[Path, ...]:
 def dotenv_loading_disabled() -> bool:
     """Return whether dotenv loading is disabled for isolated runs."""
 
-    value = os.environ.get(DOTENV_DISABLED_ENV)
-    if _truthy(value):
-        return True
-    for env_path in reversed(_candidate_env_files()):
-        if env_path.is_file() and _truthy(dotenv_values(env_path).get(DOTENV_DISABLED_ENV)):
-            return True
-    return False
+    if DOTENV_DISABLED_ENV in os.environ:
+        return _truthy(os.environ[DOTENV_DISABLED_ENV])
+    value: str | None = None
+    for env_path in _candidate_env_files():
+        if not env_path.is_file():
+            continue
+        candidate = dotenv_values(env_path).get(DOTENV_DISABLED_ENV)
+        if _truthy(candidate):
+            value = "true"
+        elif candidate is not None:
+            value = candidate if isinstance(candidate, str) else None
+    return _truthy(value)
 
 
 def clear_local_env_cache() -> None:

@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.639 Dotenv Disable Precedence Gate Record - 2026-05-16
+
+### A. 목적
+
+Dotenv precedence는 exported env, launch-directory `.env`, repo-root `.env`
+순서로 문서화되어 있다. `HALO_SWING_DISABLE_DOTENV`도 같은 규칙을 따라야 하지만,
+dotenv에 `true`가 있으면 exported `false` 같은 상위 우선순위 값이 무시될 수 있었다.
+이번 slice는 disable flag 판정도 동일한 precedence로 맞춘다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - exported HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true
+  - launch-directory HALO_SWING_DISABLE_DOTENV=false overrides repo-root dotenv true
+  - repo-root or launch-directory HALO_SWING_DISABLE_DOTENV=true still disables dotenv loading when no higher-precedence false is set
+  - tests/test_env.py locks disable flag precedence
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - committed .env file
+  - real secret values
+  - network call
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.638 Dotenv Disable Flag Gate Record - 2026-05-16
 
 ### A. 목적
