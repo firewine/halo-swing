@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.715 API Key Provider Error Compact Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`provider_error_summaries`는 provider별 recovery metadata를 보존하지만, 사용자가
+one-shot smoke 출력에서 실패 provider 목록과 첫 번째 조치를 빠르게 보려면 배열을 직접
+읽어야 한다. 이번 slice는 live-data smoke와 API-key pipeline one-shot 출력에 compact
+failed-provider summary를 추가해, API 키만 넣고 실행한 뒤 어떤 provider가 실패했는지와
+첫 recovery action을 상단에서 바로 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke now exposes failed_provider_families, failed_provider_count, first_provider_error_summary, and next_provider_recovery_action derived from provider_error_summaries
+  - run_api_key_pipeline_smoke now mirrors the compact fields in live_data_smoke_summary and top-level one-shot output
+  - fake-key one-shot smoke runs surface failed_provider_families=[market, macro, news], failed_provider_count=3, and next_provider_recovery_action=verify_provider_credentials_or_network
+  - ok and fixture-default/no-key smoke paths keep compact failed-provider fields empty or null when no provider error summaries exist
+  - compact fields do not include exception messages, URLs, API key values, or secret values
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused compact provider error readiness pytest: 2 passed
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with compact failed-provider fields and no secrets
+  - run_api_key_pipeline_smoke fixture-default CLI: exit 0; compact failed-provider fields empty/null while setup remains blocked at prepare_dotenv
+```
+
 ## 3.714 API Key Live Data Smoke Provider Error Summary Gate Record - 2026-05-17
 
 ### A. 목적

@@ -441,6 +441,9 @@ def run_live_data_smoke(
         macro_snapshot=macro_snapshot,
         news_bundle=news_bundle,
     )
+    provider_error_compact_summary = _provider_error_compact_summary(
+        provider_error_summaries
+    )
 
     return {
         "schema_version": "live_data_smoke_run.v1",
@@ -459,6 +462,18 @@ def run_live_data_smoke(
         ),
         "provider_error_summaries": provider_error_summaries,
         "provider_error_summary_count": len(provider_error_summaries),
+        "failed_provider_families": provider_error_compact_summary[
+            "failed_provider_families"
+        ],
+        "failed_provider_count": provider_error_compact_summary[
+            "failed_provider_count"
+        ],
+        "first_provider_error_summary": provider_error_compact_summary[
+            "first_provider_error_summary"
+        ],
+        "next_provider_recovery_action": provider_error_compact_summary[
+            "next_provider_recovery_action"
+        ],
         "validation": validation,
         "network_call": network_call,
         "live_data_required": live_data_required,
@@ -480,6 +495,29 @@ def _provider_error_summaries(
         if summary is not None:
             summaries.append(summary)
     return summaries
+
+
+def _provider_error_compact_summary(
+    provider_error_summaries: list[dict[str, Any]],
+) -> dict[str, Any]:
+    failed_provider_families: list[str] = []
+    for summary in provider_error_summaries:
+        provider_family = summary.get("provider_family")
+        if (
+            isinstance(provider_family, str)
+            and provider_family not in failed_provider_families
+        ):
+            failed_provider_families.append(provider_family)
+    first_summary = provider_error_summaries[0] if provider_error_summaries else None
+    next_provider_recovery_action = (
+        first_summary.get("next_setup_action") if first_summary is not None else None
+    )
+    return {
+        "failed_provider_families": failed_provider_families,
+        "failed_provider_count": len(failed_provider_families),
+        "first_provider_error_summary": first_summary,
+        "next_provider_recovery_action": next_provider_recovery_action,
+    }
 
 
 def run_integration_smoke(
@@ -738,6 +776,9 @@ def run_api_key_pipeline_smoke(
     api_key_command_summary = _api_key_pipeline_api_key_command_summary(
         live_data_setup_summary,
     )
+    live_data_smoke_summary = _api_key_pipeline_smoke_summary(
+        live_data_smoke,
+    )
 
     return {
         "schema_version": "api_key_pipeline_smoke_run.v1",
@@ -778,9 +819,17 @@ def run_api_key_pipeline_smoke(
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
-        "live_data_smoke_summary": _api_key_pipeline_smoke_summary(
-            live_data_smoke,
-        ),
+        "live_data_smoke_summary": live_data_smoke_summary,
+        "failed_provider_families": live_data_smoke_summary[
+            "failed_provider_families"
+        ],
+        "failed_provider_count": live_data_smoke_summary["failed_provider_count"],
+        "first_provider_error_summary": live_data_smoke_summary[
+            "first_provider_error_summary"
+        ],
+        "next_provider_recovery_action": live_data_smoke_summary[
+            "next_provider_recovery_action"
+        ],
         "signal_workflow_smoke_summary": _api_key_pipeline_smoke_summary(
             signal_workflow_smoke,
         ),
@@ -1629,7 +1678,16 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
     ) or {}
     provider_error_summaries = smoke.get("provider_error_summaries")
     provider_error_rows = (
-        provider_error_summaries if isinstance(provider_error_summaries, list) else []
+        [
+            row
+            for row in provider_error_summaries
+            if isinstance(row, dict)
+        ]
+        if isinstance(provider_error_summaries, list)
+        else []
+    )
+    provider_error_compact_summary = _provider_error_compact_summary(
+        provider_error_rows
     )
     next_operator_action = _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
@@ -1675,6 +1733,18 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         ),
         "provider_error_summaries": provider_error_rows,
         "provider_error_summary_count": len(provider_error_rows),
+        "failed_provider_families": provider_error_compact_summary[
+            "failed_provider_families"
+        ],
+        "failed_provider_count": provider_error_compact_summary[
+            "failed_provider_count"
+        ],
+        "first_provider_error_summary": provider_error_compact_summary[
+            "first_provider_error_summary"
+        ],
+        "next_provider_recovery_action": provider_error_compact_summary[
+            "next_provider_recovery_action"
+        ],
         "next_smoke_command_name": next_smoke_command.get("name"),
     }
 

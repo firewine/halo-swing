@@ -1888,6 +1888,10 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert all(check["passed"] for check in payload["validation"]["checks"])
     assert payload["provider_error_summaries"] == []
     assert payload["provider_error_summary_count"] == 0
+    assert payload["failed_provider_families"] == []
+    assert payload["failed_provider_count"] == 0
+    assert payload["first_provider_error_summary"] is None
+    assert payload["next_provider_recovery_action"] is None
 
 
 def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> None:
@@ -2017,6 +2021,13 @@ def test_run_live_data_smoke_surfaces_provider_error_summaries(monkeypatch) -> N
         news_error,
     ]
     assert payload["provider_error_summary_count"] == 3
+    assert payload["failed_provider_families"] == ["market", "macro", "news"]
+    assert payload["failed_provider_count"] == 3
+    assert payload["first_provider_error_summary"] == market_error
+    assert (
+        payload["next_provider_recovery_action"]
+        == "verify_provider_credentials_or_network"
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -2199,6 +2210,27 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         provider_errors
     )
     assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
+    assert payload["live_data_smoke_summary"]["failed_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["live_data_smoke_summary"]["failed_provider_count"] == 3
+    assert (
+        payload["live_data_smoke_summary"]["first_provider_error_summary"]
+        == provider_errors[0]
+    )
+    assert (
+        payload["live_data_smoke_summary"]["next_provider_recovery_action"]
+        == "verify_provider_credentials_or_network"
+    )
+    assert payload["failed_provider_families"] == ["market", "macro", "news"]
+    assert payload["failed_provider_count"] == 3
+    assert payload["first_provider_error_summary"] == provider_errors[0]
+    assert (
+        payload["next_provider_recovery_action"]
+        == "verify_provider_credentials_or_network"
+    )
     assert payload["secret_values_returned"] is False
     assert "polygon-secret-key" not in serialized
     assert "fred-secret-key" not in serialized
@@ -2221,6 +2253,10 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["secret_values_returned"] is False
     assert payload["provider_error_summaries"] == []
     assert payload["provider_error_summary_count"] == 0
+    assert payload["failed_provider_families"] == []
+    assert payload["failed_provider_count"] == 0
+    assert payload["first_provider_error_summary"] is None
+    assert payload["next_provider_recovery_action"] is None
     assert payload["validation"]["status"] == "conflict"
     assert payload["provider_route"]["status"] == "blocked"
     assert payload["provider_route"]["selected_provider_classes"] == [
