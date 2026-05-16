@@ -286,6 +286,18 @@ action mirrored inside `readiness_summary`, the first no-secret
 when a provider smoke is ready, the same no-secret `next_provider_smoke` object
 and command name in `setup_status_summary`, and which provider factory route was
 selected.
+Pass `summary_only=true` when you want a compact CLI/MCP response after filling
+API keys:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+```
+
+The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
+`api_key_integration_status_summary`, `api_key_next_action_summary`,
+`setup_status_summary`, `api_key_pipeline_failure_summary`,
+`api_key_provider_selection_summary`, `provider_route_summary`, `checks`, and
+safety flags while omitting nested full smoke sections.
 The compact `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) lists the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in

@@ -805,6 +805,7 @@ def run_api_key_pipeline_smoke(
     timeframe: str = "swing_3d_10d",
     symbols: list[str] | None = None,
     topic: str = "macro",
+    summary_only: bool = False,
 ) -> dict[str, Any]:
     """Run the API-key-backed local integration pipeline smoke checks."""
 
@@ -918,7 +919,7 @@ def run_api_key_pipeline_smoke(
         api_key_provider_selection_summary=api_key_provider_selection_summary,
     )
 
-    return {
+    payload = {
         "schema_version": "api_key_pipeline_smoke_run.v1",
         "status": "ok" if checks and all(check["passed"] for check in checks) else "conflict",
         "input": {
@@ -1001,6 +1002,9 @@ def run_api_key_pipeline_smoke(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    if summary_only:
+        return _api_key_pipeline_summary_only_payload(payload)
+    return payload
 
 
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
@@ -2057,6 +2061,100 @@ def _api_key_pipeline_failure_category(
     }:
         return "setup"
     return "smoke_failure"
+
+
+def _api_key_pipeline_summary_only_payload(
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    input_payload = _optional_mapping(payload.get("input")) or {}
+    return {
+        "schema_version": "api_key_pipeline_smoke_summary_only.v1",
+        "status": payload.get("status"),
+        "summary_only": True,
+        "input": {
+            "asset": input_payload.get("asset"),
+            "timeframe": input_payload.get("timeframe"),
+            "symbols": input_payload.get("symbols"),
+            "topic": input_payload.get("topic"),
+            "summary_only": True,
+        },
+        "executed_tools": _string_list(payload.get("executed_tools")),
+        "api_key_integration_status_summary": _optional_mapping(
+            payload.get("api_key_integration_status_summary")
+        )
+        or {},
+        "api_key_next_action_summary": _optional_mapping(
+            payload.get("api_key_next_action_summary")
+        )
+        or {},
+        "setup_status_summary": _optional_mapping(
+            payload.get("setup_status_summary")
+        )
+        or {},
+        "api_key_pipeline_failure_summary": _optional_mapping(
+            payload.get("api_key_pipeline_failure_summary")
+        )
+        or {},
+        "api_key_provider_selection_summary": _optional_mapping(
+            payload.get("api_key_provider_selection_summary")
+        )
+        or {},
+        "provider_route_summary": _optional_mapping(
+            payload.get("provider_route_summary")
+        )
+        or {},
+        "checks": _api_key_pipeline_summary_only_checks(payload.get("checks")),
+        "failed_provider_families": _string_list(
+            payload.get("failed_provider_families")
+        ),
+        "failed_provider_count": payload.get("failed_provider_count"),
+        "next_provider_recovery_action": payload.get(
+            "next_provider_recovery_action"
+        ),
+        "next_provider_recovery_smoke_command_name": payload.get(
+            "next_provider_recovery_smoke_command_name"
+        ),
+        "provider_recovery_smoke_count": payload.get(
+            "provider_recovery_smoke_count"
+        ),
+        "omitted_sections": [
+            "live_data_setup_summary",
+            "api_key_operator_checklist",
+            "api_key_command_summary",
+            "api_key_requirements_summary",
+            "api_key_provider_recovery_checklist",
+            "api_key_setup_file_summary",
+            "api_key_dotenv_loading_summary",
+            "api_key_pipeline_stage_summary",
+            "api_key_pipeline_check_summary",
+            "live_data_smoke_summary",
+            "signal_workflow_smoke_summary",
+            "recording_smoke_summary",
+            "provider_recovery_smokes",
+        ],
+        "network_call": payload.get("network_call") is True,
+        "live_data_required": payload.get("live_data_required") is True,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_summary_only_checks(raw_checks: Any) -> list[dict[str, Any]]:
+    checks = raw_checks if isinstance(raw_checks, list) else []
+    return [
+        {
+            "tool": check.get("tool"),
+            "name": check.get("name"),
+            "passed": check.get("passed") is True,
+            "secret_values_returned": False,
+        }
+        for check in checks
+        if isinstance(check, dict)
+    ]
 
 
 def _api_key_setup_file_summary(

@@ -628,6 +628,7 @@ def run_api_key_pipeline_smoke(
     timeframe: str = "swing_3d_10d",
     symbols: list[str] | None = None,
     topic: str = "macro",
+    summary_only: bool = False,
 ) -> dict[str, Any]:
     """Run API-key pipeline smoke checks."""
 
@@ -636,6 +637,7 @@ def run_api_key_pipeline_smoke(
         "timeframe": timeframe,
         "symbols": symbols,
         "topic": topic,
+        "summary_only": summary_only,
     }
     return _audited_tool_call(
         "run_api_key_pipeline_smoke",

@@ -4210,6 +4210,82 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert "news_api_key=test" not in payload_repr
 
 
+def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+        summary_only=True,
+    )
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_summary_only.v1"
+    assert payload["status"] == "conflict"
+    assert payload["summary_only"] is True
+    assert payload["input"] == {
+        "asset": "TQQQ",
+        "timeframe": "swing_3d_10d",
+        "symbols": ["QQQ"],
+        "topic": "macro",
+        "summary_only": True,
+    }
+    assert payload["api_key_integration_status_summary"] == {
+        "schema_version": "api_key_integration_status_summary.v1",
+        "status": "blocked",
+        "api_keys_configured": False,
+        "dotenv_loading_enabled": True,
+        "dotenv_target_exists": False,
+        "live_providers_selected": False,
+        "ready_to_run_live_smoke": False,
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "failure_category": "setup",
+        "has_failures": True,
+        "next_action_name": "prepare_dotenv",
+        "next_action_is_recovery": False,
+        "next_action_network_call": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_next_action_summary"]["next_action_name"] == (
+        "prepare_dotenv"
+    )
+    assert payload["setup_status_summary"]["next_setup_step"] == "prepare_dotenv"
+    assert (
+        payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
+    )
+    assert payload["api_key_provider_selection_summary"]["status"] == "blocked"
+    assert payload["provider_route_summary"]["status"] == "blocked"
+    assert len(payload["checks"]) == 9
+    assert payload["failed_provider_families"] == []
+    assert payload["failed_provider_count"] == 0
+    assert payload["provider_recovery_smoke_count"] == 0
+    assert "live_data_smoke_summary" in payload["omitted_sections"]
+    assert "signal_workflow_smoke_summary" in payload["omitted_sections"]
+    assert "recording_smoke_summary" in payload["omitted_sections"]
+    assert "live_data_smoke_summary" not in payload
+    assert "signal_workflow_smoke_summary" not in payload
+    assert "recording_smoke_summary" not in payload
+    assert "provider_recovery_smokes" not in payload
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
 def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     monkeypatch,
 ) -> None:

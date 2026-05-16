@@ -457,6 +457,17 @@ live-data provider keys are configured. The top-level `readiness_summary` mirror
 `api_key_setup_status`, `api_key_status`, `provider_route_status`,
 `ready_to_run_live_smoke`, `next_setup_step`, `next_operator_action_name`, and
 the no-secret `next_operator_action` separately from broader integration gates.
+Pass `summary_only=true` when you want the compact CLI/MCP response:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+```
+
+The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
+`api_key_integration_status_summary`, `api_key_next_action_summary`,
+`setup_status_summary`, `api_key_pipeline_failure_summary`,
+`api_key_provider_selection_summary`, `provider_route_summary`, `checks`, and
+safety flags while omitting nested full smoke sections.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret

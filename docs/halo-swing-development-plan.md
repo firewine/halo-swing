@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.733 API Key Pipeline Summary-Only Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`는 API 키만 넣은 뒤 실제 live provider, signal workflow,
+recording smoke까지 한 번에 검증하지만 full payload가 크다. 운영자는 키를 넣은 직후
+핵심 상태만 보고 `api_keys_configured`, `live_providers_selected`,
+`failure_category`, `next_action_name`을 확인하고 싶다. 이번 slice는 기존 full
+payload를 기본값으로 유지하면서 `summary_only=true` 옵션을 추가해 compact key-only
+live setup check를 한 번의 harness/MCP 호출로 받을 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now accepts summary_only with default false
+  - summary_only=true returns compact schema api_key_pipeline_smoke_summary_only.v1 with api_key_integration_status_summary, api_key_next_action_summary, setup_status_summary, api_key_pipeline_failure_summary, api_key_provider_selection_summary, provider_route_summary, checks, and safety flags
+  - summary_only=true omits nested full smoke payload sections while preserving no-secret status, failure category, next action, and provider route evidence
+  - MCP server wrapper forwards summary_only into the registered tool payload
+  - README and DevOps setup guide document the summary_only CLI option
+  - tests/test_setup_docs.py asserts summary_only guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; compact summary-only payload present without nested full smoke payloads
+  - fake-key direct summary-only check -> api_key_pipeline_smoke_summary_only.v1 True True True False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 777 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.732 API Key Integration Status Summary Gate Record - 2026-05-17
 
 ### A. 목적
