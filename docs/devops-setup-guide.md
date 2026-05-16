@@ -391,8 +391,8 @@ It also includes `dotenv_file_status` so the payload shows
 whether `.env.example` and repo-root `.env` exist, the next setup action, and
 the repo-local copy command hint without writing files or returning secret
 values. `next_operator_action` summarizes the single local action to copy
-`.env`, fill API keys, or run the one-shot smoke without returning secret
-values. `live_data_setup_steps` orders the local setup path as dotenv
+`.env`, fill API keys, run provider smokes, or run the one-shot smoke without
+returning secret values. `live_data_setup_steps` orders the local setup path as dotenv
 preparation, live data API-key entry, provider smoke verification, and the
 one-shot pipeline smoke. It also
 includes `live_data_smoke_commands` for `get_market_snapshot`,
@@ -409,8 +409,8 @@ are configured; it reports key names, missing provider families,
 provider-level `preferred_env_key`, `setup_status`, `next_setup_action`,
 `provider_family_summary`, the no-secret `dotenv_template`, and
 `dotenv_file_status` with the next setup action, `next_operator_action` with
-the single local action to copy `.env`, fill API keys, or run the one-shot
-smoke, plus `live_data_setup_steps`, but never secret values. Use
+the single local action to copy `.env`, fill API keys, run provider smokes, or
+run the one-shot smoke, plus `live_data_setup_steps`, but never secret values. Use
 `get_live_data_provider_route` when you need to confirm that the actual
 `get_market_data_provider` factory selected Polygon, FRED, and NewsAPI from
 those keys without making provider network calls. Use

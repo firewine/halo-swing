@@ -205,7 +205,7 @@ provider families, provider-level `preferred_env_key`, `setup_status`,
 `dotenv_template`, `dotenv_file_status`, `next_operator_action`, and the
 one-shot smoke command without returning secrets. `next_operator_action` is the
 single local action to take next: copy `.env.example` to `.env`, fill the
-required API keys, or run `run_api_key_pipeline_smoke`:
+required API keys, run the provider smokes, or run `run_api_key_pipeline_smoke`:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
@@ -302,7 +302,8 @@ commands. It also returns `dotenv_file_status` so the setup payload shows
 whether `.env.example` and `.env` exist, the next setup action, and the
 repo-local copy command hint without writing files or returning secret values.
 `next_operator_action` summarizes the single next local action for API-key-only
-setup without returning secret values.
+setup without returning secret values, and points to provider smoke verification
+before the one-shot pipeline smoke once API keys are ready.
 `live_data_setup_steps` orders the local setup path as dotenv preparation, live
 data API-key entry, provider smoke verification, and the one-shot pipeline
 smoke. It also returns

@@ -259,7 +259,7 @@ def expected_live_data_setup_steps(
         dotenv_status = "pending"
     else:
         next_step = (
-            "run_api_key_pipeline_smoke"
+            "run_provider_smokes"
             if ready_to_run_live_smoke
             else "fill_live_data_api_keys"
         )
@@ -362,6 +362,25 @@ def expected_next_operator_action(
             "secret_input_required": False,
             "mutates_local_state": True,
         }
+    if setup_steps["next_step"] == "run_provider_smokes":
+        provider_smoke_step = setup_steps["steps"][2]
+        return {
+            **base,
+            "name": "run_provider_smokes",
+            "status": "ready",
+            "provider_smokes": provider_smoke_step["provider_smokes"],
+            "provider_smoke_count": provider_smoke_step["provider_smoke_count"],
+            "ready_provider_smoke_count": provider_smoke_step[
+                "ready_provider_smoke_count"
+            ],
+            "blocked_provider_smoke_count": provider_smoke_step[
+                "blocked_provider_smoke_count"
+            ],
+            "network_call": True,
+            "network_call_policy": provider_smoke_step["network_call_policy"],
+            "next_after_action": "run_api_key_pipeline_smoke",
+            "secret_input_required": False,
+        }
     if ready_to_run_live_smoke:
         smoke_command = expected_pipeline_smoke_command()
         return {
@@ -380,7 +399,7 @@ def expected_next_operator_action(
         "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
         "configured_provider_families": configured_provider_families,
         "missing_provider_families": missing_provider_families,
-        "next_after_action": "run_api_key_pipeline_smoke",
+        "next_after_action": "run_provider_smokes",
         "secret_input_required": True,
     }
 
@@ -2598,8 +2617,8 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "provider_smoke_count": 3,
         "ready_provider_smoke_count": 3,
         "blocked_provider_smoke_count": 0,
-        "next_setup_step": "run_api_key_pipeline_smoke",
-        "next_operator_action_name": "run_api_key_pipeline_smoke",
+        "next_setup_step": "run_provider_smokes",
+        "next_operator_action_name": "run_provider_smokes",
         "next_smoke_command_name": "run_api_key_pipeline_smoke",
         "selected_provider_classes": [
             "PolygonMarketDataProvider",
@@ -2631,7 +2650,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["api_key_operator_checklist"] == (
         expected_api_key_operator_checklist(
             status="ready",
-            current_step="run_api_key_pipeline_smoke",
+            current_step="run_provider_smokes",
             target_path=env_path,
             market_configured_env_keys=["POLYGON_API_KEY"],
             macro_configured_env_keys=["FRED_API_KEY"],
@@ -2718,7 +2737,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             fake_next_operator_action
         )
         assert payload[summary_name]["next_setup_step"] == (
-            "run_api_key_pipeline_smoke"
+            "run_provider_smokes"
         )
         assert payload[summary_name]["setup_step_count"] == 4
         assert (

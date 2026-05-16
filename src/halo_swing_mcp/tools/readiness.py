@@ -2179,7 +2179,7 @@ def _live_data_setup_steps(
     else:
         dotenv_status = "ready"
         next_step = (
-            "run_api_key_pipeline_smoke"
+            "run_provider_smokes"
             if ready_to_run_live_smoke
             else "fill_live_data_api_keys"
         )
@@ -2261,6 +2261,15 @@ def _live_data_next_operator_action(
     next_step = str(live_data_setup_steps.get("next_step") or "")
     copy_command = _optional_mapping(dotenv_file_status.get("copy_command")) or {}
     smoke_command = _optional_mapping(one_shot_smoke_command) or {}
+    setup_step_rows = live_data_setup_steps.get("steps")
+    setup_steps = setup_step_rows if isinstance(setup_step_rows, list) else []
+    provider_smoke_step: dict[str, Any] = {}
+    for step in setup_steps:
+        step_mapping = _optional_mapping(step)
+        if step_mapping is None or step_mapping.get("name") != "run_provider_smokes":
+            continue
+        provider_smoke_step = step_mapping
+        break
     base = {
         "schema_version": "live_data_next_operator_action.v1",
         "name": next_step,
@@ -2288,6 +2297,23 @@ def _live_data_next_operator_action(
             "secret_input_required": False,
             "mutates_local_state": True,
         }
+    if next_step == "run_provider_smokes":
+        return {
+            **base,
+            "status": "ready",
+            "provider_smokes": provider_smoke_step.get("provider_smokes", []),
+            "provider_smoke_count": provider_smoke_step.get("provider_smoke_count"),
+            "ready_provider_smoke_count": provider_smoke_step.get(
+                "ready_provider_smoke_count"
+            ),
+            "blocked_provider_smoke_count": provider_smoke_step.get(
+                "blocked_provider_smoke_count"
+            ),
+            "network_call": True,
+            "network_call_policy": provider_smoke_step.get("network_call_policy"),
+            "next_after_action": "run_api_key_pipeline_smoke",
+            "secret_input_required": False,
+        }
     if ready_to_run_live_smoke:
         return {
             **base,
@@ -2311,7 +2337,7 @@ def _live_data_next_operator_action(
             "missing_provider_families",
             [],
         ),
-        "next_after_action": "run_api_key_pipeline_smoke",
+        "next_after_action": "run_provider_smokes",
         "secret_input_required": True,
     }
 

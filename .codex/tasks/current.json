@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_SETUP_STEPS_PROVIDER_SMOKES_GATE",
+  "gate_id": "LIVE_DATA_NEXT_ACTION_PROVIDER_SMOKES_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.699",
-  "next_atomic_step": "add a run_provider_smokes ordered step to live_data_setup_steps so API-key-only local setup exposes provider smoke verification before the one-shot pipeline smoke",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.700",
+  "next_atomic_step": "route ready API-key-only next_step and next_operator_action to run_provider_smokes before the one-shot pipeline smoke",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.698",
+    "docs/halo-swing-development-plan.md#3.699",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -55,14 +55,15 @@
     "read_only": true
   },
   "done_means": [
-    "live_data_setup_steps includes an ordered run_provider_smokes step between fill_live_data_api_keys and run_api_key_pipeline_smoke",
-    "the provider-smoke setup step exposes no-secret provider smoke commands, counts, and readiness without reading or returning API key values",
-    "pipeline stage summaries report setup_step_count=4 and retain no-secret provider smoke readiness",
-    "README and DevOps setup guide describe the provider smoke step in the API-key-only setup path",
+    "ready API-key-only live_data_setup_steps next_step is run_provider_smokes before run_api_key_pipeline_smoke",
+    "ready next_operator_action exposes no-secret provider smoke commands, counts, readiness, and next_after_action=run_api_key_pipeline_smoke",
+    "pending fill_live_data_api_keys next_after_action points to run_provider_smokes",
+    "pipeline setup_status_summary and operator checklist current_step reflect run_provider_smokes when API keys are ready",
+    "README and DevOps setup guide describe provider smokes as the next action before the one-shot smoke",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live data setup provider-smokes gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live data next-action provider-smokes gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
