@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.726 API Key Pipeline Stage Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`는 live-data, signal workflow, recording 세
+단계를 모두 실행하지만, 어느 단계가 실패했는지는 각 nested summary를 따라가야
+확인할 수 있다. 이번 slice는 top-level `api_key_pipeline_stage_summary`를
+추가해 API 키만 넣고 one-shot smoke를 실행한 사용자가 실패 단계, 첫 실패 단계,
+provider recovery 필요 여부를 한 곳에서 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke now returns top-level api_key_pipeline_stage_summary using schema api_key_pipeline_stage_summary.v1
+  - list run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke stage rows in execution order
+  - expose status, stage_count, failed_stage_count, failed_stage_names, and first_failed_stage without secret values
+  - include each stage status, failed flag, error_summary, provider error count, recovery smoke count, network_call, mutates_local_state, and secret_values_returned
+  - document the compact stage summary in README and DevOps setup guide
+  - tests/test_setup_docs.py asserts api_key_pipeline_stage_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - python -m json.tool for task contract and portable mirror: passed
+  - git diff --check: passed
+  - focused readiness/setup docs pytest: 5 passed
+  - fake Polygon/FRED/NewsAPI run_api_key_pipeline_smoke CLI: exit 0 with api_key_pipeline_stage_summary reporting failed stages without secrets
+  - full pytest: 775 passed
+  - ruff check: passed
+  - health_check harness: passed
+```
+
 ## 3.725 API Key Pipeline Next Action Summary Gate Record - 2026-05-17
 
 ### A. 목적

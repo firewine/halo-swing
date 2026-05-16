@@ -862,6 +862,12 @@ def run_api_key_pipeline_smoke(
     live_data_smoke_summary = _api_key_pipeline_smoke_summary(
         live_data_smoke,
     )
+    signal_workflow_smoke_summary = _api_key_pipeline_smoke_summary(
+        signal_workflow_smoke,
+    )
+    recording_smoke_summary = _api_key_pipeline_smoke_summary(
+        recording_smoke,
+    )
     api_key_provider_recovery_checklist = _api_key_provider_recovery_checklist(
         live_data_smoke_summary
     )
@@ -911,6 +917,11 @@ def run_api_key_pipeline_smoke(
         "api_key_command_summary": api_key_command_summary,
         "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
+        "api_key_pipeline_stage_summary": _api_key_pipeline_stage_summary(
+            live_data_smoke_summary=live_data_smoke_summary,
+            signal_workflow_smoke_summary=signal_workflow_smoke_summary,
+            recording_smoke_summary=recording_smoke_summary,
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -937,12 +948,8 @@ def run_api_key_pipeline_smoke(
         "provider_recovery_smoke_count": live_data_smoke_summary[
             "provider_recovery_smoke_count"
         ],
-        "signal_workflow_smoke_summary": _api_key_pipeline_smoke_summary(
-            signal_workflow_smoke,
-        ),
-        "recording_smoke_summary": _api_key_pipeline_smoke_summary(
-            recording_smoke,
-        ),
+        "signal_workflow_smoke_summary": signal_workflow_smoke_summary,
+        "recording_smoke_summary": recording_smoke_summary,
         "checks": checks,
         "network_call": any(
             smoke.get("network_call") is True
@@ -1827,6 +1834,73 @@ def _api_key_pipeline_next_action_summary(
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_stage_summary(
+    *,
+    live_data_smoke_summary: dict[str, Any],
+    signal_workflow_smoke_summary: dict[str, Any],
+    recording_smoke_summary: dict[str, Any],
+) -> dict[str, Any]:
+    stages = [
+        _api_key_pipeline_stage_row(
+            "run_live_data_smoke",
+            live_data_smoke_summary,
+        ),
+        _api_key_pipeline_stage_row(
+            "run_live_signal_workflow_smoke",
+            signal_workflow_smoke_summary,
+        ),
+        _api_key_pipeline_stage_row(
+            "run_live_recording_smoke",
+            recording_smoke_summary,
+        ),
+    ]
+    failed_stages = [stage for stage in stages if stage["failed"]]
+    return {
+        "schema_version": "api_key_pipeline_stage_summary.v1",
+        "status": "conflict" if failed_stages else "ok",
+        "stage_count": len(stages),
+        "failed_stage_count": len(failed_stages),
+        "failed_stage_names": [
+            stage["stage_name"] for stage in failed_stages
+        ],
+        "first_failed_stage": failed_stages[0] if failed_stages else None,
+        "stages": stages,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_stage_row(
+    stage_name: str,
+    stage_summary: dict[str, Any],
+) -> dict[str, Any]:
+    status = stage_summary.get("status")
+    return {
+        "stage_name": stage_name,
+        "status": status,
+        "failed": status != "ok",
+        "error_summary": stage_summary.get("error_summary"),
+        "provider_error_summary_count": stage_summary.get(
+            "provider_error_summary_count"
+        ),
+        "provider_recovery_smoke_count": stage_summary.get(
+            "provider_recovery_smoke_count"
+        ),
+        "next_provider_recovery_smoke_command_name": stage_summary.get(
+            "next_provider_recovery_smoke_command_name"
+        ),
+        "ready_to_run_live_smoke": stage_summary.get(
+            "ready_to_run_live_smoke"
+        ),
+        "provider_route_status": stage_summary.get("provider_route_status"),
+        "network_call": stage_summary.get("network_call") is True,
+        "live_data_required": stage_summary.get("live_data_required") is True,
+        "mutates_local_state": stage_summary.get("mutates_local_state") is True,
+        "secret_values_returned": stage_summary.get("secret_values_returned"),
     }
 
 

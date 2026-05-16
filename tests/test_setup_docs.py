@@ -76,6 +76,15 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_action_is_recovery" in guide
     assert "next_action_network_call" in guide
     assert "next_action_mutates_local_state" in guide
+    assert "api_key_pipeline_stage_summary" in guide
+    assert "api_key_pipeline_stage_summary.v1" in guide
+    assert "stage_count" in guide
+    assert "failed_stage_count" in guide
+    assert "failed_stage_names" in guide
+    assert "first_failed_stage" in guide
+    assert "stage_name" in guide
+    assert "run_live_signal_workflow_smoke" in guide
+    assert "run_live_recording_smoke" in guide
     assert "readiness_summary.next_operator_action" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide

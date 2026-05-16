@@ -450,9 +450,10 @@ order submissions, retained state, and secret returns. The pipeline payload also
 includes top-level `next_operator_action`, `setup_status_summary`,
 `api_key_next_action_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`,
-`api_key_operator_checklist`, `live_data_setup_summary`, and a provider route
-summary, then fails the route readiness check until all supported live-data
-provider keys are configured. The top-level `readiness_summary` mirrors
+`api_key_operator_checklist`, `api_key_pipeline_stage_summary`,
+`live_data_setup_summary`, and a provider route summary, then fails the route
+readiness check until all supported live-data provider keys are configured. The
+top-level `readiness_summary` mirrors
 `api_key_setup_status`, `api_key_status`, `provider_route_status`,
 `ready_to_run_live_smoke`, `next_setup_step`, `next_operator_action_name`, and
 the no-secret `next_operator_action` separately from broader integration gates.
@@ -468,6 +469,15 @@ top-level `api_key_next_action_summary`
 `next_action_network_call`, and `next_action_mutates_local_state` fields so the
 single next setup or recovery command is visible without reading nested
 payloads. The
+top-level `api_key_pipeline_stage_summary`
+(`api_key_pipeline_stage_summary.v1`) lists the `run_live_data_smoke`,
+`run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in
+execution order with `status`, `stage_count`, `failed_stage_count`,
+`failed_stage_names`, `first_failed_stage`, and per-stage `stage_name`,
+`failed`, `error_summary`, `provider_error_summary_count`,
+`provider_recovery_smoke_count`, `network_call`, `mutates_local_state`, and
+`secret_values_returned` fields so the failed pipeline stage is visible without
+reading every nested smoke summary. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

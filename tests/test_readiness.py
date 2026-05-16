@@ -2263,6 +2263,33 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert payload["live_data_smoke_summary"]["provider_error_summaries"] == (
         provider_errors
     )
+    assert payload["api_key_pipeline_stage_summary"]["schema_version"] == (
+        "api_key_pipeline_stage_summary.v1"
+    )
+    assert payload["api_key_pipeline_stage_summary"]["status"] == "conflict"
+    assert payload["api_key_pipeline_stage_summary"]["stage_count"] == 3
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_count"] == 1
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_names"] == [
+        "run_live_data_smoke"
+    ]
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"] == {
+        "stage_name": "run_live_data_smoke",
+        "status": "conflict",
+        "failed": True,
+        "error_summary": None,
+        "provider_error_summary_count": 3,
+        "provider_recovery_smoke_count": 3,
+        "next_provider_recovery_smoke_command_name": (
+            "get_market_snapshot_live_smoke"
+        ),
+        "ready_to_run_live_smoke": True,
+        "provider_route_status": "ready",
+        "network_call": True,
+        "live_data_required": True,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_pipeline_stage_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["provider_error_summary_count"] == 3
     assert payload["live_data_smoke_summary"]["failed_provider_families"] == [
         "market",
@@ -3243,6 +3270,18 @@ def test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_excep
         "url_returned": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_pipeline_stage_summary"]["schema_version"] == (
+        "api_key_pipeline_stage_summary.v1"
+    )
+    assert payload["api_key_pipeline_stage_summary"]["status"] == "conflict"
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_count"] == 1
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_names"] == [
+        "run_live_data_smoke"
+    ]
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
+        "error_summary"
+    ] == payload["live_data_smoke_summary"]["error_summary"]
+    assert payload["api_key_pipeline_stage_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is True
     assert payload["live_data_smoke_summary"]["provider_route_status"] == "ready"
     assert ("run_live_data_smoke", "live_data_smoke_status_ok") in failed_checks
@@ -3490,6 +3529,64 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["next_operator_action"] == fake_next_operator_action
+    assert payload["api_key_pipeline_stage_summary"] == {
+        "schema_version": "api_key_pipeline_stage_summary.v1",
+        "status": "ok",
+        "stage_count": 3,
+        "failed_stage_count": 0,
+        "failed_stage_names": [],
+        "first_failed_stage": None,
+        "stages": [
+            {
+                "stage_name": "run_live_data_smoke",
+                "status": "ok",
+                "failed": False,
+                "error_summary": None,
+                "provider_error_summary_count": 0,
+                "provider_recovery_smoke_count": 0,
+                "next_provider_recovery_smoke_command_name": None,
+                "ready_to_run_live_smoke": True,
+                "provider_route_status": "ready",
+                "network_call": True,
+                "live_data_required": True,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "stage_name": "run_live_signal_workflow_smoke",
+                "status": "ok",
+                "failed": False,
+                "error_summary": None,
+                "provider_error_summary_count": 0,
+                "provider_recovery_smoke_count": 0,
+                "next_provider_recovery_smoke_command_name": None,
+                "ready_to_run_live_smoke": True,
+                "provider_route_status": "ready",
+                "network_call": True,
+                "live_data_required": True,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+            {
+                "stage_name": "run_live_recording_smoke",
+                "status": "ok",
+                "failed": False,
+                "error_summary": None,
+                "provider_error_summary_count": 0,
+                "provider_recovery_smoke_count": 0,
+                "next_provider_recovery_smoke_command_name": None,
+                "ready_to_run_live_smoke": True,
+                "provider_route_status": "ready",
+                "network_call": True,
+                "live_data_required": True,
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+        ],
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert payload["api_key_next_action_summary"] == {
         "schema_version": "api_key_next_action_summary.v1",
         "status": "ready",
@@ -3826,6 +3923,28 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_pipeline_stage_summary"]["schema_version"] == (
+        "api_key_pipeline_stage_summary.v1"
+    )
+    assert payload["api_key_pipeline_stage_summary"]["status"] == "conflict"
+    assert payload["api_key_pipeline_stage_summary"]["stage_count"] == 3
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_count"] == 3
+    assert payload["api_key_pipeline_stage_summary"]["failed_stage_names"] == [
+        "run_live_data_smoke",
+        "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
+    ]
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
+        "stage_name"
+    ] == "run_live_data_smoke"
+    assert payload["api_key_pipeline_stage_summary"]["first_failed_stage"][
+        "provider_route_status"
+    ] == "blocked"
+    assert all(
+        stage["secret_values_returned"] is False
+        for stage in payload["api_key_pipeline_stage_summary"]["stages"]
+    )
+    assert payload["api_key_pipeline_stage_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"
