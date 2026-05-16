@@ -353,6 +353,12 @@ one-shot live recording smoke runner:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 ```
 
+one-shot API-key pipeline smoke runner:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+```
+
 The readiness and checklist commands do not call networks or return secret
 values. They report which future gates are still blocked for Hermes, Telegram,
 DB migration/repository, Binance testnet read-only smoke, live order submission,
@@ -380,6 +386,10 @@ returning secrets. Use `run_live_recording_smoke` to verify that a generated
 live signal can also pass through `record_signal` with live run-journal metadata.
 By default it uses an ephemeral JSONL ledger and leaves no runtime file; provide
 `ledger_path` only when you intentionally want a retained local smoke ledger.
+Use `run_api_key_pipeline_smoke` as the single post-setup check after filling
+API keys; it combines live-data readiness, provider smoke, signal workflow smoke,
+and recording smoke while still avoiding Hermes runtime starts, Telegram sends,
+order submissions, retained state, and secret returns.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

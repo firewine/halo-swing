@@ -609,6 +609,28 @@ def run_live_recording_smoke(
 
 
 @mcp.tool()
+def run_api_key_pipeline_smoke(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+    symbols: list[str] | None = None,
+    topic: str = "macro",
+) -> dict[str, Any]:
+    """Run API-key pipeline smoke checks."""
+
+    payload = {
+        "asset": asset,
+        "timeframe": timeframe,
+        "symbols": symbols,
+        "topic": topic,
+    }
+    return _audited_tool_call(
+        "run_api_key_pipeline_smoke",
+        payload,
+        call_tool("run_api_key_pipeline_smoke", payload),
+    )
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 

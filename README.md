@@ -236,6 +236,14 @@ ledger unless you explicitly provide `ledger_path`:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
 ```
 
+For a single post-setup check after filling API keys, use
+`run_api_key_pipeline_smoke`; it combines readiness, provider live data, signal
+workflow, and recording smoke checks:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+```
+
 The checklist is offline and non-mutating. It does not write `.env`, create
 credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_smoke_commands` for

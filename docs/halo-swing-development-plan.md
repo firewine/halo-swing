@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.659 API-Key Pipeline Smoke Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 채운 뒤 provider smoke, signal/report workflow smoke, recording
+smoke를 각각 따로 실행하지 않아도 전체 live data 판단 경로를 한 번에 검증할 수 있어야
+한다. 이번 slice는 `run_api_key_pipeline_smoke`를 추가해 readiness, live data smoke,
+signal workflow smoke, recording smoke를 합치고, API-key-backed live data 경계가 전체
+pipeline에서 통과했을 때만 `ok`를 반환하도록 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_api_key_pipeline_smoke is registered for MCP and harness use
+  - runner combines get_integration_readiness, run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke
+  - runner returns ok only when live data readiness is ready and live data, workflow, and recording smokes all pass
+  - fixture defaults remain offline and produce conflict rather than pretending API-key integration passed
+  - runner starts no Hermes runtime, sends no Telegram message, submits no order, writes no retained state by default, and returns no secrets
+  - setup checklist, README, and DevOps guide document the one-shot API-key pipeline smoke command after API keys are filled
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 754 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit -> passed, status conflict without API keys as expected
+```
+
 ## 3.658 Live Recording Smoke Gate Record - 2026-05-16
 
 ### A. 목적

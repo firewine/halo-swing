@@ -16,6 +16,7 @@ from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
     get_integration_readiness,
     get_integration_setup_checklist,
+    run_api_key_pipeline_smoke,
     run_integration_smoke,
     run_live_data_smoke,
     run_live_recording_smoke,
@@ -349,6 +350,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         "run_integration_smoke",
         "run_live_signal_workflow_smoke",
         "run_live_recording_smoke",
+        "run_api_key_pipeline_smoke",
     }
     assert set(live_smoke_commands) == {
         "get_market_snapshot_live_smoke",
@@ -931,6 +933,152 @@ def test_run_live_recording_smoke_can_use_caller_supplied_ledger(
     assert payload["mutates_local_state"] is True
     assert payload["recording_summary"]["ledger_ref"] == str(ledger_path)
     assert ledger_path.exists()
+
+
+def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    def fake_readiness() -> dict[str, Any]:
+        return {
+            "status": "blocked",
+            "gates": {
+                "live_data": {
+                    "ready": True,
+                    "status": "ready",
+                    "missing": [],
+                },
+            },
+            "next_actions": ["migration: provide explicit_MIGRATION_GO"],
+            "live_data_required": False,
+        }
+
+    def fake_live_data_smoke(
+        symbols: list[str] | None = None,
+        topic: str = "macro",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_data_smoke_run.v1",
+            "status": "ok",
+            "input": {"symbols": symbols, "topic": topic},
+            "network_call": True,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_workflow_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_signal_workflow_smoke_run.v1",
+            "status": "ok",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": True,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_recording_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_recording_smoke_run.v1",
+            "status": "ok",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": True,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(readiness_tools, "get_integration_readiness", fake_readiness)
+    monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_signal_workflow_smoke",
+        fake_workflow_smoke,
+    )
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_recording_smoke",
+        fake_recording_smoke,
+    )
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_run.v1"
+    assert payload["status"] == "ok"
+    assert payload["readiness_summary"]["live_data_ready"] is True
+    assert payload["readiness_summary"]["status"] == "blocked"
+    assert payload["executed_tools"] == [
+        "get_integration_readiness",
+        "run_live_data_smoke",
+        "run_live_signal_workflow_smoke",
+        "run_live_recording_smoke",
+    ]
+    assert payload["network_call"] is True
+    assert payload["live_data_required"] is True
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert all(check["passed"] for check in payload["checks"])
+    assert "api_key=" not in repr(payload).lower()
+
+
+def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+    )
+    failed_checks = {
+        (check["tool"], check["name"])
+        for check in payload["checks"]
+        if not check["passed"]
+    }
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_run.v1"
+    assert payload["status"] == "conflict"
+    assert payload["readiness_summary"]["live_data_ready"] is False
+    assert payload["live_data_smoke_summary"]["status"] == "conflict"
+    assert payload["signal_workflow_smoke_summary"]["status"] == "conflict"
+    assert payload["recording_smoke_summary"]["status"] == "conflict"
+    assert payload["network_call"] is False
+    assert payload["live_data_required"] is False
+    assert payload["hermes_runtime_started"] is False
+    assert payload["telegram_send_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["mutates_local_state"] is False
+    assert payload["secret_values_returned"] is False
+    assert (
+        "get_integration_readiness",
+        "live_data_readiness_ready",
+    ) in failed_checks
+    assert ("run_live_data_smoke", "live_data_smoke_status_ok") in failed_checks
+    assert (
+        "run_live_signal_workflow_smoke",
+        "signal_workflow_smoke_status_ok",
+    ) in failed_checks
+    assert ("run_live_recording_smoke", "recording_smoke_status_ok") in failed_checks
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(

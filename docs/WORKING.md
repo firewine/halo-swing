@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_RECORDING_SMOKE_VERIFIED
-gate_id: LIVE_RECORDING_SMOKE_GATE
+status: API_KEY_PIPELINE_SMOKE_VERIFIED
+gate_id: API_KEY_PIPELINE_SMOKE_GATE
 review_tier: S1_small
 
-next_atomic_step: add a one-shot live recording smoke runner that verifies an API-key-backed signal can be recorded with live run-journal metadata using an ephemeral ledger by default
+next_atomic_step: add a one-shot API-key pipeline smoke runner that combines readiness, live data, signal workflow, and recording smoke checks without Hermes, Telegram, orders, migrations, repositories, or retained state by default
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -79,26 +79,36 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_recording_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_recording_smoke_uses_ephemeral_ledger_by_default tests/test_readiness.py::test_run_live_recording_smoke_can_use_caller_supplied_ledger tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_live_recording_smoke is registered for MCP and harness use
-  - runner generates a signal and records it through record_signal
-  - runner returns ok only when the generated signal and stored run_journal preserve live_data_required and network_call metadata
-  - default runner uses an ephemeral ledger and leaves no committed runtime artifact
-  - caller-supplied ledger_path is supported for an explicit retained local smoke ledger
-  - fixture defaults remain offline and produce conflict rather than pretending live recording passed
-  - setup checklist, README, and DevOps guide document the one-shot live recording smoke command after API keys are filled
+  - run_api_key_pipeline_smoke is registered for MCP and harness use
+  - runner combines get_integration_readiness, run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke
+  - runner returns ok only when live data readiness is ready and live data, workflow, and recording smokes all pass
+  - fixture defaults remain offline and produce conflict rather than pretending API-key integration passed
+  - runner starts no Hermes runtime, sends no Telegram message, submits no order, writes no retained state by default, and returns no secrets
+  - setup checklist, README, and DevOps guide document the one-shot API-key pipeline smoke command after API keys are filled
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live recording smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_RECORDING_SMOKE_VERIFIED
+gate_id: LIVE_RECORDING_SMOKE_GATE
+review_tier: S1_small
+
+next_atomic_step: add a one-shot live recording smoke runner that verifies an API-key-backed signal can be recorded with live run-journal metadata using an ephemeral ledger by default
 ```
 
 Previous completed directive:
@@ -1191,6 +1201,63 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API-Key Pipeline Smoke Gate is verified.
+`run_api_key_pipeline_smoke` is registered for MCP and harness use. It combines
+`get_integration_readiness`, `run_live_data_smoke`,
+`run_live_signal_workflow_smoke`, and `run_live_recording_smoke`, then returns
+`ok` only when live-data readiness is ready and provider, workflow, and recording
+smokes all pass. Fixture defaults remain offline and return `conflict`. Focused
+tests passed with 4 tests, full pytest passed with 754 tests, and ruff,
+health_check, and the harness smoke command passed.
+
+```yaml
+api_key_pipeline_smoke_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/server.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_readiness.py
+    - tests/test_mvp_tools.py
+  implementation:
+    - run_api_key_pipeline_smoke is registered for MCP and harness use
+    - runner combines get_integration_readiness, run_live_data_smoke, run_live_signal_workflow_smoke, and run_live_recording_smoke
+    - runner returns ok only when live data readiness is ready and live data, workflow, and recording smokes all pass
+    - fixture defaults remain offline and produce conflict rather than pretending API-key integration passed
+    - runner starts no Hermes runtime, sends no Telegram message, submits no order, writes no retained state by default, and returns no secrets
+    - setup checklist, README, and DevOps guide document the one-shot API-key pipeline smoke command after API keys are filled
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "754 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "passed, status conflict without API keys as expected"
+```
+
+Previous verification:
 
 Summary: Live Recording Smoke Gate is verified. `run_live_recording_smoke` is
 registered for MCP and harness use. It generates a signal, records it through

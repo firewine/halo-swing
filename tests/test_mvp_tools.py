@@ -74,6 +74,7 @@ def test_phase9_btc_tools_are_manifested() -> None:
         "run_integration_smoke",
         "run_live_signal_workflow_smoke",
         "run_live_recording_smoke",
+        "run_api_key_pipeline_smoke",
         "get_btc_risk_settings",
         "update_btc_risk_settings",
         "get_btc_risk_status",

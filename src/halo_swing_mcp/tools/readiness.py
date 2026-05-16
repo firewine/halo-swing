@@ -478,6 +478,71 @@ def _run_live_recording_smoke_with_ledger(
     }
 
 
+def run_api_key_pipeline_smoke(
+    asset: str = "TQQQ",
+    timeframe: str = "swing_3d_10d",
+    symbols: list[str] | None = None,
+    topic: str = "macro",
+) -> dict[str, Any]:
+    """Run the API-key-backed local integration pipeline smoke checks."""
+
+    readiness = get_integration_readiness()
+    live_data_smoke = run_live_data_smoke(symbols=symbols, topic=topic)
+    signal_workflow_smoke = run_live_signal_workflow_smoke(
+        asset=asset,
+        timeframe=timeframe,
+    )
+    recording_smoke = run_live_recording_smoke(asset=asset, timeframe=timeframe)
+    checks = _api_key_pipeline_checks(
+        readiness=readiness,
+        live_data_smoke=live_data_smoke,
+        signal_workflow_smoke=signal_workflow_smoke,
+        recording_smoke=recording_smoke,
+    )
+
+    return {
+        "schema_version": "api_key_pipeline_smoke_run.v1",
+        "status": "ok" if checks and all(check["passed"] for check in checks) else "conflict",
+        "input": {
+            "asset": asset,
+            "timeframe": timeframe,
+            "symbols": symbols if symbols is not None else ["QQQ"],
+            "topic": topic,
+        },
+        "executed_tools": [
+            "get_integration_readiness",
+            "run_live_data_smoke",
+            "run_live_signal_workflow_smoke",
+            "run_live_recording_smoke",
+        ],
+        "readiness_summary": _api_key_pipeline_readiness_summary(readiness),
+        "live_data_smoke_summary": _api_key_pipeline_smoke_summary(
+            live_data_smoke,
+        ),
+        "signal_workflow_smoke_summary": _api_key_pipeline_smoke_summary(
+            signal_workflow_smoke,
+        ),
+        "recording_smoke_summary": _api_key_pipeline_smoke_summary(
+            recording_smoke,
+        ),
+        "checks": checks,
+        "network_call": any(
+            smoke.get("network_call") is True
+            for smoke in [live_data_smoke, signal_workflow_smoke, recording_smoke]
+        ),
+        "live_data_required": any(
+            smoke.get("live_data_required") is True
+            for smoke in [live_data_smoke, signal_workflow_smoke, recording_smoke]
+        ),
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
     binance_credentials = gates["binance_testnet_read_only"]["evidence"][
         "credentials"
@@ -677,6 +742,23 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,
             "state_policy": "uses an ephemeral ledger unless ledger_path is supplied",
+            "secret_values_returned": False,
+        },
+        {
+            "name": "run_api_key_pipeline_smoke",
+            "purpose": (
+                "run readiness, provider, signal workflow, and recording smoke "
+                "checks after API keys are configured"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "run_api_key_pipeline_smoke --input-json "
+                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+                "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+            ),
+            "network_call": True,
+            "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
             "secret_values_returned": False,
         },
     ]
@@ -1047,6 +1129,107 @@ def _recording_network_call(recorded: dict[str, Any]) -> bool:
     record = _optional_mapping(recorded.get("record"))
     run_journal = _optional_mapping(_mapping_value(record, "run_journal"))
     return _mapping_value(run_journal, "network_call") is True
+
+
+def _api_key_pipeline_checks(
+    *,
+    readiness: dict[str, Any],
+    live_data_smoke: dict[str, Any],
+    signal_workflow_smoke: dict[str, Any],
+    recording_smoke: dict[str, Any],
+) -> list[dict[str, Any]]:
+    live_data_gate = _optional_mapping(
+        _mapping_value(_optional_mapping(readiness.get("gates")), "live_data")
+    )
+    checks: list[dict[str, Any]] = []
+    _add_smoke_check(
+        checks,
+        tool="get_integration_readiness",
+        name="live_data_readiness_ready",
+        passed=_mapping_value(live_data_gate, "ready") is True,
+        expected=True,
+        actual=_mapping_value(live_data_gate, "ready"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_data_smoke",
+        name="live_data_smoke_status_ok",
+        passed=live_data_smoke.get("status") == "ok",
+        expected="ok",
+        actual=live_data_smoke.get("status"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_signal_workflow_smoke",
+        name="signal_workflow_smoke_status_ok",
+        passed=signal_workflow_smoke.get("status") == "ok",
+        expected="ok",
+        actual=signal_workflow_smoke.get("status"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_live_recording_smoke",
+        name="recording_smoke_status_ok",
+        passed=recording_smoke.get("status") == "ok",
+        expected="ok",
+        actual=recording_smoke.get("status"),
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_api_key_pipeline_smoke",
+        name="no_retained_state",
+        passed=all(
+            smoke.get("mutates_local_state", False) is False
+            for smoke in [live_data_smoke, signal_workflow_smoke, recording_smoke]
+        ),
+        expected=False,
+        actual={
+            "live_data_smoke": live_data_smoke.get("mutates_local_state", False),
+            "signal_workflow_smoke": signal_workflow_smoke.get("mutates_local_state"),
+            "recording_smoke": recording_smoke.get("mutates_local_state"),
+        },
+    )
+    _add_smoke_check(
+        checks,
+        tool="run_api_key_pipeline_smoke",
+        name="no_secret_values_returned",
+        passed=all(
+            smoke.get("secret_values_returned") is False
+            for smoke in [live_data_smoke, signal_workflow_smoke, recording_smoke]
+        ),
+        expected=False,
+        actual={
+            "live_data_smoke": live_data_smoke.get("secret_values_returned"),
+            "signal_workflow_smoke": signal_workflow_smoke.get(
+                "secret_values_returned"
+            ),
+            "recording_smoke": recording_smoke.get("secret_values_returned"),
+        },
+    )
+    return checks
+
+
+def _api_key_pipeline_readiness_summary(readiness: dict[str, Any]) -> dict[str, Any]:
+    gates = _optional_mapping(readiness.get("gates")) or {}
+    live_data_gate = _optional_mapping(gates.get("live_data")) or {}
+    return {
+        "status": readiness.get("status"),
+        "live_data_status": live_data_gate.get("status"),
+        "live_data_ready": live_data_gate.get("ready"),
+        "live_data_missing": live_data_gate.get("missing"),
+        "next_actions": readiness.get("next_actions"),
+    }
+
+
+def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": smoke.get("schema_version"),
+        "status": smoke.get("status"),
+        "network_call": smoke.get("network_call"),
+        "live_data_required": smoke.get("live_data_required"),
+        "mutates_local_state": smoke.get("mutates_local_state", False),
+        "secret_values_returned": smoke.get("secret_values_returned"),
+    }
 
 
 def _extend_workflow_contract_checks(
