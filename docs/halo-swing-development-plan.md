@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.669 Live Signal Workflow Setup Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_live_signal_workflow_smoke`는 API-key-backed scoring, trade guide, position
+review, latest signal report 경계를 확인하지만, setup readiness와 provider route
+evidence는 별도 명령이나 상위 smoke에서 확인해야 했다. 이번 slice는 workflow smoke
+payload 자체에 `live_data_setup_summary`를 포함해, 직접 workflow smoke를 실행해도
+API-key setup 상태와 다음 smoke 명령을 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_signal_workflow_smoke includes live_data_setup_summary derived from get_live_data_provider_route
+  - ready fake workflow smoke reports ready_to_run_live_smoke true and next_smoke_command run_api_key_pipeline_smoke
+  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values
+  - README and DevOps guide document live_data_setup_summary in workflow smoke payloads
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit -> passed
+```
+
 ## 3.668 Live Data Setup Next Smoke Gate Record - 2026-05-17
 
 ### A. 목적

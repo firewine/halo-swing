@@ -37,6 +37,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "validate_live_data_smoke_result" in guide
     assert "run_live_data_smoke" in guide
     assert "run_integration_smoke" in guide
+    assert "run_live_signal_workflow_smoke" in guide
     assert "get_market_snapshot" in guide
     assert "get_macro_snapshot" in guide
     assert "get_news_bundle" in guide

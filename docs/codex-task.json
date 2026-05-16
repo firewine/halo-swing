@@ -1,9 +1,9 @@
 {
-  "gate_id": "LIVE_DATA_SETUP_NEXT_SMOKE_GATE",
+  "gate_id": "LIVE_SIGNAL_WORKFLOW_SETUP_SUMMARY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.668",
-  "next_atomic_step": "add ready_to_run_live_smoke and next_smoke_command to live_data_setup_summary so API-key-only setup payloads directly show whether the next provider smoke can run without returning secrets",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.669",
+  "next_atomic_step": "add live_data_setup_summary to run_live_signal_workflow_smoke so direct workflow smoke runs show API-key setup readiness and next smoke guidance without returning secrets",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.667",
+    "docs/halo-swing-development-plan.md#3.668",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py"
   ],
@@ -36,11 +36,11 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit"
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\"}' --no-audit"
   ],
   "post_implementation_review": {
     "roles": [
@@ -53,15 +53,14 @@
     "read_only": true
   },
   "done_means": [
-    "live_data_setup_summary includes ready_to_run_live_smoke and next_smoke_command",
-    "blocked fixture defaults point next_smoke_command at get_live_data_api_key_status without network calls",
-    "ready fake API-key paths point next_smoke_command at run_api_key_pipeline_smoke without returning secret values",
-    "fixture defaults remain blocked with ReplayMarketDataProvider route evidence",
-    "README and DevOps guide document ready_to_run_live_smoke and next_smoke_command in live_data_setup_summary",
+    "run_live_signal_workflow_smoke includes live_data_setup_summary derived from get_live_data_provider_route",
+    "ready fake workflow smoke reports ready_to_run_live_smoke true and next_smoke_command run_api_key_pipeline_smoke",
+    "fixture defaults remain blocked with ReplayMarketDataProvider route evidence and no secret values",
+    "README and DevOps guide document live_data_setup_summary in workflow smoke payloads",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live data setup next smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live signal workflow setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

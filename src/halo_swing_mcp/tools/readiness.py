@@ -452,6 +452,11 @@ def run_live_signal_workflow_smoke(
     from halo_swing_mcp.tools import reporting as reporting_tools
     from halo_swing_mcp.tools import scoring as scoring_tools
 
+    provider_route = get_live_data_provider_route()
+    api_key_status = (
+        _optional_mapping(provider_route.get("api_key_status"))
+        or get_live_data_api_key_status()
+    )
     signal = scoring_tools.score_leverage_swing(asset=asset, timeframe=timeframe)
     trade_guide = scoring_tools.generate_trade_guide(asset=asset, timeframe=timeframe)
     position_review = scoring_tools.evaluate_position(asset=asset)
@@ -492,6 +497,10 @@ def run_live_signal_workflow_smoke(
             "evaluate_position",
             "generate_latest_signal_report",
         ],
+        "live_data_setup_summary": _live_data_setup_summary(
+            api_key_status,
+            provider_route,
+        ),
         "signal_summary": _workflow_signal_summary(signal),
         "trade_guide_summary": _workflow_contract_summary(
             trade_guide,

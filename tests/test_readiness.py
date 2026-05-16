@@ -1070,9 +1070,47 @@ def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effect
 def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
     monkeypatch,
 ) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
     from halo_swing_mcp.tools import reporting as reporting_tools
     from halo_swing_mcp.tools import scoring as scoring_tools
 
+    fake_provider_route = {
+        "schema_version": "live_data_provider_route.v1",
+        "status": "ready",
+        "provider_factory": "get_market_data_provider",
+        "selected_provider_classes": [
+            "PolygonMarketDataProvider",
+            "FredMacroDataProvider",
+            "NewsApiDataProvider",
+        ],
+        "missing": [],
+        "network_call": False,
+        "secret_values_returned": False,
+        "api_key_status": {
+            "schema_version": "live_data_api_key_status.v1",
+            "status": "ready",
+            "providers": {
+                "market": {"configured": True},
+                "macro": {"configured": True},
+                "news": {"configured": True},
+            },
+            "missing": [],
+            "one_shot_smoke_command": {
+                "name": "run_api_key_pipeline_smoke",
+                "command": (
+                    "PYTHONPATH=src ./.venv/bin/python -m "
+                    "halo_swing_mcp.harness run_api_key_pipeline_smoke "
+                    "--input-json "
+                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                ),
+                "network_call": True,
+                "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
+        },
+    }
     fake_signal = {
         "signal_id": "sig_live_tqqq",
         "run_id": "run_live_signal_smoke",
@@ -1126,6 +1164,11 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
     }
 
     monkeypatch.setattr(
+        readiness_tools,
+        "get_live_data_provider_route",
+        lambda: fake_provider_route,
+    )
+    monkeypatch.setattr(
         scoring_tools,
         "score_leverage_swing",
         lambda asset="TQQQ", timeframe="swing_3d_10d": fake_signal,
@@ -1159,6 +1202,21 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
         "evaluate_position",
         "generate_latest_signal_report",
     ]
+    assert payload["live_data_setup_summary"]["status"] == "ready"
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is True
+    assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert (
+        payload["live_data_setup_summary"]["next_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["network_call"] is True
     assert payload["live_data_required"] is True
     assert payload["hermes_runtime_started"] is False
@@ -1189,6 +1247,19 @@ def test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys(
 
     assert payload["schema_version"] == "live_signal_workflow_smoke_run.v1"
     assert payload["status"] == "conflict"
+    assert payload["live_data_setup_summary"]["status"] == "blocked"
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
+    assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert (
+        payload["live_data_setup_summary"]["next_smoke_command"]["name"]
+        == "get_live_data_api_key_status"
+    )
+    assert payload["live_data_setup_summary"]["network_call"] is False
+    assert payload["live_data_setup_summary"]["secret_values_returned"] is False
     assert payload["network_call"] is False
     assert payload["live_data_required"] is False
     assert payload["hermes_runtime_started"] is False

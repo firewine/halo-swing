@@ -241,7 +241,9 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_integration_smok
 
 After the provider smoke passes, use `run_live_signal_workflow_smoke` to verify
 that the API-key-backed live boundary reaches scoring, the trade guide, position
-review, and the latest signal report:
+review, and the latest signal report. Its payload also includes
+`live_data_setup_summary` so direct workflow smoke runs still show API-key setup
+readiness and next smoke guidance:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_signal_workflow_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d"}' --no-audit
