@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_NEXT_OPERATOR_ACTION_VERIFIED
-gate_id: LIVE_DATA_NEXT_OPERATOR_ACTION_GATE
+status: API_KEY_PIPELINE_STAGE_NEXT_OPERATOR_ACTION_VERIFIED
+gate_id: API_KEY_PIPELINE_STAGE_NEXT_OPERATOR_ACTION_GATE
 review_tier: S1_small
 
-next_atomic_step: add a no-secret next_operator_action to live data API-key setup payloads so users can see the single next local action to copy .env, fill API keys, or run the one-shot smoke
+next_atomic_step: propagate next_operator_action into run_api_key_pipeline_smoke sub-smoke summaries so each pipeline stage shows the single next local action without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,22 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - get_live_data_api_key_status and live_data_setup_summary include next_operator_action with copy-dotenv, fill-key, or run-smoke guidance without secret values
-  - blocked defaults, ready repo-dotenv aliases, and setup checklist paths assert next_operator_action
-  - README and DevOps guide document next_operator_action in API-key setup payloads
+  - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include next_operator_action
+  - ready fake-live and blocked fixture-default paths assert stage-level next_operator_action without leaking secret values
+  - README and DevOps guide document stage-level next_operator_action in pipeline summaries
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data next operator action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline stage next operator action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_NEXT_OPERATOR_ACTION_VERIFIED
+gate_id: LIVE_DATA_NEXT_OPERATOR_ACTION_GATE
+review_tier: S1_small
+
+next_atomic_step: add a no-secret next_operator_action to live data API-key setup payloads so users can see the single next local action to copy .env, fill API keys, or run the one-shot smoke
 ```
 
 Previous completed directive:
@@ -1501,6 +1512,57 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Stage Next Operator Action Gate is verified.
+`run_api_key_pipeline_smoke` live data, signal workflow, and recording
+sub-smoke summaries now expose the same no-secret `next_operator_action` as
+`live_data_setup_summary`, so the one-shot pipeline payload shows the single
+current local action at each stage. Ready fake-live and blocked fixture-default
+paths assert stage-level propagation without secret values. README and DevOps
+guide document the stage-level field. Focused tests passed with 3 tests, full
+pytest passed with 760 tests, and ruff, health_check, and one-shot pipeline
+harness commands passed.
+
+```yaml
+api_key_pipeline_stage_next_operator_action_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include next_operator_action
+    - ready fake-live and blocked fixture-default paths assert stage-level next_operator_action without leaking secret values
+    - README and DevOps guide document stage-level next_operator_action in pipeline summaries
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "passed, blocked fixture defaults returned next_operator_action in each sub-smoke summary without secrets"
+```
+
+Previous verification:
 
 Summary: Live Data Next Operator Action Gate is verified.
 `get_live_data_api_key_status` and `live_data_setup_summary` now include

@@ -2153,6 +2153,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         news_configured_env_keys=["NEWS_API_KEY"],
         ready_to_run_live_smoke=True,
     )
+    fake_next_operator_action = expected_next_operator_action(
+        target_path=env_path,
+        configured_provider_families=["market", "macro", "news"],
+        missing_provider_families=[],
+        ready_to_run_live_smoke=True,
+    )
     fake_setup_summary = {
         "schema_version": "live_data_setup_summary.v1",
         "status": "ready",
@@ -2173,6 +2179,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         },
         "provider_setup_actions": fake_provider_setup_actions,
         "provider_smoke_plan": fake_provider_smoke_plan,
+        "next_operator_action": fake_next_operator_action,
         "missing": [],
         "selected_provider_classes": [
             "PolygonMarketDataProvider",
@@ -2393,6 +2400,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         assert payload[summary_name]["required_provider_family_count"] == 3
         assert payload[summary_name]["missing_provider_families"] == []
         assert payload[summary_name]["live_data_setup_steps"] == fake_setup_steps
+        assert payload[summary_name]["next_operator_action"] == (
+            fake_next_operator_action
+        )
         assert payload[summary_name]["next_setup_step"] == (
             "run_api_key_pipeline_smoke"
         )
@@ -2453,6 +2463,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["live_data_smoke_summary"]["provider_route_status"] == "blocked"
     assert payload["live_data_smoke_summary"]["live_data_setup_steps"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]
+    )
+    assert payload["live_data_smoke_summary"]["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["live_data_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
@@ -2538,6 +2551,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["signal_workflow_smoke_summary"]["live_data_setup_steps"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]
     )
+    assert payload["signal_workflow_smoke_summary"]["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
+    )
     assert payload["signal_workflow_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
     )
@@ -2584,6 +2600,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     )
     assert payload["recording_smoke_summary"]["live_data_setup_steps"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]
+    )
+    assert payload["recording_smoke_summary"]["next_operator_action"] == (
+        payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["recording_smoke_summary"]["next_setup_step"] == (
         payload["live_data_setup_summary"]["live_data_setup_steps"]["next_step"]
