@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_DATA_SMOKE_SETUP_SUMMARY_VERIFIED
-gate_id: LIVE_DATA_SMOKE_SETUP_SUMMARY_GATE
+status: LIVE_DATA_SETUP_NEXT_SMOKE_VERIFIED
+gate_id: LIVE_DATA_SETUP_NEXT_SMOKE_GATE
 review_tier: S1_small
 
-next_atomic_step: add live_data_setup_summary to run_live_data_smoke so the provider smoke shows API-key setup readiness and provider route evidence without returning secrets
+next_atomic_step: add ready_to_run_live_smoke and next_smoke_command to live_data_setup_summary so API-key-only setup payloads directly show whether the next provider smoke can run without returning secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,23 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_live_data_smoke_flags_fixture_payloads_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_data_smoke --input-json '{"symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - run_live_data_smoke includes live_data_setup_summary derived from get_live_data_api_key_status and provider_route
-  - summary shows API-key readiness, provider route status, selected provider classes, missing keys, and run_api_key_pipeline_smoke command without returning secret values
-  - fixture defaults remain blocked with ReplayMarketDataProvider route evidence
-  - README and DevOps guide document live_data_setup_summary in live data smoke payloads
+  - live_data_setup_summary includes ready_to_run_live_smoke and next_smoke_command
+  - blocked fixture defaults point next_smoke_command at get_live_data_api_key_status without network calls
+  - ready fake API-key paths point next_smoke_command at run_api_key_pipeline_smoke without returning secret values
+  - README and DevOps guide document ready_to_run_live_smoke and next_smoke_command in live_data_setup_summary
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live data smoke setup summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live data setup next smoke gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_DATA_SMOKE_SETUP_SUMMARY_VERIFIED
+gate_id: LIVE_DATA_SMOKE_SETUP_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add live_data_setup_summary to run_live_data_smoke so the provider smoke shows API-key setup readiness and provider route evidence without returning secrets
 ```
 
 Previous completed directive:
@@ -1282,6 +1293,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Data Setup Next Smoke Gate is verified.
+`live_data_setup_summary` now includes `ready_to_run_live_smoke` and
+`next_smoke_command`. Blocked fixture defaults point the next command at
+no-network `get_live_data_api_key_status`; ready fake API-key paths point it at
+`run_api_key_pipeline_smoke` without returning secret values. Focused tests
+passed with 4 tests, full pytest passed with 760 tests, and ruff, health_check,
+and the setup checklist harness command passed.
+
+```yaml
+live_data_setup_next_smoke_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - live_data_setup_summary includes ready_to_run_live_smoke and next_smoke_command
+    - blocked fixture defaults point next_smoke_command at get_live_data_api_key_status without network calls
+    - ready fake API-key paths point next_smoke_command at run_api_key_pipeline_smoke without returning secret values
+    - fixture defaults remain blocked with ReplayMarketDataProvider route evidence
+    - README and DevOps guide document ready_to_run_live_smoke and next_smoke_command in live_data_setup_summary
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: "passed, blocked summary next_smoke_command points at get_live_data_api_key_status as expected"
+```
+
+Previous verification:
 
 Summary: Live Data Smoke Setup Summary Gate is verified.
 `run_live_data_smoke` now includes `live_data_setup_summary` derived from

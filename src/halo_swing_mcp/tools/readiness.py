@@ -1432,14 +1432,14 @@ def _live_data_setup_summary(
             *(provider_route.get("missing") or []),
         ]
     )
+    ready_to_run_live_smoke = (
+        api_key_status.get("status") == "ready"
+        and provider_route.get("status") == "ready"
+    )
     return {
         "schema_version": "live_data_setup_summary.v1",
-        "status": (
-            "ready"
-            if api_key_status.get("status") == "ready"
-            and provider_route.get("status") == "ready"
-            else "blocked"
-        ),
+        "status": "ready" if ready_to_run_live_smoke else "blocked",
+        "ready_to_run_live_smoke": ready_to_run_live_smoke,
         "api_key_status": api_key_status.get("status"),
         "provider_route_status": provider_route.get("status"),
         "configured_provider_families": configured_provider_families,
@@ -1448,6 +1448,11 @@ def _live_data_setup_summary(
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
         "provider_route_summary": route_summary,
         "one_shot_smoke_command": api_key_status.get("one_shot_smoke_command"),
+        "next_smoke_command": _local_command(
+            "run_api_key_pipeline_smoke"
+            if ready_to_run_live_smoke
+            else "get_live_data_api_key_status"
+        ),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

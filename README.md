@@ -270,7 +270,9 @@ credential files, call networks, start Hermes, send Telegram messages, submit
 orders, or return secret values. It also returns `live_data_setup_summary` so
 API-key-only setup shows key readiness, provider route status, selected provider
 classes, missing keys, and the one-shot pipeline smoke command without exposing
-secret values. It also returns `live_data_smoke_commands` for
+secret values. The summary includes `ready_to_run_live_smoke` and
+`next_smoke_command` so the next safe local check is explicit. It also returns
+`live_data_smoke_commands` for
 `get_market_snapshot`, `get_macro_snapshot`, and `get_news_bundle`; run those
 repo-local harness commands after filling the matching API keys to verify the
 live providers and boundary contracts. Those smoke commands are read-only and

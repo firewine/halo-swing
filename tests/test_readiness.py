@@ -347,6 +347,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     assert live_data_setup_summary == {
         "schema_version": "live_data_setup_summary.v1",
         "status": "blocked",
+        "ready_to_run_live_smoke": False,
         "api_key_status": "blocked",
         "provider_route_status": "blocked",
         "configured_provider_families": [],
@@ -384,6 +385,20 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
             ),
             "network_call": True,
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        "next_smoke_command": {
+            "name": "get_live_data_api_key_status",
+            "purpose": (
+                "show live data API-key readiness and configured alias names "
+                "without network calls or secret values"
+            ),
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_live_data_api_key_status --no-audit"
+            ),
+            "network_call": False,
             "mutates_local_state": False,
             "secret_values_returned": False,
         },
@@ -796,6 +811,7 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     assert payload["provider_route"]["network_call"] is False
     assert payload["provider_route"]["secret_values_returned"] is False
     assert payload["live_data_setup_summary"]["status"] == "ready"
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is True
     assert payload["live_data_setup_summary"]["api_key_status"] == "ready"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "ready"
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
@@ -804,6 +820,7 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
         "news",
     ]
     assert payload["live_data_setup_summary"]["missing"] == []
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is True
     assert payload["live_data_setup_summary"]["selected_provider_classes"] == [
         "PolygonMarketDataProvider",
         "FredMacroDataProvider",
@@ -811,6 +828,10 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     ]
     assert (
         payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert (
+        payload["live_data_setup_summary"]["next_smoke_command"]["name"]
         == "run_api_key_pipeline_smoke"
     )
     assert payload["live_data_setup_summary"]["network_call"] is False
@@ -839,6 +860,7 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert payload["provider_route"]["network_call"] is False
     assert payload["provider_route"]["secret_values_returned"] is False
     assert payload["live_data_setup_summary"]["status"] == "blocked"
+    assert payload["live_data_setup_summary"]["ready_to_run_live_smoke"] is False
     assert payload["live_data_setup_summary"]["api_key_status"] == "blocked"
     assert payload["live_data_setup_summary"]["provider_route_status"] == "blocked"
     assert payload["live_data_setup_summary"]["missing"] == [
@@ -852,6 +874,10 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     assert (
         payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
         == "run_api_key_pipeline_smoke"
+    )
+    assert (
+        payload["live_data_setup_summary"]["next_smoke_command"]["name"]
+        == "get_live_data_api_key_status"
     )
     assert payload["live_data_setup_summary"]["network_call"] is False
     assert payload["live_data_setup_summary"]["secret_values_returned"] is False
@@ -957,6 +983,10 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
     ]
     assert (
         payload["live_data_setup_summary"]["one_shot_smoke_command"]["name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert (
+        payload["live_data_setup_summary"]["next_smoke_command"]["name"]
         == "run_api_key_pipeline_smoke"
     )
     assert payload["live_data_setup_summary"]["network_call"] is False
