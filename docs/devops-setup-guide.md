@@ -326,6 +326,10 @@ above.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.
+Set `HALO_SWING_HERMES_CONFIG_PATH` and the non-secret
+`HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true` flag in `.env` after registering
+the MCP server in the local Hermes config to make the readiness check
+reproducible from local config values.
 The live data gate returns `live_data_source_readiness.v1` and tracks market
 OHLCV, macro, and news API-key readiness separately. The check may use
 non-secret booleans or environment presence, but it does not return key values.

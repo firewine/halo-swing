@@ -24,6 +24,10 @@ TELEGRAM_DELIVERY_KEYS = {
     "HALO_SWING_TELEGRAM_GATEWAY",
     "HALO_SWING_TELEGRAM_GATEWAY_URL",
 }
+HERMES_READINESS_KEYS = {
+    "HALO_SWING_HERMES_CONFIG_PATH",
+    "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED",
+}
 DOTENV_ISOLATION_KEY = "HALO_SWING_DISABLE_DOTENV"
 
 
@@ -54,6 +58,14 @@ def test_env_example_telegram_delivery_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 
     for key in TELEGRAM_DELIVERY_KEYS:
+        assert key in assignments
+        assert assignments[key] == ""
+
+
+def test_env_example_hermes_readiness_keys_are_blank_placeholders() -> None:
+    assignments = _env_assignments()
+
+    for key in HERMES_READINESS_KEYS:
         assert key in assignments
         assert assignments[key] == ""
 

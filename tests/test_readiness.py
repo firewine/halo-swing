@@ -18,6 +18,7 @@ from halo_swing_mcp.tools.readiness import get_integration_readiness
 ROOT = Path(__file__).resolve().parents[1]
 READINESS_ENV_KEYS = (
     "HALO_SWING_HERMES_CONFIG_PATH",
+    "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED",
     "HALO_SWING_TELEGRAM_BOT_TOKEN",
     "HALO_SWING_TELEGRAM_GATEWAY",
     "HALO_SWING_TELEGRAM_GATEWAY_URL",
@@ -458,6 +459,77 @@ def test_integration_readiness_normalizes_env_hermes_config_path(
     assert hermes_gate["evidence"]["config_path"] == str(hermes_config)
     assert hermes_gate["evidence"]["config_path_exists"] is True
     assert hermes_gate["evidence"]["config_path_is_absolute"] is True
+
+
+def test_integration_readiness_accepts_env_hermes_registration_flag(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    hermes_config = tmp_path / "hermes.yaml"
+    missing_credentials = tmp_path / "missing.enc.json"
+    hermes_config.write_text("mcp_servers: {}\n", encoding="utf-8")
+    monkeypatch.setenv("HALO_SWING_HERMES_CONFIG_PATH", str(hermes_config))
+    monkeypatch.setenv("HALO_SWING_HERMES_MCP_CONFIG_REGISTERED", " true ")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        binance_credentials_path=str(missing_credentials),
+    )
+    hermes_gate = payload["gates"]["hermes"]
+
+    assert hermes_gate["status"] == "ready"
+    assert hermes_gate["missing"] == []
+    assert hermes_gate["evidence"]["config_path"] == str(hermes_config)
+    assert hermes_gate["evidence"]["mcp_config_registered"] is True
+
+
+def test_integration_readiness_explicit_hermes_registration_overrides_env(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    hermes_config = tmp_path / "hermes.yaml"
+    missing_credentials = tmp_path / "missing.enc.json"
+    hermes_config.write_text("mcp_servers: {}\n", encoding="utf-8")
+    monkeypatch.setenv("HALO_SWING_HERMES_CONFIG_PATH", str(hermes_config))
+    monkeypatch.setenv("HALO_SWING_HERMES_MCP_CONFIG_REGISTERED", "true")
+    get_settings.cache_clear()
+
+    payload = get_integration_readiness(
+        hermes_mcp_config_registered=False,
+        binance_credentials_path=str(missing_credentials),
+    )
+    hermes_gate = payload["gates"]["hermes"]
+
+    assert hermes_gate["status"] == "blocked"
+    assert hermes_gate["missing"] == ["hermes_mcp_config_registration"]
+    assert hermes_gate["evidence"]["mcp_config_registered"] is False
+
+
+def test_integration_readiness_rejects_env_hermes_registration_flag_before_credentials(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("HALO_SWING_HERMES_MCP_CONFIG_REGISTERED", "yes")
+    get_settings.cache_clear()
+
+    def fail_credential_status(*_args, **_kwargs):
+        raise AssertionError("credential status must not run before Hermes env validation")
+
+    monkeypatch.setattr(
+        "halo_swing_mcp.tools.readiness.get_binance_credentials_status",
+        fail_credential_status,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="HALO_SWING_HERMES_MCP_CONFIG_REGISTERED must be 'true' or 'false'",
+    ):
+        get_integration_readiness(
+            binance_credentials_path=str(tmp_path / "missing.enc.json"),
+        )
 
 
 def test_integration_readiness_rejects_env_hermes_config_path_without_fallback(
@@ -1317,6 +1389,7 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
         "\n".join(
             [
                 f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
+                "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true",
                 *(f"{key}={value}" for key, value in secret_env.items()),
             ]
         ),
@@ -1324,10 +1397,7 @@ def test_integration_readiness_accepts_local_env_aliases_without_exporting_secre
     )
     clear_local_env_cache()
 
-    payload = get_integration_readiness(
-        hermes_mcp_config_registered=True,
-        binance_credentials_path="/missing/credentials.json",
-    )
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     hermes_gate = payload["gates"]["hermes"]
     telegram_gate = payload["gates"]["telegram"]
     live_data_gate = payload["gates"]["live_data"]
@@ -1382,6 +1452,7 @@ def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
         "\n".join(
             [
                 f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
+                "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true",
                 *(f"{key}={value}" for key, value in secret_env.items()),
             ]
         ),
@@ -1390,10 +1461,7 @@ def test_integration_readiness_accepts_repo_root_env_from_other_cwd(
     clear_local_env_cache()
     get_settings.cache_clear()
 
-    payload = get_integration_readiness(
-        hermes_mcp_config_registered=True,
-        binance_credentials_path="/missing/credentials.json",
-    )
+    payload = get_integration_readiness(binance_credentials_path="/missing/credentials.json")
     hermes_gate = payload["gates"]["hermes"]
     telegram_gate = payload["gates"]["telegram"]
     live_data_gate = payload["gates"]["live_data"]

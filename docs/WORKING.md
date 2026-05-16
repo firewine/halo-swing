@@ -42,6 +42,64 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
+status: HERMES_REGISTRATION_ENV_FLAG_VERIFIED
+gate_id: HERMES_REGISTRATION_ENV_FLAG_GATE
+review_tier: S1_small
+
+next_atomic_step: let get_integration_readiness read Hermes MCP registration from a non-secret dotenv/env flag
+
+allowed_edit_paths:
+  - .codex/tasks/current.json
+  - .env.example
+  - README.md
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/devops-setup-guide.md
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_env_template.py
+  - tests/test_readiness.py
+  - tests/test_setup_docs.py
+
+blocked_path_prefixes:
+  - src/halo_swing_mcp/broker/
+  - src/halo_swing_mcp/live_adapters/
+  - migrations/
+  - data/
+  - artifacts/
+  - state/
+
+blocked_exact_paths: []
+
+required_verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+
+done_means:
+  - get_integration_readiness accepts HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true from exported env or local dotenv when the public input is omitted
+  - explicit hermes_mcp_config_registered input still overrides the environment flag
+  - invalid HALO_SWING_HERMES_MCP_CONFIG_REGISTERED values are rejected before Binance credential status reads
+  - .env.example includes a blank HALO_SWING_HERMES_MCP_CONFIG_REGISTERED placeholder
+  - README and DevOps setup docs describe the non-secret Hermes registration flag
+  - tests lock env-backed Hermes readiness without exposing secrets
+  - task contract and portable mirror match
+  - all required verification passes
+  - WORKING.md records result and verification status only
+
+next_state_after_success: commit and push this verified Hermes registration env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
 status: DOTENV_DISABLE_PRECEDENCE_GATE_VERIFIED
 gate_id: DOTENV_DISABLE_PRECEDENCE_GATE
 review_tier: S1_small
@@ -619,15 +677,19 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.639
-gate_packet: docs/halo-swing-development-plan.md#3.639
+portable_mirror: docs/halo-swing-development-plan.md#3.640
+gate_packet: docs/halo-swing-development-plan.md#3.640
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.639
-  - src/halo_swing_mcp/env.py
-  - tests/test_env.py
+  - docs/halo-swing-development-plan.md#3.640
+  - src/halo_swing_mcp/tools/readiness.py
+  - src/halo_swing_mcp/server.py
+  - .env.example
+  - tests/test_readiness.py
+  - tests/test_env_template.py
+  - tests/test_setup_docs.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -929,6 +991,62 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Hermes Registration Env Flag Gate is verified.
+`get_integration_readiness` now reads
+`HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true` from exported env or local
+dotenv when `hermes_mcp_config_registered` input is omitted. Explicit public
+input still overrides the env flag, invalid env flag values fail before Binance
+credential status reads, and `.env.example`, README, and the DevOps guide
+document the non-secret local setup flag. Focused readiness/env-template/docs
+tests passed with 51 tests, full pytest passed with 715 tests, and ruff and
+health_check passed.
+
+```yaml
+hermes_registration_env_flag_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_env_template.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_integration_readiness accepts HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true from exported env or local dotenv when public input is omitted
+    - explicit hermes_mcp_config_registered input overrides env flag
+    - invalid HALO_SWING_HERMES_MCP_CONFIG_REGISTERED values fail before Binance credential status reads
+    - .env.example exposes blank HALO_SWING_HERMES_MCP_CONFIG_REGISTERED placeholder
+    - README and DevOps setup guide document the non-secret Hermes registration flag
+    - no real secret values, Hermes runtime call, Telegram send, network readiness call, migration, repository persistence, broker path change, or order submission added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q
+      result: "51 passed"
+    - command: HALO_SWING_HERMES_CONFIG_PATH=/private/tmp/halo_swing_hermes_test_config.yaml HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_credentials_path":"/private/tmp/halo_swing_missing_credentials.enc.json"}' --no-audit
+      result: passed, Hermes gate ready without secret values
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "715 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Dotenv Disable Precedence Gate is verified.
 `HALO_SWING_DISABLE_DOTENV` now follows the same precedence as other local setup

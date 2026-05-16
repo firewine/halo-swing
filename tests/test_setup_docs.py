@@ -32,3 +32,13 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "export POLYGON_API_KEY" not in guide
     assert "export FRED_API_KEY" not in guide
     assert "export NEWS_API_KEY" not in guide
+
+
+def test_setup_docs_describe_hermes_registration_env_flag() -> None:
+    text = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+
+    for document in (text, guide):
+        assert "HALO_SWING_HERMES_CONFIG_PATH" in document
+        assert "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true" in document
+        assert "non-secret" in document

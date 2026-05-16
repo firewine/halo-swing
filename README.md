@@ -161,7 +161,10 @@ runs remain fixture-backed and offline. The optional `*_DATA_MODE=live` env
 values are still accepted for explicit operator intent/source validation, but
 they are not required when the API key is present. It includes
 `hermes_mcp_config_readiness.v1`
-for config path and MCP registration evidence. It also exposes
+for config path and MCP registration evidence. `HALO_SWING_HERMES_CONFIG_PATH`
+and the non-secret `HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true` flag may be
+set in `.env` so readiness can be reproduced from local config values without
+starting Hermes. It also exposes
 `telegram_delivery_readiness.v1` for bot-token/gateway readiness while keeping
 `send_call=false`, and a separate `live_order_submission` gate that requires
 explicit approval, the live-trading env flag, encrypted credentials, manual

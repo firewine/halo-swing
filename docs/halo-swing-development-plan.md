@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.640 Hermes Registration Env Flag Gate Record - 2026-05-16
+
+### A. 목적
+
+Hermes readiness는 `HALO_SWING_HERMES_CONFIG_PATH`를 `.env`에서 읽을 수
+있지만, MCP config 등록 완료 여부는 public input으로만 전달할 수 있었다. 사용자가
+repo-root `.env`에 비밀이 아닌 로컬 설정값을 채워 readiness를 재현할 수 있도록,
+`HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true`를 지원한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_readiness accepts HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true from exported env or local dotenv when the public input is omitted
+  - explicit hermes_mcp_config_registered input still overrides the environment flag
+  - invalid HALO_SWING_HERMES_MCP_CONFIG_REGISTERED values are rejected before Binance credential status reads
+  - .env.example includes a blank HALO_SWING_HERMES_MCP_CONFIG_REGISTERED placeholder
+  - README and DevOps setup docs describe the non-secret Hermes registration flag
+  - tests lock env-backed Hermes readiness without exposing secrets
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - real secret values
+  - Hermes runtime call
+  - Telegram send call
+  - network call during readiness
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q -> 51 passed
+  - HALO_SWING_HERMES_CONFIG_PATH=/private/tmp/halo_swing_hermes_test_config.yaml HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_credentials_path":"/private/tmp/halo_swing_missing_credentials.enc.json"}' --no-audit -> passed, Hermes gate ready without secret values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 715 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.639 Dotenv Disable Precedence Gate Record - 2026-05-16
 
 ### A. 목적

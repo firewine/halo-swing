@@ -475,7 +475,7 @@ def generate_cron_prompt_pack(
 @mcp.tool()
 def get_integration_readiness(
     hermes_config_path: str | None = None,
-    hermes_mcp_config_registered: bool = False,
+    hermes_mcp_config_registered: bool | None = None,
     telegram_configured: bool | None = None,
     telegram_bot_token_configured: bool | None = None,
     telegram_gateway_configured: bool | None = None,

@@ -15,12 +15,13 @@ from halo_swing_mcp.secret_store import get_binance_credentials_status
 
 HERMES_SERVER_COMMAND = "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.server"
 HERMES_CONFIG_PATH_ENV = "HALO_SWING_HERMES_CONFIG_PATH"
+HERMES_MCP_CONFIG_REGISTERED_ENV = "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED"
 
 
 def get_integration_readiness(
     *,
     hermes_config_path: str | None = None,
-    hermes_mcp_config_registered: bool = False,
+    hermes_mcp_config_registered: bool | None = None,
     telegram_configured: bool | None = None,
     telegram_bot_token_configured: bool | None = None,
     telegram_gateway_configured: bool | None = None,
@@ -40,9 +41,8 @@ def get_integration_readiness(
     normalized_hermes_config_path = _resolve_hermes_config_path(
         hermes_config_path,
     )
-    normalized_hermes_registered = _normalize_boolean(
+    normalized_hermes_registered = _resolve_hermes_mcp_config_registered(
         hermes_mcp_config_registered,
-        "hermes_mcp_config_registered",
     )
     normalized_telegram_configured = _normalize_optional_boolean(
         telegram_configured,
@@ -193,6 +193,15 @@ def _resolve_hermes_config_path(hermes_config_path: str | None) -> str | None:
     if env_value is not None:
         return _normalize_path(env_value, HERMES_CONFIG_PATH_ENV)
     return None
+
+
+def _resolve_hermes_mcp_config_registered(value: bool | None) -> bool:
+    if value is not None:
+        return _normalize_boolean(value, "hermes_mcp_config_registered")
+    env_value = get_config_value(HERMES_MCP_CONFIG_REGISTERED_ENV)
+    if env_value is None or not env_value.strip():
+        return False
+    return _normalize_env_boolean(env_value, HERMES_MCP_CONFIG_REGISTERED_ENV)
 
 
 def _telegram_readiness(
@@ -458,6 +467,17 @@ def _normalize_boolean(value: bool, field_name: str) -> bool:
     if type(value) is not bool:
         raise ValueError(f"{field_name} must be a boolean")
     return value
+
+
+def _normalize_env_boolean(value: str, env_name: str) -> bool:
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{env_name} must be 'true' or 'false'")
+    normalized = value.strip().lower()
+    if normalized == "true":
+        return True
+    if normalized == "false":
+        return False
+    raise ValueError(f"{env_name} must be 'true' or 'false'")
 
 
 def _normalize_optional_boolean(value: bool | None, field_name: str) -> bool | None:
