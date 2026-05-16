@@ -540,6 +540,51 @@ def expected_provider_smoke_plan(
     }
 
 
+def expected_api_key_requirements_summary(
+    *,
+    status: str,
+    market_configured_env_keys: list[str],
+    macro_configured_env_keys: list[str],
+    news_configured_env_keys: list[str],
+    configured_provider_families: list[str],
+    missing_provider_families: list[str],
+) -> dict[str, Any]:
+    provider_setup_actions = expected_provider_setup_actions(
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+    )
+    configured_env_keys = []
+    provider_requirements = {}
+    for provider_family, action in provider_setup_actions.items():
+        configured_env_keys.extend(action["configured_env_keys"])
+        provider_requirements[provider_family] = {
+            "provider": action["provider"],
+            "configured": action["configured"],
+            "configured_env_keys": action["configured_env_keys"],
+            "preferred_env_key": action["preferred_env_key"],
+            "accepted_env_keys": action["accepted_env_keys"],
+            "setup_status": action["setup_status"],
+            "next_setup_action": action["next_setup_action"],
+            "smoke_command_name": action["smoke_command_name"],
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+    return {
+        "schema_version": "api_key_pipeline_api_key_requirements_summary.v1",
+        "status": status,
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "configured_env_keys": configured_env_keys,
+        "missing_provider_families": missing_provider_families,
+        "configured_provider_families": configured_provider_families,
+        "provider_requirements": provider_requirements,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
 EXPECTED_MISSING_CREDENTIAL_STATUS_KEYS = [
     "configured",
     "provider",
@@ -2219,9 +2264,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "schema_version": "live_data_api_key_status.v1",
             "status": "ready",
             "providers": {
-                "market": {"configured": True},
-                "macro": {"configured": True},
-                "news": {"configured": True},
+                "market": fake_provider_setup_actions["market"],
+                "macro": fake_provider_setup_actions["macro"],
+                "news": fake_provider_setup_actions["news"],
             },
             "missing": [],
             "one_shot_smoke_command": {
@@ -2367,6 +2412,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_requirements_summary"] == (
+        expected_api_key_requirements_summary(
+            status="ready",
+            market_configured_env_keys=["POLYGON_API_KEY"],
+            macro_configured_env_keys=["FRED_API_KEY"],
+            news_configured_env_keys=["NEWS_API_KEY"],
+            configured_provider_families=["market", "macro", "news"],
+            missing_provider_families=[],
+        )
+    )
     assert payload["live_data_setup_summary"]["configured_provider_families"] == [
         "market",
         "macro",
@@ -2507,6 +2562,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_requirements_summary"] == (
+        expected_api_key_requirements_summary(
+            status="blocked",
+            market_configured_env_keys=[],
+            macro_configured_env_keys=[],
+            news_configured_env_keys=[],
+            configured_provider_families=[],
+            missing_provider_families=["market", "macro", "news"],
+        )
+    )
     assert payload["live_data_smoke_summary"]["status"] == "conflict"
     assert payload["live_data_smoke_summary"]["live_data_setup_summary_status"] == (
         "blocked"

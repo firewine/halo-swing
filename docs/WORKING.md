@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_VERIFIED
-gate_id: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_GATE
+status: API_KEY_PIPELINE_TOP_LEVEL_REQUIREMENTS_VERIFIED
+gate_id: API_KEY_PIPELINE_TOP_LEVEL_REQUIREMENTS_GATE
 review_tier: S1_small
 
-next_atomic_step: add a top-level setup_status_summary to run_api_key_pipeline_smoke so API-key-only setup readiness, provider family counts, and the next smoke command are visible before nested summaries
+next_atomic_step: add a top-level api_key_requirements_summary to run_api_key_pipeline_smoke so required provider env keys, accepted aliases, configured alias names, and provider smoke command names are visible before nested summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,15 +81,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke includes top-level setup_status_summary copied from live_data_setup_summary without returning secrets
-  - ready fake-live and blocked fixture-default paths assert top-level setup_status_summary provider counts, readiness, missing families, and next smoke command name
-  - README and DevOps guide document top-level setup_status_summary in pipeline smoke payloads
+  - run_api_key_pipeline_smoke includes top-level api_key_requirements_summary copied from live_data_setup_summary provider setup actions without returning secrets
+  - ready fake-live and blocked fixture-default paths assert top-level api_key_requirements_summary required keys, accepted aliases, configured aliases, setup statuses, and smoke command names
+  - README and DevOps guide document top-level api_key_requirements_summary in pipeline smoke payloads
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline top-level setup status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key pipeline top-level requirements gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_VERIFIED
+gate_id: API_KEY_PIPELINE_TOP_LEVEL_SETUP_STATUS_GATE
+review_tier: S1_small
+
+next_atomic_step: add a top-level setup_status_summary to run_api_key_pipeline_smoke so API-key-only setup readiness, provider family counts, and the next smoke command are visible before nested summaries
 ```
 
 Previous completed directive:
@@ -1534,6 +1545,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Top-Level Requirements Gate is verified.
+`run_api_key_pipeline_smoke` now exposes top-level
+`api_key_requirements_summary`, a no-secret summary of required provider env
+keys, accepted aliases, configured alias names, provider setup statuses, and
+provider smoke command names before nested summaries. Ready fake-live and blocked
+fixture-default paths assert the top-level summary without secret values. README
+and DevOps guide document it. Focused tests passed with 3 tests, full pytest
+passed with 760 tests, and ruff, health_check, and one-shot pipeline harness
+commands passed. With local `.env` absent, the one-shot pipeline harness exits 0
+and returns required keys `POLYGON_API_KEY`, `FRED_API_KEY`, and `NEWS_API_KEY`,
+accepted aliases for Polygon/FRED/NewsAPI, provider smoke command names, and no
+secrets.
+
+```yaml
+api_key_pipeline_top_level_requirements_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+  implementation:
+    - run_api_key_pipeline_smoke includes top-level api_key_requirements_summary copied from live_data_setup_summary provider setup actions
+    - ready fake-live and blocked fixture-default paths assert required env keys, accepted aliases, configured alias names, provider setup statuses, provider smoke command names, and no secret values
+    - README and DevOps guide document top-level api_key_requirements_summary in pipeline smoke payloads
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+      result: "exit 0; fixture-default local setup returned top-level api_key_requirements_summary with required env keys, accepted aliases, provider smoke command names, and no secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Top-Level Setup Status Gate is verified.
 `run_api_key_pipeline_smoke` now exposes a compact top-level

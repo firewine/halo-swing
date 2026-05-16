@@ -709,6 +709,9 @@ def run_api_key_pipeline_smoke(
         "setup_status_summary": _api_key_pipeline_setup_status_summary(
             live_data_setup_summary,
         ),
+        "api_key_requirements_summary": (
+            _api_key_pipeline_api_key_requirements_summary(live_data_setup_summary)
+        ),
         "provider_route_summary": _api_key_pipeline_provider_route_summary(
             provider_route,
         ),
@@ -1600,6 +1603,56 @@ def _api_key_pipeline_setup_status_summary(
         "selected_provider_classes": live_data_setup_summary.get(
             "selected_provider_classes"
         ),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_pipeline_api_key_requirements_summary(
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
+    provider_setup_actions = _optional_mapping(
+        live_data_setup_summary.get("provider_setup_actions")
+    ) or {}
+    provider_requirements: dict[str, dict[str, Any]] = {}
+    required_env_keys: list[str] = []
+    configured_env_keys: list[str] = []
+    for provider_family, raw_action in provider_setup_actions.items():
+        action = _optional_mapping(raw_action) or {}
+        preferred_env_key = action.get("preferred_env_key")
+        action_configured_env_keys = _string_list(action.get("configured_env_keys"))
+        if isinstance(preferred_env_key, str):
+            required_env_keys.append(preferred_env_key)
+        configured_env_keys.extend(action_configured_env_keys)
+        provider_requirements[provider_family] = {
+            "provider": action.get("provider"),
+            "configured": action.get("configured"),
+            "configured_env_keys": action_configured_env_keys,
+            "preferred_env_key": preferred_env_key,
+            "accepted_env_keys": _string_list(action.get("accepted_env_keys")),
+            "setup_status": action.get("setup_status"),
+            "next_setup_action": action.get("next_setup_action"),
+            "smoke_command_name": action.get("smoke_command_name"),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+    provider_family_summary = _optional_mapping(
+        live_data_setup_summary.get("provider_family_summary")
+    ) or {}
+    return {
+        "schema_version": "api_key_pipeline_api_key_requirements_summary.v1",
+        "status": live_data_setup_summary.get("status"),
+        "required_env_keys": required_env_keys,
+        "configured_env_keys": _ordered_unique_strings(configured_env_keys),
+        "missing_provider_families": provider_family_summary.get(
+            "missing_provider_families"
+        ),
+        "configured_provider_families": provider_family_summary.get(
+            "configured_provider_families"
+        ),
+        "provider_requirements": provider_requirements,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
