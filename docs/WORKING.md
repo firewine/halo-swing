@@ -42,19 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: LIVE_SCORING_SOURCE_METADATA_VERIFIED
-gate_id: LIVE_SCORING_SOURCE_METADATA_GATE
+status: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_VERIFIED
+gate_id: LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: make score_leverage_swing, generate_trade_guide, and evaluate_position propagate live data source metadata when API-key-backed market, macro, or news inputs are used
+next_atomic_step: make latest signal and position review report payloads preserve live_data_required when their scoring or position inputs used API-key-backed live data
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/scoring.py
-  - tests/test_mvp_tools.py
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_reporting.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,23 +71,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_and_trade_guide_include_risk_controls tests/test_mvp_tools.py::test_scoring_tools_propagate_live_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_propagates_live_signal_boundary tests/test_reporting.py::test_position_review_report_propagates_live_review_boundary tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - score_leverage_swing reports source_data_contract with per-source network_call and live_data_required metadata
-  - score_leverage_swing top-level live_data_required and news_usage_contract live_data_required reflect market, macro, and news inputs
-  - generate_trade_guide and evaluate_position propagate signal live_data_required into their contracts, guards, and top-level payloads
-  - fixture defaults remain offline with no_live_data_required guards passing
-  - tests cover fake live source metadata without live network or real API keys
+  - generate_latest_signal_report top-level live_data_required follows the source signal live_data_required value
+  - generate_position_review_report top-level live_data_required follows the position review live_data_required value
+  - report and position payload guards compare live_data_required against the expected nested source value instead of hard-coded false
+  - fixture defaults and golden report remain offline and unchanged
+  - tests cover fake live signal and position review payloads without live network or real API keys
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, or committed runtime artifact changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified live scoring source metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified live report payload boundary metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: LIVE_SCORING_SOURCE_METADATA_VERIFIED
+gate_id: LIVE_SCORING_SOURCE_METADATA_GATE
+review_tier: S1_small
+
+next_atomic_step: make score_leverage_swing, generate_trade_guide, and evaluate_position propagate live data source metadata when API-key-backed market, macro, or news inputs are used
 ```
 
 Previous completed directive:
@@ -825,17 +836,16 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.654
-gate_packet: docs/halo-swing-development-plan.md#3.654
+portable_mirror: docs/halo-swing-development-plan.md#3.655
+gate_packet: docs/halo-swing-development-plan.md#3.655
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.654
+  - docs/halo-swing-development-plan.md#3.655
+  - src/halo_swing_mcp/tools/reporting.py
   - src/halo_swing_mcp/tools/scoring.py
-  - src/halo_swing_mcp/indicators.py
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_mvp_tools.py
+  - tests/test_reporting.py
 
 implementation_rule:
   - keep reusable module boundaries
@@ -1137,6 +1147,52 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Live Report Payload Boundary Metadata Gate is verified.
+`generate_latest_signal_report` now preserves the source signal
+`live_data_required` value, and `generate_position_review_report` preserves the
+position review `live_data_required` value. Report and position payload guards
+compare against the expected nested source value instead of hard-coded false.
+Focused tests passed with 3 tests, full pytest passed with 746 tests, and ruff
+and health_check passed.
+
+```yaml
+live_report_payload_boundary_metadata_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
+    - tests/test_reporting.py
+  implementation:
+    - generate_latest_signal_report top-level live_data_required follows the source signal live_data_required value
+    - generate_position_review_report top-level live_data_required follows the position review live_data_required value
+    - report and position payload guards compare live_data_required against the expected nested source value instead of hard-coded false
+    - fixture defaults and golden report remain offline and unchanged
+    - fake live signal and position review tests cover the path without live network or real API keys
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, or committed runtime artifact changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_propagates_live_signal_boundary tests/test_reporting.py::test_position_review_report_propagates_live_review_boundary tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "746 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Live Scoring Source Metadata Gate is verified. `score_leverage_swing`
 now reports `source_data_contract` with per-source `network_call` and

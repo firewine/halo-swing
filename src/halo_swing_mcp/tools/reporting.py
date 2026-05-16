@@ -120,6 +120,7 @@ def generate_latest_signal_report(
         structured_payload_key="latest_signal_report",
     )
     evidence_context = _evidence_context(signal, report)
+    payload_live_data_required = bool(signal.get("live_data_required"))
     payload = {
         "schema_version": REPORT_SCHEMA_VERSION,
         "as_of": report["created_at"],
@@ -156,7 +157,7 @@ def generate_latest_signal_report(
             "run_id": signal["run_id"],
             "config_hash": signal["config_hash"],
         },
-        "live_data_required": False,
+        "live_data_required": payload_live_data_required,
     }
     if chart_payload is not None:
         payload["chart_code_guard"] = _chart_code_guard(signal, chart_payload)
@@ -233,6 +234,7 @@ def generate_latest_signal_report(
         schema_check_name="report_payload_schema_version_matches_expected",
         live_data_check_name="report_payload_live_data_required_matches_expected",
         keys_check_name="report_payload_keys_match_expected_schema",
+        expected_live_data_required=payload_live_data_required,
         extra_checks=[
             {
                 "name": "report_payload_source_signal_ref_keys_match_expected_schema",
@@ -396,6 +398,7 @@ def generate_position_review_report(
         structured_payload_key="position_review",
     )
     review_contract = _position_review_contract()
+    payload_live_data_required = bool(review.get("live_data_required"))
     payload = {
         "schema_version": POSITION_REVIEW_SCHEMA_VERSION,
         "as_of": review["as_of"],
@@ -417,7 +420,7 @@ def generate_position_review_report(
             delivery_contract,
             review_contract,
         ),
-        "live_data_required": False,
+        "live_data_required": payload_live_data_required,
     }
     expected_position_payload_top_level_identity = {
         "as_of": payload["position_review"]["as_of"],
@@ -449,6 +452,7 @@ def generate_position_review_report(
         schema_check_name="position_payload_schema_version_matches_expected",
         live_data_check_name="position_payload_live_data_required_matches_expected",
         keys_check_name="position_payload_keys_match_expected_schema",
+        expected_live_data_required=payload_live_data_required,
         extra_checks=[
             {
                 "name": "position_payload_top_level_identity_matches_position_review",
@@ -3340,6 +3344,7 @@ def _payload_contract_guard(
     check_names_check_name: str,
     guard_keys_check_name: str,
     check_keys_check_name: str,
+    expected_live_data_required: bool = False,
     extra_checks: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     extra_checks = extra_checks or []
@@ -3371,8 +3376,8 @@ def _payload_contract_guard(
         },
         {
             "name": live_data_check_name,
-            "passed": payload["live_data_required"] is False,
-            "expected": False,
+            "passed": payload["live_data_required"] is expected_live_data_required,
+            "expected": expected_live_data_required,
             "actual": payload["live_data_required"],
         },
         {

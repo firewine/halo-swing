@@ -1136,6 +1136,35 @@ def test_latest_signal_report_contains_required_report_sections() -> None:
     assert payload["live_data_required"] is False
 
 
+def test_latest_signal_report_propagates_live_signal_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    signal = reporting.score_leverage_swing("TQQQ")
+    live_signal = {**signal, "live_data_required": True}
+    monkeypatch.setattr(
+        reporting,
+        "score_leverage_swing",
+        lambda asset="TQQQ", timeframe="swing_3d_10d": live_signal,
+    )
+
+    payload = generate_latest_signal_report("TQQQ")
+    guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+
+    assert payload["live_data_required"] is True
+    assert guard_checks["report_payload_live_data_required_matches_expected"][
+        "passed"
+    ] is True
+    assert guard_checks["report_payload_live_data_required_matches_expected"][
+        "expected"
+    ] is True
+    assert guard_checks["report_payload_live_data_required_matches_expected"][
+        "actual"
+    ] is True
+    assert payload["report_payload_guard"]["status"] == "ok"
+
+
 def test_latest_signal_report_limits_evidence_and_flags_conflicts() -> None:
     payload = generate_latest_signal_report("TQQQ")
     contract = payload["evidence_contract"]
@@ -10533,6 +10562,7 @@ def test_position_review_report_contains_guarded_decision() -> None:
     assert payload_guard_checks[
         "position_payload_guard_keys_match_expected_schema"
     ]["passed"] is True
+
     assert payload_guard_checks[
         "position_payload_guard_keys_match_expected_schema"
     ]["actual"] == ["status", "checks"]
@@ -10975,6 +11005,53 @@ def test_position_review_report_contains_guarded_decision() -> None:
     assert sections["Stop"]
     assert sections["Take Profit"]
     assert payload["live_data_required"] is False
+
+
+def test_position_review_report_propagates_live_review_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    review = reporting.evaluate_position(
+        asset="TQQQ",
+        entry_price=100,
+        current_price=114,
+        size=3,
+    )
+    live_review = {
+        **review,
+        "live_data_required": True,
+        "position_management_contract": {
+            **review["position_management_contract"],
+            "live_data_required": True,
+        },
+    }
+    monkeypatch.setattr(
+        reporting,
+        "evaluate_position",
+        lambda asset="TQQQ", entry_price=None, current_price=None, size=None: live_review,
+    )
+
+    payload = generate_position_review_report(
+        "TQQQ",
+        entry_price=100,
+        current_price=114,
+        size=3,
+    )
+    guard_checks = {
+        check["name"]: check for check in payload["position_payload_guard"]["checks"]
+    }
+
+    assert payload["live_data_required"] is True
+    assert payload["position_review"]["live_data_required"] is True
+    assert guard_checks["position_payload_live_data_required_matches_expected"][
+        "passed"
+    ] is True
+    assert guard_checks["position_payload_live_data_required_matches_expected"][
+        "expected"
+    ] is True
+    assert guard_checks["position_payload_live_data_required_matches_expected"][
+        "actual"
+    ] is True
+    assert payload["position_payload_guard"]["status"] == "ok"
 
 
 def test_delivery_preview_splits_telegram_text_on_section_boundaries() -> None:

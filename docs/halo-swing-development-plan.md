@@ -28,6 +28,54 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.655 Live Report Payload Boundary Metadata Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key를 넣어 live market/macro/news data로 scoring을 만든 뒤 report를
+생성하면, report payload도 live data boundary를 보존해야 한다. 이번 slice는
+`generate_latest_signal_report`와 `generate_position_review_report`의 top-level
+`live_data_required` 및 payload guard가 nested source payload의 live boundary를
+반영하도록 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - generate_latest_signal_report top-level live_data_required follows the source signal live_data_required value
+  - generate_position_review_report top-level live_data_required follows the position review live_data_required value
+  - report and position payload guards compare live_data_required against the expected nested source value instead of hard-coded false
+  - fixture defaults and golden report remain offline and unchanged
+  - fake live signal and position review tests prove propagation without real network or API keys
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - committed runtime artifact
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_propagates_live_signal_boundary tests/test_reporting.py::test_position_review_report_propagates_live_review_boundary tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 746 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.654 Live Scoring Source Metadata Gate Record - 2026-05-16
 
 ### A. 목적

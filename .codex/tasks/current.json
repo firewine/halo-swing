@@ -1,25 +1,24 @@
 {
-  "gate_id": "LIVE_SCORING_SOURCE_METADATA_GATE",
+  "gate_id": "LIVE_REPORT_PAYLOAD_BOUNDARY_METADATA_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.654",
-  "next_atomic_step": "make score_leverage_swing, generate_trade_guide, and evaluate_position propagate live data source metadata when API-key-backed market, macro, or news inputs are used",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.655",
+  "next_atomic_step": "make latest signal and position review report payloads preserve live_data_required when their scoring or position inputs used API-key-backed live data",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/scoring.py",
-    "tests/test_mvp_tools.py"
+    "src/halo_swing_mcp/tools/reporting.py",
+    "tests/test_reporting.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.654",
+    "docs/halo-swing-development-plan.md#3.655",
+    "src/halo_swing_mcp/tools/reporting.py",
     "src/halo_swing_mcp/tools/scoring.py",
-    "src/halo_swing_mcp/indicators.py",
-    "src/halo_swing_mcp/tools/market.py",
-    "tests/test_mvp_tools.py"
+    "tests/test_reporting.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -35,7 +34,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_score_and_trade_guide_include_risk_controls tests/test_mvp_tools.py::test_scoring_tools_propagate_live_source_metadata -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_propagates_live_signal_boundary tests/test_reporting.py::test_position_review_report_propagates_live_review_boundary tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -51,15 +50,15 @@
     "read_only": true
   },
   "done_means": [
-    "score_leverage_swing reports source_data_contract with per-source network_call and live_data_required metadata",
-    "score_leverage_swing top-level live_data_required and news_usage_contract live_data_required reflect market, macro, and news inputs",
-    "generate_trade_guide and evaluate_position propagate signal live_data_required into their contracts, guards, and top-level payloads",
-    "fixture defaults remain offline with no_live_data_required guards passing",
-    "tests cover fake live source metadata without live network or real API keys",
+    "generate_latest_signal_report top-level live_data_required follows the source signal live_data_required value",
+    "generate_position_review_report top-level live_data_required follows the position review live_data_required value",
+    "report and position payload guards compare live_data_required against the expected nested source value instead of hard-coded false",
+    "fixture defaults and golden report remain offline and unchanged",
+    "tests cover fake live signal and position review payloads without live network or real API keys",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, or committed runtime artifact changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified live scoring source metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified live report payload boundary metadata gate, then continue with user-provided live API key setup instructions or explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
