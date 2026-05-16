@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_STAGE_PROVIDER_ACTIONS_VERIFIED
-gate_id: API_KEY_PIPELINE_STAGE_PROVIDER_ACTIONS_GATE
+status: PROVIDER_SETUP_ACTION_SMOKE_COMMANDS_VERIFIED
+gate_id: PROVIDER_SETUP_ACTION_SMOKE_COMMANDS_GATE
 review_tier: S1_small
 
-next_atomic_step: propagate provider_setup_actions into run_api_key_pipeline_smoke sub-smoke summaries so each pipeline stage shows provider-level key actions without returning secrets
+next_atomic_step: add no-secret provider smoke command objects to provider_setup_actions so users can run the next provider smoke directly after filling API keys
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,22 +74,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - run_api_key_pipeline_smoke live data, signal workflow, and recording sub-smoke summaries include provider_setup_actions and provider_setup_action_count
-  - ready fake-live and blocked fixture-default paths assert stage-level provider_setup_actions without leaking secret values
-  - README and DevOps guide document stage-level provider_setup_actions in pipeline summaries
+  - provider_setup_actions include no-secret smoke_command objects with command, expected live contract/checks, and safety metadata
+  - API-key status, setup checklist, and pipeline fixture-default paths assert smoke_command propagation without leaking secret values
+  - README and DevOps guide document provider_setup_actions smoke_command usage
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, or automatic .env mutation changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key pipeline stage provider actions gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider setup action smoke commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_STAGE_PROVIDER_ACTIONS_VERIFIED
+gate_id: API_KEY_PIPELINE_STAGE_PROVIDER_ACTIONS_GATE
+review_tier: S1_small
+
+next_atomic_step: propagate provider_setup_actions into run_api_key_pipeline_smoke sub-smoke summaries so each pipeline stage shows provider-level key actions without returning secrets
 ```
 
 Previous completed directive:
@@ -1457,6 +1468,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Provider Setup Action Smoke Commands Gate is verified.
+`provider_setup_actions` now include no-secret `smoke_command` objects with the
+repo-local command, expected live contract/checks, required key groups, and
+safety metadata. Setup checklist and pipeline payloads now show both the
+provider key to fill and the provider smoke to run after keys are configured,
+without writing `.env`, calling networks during readiness checks, or returning
+secret values. Focused tests passed with 4 tests, full pytest passed with 760
+tests, and ruff, health_check, and setup checklist harness commands passed.
+
+```yaml
+provider_setup_action_smoke_commands_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - provider_setup_actions include no-secret smoke_command objects with command, expected live contract/checks, and safety metadata
+    - API-key status, setup checklist, and pipeline fixture-default paths assert smoke_command propagation without leaking secret values
+    - README and DevOps guide document provider_setup_actions smoke_command usage
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, or secret value output added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "760 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: "passed, blocked fixture defaults returned provider_setup_actions.smoke_command objects without secrets"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Stage Provider Actions Gate is verified.
 `run_api_key_pipeline_smoke` live data, signal workflow, and recording sub-smoke

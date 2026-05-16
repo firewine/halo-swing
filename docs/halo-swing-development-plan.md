@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.684 Provider Setup Action Smoke Commands Gate Record - 2026-05-17
+
+### A. 목적
+
+`provider_setup_actions`는 provider별 preferred key와 다음 action을 보여주지만, 실제로
+실행할 provider smoke command는 이름만 노출했다. 이번 slice는 no-secret `smoke_command`
+객체를 각 provider action에 포함해 사용자가 API key를 채운 뒤 payload에서 바로 다음
+provider smoke 명령과 기대 live contract/checks를 확인하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - provider_setup_actions include no-secret smoke_command objects with command, expected live contract/checks, and safety metadata
+  - API-key status, setup checklist, and pipeline fixture-default paths assert smoke_command propagation without leaking secret values
+  - README and DevOps guide document provider_setup_actions smoke_command usage
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 760 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed
+```
+
 ## 3.683 API Key Pipeline Stage Provider Actions Gate Record - 2026-05-17
 
 ### A. 목적

@@ -382,10 +382,11 @@ route status, selected provider classes, missing keys, and the one-shot
 `run_api_key_pipeline_smoke` command without returning secret values. The
 summary includes `ready_to_run_live_smoke`, `next_smoke_command`, and a no-secret
 `provider_family_summary` with configured/missing live data provider families,
-`provider_setup_actions` with provider-level preferred keys and next setup
-actions, and a no-secret `dotenv_template` with repo-root `.env` entries for
-Polygon, FRED, and NewsAPI so the setup payload itself shows what to fill before
-running smoke commands. It also includes `dotenv_file_status` so the payload shows
+`provider_setup_actions` with provider-level preferred keys, next setup actions,
+and no-secret `smoke_command` objects, and a no-secret `dotenv_template` with
+repo-root `.env` entries for Polygon, FRED, and NewsAPI so the setup payload
+itself shows what to fill before running smoke commands. It also includes
+`dotenv_file_status` so the payload shows
 whether `.env.example` and repo-root `.env` exist, the next setup action, and
 the repo-local copy command hint without writing files or returning secret
 values. `live_data_setup_steps` orders the local setup path as dotenv

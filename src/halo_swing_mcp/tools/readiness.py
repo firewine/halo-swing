@@ -1624,6 +1624,7 @@ def _live_data_provider_setup_actions(
             "dotenv_target_path": provider_status.get("dotenv_target_path"),
             "example": provider_status.get("example"),
             "smoke_command_name": smoke_command.get("name"),
+            "smoke_command": smoke_command,
             "network_call": False,
             "mutates_local_state": False,
             "secret_values_returned": False,
