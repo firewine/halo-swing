@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT_VERIFIED
-gate_id: ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT
+status: TELEGRAM_ENV_TEMPLATE_GATE_VERIFIED
+gate_id: TELEGRAM_ENV_TEMPLATE_GATE
 review_tier: S1_small
 
-next_atomic_step: keep the env template database URL blank until migration and repository gates are approved
+next_atomic_step: add secret-free Telegram bot token and gateway placeholders to the env template matching readiness aliases
 
 allowed_edit_paths:
   - src/halo_swing_mcp/
@@ -264,6 +264,7 @@ done_means:
   - .env.example exposes blank live data API-key placeholders for Polygon, FRED, and NewsAPI aliases
   - tests/test_env_template.py locks .env.example live data placeholders and optional DATA_MODE examples
   - .env.example keeps HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO
+  - .env.example exposes blank Telegram bot token and gateway placeholders matching readiness aliases
   - get_news_bundle exposes news_source_policy.v1 covering Fed/Treasury/White House/EIA/Iran/AI semiconductor fixture groups
   - record_signal stores run_journal.v1 entries with idempotency and offline guards
   - record_signal treats only signal=None as fixture fallback and validates caller-supplied signal identity fields before repository writes or indicator snapshots
@@ -613,14 +614,15 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.633
-gate_packet: docs/halo-swing-development-plan.md#3.633
+portable_mirror: docs/halo-swing-development-plan.md#3.634
+gate_packet: docs/halo-swing-development-plan.md#3.634
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.633
+  - docs/halo-swing-development-plan.md#3.634
   - .env.example
+  - src/halo_swing_mcp/tools/readiness.py
   - tests/test_env_template.py
 
 implementation_rule:
@@ -924,12 +926,49 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: Env Template Storage Gate Alignment is verified. `.env.example` now
-keeps `HALO_SWING_DATABASE_URL` blank until `MIGRATION_GO` and `REPOSITORY_GO`
-are recorded, and no longer suggests `data/halo_swing.sqlite3`. The
-`tests/test_env_template.py` contract now locks this no-data-path behavior.
-Focused env-template tests passed with 4 tests, full pytest passed with 695
-tests, and ruff and health_check passed.
+Summary: Telegram Env Template Gate is verified. `.env.example` now includes
+blank Telegram delivery placeholders matching readiness aliases:
+`HALO_SWING_TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_TOKEN`,
+`HALO_SWING_TELEGRAM_GATEWAY`, and `HALO_SWING_TELEGRAM_GATEWAY_URL`.
+`tests/test_env_template.py` locks these placeholders to blank secret-free
+values. No Telegram send behavior or credential storage was added. Focused
+env/readiness tests passed with 41 tests, full pytest passed with 696 tests,
+and ruff and health_check passed.
+
+```yaml
+telegram_env_template_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_env_template.py
+  implementation:
+    - .env.example contains blank placeholders for Telegram bot token aliases and gateway aliases
+    - tests/test_env_template.py locks Telegram delivery placeholders to blank secret-free values
+    - template still preserves no-send readiness semantics and does not add Telegram send behavior
+    - task contract and portable mirror match
+    - no source code, provider behavior, network behavior, migrations, repository persistence, broker path, Telegram send, credential storage, or order submission changed
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_readiness.py -q
+      result: "41 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "696 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 ```yaml
 env_template_storage_gate_alignment:

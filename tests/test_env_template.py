@@ -18,6 +18,12 @@ OPTIONAL_LIVE_MODE_LINES = {
     "# HALO_SWING_MACRO_DATA_MODE=live",
     "# HALO_SWING_NEWS_DATA_MODE=live",
 }
+TELEGRAM_DELIVERY_KEYS = {
+    "HALO_SWING_TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_BOT_TOKEN",
+    "HALO_SWING_TELEGRAM_GATEWAY",
+    "HALO_SWING_TELEGRAM_GATEWAY_URL",
+}
 
 
 def _env_template_lines() -> list[str]:
@@ -39,6 +45,14 @@ def test_env_example_live_data_api_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 
     for key in LIVE_DATA_KEY_NAMES:
+        assert key in assignments
+        assert assignments[key] == ""
+
+
+def test_env_example_telegram_delivery_keys_are_blank_placeholders() -> None:
+    assignments = _env_assignments()
+
+    for key in TELEGRAM_DELIVERY_KEYS:
         assert key in assignments
         assert assignments[key] == ""
 

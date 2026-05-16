@@ -1,9 +1,9 @@
 {
-  "gate_id": "ENV_TEMPLATE_STORAGE_GATE_ALIGNMENT",
+  "gate_id": "TELEGRAM_ENV_TEMPLATE_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.633",
-  "next_atomic_step": "keep the env template database URL blank until migration and repository gates are approved",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.634",
+  "next_atomic_step": "add secret-free Telegram bot token and gateway placeholders to the env template matching readiness aliases",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     ".env.example",
@@ -15,8 +15,9 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.633",
+    "docs/halo-swing-development-plan.md#3.634",
     ".env.example",
+    "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_env_template.py"
   ],
   "blocked_path_prefixes": [
@@ -33,7 +34,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -48,12 +49,12 @@
     "read_only": true
   },
   "done_means": [
-    ".env.example leaves HALO_SWING_DATABASE_URL blank until MIGRATION_GO and REPOSITORY_GO",
-    ".env.example does not include data/halo_swing sqlite paths",
-    "tests/test_env_template.py locks the blank database URL and no-data-path contract",
+    ".env.example contains blank placeholders for Telegram bot token aliases and gateway aliases",
+    "tests/test_env_template.py locks Telegram delivery placeholders to blank secret-free values",
+    "template still preserves no-send readiness semantics and does not add Telegram send behavior",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified env-template storage gate alignment, then choose Hermes/Telegram setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified Telegram env-template gate, then choose Hermes setup, Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

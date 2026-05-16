@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.634 Telegram Env Template Gate Record - 2026-05-16
+
+### A. 목적
+
+Telegram readiness는 bot token alias 또는 gateway alias 중 하나를 지원하지만,
+`.env.example`에는 bot token placeholder만 있었다. 사용자가 Telegram delivery
+준비값을 `.env`에 채우기 쉽게, readiness alias와 맞는 blank placeholder를
+추가하고 테스트로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - .env.example includes blank HALO_SWING_TELEGRAM_BOT_TOKEN and TELEGRAM_BOT_TOKEN placeholders
+  - .env.example includes blank HALO_SWING_TELEGRAM_GATEWAY and HALO_SWING_TELEGRAM_GATEWAY_URL placeholders
+  - tests/test_env_template.py locks Telegram delivery placeholders to blank secret-free values
+  - no Telegram send behavior or credential storage was added
+  - task contract and portable mirror point at this Telegram env-template gate
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - real secret values
+  - Telegram send call
+  - Telegram credential storage
+  - source code changes
+  - new data provider
+  - network call during readiness
+  - Hermes runtime call
+  - DB migration or repository persistence
+  - broker path changes
+  - order submission
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py tests/test_readiness.py -q -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.633 Env Template Storage Gate Alignment Record - 2026-05-16
 
 ### A. 목적
