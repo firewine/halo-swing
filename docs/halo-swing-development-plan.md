@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.738 API Key Summary-Only Commands Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 compact 결과에 requirements를 남기지만,
+키를 채운 뒤 실행할 provider smoke와 one-shot pipeline smoke 명령은 full payload의
+`api_key_command_summary`를 다시 확인해야 했다. 이번 slice는 summary-only payload에도
+no-secret `api_key_command_summary`를 유지해, 사용자가 compact 결과만 보고 다음 로컬
+검증 명령을 바로 실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only=true now returns top-level api_key_command_summary without nested full smoke sections
+  - api_key_command_summary exposes copy_dotenv_command, next_smoke_command, one_shot_pipeline_smoke, provider_smoke_commands, provider_smoke_command_count, next_provider_smoke_command_name, and safety flags without secret values
+  - summary_only=true no longer lists api_key_command_summary in omitted_sections
+  - focused tests cover default blocked commands and fully configured API-key summary-only command output
+  - README and DevOps setup guide document summary-only api_key_command_summary
+  - tests/test_setup_docs.py asserts summary-only api_key_command_summary guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; no-secret api_key_command_summary returned with provider smoke commands
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_command_summary"]; print(summary["schema_version"], summary["provider_smoke_command_count"], summary["next_provider_smoke_command_name"], summary["secret_values_returned"])' -> api_key_pipeline_api_key_command_summary.v1 3 get_market_snapshot_live_smoke False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 782 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.737 API Key Summary-Only Requirements Gate Record - 2026-05-17
 
 ### A. 목적

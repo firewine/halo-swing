@@ -139,6 +139,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "required_env_keys" in guide
     assert "accepted_env_keys" in guide
     assert "provider_requirements" in guide
+    assert "keeps `api_key_command_summary`" in guide
+    assert "api_key_pipeline_api_key_command_summary.v1" in guide
+    assert "provider_smoke_commands" in guide
+    assert "one_shot_pipeline_smoke" in guide
+    assert "next_provider_smoke_command_name" in guide
     assert "omitting nested full" in guide
     assert "smoke sections" in guide
     assert "api_key_provider_recovery_summary" in guide

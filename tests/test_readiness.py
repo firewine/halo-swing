@@ -4337,6 +4337,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             missing_provider_families=["market", "macro", "news"],
         )
     )
+    assert payload["api_key_command_summary"] == expected_api_key_command_summary(
+        status="blocked",
+        target_path=local_env.REPO_ROOT_ENV_PATH,
+        market_configured_env_keys=[],
+        macro_configured_env_keys=[],
+        news_configured_env_keys=[],
+        ready_to_run_live_smoke=False,
+    )
     assert (
         payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"
     )
@@ -4378,6 +4386,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "signal_workflow_smoke_summary" in payload["omitted_sections"]
     assert "recording_smoke_summary" in payload["omitted_sections"]
     assert "api_key_requirements_summary" not in payload["omitted_sections"]
+    assert "api_key_command_summary" not in payload["omitted_sections"]
     assert "live_data_smoke_summary" not in payload
     assert "signal_workflow_smoke_summary" not in payload
     assert "recording_smoke_summary" not in payload
@@ -4429,6 +4438,42 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert requirements["secret_values_returned"] is False
     assert "api_key_requirements_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    command_summary = payload["api_key_command_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert command_summary == expected_api_key_command_summary(
+        status="ready",
+        target_path=local_env.REPO_ROOT_ENV_PATH,
+        market_configured_env_keys=["POLYGON_API_KEY"],
+        macro_configured_env_keys=["FRED_API_KEY"],
+        news_configured_env_keys=["NEWS_API_KEY"],
+        ready_to_run_live_smoke=True,
+    )
+    assert command_summary["provider_smoke_command_count"] == 3
+    assert command_summary["next_provider_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert command_summary["one_shot_pipeline_smoke"]["name"] == (
+        "run_api_key_pipeline_smoke"
+    )
+    assert command_summary["secret_values_returned"] is False
+    assert "api_key_command_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
 
 
 def test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout(
