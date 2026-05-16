@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: BINANCE_PASSPHRASE_CONFIRMATION_ENV_FLAG_VERIFIED
-gate_id: BINANCE_PASSPHRASE_CONFIRMATION_ENV_FLAG_GATE
+status: BINANCE_TRADE_ONLY_ATTESTATION_ENV_FLAG_VERIFIED
+gate_id: BINANCE_TRADE_ONLY_ATTESTATION_ENV_FLAG_GATE
 review_tier: S1_small
 
-next_atomic_step: let get_integration_readiness read Binance read-only smoke passphrase confirmation from a non-secret dotenv/env flag
+next_atomic_step: let get_integration_readiness read Binance trade-only no-withdraw attestation from a non-secret dotenv/env flag
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -83,17 +83,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_integration_readiness accepts HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true from exported env or local dotenv when the public input is omitted
-  - explicit binance_passphrase_confirmed input still overrides the environment flag
-  - invalid HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED values are rejected before Binance credential status reads
-  - .env.example includes a blank HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED placeholder
-  - README and DevOps setup docs describe the non-secret Binance passphrase confirmation flag without storing the passphrase
-  - tests lock env-backed Binance read-only smoke passphrase readiness without exposing secrets
+  - get_integration_readiness accepts HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true from exported env or local dotenv when the public input is omitted
+  - explicit binance_trade_only_permission_attested input still overrides the environment flag
+  - invalid HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED values are rejected before Binance credential status reads
+  - .env.example includes a blank HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED placeholder
+  - README and DevOps setup docs describe the non-secret Binance trade-only/no-withdraw attestation flag without enabling order submission
+  - tests lock env-backed Binance live-order attestation readiness without exposing secrets
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified Binance passphrase confirmation env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+next_state_after_success: commit and push this verified Binance trade-only attestation env flag gate, then continue with Binance testnet read-only smoke prerequisites, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: BINANCE_PASSPHRASE_CONFIRMATION_ENV_FLAG_VERIFIED
+gate_id: BINANCE_PASSPHRASE_CONFIRMATION_ENV_FLAG_GATE
+review_tier: S1_small
+
+next_atomic_step: let get_integration_readiness read Binance read-only smoke passphrase confirmation from a non-secret dotenv/env flag
 ```
 
 Previous completed directive:
@@ -688,13 +699,13 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.641
-gate_packet: docs/halo-swing-development-plan.md#3.641
+portable_mirror: docs/halo-swing-development-plan.md#3.642
+gate_packet: docs/halo-swing-development-plan.md#3.642
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.641
+  - docs/halo-swing-development-plan.md#3.642
   - src/halo_swing_mcp/tools/readiness.py
   - src/halo_swing_mcp/server.py
   - .env.example
@@ -1002,6 +1013,65 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Binance Trade-Only Attestation Env Flag Gate is verified.
+`get_integration_readiness` now reads
+`HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true` from exported env or
+local dotenv when `binance_trade_only_permission_attested` input is omitted.
+Explicit public input still overrides the env flag, invalid env flag values
+fail before Binance credential status reads, and `.env.example`, README, and
+the DevOps guide document that this is non-secret readiness evidence only and
+does not enable order submission. Focused readiness/env-template/docs tests
+passed with 60 tests, full pytest passed with 724 tests, and ruff and
+health_check passed.
+
+```yaml
+binance_trade_only_attestation_env_flag_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - .env.example
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_env_template.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_integration_readiness accepts HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true from exported env or local dotenv when public input is omitted
+    - explicit binance_trade_only_permission_attested input overrides env flag
+    - invalid HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED values fail before Binance credential status reads
+    - .env.example exposes blank HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED placeholder
+    - README and DevOps setup guide document the non-secret Binance trade-only/no-withdraw attestation flag without enabling order submission
+    - no order submission approval, Binance network call, passphrase persistence, real secret values, Telegram send, Hermes runtime call, migration, repository persistence, or broker path change added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_env_template.py tests/test_setup_docs.py -q
+      result: "60 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness save_binance_credentials --input-json '{"api_key":"abcde12345key","api_secret":"super-secret","passphrase":"local-passphrase","credentials_path":"/private/tmp/halo_swing_binance_attestation_env.enc.json"}' --no-audit
+      result: passed, safe credential status returned without secret values
+    - command: HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness --input-json '{"binance_credentials_path":"/private/tmp/halo_swing_binance_attestation_env.enc.json"}' --no-audit
+      result: passed, live-order gate remained blocked only on explicit_live_order_approval with order_submission=false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "724 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: Binance Passphrase Confirmation Env Flag Gate is verified.
 `get_integration_readiness` now reads

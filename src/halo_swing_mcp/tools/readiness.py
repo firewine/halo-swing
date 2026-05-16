@@ -17,6 +17,9 @@ HERMES_SERVER_COMMAND = "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.ser
 HERMES_CONFIG_PATH_ENV = "HALO_SWING_HERMES_CONFIG_PATH"
 HERMES_MCP_CONFIG_REGISTERED_ENV = "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED"
 BINANCE_PASSPHRASE_CONFIRMED_ENV = "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED"
+BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV = (
+    "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED"
+)
 
 
 def get_integration_readiness(
@@ -30,7 +33,7 @@ def get_integration_readiness(
     repository_go_approved: bool = False,
     binance_credentials_path: str | None = None,
     binance_passphrase_confirmed: bool | None = None,
-    binance_trade_only_permission_attested: bool = False,
+    binance_trade_only_permission_attested: bool | None = None,
     live_order_approved: bool = False,
     btc_risk_settings_path: str | None = None,
     market_data_source_configured: bool | None = None,
@@ -72,9 +75,10 @@ def get_integration_readiness(
     normalized_binance_passphrase_confirmed = _resolve_binance_passphrase_confirmed(
         binance_passphrase_confirmed,
     )
-    normalized_binance_trade_only_permission_attested = _normalize_boolean(
-        binance_trade_only_permission_attested,
-        "binance_trade_only_permission_attested",
+    normalized_binance_trade_only_permission_attested = (
+        _resolve_binance_trade_only_permission_attested(
+            binance_trade_only_permission_attested,
+        )
     )
     normalized_live_order_approved = _normalize_boolean(
         live_order_approved,
@@ -211,6 +215,21 @@ def _resolve_binance_passphrase_confirmed(value: bool | None) -> bool:
     if env_value is None or not env_value.strip():
         return False
     return _normalize_env_boolean(env_value, BINANCE_PASSPHRASE_CONFIRMED_ENV)
+
+
+def _resolve_binance_trade_only_permission_attested(value: bool | None) -> bool:
+    if value is not None:
+        return _normalize_boolean(
+            value,
+            "binance_trade_only_permission_attested",
+        )
+    env_value = get_config_value(BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV)
+    if env_value is None or not env_value.strip():
+        return False
+    return _normalize_env_boolean(
+        env_value,
+        BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV,
+    )
 
 
 def _telegram_readiness(

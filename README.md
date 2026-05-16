@@ -173,6 +173,10 @@ evidence while still reporting `order_submission=false`.
 `HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true` may be set in `.env` as a
 non-secret readiness confirmation; it never stores the passphrase, and read-only
 account smoke calls still require the passphrase at call time.
+`HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true` may also be set after
+checking in the Binance console that the key is COIN-M trade-only with
+withdraw/transfer permissions disabled. This is readiness evidence only and
+does not enable order submission.
 Report tools include an offline `delivery_preview` payload for Hermes and
 Telegram. The preview contains Telegram message chunks and guard checks, but it
 does not send messages or require credentials. Telegram previews expose the

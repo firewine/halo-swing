@@ -483,7 +483,7 @@ def get_integration_readiness(
     repository_go_approved: bool = False,
     binance_credentials_path: str | None = None,
     binance_passphrase_confirmed: bool | None = None,
-    binance_trade_only_permission_attested: bool = False,
+    binance_trade_only_permission_attested: bool | None = None,
     live_order_approved: bool = False,
     btc_risk_settings_path: str | None = None,
     market_data_source_configured: bool | None = None,

@@ -401,6 +401,19 @@ trade-only/no-withdraw attestation, testnet policy compatibility, and emergency
 kill switch disabled. The readiness check still reports `order_submission=false`
 and `network_call=false`.
 
+After confirming in the Binance console that the key is COIN-M trade-only and
+withdraw/transfer permissions are disabled, record that non-secret attestation
+in `.env`:
+
+```bash
+HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true
+```
+
+This flag only affects readiness evidence. It does not enable order submission;
+live orders still require explicit live-order approval, the live trading env
+flag, valid credentials, manual passphrase input, passing risk checks, and the
+confirmation string.
+
 BTC COIN-M trading admin:
 
 ```bash
