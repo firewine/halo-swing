@@ -711,7 +711,10 @@ def run_api_key_pipeline_smoke(
             "run_live_signal_workflow_smoke",
             "run_live_recording_smoke",
         ],
-        "readiness_summary": _api_key_pipeline_readiness_summary(readiness),
+        "readiness_summary": _api_key_pipeline_readiness_summary(
+            readiness,
+            live_data_setup_summary,
+        ),
         "live_data_setup_summary": live_data_setup_summary,
         "next_operator_action": _optional_mapping(
             live_data_setup_summary.get("next_operator_action")
@@ -1476,14 +1479,33 @@ def _api_key_pipeline_checks(
     return checks
 
 
-def _api_key_pipeline_readiness_summary(readiness: dict[str, Any]) -> dict[str, Any]:
+def _api_key_pipeline_readiness_summary(
+    readiness: dict[str, Any],
+    live_data_setup_summary: dict[str, Any],
+) -> dict[str, Any]:
     gates = _optional_mapping(readiness.get("gates")) or {}
     live_data_gate = _optional_mapping(gates.get("live_data")) or {}
+    live_data_setup_steps = _optional_mapping(
+        live_data_setup_summary.get("live_data_setup_steps")
+    ) or {}
+    next_operator_action = _optional_mapping(
+        live_data_setup_summary.get("next_operator_action")
+    ) or {}
     return {
         "status": readiness.get("status"),
         "live_data_status": live_data_gate.get("status"),
         "live_data_ready": live_data_gate.get("ready"),
         "live_data_missing": live_data_gate.get("missing"),
+        "api_key_setup_status": live_data_setup_summary.get("status"),
+        "api_key_status": live_data_setup_summary.get("api_key_status"),
+        "provider_route_status": live_data_setup_summary.get(
+            "provider_route_status"
+        ),
+        "ready_to_run_live_smoke": live_data_setup_summary.get(
+            "ready_to_run_live_smoke"
+        ),
+        "next_setup_step": live_data_setup_steps.get("next_step"),
+        "next_operator_action_name": next_operator_action.get("name"),
         "next_actions": readiness.get("next_actions"),
     }
 

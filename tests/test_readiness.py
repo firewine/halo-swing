@@ -2625,6 +2625,15 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["status"] == "ok"
     assert payload["readiness_summary"]["live_data_ready"] is True
     assert payload["readiness_summary"]["status"] == "blocked"
+    assert payload["readiness_summary"]["api_key_setup_status"] == "ready"
+    assert payload["readiness_summary"]["api_key_status"] == "ready"
+    assert payload["readiness_summary"]["provider_route_status"] == "ready"
+    assert payload["readiness_summary"]["ready_to_run_live_smoke"] is True
+    assert payload["readiness_summary"]["next_setup_step"] == "run_provider_smokes"
+    assert (
+        payload["readiness_summary"]["next_operator_action_name"]
+        == "run_provider_smokes"
+    )
     assert payload["executed_tools"] == [
         "get_integration_readiness",
         "get_live_data_api_key_status",
@@ -2826,6 +2835,15 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["schema_version"] == "api_key_pipeline_smoke_run.v1"
     assert payload["status"] == "conflict"
     assert payload["readiness_summary"]["live_data_ready"] is False
+    assert payload["readiness_summary"]["api_key_setup_status"] == "blocked"
+    assert payload["readiness_summary"]["api_key_status"] == "blocked"
+    assert payload["readiness_summary"]["provider_route_status"] == "blocked"
+    assert payload["readiness_summary"]["ready_to_run_live_smoke"] is False
+    assert payload["readiness_summary"]["next_setup_step"] == "prepare_dotenv"
+    assert (
+        payload["readiness_summary"]["next_operator_action_name"]
+        == "prepare_dotenv"
+    )
     assert payload["setup_status_summary"] == {
         "schema_version": "api_key_pipeline_setup_status_summary.v1",
         "status": "blocked",
