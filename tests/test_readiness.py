@@ -12,7 +12,10 @@ from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.risk_settings import update_btc_risk_settings
 from halo_swing_mcp.secret_store import save_binance_credentials
-from halo_swing_mcp.tools.readiness import get_integration_readiness
+from halo_swing_mcp.tools.readiness import (
+    get_integration_readiness,
+    get_integration_setup_checklist,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -282,6 +285,67 @@ def test_integration_readiness_payload_schema_is_stable(monkeypatch) -> None:
         assert credentials["secret_values_returned"] is False
         assert credentials["passphrase_persisted"] is False
         assert credentials["live_data_required"] is False
+
+
+def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> None:
+    clear_readiness_env(monkeypatch)
+
+    payload = get_integration_setup_checklist()
+    env_requirements = {
+        requirement["section"]: requirement
+        for requirement in payload["env_requirements"]
+    }
+    command_names = {command["name"] for command in payload["local_commands"]}
+
+    assert payload["schema_version"] == "integration_setup_checklist.v1"
+    assert payload["status"] == "blocked"
+    assert payload["readiness_status"] == "blocked"
+    assert payload["secret_values_returned"] is False
+    assert payload["network_call"] is False
+    assert payload["send_call"] is False
+    assert payload["order_submission"] is False
+    assert payload["offline_guardrails"] == {
+        "network_call": False,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "order_submission": False,
+        "secret_values_returned": False,
+        "dotenv_mutation": False,
+        "credential_file_write": False,
+    }
+    assert env_requirements["hermes"]["env_keys"] == [
+        "HALO_SWING_HERMES_CONFIG_PATH",
+        "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED",
+    ]
+    assert env_requirements["telegram"]["secret"] is True
+    assert env_requirements["live_data"]["secret"] is True
+    assert env_requirements["binance_credentials"]["configured"] is False
+    assert env_requirements["binance_credentials"]["missing"] == [
+        "encrypted_binance_credentials"
+    ]
+    assert env_requirements["binance_read_only_smoke"]["configured"] is False
+    assert env_requirements["binance_live_order_readiness"]["configured"] is False
+    assert command_names == {
+        "save_binance_credentials",
+        "get_integration_readiness",
+        "get_integration_setup_checklist",
+    }
+    assert payload["durable_gate_requirements"] == [
+        {
+            "gate": "migration",
+            "required_approval": "MIGRATION_GO",
+            "dotenv_supported": False,
+            "configured": False,
+            "missing": ["explicit_MIGRATION_GO"],
+        },
+        {
+            "gate": "repository",
+            "required_approval": "REPOSITORY_GO",
+            "dotenv_supported": False,
+            "configured": False,
+            "missing": ["MIGRATION_GO", "REPOSITORY_GO"],
+        },
+    ]
 
 
 def test_integration_readiness_configured_credential_schema_is_stable(
@@ -1599,6 +1663,87 @@ def test_integration_readiness_repo_root_env_clears_integration_gates_without_ga
     assert '"token":' not in serialized
 
 
+def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    repo_dir = tmp_path / "repo"
+    run_dir = tmp_path / "runner"
+    repo_dir.mkdir()
+    run_dir.mkdir()
+    repo_env = repo_dir / ".env"
+    monkeypatch.setattr(local_env, "REPO_ROOT_ENV_PATH", repo_env)
+    monkeypatch.chdir(run_dir)
+    monkeypatch.delenv("HALO_SWING_DISABLE_DOTENV", raising=False)
+
+    hermes_config_path = repo_dir / "hermes.yaml"
+    credentials_path = repo_dir / "credentials.enc.json"
+    hermes_config_path.write_text("mcp_servers: {}\n", encoding="utf-8")
+    save_binance_credentials(
+        api_key="abcde12345key",
+        api_secret="super-secret",
+        passphrase="local-passphrase",
+        credentials_path=str(credentials_path),
+    )
+    secret_env = {
+        "HALO_SWING_TELEGRAM_BOT_TOKEN": "telegram-checklist-secret",
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-checklist-secret",
+        "HALO_SWING_MACRO_API_KEY": "macro-checklist-secret",
+        "HALO_SWING_NEWS_API_KEY": "news-checklist-secret",
+    }
+    repo_env.write_text(
+        "\n".join(
+            [
+                f"HALO_SWING_HERMES_CONFIG_PATH={hermes_config_path}",
+                "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=true",
+                f"HALO_SWING_BINANCE_CREDENTIALS_PATH={credentials_path}",
+                "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=true",
+                "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=true",
+                "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=true",
+                "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=true",
+                *(f"{key}={value}" for key, value in secret_env.items()),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_integration_setup_checklist()
+    env_requirements = {
+        requirement["section"]: requirement
+        for requirement in payload["env_requirements"]
+    }
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["status"] == "blocked"
+    assert payload["next_actions"] == [
+        "migration: provide explicit_MIGRATION_GO",
+        "repository: provide MIGRATION_GO, REPOSITORY_GO",
+    ]
+    assert env_requirements["hermes"]["configured"] is True
+    assert env_requirements["telegram"]["configured"] is True
+    assert env_requirements["live_data"]["configured"] is True
+    assert env_requirements["binance_credentials"]["configured"] is True
+    assert env_requirements["binance_read_only_smoke"]["configured"] is True
+    assert env_requirements["binance_live_order_readiness"]["configured"] is True
+    assert all(
+        not gate["dotenv_supported"]
+        for gate in payload["durable_gate_requirements"]
+    )
+    assert payload["offline_guardrails"]["credential_file_write"] is False
+    assert "<binance_api_key>" in serialized
+    for key, value in secret_env.items():
+        assert key in serialized
+        assert value not in serialized
+    assert "abcde12345key" not in serialized
+    assert "super-secret" not in serialized
+    assert "local-passphrase" not in serialized
+    assert "salt_b64" not in serialized
+    assert '"token":' not in serialized
+
+
 def test_integration_readiness_requires_api_keys_with_live_modes(
     monkeypatch,
 ) -> None:
@@ -2157,3 +2302,25 @@ def test_harness_returns_integration_readiness(tmp_path: Path) -> None:
     assert payload["status"] == "blocked"
     assert payload["gates"]["migration"]["status"] == "blocked"
     assert audit_path.exists()
+
+
+def test_harness_returns_integration_setup_checklist() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_integration_setup_checklist",
+            "--no-audit",
+        ],
+        check=True,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    payload = json.loads(result.stdout)
+
+    assert payload["schema_version"] == "integration_setup_checklist.v1"
+    assert payload["status"] == "blocked"
+    assert payload["offline_guardrails"]["network_call"] is False
+    assert payload["offline_guardrails"]["credential_file_write"] is False

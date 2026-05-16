@@ -68,6 +68,7 @@ def test_phase7_runtime_tools_are_manifested() -> None:
 
 def test_phase9_btc_tools_are_manifested() -> None:
     assert {
+        "get_integration_setup_checklist",
         "get_btc_risk_settings",
         "update_btc_risk_settings",
         "get_btc_risk_status",

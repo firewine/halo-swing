@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: ENV_BACKED_INTEGRATION_READINESS_SMOKE_VERIFIED
-gate_id: ENV_BACKED_INTEGRATION_READINESS_SMOKE_GATE
-review_tier: S1_small
+status: INTEGRATION_SETUP_CHECKLIST_TOOL_VERIFIED
+gate_id: INTEGRATION_SETUP_CHECKLIST_TOOL_GATE
+review_tier: S2_medium
 
-next_atomic_step: prove get_integration_readiness can reach integration-ready evidence from repo-root dotenv values while migration and repository remain gated
+next_atomic_step: add a deterministic get_integration_setup_checklist tool that converts readiness state into local dotenv setup requirements without exposing secrets or performing integrations
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,15 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
+  - tests/test_mvp_tools.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -72,23 +79,38 @@ required_verification:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/health_check.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/mvp_tool_contracts.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_readiness.py tests/test_tool_registry.py tests/test_mvp_tools.py tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
 
 done_means:
-  - repo-root .env can provide Hermes config/registration, Telegram token/gateway, live data API keys, Binance encrypted credential path, live trading, passphrase confirmation, trade-only attestation, and live-order approval without public readiness inputs
-  - get_integration_readiness marks Hermes, Telegram, live_data, Binance testnet read-only, and live_order_submission ready from that local dotenv setup
-  - migration and repository gates remain blocked without explicit durable MIGRATION_GO and REPOSITORY_GO approval
-  - readiness output still returns no secret values, no Telegram send, no Hermes runtime start, no network call, and no order submission
-  - README and DevOps setup docs describe the local all-env readiness smoke boundary
+  - get_integration_setup_checklist is callable through the shared registry, CLI harness, MCP server wrapper, and health capabilities
+  - the checklist returns stable schema_version, readiness_status, next_actions, env requirements, local setup commands, and offline guardrails
+  - the checklist maps current readiness evidence into configured booleans without returning secret values or raw env values
+  - the checklist keeps MIGRATION_GO and REPOSITORY_GO as durable gate requirements instead of dotenv-only approvals
+  - tests cover blocked defaults, repo-root dotenv integration-ready values with secrets redacted, registry/server/manifest parity, and harness invocation
+  - README and DevOps setup docs describe the setup checklist command as offline and non-mutating
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified env-backed integration readiness smoke gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+next_state_after_success: commit and push this verified integration setup checklist tool gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: ENV_BACKED_INTEGRATION_READINESS_SMOKE_VERIFIED
+gate_id: ENV_BACKED_INTEGRATION_READINESS_SMOKE_GATE
+review_tier: S1_small
+
+next_atomic_step: prove get_integration_readiness can reach integration-ready evidence from repo-root dotenv values while migration and repository remain gated
 ```
 
 Previous completed directive:
@@ -716,15 +738,21 @@ p1_dto_contract_tests:
 
 ```yaml
 task_contract: user directive 2026-05-10: read docs/halo-swing-development-plan.md and continue development toward the documented goals
-portable_mirror: docs/halo-swing-development-plan.md#3.644
-gate_packet: docs/halo-swing-development-plan.md#3.644
+portable_mirror: docs/halo-swing-development-plan.md#3.645
+gate_packet: docs/halo-swing-development-plan.md#3.645
 
 read_only_context:
   - AGENTS.md
   - docs/WORKING.md
-  - docs/halo-swing-development-plan.md#3.644
+  - docs/halo-swing-development-plan.md#3.645
   - src/halo_swing_mcp/tools/readiness.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/server.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
   - tests/test_readiness.py
+  - tests/test_tool_registry.py
+  - tests/test_mvp_tools.py
   - tests/test_setup_docs.py
 
 implementation_rule:
@@ -1027,6 +1055,69 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: Integration Setup Checklist Tool Gate is verified.
+`get_integration_setup_checklist` is now registered across the shared tool
+registry, MCP server wrapper, CLI harness, health capabilities, and MVP
+manifest. It converts current `get_integration_readiness` evidence into
+structured `.env` setup requirements, local harness command templates, durable
+gate requirements, and offline guardrails without returning raw env values or
+secret material. `MIGRATION_GO` and `REPOSITORY_GO` remain durable approvals,
+not dotenv-only setup flags. Focused tests passed with 279 tests, full pytest
+passed with 734 tests, and ruff, health_check, and the setup checklist harness
+smoke passed.
+
+```yaml
+integration_setup_checklist_tool_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/server.py
+    - src/halo_swing_mcp/tool_registry.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/golden/health_check.json
+    - tests/golden/mvp_tool_contracts.json
+    - tests/test_mvp_tools.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_integration_setup_checklist returns schema_version, readiness_status, next_actions, env_requirements, local_commands, durable_gate_requirements, and offline_guardrails
+    - checklist maps readiness evidence into configured booleans without exposing secret values or raw env values
+    - checklist marks MIGRATION_GO and REPOSITORY_GO as durable gate requirements with dotenv_supported=false
+    - shared registry, MCP wrapper, CLI harness, health golden, and MVP tool manifest include the new tool
+    - README and DevOps setup guide document the offline non-mutating setup checklist command
+    - no order submission, Binance network call, Telegram send, Hermes runtime call, secret exposure, dotenv mutation, credential file write by the checklist, migration, repository persistence, or broker path change added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/health_check.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/mvp_tool_contracts.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_readiness.py tests/test_tool_registry.py tests/test_mvp_tools.py tests/test_setup_docs.py -q
+      result: "279 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "734 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+      result: passed, status blocked with offline setup requirements and no secret values returned
+```
+
+Previous verification:
 
 Summary: Env-Backed Integration Readiness Smoke Gate is verified. A repo-root
 `.env` smoke test now proves `get_integration_readiness` can mark Hermes,

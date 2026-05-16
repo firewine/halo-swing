@@ -154,6 +154,183 @@ def get_integration_readiness(
     }
 
 
+def get_integration_setup_checklist() -> dict[str, Any]:
+    """Return local setup requirements derived from offline readiness state."""
+
+    readiness = get_integration_readiness()
+    gates = readiness["gates"]
+    return {
+        "schema_version": "integration_setup_checklist.v1",
+        "status": readiness["status"],
+        "readiness_status": readiness["status"],
+        "next_actions": readiness["next_actions"],
+        "env_requirements": _setup_env_requirements(gates),
+        "local_commands": _setup_local_commands(),
+        "durable_gate_requirements": [
+            {
+                "gate": "migration",
+                "required_approval": "MIGRATION_GO",
+                "dotenv_supported": False,
+                "configured": gates["migration"]["ready"],
+                "missing": gates["migration"]["missing"],
+            },
+            {
+                "gate": "repository",
+                "required_approval": "REPOSITORY_GO",
+                "dotenv_supported": False,
+                "configured": gates["repository"]["ready"],
+                "missing": gates["repository"]["missing"],
+            },
+        ],
+        "offline_guardrails": {
+            "network_call": False,
+            "hermes_runtime_started": False,
+            "telegram_send_call": False,
+            "order_submission": False,
+            "secret_values_returned": False,
+            "dotenv_mutation": False,
+            "credential_file_write": False,
+        },
+        "secret_values_returned": False,
+        "network_call": False,
+        "send_call": False,
+        "order_submission": False,
+    }
+
+
+def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
+    binance_credentials = gates["binance_testnet_read_only"]["evidence"][
+        "credentials"
+    ]
+    return [
+        {
+            "section": "hermes",
+            "required_for": "Hermes MCP config readiness",
+            "env_keys": [
+                HERMES_CONFIG_PATH_ENV,
+                HERMES_MCP_CONFIG_REGISTERED_ENV,
+            ],
+            "configured": gates["hermes"]["ready"],
+            "secret": False,
+            "value_policy": "config path plus non-secret true/false registration flag",
+            "missing": gates["hermes"]["missing"],
+        },
+        {
+            "section": "telegram",
+            "required_for": "Telegram delivery readiness",
+            "env_keys": [
+                "HALO_SWING_TELEGRAM_BOT_TOKEN",
+                "TELEGRAM_BOT_TOKEN",
+                "HALO_SWING_TELEGRAM_GATEWAY",
+                "HALO_SWING_TELEGRAM_GATEWAY_URL",
+            ],
+            "configured": gates["telegram"]["ready"],
+            "secret": True,
+            "value_policy": "provide a bot token or gateway; values are never returned",
+            "missing": gates["telegram"]["missing"],
+        },
+        {
+            "section": "live_data",
+            "required_for": "market, macro, and news live-data readiness",
+            "env_keys": [
+                "HALO_SWING_MARKET_DATA_API_KEY",
+                "POLYGON_API_KEY",
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+            ],
+            "configured": gates["live_data"]["ready"],
+            "secret": True,
+            "value_policy": "provide one supported API key per provider family",
+            "missing": gates["live_data"]["missing"],
+        },
+        {
+            "section": "binance_credentials",
+            "required_for": "Binance COIN-M credential readiness",
+            "env_keys": ["HALO_SWING_BINANCE_CREDENTIALS_PATH"],
+            "configured": binance_credentials["configured"],
+            "secret": False,
+            "value_policy": "path to encrypted local credential file",
+            "missing": (
+                []
+                if binance_credentials["configured"]
+                else ["encrypted_binance_credentials"]
+            ),
+        },
+        {
+            "section": "binance_read_only_smoke",
+            "required_for": "Binance testnet read-only account smoke readiness",
+            "env_keys": [
+                "HALO_SWING_BINANCE_TESTNET",
+                "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION",
+                BINANCE_PASSPHRASE_CONFIRMED_ENV,
+            ],
+            "configured": gates["binance_testnet_read_only"]["ready"],
+            "secret": False,
+            "value_policy": "testnet safety flags plus non-secret passphrase availability confirmation",
+            "missing": gates["binance_testnet_read_only"]["missing"],
+        },
+        {
+            "section": "binance_live_order_readiness",
+            "required_for": "live-order readiness evidence without submitting orders",
+            "env_keys": [
+                "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING",
+                BINANCE_LIVE_ORDER_APPROVED_ENV,
+                BINANCE_PASSPHRASE_CONFIRMED_ENV,
+                BINANCE_TRADE_ONLY_PERMISSION_ATTESTED_ENV,
+            ],
+            "configured": gates["live_order_submission"]["ready"],
+            "secret": False,
+            "value_policy": "explicit operator approvals and safety flags only",
+            "missing": gates["live_order_submission"]["missing"],
+        },
+    ]
+
+
+def _setup_local_commands() -> list[dict[str, Any]]:
+    return [
+        {
+            "name": "save_binance_credentials",
+            "purpose": "encrypt Binance API credentials into the configured local file",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "save_binance_credentials --input-json "
+                "'{\"api_key\":\"<binance_api_key>\","
+                "\"api_secret\":\"<binance_api_secret>\","
+                "\"passphrase\":\"<local_passphrase>\","
+                "\"credentials_path\":\"state/binance_credentials.enc.json\"}'"
+            ),
+            "network_call": False,
+            "mutates_local_state": True,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_integration_readiness",
+            "purpose": "check current readiness evidence after .env values are set",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_integration_readiness --no-audit"
+            ),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "name": "get_integration_setup_checklist",
+            "purpose": "show missing local setup requirements without changing state",
+            "command": (
+                "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+                "get_integration_setup_checklist --no-audit"
+            ),
+            "network_call": False,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+    ]
+
+
 def _hermes_readiness(
     hermes_config_path: str | None,
     mcp_config_registered: bool,

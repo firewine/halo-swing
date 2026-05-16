@@ -1,9 +1,9 @@
 {
-  "gate_id": "ENV_BACKED_INTEGRATION_READINESS_SMOKE_GATE",
+  "gate_id": "INTEGRATION_SETUP_CHECKLIST_TOOL_GATE",
   "mode": "implement",
-  "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.644",
-  "next_atomic_step": "prove get_integration_readiness can reach integration-ready evidence from repo-root dotenv values while migration and repository remain gated",
+  "review_tier": "S2_medium",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.645",
+  "next_atomic_step": "add a deterministic get_integration_setup_checklist tool that converts readiness state into local dotenv setup requirements without exposing secrets or performing integrations",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -11,15 +11,28 @@
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
+    "src/halo_swing_mcp/server.py",
+    "src/halo_swing_mcp/tool_registry.py",
+    "src/halo_swing_mcp/tools/readiness.py",
+    "tests/golden/health_check.json",
+    "tests/golden/mvp_tool_contracts.json",
+    "tests/test_mvp_tools.py",
     "tests/test_readiness.py",
-    "tests/test_setup_docs.py"
+    "tests/test_setup_docs.py",
+    "tests/test_tool_registry.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.644",
+    "docs/halo-swing-development-plan.md#3.645",
     "src/halo_swing_mcp/tools/readiness.py",
+    "src/halo_swing_mcp/tool_registry.py",
+    "src/halo_swing_mcp/server.py",
+    "tests/golden/health_check.json",
+    "tests/golden/mvp_tool_contracts.json",
     "tests/test_readiness.py",
+    "tests/test_tool_registry.py",
+    "tests/test_mvp_tools.py",
     "tests/test_setup_docs.py"
   ],
   "blocked_path_prefixes": [
@@ -35,30 +48,37 @@
     "diff -u .codex/tasks/current.json docs/codex-task.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
+    "PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/health_check.json",
+    "PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/mvp_tool_contracts.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_readiness.py tests/test_tool_registry.py tests/test_mvp_tools.py tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check",
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit"
   ],
   "post_implementation_review": {
     "roles": [
+      "be",
       "qc",
       "devops",
-      "docs-gardener"
+      "security",
+      "docs-gardener",
+      "cto"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "repo-root .env can provide Hermes config/registration, Telegram token/gateway, live data API keys, Binance encrypted credential path, live trading, passphrase confirmation, trade-only attestation, and live-order approval without public readiness inputs",
-    "get_integration_readiness marks Hermes, Telegram, live_data, Binance testnet read-only, and live_order_submission ready from that local dotenv setup",
-    "migration and repository gates remain blocked without explicit durable MIGRATION_GO and REPOSITORY_GO approval",
-    "readiness output still returns no secret values, no Telegram send, no Hermes runtime start, no network call, and no order submission",
-    "README and DevOps setup docs describe the local all-env readiness smoke boundary",
+    "get_integration_setup_checklist is callable through the shared registry, CLI harness, MCP server wrapper, and health capabilities",
+    "the checklist returns stable schema_version, readiness_status, next_actions, env requirements, local setup commands, and offline guardrails",
+    "the checklist maps current readiness evidence into configured booleans without returning secret values or raw env values",
+    "the checklist keeps MIGRATION_GO and REPOSITORY_GO as durable gate requirements instead of dotenv-only approvals",
+    "tests cover blocked defaults, repo-root dotenv integration-ready values with secrets redacted, registry/server/manifest parity, and harness invocation",
+    "README and DevOps setup docs describe the setup checklist command as offline and non-mutating",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified env-backed integration readiness smoke gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
+  "next_state_after_success": "commit and push this verified integration setup checklist tool gate, then continue with user-provided live API key setup instructions, explicit MIGRATION_GO/REPOSITORY_GO approval, or the next integration hardening target"
 }

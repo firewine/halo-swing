@@ -317,6 +317,12 @@ Integration readiness:
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_readiness
 ```
 
+local setup checklist:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit
+```
+
 This command does not call networks or return secret values. It reports which
 future gates are still blocked for Hermes, Telegram, DB migration/repository,
 Binance testnet read-only smoke, live order submission, and live data adapters.
@@ -434,6 +440,11 @@ without public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` still stay
 blocked until their durable gates are approved. This all-env readiness smoke is
 offline only: no network call, no Hermes runtime start, no Telegram send, no
 order submission, and no secret values returned.
+Use `get_integration_setup_checklist` when you want the missing `.env` keys,
+durable gate approvals, and local harness command templates in one structured
+payload. The checklist itself is non-mutating: it does not write `.env`, create
+credential files, call networks, start Hermes, send Telegram messages, submit
+orders, or return secret values.
 
 BTC COIN-M trading admin:
 

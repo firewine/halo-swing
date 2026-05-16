@@ -517,6 +517,13 @@ def get_integration_readiness(
 
 
 @mcp.tool()
+def get_integration_setup_checklist() -> dict[str, Any]:
+    """Return local setup requirements for integration readiness."""
+
+    return _call_registered_tool("get_integration_setup_checklist")
+
+
+@mcp.tool()
 def get_btc_risk_settings(settings_path: str | None = None) -> dict[str, Any]:
     """Return BTC COIN-M risk settings."""
 

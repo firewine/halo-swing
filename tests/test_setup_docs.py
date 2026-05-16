@@ -85,3 +85,16 @@ def test_setup_docs_describe_all_env_readiness_smoke_boundary() -> None:
         assert "no network call" in document
         assert "no Telegram send" in document
         assert "no order submission" in document
+
+
+def test_setup_docs_describe_integration_setup_checklist_tool() -> None:
+    text = _normalized_text(README)
+    guide = _normalized_text(DEVOPS_GUIDE)
+
+    for document in (text, guide):
+        assert "get_integration_setup_checklist" in document
+        assert "local setup checklist" in document
+        assert "non-mutating" in document
+        assert "does not write `.env`" in document or "does not write .env" in document
+        assert "does not" in document
+        assert "return secret values" in document

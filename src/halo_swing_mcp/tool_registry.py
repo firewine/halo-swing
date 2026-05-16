@@ -39,7 +39,10 @@ from halo_swing_mcp.tools.recording import (
     label_signal_outcome,
     record_signal,
 )
-from halo_swing_mcp.tools.readiness import get_integration_readiness
+from halo_swing_mcp.tools.readiness import (
+    get_integration_readiness,
+    get_integration_setup_checklist,
+)
 from halo_swing_mcp.tools.reporting import (
     generate_cron_prompt_pack,
     generate_latest_signal_report,
@@ -188,6 +191,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_integration_readiness",
         get_integration_readiness,
         "Return offline readiness for blocked integration gates.",
+    ),
+    ToolSpec(
+        "get_integration_setup_checklist",
+        get_integration_setup_checklist,
+        "Return local setup requirements for integration readiness.",
     ),
     ToolSpec("get_audit_log", get_audit_log, "Return recent audit events."),
     ToolSpec("get_audit_summary", get_audit_summary, "Return audit event summary."),

@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.645 Integration Setup Checklist Tool Gate Record - 2026-05-16
+
+### A. 목적
+
+사용자가 API key와 로컬 config 값을 넣으면 실제 연동 준비 상태까지 갈 수 있도록
+`get_integration_readiness`가 이미 gate별 readiness evidence를 계산한다. 다만
+운영자가 다음에 채워야 하는 `.env` 키와 로컬 harness 명령을 구조화된 도구
+출력으로 확인할 수 있는 경로가 부족했다. 이번 slice는
+`get_integration_setup_checklist`를 MCP/server/CLI harness에 등록해 readiness
+상태를 deterministic setup checklist로 변환한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_integration_setup_checklist is callable through the shared registry, CLI harness, MCP server wrapper, health capabilities, and MVP manifest
+  - checklist returns schema_version, readiness_status, next_actions, env requirements, local setup commands, durable gate requirements, and offline guardrails
+  - checklist maps readiness evidence into configured booleans without returning secret values or raw env values
+  - checklist keeps MIGRATION_GO and REPOSITORY_GO as durable gate requirements instead of dotenv-only approvals
+  - README and DevOps setup docs describe the setup checklist command as offline and non-mutating
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - order submission
+  - Binance network call
+  - Telegram send call
+  - Hermes runtime call
+  - secret value exposure
+  - DB migration or repository persistence
+  - broker path changes
+  - dotenv mutation or credential file writes
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/health_check.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool tests/golden/mvp_tool_contracts.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_health_check.py tests/test_readiness.py tests/test_tool_registry.py tests/test_mvp_tools.py tests/test_setup_docs.py -q -> 279 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 734 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_integration_setup_checklist --no-audit -> passed, status blocked with offline setup requirements and no secret values returned
+```
+
 ## 3.644 Env-Backed Integration Readiness Smoke Gate Record - 2026-05-16
 
 ### A. 목적
