@@ -874,6 +874,63 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.846 API Key Setup Docs Dotenv Loading Parity Guard Record - 2026-05-17
+
+### A. 목적
+
+3.845에서 README와 DevOps guide의 setup-file summary field parity를
+고정했다. API-key-only setup compact output은 dotenv loading 상태를
+`api_key_dotenv_loading_summary`로 보여주며, dotenv 지원/활성화/비활성화 flag,
+비활성화 env key, configuration precedence, `.env.example`/`.env` 파일 상태, 복사
+필요 여부, 다음 setup step, live smoke readiness를 포함한다. 기존 setup-docs coverage는
+DevOps guide field 존재를 직접 고정하지만 README와 같은 dotenv loading summary 목록을
+계속 유지하는지는 별도 guard가 없었다. 이번 slice는 README와 DevOps guide가 같은
+dotenv loading summary field 이름들을 계속 포함하는지 parity coverage로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only/docs guard asserts README and DevOps guide both include API-key dotenv loading summary schema, support/enabled/disabled flags, disabled env key, and configuration precedence field names
+  - parity coverage asserts both docs include dotenv source/target path, source/target existence, copy requirement, next setup step, and live-smoke readiness field names
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused README/DevOps dotenv loading parity setup-docs pytest: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 18 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 810 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations: passed, no blocked-path changes
+  - git status --short --ignored state: ignored local state/ only
+```
+
 ## 3.845 API Key Setup Docs Setup File Parity Guard Record - 2026-05-17
 
 ### A. 목적
