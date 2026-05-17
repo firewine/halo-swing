@@ -3472,6 +3472,34 @@ def _api_key_integration_status_summary(
                 "provider_recovery_blocked_providers"
             )
         ),
+        "provider_recovery_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_smoke_command_names"
+            )
+        ),
+        "provider_recovery_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get("provider_recovery_smoke_commands")
+        ),
+        "provider_recovery_pending_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_smoke_command_names"
+            )
+        ),
+        "provider_recovery_pending_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_smoke_commands"
+            )
+        ),
+        "provider_recovery_blocked_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_smoke_command_names"
+            )
+        ),
+        "provider_recovery_blocked_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_smoke_commands"
+            )
+        ),
         "provider_recovery_retry_ready": (
             api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
             is True

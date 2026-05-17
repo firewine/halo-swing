@@ -526,7 +526,12 @@ provider selection, failure, and next-action evidence into one operator row with
 `provider_recovery_pending_provider_families`,
 `provider_recovery_pending_providers`,
 `provider_recovery_blocked_provider_families`, and
-`provider_recovery_blocked_providers`. It also
+`provider_recovery_blocked_providers`. It also includes recovery command lists:
+`provider_recovery_smoke_command_names`, `provider_recovery_smoke_commands`,
+`provider_recovery_pending_smoke_command_names`,
+`provider_recovery_pending_smoke_commands`,
+`provider_recovery_blocked_smoke_command_names`, and
+`provider_recovery_blocked_smoke_commands`. It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
 `next_pending_recovery_smoke_command`,
