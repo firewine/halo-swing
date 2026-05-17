@@ -1799,7 +1799,10 @@ def _api_key_pipeline_readiness_summary(
     next_operator_action = next_operator_action or _optional_mapping(
         live_data_setup_summary.get("next_operator_action")
     ) or {}
-    return {
+    next_provider_smoke = _optional_mapping(
+        next_operator_action.get("next_provider_smoke")
+    ) or {}
+    summary = {
         "status": readiness.get("status"),
         "live_data_status": live_data_gate.get("status"),
         "live_data_ready": live_data_gate.get("ready"),
@@ -1816,7 +1819,22 @@ def _api_key_pipeline_readiness_summary(
         "next_operator_action_name": next_operator_action.get("name"),
         "next_operator_action": next_operator_action,
         "next_actions": readiness.get("next_actions"),
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
     }
+    preferred_env_key = next_operator_action.get(
+        "preferred_env_key"
+    ) or next_provider_smoke.get("preferred_env_key")
+    accepted_env_keys = _string_list(
+        next_operator_action.get("accepted_env_keys")
+        or next_provider_smoke.get("accepted_env_keys")
+    )
+    if isinstance(preferred_env_key, str):
+        summary["preferred_env_key"] = preferred_env_key
+    if accepted_env_keys:
+        summary["accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_pipeline_next_operator_action(
@@ -2327,6 +2345,8 @@ def _api_key_pipeline_summary_only_payload(
             "summary_only": True,
         },
         "executed_tools": _string_list(payload.get("executed_tools")),
+        "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
+        or {},
         "api_key_integration_status_summary": _optional_mapping(
             payload.get("api_key_integration_status_summary")
         )

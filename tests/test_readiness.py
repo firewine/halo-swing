@@ -3974,6 +3974,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert payload["readiness_summary"]["next_operator_action"] == (
         payload["next_operator_action"]
     )
+    assert payload["readiness_summary"]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert payload["readiness_summary"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert payload["readiness_summary"]["secret_values_returned"] is False
     assert payload["executed_tools"] == [
         "get_integration_readiness",
         "get_live_data_api_key_status",
@@ -5435,6 +5441,82 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     ]
     assert integration_status["secret_values_returned"] is False
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_readiness_summary_provider_smoke_env_hints(
+    monkeypatch,
+) -> None:
+    from halo_swing_mcp.tools import readiness as readiness_tools
+
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    def fake_live_data_smoke(
+        symbols: list[str] | None = None,
+        topic: str = "macro",
+    ) -> dict[str, Any]:
+        provider_route = readiness_tools.get_live_data_provider_route()
+        api_key_status = readiness_tools.get_live_data_api_key_status()
+        return {
+            "schema_version": "live_data_smoke_run.v1",
+            "status": "ok",
+            "input": {"symbols": symbols, "topic": topic},
+            "provider_route": provider_route,
+            "live_data_setup_summary": readiness_tools._live_data_setup_summary(
+                api_key_status,
+                provider_route,
+            ),
+            "network_call": True,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    def fake_workflow_smoke(
+        asset: str = "TQQQ",
+        timeframe: str = "swing_3d_10d",
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": "live_signal_workflow_smoke_run.v1",
+            "status": "ok",
+            "input": {"asset": asset, "timeframe": timeframe},
+            "network_call": True,
+            "live_data_required": True,
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        }
+
+    monkeypatch.setattr(readiness_tools, "run_live_data_smoke", fake_live_data_smoke)
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_signal_workflow_smoke",
+        fake_workflow_smoke,
+    )
+    monkeypatch.setattr(
+        readiness_tools,
+        "run_live_recording_smoke",
+        fake_workflow_smoke,
+    )
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    readiness_summary = payload["readiness_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert readiness_summary["next_operator_action_name"] == "run_provider_smokes"
+    assert readiness_summary["preferred_env_key"] == "POLYGON_API_KEY"
+    assert readiness_summary["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert readiness_summary["secret_values_returned"] is False
+    assert "readiness_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

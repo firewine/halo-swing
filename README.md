@@ -286,7 +286,9 @@ the compact `api_key_next_action_summary.v1` with `next_action_name`,
 `preferred_env_key`, and `accepted_env_keys` when the next action points at a
 provider smoke command or provider recovery, provider
 family counts, API-key setup status inside `readiness_summary`, the next local
-action mirrored inside `readiness_summary`, the first no-secret
+action mirrored inside `readiness_summary`, readiness summary
+`preferred_env_key` and `accepted_env_keys` when that action points at a
+provider smoke command or provider recovery, the first no-secret
 `next_provider_smoke` command in the top-level command summary and checklist
 when a provider smoke is ready, the same no-secret `next_provider_smoke` object
 and command name in `setup_status_summary`, and which provider factory route was
@@ -299,7 +301,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
-`api_key_integration_status_summary`, `api_key_next_action_summary`,
+`readiness_summary`, `api_key_integration_status_summary`,
+`api_key_next_action_summary`,
 `api_key_operator_checklist_summary`, `setup_status_summary`,
 `live_data_setup_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`, `api_key_setup_file_summary`,
@@ -410,6 +413,10 @@ selection with `provider_factory`, `selected_provider_classes`,
 `selected_provider_by_family`, and `ready_to_run_live_smoke`, so API-key
 auto-selection and each provider family's `preferred_env_key` /
 `accepted_env_keys` can be verified without secret values.
+The top-level `readiness_summary` mirrors the selected `next_operator_action`
+and, when that action carries provider smoke or recovery env-key hints, also
+includes `preferred_env_key` and `accepted_env_keys` without returning key
+values.
 The top-level `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
 provider selection, failure, and next-action evidence into one operator row with

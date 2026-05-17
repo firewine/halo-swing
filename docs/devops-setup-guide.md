@@ -463,6 +463,9 @@ live-data provider keys are configured. The top-level `readiness_summary` mirror
 `api_key_setup_status`, `api_key_status`, `provider_route_status`,
 `ready_to_run_live_smoke`, `next_setup_step`, `next_operator_action_name`, and
 the no-secret `next_operator_action` separately from broader integration gates.
+When the mirrored next action carries provider smoke or recovery env-key hints,
+`readiness_summary` also includes `preferred_env_key` and `accepted_env_keys`
+without returning key values.
 Pass `summary_only=true` when you want the compact CLI/MCP response:
 
 ```bash
@@ -470,7 +473,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
-`api_key_integration_status_summary`, `api_key_next_action_summary`,
+`readiness_summary`, `api_key_integration_status_summary`,
+`api_key_next_action_summary`,
 `api_key_operator_checklist_summary`, `setup_status_summary`,
 `live_data_setup_summary`, `api_key_requirements_summary`,
 `api_key_command_summary`, `api_key_setup_file_summary`,
@@ -591,6 +595,9 @@ selection with `provider_factory`, `selected_provider_classes`,
 `selected_provider_by_family`, and `ready_to_run_live_smoke`, so API-key
 auto-selection and each provider family's `preferred_env_key` /
 `accepted_env_keys` can be verified without secret values. The top-level
+`readiness_summary` mirrors provider smoke or recovery `preferred_env_key` and
+`accepted_env_keys` from the next operator action without returning key values.
+The top-level
 `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
 provider selection, failure, and next-action evidence into one operator row with

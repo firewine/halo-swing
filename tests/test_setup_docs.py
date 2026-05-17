@@ -141,6 +141,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "summary_only" in guide
     assert "api_key_pipeline_smoke_summary_only.v1" in guide
     assert '"summary_only":true' in guide
+    assert "keeps\n`readiness_summary`" in guide
     assert "keeps `api_key_operator_checklist_summary`" in guide
     assert "api_key_operator_checklist_summary.v1" in guide
     assert "next_blocking_action_command" in guide
@@ -186,6 +187,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "exception_message_returned" in guide
     assert "url_returned" in guide
     assert "readiness_summary.next_operator_action" in guide
+    assert "readiness_summary` also includes `preferred_env_key`" in guide
     assert "smoke_command" in guide
     assert "provider_family_summary" in guide
     assert "run_api_key_pipeline_smoke" in guide
