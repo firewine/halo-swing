@@ -2668,6 +2668,14 @@ def _api_key_provider_recovery_summary(
         ),
         None,
     )
+    first_blocked_item = next(
+        (
+            item
+            for item in compact_items
+            if item.get("recovery_status") == "blocked"
+        ),
+        None,
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2857,6 +2865,56 @@ def _api_key_provider_recovery_summary(
             else False
         ),
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": (
+            first_blocked_item.get("smoke_command_name")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_smoke_command": (
+            first_blocked_item.get("recovery_smoke_command")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_provider_family": (
+            first_blocked_item.get("provider_family")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_provider": (
+            first_blocked_item.get("provider") if first_blocked_item else None
+        ),
+        "next_blocked_recovery_next_setup_action": (
+            first_blocked_item.get("next_setup_action")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_preferred_env_key": (
+            first_blocked_item.get("preferred_env_key")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_accepted_env_keys": (
+            _string_list(first_blocked_item.get("accepted_env_keys"))
+            if first_blocked_item
+            else []
+        ),
+        "next_blocked_recovery_network_call_policy": (
+            first_blocked_item.get("network_call_policy")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": (
+            isinstance(first_blocked_item.get("recovery_smoke_command"), str)
+            if first_blocked_item
+            else False
+        ),
+        "next_blocked_recovery_mutates_local_state": (
+            first_blocked_item.get("mutates_local_state") is True
+            if first_blocked_item
+            else False
+        ),
+        "next_blocked_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": (
             first_item.get("smoke_command_name") if first_item else None
         ),

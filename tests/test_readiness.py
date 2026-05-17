@@ -2813,6 +2813,18 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_pending_recovery_network_call": True,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_recovery_smoke_command": payload["provider_recovery_smokes"][0][
             "command"
@@ -5035,6 +5047,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "next_pending_recovery_network_call": False,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": None,
         "next_recovery_smoke_command": None,
         "items": [],
@@ -5146,6 +5170,72 @@ def test_api_key_provider_recovery_summary_next_pending_skips_blocked_item() -> 
     assert summary["next_pending_recovery_network_call"] is True
     assert summary["next_pending_recovery_mutates_local_state"] is False
     assert summary["next_pending_recovery_secret_values_returned"] is False
+
+
+def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> None:
+    summary = _api_key_provider_recovery_summary(
+        {
+            "status": "conflict",
+            "provider_error_count": 2,
+            "provider_recovery_smoke_count": 1,
+            "items": [
+                {
+                    "provider_family": "market",
+                    "provider": "polygon",
+                    "smoke_command_name": "get_market_snapshot_live_smoke",
+                    "recovery_smoke_command": "run polygon smoke",
+                    "recovery_smoke_available": True,
+                    "recovery_smoke": {
+                        "network_call_policy": (
+                            "only_when_matching_api_key_selects_live_provider"
+                        ),
+                        "mutates_local_state": False,
+                    },
+                    "next_setup_action": "verify_provider_credentials_or_network",
+                    "preferred_env_key": "POLYGON_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_MARKET_DATA_API_KEY",
+                        "POLYGON_API_KEY",
+                    ],
+                },
+                {
+                    "provider_family": "news",
+                    "provider": "newsapi",
+                    "smoke_command_name": "get_news_bundle_live_smoke",
+                    "recovery_smoke_command": None,
+                    "recovery_smoke_available": False,
+                    "next_setup_action": "fill_provider_key",
+                    "preferred_env_key": "NEWS_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_NEWS_API_KEY",
+                        "NEWS_API_KEY",
+                    ],
+                },
+            ],
+        }
+    )
+
+    assert summary["next_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert summary["next_recovery_smoke_available"] is True
+    assert summary["next_blocked_recovery_smoke_command_name"] == (
+        "get_news_bundle_live_smoke"
+    )
+    assert summary["next_blocked_recovery_smoke_command"] is None
+    assert summary["next_blocked_recovery_provider_family"] == "news"
+    assert summary["next_blocked_recovery_provider"] == "newsapi"
+    assert summary["next_blocked_recovery_next_setup_action"] == "fill_provider_key"
+    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWS_API_KEY"
+    assert summary["next_blocked_recovery_accepted_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary["next_blocked_recovery_network_call_policy"] is None
+    assert summary["next_blocked_recovery_smoke_available"] is False
+    assert summary["next_blocked_recovery_network_call"] is False
+    assert summary["next_blocked_recovery_mutates_local_state"] is False
+    assert summary["next_blocked_recovery_secret_values_returned"] is False
 
 
 def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(

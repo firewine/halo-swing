@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.784 API Key Provider Recovery Summary Next Blocked Command Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 pending recovery command와 첫 pending command를
+top-level에서 보여주지만, recovery item 중 실행 가능한 smoke가 없는 blocked 항목을
+단일 next blocker 필드로 분리하지는 않았다. 이번 slice는 no-secret
+`next_blocked_recovery_smoke_command_name`,
+`next_blocked_recovery_smoke_command`,
+`next_blocked_recovery_provider_family`, `next_blocked_recovery_provider`와 safety 필드를
+추가해, API key 입력 후 provider 복구가 막힌 경우에도 compact summary만으로 어떤
+provider recovery가 아직 실행 불가한지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes next_blocked_recovery_smoke_command_name and next_blocked_recovery_smoke_command when a blocked recovery item exists
+  - api_key_provider_recovery_summary includes next_blocked_recovery_provider_family and next_blocked_recovery_provider for the first blocked recovery item
+  - api_key_provider_recovery_summary includes next_blocked_recovery_next_setup_action, next_blocked_recovery_preferred_env_key, next_blocked_recovery_accepted_env_keys, and next_blocked_recovery_network_call_policy
+  - api_key_provider_recovery_summary includes next_blocked_recovery_smoke_available, next_blocked_recovery_network_call, next_blocked_recovery_mutates_local_state, and next_blocked_recovery_secret_values_returned safety fields
+  - next blocked recovery fields return null, empty-list, or false values when no blocked recovery item exists
+  - focused tests cover all-pending, no-blocked, and pending-before-blocked next blocked recovery summary paths
+  - fake-key API-key pipeline summary-only CLI returns next blocked recovery fields without secret values
+  - README and DevOps setup guide document next blocked recovery fields
+  - tests/test_setup_docs.py asserts next blocked recovery field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_provider_recovery_summary_next_blocked_skips_pending_item tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only next blocked recovery fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["next_blocked_recovery_smoke_command_name"], summary["next_blocked_recovery_provider_family"], summary["next_blocked_recovery_provider"], summary["next_blocked_recovery_smoke_available"], summary["next_blocked_recovery_secret_values_returned"], summary["secret_values_returned"])': None None None False False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 794 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.783 API Key Provider Recovery Summary Next Pending Command Gate Record - 2026-05-17
 
 ### A. 목적
