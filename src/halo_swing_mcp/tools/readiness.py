@@ -2636,7 +2636,7 @@ def _api_key_provider_recovery_summary(
     )
     compact_items = [_api_key_provider_recovery_summary_item(item) for item in items]
     first_item = compact_items[0] if compact_items else None
-    return {
+    summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
         "provider_recovery_required": bool(compact_items),
@@ -2657,6 +2657,20 @@ def _api_key_provider_recovery_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    if first_item:
+        provider_family = first_item.get("provider_family")
+        provider = first_item.get("provider")
+        preferred_env_key = first_item.get("preferred_env_key")
+        accepted_env_keys = _string_list(first_item.get("accepted_env_keys"))
+        if isinstance(provider_family, str):
+            summary["next_recovery_provider_family"] = provider_family
+        if isinstance(provider, str):
+            summary["next_recovery_provider"] = provider
+        if isinstance(preferred_env_key, str):
+            summary["next_recovery_preferred_env_key"] = preferred_env_key
+        if accepted_env_keys:
+            summary["next_recovery_accepted_env_keys"] = accepted_env_keys
+    return summary
 
 
 def _api_key_provider_recovery_summary_item(

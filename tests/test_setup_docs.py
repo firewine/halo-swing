@@ -142,6 +142,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "timeout_seconds" in guide
     assert "default_timeout_seconds" in guide
     assert "applies_to" in guide
+    assert "next_recovery_provider_family" in guide
+    assert "next_recovery_provider" in guide
+    assert "next_recovery_preferred_env_key" in guide
+    assert "next_recovery_accepted_env_keys" in guide
     assert "summary_only" in guide
     assert "api_key_pipeline_smoke_summary_only.v1" in guide
     assert '"summary_only":true' in guide
