@@ -509,6 +509,8 @@ and `api_key_setup_quickstart_next_command`.
 It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_names`,
 `api_key_setup_quickstart_command_plan_count`,
+`api_key_setup_quickstart_command_plan_command_names_by_family`,
+`api_key_setup_quickstart_command_plan_commands_by_family`,
 `api_key_setup_quickstart_command_plan_provider_by_family`,
 `api_key_setup_quickstart_command_plan_selected_provider_class_by_family`,
 `api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family`,

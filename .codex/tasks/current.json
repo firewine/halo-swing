@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_COMMAND_MAPS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.892",
-  "next_atomic_step": "mirror provider smoke quickstart command plan status and safety fields into provider-family maps",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.893",
+  "next_atomic_step": "mirror provider smoke quickstart command names and commands into provider-family maps",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.892",
+    "docs/halo-swing-development-plan.md#3.893",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
@@ -57,13 +57,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level quickstart command plan exposes provider-family status, network_call, network_call_policy, mutates_local_state, and secret_values_returned maps for provider-smoke rows",
-    "fake-key offline verification proves quickstart command plan safety maps report ready provider smokes, network calls, no local mutation, no secret values, and live-provider network policy",
-    "blocked no-key verification proves quickstart command plan safety maps report blocked provider smokes without secret values",
+    "summary-only top-level quickstart command plan exposes provider-family command name and command maps for provider-smoke rows",
+    "fake-key offline verification proves quickstart command plan command maps carry all three live provider smoke commands without secret values",
+    "blocked no-key verification proves quickstart command plan command maps stay tied to provider smoke command rows without secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan safety maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan command maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

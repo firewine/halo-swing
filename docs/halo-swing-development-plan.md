@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.893 API Key Quickstart Command Plan Command Maps Gate Record - 2026-05-18
+
+### A. 목적
+
+3.892에서 quickstart command plan provider-smoke row의 status/safety evidence는
+provider-family map으로 올라왔다. 하지만 quickstart plan만 읽는 compact client는
+provider-family별 실제 smoke command name과 command를 얻으려면 아직 command plan row나
+generic provider-smoke maps를 같이 읽어야 한다. 이번 slice는 API 키만 넣은 뒤
+quickstart command plan family maps만 읽어도 market/macro/news provider smoke 명령을
+바로 표시하고 실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level quickstart command plan exposes provider-family command-name maps for provider-smoke rows
+  - summary-only top-level quickstart command plan exposes provider-family command maps for provider-smoke rows
+  - README and DevOps setup guide document quickstart command plan command identity maps
+  - fake-key offline verification confirmed market/macro/news command-name and command maps carry all three live provider smoke commands without secret values
+  - blocked no-key test coverage keeps command identity maps tied to provider smoke command rows without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan command maps pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key assertion confirmed command-name map, command map, and no secret values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.892 API Key Quickstart Command Plan Safety Maps Gate Record - 2026-05-18
 
 ### A. 목적

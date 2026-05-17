@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_GATE
+status: API_KEY_QUICKSTART_COMMAND_PLAN_COMMAND_MAPS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_COMMAND_MAPS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider smoke quickstart command plan status and safety fields into provider-family maps
+next_atomic_step: mirror provider smoke quickstart command names and commands into provider-family maps
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,30 +82,30 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level quickstart command plan exposes provider-family status, network_call, network_call_policy, mutates_local_state, and secret_values_returned maps for provider-smoke rows
-  - fake-key offline verification proves quickstart command plan safety maps report ready provider smokes, network calls, no local mutation, no secret values, and live-provider network policy
-  - blocked no-key verification proves quickstart command plan safety maps report blocked provider smokes without secret values
+  - summary-only top-level quickstart command plan exposes provider-family command name and command maps for provider-smoke rows
+  - fake-key offline verification proves quickstart command plan command maps carry all three live provider smoke commands without secret values
+  - blocked no-key verification proves quickstart command plan command maps stay tied to provider smoke command rows without secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan safety maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart command plan command maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_GATE
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_COMMAND_MAPS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart command plan safety maps pytest: 2 passed
+  - focused API-key quickstart command plan command maps pytest: 3 passed
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - direct fake-key assertion confirmed quickstart command plan safety maps show ready statuses, network_call=true, live-provider network policy, mutates_local_state=false, secret_values_returned=false, and top-level secret_values_returned=false
+  - direct fake-key assertion confirmed quickstart command plan command-name map carries market/macro/news smoke names, command map carries all three live smoke commands, and secret_values_returned=false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -122,9 +122,20 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: commit this verified gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - quickstart command plan now exposes provider-family status and safety maps without row parsing
-  - fake-key path shows all provider smokes ready, networked, non-mutating, and no-secret
+  - quickstart command plan now exposes provider-family command name and command maps without row parsing
+  - fake-key path carries all three live provider smoke commands without secret values
   - blocked no-key tests keep the maps tied to provider smoke command rows without secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_SAFETY_MAPS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider smoke quickstart command plan status and safety fields into provider-family maps
 ```
 
 Previous completed directive:

@@ -58,6 +58,14 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         if isinstance(row.get("provider_family"), str)
     ]
     return {
+        "api_key_setup_quickstart_command_plan_command_names_by_family": {
+            row["provider_family"]: row.get("name")
+            for row in provider_rows
+        },
+        "api_key_setup_quickstart_command_plan_commands_by_family": {
+            row["provider_family"]: row.get("command")
+            for row in provider_rows
+        },
         "api_key_setup_quickstart_command_plan_provider_by_family": {
             row["provider_family"]: row.get("provider")
             for row in provider_rows
