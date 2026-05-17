@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_STAGE_RECOVERY_ENV_HINT_VERIFIED
-gate_id: API_KEY_STAGE_RECOVERY_ENV_HINT_GATE
+status: API_KEY_CHECK_RECOVERY_ENV_HINT_VERIFIED
+gate_id: API_KEY_CHECK_RECOVERY_ENV_HINT_GATE
 review_tier: S1_small
 
-next_atomic_step: add provider recovery env-key hints to API-key pipeline stage summary rows
+next_atomic_step: add provider recovery env-key hints to API-key pipeline check summary rows
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,28 +74,39 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); stage=payload["api_key_pipeline_stage_summary"]["first_failed_stage"]; print(stage["stage_name"], stage["preferred_env_key"], stage["accepted_env_keys"], stage["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); check=payload["api_key_pipeline_check_summary"]["first_failed_check"]; print(check["key"], check["preferred_env_key"], check["accepted_env_keys"], check["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_pipeline_stage_summary failed live-data stage rows include preferred_env_key and accepted_env_keys when provider recovery smoke metadata exists
-  - api_key_pipeline_stage_summary first_failed_stage carries the same no-secret recovery env-key hints
-  - setup stage summaries remain unchanged and do not add irrelevant recovery env-key fields
-  - stage recovery env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
-  - focused tests cover stage summary recovery env-key hints in full and summary_only API-key pipeline output
-  - fake-key API-key pipeline summary-only CLI returns first failed stage recovery env-key names without secret values
-  - README and DevOps setup guide document stage summary recovery env-key hints
-  - setup docs tests assert stage recovery env-key hint guidance
+  - api_key_pipeline_check_summary failed live-data check rows include preferred_env_key and accepted_env_keys when the matching stage has provider recovery env-key hints
+  - api_key_pipeline_check_summary first_failed_check carries the same no-secret recovery env-key hints
+  - setup check summaries remain unchanged and do not add irrelevant recovery env-key fields
+  - check recovery env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
+  - focused tests cover check summary recovery env-key hints in full and summary_only API-key pipeline output
+  - fake-key API-key pipeline summary-only CLI returns first failed check recovery env-key names without secret values
+  - README and DevOps setup guide document check summary recovery env-key hints
+  - setup docs tests assert check recovery env-key hint guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key stage recovery env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key check recovery env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_STAGE_RECOVERY_ENV_HINT_VERIFIED
+gate_id: API_KEY_STAGE_RECOVERY_ENV_HINT_GATE
+review_tier: S1_small
+
+next_atomic_step: add provider recovery env-key hints to API-key pipeline stage summary rows
 ```
 
 Previous completed directive:
@@ -2200,6 +2211,61 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Check Recovery Env Hint Gate is verified.
+`api_key_pipeline_check_summary` now carries provider recovery env-key hints
+into failed live-data check rows and `first_failed_check` when the matching
+stage has recovery hints, so the compact check summary shows the env-key names
+to check without returning API key values. Focused tests, fake-key CLI, full
+pytest, ruff, and health_check passed.
+
+```yaml
+api_key_check_recovery_env_hint_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_pipeline_check_summary failed live-data check rows include preferred_env_key and accepted_env_keys when the matching stage has provider recovery env-key hints
+    - api_key_pipeline_check_summary first_failed_check carries the same no-secret recovery env-key hints
+    - setup check summaries remain unchanged and do not add irrelevant recovery env-key fields
+    - check recovery env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
+    - focused tests cover check summary recovery env-key hints in full and summary_only API-key pipeline output
+    - fake-key API-key pipeline summary-only CLI returns first failed check recovery env-key names without secret values
+    - README and DevOps setup guide document check summary recovery env-key hints
+    - tests/test_setup_docs.py asserts check recovery env-key hint guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only first failed check returned preferred_env_key and accepted_env_keys without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); check=payload["api_key_pipeline_check_summary"]["first_failed_check"]; print(check["key"], check["preferred_env_key"], check["accepted_env_keys"], check["secret_values_returned"])'
+      result: "run_live_data_smoke.live_data_smoke_status_ok POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "788 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Stage Recovery Env Hint Gate is verified.
 `api_key_pipeline_stage_summary` now carries provider recovery env-key hints

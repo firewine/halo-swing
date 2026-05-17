@@ -2383,6 +2383,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "passed": False,
             "expected": "ok",
             "actual": "conflict",
+            "preferred_env_key": "POLYGON_API_KEY",
+            "accepted_env_keys": [
+                "HALO_SWING_MARKET_DATA_API_KEY",
+                "POLYGON_API_KEY",
+            ],
             "secret_values_returned": False,
         },
         "failed_checks": [
@@ -2393,6 +2398,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "passed": False,
                 "expected": "ok",
                 "actual": "conflict",
+                "preferred_env_key": "POLYGON_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MARKET_DATA_API_KEY",
+                    "POLYGON_API_KEY",
+                ],
                 "secret_values_returned": False,
             }
         ],
@@ -4630,6 +4640,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "accepted_env_keys"
         not in payload["api_key_pipeline_stage_summary"]["first_failed_stage"]
     )
+    assert "preferred_env_key" not in payload["api_key_pipeline_check_summary"][
+        "first_failed_check"
+    ]
+    assert "accepted_env_keys" not in payload["api_key_pipeline_check_summary"][
+        "first_failed_check"
+    ]
     assert all(
         stage["secret_values_returned"] is False
         for stage in payload["api_key_pipeline_stage_summary"]["stages"]
@@ -4954,6 +4970,20 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     assert check_summary["first_failed_check"]["key"] == (
         "run_live_data_smoke.live_data_smoke_status_ok"
     )
+    assert check_summary["first_failed_check"]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert check_summary["first_failed_check"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert check_summary["failed_checks"][0]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert check_summary["failed_checks"][0]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
     assert all(
         failed_check["secret_values_returned"] is False
         for failed_check in check_summary["failed_checks"]

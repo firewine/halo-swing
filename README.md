@@ -371,7 +371,9 @@ It keeps `api_key_pipeline_check_summary`
 with `check_count`, `passed_check_count`, `failed_check_count`,
 `failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
 `first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
-`name`, `key`, `expected`, `actual`, and `passed=false`.
+`name`, `key`, `expected`, `actual`, and `passed=false`. When the matching
+stage has provider recovery env-key hints, the check summary includes
+`preferred_env_key` and `accepted_env_keys` without returning key values.
 The compact `api_key_pipeline_failure_summary`
 (`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
 operator-facing row with `status`, `has_failures`, `failure_category`,

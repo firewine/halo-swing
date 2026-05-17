@@ -896,7 +896,10 @@ def run_api_key_pipeline_smoke(
         signal_workflow_smoke_summary=signal_workflow_smoke_summary,
         recording_smoke_summary=recording_smoke_summary,
     )
-    api_key_pipeline_check_summary = _api_key_pipeline_check_summary(checks)
+    api_key_pipeline_check_summary = _api_key_pipeline_check_summary(
+        checks,
+        api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
+    )
     api_key_setup_file_summary = _api_key_setup_file_summary(
         live_data_setup_summary
     )
@@ -2111,9 +2114,17 @@ def _api_key_pipeline_stage_row(
 
 def _api_key_pipeline_check_summary(
     checks: list[dict[str, Any]],
+    *,
+    api_key_pipeline_stage_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    stage_recovery_hints_by_tool = _api_key_pipeline_stage_recovery_hints_by_tool(
+        api_key_pipeline_stage_summary
+    )
     failed_checks = [
-        _api_key_pipeline_check_row(check)
+        _api_key_pipeline_check_row(
+            check,
+            recovery_hint=stage_recovery_hints_by_tool.get(check.get("tool")),
+        )
         for check in checks
         if check.get("passed") is not True
     ]
@@ -2138,10 +2149,42 @@ def _api_key_pipeline_check_summary(
     }
 
 
-def _api_key_pipeline_check_row(check: dict[str, Any]) -> dict[str, Any]:
+def _api_key_pipeline_stage_recovery_hints_by_tool(
+    api_key_pipeline_stage_summary: dict[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    if api_key_pipeline_stage_summary is None:
+        return {}
+    stages = api_key_pipeline_stage_summary.get("stages")
+    if not isinstance(stages, list):
+        return {}
+    hints_by_tool: dict[str, dict[str, Any]] = {}
+    for stage in stages:
+        stage_row = _optional_mapping(stage)
+        if stage_row is None:
+            continue
+        stage_name = stage_row.get("stage_name")
+        preferred_env_key = stage_row.get("preferred_env_key")
+        accepted_env_keys = _string_list(stage_row.get("accepted_env_keys"))
+        if (
+            isinstance(stage_name, str)
+            and isinstance(preferred_env_key, str)
+            and accepted_env_keys
+        ):
+            hints_by_tool[stage_name] = {
+                "preferred_env_key": preferred_env_key,
+                "accepted_env_keys": accepted_env_keys,
+            }
+    return hints_by_tool
+
+
+def _api_key_pipeline_check_row(
+    check: dict[str, Any],
+    *,
+    recovery_hint: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     tool = str(check.get("tool"))
     name = str(check.get("name"))
-    return {
+    row = {
         "tool": tool,
         "name": name,
         "key": f"{tool}.{name}",
@@ -2150,6 +2193,14 @@ def _api_key_pipeline_check_row(check: dict[str, Any]) -> dict[str, Any]:
         "actual": check.get("actual"),
         "secret_values_returned": False,
     }
+    if recovery_hint is not None:
+        preferred_env_key = recovery_hint.get("preferred_env_key")
+        accepted_env_keys = _string_list(recovery_hint.get("accepted_env_keys"))
+        if isinstance(preferred_env_key, str):
+            row["preferred_env_key"] = preferred_env_key
+        if accepted_env_keys:
+            row["accepted_env_keys"] = accepted_env_keys
+    return row
 
 
 def _api_key_pipeline_failure_summary(
