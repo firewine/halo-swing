@@ -135,6 +135,25 @@ def _api_key_provider_smoke_top_level_fields(
             if row.get("status") != "ready"
         ]
     )
+    provider_smoke_blocked_preferred_env_keys = _ordered_unique_strings(
+        [
+            row.get("preferred_env_key")
+            for row in provider_smoke_command_rows
+            if row.get("status") != "ready"
+        ]
+    )
+    provider_smoke_blocked_accepted_env_key_groups = [
+        _string_list(row.get("accepted_env_keys"))
+        for row in provider_smoke_command_rows
+        if row.get("status") != "ready"
+    ]
+    provider_smoke_blocked_accepted_env_keys = _ordered_unique_strings(
+        [
+            env_key
+            for group in provider_smoke_blocked_accepted_env_key_groups
+            for env_key in group
+        ]
+    )
     next_blocked_provider_smoke = next(
         (
             row
@@ -193,6 +212,24 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_commands": (
             provider_smoke_next_action_commands
+        ),
+        "api_key_provider_smoke_blocked_preferred_env_keys": (
+            provider_smoke_blocked_preferred_env_keys
+        ),
+        "api_key_provider_smoke_blocked_preferred_env_key_count": len(
+            provider_smoke_blocked_preferred_env_keys
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_keys": (
+            provider_smoke_blocked_accepted_env_keys
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_key_count": len(
+            provider_smoke_blocked_accepted_env_keys
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_key_groups": (
+            provider_smoke_blocked_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_key_group_count": len(
+            provider_smoke_blocked_accepted_env_key_groups
         ),
         "api_key_next_provider_smoke_command_name": (
             setup_status_summary.get("next_provider_smoke_command_name")
