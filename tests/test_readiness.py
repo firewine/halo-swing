@@ -1218,6 +1218,28 @@ def provider_smoke_route_summary_from_payload(
     }
 
 
+def assert_provider_smoke_readiness_flag_fields(payload: dict[str, Any]) -> None:
+    provider_smoke_command_count = payload["api_key_provider_smoke_command_count"]
+    live_data_required_by_family = payload[
+        "api_key_provider_smoke_provider_route_live_data_required_by_family"
+    ]
+    assert payload["api_key_provider_smoke_all_ready"] is (
+        provider_smoke_command_count > 0
+        and payload["api_key_provider_smoke_ready_count"]
+        == provider_smoke_command_count
+    )
+    assert payload["api_key_provider_smoke_any_blocked"] is (
+        payload["api_key_provider_smoke_blocked_count"] > 0
+    )
+    assert payload["api_key_provider_smoke_all_live_data_required"] is (
+        provider_smoke_command_count > 0
+        and all(
+            live_data_required is True
+            for live_data_required in live_data_required_by_family.values()
+        )
+    )
+
+
 def assert_provider_smoke_list_count_fields(payload: dict[str, Any]) -> None:
     expected_live_check_counts_by_family = {
         family: len(expected_live_checks)
@@ -7207,6 +7229,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_list_count_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)
     assert_route_count_top_level_fields(
@@ -8313,6 +8336,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         row["provider_family"]: row["secret_values_returned"]
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
     }
+    assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)
     assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
         "market": "market_snapshot_contract",
@@ -11039,6 +11063,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_list_count_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)
     assert_route_count_top_level_fields(

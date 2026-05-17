@@ -87,15 +87,23 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("secret_values_returned") is True
         for family, row in provider_smoke_command_rows_by_family.items()
     }
+    ready_provider_smoke_count = setup_status_summary.get("ready_provider_smoke_count")
+    blocked_provider_smoke_count = setup_status_summary.get(
+        "blocked_provider_smoke_count"
+    )
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
         ),
-        "api_key_provider_smoke_ready_count": setup_status_summary.get(
-            "ready_provider_smoke_count"
+        "api_key_provider_smoke_ready_count": ready_provider_smoke_count,
+        "api_key_provider_smoke_blocked_count": blocked_provider_smoke_count,
+        "api_key_provider_smoke_all_ready": (
+            provider_smoke_command_count > 0
+            and ready_provider_smoke_count == provider_smoke_command_count
         ),
-        "api_key_provider_smoke_blocked_count": setup_status_summary.get(
-            "blocked_provider_smoke_count"
+        "api_key_provider_smoke_any_blocked": (
+            isinstance(blocked_provider_smoke_count, int)
+            and blocked_provider_smoke_count > 0
         ),
         "api_key_next_provider_smoke_command_name": (
             setup_status_summary.get("next_provider_smoke_command_name")
@@ -175,6 +183,12 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_provider_route_live_data_required_by_family": (
             provider_smoke_provider_route_live_data_required_by_family
+        ),
+        "api_key_provider_smoke_all_live_data_required": (
+            provider_smoke_command_count > 0
+            and all(
+                provider_smoke_provider_route_live_data_required_by_family.values()
+            )
         ),
         **_api_key_provider_smoke_route_count_top_level_fields(
             provider_smoke_route_summary

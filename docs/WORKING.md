@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_READINESS_FLAG_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_READINESS_FLAG_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider smoke safety flag fields
+next_atomic_step: surface summary-only API-key provider smoke readiness flag fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output mirrors API-key provider smoke all-network-call, any-mutates-local-state, and any-secret-values-returned aggregate safety flags
-  - summary-only tests prove provider smoke safety flag fields match their by-family safety maps
-  - README and DevOps guide document the top-level API-key provider smoke safety flag fields
+  - summary-only output mirrors API-key provider smoke all-ready, any-blocked, and all-live-data-required aggregate flags
+  - summary-only tests prove provider smoke readiness flag fields match their counts and by-family route maps
+  - README and DevOps guide document the top-level API-key provider smoke readiness flag fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider smoke safety flag fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke readiness flag fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_READINESS_FLAG_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,38 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider smoke safety flag fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key provider smoke readiness flag fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only top-level output now mirrors provider smoke safety aggregate flag fields
+  - summary-only top-level output now mirrors provider smoke readiness aggregate flag fields
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider smoke safety flag fields
+```
+
+Previous verification result:
+
+```text
+status: passed
+gate_id: API_KEY_PROVIDER_SMOKE_SAFETY_FLAG_FIELDS_GATE
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
 Previous completed directive:
