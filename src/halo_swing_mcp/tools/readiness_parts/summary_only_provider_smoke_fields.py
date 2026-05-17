@@ -332,6 +332,17 @@ def _api_key_provider_smoke_top_level_fields(
     provider_smoke_next_action_primary_accepted_env_keys = _string_list(
         provider_smoke_next_action_primary_row.get("accepted_env_keys")
     )
+    provider_smoke_next_action_primary_has_command = bool(
+        provider_smoke_next_action_primary_row.get("command")
+    )
+    provider_smoke_next_action_primary_ready_to_run = (
+        provider_smoke_next_action_primary_row.get("status") == "ready"
+        and provider_smoke_next_action_primary_has_command
+    )
+    provider_smoke_next_action_primary_requires_api_keys = (
+        provider_smoke_next_action_primary_row.get("status") != "ready"
+        and bool(provider_smoke_next_action_primary_accepted_env_keys)
+    )
     provider_smoke_next_action_primary_expected_live_checks = _string_list(
         provider_smoke_next_action_primary_row.get("expected_live_checks")
     )
@@ -529,8 +540,17 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_next_action_primary_command": (
             provider_smoke_next_action_primary_row.get("command")
         ),
+        "api_key_provider_smoke_next_action_primary_has_command": (
+            provider_smoke_next_action_primary_has_command
+        ),
         "api_key_provider_smoke_next_action_primary_status": (
             provider_smoke_next_action_primary_row.get("status")
+        ),
+        "api_key_provider_smoke_next_action_primary_ready_to_run": (
+            provider_smoke_next_action_primary_ready_to_run
+        ),
+        "api_key_provider_smoke_next_action_primary_requires_api_keys": (
+            provider_smoke_next_action_primary_requires_api_keys
         ),
         "api_key_provider_smoke_next_action_primary_setup_action": (
             provider_smoke_next_action_primary_row.get("next_setup_action")

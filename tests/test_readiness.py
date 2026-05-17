@@ -1491,9 +1491,27 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_primary_command"
     ] == expected_next_action_primary_row.get("command")
+    expected_next_action_primary_has_command = bool(
+        expected_next_action_primary_row.get("command")
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_has_command"
+    ] is expected_next_action_primary_has_command
     assert payload[
         "api_key_provider_smoke_next_action_primary_status"
     ] == expected_next_action_primary_row.get("status")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_ready_to_run"
+    ] is (
+        expected_next_action_primary_row.get("status") == "ready"
+        and expected_next_action_primary_has_command
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_requires_api_keys"
+    ] is (
+        expected_next_action_primary_row.get("status") != "ready"
+        and bool(expected_next_action_primary_row.get("accepted_env_keys", []))
+    )
     assert payload[
         "api_key_provider_smoke_next_action_primary_setup_action"
     ] == expected_next_action_primary_row.get("next_setup_action")
