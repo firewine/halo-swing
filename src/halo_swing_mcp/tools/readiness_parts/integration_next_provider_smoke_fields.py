@@ -61,10 +61,6 @@ def _api_key_integration_next_provider_smoke_fields(
         summary["next_action_next_provider_smoke_status"] = (
             next_provider_smoke.get("status")
         )
-    if isinstance(next_provider_smoke.get("next_setup_action"), str):
-        summary["next_action_next_provider_smoke_next_setup_action"] = (
-            next_provider_smoke.get("next_setup_action")
-        )
     if "network_call" in next_provider_smoke:
         summary["next_action_next_provider_smoke_network_call"] = (
             next_provider_smoke.get("network_call") is True

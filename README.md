@@ -851,6 +851,8 @@ provider selection, failure, and next-action evidence into one operator row with
 `selected_provider_classes`, `selected_provider_class_by_family`,
 `provider_route_data_mode_by_family`,
 `provider_route_live_data_required_by_family`, `all_selected_routes_live`,
+`provider_smoke_count`, `ready_provider_smoke_count`,
+`blocked_provider_smoke_count`,
 `failure_category`, `has_failures`,
 `next_action_name`, `next_action_provider_family`, `next_action_provider`,
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
@@ -892,7 +894,10 @@ readiness values as top-level scalars/lists:
 `api_key_integration_selected_provider_class_by_family`,
 `api_key_integration_provider_route_data_mode_by_family`,
 `api_key_integration_provider_route_live_data_required_by_family`,
-`api_key_integration_all_selected_routes_live`, and
+`api_key_integration_all_selected_routes_live`,
+`api_key_integration_provider_smoke_count`,
+`api_key_integration_ready_provider_smoke_count`,
+`api_key_integration_blocked_provider_smoke_count`, and
 `api_key_integration_next_action_name`. It also mirrors next-action details as
 `api_key_integration_next_action_provider_family`,
 `api_key_integration_next_action_provider`,
@@ -922,6 +927,10 @@ details as `api_key_integration_next_action_next_after_action`,
 `api_key_integration_next_action_secret_input_required`,
 `api_key_integration_next_action_dotenv_examples`, and
 `api_key_integration_next_action_dotenv_example_count`.
+It also mirrors integration-wide provider smoke progress as
+`api_key_integration_provider_smoke_count`,
+`api_key_integration_ready_provider_smoke_count`, and
+`api_key_integration_blocked_provider_smoke_count`.
 It also mirrors provider smoke progress for that integration next action as
 `api_key_integration_next_action_provider_smoke_count`,
 `api_key_integration_next_action_ready_provider_smoke_count`,

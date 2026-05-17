@@ -451,6 +451,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_provider_smoke_count" in guide
     assert "api_key_integration_next_action_ready_provider_smoke_count" in guide
     assert "api_key_integration_next_action_blocked_provider_smoke_count" in guide
+    assert "api_key_integration_provider_smoke_count" in guide
+    assert "api_key_integration_ready_provider_smoke_count" in guide
+    assert "api_key_integration_blocked_provider_smoke_count" in guide
     assert (
         "api_key_integration_next_action_next_provider_smoke_command_name" in guide
     )
@@ -621,6 +624,9 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
     assert "api_key_integration_next_action_provider_smoke_count" in readme
     assert "api_key_integration_next_action_ready_provider_smoke_count" in readme
     assert "api_key_integration_next_action_blocked_provider_smoke_count" in readme
+    assert "api_key_integration_provider_smoke_count" in readme
+    assert "api_key_integration_ready_provider_smoke_count" in readme
+    assert "api_key_integration_blocked_provider_smoke_count" in readme
     assert (
         "api_key_integration_next_action_next_provider_smoke_command_name"
         in readme
@@ -688,6 +694,9 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_provider_smoke_count",
         "api_key_integration_next_action_ready_provider_smoke_count",
         "api_key_integration_next_action_blocked_provider_smoke_count",
+        "api_key_integration_provider_smoke_count",
+        "api_key_integration_ready_provider_smoke_count",
+        "api_key_integration_blocked_provider_smoke_count",
         "api_key_integration_next_action_next_provider_smoke_command_name",
         "api_key_integration_next_action_next_provider_smoke_command",
         "api_key_integration_next_action_next_provider_smoke_next_setup_action",
@@ -765,10 +774,16 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         "provider_route_data_mode_by_family",
         "provider_route_live_data_required_by_family",
         "all_selected_routes_live",
+        "provider_smoke_count",
+        "ready_provider_smoke_count",
+        "blocked_provider_smoke_count",
         "api_key_integration_selected_provider_class_by_family",
         "api_key_integration_provider_route_data_mode_by_family",
         "api_key_integration_provider_route_live_data_required_by_family",
         "api_key_integration_all_selected_routes_live",
+        "api_key_integration_provider_smoke_count",
+        "api_key_integration_ready_provider_smoke_count",
+        "api_key_integration_blocked_provider_smoke_count",
         "api_key_integration_next_action_name",
         "next_action_status",
         "next_action_command",

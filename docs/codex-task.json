@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SMOKE_NEXT_SETUP_ACTION_FIELDS_GATE",
+  "gate_id": "API_KEY_INTEGRATION_PROVIDER_SMOKE_COUNT_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.889",
-  "next_atomic_step": "mirror provider smoke next_setup_action into API-key command, provider-smoke, and integration summary fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.890",
+  "next_atomic_step": "mirror provider smoke total, ready, and blocked counts into API-key integration status fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -11,25 +11,21 @@
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/readiness_parts/command_checklists.py",
     "src/halo_swing_mcp/tools/readiness_parts/integration_next_provider_smoke_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.889",
+    "docs/halo-swing-development-plan.md#3.890",
     "README.md",
     "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/tools/readiness_parts/command_checklists.py",
     "src/halo_swing_mcp/tools/readiness_parts/integration_next_provider_smoke_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
@@ -65,14 +61,13 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_command_summary provider_smoke_commands and next_provider_smoke preserve provider smoke next_setup_action without secret values",
-    "summary-only api_key_next_provider_smoke_next_setup_action exposes the immediate provider smoke next_setup_action",
-    "api_key_integration_status_summary and top-level api_key_integration_next_action_next_provider_smoke_next_setup_action mirror the same next_setup_action",
-    "fake-key offline verification proves provider smoke next_setup_action fields carry run_provider_smoke and no secret values",
+    "api_key_integration_status_summary mirrors provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count from setup_status_summary",
+    "summary-only top-level api_key_integration_provider_smoke_count, api_key_integration_ready_provider_smoke_count, and api_key_integration_blocked_provider_smoke_count expose the same counts",
+    "fake-key offline verification proves integration provider-smoke count fields carry 3 ready smokes and 0 blocked smokes without secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key provider smoke next_setup_action fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key integration provider smoke count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -51,6 +51,15 @@ def _api_key_integration_status_top_level_fields(
             api_key_integration_status_summary.get("ready_to_run_live_smoke")
             is True
         ),
+        "api_key_integration_provider_smoke_count": (
+            api_key_integration_status_summary.get("provider_smoke_count")
+        ),
+        "api_key_integration_ready_provider_smoke_count": (
+            api_key_integration_status_summary.get("ready_provider_smoke_count")
+        ),
+        "api_key_integration_blocked_provider_smoke_count": (
+            api_key_integration_status_summary.get("blocked_provider_smoke_count")
+        ),
         "api_key_integration_configured_provider_families": _string_list(
             api_key_integration_status_summary.get(
                 "configured_provider_families"

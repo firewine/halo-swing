@@ -504,6 +504,13 @@ def _api_key_integration_status_summary(
         ),
         "live_providers_selected": live_providers_selected,
         "ready_to_run_live_smoke": ready_to_run_live_smoke,
+        "provider_smoke_count": setup_status_summary.get("provider_smoke_count"),
+        "ready_provider_smoke_count": setup_status_summary.get(
+            "ready_provider_smoke_count"
+        ),
+        "blocked_provider_smoke_count": setup_status_summary.get(
+            "blocked_provider_smoke_count"
+        ),
         "configured_provider_families": configured_provider_families,
         "missing_provider_families": missing_provider_families,
         "selected_provider_classes": selected_provider_classes,
@@ -844,15 +851,9 @@ def _api_key_integration_status_summary(
         api_key_next_action_summary.get("next_action_expected_live_checks")
     )
     api_key_command_summary = api_key_command_summary or {}
-    setup_next_provider_smoke = _optional_mapping(
-        setup_status_summary.get("next_provider_smoke")
-    ) or {}
-    command_next_provider_smoke = _optional_mapping(
-        api_key_command_summary.get("next_provider_smoke")
-    ) or {}
     next_provider_smoke = {
-        **setup_next_provider_smoke,
-        **command_next_provider_smoke,
+        **(_optional_mapping(setup_status_summary.get("next_provider_smoke")) or {}),
+        **(_optional_mapping(api_key_command_summary.get("next_provider_smoke")) or {}),
     }
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family

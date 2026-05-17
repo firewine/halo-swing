@@ -2924,6 +2924,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "dotenv_target_exists": False,
         "live_providers_selected": True,
         "ready_to_run_live_smoke": True,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 3,
+        "blocked_provider_smoke_count": 0,
         "configured_provider_families": ["market", "macro", "news"],
         "missing_provider_families": [],
         "selected_provider_classes": [
@@ -5537,6 +5540,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "dotenv_target_exists": True,
         "live_providers_selected": True,
         "ready_to_run_live_smoke": True,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 3,
+        "blocked_provider_smoke_count": 0,
         "configured_provider_families": ["market", "macro", "news"],
         "missing_provider_families": [],
         "selected_provider_classes": [
@@ -6058,6 +6064,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "dotenv_target_exists": False,
         "live_providers_selected": False,
         "ready_to_run_live_smoke": False,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 0,
+        "blocked_provider_smoke_count": 3,
         "configured_provider_families": [],
         "missing_provider_families": ["market", "macro", "news"],
         "selected_provider_classes": ["ReplayMarketDataProvider"],
@@ -6151,6 +6160,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_dotenv_target_exists"] is False
     assert payload["api_key_integration_live_providers_selected"] is False
     assert payload["api_key_integration_ready_to_run_live_smoke"] is False
+    assert payload["api_key_integration_provider_smoke_count"] == 3
+    assert payload["api_key_integration_ready_provider_smoke_count"] == 0
+    assert payload["api_key_integration_blocked_provider_smoke_count"] == 3
     assert payload["api_key_integration_configured_provider_families"] == []
     assert payload["api_key_integration_missing_provider_families"] == [
         "market",
@@ -9222,6 +9234,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         payload["api_key_integration_ready_to_run_live_smoke"]
         is integration_status["ready_to_run_live_smoke"]
     )
+    assert integration_status["provider_smoke_count"] == (
+        payload["setup_status_summary"]["provider_smoke_count"]
+    )
+    assert integration_status["ready_provider_smoke_count"] == (
+        payload["setup_status_summary"]["ready_provider_smoke_count"]
+    )
+    assert integration_status["blocked_provider_smoke_count"] == (
+        payload["setup_status_summary"]["blocked_provider_smoke_count"]
+    )
+    assert payload["api_key_integration_provider_smoke_count"] == (
+        integration_status["provider_smoke_count"]
+    )
+    assert payload["api_key_integration_ready_provider_smoke_count"] == (
+        integration_status["ready_provider_smoke_count"]
+    )
+    assert payload["api_key_integration_blocked_provider_smoke_count"] == (
+        integration_status["blocked_provider_smoke_count"]
+    )
     assert payload["api_key_integration_configured_provider_families"] == (
         integration_status["configured_provider_families"]
     )
@@ -9263,6 +9293,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert payload["api_key_integration_all_selected_routes_live"] is (
         integration_status["all_selected_routes_live"]
+    )
+    assert integration_status["provider_smoke_count"] == (
+        payload["setup_status_summary"]["provider_smoke_count"]
+    )
+    assert integration_status["ready_provider_smoke_count"] == (
+        payload["setup_status_summary"]["ready_provider_smoke_count"]
+    )
+    assert integration_status["blocked_provider_smoke_count"] == (
+        payload["setup_status_summary"]["blocked_provider_smoke_count"]
+    )
+    assert payload["api_key_integration_provider_smoke_count"] == (
+        integration_status["provider_smoke_count"]
+    )
+    assert payload["api_key_integration_ready_provider_smoke_count"] == (
+        integration_status["ready_provider_smoke_count"]
+    )
+    assert payload["api_key_integration_blocked_provider_smoke_count"] == (
+        integration_status["blocked_provider_smoke_count"]
     )
     assert payload["api_key_integration_next_action_name"] == (
         integration_status["next_action_name"]
@@ -10342,6 +10390,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "dotenv_target_exists": False,
         "live_providers_selected": False,
         "ready_to_run_live_smoke": False,
+        "provider_smoke_count": 3,
+        "ready_provider_smoke_count": 0,
+        "blocked_provider_smoke_count": 3,
         "configured_provider_families": [],
         "missing_provider_families": ["market", "macro", "news"],
         "selected_provider_classes": ["ReplayMarketDataProvider"],
