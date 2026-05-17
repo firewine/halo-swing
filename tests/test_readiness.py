@@ -5523,6 +5523,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["next_operator_action_network_call"] == (
         next_action_summary["next_action_network_call"]
     )
+    assert payload["next_operator_action_network_call_policy"] == (
+        next_operator_action["network_call_policy"]
+    )
     assert payload["next_operator_action_mutates_local_state"] == (
         next_action_summary["next_action_mutates_local_state"]
     )

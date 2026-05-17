@@ -493,6 +493,7 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_preferred_env_key`, and
 `next_operator_action_accepted_env_keys`, plus safety fields
 `next_operator_action_status`, `next_operator_action_network_call`,
+`next_operator_action_network_call_policy`,
 `next_operator_action_mutates_local_state`, and
 `next_operator_action_secret_values_returned`.
 It keeps `api_key_requirements_summary`

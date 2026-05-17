@@ -2363,6 +2363,9 @@ def _api_key_pipeline_summary_only_payload(
         "next_operator_action_network_call": (
             api_key_next_action_summary.get("next_action_network_call") is True
         ),
+        "next_operator_action_network_call_policy": next_operator_action.get(
+            "network_call_policy"
+        ),
         "next_operator_action_mutates_local_state": (
             api_key_next_action_summary.get("next_action_mutates_local_state")
             is True

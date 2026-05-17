@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.761 API Key Summary-Only Next Operator Action Policy Field Gate Record - 2026-05-17
+
+### A. 목적
+
+`summary_only=true` output은 next operator action의 network 여부를 top-level로 보여주지만,
+그 network call이 어떤 정책으로 제한되는지(`only_when_matching_api_key_selects_live_provider`)
+는 nested action object를 열어야 했다. 이번 slice는 no-secret
+`next_operator_action_network_call_policy`를 summary-only top-level에 미러링해, API key
+입력 후 compact 응답만으로 live call 조건을 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary_only API-key pipeline output includes top-level next_operator_action_network_call_policy
+  - summary_only next operator action network-call policy mirrors next_operator_action without secret values
+  - focused tests cover one-line next operator action network-call policy in summary_only API-key pipeline output
+  - fake-key API-key pipeline summary-only CLI returns next operator action network-call policy without secret values
+  - README and DevOps setup guide document summary_only next operator action network-call policy
+  - tests/test_setup_docs.py asserts summary_only next operator action network-call policy guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only top-level next_operator_action_network_call_policy returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_operator_action_name"], payload["next_operator_action_network_call"], payload["next_operator_action_network_call_policy"], payload["next_operator_action_secret_values_returned"])' -> recover_failed_providers True only_when_matching_api_key_selects_live_provider False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.760 API Key Summary-Only Next Operator Action Safety Fields Gate Record - 2026-05-17
 
 ### A. 목적
