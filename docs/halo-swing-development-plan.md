@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.891 API Key Quickstart Next Command Plan Next Setup Action Gate Record - 2026-05-18
+
+### A. 목적
+
+3.889에서 provider smoke row의 `next_setup_action`은 command summary와 integration
+next-provider-smoke mirror까지 이어졌다. 하지만 quickstart command plan만 읽는 compact
+client는 다음 provider smoke 명령을 실행한 뒤 기대되는 setup action을 별도
+`api_key_command_summary.provider_smoke_commands`에서 다시 찾아야 한다. 이번 slice는
+API 키만 넣은 뒤 quickstart command plan 한 벌만 읽어도 다음 provider smoke의 후속
+setup action이 `run_provider_smoke`인지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_setup_quickstart_command_plan provider-smoke rows preserve next_setup_action from api_key_command_summary.provider_smoke_commands
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_setup_actions_by_family exposes provider-smoke next setup actions by family
+  - summary-only top-level api_key_setup_quickstart_next_command_plan_next_setup_action mirrors the selected quickstart command plan row
+  - README and DevOps setup guide document quickstart command plan next_setup_action mirrors
+  - fake-key offline verification confirmed the next quickstart command plan item is provider_smoke with next_setup_action=run_provider_smoke and no secret values
+  - blocked no-key quickstart commands keep next_setup_action null and do not invent workflow state
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart next-command plan next_setup_action pytest: 2 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key assertion confirmed next quickstart command plan kind=provider_smoke, next_setup_action=run_provider_smoke, provider-family mapping, and secret_values_returned=false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.890 API Key Integration Provider Smoke Count Fields Gate Record - 2026-05-18
 
 ### A. 목적

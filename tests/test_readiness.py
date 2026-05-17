@@ -6372,6 +6372,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "expected_live_checks": [],
         "preferred_env_key": None,
         "accepted_env_keys": [],
+        "next_setup_action": None,
         "status": "required",
         "network_call": False,
         "network_call_policy": None,
@@ -6394,6 +6395,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "expected_live_checks": [],
         "preferred_env_key": None,
         "accepted_env_keys": [],
+        "next_setup_action": None,
         "status": "ready",
         "network_call": False,
         "network_call_policy": None,
@@ -6462,6 +6464,10 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert (
         payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
         == []
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_next_setup_action"]
+        is None
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         "required"
@@ -8429,6 +8435,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "expected_live_checks": row["expected_live_checks"],
             "preferred_env_key": row["preferred_env_key"],
             "accepted_env_keys": row["accepted_env_keys"],
+            "next_setup_action": row["next_setup_action"],
             "status": row["status"],
             "network_call": row["network_call"],
             "network_call_policy": row["network_call_policy"],
@@ -8495,6 +8502,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         ]
         == {
             row["provider_family"]: row["accepted_env_keys"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_setup_actions_by_family"
+        ]
+        == {
+            row["provider_family"]: row["next_setup_action"]
             for row in payload["api_key_command_summary"]["provider_smoke_commands"]
         }
     )
@@ -8577,6 +8593,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
         == payload["api_key_setup_quickstart_next_command_plan_item"][
             "accepted_env_keys"
+        ]
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_next_setup_action"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "next_setup_action"
         ]
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (

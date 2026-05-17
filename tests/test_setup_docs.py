@@ -375,6 +375,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_setup_quickstart_next_command_plan_name" in guide
     assert "api_key_setup_quickstart_next_command_plan_kind" in guide
     assert "api_key_setup_quickstart_next_command_plan_command" in guide
+    assert "api_key_setup_quickstart_next_command_plan_next_setup_action" in guide
     assert "api_key_setup_quickstart_next_command_plan_status" in guide
     assert "api_key_setup_quickstart_next_command_plan_network_call" in guide
     assert (
@@ -890,6 +891,7 @@ def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
         "api_key_setup_quickstart_command_plan_expected_live_checks_by_family",
         "api_key_setup_quickstart_command_plan_preferred_env_key_by_family",
         "api_key_setup_quickstart_command_plan_accepted_env_keys_by_family",
+        "api_key_setup_quickstart_command_plan_next_setup_actions_by_family",
         "api_key_setup_quickstart_next_command_plan_item",
         "api_key_setup_quickstart_next_command_plan_name",
         "api_key_setup_quickstart_next_command_plan_kind",
@@ -903,6 +905,7 @@ def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
         "api_key_setup_quickstart_next_command_plan_expected_live_checks",
         "api_key_setup_quickstart_next_command_plan_preferred_env_key",
         "api_key_setup_quickstart_next_command_plan_accepted_env_keys",
+        "api_key_setup_quickstart_next_command_plan_next_setup_action",
         "api_key_setup_quickstart_next_command_plan_status",
         "api_key_setup_quickstart_next_command_plan_network_call",
         "api_key_setup_quickstart_next_command_plan_network_call_policy",

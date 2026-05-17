@@ -192,6 +192,7 @@ def _api_key_pipeline_summary_only_context(
                 "expected_live_checks": [],
                 "preferred_env_key": None,
                 "accepted_env_keys": [],
+                "next_setup_action": None,
                 "status": "required"
                 if copy_dotenv_command.get("required") is True
                 else "ready",
@@ -226,6 +227,7 @@ def _api_key_pipeline_summary_only_context(
                 "expected_live_checks": [],
                 "preferred_env_key": None,
                 "accepted_env_keys": [],
+                "next_setup_action": None,
                 "status": "ready",
                 "network_call": next_smoke_command.get("network_call") is True,
                 "network_call_policy": next_smoke_command.get(
@@ -258,6 +260,7 @@ def _api_key_pipeline_summary_only_context(
                 ),
                 "preferred_env_key": row.get("preferred_env_key"),
                 "accepted_env_keys": _string_list(row.get("accepted_env_keys")),
+                "next_setup_action": row.get("next_setup_action"),
                 "status": row.get("status"),
                 "network_call": row.get("network_call") is True,
                 "network_call_policy": row.get("network_call_policy"),
@@ -282,6 +285,7 @@ def _api_key_pipeline_summary_only_context(
                 "expected_live_checks": [],
                 "preferred_env_key": None,
                 "accepted_env_keys": [],
+                "next_setup_action": None,
                 "status": "ready"
                 if setup_status_summary.get("ready_to_run_live_smoke") is True
                 else "blocked",

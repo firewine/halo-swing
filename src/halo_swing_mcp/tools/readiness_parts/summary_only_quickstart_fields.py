@@ -92,6 +92,10 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             row["provider_family"]: _string_list(row.get("accepted_env_keys"))
             for row in provider_rows
         },
+        "api_key_setup_quickstart_command_plan_next_setup_actions_by_family": {
+            row["provider_family"]: row.get("next_setup_action")
+            for row in provider_rows
+        },
     }
 
 
@@ -137,6 +141,9 @@ def _api_key_setup_quickstart_next_command_plan_fields(
         ),
         "api_key_setup_quickstart_next_command_plan_accepted_env_keys": (
             _string_list(next_quickstart_command_plan_row.get("accepted_env_keys"))
+        ),
+        "api_key_setup_quickstart_next_command_plan_next_setup_action": (
+            next_quickstart_command_plan_row.get("next_setup_action")
         ),
         "api_key_setup_quickstart_next_command_plan_status": (
             next_quickstart_command_plan_row.get("status")
