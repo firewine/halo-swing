@@ -874,6 +874,61 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.861 API Key Integration Status Next Action Dotenv Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.860에서 nested `api_key_integration_status_summary`가 다음 action의 required env-key
+이름과 network call policy를 직접 보여주게 됐다. 하지만 API 키만 넣는 연동 흐름의 첫
+단계인 `.env` 준비에서는 nested row만 읽을 때 다음 단계, source/target path,
+secret-input 여부, dotenv example handoff를 아직 top-level mirror에서 확인해야 했다.
+이번 slice는 no-secret dotenv handoff fields를 next action summary와 integration status
+summary 안에 포함해, compact client가 copy `.env` 이후 어떤 API key 입력 단계로 이어지는지
+한 row에서 표시할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_next_action_summary now preserves next_after_action, dotenv_target_path, source_path, target_path, and secret_input_required when the next operator action carries them
+  - api_key_integration_status_summary now includes next_action_next_after_action, next_action_dotenv_target_path, next_action_source_path, next_action_target_path, next_action_secret_input_required, next_action_dotenv_examples, and next_action_dotenv_example_count copied from api_key_next_action_summary
+  - README and DevOps setup guide document nested integration status next-action dotenv handoff fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key integration status next-action dotenv fields pytest: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 30 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 822 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct summary-only smoke confirmed api_key_integration_status_summary next_action_next_after_action fill_live_data_api_keys, next_action_dotenv_target_path .env, next_action_secret_input_required false, and secret_values_returned false
+```
+
 ## 3.860 API Key Integration Status Next Action Hint Fields Gate Record - 2026-05-17
 
 ### A. 목적

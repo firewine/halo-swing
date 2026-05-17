@@ -257,6 +257,22 @@ def _api_key_pipeline_next_action_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    next_after_action = next_operator_action.get("next_after_action")
+    dotenv_target_path = next_operator_action.get("dotenv_target_path")
+    source_path = next_operator_action.get("source_path")
+    target_path = next_operator_action.get("target_path")
+    if isinstance(next_after_action, str):
+        summary["next_after_action"] = next_after_action
+    if isinstance(dotenv_target_path, str):
+        summary["dotenv_target_path"] = dotenv_target_path
+    if isinstance(source_path, str):
+        summary["source_path"] = source_path
+    if isinstance(target_path, str):
+        summary["target_path"] = target_path
+    if "secret_input_required" in next_operator_action:
+        summary["secret_input_required"] = (
+            next_operator_action.get("secret_input_required") is True
+        )
     next_action_provider_family = (
         next_operator_action.get("provider_family")
         or next_provider_recovery_action.get("provider_family")

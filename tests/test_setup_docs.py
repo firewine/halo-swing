@@ -624,6 +624,13 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         "next_action_command",
         "next_action_required_env_keys",
         "next_action_network_call_policy",
+        "next_action_next_after_action",
+        "next_action_dotenv_target_path",
+        "next_action_source_path",
+        "next_action_target_path",
+        "next_action_secret_input_required",
+        "next_action_dotenv_examples",
+        "next_action_dotenv_example_count",
         "next_action_mutates_local_state",
         "next_action_secret_values_returned",
     )

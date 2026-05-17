@@ -424,6 +424,27 @@ def _api_key_integration_status_summary(
         "next_action_network_call_policy": api_key_next_action_summary.get(
             "next_action_network_call_policy"
         ),
+        "next_action_next_after_action": api_key_next_action_summary.get(
+            "next_after_action"
+        ),
+        "next_action_dotenv_target_path": api_key_next_action_summary.get(
+            "dotenv_target_path"
+        ),
+        "next_action_source_path": api_key_next_action_summary.get(
+            "source_path"
+        ),
+        "next_action_target_path": api_key_next_action_summary.get(
+            "target_path"
+        ),
+        "next_action_secret_input_required": (
+            api_key_next_action_summary.get("secret_input_required") is True
+        ),
+        "next_action_dotenv_examples": _string_list(
+            api_key_next_action_summary.get("dotenv_examples")
+        ),
+        "next_action_dotenv_example_count": (
+            api_key_next_action_summary.get("dotenv_example_count")
+        ),
         "next_action_mutates_local_state": (
             api_key_next_action_summary.get("next_action_mutates_local_state")
             is True
