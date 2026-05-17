@@ -783,6 +783,11 @@ def test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync() -> None:
         "api_key_provider_smoke_selected_provider_family_count",
         "api_key_provider_smoke_provider_route_live_data_required_family_count",
         "api_key_provider_smoke_provider_route_data_mode_counts",
+        "api_key_provider_smoke_expected_live_check_count",
+        "api_key_provider_smoke_expected_live_check_counts_by_family",
+        "api_key_provider_smoke_accepted_env_keys_by_family",
+        "api_key_provider_smoke_accepted_env_key_count",
+        "api_key_provider_smoke_accepted_env_key_counts_by_family",
     )
 
     for field_name in field_names:

@@ -969,8 +969,13 @@ It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_provider_route_data_mode_counts`,
 `api_key_provider_smoke_network_call_policies_by_family`,
 `api_key_provider_smoke_next_setup_actions_by_family`,
-`api_key_provider_smoke_expected_live_contracts_by_family`, and
-`api_key_provider_smoke_expected_live_checks_by_family`.
+`api_key_provider_smoke_expected_live_contracts_by_family`,
+`api_key_provider_smoke_expected_live_checks_by_family`,
+`api_key_provider_smoke_expected_live_check_count`,
+`api_key_provider_smoke_expected_live_check_counts_by_family`,
+`api_key_provider_smoke_accepted_env_keys_by_family`,
+`api_key_provider_smoke_accepted_env_key_count`, and
+`api_key_provider_smoke_accepted_env_key_counts_by_family`.
 Returned one-shot command summaries use `--summary-only --no-audit` for
 `run_api_key_pipeline_smoke`, so the displayed post-setup command opens the same
 compact response without requiring input JSON edits.

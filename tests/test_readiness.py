@@ -1218,6 +1218,33 @@ def provider_smoke_route_summary_from_payload(
     }
 
 
+def assert_provider_smoke_list_count_fields(payload: dict[str, Any]) -> None:
+    expected_live_check_counts_by_family = {
+        family: len(expected_live_checks)
+        for family, expected_live_checks in payload[
+            "api_key_provider_smoke_expected_live_checks_by_family"
+        ].items()
+    }
+    accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in payload[
+            "api_key_provider_smoke_accepted_env_keys_by_family"
+        ].items()
+    }
+    assert payload["api_key_provider_smoke_expected_live_check_count"] == sum(
+        expected_live_check_counts_by_family.values()
+    )
+    assert payload["api_key_provider_smoke_expected_live_check_counts_by_family"] == (
+        expected_live_check_counts_by_family
+    )
+    assert payload["api_key_provider_smoke_accepted_env_key_count"] == sum(
+        accepted_env_key_counts_by_family.values()
+    )
+    assert payload["api_key_provider_smoke_accepted_env_key_counts_by_family"] == (
+        accepted_env_key_counts_by_family
+    )
+
+
 def quickstart_command_plan_route_summary_from_payload(
     payload: dict[str, Any],
 ) -> dict[str, Any]:
@@ -7136,6 +7163,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_list_count_fields(payload)
     assert_route_count_top_level_fields(
         payload,
         prefix="api_key_setup_quickstart_command_plan",
@@ -8242,6 +8270,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "secret_values_not_returned",
         ],
     }
+    assert payload["api_key_provider_smoke_accepted_env_keys_by_family"] == {
+        row["provider_family"]: row["accepted_env_keys"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
+    assert_provider_smoke_list_count_fields(payload)
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
@@ -10948,6 +10981,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_list_count_fields(payload)
     assert_route_count_top_level_fields(
         payload,
         prefix="api_key_setup_quickstart_command_plan",
@@ -10964,6 +10998,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     }
     assert payload["api_key_provider_smoke_expected_live_checks_by_family"] == {
         row["provider_family"]: row["expected_live_checks"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_accepted_env_keys_by_family"] == {
+        row["provider_family"]: row["accepted_env_keys"]
         for row in command_summary["provider_smoke_commands"]
     }
     assert command_summary["next_provider_smoke_command_name"] == (

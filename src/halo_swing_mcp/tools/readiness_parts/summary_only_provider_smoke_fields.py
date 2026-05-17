@@ -61,6 +61,20 @@ def _api_key_provider_smoke_top_level_fields(
             provider_smoke_provider_route_live_data_required_by_family
         ),
     }
+    provider_smoke_expected_live_check_counts_by_family = {
+        family: len(_string_list(row.get("expected_live_checks")))
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_accepted_env_keys_by_family = {
+        family: _string_list(row.get("accepted_env_keys"))
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in (
+            provider_smoke_accepted_env_keys_by_family.items()
+        )
+    }
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -165,6 +179,21 @@ def _api_key_provider_smoke_top_level_fields(
             family: _string_list(row.get("expected_live_checks"))
             for family, row in provider_smoke_command_rows_by_family.items()
         },
+        "api_key_provider_smoke_expected_live_check_count": sum(
+            provider_smoke_expected_live_check_counts_by_family.values()
+        ),
+        "api_key_provider_smoke_expected_live_check_counts_by_family": (
+            provider_smoke_expected_live_check_counts_by_family
+        ),
+        "api_key_provider_smoke_accepted_env_keys_by_family": (
+            provider_smoke_accepted_env_keys_by_family
+        ),
+        "api_key_provider_smoke_accepted_env_key_count": sum(
+            provider_smoke_accepted_env_key_counts_by_family.values()
+        ),
+        "api_key_provider_smoke_accepted_env_key_counts_by_family": (
+            provider_smoke_accepted_env_key_counts_by_family
+        ),
     }
 
 
