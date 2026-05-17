@@ -237,6 +237,21 @@ def _api_key_provider_recovery_summary(
         "next_pending_recovery_provider": (
             first_pending_item.get("provider") if first_pending_item else None
         ),
+        "next_pending_recovery_selected_provider_class": (
+            first_pending_item.get("selected_provider_class")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_provider_route_data_mode": (
+            first_pending_item.get("provider_route_data_mode")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_provider_route_live_data_required": (
+            first_pending_item.get("provider_route_live_data_required") is True
+            if first_pending_item
+            else False
+        ),
         "next_pending_recovery_next_setup_action": (
             first_pending_item.get("next_setup_action")
             if first_pending_item
@@ -286,6 +301,21 @@ def _api_key_provider_recovery_summary(
         ),
         "next_blocked_recovery_provider": (
             first_blocked_item.get("provider") if first_blocked_item else None
+        ),
+        "next_blocked_recovery_selected_provider_class": (
+            first_blocked_item.get("selected_provider_class")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_provider_route_data_mode": (
+            first_blocked_item.get("provider_route_data_mode")
+            if first_blocked_item
+            else None
+        ),
+        "next_blocked_recovery_provider_route_live_data_required": (
+            first_blocked_item.get("provider_route_live_data_required") is True
+            if first_blocked_item
+            else False
         ),
         "next_blocked_recovery_next_setup_action": (
             first_blocked_item.get("next_setup_action")

@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.881 API Key Pending And Blocked Recovery Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.880에서 첫 `next_recovery_*` row의 no-secret provider route evidence를 top-level
+payload로 올렸다. 하지만 pending-only 또는 blocked-only recovery row를 직접 읽는 client는
+아직 `next_pending_recovery_*`와 `next_blocked_recovery_*`에서 selected provider class,
+route data mode, live-data-required evidence를 바로 볼 수 없다. 이번 slice는 같은 route
+evidence를 next pending/blocked recovery mirrors에 추가해, API 키만 채우는 live setup
+흐름에서 nested summary를 파싱하지 않아도 다음 pending retry와 blocked provider row의
+실제 live provider route를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary mirrors selected provider class, route data mode, and live-data-required evidence for next pending recovery items
+  - api_key_provider_recovery_summary mirrors selected provider class, route data mode, and live-data-required evidence for next blocked recovery items
+  - api_key_integration_status_summary mirrors the same next pending and blocked recovery route evidence
+  - full and summary-only top-level payloads expose next_pending_recovery_* and next_blocked_recovery_* route evidence without nested parsing
+  - README and DevOps setup guide document next pending and blocked recovery route fields
+  - tests cover pending, blocked, integration summary, summary-only, and fake-key no-secret paths
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key pending and blocked recovery route fields pytest: 7 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 35 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 827 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed next_pending_recovery_selected_provider_class, next_pending_recovery_provider_route_data_mode, next_pending_recovery_provider_route_live_data_required, and blocked defaults without secret values
+```
+
 ## 3.880 API Key Next Recovery Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

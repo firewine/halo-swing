@@ -714,6 +714,16 @@ def _api_key_pipeline_summary_only_payload(
         "next_pending_recovery_provider": payload.get(
             "next_pending_recovery_provider"
         ),
+        "next_pending_recovery_selected_provider_class": payload.get(
+            "next_pending_recovery_selected_provider_class"
+        ),
+        "next_pending_recovery_provider_route_data_mode": payload.get(
+            "next_pending_recovery_provider_route_data_mode"
+        ),
+        "next_pending_recovery_provider_route_live_data_required": (
+            payload.get("next_pending_recovery_provider_route_live_data_required")
+            is True
+        ),
         "next_pending_recovery_next_setup_action": payload.get(
             "next_pending_recovery_next_setup_action"
         ),
@@ -747,6 +757,16 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "next_blocked_recovery_provider": payload.get(
             "next_blocked_recovery_provider"
+        ),
+        "next_blocked_recovery_selected_provider_class": payload.get(
+            "next_blocked_recovery_selected_provider_class"
+        ),
+        "next_blocked_recovery_provider_route_data_mode": payload.get(
+            "next_blocked_recovery_provider_route_data_mode"
+        ),
+        "next_blocked_recovery_provider_route_live_data_required": (
+            payload.get("next_blocked_recovery_provider_route_live_data_required")
+            is True
         ),
         "next_blocked_recovery_next_setup_action": payload.get(
             "next_blocked_recovery_next_setup_action"

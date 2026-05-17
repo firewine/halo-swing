@@ -232,6 +232,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_pending_recovery_smoke_command" in guide
     assert "next_pending_recovery_provider_family" in guide
     assert "next_pending_recovery_provider" in guide
+    assert "next_pending_recovery_selected_provider_class" in guide
+    assert "next_pending_recovery_provider_route_data_mode" in guide
+    assert "next_pending_recovery_provider_route_live_data_required" in guide
     assert "next_pending_recovery_next_setup_action" in guide
     assert "next_pending_recovery_preferred_env_key" in guide
     assert "next_pending_recovery_accepted_env_keys" in guide
@@ -244,6 +247,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_blocked_recovery_smoke_command" in guide
     assert "next_blocked_recovery_provider_family" in guide
     assert "next_blocked_recovery_provider" in guide
+    assert "next_blocked_recovery_selected_provider_class" in guide
+    assert "next_blocked_recovery_provider_route_data_mode" in guide
+    assert "next_blocked_recovery_provider_route_live_data_required" in guide
     assert "next_blocked_recovery_next_setup_action" in guide
     assert "next_blocked_recovery_preferred_env_key" in guide
     assert "next_blocked_recovery_accepted_env_keys" in guide
@@ -1067,6 +1073,9 @@ def test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync()
         "next_pending_recovery_smoke_command",
         "next_pending_recovery_provider_family",
         "next_pending_recovery_provider",
+        "next_pending_recovery_selected_provider_class",
+        "next_pending_recovery_provider_route_data_mode",
+        "next_pending_recovery_provider_route_live_data_required",
         "next_pending_recovery_next_setup_action",
         "next_pending_recovery_preferred_env_key",
         "next_pending_recovery_accepted_env_keys",
@@ -1079,6 +1088,9 @@ def test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync()
         "next_blocked_recovery_smoke_command",
         "next_blocked_recovery_provider_family",
         "next_blocked_recovery_provider",
+        "next_blocked_recovery_selected_provider_class",
+        "next_blocked_recovery_provider_route_data_mode",
+        "next_blocked_recovery_provider_route_live_data_required",
         "next_blocked_recovery_next_setup_action",
         "next_blocked_recovery_preferred_env_key",
         "next_blocked_recovery_accepted_env_keys",

@@ -441,7 +441,8 @@ It also exposes top-level summary-only next recovery fields:
 `next_recovery_mutates_local_state`, `next_recovery_exception_type`,
 `next_recovery_exception_message_returned`, `next_recovery_url_returned`,
 `next_recovery_secret_values_returned`, plus matching
-`next_pending_recovery_*` and `next_blocked_recovery_*` fields.
+`next_pending_recovery_*` and `next_blocked_recovery_*` fields, including
+selected provider class, route data mode, and live-data-required mirrors.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,
@@ -626,6 +627,9 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `next_pending_recovery_smoke_command_name`,
 `next_pending_recovery_smoke_command`,
 `next_pending_recovery_provider_family`, `next_pending_recovery_provider`,
+`next_pending_recovery_selected_provider_class`,
+`next_pending_recovery_provider_route_data_mode`,
+`next_pending_recovery_provider_route_live_data_required`,
 `next_pending_recovery_next_setup_action`,
 `next_pending_recovery_preferred_env_key`,
 `next_pending_recovery_accepted_env_keys`,
@@ -637,6 +641,9 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `next_blocked_recovery_smoke_command_name`,
 `next_blocked_recovery_smoke_command`,
 `next_blocked_recovery_provider_family`, `next_blocked_recovery_provider`,
+`next_blocked_recovery_selected_provider_class`,
+`next_blocked_recovery_provider_route_data_mode`,
+`next_blocked_recovery_provider_route_live_data_required`,
 `next_blocked_recovery_next_setup_action`,
 `next_blocked_recovery_preferred_env_key`,
 `next_blocked_recovery_accepted_env_keys`,
@@ -895,6 +902,9 @@ mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
 `next_pending_recovery_smoke_command`,
 `next_pending_recovery_provider_family`, `next_pending_recovery_provider`,
+`next_pending_recovery_selected_provider_class`,
+`next_pending_recovery_provider_route_data_mode`,
+`next_pending_recovery_provider_route_live_data_required`,
 `next_pending_recovery_next_setup_action`,
 `next_pending_recovery_preferred_env_key`,
 `next_pending_recovery_accepted_env_keys`,
@@ -906,6 +916,9 @@ mirrors the first pending recovery command as
 recovery item as `next_blocked_recovery_smoke_command_name`,
 `next_blocked_recovery_smoke_command`,
 `next_blocked_recovery_provider_family`, `next_blocked_recovery_provider`,
+`next_blocked_recovery_selected_provider_class`,
+`next_blocked_recovery_provider_route_data_mode`,
+`next_blocked_recovery_provider_route_live_data_required`,
 `next_blocked_recovery_next_setup_action`,
 `next_blocked_recovery_preferred_env_key`,
 `next_blocked_recovery_accepted_env_keys`,

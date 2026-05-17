@@ -684,6 +684,22 @@ def _api_key_integration_status_summary(
         "next_pending_recovery_provider": (
             api_key_provider_recovery_summary.get("next_pending_recovery_provider")
         ),
+        "next_pending_recovery_selected_provider_class": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_selected_provider_class"
+            )
+        ),
+        "next_pending_recovery_provider_route_data_mode": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_provider_route_data_mode"
+            )
+        ),
+        "next_pending_recovery_provider_route_live_data_required": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_provider_route_live_data_required"
+            )
+            is True
+        ),
         "next_pending_recovery_next_setup_action": (
             api_key_provider_recovery_summary.get(
                 "next_pending_recovery_next_setup_action"
@@ -740,6 +756,22 @@ def _api_key_integration_status_summary(
         ),
         "next_blocked_recovery_provider": (
             api_key_provider_recovery_summary.get("next_blocked_recovery_provider")
+        ),
+        "next_blocked_recovery_selected_provider_class": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_selected_provider_class"
+            )
+        ),
+        "next_blocked_recovery_provider_route_data_mode": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_provider_route_data_mode"
+            )
+        ),
+        "next_blocked_recovery_provider_route_live_data_required": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_provider_route_live_data_required"
+            )
+            is True
         ),
         "next_blocked_recovery_next_setup_action": (
             api_key_provider_recovery_summary.get(
