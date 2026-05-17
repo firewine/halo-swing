@@ -5525,6 +5525,26 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_required_provider_family_count"] == 3
     assert payload["api_key_setup_ready_to_run_live_smoke"] is False
     assert payload["api_key_setup_provider_route_status"] == "blocked"
+    assert payload["api_key_required_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["api_key_required_env_key_count"] == 3
+    assert payload["api_key_configured_env_keys"] == []
+    assert payload["api_key_configured_env_key_count"] == 0
+    assert payload["api_key_requirement_configured_provider_families"] == []
+    assert payload["api_key_requirement_missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_provider_requirement_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_provider_requirement_count"] == 3
     assert payload["api_key_copy_dotenv_command"] == "cp .env.example .env"
     assert payload["api_key_copy_dotenv_required"] is True
     assert payload["api_key_next_smoke_command_name"] == (
@@ -6860,6 +6880,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert requirements["configured_env_keys"] == ["POLYGON_API_KEY"]
     assert requirements["configured_provider_families"] == ["market"]
     assert requirements["missing_provider_families"] == ["macro", "news"]
+    assert payload["api_key_required_env_keys"] == requirements["required_env_keys"]
+    assert payload["api_key_required_env_key_count"] == 3
+    assert payload["api_key_configured_env_keys"] == (
+        requirements["configured_env_keys"]
+    )
+    assert payload["api_key_configured_env_key_count"] == 1
+    assert payload["api_key_requirement_configured_provider_families"] == (
+        requirements["configured_provider_families"]
+    )
+    assert payload["api_key_requirement_missing_provider_families"] == (
+        requirements["missing_provider_families"]
+    )
+    assert payload["api_key_provider_requirement_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_provider_requirement_count"] == 3
     assert requirements["provider_requirements"]["market"]["configured"] is True
     assert requirements["provider_requirements"]["macro"]["preferred_env_key"] == (
         "FRED_API_KEY"

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_COMMAND_SUMMARY_MIRRORS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_COMMAND_SUMMARY_MIRRORS_GATE
+status: API_KEY_TOP_LEVEL_REQUIREMENTS_MIRRORS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_REQUIREMENTS_MIRRORS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror API-key command summary onto summary-only top-level fields
+next_atomic_step: mirror API-key requirements summary onto summary-only top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,25 +74,36 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_copy_dotenv_command and api_key_copy_dotenv_required mirror the command summary dotenv copy command
-  - summary-only top-level api_key_next_smoke_command and api_key_next_smoke_command_name mirror the command summary next smoke command
-  - summary-only top-level api_key_one_shot_pipeline_smoke_command mirrors the compact one-shot pipeline smoke command
-  - summary-only top-level api_key_provider_smoke_command_count and api_key_provider_smoke_command_names mirror provider smoke command metadata
-  - README and DevOps setup guide document top-level API-key command summary mirrors
-  - setup docs tests assert the new top-level command summary mirror guidance
+  - summary-only top-level api_key_required_env_keys and api_key_required_env_key_count mirror required API-key names
+  - summary-only top-level api_key_configured_env_keys and api_key_configured_env_key_count mirror configured API-key names without values
+  - summary-only top-level api_key_requirement_configured_provider_families and api_key_requirement_missing_provider_families mirror requirements provider-family state
+  - summary-only top-level api_key_provider_requirement_families and api_key_provider_requirement_count mirror provider requirement coverage
+  - README and DevOps setup guide document top-level API-key requirement mirrors
+  - setup docs tests assert the new top-level requirement mirror guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level command summary mirrors gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level requirements mirrors gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_COMMAND_SUMMARY_MIRRORS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_COMMAND_SUMMARY_MIRRORS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror API-key command summary onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -2979,14 +2990,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Top-Level Command Summary Mirrors Gate is verified.
-Summary-only top-level payload now mirrors no-secret command summary metadata
-for dotenv copy, next smoke, one-shot pipeline smoke, and provider smoke command
-names/count. Focused tests, direct summary-only smoke, full pytest, ruff, and
-health_check passed.
+Summary: API Key Top-Level Requirements Mirrors Gate is verified.
+Summary-only top-level payload now mirrors no-secret API-key requirements
+metadata for required/configured key names and provider requirement coverage.
+Focused tests, direct summary-only smoke, targeted payload print, full pytest,
+ruff, and health_check passed.
 
 ```yaml
-api_key_top_level_command_summary_mirrors_gate:
+api_key_top_level_requirements_mirrors_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2999,12 +3010,12 @@ api_key_top_level_command_summary_mirrors_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary-only top-level api_key_copy_dotenv_command and api_key_copy_dotenv_required mirror command summary dotenv copy metadata
-    - summary-only top-level api_key_next_smoke_command and api_key_next_smoke_command_name mirror command summary next smoke metadata
-    - summary-only top-level api_key_one_shot_pipeline_smoke_command mirrors the compact one-shot pipeline smoke command
-    - summary-only top-level api_key_provider_smoke_command_count and api_key_provider_smoke_command_names mirror provider smoke command metadata
-    - README and DevOps setup guide document top-level API-key command summary mirrors
-    - setup docs tests assert top-level command summary mirror guidance
+    - summary-only top-level api_key_required_env_keys and api_key_required_env_key_count mirror required API-key names
+    - summary-only top-level api_key_configured_env_keys and api_key_configured_env_key_count mirror configured API-key names without values
+    - summary-only top-level api_key_requirement_configured_provider_families and api_key_requirement_missing_provider_families mirror requirements provider-family state
+    - summary-only top-level api_key_provider_requirement_families and api_key_provider_requirement_count mirror provider requirement coverage
+    - README and DevOps setup guide document top-level API-key requirement mirrors
+    - setup docs tests assert top-level requirement mirror guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3015,16 +3026,31 @@ api_key_top_level_command_summary_mirrors_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level command summary mirrors present; secret_values_returned false
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level requirement mirrors present; secret_values_returned false
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "800 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_required_env_keys"], p["api_key_required_env_key_count"], p["api_key_configured_env_keys"], p["api_key_provider_requirement_families"], p["secret_values_returned"])'
+      result: "['POLYGON_API_KEY', 'FRED_API_KEY', 'NEWS_API_KEY'] 3 [] ['market', 'macro', 'news'] False"
+```
+
+Previous verification:
+
+Summary: API Key Top-Level Command Summary Mirrors Gate is verified.
+Summary-only top-level payload now mirrors no-secret command summary metadata
+for dotenv copy, next smoke, one-shot pipeline smoke, and provider smoke command
+names/count. Focused tests, direct summary-only smoke, full pytest, ruff, and
+health_check passed.
+
+```yaml
+api_key_top_level_command_summary_mirrors_gate:
+  status: verified
 ```
 
 Previous verification:

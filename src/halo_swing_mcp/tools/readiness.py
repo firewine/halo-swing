@@ -3021,6 +3021,15 @@ def _api_key_pipeline_summary_only_payload(
         _optional_mapping(payload.get("api_key_operator_checklist")) or {}
     )
     setup_status_summary = _optional_mapping(payload.get("setup_status_summary")) or {}
+    api_key_requirements_summary = _optional_mapping(
+        payload.get("api_key_requirements_summary")
+    ) or {}
+    provider_requirements = _optional_mapping(
+        api_key_requirements_summary.get("provider_requirements")
+    ) or {}
+    provider_requirement_families = _ordered_unique_strings(
+        provider_requirements.keys()
+    )
     api_key_command_summary = _optional_mapping(
         payload.get("api_key_command_summary")
     ) or {}
@@ -3177,6 +3186,26 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_provider_route_status": setup_status_summary.get(
             "provider_route_status"
         ),
+        "api_key_required_env_keys": _string_list(
+            api_key_requirements_summary.get("required_env_keys")
+        ),
+        "api_key_required_env_key_count": len(
+            _string_list(api_key_requirements_summary.get("required_env_keys"))
+        ),
+        "api_key_configured_env_keys": _string_list(
+            api_key_requirements_summary.get("configured_env_keys")
+        ),
+        "api_key_configured_env_key_count": len(
+            _string_list(api_key_requirements_summary.get("configured_env_keys"))
+        ),
+        "api_key_requirement_configured_provider_families": _string_list(
+            api_key_requirements_summary.get("configured_provider_families")
+        ),
+        "api_key_requirement_missing_provider_families": _string_list(
+            api_key_requirements_summary.get("missing_provider_families")
+        ),
+        "api_key_provider_requirement_families": provider_requirement_families,
+        "api_key_provider_requirement_count": len(provider_requirement_families),
         "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
         "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
         "api_key_next_smoke_command": next_smoke_command.get("command"),
@@ -3205,10 +3234,7 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("live_data_setup_summary")
         )
         or {},
-        "api_key_requirements_summary": _optional_mapping(
-            payload.get("api_key_requirements_summary")
-        )
-        or {},
+        "api_key_requirements_summary": api_key_requirements_summary,
         "api_key_command_summary": api_key_command_summary,
         "api_key_setup_file_summary": _optional_mapping(
             payload.get("api_key_setup_file_summary")

@@ -428,6 +428,14 @@ It keeps `api_key_requirements_summary`
 `configured_provider_families`, and per-family `provider_requirements`
 including `preferred_env_key` and `accepted_env_keys`, so the compact response
 still shows which API-key names to fill without returning secret values.
+For compact clients that read only top-level fields, summary-only output also
+mirrors requirement metadata as `api_key_required_env_keys`,
+`api_key_required_env_key_count`, `api_key_configured_env_keys`,
+`api_key_configured_env_key_count`,
+`api_key_requirement_configured_provider_families`,
+`api_key_requirement_missing_provider_families`,
+`api_key_provider_requirement_families`, and
+`api_key_provider_requirement_count`.
 It keeps `api_key_operator_checklist_summary`
 (`api_key_operator_checklist_summary.v1`) with `current_step`, `ready`,
 ready/blocking step names and counts, `next_blocking_action_name`,

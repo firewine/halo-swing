@@ -360,6 +360,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "required_env_keys" in guide
     assert "accepted_env_keys" in guide
     assert "provider_requirements" in guide
+    assert "api_key_required_env_keys" in guide
+    assert "api_key_required_env_key_count" in guide
+    assert "api_key_configured_env_keys" in guide
+    assert "api_key_configured_env_key_count" in guide
+    assert "api_key_requirement_configured_provider_families" in guide
+    assert "api_key_requirement_missing_provider_families" in guide
+    assert "api_key_provider_requirement_families" in guide
+    assert "api_key_provider_requirement_count" in guide
     assert "keeps `api_key_command_summary`" in guide
     assert "api_key_pipeline_api_key_command_summary.v1" in guide
     assert "provider_smoke_commands" in guide
