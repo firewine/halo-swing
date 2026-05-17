@@ -529,6 +529,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_requirement_missing_provider_families" in guide
     assert "api_key_provider_requirement_families" in guide
     assert "api_key_provider_requirement_count" in guide
+    assert "api_key_provider_requirement_required_env_keys" in guide
+    assert "api_key_provider_requirement_missing_env_keys" in guide
     assert "api_key_provider_requirement_preferred_env_keys" in guide
     assert "api_key_provider_requirement_accepted_env_keys" in guide
     assert "api_key_provider_requirement_setup_statuses" in guide
@@ -1026,7 +1028,9 @@ def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
         "api_key_provider_requirement_families",
         "api_key_provider_requirement_count",
         "api_key_provider_requirement_providers",
+        "api_key_provider_requirement_required_env_keys",
         "api_key_provider_requirement_configured_env_keys",
+        "api_key_provider_requirement_missing_env_keys",
         "api_key_provider_requirement_preferred_env_keys",
         "api_key_provider_requirement_accepted_env_keys",
         "api_key_provider_requirement_setup_statuses",

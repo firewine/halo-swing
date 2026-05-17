@@ -769,10 +769,13 @@ def expected_api_key_requirements_summary(
     provider_requirements = {}
     for provider_family, action in provider_setup_actions.items():
         configured_env_keys.extend(action["configured_env_keys"])
+        required_env_keys = [action["preferred_env_key"]]
         provider_requirements[provider_family] = {
             "provider": action["provider"],
             "configured": action["configured"],
+            "required_env_keys": required_env_keys,
             "configured_env_keys": action["configured_env_keys"],
+            "missing_env_keys": [] if action["configured"] else required_env_keys,
             "preferred_env_key": action["preferred_env_key"],
             "accepted_env_keys": action["accepted_env_keys"],
             "setup_status": action["setup_status"],
@@ -1633,6 +1636,14 @@ def assert_api_key_requirements_summary_top_level_fields(
     }
     assert payload["api_key_provider_requirement_configured_env_keys"] == {
         family: row["configured_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_required_env_keys"] == {
+        family: row["required_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_missing_env_keys"] == {
+        family: row["missing_env_keys"]
         for family, row in provider_requirements.items()
     }
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
@@ -10412,6 +10423,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_provider_requirement_accepted_env_keys"] == {
         family: row["accepted_env_keys"]
         for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_required_env_keys"] == {
+        "market": ["POLYGON_API_KEY"],
+        "macro": ["FRED_API_KEY"],
+        "news": ["NEWS_API_KEY"],
+    }
+    assert payload["api_key_provider_requirement_missing_env_keys"] == {
+        "market": [],
+        "macro": ["FRED_API_KEY"],
+        "news": ["NEWS_API_KEY"],
     }
     assert payload["api_key_provider_requirement_setup_statuses"] == {
         family: row["setup_status"]

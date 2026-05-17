@@ -228,13 +228,21 @@ def _api_key_pipeline_api_key_requirements_summary(
         action = _optional_mapping(raw_action) or {}
         preferred_env_key = action.get("preferred_env_key")
         action_configured_env_keys = _string_list(action.get("configured_env_keys"))
+        action_required_env_keys = (
+            [preferred_env_key] if isinstance(preferred_env_key, str) else []
+        )
         if isinstance(preferred_env_key, str):
             required_env_keys.append(preferred_env_key)
         configured_env_keys.extend(action_configured_env_keys)
+        configured = action.get("configured")
         provider_requirements[provider_family] = {
             "provider": action.get("provider"),
-            "configured": action.get("configured"),
+            "configured": configured,
+            "required_env_keys": action_required_env_keys,
             "configured_env_keys": action_configured_env_keys,
+            "missing_env_keys": (
+                [] if configured is True else action_required_env_keys
+            ),
             "preferred_env_key": preferred_env_key,
             "accepted_env_keys": _string_list(action.get("accepted_env_keys")),
             "setup_status": action.get("setup_status"),

@@ -518,7 +518,9 @@ mirrors requirement metadata as `api_key_requirement_schema_version`,
 `api_key_provider_requirement_count`.
 It also mirrors per-family provider requirement hints as
 `api_key_provider_requirement_providers`,
+`api_key_provider_requirement_required_env_keys`,
 `api_key_provider_requirement_configured_env_keys`,
+`api_key_provider_requirement_missing_env_keys`,
 `api_key_provider_requirement_preferred_env_keys`,
 `api_key_provider_requirement_accepted_env_keys`,
 `api_key_provider_requirement_setup_statuses`,
