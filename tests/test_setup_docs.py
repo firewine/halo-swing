@@ -719,6 +719,31 @@ def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_required_env_keys",
+        "api_key_required_env_key_count",
+        "api_key_configured_env_keys",
+        "api_key_configured_env_key_count",
+        "api_key_requirement_configured_provider_families",
+        "api_key_requirement_missing_provider_families",
+        "api_key_provider_requirement_families",
+        "api_key_provider_requirement_count",
+        "api_key_provider_requirement_preferred_env_keys",
+        "api_key_provider_requirement_accepted_env_keys",
+        "api_key_provider_requirement_setup_statuses",
+        "api_key_provider_requirement_configured",
+        "api_key_provider_requirement_next_setup_actions",
+        "api_key_provider_requirement_smoke_command_names",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
