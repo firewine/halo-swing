@@ -265,6 +265,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "keeps\ntop-level `next_operator_action`" in guide
     assert "summary-only top-level provider smoke aggregates" in guide
     assert "provider\nsuccess contracts/checks" in guide
+    assert "summary-only provider smoke status aggregate" in guide
+    assert "provider_smoke_success_count" in guide
+    assert "provider_smoke_all_successful" in guide
+    assert "provider_smoke_success_provider_families" in guide
+    assert "provider_smoke_success_providers" in guide
+    assert "provider_smoke_success_smoke_command_names" in guide
     assert "matches\n`readiness_summary.next_operator_action`" in guide
     assert "next_operator_action_command" in guide
     assert "top-level summary-only recovery env hints and network policies" in guide

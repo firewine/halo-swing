@@ -5241,6 +5241,23 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         fake_provider_smoke_summaries
     )
     assert summary_payload["provider_smoke_summary_count"] == 3
+    assert summary_payload["provider_smoke_success_count"] == 3
+    assert summary_payload["provider_smoke_all_successful"] is True
+    assert summary_payload["provider_smoke_success_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert summary_payload["provider_smoke_success_providers"] == [
+        "polygon",
+        "fred",
+        "newsapi",
+    ]
+    assert summary_payload["provider_smoke_success_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
     assert (
         summary_payload["provider_smoke_summaries"][0]["provider_family"]
         == "market"

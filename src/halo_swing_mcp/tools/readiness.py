@@ -2962,6 +2962,20 @@ def _api_key_pipeline_summary_only_payload(
         if isinstance(provider_smoke_summaries, list)
         else []
     )
+    raw_provider_smoke_summary_count = live_data_smoke_summary.get(
+        "provider_smoke_summary_count"
+    )
+    provider_smoke_summary_count = (
+        raw_provider_smoke_summary_count
+        if isinstance(raw_provider_smoke_summary_count, int)
+        else len(provider_smoke_rows)
+    )
+    provider_smoke_success_rows = [
+        row
+        for row in provider_smoke_rows
+        if row.get("passed") is True or row.get("status") == "ok"
+    ]
+    provider_smoke_success_count = len(provider_smoke_success_rows)
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3094,9 +3108,20 @@ def _api_key_pipeline_summary_only_payload(
             )
         ),
         "provider_smoke_summaries": provider_smoke_rows,
-        "provider_smoke_summary_count": live_data_smoke_summary.get(
-            "provider_smoke_summary_count",
-            len(provider_smoke_rows),
+        "provider_smoke_summary_count": provider_smoke_summary_count,
+        "provider_smoke_success_count": provider_smoke_success_count,
+        "provider_smoke_all_successful": (
+            provider_smoke_summary_count > 0
+            and provider_smoke_success_count == provider_smoke_summary_count
+        ),
+        "provider_smoke_success_provider_families": _ordered_unique_strings(
+            [row.get("provider_family") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_providers": _ordered_unique_strings(
+            [row.get("provider") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_smoke_command_names": _ordered_unique_strings(
+            [row.get("smoke_command_name") for row in provider_smoke_success_rows]
         ),
         "api_key_failure_category": payload.get("api_key_failure_category"),
         "api_key_has_failures": payload.get("api_key_has_failures") is True,
