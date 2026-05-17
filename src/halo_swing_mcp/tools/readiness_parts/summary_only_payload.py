@@ -1,0 +1,907 @@
+# ruff: noqa: F403,F405,F821
+"""Summary-only API-key pipeline payload assembly."""
+
+from __future__ import annotations
+
+from .context import *
+
+
+__all__ = ('_api_key_pipeline_summary_only_payload',)
+
+
+def _api_key_pipeline_summary_only_payload(
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    _summary_context = _api_key_pipeline_summary_only_context(payload)
+    input_payload = _summary_context['input_payload']
+    next_operator_action = _summary_context['next_operator_action']
+    next_provider_smoke = _summary_context['next_provider_smoke']
+    next_provider_recovery_action = _summary_context['next_provider_recovery_action']
+    api_key_next_action_summary = _summary_context['api_key_next_action_summary']
+    api_key_integration_status_summary = _summary_context['api_key_integration_status_summary']
+    provider_smoke_rows = _summary_context['provider_smoke_rows']
+    provider_smoke_summary_count = _summary_context['provider_smoke_summary_count']
+    provider_smoke_success_rows = _summary_context['provider_smoke_success_rows']
+    provider_smoke_success_count = _summary_context['provider_smoke_success_count']
+    provider_smoke_success_expected_live_checks = _summary_context['provider_smoke_success_expected_live_checks']
+    provider_smoke_success_network_call_count = _summary_context['provider_smoke_success_network_call_count']
+    provider_smoke_success_mutates_local_state_count = _summary_context['provider_smoke_success_mutates_local_state_count']
+    provider_smoke_success_secret_values_returned_count = _summary_context['provider_smoke_success_secret_values_returned_count']
+    provider_smoke_success_accepted_env_key_groups = _summary_context['provider_smoke_success_accepted_env_key_groups']
+    api_key_operator_checklist_summary = _summary_context['api_key_operator_checklist_summary']
+    setup_quickstart_rows = _summary_context['setup_quickstart_rows']
+    setup_status_summary = _summary_context['setup_status_summary']
+    api_key_setup_file_summary = _summary_context['api_key_setup_file_summary']
+    api_key_provider_selection_summary = _summary_context['api_key_provider_selection_summary']
+    api_key_requirements_summary = _summary_context['api_key_requirements_summary']
+    provider_requirement_families = _summary_context['provider_requirement_families']
+    provider_requirement_rows = _summary_context['provider_requirement_rows']
+    api_key_command_summary = _summary_context['api_key_command_summary']
+    copy_dotenv_command = _summary_context['copy_dotenv_command']
+    next_smoke_command = _summary_context['next_smoke_command']
+    one_shot_pipeline_smoke = _summary_context['one_shot_pipeline_smoke']
+    provider_smoke_command_rows = _summary_context['provider_smoke_command_rows']
+    provider_smoke_command_count = _summary_context['provider_smoke_command_count']
+    provider_smoke_command_rows_by_family = _summary_context['provider_smoke_command_rows_by_family']
+    quickstart_command_plan = _summary_context['quickstart_command_plan']
+    next_quickstart_command_plan_item = _summary_context['next_quickstart_command_plan_item']
+    next_quickstart_command_plan_row = _summary_context['next_quickstart_command_plan_row']
+    return {
+        "schema_version": "api_key_pipeline_smoke_summary_only.v1",
+        "status": payload.get("status"),
+        "summary_only": True,
+        "input": {
+            "asset": input_payload.get("asset"),
+            "timeframe": input_payload.get("timeframe"),
+            "symbols": input_payload.get("symbols"),
+            "topic": input_payload.get("topic"),
+            "summary_only": True,
+        },
+        "executed_tools": _string_list(payload.get("executed_tools")),
+        "next_operator_action_name": (
+            next_operator_action.get("name")
+            or api_key_next_action_summary.get("next_action_name")
+        ),
+        "next_operator_action_status": (
+            next_operator_action.get("status")
+            or api_key_next_action_summary.get("next_action_status")
+        ),
+        "next_operator_action_command": api_key_next_action_summary.get(
+            "next_action_command"
+        ),
+        "next_operator_action_next_after_action": next_operator_action.get(
+            "next_after_action"
+        ),
+        "next_operator_action_dotenv_target_path": next_operator_action.get(
+            "dotenv_target_path"
+        ),
+        "next_operator_action_source_path": next_operator_action.get("source_path"),
+        "next_operator_action_target_path": next_operator_action.get("target_path"),
+        "next_operator_action_provider_family": (
+            next_operator_action.get("provider_family")
+            or next_provider_recovery_action.get("provider_family")
+            or next_provider_smoke.get("provider_family")
+        ),
+        "next_operator_action_provider": (
+            next_operator_action.get("provider")
+            or next_provider_recovery_action.get("provider")
+            or next_provider_smoke.get("provider")
+        ),
+        "next_operator_action_smoke_command_name": (
+            next_operator_action.get("smoke_command_name")
+            or next_operator_action.get("next_provider_smoke_command_name")
+            or next_operator_action.get("next_provider_recovery_smoke_command_name")
+            or next_provider_recovery_action.get("smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "next_operator_action_expected_live_contract": (
+            api_key_next_action_summary.get("next_action_expected_live_contract")
+        ),
+        "next_operator_action_expected_live_checks": _string_list(
+            api_key_next_action_summary.get("next_action_expected_live_checks")
+        ),
+        "next_operator_action_network_call": (
+            api_key_next_action_summary.get("next_action_network_call") is True
+        ),
+        "next_operator_action_network_call_policy": next_operator_action.get(
+            "network_call_policy"
+        ),
+        "next_operator_action_mutates_local_state": (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
+        ),
+        "next_operator_action_secret_input_required": (
+            next_operator_action.get("secret_input_required") is True
+        ),
+        "next_operator_action_preferred_env_key": api_key_next_action_summary.get(
+            "preferred_env_key"
+        ),
+        "next_operator_action_accepted_env_keys": _string_list(
+            api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "next_operator_action_required_env_keys": _string_list(
+            api_key_next_action_summary.get("required_env_keys")
+        ),
+        "next_operator_action_dotenv_examples": _string_list(
+            api_key_next_action_summary.get("dotenv_examples")
+        ),
+        "next_operator_action_dotenv_example_count": (
+            api_key_next_action_summary.get("dotenv_example_count")
+        ),
+        "next_operator_action_secret_values_returned": (
+            next_operator_action.get("secret_values_returned") is True
+            or api_key_next_action_summary.get("secret_values_returned") is True
+        ),
+        "api_key_setup_current_step": api_key_operator_checklist_summary.get(
+            "current_step"
+        ),
+        "api_key_setup_ready": api_key_operator_checklist_summary.get("ready") is True,
+        "api_key_setup_step_count": api_key_operator_checklist_summary.get(
+            "step_count"
+        ),
+        "api_key_setup_ready_step_names": _string_list(
+            api_key_operator_checklist_summary.get("ready_step_names")
+        ),
+        "api_key_setup_ready_step_count": api_key_operator_checklist_summary.get(
+            "ready_step_count"
+        ),
+        "api_key_setup_blocking_step_names": _string_list(
+            api_key_operator_checklist_summary.get("blocking_step_names")
+        ),
+        "api_key_setup_blocking_step_count": api_key_operator_checklist_summary.get(
+            "blocking_step_count"
+        ),
+        "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
+            "next_blocking_step"
+        ),
+        "api_key_setup_quickstart_steps": setup_quickstart_rows,
+        "api_key_setup_quickstart_step_names": _ordered_unique_strings(
+            [row.get("name") for row in setup_quickstart_rows]
+        ),
+        "api_key_setup_quickstart_step_count": len(setup_quickstart_rows),
+        "api_key_setup_quickstart_next_step": (
+            api_key_operator_checklist_summary.get("next_blocking_step")
+        ),
+        "api_key_setup_quickstart_next_command": (
+            api_key_operator_checklist_summary.get("next_blocking_action_command")
+        ),
+        "api_key_setup_quickstart_command_plan": quickstart_command_plan,
+        "api_key_setup_quickstart_command_plan_names": _string_list(
+            [row.get("name") for row in quickstart_command_plan]
+        ),
+        "api_key_setup_quickstart_command_plan_count": len(
+            quickstart_command_plan
+        ),
+        "api_key_setup_quickstart_next_command_plan_item": (
+            next_quickstart_command_plan_item
+        ),
+        "api_key_setup_quickstart_next_command_plan_name": (
+            next_quickstart_command_plan_row.get("name")
+        ),
+        "api_key_setup_quickstart_next_command_plan_kind": (
+            next_quickstart_command_plan_row.get("kind")
+        ),
+        "api_key_setup_quickstart_next_command_plan_command": (
+            next_quickstart_command_plan_row.get("command")
+        ),
+        "api_key_setup_quickstart_next_command_plan_provider_family": (
+            next_quickstart_command_plan_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_next_command_plan_status": (
+            next_quickstart_command_plan_row.get("status")
+        ),
+        "api_key_setup_quickstart_next_command_plan_network_call": (
+            next_quickstart_command_plan_row.get("network_call") is True
+        ),
+        "api_key_setup_quickstart_next_command_plan_network_call_policy": (
+            next_quickstart_command_plan_row.get("network_call_policy")
+        ),
+        "api_key_setup_quickstart_next_command_plan_mutates_local_state": (
+            next_quickstart_command_plan_row.get("mutates_local_state") is True
+        ),
+        "api_key_setup_quickstart_next_command_plan_secret_values_returned": (
+            next_quickstart_command_plan_row.get("secret_values_returned") is True
+        ),
+        "api_key_setup_dotenv_example_lines": _string_list(
+            api_key_setup_file_summary.get("dotenv_examples")
+        ),
+        "api_key_setup_dotenv_example_line_count": len(
+            _string_list(api_key_setup_file_summary.get("dotenv_examples"))
+        ),
+        "api_key_setup_dotenv_example_env_keys": _string_list(
+            api_key_setup_file_summary.get("preferred_env_keys")
+        ),
+        "api_key_setup_dotenv_source_path": api_key_setup_file_summary.get(
+            "source_path"
+        ),
+        "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
+            "target_path"
+        ),
+        "api_key_provider_selection_status": (
+            api_key_provider_selection_summary.get("status")
+        ),
+        "api_key_provider_factory": (
+            api_key_provider_selection_summary.get("provider_factory")
+        ),
+        "api_key_selected_provider_classes": _string_list(
+            api_key_provider_selection_summary.get("selected_provider_classes")
+        ),
+        "api_key_selected_provider_class_count": (
+            api_key_provider_selection_summary.get("selected_provider_class_count")
+        ),
+        "api_key_selected_provider_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get("selected_provider_by_family")
+        )
+        or {},
+        "api_key_configured_env_keys_by_provider_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "configured_env_keys_by_provider_family"
+            )
+        )
+        or {},
+        "api_key_provider_env_key_hints_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "provider_env_key_hints_by_family"
+            )
+        )
+        or {},
+        "api_key_integration_status": (
+            api_key_integration_status_summary.get("status")
+        ),
+        "api_key_integration_api_keys_configured": (
+            api_key_integration_status_summary.get("api_keys_configured") is True
+        ),
+        "api_key_integration_dotenv_loading_enabled": (
+            api_key_integration_status_summary.get("dotenv_loading_enabled")
+            is True
+        ),
+        "api_key_integration_dotenv_target_exists": (
+            api_key_integration_status_summary.get("dotenv_target_exists") is True
+        ),
+        "api_key_integration_live_providers_selected": (
+            api_key_integration_status_summary.get("live_providers_selected")
+            is True
+        ),
+        "api_key_integration_ready_to_run_live_smoke": (
+            api_key_integration_status_summary.get("ready_to_run_live_smoke")
+            is True
+        ),
+        "api_key_integration_configured_provider_families": _string_list(
+            api_key_integration_status_summary.get(
+                "configured_provider_families"
+            )
+        ),
+        "api_key_integration_missing_provider_families": _string_list(
+            api_key_integration_status_summary.get("missing_provider_families")
+        ),
+        "api_key_integration_selected_provider_classes": _string_list(
+            api_key_integration_status_summary.get("selected_provider_classes")
+        ),
+        "api_key_integration_next_action_name": (
+            api_key_integration_status_summary.get("next_action_name")
+        ),
+        "api_key_integration_next_action_status": (
+            api_key_next_action_summary.get("next_action_status")
+        ),
+        "api_key_integration_next_action_command": (
+            api_key_next_action_summary.get("next_action_command")
+        ),
+        "api_key_integration_next_action_next_after_action": (
+            next_operator_action.get("next_after_action")
+        ),
+        "api_key_integration_next_action_dotenv_target_path": (
+            next_operator_action.get("dotenv_target_path")
+        ),
+        "api_key_integration_next_action_source_path": (
+            next_operator_action.get("source_path")
+        ),
+        "api_key_integration_next_action_target_path": (
+            next_operator_action.get("target_path")
+        ),
+        "api_key_integration_next_action_provider_family": (
+            api_key_integration_status_summary.get(
+                "next_action_provider_family"
+            )
+        ),
+        "api_key_integration_next_action_provider": (
+            api_key_integration_status_summary.get("next_action_provider")
+        ),
+        "api_key_integration_next_action_smoke_command_name": (
+            api_key_integration_status_summary.get(
+                "next_action_smoke_command_name"
+            )
+        ),
+        "api_key_integration_next_action_is_recovery": (
+            api_key_integration_status_summary.get("next_action_is_recovery")
+            is True
+        ),
+        "api_key_integration_next_action_network_call": (
+            api_key_integration_status_summary.get("next_action_network_call")
+            is True
+        ),
+        "api_key_integration_next_action_network_call_policy": (
+            next_operator_action.get("network_call_policy")
+        ),
+        "api_key_integration_next_action_preferred_env_key": (
+            api_key_next_action_summary.get("preferred_env_key")
+        ),
+        "api_key_integration_next_action_accepted_env_keys": _string_list(
+            api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "api_key_integration_next_action_required_env_keys": _string_list(
+            api_key_next_action_summary.get("required_env_keys")
+        ),
+        "api_key_integration_next_action_expected_live_contract": (
+            api_key_next_action_summary.get("next_action_expected_live_contract")
+        ),
+        "api_key_integration_next_action_expected_live_checks": _string_list(
+            api_key_next_action_summary.get("next_action_expected_live_checks")
+        ),
+        "api_key_integration_next_action_mutates_local_state": (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
+        ),
+        "api_key_integration_next_action_secret_values_returned": (
+            api_key_next_action_summary.get("secret_values_returned") is True
+        ),
+        "api_key_integration_next_action_secret_input_required": (
+            next_operator_action.get("secret_input_required") is True
+        ),
+        "api_key_integration_next_action_dotenv_examples": _string_list(
+            api_key_next_action_summary.get("dotenv_examples")
+        ),
+        "api_key_integration_next_action_dotenv_example_count": (
+            api_key_next_action_summary.get("dotenv_example_count")
+        ),
+        "api_key_integration_next_action_provider_smoke_count": (
+            next_operator_action.get("provider_smoke_count")
+        ),
+        "api_key_integration_next_action_ready_provider_smoke_count": (
+            next_operator_action.get("ready_provider_smoke_count")
+        ),
+        "api_key_integration_next_action_blocked_provider_smoke_count": (
+            next_operator_action.get("blocked_provider_smoke_count")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_command_name": (
+            next_operator_action.get("next_provider_smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_command": (
+            next_provider_smoke.get("command")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider_family": (
+            next_provider_smoke.get("provider_family")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider": (
+            next_provider_smoke.get("provider")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_status": (
+            next_provider_smoke.get("status")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_network_call": (
+            next_provider_smoke.get("network_call") is True
+        ),
+        "api_key_integration_next_action_next_provider_smoke_network_call_policy": (
+            next_provider_smoke.get("network_call_policy")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_secret_values_returned": (
+            next_provider_smoke.get("secret_values_returned") is True
+        ),
+        "api_key_setup_configured_provider_families": _string_list(
+            setup_status_summary.get("configured_provider_families")
+        ),
+        "api_key_setup_missing_provider_families": _string_list(
+            setup_status_summary.get("missing_provider_families")
+        ),
+        "api_key_setup_configured_provider_family_count": (
+            setup_status_summary.get("configured_provider_family_count")
+        ),
+        "api_key_setup_required_provider_family_count": (
+            setup_status_summary.get("required_provider_family_count")
+        ),
+        "api_key_setup_ready_to_run_live_smoke": (
+            setup_status_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "api_key_setup_provider_route_status": setup_status_summary.get(
+            "provider_route_status"
+        ),
+        "api_key_required_env_keys": _string_list(
+            api_key_requirements_summary.get("required_env_keys")
+        ),
+        "api_key_required_env_key_count": len(
+            _string_list(api_key_requirements_summary.get("required_env_keys"))
+        ),
+        "api_key_configured_env_keys": _string_list(
+            api_key_requirements_summary.get("configured_env_keys")
+        ),
+        "api_key_configured_env_key_count": len(
+            _string_list(api_key_requirements_summary.get("configured_env_keys"))
+        ),
+        "api_key_requirement_configured_provider_families": _string_list(
+            api_key_requirements_summary.get("configured_provider_families")
+        ),
+        "api_key_requirement_missing_provider_families": _string_list(
+            api_key_requirements_summary.get("missing_provider_families")
+        ),
+        "api_key_provider_requirement_families": provider_requirement_families,
+        "api_key_provider_requirement_count": len(provider_requirement_families),
+        "api_key_provider_requirement_preferred_env_keys": {
+            family: row.get("preferred_env_key")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_accepted_env_keys": {
+            family: _string_list(row.get("accepted_env_keys"))
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_setup_statuses": {
+            family: row.get("setup_status")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_configured": {
+            family: row.get("configured") is True
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_next_setup_actions": {
+            family: row.get("next_setup_action")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_smoke_command_names": {
+            family: row.get("smoke_command_name")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
+        "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
+        "api_key_next_smoke_command": next_smoke_command.get("command"),
+        "api_key_next_smoke_command_name": next_smoke_command.get("name"),
+        "api_key_provider_smoke_total_count": setup_status_summary.get(
+            "provider_smoke_count"
+        ),
+        "api_key_provider_smoke_ready_count": setup_status_summary.get(
+            "ready_provider_smoke_count"
+        ),
+        "api_key_provider_smoke_blocked_count": setup_status_summary.get(
+            "blocked_provider_smoke_count"
+        ),
+        "api_key_next_provider_smoke_command_name": (
+            setup_status_summary.get("next_provider_smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "api_key_next_provider_smoke_provider_family": (
+            next_provider_smoke.get("provider_family")
+        ),
+        "api_key_next_provider_smoke_provider": next_provider_smoke.get(
+            "provider"
+        ),
+        "api_key_next_provider_smoke_command": next_provider_smoke.get(
+            "command"
+        ),
+        "api_key_next_provider_smoke_status": next_provider_smoke.get("status"),
+        "api_key_one_shot_pipeline_smoke_command": one_shot_pipeline_smoke.get(
+            "command"
+        ),
+        "api_key_provider_smoke_command_count": provider_smoke_command_count,
+        "api_key_provider_smoke_command_names": _ordered_unique_strings(
+            [
+                row.get("smoke_command_name")
+                for row in provider_smoke_command_rows
+            ]
+        ),
+        "api_key_provider_smoke_commands_by_family": {
+            family: row.get("command")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_statuses_by_family": {
+            family: row.get("status")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_network_call_policies_by_family": {
+            family: row.get("network_call_policy")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_expected_live_contracts_by_family": {
+            family: row.get("expected_live_contract")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_expected_live_checks_by_family": {
+            family: _string_list(row.get("expected_live_checks"))
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "next_operator_action": next_operator_action,
+        "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
+        or {},
+        "api_key_integration_status_summary": api_key_integration_status_summary,
+        "api_key_next_action_summary": api_key_next_action_summary,
+        "api_key_operator_checklist_summary": api_key_operator_checklist_summary,
+        "setup_status_summary": setup_status_summary,
+        "live_data_setup_summary": _optional_mapping(
+            payload.get("live_data_setup_summary")
+        )
+        or {},
+        "api_key_requirements_summary": api_key_requirements_summary,
+        "api_key_command_summary": api_key_command_summary,
+        "api_key_setup_file_summary": api_key_setup_file_summary,
+        "api_key_dotenv_loading_summary": _optional_mapping(
+            payload.get("api_key_dotenv_loading_summary")
+        )
+        or {},
+        "api_key_pipeline_failure_summary": _optional_mapping(
+            payload.get("api_key_pipeline_failure_summary")
+        )
+        or {},
+        "api_key_pipeline_stage_summary": _optional_mapping(
+            payload.get("api_key_pipeline_stage_summary")
+        )
+        or {},
+        "api_key_pipeline_check_summary": _optional_mapping(
+            payload.get("api_key_pipeline_check_summary")
+        )
+        or {},
+        "api_key_provider_selection_summary": api_key_provider_selection_summary,
+        "api_key_live_http_timeout_summary": _optional_mapping(
+            payload.get("api_key_live_http_timeout_summary")
+        )
+        or {},
+        "api_key_provider_recovery_summary": (
+            _api_key_provider_recovery_summary(
+                _optional_mapping(
+                    payload.get("api_key_provider_recovery_checklist")
+                )
+                or {}
+            )
+        ),
+        "provider_smoke_summaries": provider_smoke_rows,
+        "provider_smoke_summary_count": provider_smoke_summary_count,
+        "provider_smoke_success_count": provider_smoke_success_count,
+        "provider_smoke_all_successful": (
+            provider_smoke_summary_count > 0
+            and provider_smoke_success_count == provider_smoke_summary_count
+        ),
+        "provider_smoke_success_provider_families": _ordered_unique_strings(
+            [row.get("provider_family") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_providers": _ordered_unique_strings(
+            [row.get("provider") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_smoke_command_names": _ordered_unique_strings(
+            [row.get("smoke_command_name") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_expected_live_contracts": _ordered_unique_strings(
+            [
+                row.get("expected_live_contract")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_expected_live_checks": (
+            provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_check_count": len(
+            provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_network_call_count": (
+            provider_smoke_success_network_call_count
+        ),
+        "provider_smoke_success_all_network_calls": (
+            provider_smoke_success_count > 0
+            and provider_smoke_success_network_call_count
+            == provider_smoke_success_count
+        ),
+        "provider_smoke_success_network_call_policies": _ordered_unique_strings(
+            [
+                row.get("network_call_policy")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_mutates_local_state_count": (
+            provider_smoke_success_mutates_local_state_count
+        ),
+        "provider_smoke_success_any_mutates_local_state": (
+            provider_smoke_success_mutates_local_state_count > 0
+        ),
+        "provider_smoke_success_secret_values_returned_count": (
+            provider_smoke_success_secret_values_returned_count
+        ),
+        "provider_smoke_success_any_secret_values_returned": (
+            provider_smoke_success_secret_values_returned_count > 0
+        ),
+        "provider_smoke_success_preferred_env_keys": _ordered_unique_strings(
+            [row.get("preferred_env_key") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_accepted_env_keys": _ordered_unique_strings(
+            [
+                env_key
+                for group in provider_smoke_success_accepted_env_key_groups
+                for env_key in group
+            ]
+        ),
+        "provider_smoke_success_accepted_env_key_groups": (
+            provider_smoke_success_accepted_env_key_groups
+        ),
+        "api_key_failure_category": payload.get("api_key_failure_category"),
+        "api_key_has_failures": payload.get("api_key_has_failures") is True,
+        "api_key_failed_stage_names": _string_list(
+            payload.get("api_key_failed_stage_names")
+        ),
+        "api_key_failed_check_keys": _string_list(
+            payload.get("api_key_failed_check_keys")
+        ),
+        "api_key_tools_with_failures": _string_list(
+            payload.get("api_key_tools_with_failures")
+        ),
+        "api_key_first_failed_stage_name": payload.get(
+            "api_key_first_failed_stage_name"
+        ),
+        "api_key_first_failed_check_key": payload.get(
+            "api_key_first_failed_check_key"
+        ),
+        "provider_route_summary": _optional_mapping(
+            payload.get("provider_route_summary")
+        )
+        or {},
+        "checks": _api_key_pipeline_summary_only_checks(payload.get("checks")),
+        "failed_provider_families": _string_list(
+            payload.get("failed_provider_families")
+        ),
+        "failed_provider_count": payload.get("failed_provider_count"),
+        "next_provider_recovery_action": payload.get(
+            "next_provider_recovery_action"
+        ),
+        "next_provider_recovery_smoke_command_name": payload.get(
+            "next_provider_recovery_smoke_command_name"
+        ),
+        "provider_recovery_smoke_count": payload.get(
+            "provider_recovery_smoke_count"
+        ),
+        "provider_recovery_required": (
+            payload.get("provider_recovery_required") is True
+        ),
+        "provider_recovery_summary_status": payload.get(
+            "provider_recovery_summary_status"
+        ),
+        "provider_recovery_action_status": payload.get(
+            "provider_recovery_action_status"
+        ),
+        "provider_recovery_item_count": payload.get(
+            "provider_recovery_item_count"
+        ),
+        "provider_recovery_pending_count": payload.get(
+            "provider_recovery_pending_count"
+        ),
+        "provider_recovery_blocked_count": payload.get(
+            "provider_recovery_blocked_count"
+        ),
+        "provider_error_count": payload.get("provider_error_count"),
+        "provider_recovery_smoke_available_count": payload.get(
+            "provider_recovery_smoke_available_count"
+        ),
+        "provider_recovery_smoke_unavailable_count": payload.get(
+            "provider_recovery_smoke_unavailable_count"
+        ),
+        "provider_recovery_all_smokes_available": (
+            payload.get("provider_recovery_all_smokes_available") is True
+        ),
+        "provider_recovery_network_call_count": payload.get(
+            "provider_recovery_network_call_count"
+        ),
+        "provider_recovery_all_network_calls": (
+            payload.get("provider_recovery_all_network_calls") is True
+        ),
+        "provider_recovery_mutates_local_state_count": payload.get(
+            "provider_recovery_mutates_local_state_count"
+        ),
+        "provider_recovery_any_mutates_local_state": (
+            payload.get("provider_recovery_any_mutates_local_state") is True
+        ),
+        "provider_recovery_secret_values_returned_count": payload.get(
+            "provider_recovery_secret_values_returned_count"
+        ),
+        "provider_recovery_any_secret_values_returned": (
+            payload.get("provider_recovery_any_secret_values_returned") is True
+        ),
+        "provider_recovery_next_setup_actions": _string_list(
+            payload.get("provider_recovery_next_setup_actions")
+        ),
+        "provider_recovery_exception_types": _string_list(
+            payload.get("provider_recovery_exception_types")
+        ),
+        "provider_recovery_exception_message_returned_count": payload.get(
+            "provider_recovery_exception_message_returned_count"
+        ),
+        "provider_recovery_any_exception_messages_returned": (
+            payload.get("provider_recovery_any_exception_messages_returned") is True
+        ),
+        "provider_recovery_url_returned_count": payload.get(
+            "provider_recovery_url_returned_count"
+        ),
+        "provider_recovery_any_urls_returned": (
+            payload.get("provider_recovery_any_urls_returned") is True
+        ),
+        "provider_recovery_statuses": _string_list(
+            payload.get("provider_recovery_statuses")
+        ),
+        "provider_recovery_all_pending": (
+            payload.get("provider_recovery_all_pending") is True
+        ),
+        "provider_recovery_retry_ready": (
+            payload.get("provider_recovery_retry_ready") is True
+        ),
+        "provider_recovery_all_retryable": (
+            payload.get("provider_recovery_all_retryable") is True
+        ),
+        "provider_recovery_has_pending": (
+            payload.get("provider_recovery_has_pending") is True
+        ),
+        "provider_recovery_has_blocked": (
+            payload.get("provider_recovery_has_blocked") is True
+        ),
+        "provider_recovery_provider_families": _string_list(
+            payload.get("provider_recovery_provider_families")
+        ),
+        "provider_recovery_providers": _string_list(
+            payload.get("provider_recovery_providers")
+        ),
+        "provider_recovery_pending_provider_families": _string_list(
+            payload.get("provider_recovery_pending_provider_families")
+        ),
+        "provider_recovery_pending_providers": _string_list(
+            payload.get("provider_recovery_pending_providers")
+        ),
+        "provider_recovery_blocked_provider_families": _string_list(
+            payload.get("provider_recovery_blocked_provider_families")
+        ),
+        "provider_recovery_blocked_providers": _string_list(
+            payload.get("provider_recovery_blocked_providers")
+        ),
+        "provider_recovery_smoke_command_names": _string_list(
+            payload.get("provider_recovery_smoke_command_names")
+        ),
+        "provider_recovery_smoke_commands": _string_list(
+            payload.get("provider_recovery_smoke_commands")
+        ),
+        "provider_recovery_pending_smoke_command_names": _string_list(
+            payload.get("provider_recovery_pending_smoke_command_names")
+        ),
+        "provider_recovery_pending_smoke_commands": _string_list(
+            payload.get("provider_recovery_pending_smoke_commands")
+        ),
+        "provider_recovery_blocked_smoke_command_names": _string_list(
+            payload.get("provider_recovery_blocked_smoke_command_names")
+        ),
+        "provider_recovery_blocked_smoke_commands": _string_list(
+            payload.get("provider_recovery_blocked_smoke_commands")
+        ),
+        "provider_recovery_network_call_policies": _string_list(
+            payload.get("provider_recovery_network_call_policies")
+        ),
+        "provider_recovery_preferred_env_keys": _string_list(
+            payload.get("provider_recovery_preferred_env_keys")
+        ),
+        "provider_recovery_accepted_env_keys": _string_list(
+            payload.get("provider_recovery_accepted_env_keys")
+        ),
+        "provider_recovery_accepted_env_key_groups": [
+            _string_list(group)
+            for group in payload.get("provider_recovery_accepted_env_key_groups", [])
+            if isinstance(group, list)
+        ],
+        "next_pending_recovery_smoke_command_name": payload.get(
+            "next_pending_recovery_smoke_command_name"
+        ),
+        "next_pending_recovery_smoke_command": payload.get(
+            "next_pending_recovery_smoke_command"
+        ),
+        "next_pending_recovery_provider_family": payload.get(
+            "next_pending_recovery_provider_family"
+        ),
+        "next_pending_recovery_provider": payload.get(
+            "next_pending_recovery_provider"
+        ),
+        "next_pending_recovery_next_setup_action": payload.get(
+            "next_pending_recovery_next_setup_action"
+        ),
+        "next_pending_recovery_preferred_env_key": payload.get(
+            "next_pending_recovery_preferred_env_key"
+        ),
+        "next_pending_recovery_accepted_env_keys": _string_list(
+            payload.get("next_pending_recovery_accepted_env_keys")
+        ),
+        "next_pending_recovery_network_call_policy": payload.get(
+            "next_pending_recovery_network_call_policy"
+        ),
+        "next_pending_recovery_smoke_available": (
+            payload.get("next_pending_recovery_smoke_available") is True
+        ),
+        "next_pending_recovery_network_call": (
+            payload.get("next_pending_recovery_network_call") is True
+        ),
+        "next_pending_recovery_mutates_local_state": (
+            payload.get("next_pending_recovery_mutates_local_state") is True
+        ),
+        "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": payload.get(
+            "next_blocked_recovery_smoke_command_name"
+        ),
+        "next_blocked_recovery_smoke_command": payload.get(
+            "next_blocked_recovery_smoke_command"
+        ),
+        "next_blocked_recovery_provider_family": payload.get(
+            "next_blocked_recovery_provider_family"
+        ),
+        "next_blocked_recovery_provider": payload.get(
+            "next_blocked_recovery_provider"
+        ),
+        "next_blocked_recovery_next_setup_action": payload.get(
+            "next_blocked_recovery_next_setup_action"
+        ),
+        "next_blocked_recovery_preferred_env_key": payload.get(
+            "next_blocked_recovery_preferred_env_key"
+        ),
+        "next_blocked_recovery_accepted_env_keys": _string_list(
+            payload.get("next_blocked_recovery_accepted_env_keys")
+        ),
+        "next_blocked_recovery_network_call_policy": payload.get(
+            "next_blocked_recovery_network_call_policy"
+        ),
+        "next_blocked_recovery_smoke_available": (
+            payload.get("next_blocked_recovery_smoke_available") is True
+        ),
+        "next_blocked_recovery_network_call": (
+            payload.get("next_blocked_recovery_network_call") is True
+        ),
+        "next_blocked_recovery_mutates_local_state": (
+            payload.get("next_blocked_recovery_mutates_local_state") is True
+        ),
+        "next_blocked_recovery_secret_values_returned": False,
+        "next_recovery_smoke_command_name": payload.get(
+            "next_recovery_smoke_command_name"
+        ),
+        "next_recovery_smoke_command": payload.get("next_recovery_smoke_command"),
+        "next_recovery_provider_family": payload.get(
+            "next_recovery_provider_family"
+        ),
+        "next_recovery_provider": payload.get("next_recovery_provider"),
+        "next_recovery_next_setup_action": payload.get(
+            "next_recovery_next_setup_action"
+        ),
+        "next_recovery_preferred_env_key": payload.get(
+            "next_recovery_preferred_env_key"
+        ),
+        "next_recovery_accepted_env_keys": _string_list(
+            payload.get("next_recovery_accepted_env_keys")
+        ),
+        "next_recovery_network_call_policy": payload.get(
+            "next_recovery_network_call_policy"
+        ),
+        "next_recovery_smoke_available": (
+            payload.get("next_recovery_smoke_available") is True
+        ),
+        "next_recovery_network_call": (
+            payload.get("next_recovery_network_call") is True
+        ),
+        "next_recovery_mutates_local_state": (
+            payload.get("next_recovery_mutates_local_state") is True
+        ),
+        "next_recovery_exception_type": payload.get("next_recovery_exception_type"),
+        "next_recovery_exception_message_returned": (
+            payload.get("next_recovery_exception_message_returned") is True
+        ),
+        "next_recovery_url_returned": (
+            payload.get("next_recovery_url_returned") is True
+        ),
+        "next_recovery_secret_values_returned": False,
+        "omitted_sections": [
+            "api_key_operator_checklist",
+            "api_key_provider_recovery_checklist",
+            "live_data_smoke_summary",
+            "signal_workflow_smoke_summary",
+            "recording_smoke_summary",
+            "provider_recovery_smokes",
+        ],
+        "network_call": payload.get("network_call") is True,
+        "live_data_required": payload.get("live_data_required") is True,
+        "hermes_runtime_started": False,
+        "telegram_send_call": False,
+        "send_call": False,
+        "order_submission": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }

@@ -692,9 +692,11 @@ provider selection, failure, and next-action evidence into one operator row with
 `next_action_name`, `next_action_provider_family`, `next_action_provider`,
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`, plus `next_action_status`, `next_action_command`,
+`next_action_required_env_keys`, `next_action_network_call_policy`,
 `next_action_mutates_local_state`, and `next_action_secret_values_returned`, so
-the integration status row itself carries the next executable local command
-without returning secrets. It also includes `provider_recovery_action_status`,
+the integration status row itself carries the next executable local command,
+required env-key names, and network-call policy without returning secrets. It
+also includes `provider_recovery_action_status`,
 `provider_recovery_retry_ready`, `provider_recovery_all_retryable`,
 `provider_recovery_has_pending`, `provider_recovery_has_blocked`,
 `provider_recovery_item_count`, `provider_recovery_pending_count`,

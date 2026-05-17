@@ -2737,6 +2737,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ],
         "next_action_is_recovery": True,
         "next_action_network_call": True,
+        "next_action_required_env_keys": [],
+        "next_action_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
         "next_action_mutates_local_state": False,
         "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "ready_to_retry",
@@ -3575,6 +3579,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ],
         "next_action_is_recovery": True,
         "next_action_network_call": True,
+        "next_action_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
         "next_action_mutates_local_state": False,
         "provider_recovery_status": "conflict",
         "provider_recovery_required": True,
@@ -5044,6 +5051,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ],
         "next_action_is_recovery": False,
         "next_action_network_call": True,
+        "next_action_required_env_keys": [],
+        "next_action_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
         "next_action_mutates_local_state": False,
         "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",
@@ -5120,6 +5131,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ],
         "next_action_is_recovery": False,
         "next_action_network_call": True,
+        "next_action_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
         "next_action_mutates_local_state": False,
         "provider_recovery_status": "ok",
         "provider_recovery_required": False,
@@ -5454,6 +5468,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "next_action_command": "cp .env.example .env",
         "next_action_is_recovery": False,
         "next_action_network_call": False,
+        "next_action_required_env_keys": [],
+        "next_action_network_call_policy": None,
         "next_action_mutates_local_state": True,
         "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",
@@ -7748,6 +7764,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert integration_status["next_action_required_env_keys"] == (
+        payload["api_key_next_action_summary"].get("required_env_keys", [])
+    )
+    assert integration_status["next_action_network_call_policy"] == (
+        payload["api_key_next_action_summary"]["next_action_network_call_policy"]
+    )
     assert integration_status["secret_values_returned"] is False
     assert payload["api_key_integration_status"] == integration_status["status"]
     assert (
@@ -7995,6 +8017,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert integration_status["next_action_command"] == next_action_summary[
         "next_action_command"
     ]
+    assert integration_status["next_action_required_env_keys"] == (
+        next_action_summary.get("required_env_keys", [])
+    )
+    assert integration_status["next_action_network_call_policy"] == (
+        next_action_summary["next_action_network_call_policy"]
+    )
     assert integration_status["next_action_mutates_local_state"] == (
         next_action_summary["next_action_mutates_local_state"]
     )
@@ -8375,6 +8403,8 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "next_action_command": "cp .env.example .env",
         "next_action_is_recovery": False,
         "next_action_network_call": False,
+        "next_action_required_env_keys": [],
+        "next_action_network_call_policy": None,
         "next_action_mutates_local_state": True,
         "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",

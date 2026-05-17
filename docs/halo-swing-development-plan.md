@@ -874,6 +874,64 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.860 API Key Integration Status Next Action Hint Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.859에서 nested `api_key_integration_status_summary`가 다음 실행 상태, 명령,
+mutation, secret-safety fields를 직접 노출하도록 만들었다. 하지만 compact client가
+API 키만 넣고 바로 어떤 live/recovery smoke를 실행할지 판단하려면 nested row 안에서도
+필요 env-key 이름과 네트워크 호출 정책을 확인할 수 있어야 한다. 이번 slice는
+`next_action_required_env_keys`와 `next_action_network_call_policy`를 integration status
+summary에 포함하고, 원천 `api_key_next_action_summary`가 network call policy를
+보존하도록 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_next_action_summary preserves next_action_network_call_policy when the next operator action carries it
+  - api_key_integration_status_summary now includes next_action_required_env_keys copied from api_key_next_action_summary
+  - api_key_integration_status_summary now includes next_action_network_call_policy copied from api_key_next_action_summary
+  - readiness source is decomposed into responsibility-owned readiness_parts modules with every touched source file below 1000 lines
+  - README and DevOps setup guide document nested integration status next-action hint fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key integration status next-action hint fields pytest: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 30 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 822 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - wc -l src/halo_swing_mcp/tools/readiness.py src/halo_swing_mcp/tools/readiness_parts/*.py: passed; every touched source file is below 1000 lines
+  - direct summary-only smoke confirmed api_key_integration_status_summary next_action_required_env_keys [] and next_action_network_call_policy null without secret values
+```
+
 ## 3.859 API Key Integration Status Next Action Execution Fields Gate Record - 2026-05-17
 
 ### A. 목적
