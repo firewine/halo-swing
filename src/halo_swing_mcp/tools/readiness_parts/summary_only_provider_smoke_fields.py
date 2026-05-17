@@ -147,6 +147,28 @@ def _api_key_provider_smoke_top_level_fields(
     blocked_provider_smoke_count = setup_status_summary.get(
         "blocked_provider_smoke_count"
     )
+    provider_smoke_action_status = _provider_smoke_action_status(
+        provider_smoke_command_count=provider_smoke_command_count,
+        ready_provider_smoke_count=len(provider_smoke_ready_command_names),
+        blocked_provider_smoke_count=len(provider_smoke_blocked_command_names),
+    )
+    provider_smoke_next_action = (
+        "run_ready_provider_smokes"
+        if provider_smoke_ready_command_names
+        else "fill_live_data_api_keys"
+        if provider_smoke_blocked_command_names
+        else None
+    )
+    provider_smoke_next_action_command_names = (
+        provider_smoke_ready_command_names
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else []
+    )
+    provider_smoke_next_action_commands = (
+        provider_smoke_ready_commands
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else []
+    )
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -160,6 +182,17 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_any_blocked": (
             isinstance(blocked_provider_smoke_count, int)
             and blocked_provider_smoke_count > 0
+        ),
+        "api_key_provider_smoke_action_status": provider_smoke_action_status,
+        "api_key_provider_smoke_next_action": provider_smoke_next_action,
+        "api_key_provider_smoke_next_action_command_count": len(
+            provider_smoke_next_action_command_names
+        ),
+        "api_key_provider_smoke_next_action_command_names": (
+            provider_smoke_next_action_command_names
+        ),
+        "api_key_provider_smoke_next_action_commands": (
+            provider_smoke_next_action_commands
         ),
         "api_key_next_provider_smoke_command_name": (
             setup_status_summary.get("next_provider_smoke_command_name")
@@ -453,6 +486,23 @@ def _api_key_provider_smoke_top_level_fields(
 
 def _mapping_or_empty(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
+
+
+def _provider_smoke_action_status(
+    *,
+    provider_smoke_command_count: int,
+    ready_provider_smoke_count: int,
+    blocked_provider_smoke_count: int,
+) -> str:
+    if provider_smoke_command_count <= 0:
+        return "not_available"
+    if ready_provider_smoke_count == provider_smoke_command_count:
+        return "ready"
+    if ready_provider_smoke_count > 0:
+        return "partially_ready"
+    if blocked_provider_smoke_count > 0:
+        return "blocked"
+    return "not_available"
 
 
 def _api_key_provider_smoke_success_top_level_fields(

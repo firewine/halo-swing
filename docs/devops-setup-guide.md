@@ -953,6 +953,11 @@ It also mirrors provider smoke progress as
 `api_key_provider_smoke_blocked_count`,
 `api_key_provider_smoke_all_ready`,
 `api_key_provider_smoke_any_blocked`,
+`api_key_provider_smoke_action_status`,
+`api_key_provider_smoke_next_action`,
+`api_key_provider_smoke_next_action_command_count`,
+`api_key_provider_smoke_next_action_command_names`, and
+`api_key_provider_smoke_next_action_commands`,
 `api_key_next_provider_smoke_command_name`,
 `api_key_next_provider_smoke_provider_family`,
 `api_key_next_provider_smoke_provider`,

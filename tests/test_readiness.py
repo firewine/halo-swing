@@ -1222,6 +1222,12 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     provider_smoke_rows = payload["api_key_command_summary"][
         "provider_smoke_commands"
     ]
+    ready_provider_smoke_rows = [
+        row for row in provider_smoke_rows if row["status"] == "ready"
+    ]
+    blocked_provider_smoke_rows = [
+        row for row in provider_smoke_rows if row["status"] != "ready"
+    ]
     provider_families = [row["provider_family"] for row in provider_smoke_rows]
     assert payload["api_key_provider_smoke_provider_families"] == (
         provider_families
@@ -1258,6 +1264,44 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_provider_smoke_blocked_commands"] == [
         row["command"] for row in provider_smoke_rows if row["status"] != "ready"
     ]
+    if not provider_smoke_rows:
+        expected_action_status = "not_available"
+    elif len(ready_provider_smoke_rows) == len(provider_smoke_rows):
+        expected_action_status = "ready"
+    elif ready_provider_smoke_rows:
+        expected_action_status = "partially_ready"
+    else:
+        expected_action_status = "blocked"
+    expected_next_action = (
+        "run_ready_provider_smokes"
+        if ready_provider_smoke_rows
+        else "fill_live_data_api_keys"
+        if blocked_provider_smoke_rows
+        else None
+    )
+    expected_next_action_command_names = (
+        [row["smoke_command_name"] for row in ready_provider_smoke_rows]
+        if expected_next_action == "run_ready_provider_smokes"
+        else []
+    )
+    expected_next_action_commands = (
+        [row["command"] for row in ready_provider_smoke_rows]
+        if expected_next_action == "run_ready_provider_smokes"
+        else []
+    )
+    assert payload["api_key_provider_smoke_action_status"] == (
+        expected_action_status
+    )
+    assert payload["api_key_provider_smoke_next_action"] == expected_next_action
+    assert payload["api_key_provider_smoke_next_action_command_count"] == len(
+        expected_next_action_command_names
+    )
+    assert payload["api_key_provider_smoke_next_action_command_names"] == (
+        expected_next_action_command_names
+    )
+    assert payload["api_key_provider_smoke_next_action_commands"] == (
+        expected_next_action_commands
+    )
     next_ready_provider_smoke = next(
         (row for row in provider_smoke_rows if row["status"] == "ready"),
         {},
