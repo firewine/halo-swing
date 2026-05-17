@@ -11,6 +11,17 @@ from .live_data_setup import _string_list
 __all__ = ("_api_key_integration_status_top_level_fields",)
 
 
+def _bool_from_status_or_provider(
+    status_summary: dict[str, Any],
+    status_key: str,
+    provider_row: dict[str, Any],
+    provider_key: str,
+) -> bool:
+    if status_key in status_summary:
+        return status_summary.get(status_key) is True
+    return provider_row.get(provider_key) is True
+
+
 def _api_key_integration_status_top_level_fields(
     *,
     api_key_integration_status_summary: dict[str, Any],
@@ -181,17 +192,29 @@ def _api_key_integration_status_top_level_fields(
             next_operator_action.get("blocked_provider_smoke_count")
         ),
         "api_key_integration_next_action_next_provider_smoke_command_name": (
-            next_operator_action.get("next_provider_smoke_command_name")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_command_name"
+            )
+            or next_operator_action.get("next_provider_smoke_command_name")
             or next_provider_smoke.get("smoke_command_name")
         ),
         "api_key_integration_next_action_next_provider_smoke_command": (
-            next_provider_smoke.get("command")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_command"
+            )
+            or next_provider_smoke.get("command")
         ),
         "api_key_integration_next_action_next_provider_smoke_provider_family": (
-            next_provider_smoke.get("provider_family")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_provider_family"
+            )
+            or next_provider_smoke.get("provider_family")
         ),
         "api_key_integration_next_action_next_provider_smoke_provider": (
-            next_provider_smoke.get("provider")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_provider"
+            )
+            or next_provider_smoke.get("provider")
         ),
         "api_key_integration_next_action_next_provider_smoke_selected_provider_class": (
             api_key_integration_status_summary.get(
@@ -213,13 +236,24 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("provider_route_live_data_required") is True
         ),
         "api_key_integration_next_action_next_provider_smoke_status": (
-            next_provider_smoke.get("status")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_status"
+            )
+            or next_provider_smoke.get("status")
         ),
         "api_key_integration_next_action_next_provider_smoke_network_call": (
-            next_provider_smoke.get("network_call") is True
+            _bool_from_status_or_provider(
+                api_key_integration_status_summary,
+                "next_action_next_provider_smoke_network_call",
+                next_provider_smoke,
+                "network_call",
+            )
         ),
         "api_key_integration_next_action_next_provider_smoke_network_call_policy": (
-            next_provider_smoke.get("network_call_policy")
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_network_call_policy"
+            )
+            or next_provider_smoke.get("network_call_policy")
         ),
         "api_key_integration_next_action_next_provider_smoke_expected_live_contract": (
             api_key_integration_status_summary.get(
@@ -257,6 +291,11 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("mutates_local_state") is True
         ),
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned": (
-            next_provider_smoke.get("secret_values_returned") is True
+            _bool_from_status_or_provider(
+                api_key_integration_status_summary,
+                "next_action_next_provider_smoke_secret_values_returned",
+                next_provider_smoke,
+                "secret_values_returned",
+            )
         ),
     }

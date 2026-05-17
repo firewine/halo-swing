@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.888 API Key Integration Status Next Provider Smoke Identity Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.887에서 integration compact payload의 next-provider-smoke top-level fields가 실행
+조건과 env hint를 갖게 됐다. 하지만 `api_key_integration_status_summary`만 읽는 compact
+client는 여전히 다음 provider smoke의 command/status/network identity를 top-level fields나
+`next_operator_action.next_provider_smoke`에서 따로 조합해야 한다. 이번 slice는 API 키만
+넣은 뒤 integration status summary 한 벌만 읽어도 다음 provider smoke 명령, provider,
+status, network policy, secret redaction 여부를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary next-provider-smoke fields mirror command name, command, provider family, provider, status, network call, network policy, and secret redaction evidence
+  - summary-only api_key_integration_next_action_next_provider_smoke_* top-level fields prefer the same integration status summary identity fields where available
+  - fake-key offline verification confirmed nested and top-level next-provider-smoke identity fields carry command, provider, status, network policy, and no secret values
+  - no new decomposition was needed; the existing focused next-provider-smoke projection module kept touched source files below the 900-line warning point
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key integration status next-provider-smoke identity pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - fake-key summary-only output confirmed nested api_key_integration_status_summary and top-level api_key_integration_next_action_next_provider_smoke command, provider, status, network policy, and secret_values_returned=false mirrors
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.887 API Key Integration Next Provider Smoke Execution Fields Gate Record - 2026-05-18
 
 ### A. 목적

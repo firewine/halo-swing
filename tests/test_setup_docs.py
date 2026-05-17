@@ -489,6 +489,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
         in guide
     )
+    assert "nested `api_key_integration_status_summary`" in guide
+    assert "secret redaction flag" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide
@@ -665,6 +667,8 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
         in readme
     )
+    assert "nested `api_key_integration_status_summary`" in readme
+    assert "secret redaction flag" in readme
 
 
 def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_sync() -> None:

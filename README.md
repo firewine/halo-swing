@@ -940,6 +940,9 @@ It also mirrors provider smoke progress for that integration next action as
 `api_key_integration_next_action_next_provider_smoke_accepted_env_keys`,
 `api_key_integration_next_action_next_provider_smoke_mutates_local_state`, and
 `api_key_integration_next_action_next_provider_smoke_secret_values_returned`.
+The nested `api_key_integration_status_summary` carries the same next-provider-smoke
+command, provider identity, route, status, network policy, expected live
+contract/checks, env-key hints, mutation flag, and secret redaction flag.
 It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
