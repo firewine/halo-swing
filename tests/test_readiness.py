@@ -5512,6 +5512,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_command"] == (
         "cp .env.example .env"
     )
+    assert payload["api_key_integration_next_action_next_after_action"] == (
+        "fill_live_data_api_keys"
+    )
+    assert payload["api_key_integration_next_action_dotenv_target_path"] == ".env"
+    assert payload["api_key_integration_next_action_source_path"] == ".env.example"
+    assert payload["api_key_integration_next_action_target_path"] == ".env"
     assert payload["api_key_integration_next_action_provider_family"] is None
     assert payload["api_key_integration_next_action_provider"] is None
     assert payload["api_key_integration_next_action_smoke_command_name"] is None
@@ -5527,6 +5533,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert (
         payload["api_key_integration_next_action_secret_values_returned"] is False
     )
+    assert payload["api_key_integration_next_action_secret_input_required"] is False
+    assert payload["api_key_integration_next_action_dotenv_examples"] == []
+    assert payload["api_key_integration_next_action_dotenv_example_count"] is None
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
@@ -7716,6 +7725,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     assert payload["api_key_integration_next_action_command"] == (
         payload["api_key_next_action_summary"]["next_action_command"]
     )
+    assert payload["api_key_integration_next_action_next_after_action"] == (
+        payload["next_operator_action_next_after_action"]
+    )
+    assert payload["api_key_integration_next_action_dotenv_target_path"] == (
+        payload["next_operator_action_dotenv_target_path"]
+    )
+    assert payload["api_key_integration_next_action_source_path"] == (
+        payload["next_operator_action_source_path"]
+    )
+    assert payload["api_key_integration_next_action_target_path"] == (
+        payload["next_operator_action_target_path"]
+    )
     assert payload["api_key_integration_next_action_provider_family"] == (
         integration_status["next_action_provider_family"]
     )
@@ -7758,6 +7779,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     assert (
         payload["api_key_integration_next_action_secret_values_returned"]
         is payload["api_key_next_action_summary"]["secret_values_returned"]
+    )
+    assert (
+        payload["api_key_integration_next_action_secret_input_required"]
+        is payload["next_operator_action_secret_input_required"]
+    )
+    assert payload["api_key_integration_next_action_dotenv_examples"] == (
+        payload["next_operator_action_dotenv_examples"]
+    )
+    assert payload["api_key_integration_next_action_dotenv_example_count"] == (
+        payload["next_operator_action_dotenv_example_count"]
     )
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized

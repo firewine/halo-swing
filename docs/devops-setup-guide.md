@@ -915,7 +915,14 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_expected_live_checks`, so compact clients can
 show whether API keys are configured, live providers are selected, and the next
 live/recovery step can call the network, mutate local state, or satisfy the
-expected live contract without nested parsing.
+expected live contract without nested parsing. It also mirrors dotenv setup
+details as `api_key_integration_next_action_next_after_action`,
+`api_key_integration_next_action_dotenv_target_path`,
+`api_key_integration_next_action_source_path`,
+`api_key_integration_next_action_target_path`,
+`api_key_integration_next_action_secret_input_required`,
+`api_key_integration_next_action_dotenv_examples`, and
+`api_key_integration_next_action_dotenv_example_count`.
 It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,

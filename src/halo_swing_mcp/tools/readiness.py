@@ -3453,6 +3453,18 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_integration_next_action_command": (
             api_key_next_action_summary.get("next_action_command")
         ),
+        "api_key_integration_next_action_next_after_action": (
+            next_operator_action.get("next_after_action")
+        ),
+        "api_key_integration_next_action_dotenv_target_path": (
+            next_operator_action.get("dotenv_target_path")
+        ),
+        "api_key_integration_next_action_source_path": (
+            next_operator_action.get("source_path")
+        ),
+        "api_key_integration_next_action_target_path": (
+            next_operator_action.get("target_path")
+        ),
         "api_key_integration_next_action_provider_family": (
             api_key_integration_status_summary.get(
                 "next_action_provider_family"
@@ -3498,6 +3510,15 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_integration_next_action_secret_values_returned": (
             api_key_next_action_summary.get("secret_values_returned") is True
+        ),
+        "api_key_integration_next_action_secret_input_required": (
+            next_operator_action.get("secret_input_required") is True
+        ),
+        "api_key_integration_next_action_dotenv_examples": _string_list(
+            api_key_next_action_summary.get("dotenv_examples")
+        ),
+        "api_key_integration_next_action_dotenv_example_count": (
+            api_key_next_action_summary.get("dotenv_example_count")
         ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
