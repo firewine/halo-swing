@@ -411,6 +411,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_command" in guide
     assert "api_key_integration_next_action_mutates_local_state" in guide
     assert "api_key_integration_next_action_secret_values_returned" in guide
+    assert "api_key_integration_next_action_preferred_env_key" in guide
+    assert "api_key_integration_next_action_accepted_env_keys" in guide
+    assert "api_key_integration_next_action_required_env_keys" in guide
+    assert "api_key_integration_next_action_network_call_policy" in guide
+    assert "api_key_integration_next_action_expected_live_contract" in guide
+    assert "api_key_integration_next_action_expected_live_checks" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

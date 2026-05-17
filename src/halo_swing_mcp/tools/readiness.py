@@ -3474,6 +3474,24 @@ def _api_key_pipeline_summary_only_payload(
             api_key_integration_status_summary.get("next_action_network_call")
             is True
         ),
+        "api_key_integration_next_action_network_call_policy": (
+            next_operator_action.get("network_call_policy")
+        ),
+        "api_key_integration_next_action_preferred_env_key": (
+            api_key_next_action_summary.get("preferred_env_key")
+        ),
+        "api_key_integration_next_action_accepted_env_keys": _string_list(
+            api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "api_key_integration_next_action_required_env_keys": _string_list(
+            api_key_next_action_summary.get("required_env_keys")
+        ),
+        "api_key_integration_next_action_expected_live_contract": (
+            api_key_next_action_summary.get("next_action_expected_live_contract")
+        ),
+        "api_key_integration_next_action_expected_live_checks": _string_list(
+            api_key_next_action_summary.get("next_action_expected_live_checks")
+        ),
         "api_key_integration_next_action_mutates_local_state": (
             api_key_next_action_summary.get("next_action_mutates_local_state")
             is True

@@ -762,6 +762,62 @@ verification:
   - targeted payload print: integration next action command pending cp .env.example .env True False secret_values_returned false
 ```
 
+## 3.834 API Key Top-Level Integration Next Action Hint Mirrors Gate Record - 2026-05-17
+
+### A. 목적
+
+3.833에서 summary-only top-level payload는 integration next-action의 command,
+status, local mutation, secret-value safety를 직접 보여주게 됐다. 하지만 API 키를 채운
+뒤 어떤 env-key alias를 사용했고, 다음 live/recovery step이 어떤 expected live contract
+및 check를 만족해야 하는지는 아직 `next_operator_action_*` prefix나 nested rows를 함께
+읽어야 한다. 이번 slice는 next-action env-key hints와 expected live contract/check hints를
+`api_key_integration_*` prefix로 미러링해, compact client가 API-key integration row 하나로
+다음 실행 조건과 검증 기대치를 표시할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_next_action_preferred_env_key, accepted_env_keys, and required_env_keys mirror next operator action env-key hints
+  - summary-only top-level api_key_integration_next_action_network_call_policy, expected_live_contract, and expected_live_checks mirror next operator action live contract hints
+  - README and DevOps setup guide document top-level API-key integration next-action env-key and contract hint mirrors
+  - setup docs tests assert top-level integration next-action hint guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: integration next action hints None [] [] None None [] secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

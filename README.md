@@ -723,10 +723,16 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_status`,
 `api_key_integration_next_action_command`,
 `api_key_integration_next_action_mutates_local_state`, and
-`api_key_integration_next_action_secret_values_returned`, so compact clients
-can show whether API keys are configured, live providers are selected, and the
-next live/recovery step can call the network or mutate local state without
-nested parsing.
+`api_key_integration_next_action_secret_values_returned`. It also mirrors
+`api_key_integration_next_action_preferred_env_key`,
+`api_key_integration_next_action_accepted_env_keys`,
+`api_key_integration_next_action_required_env_keys`,
+`api_key_integration_next_action_network_call_policy`,
+`api_key_integration_next_action_expected_live_contract`, and
+`api_key_integration_next_action_expected_live_checks`, so compact clients can
+show whether API keys are configured, live providers are selected, and the next
+live/recovery step can call the network, mutate local state, or satisfy the
+expected live contract without nested parsing.
 It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
