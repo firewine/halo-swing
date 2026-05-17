@@ -191,6 +191,34 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
             "next_blocking_step"
         ),
+        "api_key_operator_checklist_selected_provider_class_by_family": (
+            _optional_mapping(
+                api_key_operator_checklist_summary.get(
+                    "selected_provider_class_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_operator_checklist_provider_route_data_mode_by_family": (
+            _optional_mapping(
+                api_key_operator_checklist_summary.get(
+                    "provider_route_data_mode_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_operator_checklist_provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                api_key_operator_checklist_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_operator_checklist_all_selected_routes_live": (
+            api_key_operator_checklist_summary.get("all_selected_routes_live")
+            is True
+        ),
         "api_key_setup_quickstart_steps": setup_quickstart_rows,
         "api_key_setup_quickstart_step_names": _ordered_unique_strings(
             [row.get("name") for row in setup_quickstart_rows]

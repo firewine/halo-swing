@@ -467,7 +467,11 @@ ready/blocking step names and counts, `next_blocking_action_name`,
 such as `next_blocking_action_preferred_env_key`, provider identity fields such
 as `next_blocking_action_provider_family`,
 `next_blocking_action_provider`, and
-`next_blocking_action_smoke_command_name`, and compact setup step rows including
+`next_blocking_action_smoke_command_name`,
+`selected_provider_class_by_family`,
+`provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`, and
+compact setup step rows including
 `configured_env_keys`, `missing_provider_families`, `required_env_keys`,
 `network_call_policy`, `next_provider_smoke_command_name`,
 `next_provider_recovery_smoke_command_name`, `provider_smoke_command_count`,
@@ -478,6 +482,12 @@ compact response still shows the next local setup or recovery action and the
 `KEY=placeholder` lines to fill without
 returning the full checklist payload.
 For compact clients that read only top-level fields, summary-only output also
+mirrors checklist route-family evidence as
+`api_key_operator_checklist_selected_provider_class_by_family`,
+`api_key_operator_checklist_provider_route_data_mode_by_family`,
+`api_key_operator_checklist_provider_route_live_data_required_by_family`, and
+`api_key_operator_checklist_all_selected_routes_live`.
+It also
 mirrors the no-secret setup sequence as `api_key_setup_quickstart_steps`,
 `api_key_setup_quickstart_step_names`,
 `api_key_setup_quickstart_step_count`, `api_key_setup_quickstart_next_step`,

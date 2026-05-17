@@ -265,6 +265,7 @@ def _api_key_operator_checklist_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    summary.update(_api_key_route_family_fields(api_key_operator_checklist))
     preferred_env_key = next_blocking_action.get("preferred_env_key")
     accepted_env_keys = _string_list(next_blocking_action.get("accepted_env_keys"))
     next_blocking_provider_family = (

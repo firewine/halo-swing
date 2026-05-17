@@ -984,6 +984,22 @@ def expected_api_key_operator_checklist(
         "next_blocking_action": next_blocking_action,
         "steps": steps,
         "step_count": 4,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "all_selected_routes_live": ready_to_run_live_smoke,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -6224,6 +6240,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_item_count": 0,
         "next_provider_recovery_smoke_command_name": None,
         "step_count": 4,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "steps": [
             {
                 "name": "prepare_dotenv",
@@ -7392,6 +7418,32 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert payload["api_key_setup_all_selected_routes_live"] is (
         payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert checklist_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert checklist_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert checklist_summary["provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert checklist_summary["all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert payload[
+        "api_key_operator_checklist_selected_provider_class_by_family"
+    ] == checklist_summary["selected_provider_class_by_family"]
+    assert payload[
+        "api_key_operator_checklist_provider_route_data_mode_by_family"
+    ] == checklist_summary["provider_route_data_mode_by_family"]
+    assert payload[
+        "api_key_operator_checklist_provider_route_live_data_required_by_family"
+    ] == checklist_summary["provider_route_live_data_required_by_family"]
+    assert payload["api_key_operator_checklist_all_selected_routes_live"] is (
+        checklist_summary["all_selected_routes_live"]
     )
     assert payload["api_key_copy_dotenv_command"] == (
         payload["api_key_command_summary"]["copy_dotenv_command"]["command"]

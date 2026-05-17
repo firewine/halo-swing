@@ -519,6 +519,29 @@ def _api_key_pipeline_operator_checklist(
         "next_blocking_action": next_blocking_action,
         "steps": steps,
         "step_count": len(steps),
+        "selected_provider_class_by_family": (
+            _optional_mapping(
+                setup_status_summary.get("selected_provider_class_by_family")
+            )
+            or {}
+        ),
+        "provider_route_data_mode_by_family": (
+            _optional_mapping(
+                setup_status_summary.get("provider_route_data_mode_by_family")
+            )
+            or {}
+        ),
+        "provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                setup_status_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "all_selected_routes_live": (
+            setup_status_summary.get("all_selected_routes_live") is True
+        ),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

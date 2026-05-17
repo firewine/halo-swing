@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_FAILURE_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
-gate_id: API_KEY_FAILURE_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
+status: API_KEY_OPERATOR_CHECKLIST_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider route family evidence into API-key failure summary
+next_atomic_step: mirror provider route family evidence into API-key operator checklist summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,7 +74,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,17 +82,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_pipeline_failure_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
-  - summary-only top-level api_key_failure_* mirrors expose the same route family evidence without nested parsing
-  - README and DevOps setup guide document the failure summary provider route family fields
-  - setup docs guard keeps README and DevOps API-key failure summary field parity in sync
-  - fake-key offline verification proves failure summary carries live family routes with expected provider classes and no secret values
+  - api_key_operator_checklist_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
+  - summary-only top-level api_key_operator_checklist_* mirrors expose the same route family evidence without nested parsing
+  - README and DevOps setup guide document the operator checklist summary provider route family fields
+  - setup docs guard keeps README and DevOps API-key operator checklist summary field parity in sync
+  - fake-key offline verification proves operator checklist summary carries live family routes with expected provider classes and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key failure summary provider route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key operator checklist summary provider route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_FAILURE_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_FAILURE_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider route family evidence into API-key failure summary
 ```
 
 Previous completed directive:
