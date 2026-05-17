@@ -135,6 +135,8 @@ files_changed:
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 next_state: commit this verified gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+notes:
+  - direct fake-key summary-only output confirmed next_operator_action_selected_provider_class, next_operator_action_provider_route_data_mode, next_operator_action_provider_route_live_data_required, api_key_next_action_summary next_action route fields, and api_key_integration_next_action route mirrors without secret values
 ```
 
 Previous completed directive:
