@@ -93,6 +93,38 @@ def _api_key_provider_smoke_top_level_fields(
             provider_smoke_accepted_env_keys_by_family.items()
         )
     }
+    provider_smoke_ready_preferred_env_keys_by_family = {
+        family: row.get("preferred_env_key")
+        for family, row in provider_smoke_command_rows_by_family.items()
+        if row.get("status") == "ready"
+    }
+    provider_smoke_ready_accepted_env_keys_by_family = {
+        family: _string_list(row.get("accepted_env_keys"))
+        for family, row in provider_smoke_command_rows_by_family.items()
+        if row.get("status") == "ready"
+    }
+    provider_smoke_ready_accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in (
+            provider_smoke_ready_accepted_env_keys_by_family.items()
+        )
+    }
+    provider_smoke_blocked_preferred_env_keys_by_family = {
+        family: row.get("preferred_env_key")
+        for family, row in provider_smoke_command_rows_by_family.items()
+        if row.get("status") != "ready"
+    }
+    provider_smoke_blocked_accepted_env_keys_by_family = {
+        family: _string_list(row.get("accepted_env_keys"))
+        for family, row in provider_smoke_command_rows_by_family.items()
+        if row.get("status") != "ready"
+    }
+    provider_smoke_blocked_accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in (
+            provider_smoke_blocked_accepted_env_keys_by_family.items()
+        )
+    }
     provider_smoke_network_calls_by_family = {
         family: row.get("network_call") is True
         for family, row in provider_smoke_command_rows_by_family.items()
@@ -268,6 +300,15 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_ready_accepted_env_key_group_count": len(
             provider_smoke_ready_accepted_env_key_groups
         ),
+        "api_key_provider_smoke_ready_preferred_env_keys_by_family": (
+            provider_smoke_ready_preferred_env_keys_by_family
+        ),
+        "api_key_provider_smoke_ready_accepted_env_keys_by_family": (
+            provider_smoke_ready_accepted_env_keys_by_family
+        ),
+        "api_key_provider_smoke_ready_accepted_env_key_counts_by_family": (
+            provider_smoke_ready_accepted_env_key_counts_by_family
+        ),
         "api_key_provider_smoke_blocked_preferred_env_keys": (
             provider_smoke_blocked_preferred_env_keys
         ),
@@ -285,6 +326,15 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_blocked_accepted_env_key_group_count": len(
             provider_smoke_blocked_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_blocked_preferred_env_keys_by_family": (
+            provider_smoke_blocked_preferred_env_keys_by_family
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_keys_by_family": (
+            provider_smoke_blocked_accepted_env_keys_by_family
+        ),
+        "api_key_provider_smoke_blocked_accepted_env_key_counts_by_family": (
+            provider_smoke_blocked_accepted_env_key_counts_by_family
         ),
         "api_key_next_provider_smoke_command_name": (
             setup_status_summary.get("next_provider_smoke_command_name")

@@ -965,6 +965,9 @@ plus ready setup hints
 `api_key_provider_smoke_ready_accepted_env_key_count`,
 `api_key_provider_smoke_ready_accepted_env_key_groups`, and
 `api_key_provider_smoke_ready_accepted_env_key_group_count`,
+`api_key_provider_smoke_ready_preferred_env_keys_by_family`,
+`api_key_provider_smoke_ready_accepted_env_keys_by_family`, and
+`api_key_provider_smoke_ready_accepted_env_key_counts_by_family`,
 plus blocked setup hints
 `api_key_provider_smoke_blocked_preferred_env_keys`,
 `api_key_provider_smoke_blocked_preferred_env_key_count`,
@@ -972,6 +975,9 @@ plus blocked setup hints
 `api_key_provider_smoke_blocked_accepted_env_key_count`,
 `api_key_provider_smoke_blocked_accepted_env_key_groups`, and
 `api_key_provider_smoke_blocked_accepted_env_key_group_count`,
+`api_key_provider_smoke_blocked_preferred_env_keys_by_family`,
+`api_key_provider_smoke_blocked_accepted_env_keys_by_family`, and
+`api_key_provider_smoke_blocked_accepted_env_key_counts_by_family`,
 `api_key_next_provider_smoke_command_name`,
 `api_key_next_provider_smoke_provider_family`,
 `api_key_next_provider_smoke_provider`,
