@@ -301,6 +301,11 @@ def _api_key_provider_smoke_top_level_fields(
         if provider_smoke_next_action == "fill_live_data_api_keys"
         else {}
     )
+    provider_smoke_next_action_primary_row = (
+        next(iter(provider_smoke_next_action_rows_by_family.values()))
+        if provider_smoke_next_action_rows_by_family
+        else {}
+    )
     provider_smoke_next_action_kinds_by_family = {
         family: row.get("kind")
         for family, row in provider_smoke_next_action_rows_by_family.items()
@@ -479,6 +484,24 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_next_action_requires_api_keys": (
             provider_smoke_next_action == "fill_live_data_api_keys"
             and bool(provider_smoke_next_action_provider_families)
+        ),
+        "api_key_provider_smoke_next_action_primary_provider_family": (
+            provider_smoke_next_action_primary_row.get("provider_family")
+        ),
+        "api_key_provider_smoke_next_action_primary_provider": (
+            provider_smoke_next_action_primary_row.get("provider")
+        ),
+        "api_key_provider_smoke_next_action_primary_command_name": (
+            provider_smoke_next_action_primary_row.get("smoke_command_name")
+        ),
+        "api_key_provider_smoke_next_action_primary_command": (
+            provider_smoke_next_action_primary_row.get("command")
+        ),
+        "api_key_provider_smoke_next_action_primary_status": (
+            provider_smoke_next_action_primary_row.get("status")
+        ),
+        "api_key_provider_smoke_next_action_primary_setup_action": (
+            provider_smoke_next_action_primary_row.get("next_setup_action")
         ),
         "api_key_provider_smoke_next_action_command_count": len(
             provider_smoke_next_action_command_names

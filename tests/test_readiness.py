@@ -1296,6 +1296,11 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         if expected_next_action == "fill_live_data_api_keys"
         else []
     )
+    expected_next_action_primary_row = (
+        expected_next_action_env_key_rows[0]
+        if expected_next_action_env_key_rows
+        else {}
+    )
     expected_next_action_preferred_env_keys = list(
         dict.fromkeys(
             row["preferred_env_key"] for row in expected_next_action_env_key_rows
@@ -1471,6 +1476,24 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         expected_next_action == "fill_live_data_api_keys"
         and bool(expected_next_action_provider_families)
     )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_provider_family"
+    ] == expected_next_action_primary_row.get("provider_family")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_provider"
+    ] == expected_next_action_primary_row.get("provider")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_command_name"
+    ] == expected_next_action_primary_row.get("smoke_command_name")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_command"
+    ] == expected_next_action_primary_row.get("command")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_status"
+    ] == expected_next_action_primary_row.get("status")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_setup_action"
+    ] == expected_next_action_primary_row.get("next_setup_action")
     assert payload["api_key_provider_smoke_next_action_command_count"] == len(
         expected_next_action_command_names
     )
