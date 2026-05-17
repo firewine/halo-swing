@@ -329,8 +329,10 @@ It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,
 `provider_smoke_commands`, `provider_smoke_command_count`, and
-`next_provider_smoke_command_name`, so the compact response still shows the
-exact local smoke commands to run after API keys are configured.
+`next_provider_smoke_command_name`. Provider smoke rows include
+`preferred_env_key` and `accepted_env_keys` without returning key values, so the
+compact response still shows the exact local smoke commands and accepted API-key
+aliases to use after API keys are configured.
 It keeps `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) with `.env.example`/`.env` source and target
 status, `copy_required`, `copy_command`, `preferred_env_keys`,

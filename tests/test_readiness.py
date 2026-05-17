@@ -684,6 +684,11 @@ def expected_api_key_command_summary(
         news_configured_env_keys=news_configured_env_keys,
         ready_to_run_live_smoke=ready_to_run_live_smoke,
     )
+    provider_setup_actions = expected_provider_setup_actions(
+        market_configured_env_keys=market_configured_env_keys,
+        macro_configured_env_keys=macro_configured_env_keys,
+        news_configured_env_keys=news_configured_env_keys,
+    )
     provider_smoke_commands = [
         {
             "provider_family": provider_smoke["provider_family"],
@@ -692,6 +697,10 @@ def expected_api_key_command_summary(
             "smoke_command_name": provider_smoke["smoke_command_name"],
             "command": provider_smoke["command"],
             "network_call_policy": provider_smoke["network_call_policy"],
+            "preferred_env_key": provider_smoke["preferred_env_key"],
+            "accepted_env_keys": provider_setup_actions[
+                provider_smoke["provider_family"]
+            ]["accepted_env_keys"],
             "mutates_local_state": False,
             "secret_values_returned": False,
         }
@@ -5172,6 +5181,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert command_summary["next_provider_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
+    assert command_summary["next_provider_smoke"]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert command_summary["next_provider_smoke"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert command_summary["provider_smoke_commands"][1]["preferred_env_key"] == (
+        "FRED_API_KEY"
+    )
+    assert command_summary["provider_smoke_commands"][1]["accepted_env_keys"] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
     assert command_summary["one_shot_pipeline_smoke"]["name"] == (
         "run_api_key_pipeline_smoke"
     )

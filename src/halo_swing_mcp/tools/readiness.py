@@ -3090,17 +3090,14 @@ def _api_key_pipeline_api_key_command_summary(
     ) or {}
     raw_provider_smokes = provider_smoke_plan.get("provider_smokes")
     provider_smoke_rows = raw_provider_smokes if isinstance(raw_provider_smokes, list) else []
+    provider_setup_actions = _optional_mapping(
+        live_data_setup_summary.get("provider_setup_actions")
+    ) or {}
     provider_smokes = [
-        {
-            "provider_family": provider_smoke.get("provider_family"),
-            "provider": provider_smoke.get("provider"),
-            "status": provider_smoke.get("status"),
-            "smoke_command_name": provider_smoke.get("smoke_command_name"),
-            "command": provider_smoke.get("command"),
-            "network_call_policy": provider_smoke.get("network_call_policy"),
-            "mutates_local_state": False,
-            "secret_values_returned": False,
-        }
+        _api_key_command_provider_smoke_row(
+            provider_smoke,
+            provider_setup_actions,
+        )
         for provider_smoke in provider_smoke_rows
         if isinstance(provider_smoke, dict)
     ]
@@ -3141,6 +3138,51 @@ def _api_key_pipeline_api_key_command_summary(
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
+    }
+
+
+def _api_key_command_provider_smoke_row(
+    provider_smoke: dict[str, Any],
+    provider_setup_actions: dict[str, Any],
+) -> dict[str, Any]:
+    env_hint = _api_key_command_provider_smoke_env_hint(
+        provider_smoke,
+        provider_setup_actions,
+    )
+    return {
+        "provider_family": provider_smoke.get("provider_family"),
+        "provider": provider_smoke.get("provider"),
+        "status": provider_smoke.get("status"),
+        "smoke_command_name": provider_smoke.get("smoke_command_name"),
+        "command": provider_smoke.get("command"),
+        "network_call_policy": provider_smoke.get("network_call_policy"),
+        "preferred_env_key": env_hint.get("preferred_env_key"),
+        "accepted_env_keys": env_hint.get("accepted_env_keys", []),
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+
+
+def _api_key_command_provider_smoke_env_hint(
+    provider_smoke: dict[str, Any],
+    provider_setup_actions: dict[str, Any],
+) -> dict[str, Any]:
+    provider_family = provider_smoke.get("provider_family")
+    provider_setup_action = (
+        _optional_mapping(provider_setup_actions.get(provider_family))
+        if isinstance(provider_family, str)
+        else None
+    ) or {}
+    preferred_env_key = provider_smoke.get(
+        "preferred_env_key"
+    ) or provider_setup_action.get("preferred_env_key")
+    accepted_env_keys = _string_list(
+        provider_smoke.get("accepted_env_keys")
+        or provider_setup_action.get("accepted_env_keys")
+    )
+    return {
+        "preferred_env_key": preferred_env_key,
+        "accepted_env_keys": accepted_env_keys,
     }
 
 
