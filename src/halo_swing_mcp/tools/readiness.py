@@ -3420,6 +3420,30 @@ def _api_key_integration_status_summary(
                 "provider_recovery_action_status"
             )
         ),
+        "provider_recovery_item_count": (
+            api_key_provider_recovery_summary.get("item_count", 0)
+        ),
+        "provider_recovery_pending_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_count",
+                0,
+            )
+        ),
+        "provider_recovery_blocked_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_count",
+                0,
+            )
+        ),
+        "provider_error_count": (
+            api_key_provider_recovery_summary.get("provider_error_count", 0)
+        ),
+        "provider_recovery_smoke_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_smoke_count",
+                0,
+            )
+        ),
         "provider_recovery_retry_ready": (
             api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
             is True

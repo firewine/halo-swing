@@ -518,7 +518,10 @@ provider selection, failure, and next-action evidence into one operator row with
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`, plus `provider_recovery_action_status`,
 `provider_recovery_retry_ready`, `provider_recovery_all_retryable`,
-`provider_recovery_has_pending`, and `provider_recovery_has_blocked`. It also
+`provider_recovery_has_pending`, `provider_recovery_has_blocked`,
+`provider_recovery_item_count`, `provider_recovery_pending_count`,
+`provider_recovery_blocked_count`, `provider_error_count`, and
+`provider_recovery_smoke_count`. It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
 `next_pending_recovery_smoke_command`,
