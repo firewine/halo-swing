@@ -6482,6 +6482,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call"
+        ]
+        == (first_ready_command_row.get("network_call") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy"
+        ]
+        == first_ready_command_row.get("network_call_policy")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state"
+        ]
+        == (first_ready_command_row.get("mutates_local_state") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned"
+        ]
+        == (first_ready_command_row.get("secret_values_returned") is True)
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
         ]
         == first_blocked_command_row.get("provider_family")
@@ -6497,6 +6521,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
         ]
         == first_blocked_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call"
+        ]
+        == (first_blocked_command_row.get("network_call") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy"
+        ]
+        == first_blocked_command_row.get("network_call_policy")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state"
+        ]
+        == (first_blocked_command_row.get("mutates_local_state") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_secret_values_returned"
+        ]
+        == (first_blocked_command_row.get("secret_values_returned") is True)
     )
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
@@ -8683,6 +8731,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call"
+        ]
+        == (first_ready_command_row.get("network_call") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy"
+        ]
+        == first_ready_command_row.get("network_call_policy")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state"
+        ]
+        == (first_ready_command_row.get("mutates_local_state") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned"
+        ]
+        == (first_ready_command_row.get("secret_values_returned") is True)
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
         ]
         == first_blocked_command_row.get("provider_family")
@@ -8698,6 +8770,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
         ]
         == first_blocked_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call"
+        ]
+        == (first_blocked_command_row.get("network_call") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy"
+        ]
+        == first_blocked_command_row.get("network_call_policy")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state"
+        ]
+        == (first_blocked_command_row.get("mutates_local_state") is True)
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_secret_values_returned"
+        ]
+        == (first_blocked_command_row.get("secret_values_returned") is True)
     )
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]

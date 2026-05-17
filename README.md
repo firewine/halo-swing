@@ -520,9 +520,17 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_secret_values_returned`,
 `api_key_setup_quickstart_command_plan_ready_provider_smoke_count`,
 `api_key_setup_quickstart_command_plan_blocked_provider_smoke_count`,
 `api_key_setup_quickstart_command_plan_all_provider_smokes_ready`,
@@ -551,8 +559,9 @@ and `api_key_setup_quickstart_next_command_plan_item`, so compact clients can
 show the copy/status/provider-smoke/one-shot commands in operator order with
 provider route evidence, expected live checks, env-key hints, next setup
 actions, ready/blocked provider-family lists, ready/blocked command lists, first
-ready/blocked provider-smoke commands, aggregate provider-smoke
-readiness/safety flags, and safety/status maps on provider-smoke rows.
+ready/blocked provider-smoke commands with safety flags, aggregate
+provider-smoke readiness/safety flags, and safety/status maps on provider-smoke
+rows.
 It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,

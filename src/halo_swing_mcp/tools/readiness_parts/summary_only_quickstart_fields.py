@@ -117,6 +117,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command": (
             next_ready_row.get("command")
         ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call": (
+            next_ready_row.get("network_call") is True
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy": (
+            next_ready_row.get("network_call_policy")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state": (
+            next_ready_row.get("mutates_local_state") is True
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned": (
+            next_ready_row.get("secret_values_returned") is True
+        ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family": (
             next_blocked_row.get("provider_family")
         ),
@@ -125,6 +137,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command": (
             next_blocked_row.get("command")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call": (
+            next_blocked_row.get("network_call") is True
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy": (
+            next_blocked_row.get("network_call_policy")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state": (
+            next_blocked_row.get("mutates_local_state") is True
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_secret_values_returned": (
+            next_blocked_row.get("secret_values_returned") is True
         ),
         "api_key_setup_quickstart_command_plan_ready_provider_smoke_count": (
             ready_provider_smoke_count

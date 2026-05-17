@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_COMMAND_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_COMMAND_GATE
+status: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key quickstart next ready and blocked provider-smoke command fields
+next_atomic_step: surface API-key quickstart next ready and next blocked provider-smoke safety scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,33 +82,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level quickstart command plan exposes first ready provider-smoke provider family, command name, and command
-  - summary-only top-level quickstart command plan exposes first blocked provider-smoke provider family, command name, and command
-  - fake-key offline verification proves next ready provider-smoke command points to market while next blocked provider-smoke command is absent without secret values
-  - blocked no-key verification proves next ready provider-smoke command is absent while next blocked provider-smoke command points to market without secret values
-  - partial-key verification proves next ready provider-smoke command points to market and next blocked provider-smoke command points to macro without secret values
+  - summary-only top-level quickstart command plan exposes next ready provider-smoke network, mutation, and secret-return safety scalars
+  - summary-only top-level quickstart command plan exposes next blocked provider-smoke network, mutation, and secret-return safety scalars
+  - fake-key offline verification proves next ready safety is network true, local mutation false, secret false, and next blocked safety is absent/false without secret values
+  - blocked no-key verification proves next ready safety is absent/false and next blocked safety is network true, local mutation false, secret false without secret values
+  - partial-key verification proves next ready and next blocked safety scalars stay tied to provider smoke command row status without secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan next ready/blocked command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart command plan next ready/blocked safety gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_COMMAND_GATE
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart next ready/blocked command pytest: 3 passed
-  - direct fake-key next ready/blocked command assertion: next ready market smoke command, next blocked empty, secret_values_returned false
-  - direct no-key next ready/blocked command assertion: next ready empty, next blocked market smoke command, secret_values_returned false
-  - direct partial-key next ready/blocked command assertion: next ready market smoke command, next blocked macro smoke command, secret_values_returned false
+  - focused API-key quickstart next ready/blocked safety pytest: 3 passed
+  - direct fake-key next ready/blocked safety assertion: next ready network true/policy live-provider/mutation false/secret false, next blocked absent/false, secret_values_returned false
+  - direct no-key next ready/blocked safety assertion: next ready absent/false, next blocked network true/policy live-provider/mutation false/secret false, secret_values_returned false
+  - direct partial-key next ready/blocked safety assertion: next ready and next blocked network true/policy live-provider/mutation false/secret false, secret_values_returned false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -123,9 +123,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart command plan next ready/blocked command gate
+next_state: commit this verified API-key quickstart command plan next ready/blocked safety gate
 notes:
-  - quickstart command plan next ready/blocked command scalars are top-level and tied to provider-smoke row status without returning secret values
+  - quickstart command plan next ready/blocked safety scalars are top-level and tied to provider-smoke row status without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key quickstart next ready and next blocked provider-smoke safety scalars
 ```
 
 Previous completed directive:

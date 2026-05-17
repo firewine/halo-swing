@@ -28,6 +28,72 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.899 API Key Quickstart Command Plan Next Ready/Blocked Safety Gate Record - 2026-05-18
+
+### A. 목적
+
+3.898에서 quickstart command plan provider-smoke rows의 next ready/blocked command
+scalars는 top-level로 올라왔다. 하지만 compact client가 API 키만 넣은 뒤 다음 ready 또는
+blocked smoke command를 안전하게 표시하려면 network call 여부, network policy, local
+mutation 여부, secret 반환 여부를 다시 row에서 찾아야 한다. 이번 slice는 next
+ready/blocked provider-smoke safety scalars를 top-level로 올려 다음 smoke action의 실행
+안전성을 바로 보여주게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call mirrors the first ready provider-smoke row network_call flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy mirrors the first ready provider-smoke row network policy
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state mirrors the first ready provider-smoke row local mutation flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned mirrors the first ready provider-smoke row secret return flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call mirrors the first blocked provider-smoke row network_call flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy mirrors the first blocked provider-smoke row network policy
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state mirrors the first blocked provider-smoke row local mutation flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_secret_values_returned mirrors the first blocked provider-smoke row secret return flag
+  - README and DevOps setup guide document the quickstart command plan next ready/blocked safety scalar fields
+  - setup docs tests assert the documented next ready/blocked safety field list stays in sync
+  - fake-key offline verification confirmed next ready network true/policy live-provider/mutation false/secret false, next blocked absent/false, and no secret values
+  - no-key offline verification confirmed next ready absent/false, next blocked network true/policy live-provider/mutation false/secret false, and no secret values
+  - partial-key offline verification confirmed next ready and next blocked network true/policy live-provider/mutation false/secret false, and no secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan next ready/blocked safety pytest: 3 passed
+  - direct fake-key next ready/blocked safety assertion: next ready network true/policy live-provider/mutation false/secret false, next blocked absent/false, secret_values_returned false
+  - direct no-key next ready/blocked safety assertion: next ready absent/false, next blocked network true/policy live-provider/mutation false/secret false, secret_values_returned false
+  - direct partial-key next ready/blocked safety assertion: next ready and next blocked network true/policy live-provider/mutation false/secret false, secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.898 API Key Quickstart Command Plan Next Ready/Blocked Command Gate Record - 2026-05-18
 
 ### A. 목적
