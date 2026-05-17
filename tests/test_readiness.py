@@ -5536,6 +5536,55 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_secret_input_required"] is False
     assert payload["api_key_integration_next_action_dotenv_examples"] == []
     assert payload["api_key_integration_next_action_dotenv_example_count"] is None
+    assert payload["api_key_integration_next_action_provider_smoke_count"] is None
+    assert (
+        payload["api_key_integration_next_action_ready_provider_smoke_count"]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_blocked_provider_smoke_count"]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_command_name"
+        ]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_command"]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_family"
+        ]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_provider"]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_status"]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_network_call"]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_network_call_policy"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
+        ]
+        is False
+    )
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
@@ -7789,6 +7838,61 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     )
     assert payload["api_key_integration_next_action_dotenv_example_count"] == (
         payload["next_operator_action_dotenv_example_count"]
+    )
+    assert payload["api_key_integration_next_action_provider_smoke_count"] == (
+        payload["next_operator_action"]["provider_smoke_count"]
+    )
+    assert (
+        payload["api_key_integration_next_action_ready_provider_smoke_count"]
+        == payload["next_operator_action"]["ready_provider_smoke_count"]
+    )
+    assert (
+        payload["api_key_integration_next_action_blocked_provider_smoke_count"]
+        == payload["next_operator_action"]["blocked_provider_smoke_count"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_command_name"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke_command_name"]
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_command"]
+        == payload["next_operator_action"]["next_provider_smoke"]["command"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_family"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"]["provider_family"]
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_provider"]
+        == payload["next_operator_action"]["next_provider_smoke"]["provider"]
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_status"]
+        == payload["next_operator_action"]["next_provider_smoke"]["status"]
+    )
+    assert (
+        payload["api_key_integration_next_action_next_provider_smoke_network_call"]
+        is payload["next_operator_action"]["next_provider_smoke"]["network_call"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_network_call_policy"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "network_call_policy"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
+        ]
+        is payload["next_operator_action"]["next_provider_smoke"][
+            "secret_values_returned"
+        ]
     )
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized

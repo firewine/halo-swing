@@ -3520,6 +3520,40 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_integration_next_action_dotenv_example_count": (
             api_key_next_action_summary.get("dotenv_example_count")
         ),
+        "api_key_integration_next_action_provider_smoke_count": (
+            next_operator_action.get("provider_smoke_count")
+        ),
+        "api_key_integration_next_action_ready_provider_smoke_count": (
+            next_operator_action.get("ready_provider_smoke_count")
+        ),
+        "api_key_integration_next_action_blocked_provider_smoke_count": (
+            next_operator_action.get("blocked_provider_smoke_count")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_command_name": (
+            next_operator_action.get("next_provider_smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_command": (
+            next_provider_smoke.get("command")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider_family": (
+            next_provider_smoke.get("provider_family")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider": (
+            next_provider_smoke.get("provider")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_status": (
+            next_provider_smoke.get("status")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_network_call": (
+            next_provider_smoke.get("network_call") is True
+        ),
+        "api_key_integration_next_action_next_provider_smoke_network_call_policy": (
+            next_provider_smoke.get("network_call_policy")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_secret_values_returned": (
+            next_provider_smoke.get("secret_values_returned") is True
+        ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
         ),

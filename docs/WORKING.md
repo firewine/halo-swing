@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_DOTENV_MIRRORS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_DOTENV_MIRRORS_GATE
+status: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror API-key integration next-action dotenv setup details onto summary-only top-level fields
+next_atomic_step: mirror API-key integration next-action provider smoke progress onto summary-only top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,16 +81,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_integration_next_action_source_path, target_path, and dotenv_target_path mirror next operator action setup paths
-  - summary-only top-level api_key_integration_next_action_next_after_action, secret_input_required, dotenv_examples, and dotenv_example_count mirror next operator action setup guidance
-  - README and DevOps setup guide document top-level API-key integration next-action dotenv setup mirrors
-  - setup docs tests assert the new top-level integration next-action dotenv guidance
+  - summary-only top-level api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count mirror next operator action provider smoke progress
+  - summary-only top-level api_key_integration_next_action_next_provider_smoke_command_name, command, provider_family, provider, status, network_call, network_call_policy, and secret_values_returned mirror the next provider smoke row
+  - README and DevOps setup guide document top-level API-key integration next-action provider smoke progress mirrors
+  - setup docs tests assert the new top-level integration next-action provider smoke progress guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level integration next-action dotenv mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level integration next-action provider smoke progress mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_DOTENV_MIRRORS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_DOTENV_MIRRORS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror API-key integration next-action dotenv setup details onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -3131,14 +3142,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Top-Level Integration Next Action Dotenv Mirrors Gate is
-verified. Summary-only top-level payload now mirrors integration next-action
-dotenv source/target paths, next-after action, secret-input flag, and no-secret
-dotenv examples. Focused tests, direct summary-only smoke, targeted payload
-print, full pytest, ruff, and health_check passed.
+Summary: API Key Top-Level Integration Next Action Provider Smoke Progress Gate
+is verified. Summary-only top-level payload now mirrors integration next-action
+provider smoke counts and the first no-secret provider smoke command row.
+Focused tests, direct summary-only smoke, targeted payload print, full pytest,
+ruff, and health_check passed.
 
 ```yaml
-api_key_top_level_integration_next_action_dotenv_mirrors_gate:
+api_key_top_level_integration_next_action_provider_smoke_progress_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3151,10 +3162,10 @@ api_key_top_level_integration_next_action_dotenv_mirrors_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary-only top-level api_key_integration_next_action_source_path, target_path, and dotenv_target_path mirror next operator action setup paths
-    - summary-only top-level api_key_integration_next_action_next_after_action, secret_input_required, dotenv_examples, and dotenv_example_count mirror next operator action setup guidance
-    - README and DevOps setup guide document top-level API-key integration next-action dotenv setup mirrors
-    - setup docs tests assert top-level integration next-action dotenv guidance
+    - summary-only top-level api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count mirror next operator action provider smoke progress
+    - summary-only top-level api_key_integration_next_action_next_provider_smoke_command_name, command, provider_family, provider, status, network_call, network_call_policy, and secret_values_returned mirror the next provider smoke row
+    - README and DevOps setup guide document top-level API-key integration next-action provider smoke progress mirrors
+    - setup docs tests assert top-level integration next-action provider smoke progress guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3175,8 +3186,21 @@ api_key_top_level_integration_next_action_dotenv_mirrors_gate:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_integration_next_action_next_after_action"], p["api_key_integration_next_action_dotenv_target_path"], p["api_key_integration_next_action_source_path"], p["api_key_integration_next_action_target_path"], p["api_key_integration_next_action_secret_input_required"], p["api_key_integration_next_action_dotenv_examples"], p["api_key_integration_next_action_dotenv_example_count"], p["secret_values_returned"])'
-      result: "fill_live_data_api_keys .env .env.example .env False [] None False"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_integration_next_action_provider_smoke_count"], p["api_key_integration_next_action_ready_provider_smoke_count"], p["api_key_integration_next_action_blocked_provider_smoke_count"], p["api_key_integration_next_action_next_provider_smoke_command_name"], p["api_key_integration_next_action_next_provider_smoke_command"], p["api_key_integration_next_action_next_provider_smoke_provider_family"], p["api_key_integration_next_action_next_provider_smoke_provider"], p["api_key_integration_next_action_next_provider_smoke_status"], p["api_key_integration_next_action_next_provider_smoke_network_call"], p["api_key_integration_next_action_next_provider_smoke_network_call_policy"], p["api_key_integration_next_action_next_provider_smoke_secret_values_returned"], p["secret_values_returned"])'
+      result: "None None None None None None None None False None False False"
+```
+
+Previous verification:
+
+Summary: API Key Top-Level Integration Next Action Dotenv Mirrors Gate is
+verified. Summary-only top-level payload now mirrors integration next-action
+dotenv source/target paths, next-after action, secret-input flag, and no-secret
+dotenv examples. Focused tests, direct summary-only smoke, targeted payload
+print, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_top_level_integration_next_action_dotenv_mirrors_gate:
+  status: verified
 ```
 
 Previous verification:

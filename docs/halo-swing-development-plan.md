@@ -874,6 +874,63 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.836 API Key Top-Level Integration Next Action Provider Smoke Progress Gate Record - 2026-05-17
+
+### A. 목적
+
+3.835에서 integration next-action row는 `.env` 준비와 API-key 입력 안내를 직접
+보여주게 됐다. 하지만 API 키를 채운 뒤 provider smoke 단계로 넘어가면 compact client는
+아직 `next_operator_action.next_provider_smoke`나 별도 provider-smoke top-level 필드를
+함께 읽어야 첫 provider smoke 명령과 진행 수를 integration row 하나에 표시할 수 있다.
+이번 slice는 provider smoke progress와 첫 provider smoke command row를
+`api_key_integration_*` prefix로 미러링해, API-key-only 연동 화면이 한 row에서 다음
+실행 명령과 안전 플래그를 보여줄 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count mirror next operator action provider smoke progress
+  - summary-only top-level api_key_integration_next_action_next_provider_smoke_command_name, command, provider_family, provider, status, network_call, network_call_policy, and secret_values_returned mirror the next provider smoke row
+  - README and DevOps setup guide document top-level API-key integration next-action provider smoke progress mirrors
+  - setup docs tests assert top-level integration next-action provider smoke progress guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - focused provider-smoke progress pytest: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: None None None None None None None None False None False False
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

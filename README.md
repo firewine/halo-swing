@@ -740,6 +740,18 @@ details as `api_key_integration_next_action_next_after_action`,
 `api_key_integration_next_action_secret_input_required`,
 `api_key_integration_next_action_dotenv_examples`, and
 `api_key_integration_next_action_dotenv_example_count`.
+It also mirrors provider smoke progress for that integration next action as
+`api_key_integration_next_action_provider_smoke_count`,
+`api_key_integration_next_action_ready_provider_smoke_count`,
+`api_key_integration_next_action_blocked_provider_smoke_count`,
+`api_key_integration_next_action_next_provider_smoke_command_name`,
+`api_key_integration_next_action_next_provider_smoke_command`,
+`api_key_integration_next_action_next_provider_smoke_provider_family`,
+`api_key_integration_next_action_next_provider_smoke_provider`,
+`api_key_integration_next_action_next_provider_smoke_status`,
+`api_key_integration_next_action_next_provider_smoke_network_call`,
+`api_key_integration_next_action_next_provider_smoke_network_call_policy`, and
+`api_key_integration_next_action_next_provider_smoke_secret_values_returned`.
 It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
