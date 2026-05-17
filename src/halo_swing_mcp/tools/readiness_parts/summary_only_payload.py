@@ -25,7 +25,9 @@ from .provider_recovery_checklist_summary import (
 )
 from .summary_only_provider_route_fields import (
     _api_key_provider_recovery_checklist_route_top_level_fields,
+    _api_key_readiness_route_top_level_fields,
     _api_key_requirement_route_top_level_fields,
+    _api_key_setup_route_top_level_fields,
 )
 from .summary_only_provider_route_summary_fields import (
     _api_key_provider_route_summary_top_level_fields,
@@ -339,52 +341,8 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_provider_route_status": setup_status_summary.get(
             "provider_route_status"
         ),
-        "api_key_setup_selected_provider_class_by_family": (
-            _optional_mapping(
-                setup_status_summary.get("selected_provider_class_by_family")
-            )
-            or {}
-        ),
-        "api_key_setup_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                setup_status_summary.get("provider_route_data_mode_by_family")
-            )
-            or {}
-        ),
-        "api_key_setup_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                setup_status_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_setup_all_selected_routes_live": (
-            setup_status_summary.get("all_selected_routes_live") is True
-        ),
-        "api_key_readiness_selected_provider_class_by_family": (
-            _optional_mapping(
-                readiness_summary.get("selected_provider_class_by_family")
-            )
-            or {}
-        ),
-        "api_key_readiness_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                readiness_summary.get("provider_route_data_mode_by_family")
-            )
-            or {}
-        ),
-        "api_key_readiness_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                readiness_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_readiness_all_selected_routes_live": (
-            readiness_summary.get("all_selected_routes_live") is True
-        ),
+        **_api_key_setup_route_top_level_fields(setup_status_summary),
+        **_api_key_readiness_route_top_level_fields(readiness_summary),
         **_api_key_requirements_top_level_fields(
             api_key_requirements_summary=api_key_requirements_summary,
             provider_requirement_rows=provider_requirement_rows,

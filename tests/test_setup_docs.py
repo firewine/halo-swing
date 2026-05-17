@@ -908,6 +908,10 @@ def test_setup_docs_keep_api_key_setup_progress_fields_in_sync() -> None:
         "api_key_setup_provider_route_data_mode_by_family",
         "api_key_setup_provider_route_live_data_required_by_family",
         "api_key_setup_all_selected_routes_live",
+        "api_key_setup_provider_route_family_count",
+        "api_key_setup_selected_provider_family_count",
+        "api_key_setup_provider_route_live_data_required_family_count",
+        "api_key_setup_provider_route_data_mode_counts",
     )
 
     for field_name in field_names:
@@ -1416,6 +1420,10 @@ def test_setup_docs_keep_api_key_readiness_summary_fields_in_sync() -> None:
         "api_key_readiness_provider_route_data_mode_by_family",
         "api_key_readiness_provider_route_live_data_required_by_family",
         "api_key_readiness_all_selected_routes_live",
+        "api_key_readiness_provider_route_family_count",
+        "api_key_readiness_selected_provider_family_count",
+        "api_key_readiness_provider_route_live_data_required_family_count",
+        "api_key_readiness_provider_route_data_mode_counts",
     )
 
     for field_name in field_names:

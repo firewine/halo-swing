@@ -1153,6 +1153,55 @@ def assert_provider_route_summary_top_level_fields(payload: dict[str, Any]) -> N
     )
 
 
+def assert_route_count_top_level_fields(
+    payload: dict[str, Any],
+    *,
+    prefix: str,
+    source_summary: dict[str, Any],
+) -> None:
+    selected_provider_class_by_family = source_summary[
+        "selected_provider_class_by_family"
+    ]
+    provider_route_data_mode_by_family = source_summary[
+        "provider_route_data_mode_by_family"
+    ]
+    provider_route_live_data_required_by_family = source_summary[
+        "provider_route_live_data_required_by_family"
+    ]
+    provider_route_families = (
+        set(selected_provider_class_by_family)
+        | set(provider_route_data_mode_by_family)
+        | set(provider_route_live_data_required_by_family)
+    )
+    expected_data_mode_counts: dict[str, int] = {}
+    for data_mode in provider_route_data_mode_by_family.values():
+        if data_mode:
+            expected_data_mode_counts[data_mode] = (
+                expected_data_mode_counts.get(data_mode, 0) + 1
+            )
+
+    assert payload[f"{prefix}_provider_route_family_count"] == len(
+        provider_route_families
+    )
+    assert payload[f"{prefix}_selected_provider_family_count"] == sum(
+        1 for provider_class in selected_provider_class_by_family.values()
+        if provider_class
+    )
+    assert (
+        payload[f"{prefix}_provider_route_live_data_required_family_count"]
+        == sum(
+            1
+            for live_data_required in (
+                provider_route_live_data_required_by_family.values()
+            )
+            if live_data_required is True
+        )
+    )
+    assert payload[f"{prefix}_provider_route_data_mode_counts"] == (
+        expected_data_mode_counts
+    )
+
+
 def assert_pipeline_check_summary_top_level_fields(payload: dict[str, Any]) -> None:
     check_summary = payload["api_key_pipeline_check_summary"]
     first_failed_check = check_summary["first_failed_check"] or {}
@@ -6973,6 +7022,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert_api_key_command_summary_top_level_fields(payload)
     assert_api_key_requirements_summary_top_level_fields(payload)
     assert_api_key_operator_checklist_top_level_fields(payload)
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_setup",
+        source_summary=payload["setup_status_summary"],
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_readiness",
+        source_summary=payload["readiness_summary"],
+    )
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -9591,6 +9650,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert payload["api_key_setup_all_selected_routes_live"] is (
         payload["setup_status_summary"]["all_selected_routes_live"]
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_setup",
+        source_summary=payload["setup_status_summary"],
+    )
     assert checklist_summary["selected_provider_class_by_family"] == (
         payload["setup_status_summary"]["selected_provider_class_by_family"]
     )
@@ -10668,6 +10732,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_requirement_provider_route_data_mode_counts"] == {
         "live": 1
     }
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_setup",
+        source_summary=payload["setup_status_summary"],
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_readiness",
+        source_summary=payload["readiness_summary"],
+    )
     assert requirements["provider_requirements"]["market"]["configured"] is True
     assert requirements["provider_requirements"]["macro"]["preferred_env_key"] == (
         "FRED_API_KEY"
@@ -11991,6 +12065,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     )
     assert payload["api_key_readiness_all_selected_routes_live"] is (
         readiness_summary["all_selected_routes_live"]
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_readiness",
+        source_summary=readiness_summary,
     )
     assert readiness_summary["secret_values_returned"] is False
     assert "next_operator_action" not in payload["omitted_sections"]

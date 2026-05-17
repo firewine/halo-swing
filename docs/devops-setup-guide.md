@@ -601,7 +601,11 @@ It mirrors provider-family readiness at top level with
 evidence as `api_key_setup_selected_provider_class_by_family`,
 `api_key_setup_provider_route_data_mode_by_family`,
 `api_key_setup_provider_route_live_data_required_by_family`, and
-`api_key_setup_all_selected_routes_live`.
+`api_key_setup_all_selected_routes_live`, plus route count aggregates
+`api_key_setup_provider_route_family_count`,
+`api_key_setup_selected_provider_family_count`,
+`api_key_setup_provider_route_live_data_required_family_count`, and
+`api_key_setup_provider_route_data_mode_counts`.
 When provider recovery is required, the compact top-level payload also exposes
 top-level summary-only recovery command lists:
 `provider_recovery_smoke_command_names`, `provider_recovery_smoke_commands`,
@@ -1266,7 +1270,11 @@ with `selected_provider_class_by_family`,
 `api_key_readiness_selected_provider_class_by_family`,
 `api_key_readiness_provider_route_data_mode_by_family`,
 `api_key_readiness_provider_route_live_data_required_by_family`, and
-`api_key_readiness_all_selected_routes_live`.
+`api_key_readiness_all_selected_routes_live`, plus route count aggregates
+`api_key_readiness_provider_route_family_count`,
+`api_key_readiness_selected_provider_family_count`,
+`api_key_readiness_provider_route_live_data_required_family_count`, and
+`api_key_readiness_provider_route_data_mode_counts`.
 The top-level
 `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
