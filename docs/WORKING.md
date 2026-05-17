@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SETUP_DOCS_PROVIDER_ERROR_RECOVERY_PARITY_VERIFIED
-gate_id: API_KEY_SETUP_DOCS_PROVIDER_ERROR_RECOVERY_PARITY_GATE
+status: API_KEY_SETUP_DOCS_PROVIDER_RECOVERY_SUMMARY_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_PROVIDER_RECOVERY_SUMMARY_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: lock README and DevOps API-key provider error recovery field parity
+next_atomic_step: lock README and DevOps API-key provider recovery summary field parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,7 +70,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_error_recovery_fields_in_sync -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -78,14 +78,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide coverage assert the same provider error summary, failed provider, and next provider recovery field names
-  - README and DevOps setup guide coverage assert the same API-key provider recovery checklist recovery smoke command and availability field names
+  - README and DevOps setup guide coverage assert the same API-key provider recovery summary schema, status, count, smoke availability, network, mutation, and secret-safety field names
+  - README and DevOps setup guide coverage assert the same provider recovery diagnostic, URL, env-key, status, and next recovery field names
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified README/DevOps provider error recovery parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified README/DevOps provider recovery summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SETUP_DOCS_PROVIDER_ERROR_RECOVERY_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_PROVIDER_ERROR_RECOVERY_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock README and DevOps API-key provider error recovery field parity
 ```
 
 Previous completed directive:
@@ -3357,15 +3368,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Setup Docs Provider Error Recovery Parity Guard is verified.
-README and DevOps setup-guide coverage now assert the same provider error
-summary, failed provider, next provider recovery, provider recovery smoke, and
-API-key provider recovery checklist field names. Focused parity coverage,
-setup-docs coverage, direct summary-only smoke, full pytest, ruff, and
-health_check passed.
+Summary: API Key Setup Docs Provider Recovery Summary Parity Guard is verified.
+README and DevOps setup-guide coverage now assert the same API-key provider
+recovery summary schema, count, smoke availability, network, mutation,
+secret-safety, diagnostic, URL, env-key, status, and next recovery field names.
+Focused parity coverage, setup-docs coverage, direct summary-only smoke, full
+pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_setup_docs_provider_error_recovery_parity_gate:
+api_key_setup_docs_provider_recovery_summary_parity_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3374,8 +3385,8 @@ api_key_setup_docs_provider_error_recovery_parity_gate:
     - docs/halo-swing-development-plan.md
     - tests/test_setup_docs.py
   implementation:
-    - tests-only/docs guard asserts README and DevOps guide both include provider error summary, failed provider, and next provider recovery field names
-    - parity coverage asserts both docs include API-key provider recovery checklist recovery smoke command and availability field names
+    - tests-only/docs guard asserts README and DevOps guide both include API-key provider recovery summary schema, status, count, smoke availability, network, mutation, and secret-safety field names
+    - parity coverage asserts both docs include provider recovery diagnostic, URL, env-key, status, and next recovery field names
     - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
@@ -3387,14 +3398,14 @@ api_key_setup_docs_provider_error_recovery_parity_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_error_recovery_fields_in_sync -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync -q
       result: "1 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
-      result: "28 passed"
+      result: "29 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
       result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; secret_values_returned false
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "820 passed"
+      result: "821 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -3405,6 +3416,20 @@ api_key_setup_docs_provider_error_recovery_parity_gate:
       result: ignored local state/ only
     - command: git diff -- src/halo_swing_mcp
       result: passed; no source changes
+```
+
+Previous verification:
+
+Summary: API Key Setup Docs Provider Error Recovery Parity Guard is verified.
+README and DevOps setup-guide coverage now assert the same provider error
+summary, failed provider, next provider recovery, provider recovery smoke, and
+API-key provider recovery checklist field names. Focused parity coverage,
+setup-docs coverage, direct summary-only smoke, full pytest, ruff, and
+health_check passed.
+
+```yaml
+api_key_setup_docs_provider_error_recovery_parity_gate:
+  status: verified
 ```
 
 Previous verification:

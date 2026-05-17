@@ -1111,6 +1111,56 @@ def test_setup_docs_keep_api_key_provider_error_recovery_fields_in_sync() -> Non
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_provider_recovery_summary",
+        "api_key_provider_recovery_summary.v1",
+        "provider_error_count",
+        "provider_recovery_smoke_available_count",
+        "provider_recovery_smoke_unavailable_count",
+        "provider_recovery_all_smokes_available",
+        "provider_recovery_network_call_count",
+        "provider_recovery_all_network_calls",
+        "provider_recovery_mutates_local_state_count",
+        "provider_recovery_any_mutates_local_state",
+        "provider_recovery_secret_values_returned_count",
+        "provider_recovery_any_secret_values_returned",
+        "provider_recovery_next_setup_actions",
+        "provider_recovery_exception_types",
+        "provider_recovery_exception_message_returned_count",
+        "provider_recovery_any_exception_messages_returned",
+        "provider_recovery_url_returned_count",
+        "provider_recovery_any_urls_returned",
+        "provider_recovery_network_call_policies",
+        "provider_recovery_statuses",
+        "provider_recovery_preferred_env_keys",
+        "provider_recovery_accepted_env_keys",
+        "provider_recovery_accepted_env_key_groups",
+        "provider_recovery_summary_status",
+        "next_recovery_smoke_command_name",
+        "next_recovery_smoke_command",
+        "next_recovery_provider_family",
+        "next_recovery_provider",
+        "next_recovery_smoke_available",
+        "next_recovery_next_setup_action",
+        "next_recovery_preferred_env_key",
+        "next_recovery_accepted_env_keys",
+        "next_recovery_network_call_policy",
+        "next_recovery_network_call",
+        "next_recovery_mutates_local_state",
+        "next_recovery_exception_type",
+        "next_recovery_exception_message_returned",
+        "next_recovery_url_returned",
+        "next_recovery_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
