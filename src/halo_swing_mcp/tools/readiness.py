@@ -3444,6 +3444,34 @@ def _api_key_integration_status_summary(
                 0,
             )
         ),
+        "provider_recovery_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_provider_families"
+            )
+        ),
+        "provider_recovery_providers": _string_list(
+            api_key_provider_recovery_summary.get("provider_recovery_providers")
+        ),
+        "provider_recovery_pending_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_provider_families"
+            )
+        ),
+        "provider_recovery_pending_providers": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_providers"
+            )
+        ),
+        "provider_recovery_blocked_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_provider_families"
+            )
+        ),
+        "provider_recovery_blocked_providers": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_providers"
+            )
+        ),
         "provider_recovery_retry_ready": (
             api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
             is True

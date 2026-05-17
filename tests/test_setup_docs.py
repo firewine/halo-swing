@@ -142,6 +142,13 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_blocked_count" in guide
     assert "provider_error_count" in guide
     assert "provider_recovery_smoke_count" in guide
+    assert "recovery identity lists" in guide
+    assert "provider_recovery_provider_families" in guide
+    assert "provider_recovery_providers" in guide
+    assert "provider_recovery_pending_provider_families" in guide
+    assert "provider_recovery_pending_providers" in guide
+    assert "provider_recovery_blocked_provider_families" in guide
+    assert "provider_recovery_blocked_providers" in guide
     assert "mirrors the first pending recovery command" in guide
     assert "mirrors the first blocked" in guide
     assert "next action summary carries provider smoke" in guide

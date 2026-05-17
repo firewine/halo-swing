@@ -28,6 +28,68 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.790 API Key Integration Status Recovery Identity Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_integration_status_summary`는 recovery count와 첫 pending/blocked action을
+보여주지만, 상위 row만 보는 operator가 어떤 provider family와 provider가 recovery
+대상인지 전체 목록으로 확인하려면 nested `api_key_provider_recovery_summary`를 다시
+열어야 했다. 이번 slice는 no-secret
+`provider_recovery_pending_provider_families`,
+`provider_recovery_pending_providers`,
+`provider_recovery_blocked_provider_families`,
+`provider_recovery_blocked_providers`, `provider_recovery_provider_families`,
+`provider_recovery_providers`를 integration status summary로 올려, API-key-only summary
+row만으로 recovery 대상 provider identity를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary includes provider_recovery_pending_provider_families and provider_recovery_pending_providers copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes provider_recovery_blocked_provider_families and provider_recovery_blocked_providers copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes provider_recovery_provider_families and provider_recovery_providers aggregate identity lists
+  - fake-key API-key pipeline summary-only CLI returns integration status recovery identity lists without secret values
+  - blocked setup summary returns empty recovery identity lists without secret values
+  - ready fake-live summary returns empty recovery identity lists without secret values
+  - focused tests cover integration status recovery identity fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document integration status recovery identity fields
+  - tests/test_setup_docs.py asserts integration status recovery identity field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_integration_status_summary_carries_next_blocked_recovery_fields tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only integration status recovery identity lists returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(",".join(summary["provider_recovery_pending_provider_families"]), ",".join(summary["provider_recovery_pending_providers"]), ",".join(summary["provider_recovery_blocked_provider_families"]), ",".join(summary["provider_recovery_blocked_providers"]), summary["secret_values_returned"])': market,macro,news polygon,fred,newsapi   False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.789 API Key Integration Status Recovery Count Gate Record - 2026-05-17
 
 ### A. 목적
