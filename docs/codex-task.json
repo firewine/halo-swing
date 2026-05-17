@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_NEXT_ACTION_SUMMARY_PROVIDER_FIELDS_GATE",
+  "gate_id": "API_KEY_FAILURE_SUMMARY_PROVIDER_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.763",
-  "next_atomic_step": "add provider identity fields to API-key next-action and integration-status summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.764",
+  "next_atomic_step": "add provider identity fields to API-key pipeline failure summary",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.762",
+    "docs/halo-swing-development-plan.md#3.763",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -39,9 +39,9 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\",\"symbols\":[\"QQQ\"],\"topic\":\"macro\",\"summary_only\":true}' --no-audit",
-    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload[\"api_key_next_action_summary\"]; status=payload[\"api_key_integration_status_summary\"]; print(action[\"next_action_provider_family\"], action[\"next_action_provider\"], action[\"next_action_smoke_command_name\"], status[\"next_action_provider_family\"], status[\"next_action_provider\"], status[\"next_action_smoke_command_name\"], action[\"secret_values_returned\"], status[\"secret_values_returned\"])'",
+    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload[\"api_key_pipeline_failure_summary\"]; print(summary[\"next_action_provider_family\"], summary[\"next_action_provider\"], summary[\"next_action_smoke_command_name\"], summary[\"secret_values_returned\"])'",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -57,16 +57,16 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_next_action_summary includes next_action_provider_family, next_action_provider, and next_action_smoke_command_name",
-    "api_key_integration_status_summary mirrors next-action provider identity without secret values",
-    "focused tests cover provider identity fields in summary_only API-key next-action and integration-status summaries",
-    "fake-key API-key pipeline summary-only CLI returns next-action summary provider identity without secret values",
-    "README and DevOps setup guide document next-action and integration-status provider identity",
-    "setup docs tests assert next-action and integration-status provider identity guidance",
+    "api_key_pipeline_failure_summary includes next_action_provider_family, next_action_provider, and next_action_smoke_command_name when failure recovery targets provider smoke",
+    "api_key_pipeline_failure_summary mirrors next-action provider identity without secret values",
+    "focused tests cover provider identity fields in summary_only API-key failure summary",
+    "fake-key API-key pipeline summary-only CLI returns failure summary provider identity without secret values",
+    "README and DevOps setup guide document failure summary provider identity",
+    "setup docs tests assert failure summary provider identity guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key next-action summary provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key failure summary provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

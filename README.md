@@ -405,10 +405,13 @@ The compact `api_key_pipeline_failure_summary`
 operator-facing row with `status`, `has_failures`, `failure_category`,
 `failed_stage_names`, `failed_check_keys`, `tools_with_failures`,
 `first_failed_stage_name`, `first_failed_check_key`, `next_action_name`,
-`next_action_command`, `next_action_is_recovery`,
+`next_action_command`, `next_action_provider_family`,
+`next_action_provider`, `next_action_smoke_command_name`,
+`next_action_is_recovery`,
 `provider_recovery_required`, and `provider_recovery_item_count`. When the
 failure category is provider recovery, it also includes recovery env-key hints
-with `preferred_env_key` and `accepted_env_keys` without returning key values.
+with `preferred_env_key` and `accepted_env_keys` without returning key values,
+so failure summary provider identity is visible in compact output.
 The top-level `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) keeps the `.env.example` and `.env` setup
 state visible with `source_path`, `target_path`, `source_exists`,

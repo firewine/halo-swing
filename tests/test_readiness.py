@@ -2454,6 +2454,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_name": "recover_failed_providers",
         "next_action_command": payload["provider_recovery_smokes"][0]["command"],
         "next_action_is_recovery": True,
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "provider_recovery_required": True,
         "provider_recovery_item_count": 3,
         "preferred_env_key": "POLYGON_API_KEY",
@@ -4089,6 +4092,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "command"
         ],
         "next_action_is_recovery": False,
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "provider_recovery_required": False,
         "provider_recovery_item_count": 0,
         "network_call": False,
@@ -5134,6 +5140,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert payload["api_key_pipeline_failure_summary"][
+        "next_action_provider_family"
+    ] == "market"
+    assert payload["api_key_pipeline_failure_summary"]["next_action_provider"] == (
+        "polygon"
+    )
+    assert payload["api_key_pipeline_failure_summary"][
+        "next_action_smoke_command_name"
+    ] == "get_market_snapshot_live_smoke"
     assert checklist_summary["secret_values_returned"] is False
     assert "api_key_operator_checklist" not in payload
     assert "api_key_provider_recovery_checklist" not in payload

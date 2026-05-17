@@ -2312,6 +2312,19 @@ def _api_key_pipeline_failure_summary(
     accepted_env_keys = _string_list(
         api_key_next_action_summary.get("accepted_env_keys")
     )
+    next_action_provider_family = api_key_next_action_summary.get(
+        "next_action_provider_family"
+    )
+    next_action_provider = api_key_next_action_summary.get("next_action_provider")
+    next_action_smoke_command_name = api_key_next_action_summary.get(
+        "next_action_smoke_command_name"
+    )
+    if isinstance(next_action_provider_family, str):
+        summary["next_action_provider_family"] = next_action_provider_family
+    if isinstance(next_action_provider, str):
+        summary["next_action_provider"] = next_action_provider
+    if isinstance(next_action_smoke_command_name, str):
+        summary["next_action_smoke_command_name"] = next_action_smoke_command_name
     if provider_recovery_required and isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if provider_recovery_required and accepted_env_keys:
