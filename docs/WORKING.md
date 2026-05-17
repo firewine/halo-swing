@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_RECOVERY_REQUIRED_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_REQUIRED_GATE
+status: API_KEY_SUMMARY_ONLY_FAILURE_ONE_LINE_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_FAILURE_ONE_LINE_GATE
 review_tier: S1_small
 
-next_atomic_step: carry provider recovery required flag and summary status into top-level API-key pipeline summary-only payload
+next_atomic_step: carry API-key pipeline failure category and first failure fields into top-level summary-only payload
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -76,25 +76,36 @@ required_verification:
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["provider_recovery_required"], payload["provider_recovery_summary_status"], payload["provider_recovery_item_count"], payload["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_failure_category"], payload["api_key_has_failures"], payload["api_key_first_failed_stage_name"], payload["api_key_first_failed_check_key"], payload["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - top-level API-key pipeline full payload includes provider_recovery_required and provider_recovery_summary_status copied from API-key provider recovery summary
-  - top-level API-key pipeline summary-only payload includes provider_recovery_required and provider_recovery_summary_status copied from full payload
-  - fake-key API-key pipeline summary-only CLI returns provider_recovery_required=true and provider_recovery_summary_status without secret values
-  - blocked setup summary-only payload returns provider_recovery_required=false and provider_recovery_summary_status=ok without secret values
-  - focused tests cover top-level recovery required flag and summary status in summary_only API-key pipeline output
-  - README and DevOps setup guide document top-level summary-only recovery required flag and summary status
-  - setup docs tests assert top-level summary-only recovery required guidance
+  - top-level API-key pipeline full payload includes api_key_failure_category, api_key_has_failures, api_key_failed_stage_names, api_key_failed_check_keys, api_key_tools_with_failures, api_key_first_failed_stage_name, and api_key_first_failed_check_key copied from API-key pipeline failure summary
+  - top-level API-key pipeline summary-only payload includes the same API-key failure one-line fields copied from full payload
+  - fake-key API-key pipeline summary-only CLI returns provider_recovery failure category and first failure fields without secret values
+  - blocked setup summary-only payload returns setup failure category and first failure fields without secret values
+  - focused tests cover top-level API-key failure one-line fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document top-level summary-only API-key failure one-line fields
+  - setup docs tests assert top-level summary-only API-key failure one-line guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only recovery required gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only failure one-line gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_RECOVERY_REQUIRED_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_REQUIRED_GATE
+review_tier: S1_small
+
+next_atomic_step: carry provider recovery required flag and summary status into top-level API-key pipeline summary-only payload
 ```
 
 Previous completed directive:
@@ -2717,14 +2728,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Summary-Only Recovery Required Gate is verified.
-`run_api_key_pipeline_smoke(summary_only=true)` now exposes
-`provider_recovery_required` and `provider_recovery_summary_status` in the
-top-level summary-only payload. Focused tests, fake-key CLI, full pytest,
-ruff, and health_check passed.
+Summary: API Key Summary-Only Failure One-Line Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes API-key failure
+category, failure boolean, failed stage/check names, tools with failures, and
+first failed stage/check keys in the top-level summary-only payload. Focused
+tests, fake-key CLI, full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_summary_only_recovery_required_gate:
+api_key_summary_only_failure_one_line_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2737,13 +2748,13 @@ api_key_summary_only_recovery_required_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - top-level API-key pipeline full payload includes provider_recovery_required and provider_recovery_summary_status copied from API-key provider recovery summary
-    - top-level API-key pipeline summary-only payload includes provider_recovery_required and provider_recovery_summary_status copied from full payload
-    - fake-key API-key pipeline summary-only CLI returns provider_recovery_required=true and provider_recovery_summary_status without secret values
-    - blocked setup summary-only payload returns provider_recovery_required=false and provider_recovery_summary_status=ok without secret values
-    - focused tests cover top-level recovery required flag and summary status in summary_only API-key pipeline output
-    - README and DevOps setup guide document top-level summary-only recovery required flag and summary status
-    - tests/test_setup_docs.py asserts top-level summary-only recovery required guidance
+    - top-level API-key pipeline full payload includes api_key_failure_category, api_key_has_failures, api_key_failed_stage_names, api_key_failed_check_keys, api_key_tools_with_failures, api_key_first_failed_stage_name, and api_key_first_failed_check_key copied from API-key pipeline failure summary
+    - top-level API-key pipeline summary-only payload includes the same API-key failure one-line fields copied from full payload
+    - fake-key API-key pipeline summary-only CLI returns provider_recovery failure category and first failure fields without secret values
+    - blocked setup summary-only payload returns setup failure category and first failure fields without secret values
+    - focused tests cover top-level API-key failure one-line fields in summary_only API-key pipeline output
+    - README and DevOps setup guide document top-level summary-only API-key failure one-line fields
+    - tests/test_setup_docs.py asserts top-level summary-only API-key failure one-line guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2757,9 +2768,9 @@ api_key_summary_only_recovery_required_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; top-level recovery required flag and summary status returned without secret values"
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["provider_recovery_required"], payload["provider_recovery_summary_status"], payload["provider_recovery_item_count"], payload["secret_values_returned"])'
-      result: "True conflict 3 False"
+      result: "exit 0; top-level API-key failure one-line fields returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_failure_category"], payload["api_key_has_failures"], payload["api_key_first_failed_stage_name"], payload["api_key_first_failed_check_key"], payload["secret_values_returned"])'
+      result: "provider_recovery True run_live_data_smoke run_live_data_smoke.live_data_smoke_status_ok False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "796 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .

@@ -703,6 +703,11 @@ operator-facing row with `status`, `has_failures`, `failure_category`,
 `next_action_is_recovery`,
 `provider_recovery_required`, and `provider_recovery_item_count`. When the
 failure category is provider recovery, it also includes recovery env-key hints
+The compact top-level payload also mirrors API-key failure one-line fields:
+`api_key_failure_category`, `api_key_has_failures`,
+`api_key_failed_stage_names`, `api_key_failed_check_keys`,
+`api_key_tools_with_failures`, `api_key_first_failed_stage_name`, and
+`api_key_first_failed_check_key`.
 with `preferred_env_key` and `accepted_env_keys` without returning key values, so
 failure summary provider identity is visible in compact output. The
 top-level `api_key_setup_file_summary`

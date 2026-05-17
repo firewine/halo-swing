@@ -974,6 +974,27 @@ def run_api_key_pipeline_smoke(
             api_key_integration_status_summary
         ),
         "api_key_live_http_timeout_summary": api_key_live_http_timeout_summary,
+        "api_key_failure_category": api_key_pipeline_failure_summary.get(
+            "failure_category"
+        ),
+        "api_key_has_failures": (
+            api_key_pipeline_failure_summary.get("has_failures") is True
+        ),
+        "api_key_failed_stage_names": _string_list(
+            api_key_pipeline_failure_summary.get("failed_stage_names")
+        ),
+        "api_key_failed_check_keys": _string_list(
+            api_key_pipeline_failure_summary.get("failed_check_keys")
+        ),
+        "api_key_tools_with_failures": _string_list(
+            api_key_pipeline_failure_summary.get("tools_with_failures")
+        ),
+        "api_key_first_failed_stage_name": api_key_pipeline_failure_summary.get(
+            "first_failed_stage_name"
+        ),
+        "api_key_first_failed_check_key": api_key_pipeline_failure_summary.get(
+            "first_failed_check_key"
+        ),
         "live_data_smoke_summary": live_data_smoke_summary,
         "failed_provider_families": live_data_smoke_summary[
             "failed_provider_families"
@@ -2968,6 +2989,23 @@ def _api_key_pipeline_summary_only_payload(
                 )
                 or {}
             )
+        ),
+        "api_key_failure_category": payload.get("api_key_failure_category"),
+        "api_key_has_failures": payload.get("api_key_has_failures") is True,
+        "api_key_failed_stage_names": _string_list(
+            payload.get("api_key_failed_stage_names")
+        ),
+        "api_key_failed_check_keys": _string_list(
+            payload.get("api_key_failed_check_keys")
+        ),
+        "api_key_tools_with_failures": _string_list(
+            payload.get("api_key_tools_with_failures")
+        ),
+        "api_key_first_failed_stage_name": payload.get(
+            "api_key_first_failed_stage_name"
+        ),
+        "api_key_first_failed_check_key": payload.get(
+            "api_key_first_failed_check_key"
         ),
         "provider_route_summary": _optional_mapping(
             payload.get("provider_route_summary")

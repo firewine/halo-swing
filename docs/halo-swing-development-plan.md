@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.798 API Key Summary-Only Failure One-Line Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_pipeline_failure_summary`는 failure category, failed stage/check 목록, 첫
+실패 stage/check를 보여주지만, 최상위
+`run_api_key_pipeline_smoke(summary_only=true)` row만 스캔하는 operator는 setup 문제인지
+provider recovery 문제인지 확인하려면 nested summary를 다시 열어야 했다. 이번 slice는
+no-secret `api_key_failure_category`, `api_key_has_failures`,
+`api_key_failed_stage_names`, `api_key_failed_check_keys`,
+`api_key_tools_with_failures`, `api_key_first_failed_stage_name`,
+`api_key_first_failed_check_key`를 summary-only 최상위 payload로 올려, API-key-only 한 줄
+요약만으로 실패 분류와 첫 실패 지점을 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level API-key pipeline full payload includes api_key_failure_category, api_key_has_failures, api_key_failed_stage_names, api_key_failed_check_keys, api_key_tools_with_failures, api_key_first_failed_stage_name, and api_key_first_failed_check_key copied from API-key pipeline failure summary
+  - top-level API-key pipeline summary-only payload includes the same API-key failure one-line fields copied from full payload
+  - fake-key API-key pipeline summary-only CLI returns provider_recovery failure category and first failure fields without secret values
+  - blocked setup summary-only payload returns setup failure category and first failure fields without secret values
+  - focused tests cover top-level API-key failure one-line fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document top-level summary-only API-key failure one-line fields
+  - tests/test_setup_docs.py asserts top-level summary-only API-key failure one-line guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; top-level API-key failure one-line fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_failure_category"], payload["api_key_has_failures"], payload["api_key_first_failed_stage_name"], payload["api_key_first_failed_check_key"], payload["secret_values_returned"])': provider_recovery True run_live_data_smoke run_live_data_smoke.live_data_smoke_status_ok False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.797 API Key Summary-Only Recovery Required Gate Record - 2026-05-17
 
 ### A. 목적
