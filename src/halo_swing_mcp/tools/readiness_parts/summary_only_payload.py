@@ -10,7 +10,11 @@ from .summary_only_integration_status_fields import (
 from .summary_only_pipeline_route_fields import (
     _api_key_pipeline_route_top_level_fields,
 )
+from .provider_recovery_checklist_summary import (
+    _api_key_provider_recovery_checklist_summary,
+)
 from .summary_only_provider_route_fields import (
+    _api_key_provider_recovery_checklist_route_top_level_fields,
     _api_key_provider_recovery_route_top_level_fields,
     _api_key_requirement_route_top_level_fields,
 )
@@ -69,9 +73,16 @@ def _api_key_pipeline_summary_only_payload(
     api_key_pipeline_check_summary = _optional_mapping(
         payload.get("api_key_pipeline_check_summary")
     ) or {}
+    api_key_provider_recovery_checklist = _optional_mapping(
+        payload.get("api_key_provider_recovery_checklist")
+    ) or {}
+    api_key_provider_recovery_checklist_summary = (
+        _api_key_provider_recovery_checklist_summary(
+            api_key_provider_recovery_checklist
+        )
+    )
     api_key_provider_recovery_summary = _api_key_provider_recovery_summary(
-        _optional_mapping(payload.get("api_key_provider_recovery_checklist"))
-        or {},
+        api_key_provider_recovery_checklist,
         route_family_summary=setup_status_summary,
     )
     return {
@@ -469,6 +480,9 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_provider_recovery_summary": (
             api_key_provider_recovery_summary
         ),
+        "api_key_provider_recovery_checklist_summary": (
+            api_key_provider_recovery_checklist_summary
+        ),
         "provider_smoke_summaries": provider_smoke_rows,
         "provider_smoke_summary_count": provider_smoke_summary_count,
         "provider_smoke_success_count": provider_smoke_success_count,
@@ -599,6 +613,9 @@ def _api_key_pipeline_summary_only_payload(
         ),
         **_api_key_provider_recovery_route_top_level_fields(
             api_key_provider_recovery_summary
+        ),
+        **_api_key_provider_recovery_checklist_route_top_level_fields(
+            api_key_provider_recovery_checklist_summary
         ),
         "provider_recovery_summary_status": payload.get(
             "provider_recovery_summary_status"

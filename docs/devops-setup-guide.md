@@ -815,6 +815,18 @@ The compact top-level payload mirrors provider recovery route-family evidence as
 `api_key_provider_recovery_provider_route_data_mode_by_family`,
 `api_key_provider_recovery_provider_route_live_data_required_by_family`, and
 `api_key_provider_recovery_all_selected_routes_live`.
+It also keeps `api_key_provider_recovery_checklist_summary`
+(`api_key_provider_recovery_checklist_summary.v1`) with checklist status,
+provider error and recovery smoke counts, next recovery provider/smoke fields,
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`, and
+no secret values while the full `api_key_provider_recovery_checklist` remains
+omitted from summary-only output. Compact clients can read the same checklist
+route evidence from
+`api_key_provider_recovery_checklist_selected_provider_class_by_family`,
+`api_key_provider_recovery_checklist_provider_route_data_mode_by_family`,
+`api_key_provider_recovery_checklist_provider_route_live_data_required_by_family`,
+and `api_key_provider_recovery_checklist_all_selected_routes_live`.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
@@ -1119,7 +1131,10 @@ with its matching no-secret `recovery_smoke_command` and
 `provider_route_live_data_required_by_family`, and `all_selected_routes_live`,
 so API-key-only recovery can rerun the right provider smoke with the selected
 live provider route evidence visible without manually matching
-`provider_error_summaries` to `provider_recovery_smokes`.
+`provider_error_summaries` to `provider_recovery_smokes`. Individual checklist
+items also include no-secret `selected_provider_class`,
+`provider_route_data_mode`, and `provider_route_live_data_required` for their
+provider family.
 The `api_key_operator_checklist` mirrors provider recovery state as
 `provider_recovery_status`, `provider_recovery_required`,
 `provider_recovery_item_count`, `next_provider_recovery_action`, and

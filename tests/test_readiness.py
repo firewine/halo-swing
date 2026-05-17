@@ -3262,6 +3262,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "get_news_bundle_live_smoke",
     ]
     assert recovery_checklist["items"][0]["exception_type"] == "RuntimeError"
+    assert recovery_checklist["items"][0]["selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert recovery_checklist["items"][0]["provider_route_data_mode"] == "live"
+    assert (
+        recovery_checklist["items"][0]["provider_route_live_data_required"]
+        is True
+    )
+    assert [
+        item["selected_provider_class"] for item in recovery_checklist["items"]
+    ] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert [
+        item["provider_route_data_mode"] for item in recovery_checklist["items"]
+    ] == ["live", "live", "live"]
+    assert [
+        item["provider_route_live_data_required"]
+        for item in recovery_checklist["items"]
+    ] == [True, True, True]
     assert recovery_checklist["items"][0]["next_setup_action"] == (
         "verify_provider_credentials_or_network"
     )
@@ -6855,6 +6877,52 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_provider_recovery_all_selected_routes_live"] is (
         payload["api_key_provider_recovery_summary"]["all_selected_routes_live"]
     )
+    recovery_checklist_summary = payload[
+        "api_key_provider_recovery_checklist_summary"
+    ]
+    assert recovery_checklist_summary == {
+        "schema_version": "api_key_provider_recovery_checklist_summary.v1",
+        "status": "ok",
+        "provider_recovery_required": False,
+        "provider_error_count": 0,
+        "provider_recovery_smoke_count": 0,
+        "item_count": 0,
+        "next_recovery_provider_family": None,
+        "next_recovery_provider": None,
+        "next_recovery_smoke_command_name": None,
+        "next_recovery_smoke_available": False,
+        "next_recovery_network_call": False,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload[
+        "api_key_provider_recovery_checklist_selected_provider_class_by_family"
+    ] == recovery_checklist_summary["selected_provider_class_by_family"]
+    assert payload[
+        "api_key_provider_recovery_checklist_provider_route_data_mode_by_family"
+    ] == recovery_checklist_summary["provider_route_data_mode_by_family"]
+    assert (
+        payload[
+            "api_key_provider_recovery_checklist_provider_route_live_data_required_by_family"
+        ]
+        == recovery_checklist_summary[
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert payload[
+        "api_key_provider_recovery_checklist_all_selected_routes_live"
+    ] is recovery_checklist_summary["all_selected_routes_live"]
     assert payload["provider_recovery_summary_status"] == "ok"
     assert payload["provider_recovery_action_status"] == "no_recovery_required"
     assert payload["provider_recovery_item_count"] == 0
@@ -7649,6 +7717,52 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert payload["api_key_operator_checklist_all_selected_routes_live"] is (
         checklist_summary["all_selected_routes_live"]
     )
+    recovery_checklist_summary = payload[
+        "api_key_provider_recovery_checklist_summary"
+    ]
+    assert recovery_checklist_summary["schema_version"] == (
+        "api_key_provider_recovery_checklist_summary.v1"
+    )
+    assert recovery_checklist_summary["status"] == "conflict"
+    assert recovery_checklist_summary["provider_recovery_required"] is True
+    assert recovery_checklist_summary["provider_error_count"] == 3
+    assert recovery_checklist_summary["provider_recovery_smoke_count"] == 3
+    assert recovery_checklist_summary["item_count"] == 3
+    assert recovery_checklist_summary["next_recovery_provider_family"] == "market"
+    assert recovery_checklist_summary["next_recovery_provider"] == "polygon"
+    assert recovery_checklist_summary["next_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert recovery_checklist_summary["next_recovery_smoke_available"] is True
+    assert recovery_checklist_summary["next_recovery_network_call"] is True
+    assert recovery_checklist_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert recovery_checklist_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert recovery_checklist_summary[
+        "provider_route_live_data_required_by_family"
+    ] == payload["setup_status_summary"]["provider_route_live_data_required_by_family"]
+    assert recovery_checklist_summary["all_selected_routes_live"] is True
+    assert recovery_checklist_summary["secret_values_returned"] is False
+    assert payload[
+        "api_key_provider_recovery_checklist_selected_provider_class_by_family"
+    ] == recovery_checklist_summary["selected_provider_class_by_family"]
+    assert payload[
+        "api_key_provider_recovery_checklist_provider_route_data_mode_by_family"
+    ] == recovery_checklist_summary["provider_route_data_mode_by_family"]
+    assert (
+        payload[
+            "api_key_provider_recovery_checklist_provider_route_live_data_required_by_family"
+        ]
+        == recovery_checklist_summary[
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert payload[
+        "api_key_provider_recovery_checklist_all_selected_routes_live"
+    ] is recovery_checklist_summary["all_selected_routes_live"]
     assert payload["api_key_copy_dotenv_command"] == (
         payload["api_key_command_summary"]["copy_dotenv_command"]["command"]
     )

@@ -1297,7 +1297,38 @@ def test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync() ->
         "provider_route_data_mode_by_family",
         "provider_route_live_data_required_by_family",
         "all_selected_routes_live",
+        "selected_provider_class",
+        "provider_route_data_mode",
+        "provider_route_live_data_required",
         "provider_recovery_checklist",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
+def test_setup_docs_keep_api_key_provider_recovery_checklist_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_provider_recovery_checklist_summary",
+        "api_key_provider_recovery_checklist_summary.v1",
+        "provider_error_count",
+        "provider_recovery_smoke_count",
+        "next_recovery_provider_family",
+        "next_recovery_provider",
+        "next_recovery_smoke_command_name",
+        "next_recovery_smoke_available",
+        "next_recovery_network_call",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "api_key_provider_recovery_checklist_selected_provider_class_by_family",
+        "api_key_provider_recovery_checklist_provider_route_data_mode_by_family",
+        "api_key_provider_recovery_checklist_provider_route_live_data_required_by_family",
+        "api_key_provider_recovery_checklist_all_selected_routes_live",
     )
 
     for field_name in field_names:

@@ -38,6 +38,16 @@ def _api_key_provider_recovery_checklist(
     route_family_summary = (
         route_family_summary or live_data_setup_summary or live_data_smoke_summary
     )
+    route_family_fields = _api_key_route_family_fields(route_family_summary)
+    selected_provider_class_by_family = _optional_mapping(
+        route_family_fields.get("selected_provider_class_by_family")
+    ) or {}
+    provider_route_data_mode_by_family = _optional_mapping(
+        route_family_fields.get("provider_route_data_mode_by_family")
+    ) or {}
+    provider_route_live_data_required_by_family = _optional_mapping(
+        route_family_fields.get("provider_route_live_data_required_by_family")
+    ) or {}
     provider_setup_actions = _optional_mapping(
         live_data_setup_summary.get("provider_setup_actions")
     ) or _optional_mapping(live_data_smoke_summary.get("provider_setup_actions")) or {}
@@ -60,6 +70,24 @@ def _api_key_provider_recovery_checklist(
                 "provider_family": provider_family,
                 "provider": provider_error.get("provider"),
                 "smoke_command_name": smoke_command_name,
+                "selected_provider_class": (
+                    selected_provider_class_by_family.get(provider_family)
+                    if isinstance(provider_family, str)
+                    else None
+                ),
+                "provider_route_data_mode": (
+                    provider_route_data_mode_by_family.get(provider_family)
+                    if isinstance(provider_family, str)
+                    else None
+                ),
+                "provider_route_live_data_required": (
+                    provider_route_live_data_required_by_family.get(
+                        provider_family
+                    )
+                    is True
+                    if isinstance(provider_family, str)
+                    else False
+                ),
                 "exception_type": provider_error.get("exception_type"),
                 "exception_message_returned": (
                     provider_error.get("exception_message_returned") is True
@@ -93,7 +121,7 @@ def _api_key_provider_recovery_checklist(
         "provider_recovery_smoke_count": len(recovery_smoke_rows),
         "item_count": len(items),
         "items": items,
-        **_api_key_route_family_fields(route_family_summary),
+        **route_family_fields,
         "secret_values_returned": False,
     }
 
