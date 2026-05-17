@@ -844,9 +844,16 @@ def _api_key_integration_status_summary(
         api_key_next_action_summary.get("next_action_expected_live_checks")
     )
     api_key_command_summary = api_key_command_summary or {}
-    next_provider_smoke = _optional_mapping(
+    setup_next_provider_smoke = _optional_mapping(
+        setup_status_summary.get("next_provider_smoke")
+    ) or {}
+    command_next_provider_smoke = _optional_mapping(
         api_key_command_summary.get("next_provider_smoke")
     ) or {}
+    next_provider_smoke = {
+        **setup_next_provider_smoke,
+        **command_next_provider_smoke,
+    }
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):

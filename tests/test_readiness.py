@@ -840,6 +840,7 @@ def expected_api_key_command_summary(
             "status": provider_smoke["status"],
             "smoke_command_name": provider_smoke["smoke_command_name"],
             "command": provider_smoke["command"],
+            "next_setup_action": provider_smoke["next_setup_action"],
             "selected_provider_class": provider_smoke["selected_provider_class"],
             "provider_route_data_mode": provider_smoke["provider_route_data_mode"],
             "provider_route_live_data_required": provider_smoke[
@@ -2956,6 +2957,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ),
         "next_action_next_provider_smoke_command": (
             payload["provider_recovery_smokes"][0]["command"]
+        ),
+        "next_action_next_provider_smoke_next_setup_action": (
+            "run_provider_smoke"
         ),
         "next_action_next_provider_smoke_provider_family": "market",
         "next_action_next_provider_smoke_provider": "polygon",
@@ -5569,6 +5573,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_next_provider_smoke_command": (
             fake_next_operator_action["next_provider_smoke"]["command"]
         ),
+        "next_action_next_provider_smoke_next_setup_action": (
+            "run_provider_smoke"
+        ),
         "next_action_next_provider_smoke_provider_family": "market",
         "next_action_next_provider_smoke_provider": "polygon",
         "next_action_next_provider_smoke_selected_provider_class": (
@@ -6215,6 +6222,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        ]
+        is None
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_provider_family"
         ]
         is None
@@ -6596,6 +6609,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_provider_smoke_expected_live_checks"] == []
     assert payload["api_key_next_provider_smoke_preferred_env_key"] is None
     assert payload["api_key_next_provider_smoke_accepted_env_keys"] == []
+    assert payload["api_key_next_provider_smoke_next_setup_action"] is None
     assert payload["api_key_next_provider_smoke_mutates_local_state"] is False
     assert payload["api_key_next_provider_smoke_secret_values_returned"] is False
     assert payload["api_key_one_shot_pipeline_smoke_command"] == (
@@ -6622,6 +6636,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
             "get_news_bundle --input-json '{\"topic\":\"macro\"}' --no-audit"
         ),
+    }
+    assert payload["api_key_provider_smoke_next_setup_actions_by_family"] == {
+        "market": "fill_preferred_env_key",
+        "macro": "fill_preferred_env_key",
+        "news": "fill_preferred_env_key",
     }
     assert payload["api_key_provider_smoke_statuses_by_family"] == {
         "market": "blocked",
@@ -8658,6 +8677,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         row["provider_family"]: row["command"]
         for row in command_summary["provider_smoke_commands"]
     }
+    assert payload["api_key_provider_smoke_next_setup_actions_by_family"] == {
+        row["provider_family"]: row["next_setup_action"]
+        for row in command_summary["provider_smoke_commands"]
+    }
     assert payload["api_key_provider_smoke_statuses_by_family"] == {
         row["provider_family"]: row["status"]
         for row in command_summary["provider_smoke_commands"]
@@ -8722,6 +8745,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     )
     assert payload["api_key_next_provider_smoke_command"] == (
         command_summary["next_provider_smoke"]["command"]
+    )
+    assert payload["api_key_next_provider_smoke_next_setup_action"] == (
+        command_summary["next_provider_smoke"]["next_setup_action"]
     )
     assert payload["api_key_next_provider_smoke_status"] == (
         command_summary["next_provider_smoke"]["status"]
@@ -9108,6 +9134,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         payload["next_operator_action"]["next_provider_smoke"]["command"]
     )
     assert (
+        integration_status["next_action_next_provider_smoke_next_setup_action"]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "next_setup_action"
+        ]
+    )
+    assert (
         integration_status["next_action_next_provider_smoke_provider_family"]
         == payload["next_operator_action"]["next_provider_smoke"]["provider_family"]
     )
@@ -9134,6 +9166,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert integration_status["next_action_next_provider_smoke_status"] == (
         payload["next_operator_action"]["next_provider_smoke"]["status"]
+    )
+    assert integration_status[
+        "next_action_next_provider_smoke_next_setup_action"
+    ] == (
+        payload["setup_status_summary"]["next_provider_smoke"][
+            "next_setup_action"
+        ]
     )
     assert integration_status["next_action_next_provider_smoke_network_call"] is (
         payload["next_operator_action"]["next_provider_smoke"]["network_call"]
@@ -9334,6 +9373,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        ]
+        == integration_status["next_action_next_provider_smoke_next_setup_action"]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "next_setup_action"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_provider_family"
         ]
         == integration_status["next_action_next_provider_smoke_provider_family"]
@@ -9381,6 +9429,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         payload["api_key_integration_next_action_next_provider_smoke_status"]
         == integration_status["next_action_next_provider_smoke_status"]
         == payload["next_operator_action"]["next_provider_smoke"]["status"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        ]
+        == integration_status["next_action_next_provider_smoke_next_setup_action"]
+        == payload["setup_status_summary"]["next_provider_smoke"][
+            "next_setup_action"
+        ]
+        == "run_provider_smoke"
     )
     assert (
         payload["api_key_integration_next_action_next_provider_smoke_network_call"]
@@ -9498,6 +9556,14 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        ]
+        == integration_status["next_action_next_provider_smoke_next_setup_action"]
+        == next_provider_smoke["next_setup_action"]
+        == "run_provider_smoke"
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_provider_family"
         ]
         == integration_status["next_action_next_provider_smoke_provider_family"]
@@ -9545,6 +9611,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
         == integration_status["next_action_next_provider_smoke_status"]
         == next_provider_smoke["status"]
         == "ready"
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        ]
+        == integration_status["next_action_next_provider_smoke_next_setup_action"]
+        == payload["setup_status_summary"]["next_provider_smoke"][
+            "next_setup_action"
+        ]
+        == "run_provider_smoke"
     )
     assert (
         payload["api_key_integration_next_action_next_provider_smoke_network_call"]

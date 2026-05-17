@@ -345,6 +345,7 @@ def _api_key_command_provider_smoke_row(
         "status": provider_smoke.get("status"),
         "smoke_command_name": provider_smoke.get("smoke_command_name"),
         "command": provider_smoke.get("command"),
+        "next_setup_action": provider_smoke.get("next_setup_action"),
         "selected_provider_class": provider_smoke.get("selected_provider_class"),
         "provider_route_data_mode": provider_smoke.get("provider_route_data_mode"),
         "provider_route_live_data_required": (

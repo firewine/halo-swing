@@ -408,6 +408,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "api_key_next_provider_smoke_provider_route_live_data_required" in guide
     )
     assert "api_key_next_provider_smoke_command" in guide
+    assert "api_key_next_provider_smoke_next_setup_action" in guide
     assert "api_key_next_provider_smoke_status" in guide
     assert "api_key_integration_status" in guide
     assert "api_key_integration_api_keys_configured" in guide
@@ -454,6 +455,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "api_key_integration_next_action_next_provider_smoke_command_name" in guide
     )
     assert "api_key_integration_next_action_next_provider_smoke_command" in guide
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        in guide
+    )
     assert (
         "api_key_integration_next_action_next_provider_smoke_provider_family"
         in guide
@@ -543,6 +548,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         in guide
     )
     assert "api_key_provider_smoke_network_call_policies_by_family" in guide
+    assert "api_key_provider_smoke_next_setup_actions_by_family" in guide
     assert "api_key_provider_smoke_expected_live_contracts_by_family" in guide
     assert "api_key_provider_smoke_expected_live_checks_by_family" in guide
     assert "accepted API-key aliases" in guide
@@ -621,6 +627,10 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
     )
     assert "api_key_integration_next_action_next_provider_smoke_command" in readme
     assert (
+        "api_key_integration_next_action_next_provider_smoke_next_setup_action"
+        in readme
+    )
+    assert (
         "api_key_integration_next_action_next_provider_smoke_provider_family"
         in readme
     )
@@ -680,6 +690,7 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_blocked_provider_smoke_count",
         "api_key_integration_next_action_next_provider_smoke_command_name",
         "api_key_integration_next_action_next_provider_smoke_command",
+        "api_key_integration_next_action_next_provider_smoke_next_setup_action",
         "api_key_integration_next_action_next_provider_smoke_provider_family",
         "api_key_integration_next_action_next_provider_smoke_provider",
         "api_key_integration_next_action_next_provider_smoke_selected_provider_class",
@@ -1390,6 +1401,7 @@ def test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync() -> None:
         "api_key_next_provider_smoke_provider_family",
         "api_key_next_provider_smoke_provider",
         "api_key_next_provider_smoke_command",
+        "api_key_next_provider_smoke_next_setup_action",
         "api_key_next_provider_smoke_status",
         "api_key_next_provider_smoke_network_call",
         "api_key_next_provider_smoke_network_call_policy",

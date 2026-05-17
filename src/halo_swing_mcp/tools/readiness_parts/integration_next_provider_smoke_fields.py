@@ -30,6 +30,10 @@ def _api_key_integration_next_provider_smoke_fields(
         summary["next_action_next_provider_smoke_command"] = (
             next_provider_smoke.get("command")
         )
+    if isinstance(next_provider_smoke.get("next_setup_action"), str):
+        summary["next_action_next_provider_smoke_next_setup_action"] = (
+            next_provider_smoke.get("next_setup_action")
+        )
     if isinstance(next_provider_smoke.get("provider_family"), str):
         summary["next_action_next_provider_smoke_provider_family"] = (
             next_provider_smoke.get("provider_family")
@@ -56,6 +60,10 @@ def _api_key_integration_next_provider_smoke_fields(
     if isinstance(next_provider_smoke.get("status"), str):
         summary["next_action_next_provider_smoke_status"] = (
             next_provider_smoke.get("status")
+        )
+    if isinstance(next_provider_smoke.get("next_setup_action"), str):
+        summary["next_action_next_provider_smoke_next_setup_action"] = (
+            next_provider_smoke.get("next_setup_action")
         )
     if "network_call" in next_provider_smoke:
         summary["next_action_next_provider_smoke_network_call"] = (

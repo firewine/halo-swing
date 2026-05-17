@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_STATUS_NEXT_PROVIDER_SMOKE_IDENTITY_FIELDS_VERIFIED
-gate_id: API_KEY_INTEGRATION_STATUS_NEXT_PROVIDER_SMOKE_IDENTITY_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_NEXT_SETUP_ACTION_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_SETUP_ACTION_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror next-provider-smoke command, status, and network identity into API-key integration status summary
+next_atomic_step: mirror provider smoke next_setup_action into API-key command, provider-smoke, and integration summary fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,9 +55,11 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/command_checklists.py
   - src/halo_swing_mcp/tools/readiness_parts/integration_next_provider_smoke_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -84,30 +86,31 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_integration_status_summary next-provider-smoke fields mirror command name, command, provider family, provider, status, network call, network policy, and secret redaction evidence
-  - summary-only api_key_integration_next_action_next_provider_smoke_* top-level fields prefer the same integration status summary identity fields where available
-  - fake-key offline verification proves nested and top-level next-provider-smoke identity fields carry command, provider, status, network policy, and no secret values
+  - api_key_command_summary provider_smoke_commands and next_provider_smoke preserve provider smoke next_setup_action without secret values
+  - summary-only api_key_next_provider_smoke_next_setup_action exposes the immediate provider smoke next_setup_action
+  - api_key_integration_status_summary and top-level api_key_integration_next_action_next_provider_smoke_next_setup_action mirror the same next_setup_action
+  - fake-key offline verification proves provider smoke next_setup_action fields carry run_provider_smoke and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key integration status next-provider-smoke identity fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke next_setup_action fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_STATUS_NEXT_PROVIDER_SMOKE_IDENTITY_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_SETUP_ACTION_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key integration status next-provider-smoke identity pytest: 3 passed
+  - focused API-key provider smoke next_setup_action pytest: 4 passed
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - fake-key summary-only output confirmed nested api_key_integration_status_summary and top-level api_key_integration_next_action_next_provider_smoke command, provider, status, network policy, and secret_values_returned=false mirrors
+  - fake-key summary-only output confirmed api_key_command_summary.next_provider_smoke, api_key_next_provider_smoke_next_setup_action, api_key_integration_status_summary, and top-level api_key_integration_next_action_next_provider_smoke_next_setup_action expose run_provider_smoke with secret_values_returned=false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -119,15 +122,27 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/command_checklists.py
   - src/halo_swing_mcp/tools/readiness_parts/integration_next_provider_smoke_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 next_state: commit this verified gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - integration status summary now mirrors next-provider-smoke command name, command, provider family, provider, status, network call, network policy, and secret redaction evidence
-  - summary-only top-level integration next-provider-smoke identity fields prefer integration status summary values where available
-  - no new decomposition was needed; the existing focused next-provider-smoke projection module kept touched source files below the 900-line warning point
+  - provider smoke command rows now preserve next_setup_action from the provider smoke plan
+  - generic and integration summary-only mirrors expose the immediate next provider smoke next_setup_action without secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_STATUS_NEXT_PROVIDER_SMOKE_IDENTITY_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_NEXT_PROVIDER_SMOKE_IDENTITY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror next-provider-smoke command, status, and network identity into API-key integration status summary
 ```
 
 Previous completed directive:

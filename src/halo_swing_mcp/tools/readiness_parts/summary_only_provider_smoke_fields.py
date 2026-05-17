@@ -64,6 +64,10 @@ def _api_key_provider_smoke_top_level_fields(
             is True
         ),
         "api_key_next_provider_smoke_command": next_provider_smoke.get("command"),
+        "api_key_next_provider_smoke_next_setup_action": (
+            next_provider_smoke.get("next_setup_action")
+            or setup_next_provider_smoke.get("next_setup_action")
+        ),
         "api_key_next_provider_smoke_status": next_provider_smoke.get("status"),
         "api_key_next_provider_smoke_network_call": (
             next_provider_smoke.get("network_call") is True
@@ -98,6 +102,10 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_commands_by_family": {
             family: row.get("command")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_next_setup_actions_by_family": {
+            family: row.get("next_setup_action")
             for family, row in provider_smoke_command_rows_by_family.items()
         },
         "api_key_provider_smoke_statuses_by_family": {

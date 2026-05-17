@@ -204,6 +204,12 @@ def _api_key_integration_status_top_level_fields(
             )
             or next_provider_smoke.get("command")
         ),
+        "api_key_integration_next_action_next_provider_smoke_next_setup_action": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_next_setup_action"
+            )
+            or next_provider_smoke.get("next_setup_action")
+        ),
         "api_key_integration_next_action_next_provider_smoke_provider_family": (
             api_key_integration_status_summary.get(
                 "next_action_next_provider_smoke_provider_family"

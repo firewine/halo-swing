@@ -581,6 +581,7 @@ It also mirrors provider smoke progress as
 `api_key_next_provider_smoke_provider_route_data_mode`,
 `api_key_next_provider_smoke_provider_route_live_data_required`,
 `api_key_next_provider_smoke_command`,
+`api_key_next_provider_smoke_next_setup_action`,
 `api_key_next_provider_smoke_status`,
 `api_key_next_provider_smoke_network_call`,
 `api_key_next_provider_smoke_network_call_policy`,
@@ -597,6 +598,7 @@ It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_provider_route_data_mode_by_family`,
 `api_key_provider_smoke_provider_route_live_data_required_by_family`,
 `api_key_provider_smoke_network_call_policies_by_family`,
+`api_key_provider_smoke_next_setup_actions_by_family`,
 `api_key_provider_smoke_expected_live_contracts_by_family`, and
 `api_key_provider_smoke_expected_live_checks_by_family`.
 Returned one-shot command summaries use `--summary-only --no-audit` for
@@ -926,6 +928,7 @@ It also mirrors provider smoke progress for that integration next action as
 `api_key_integration_next_action_blocked_provider_smoke_count`,
 `api_key_integration_next_action_next_provider_smoke_command_name`,
 `api_key_integration_next_action_next_provider_smoke_command`,
+`api_key_integration_next_action_next_provider_smoke_next_setup_action`,
 `api_key_integration_next_action_next_provider_smoke_provider_family`,
 `api_key_integration_next_action_next_provider_smoke_provider`,
 `api_key_integration_next_action_next_provider_smoke_selected_provider_class`,
@@ -941,7 +944,7 @@ It also mirrors provider smoke progress for that integration next action as
 `api_key_integration_next_action_next_provider_smoke_mutates_local_state`, and
 `api_key_integration_next_action_next_provider_smoke_secret_values_returned`.
 The nested `api_key_integration_status_summary` carries the same next-provider-smoke
-command, provider identity, route, status, network policy, expected live
+command, next setup action, provider identity, route, status, network policy, expected live
 contract/checks, env-key hints, mutation flag, and secret redaction flag.
 It also
 mirrors the first pending recovery command as
