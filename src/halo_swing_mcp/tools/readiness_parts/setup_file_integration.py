@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 from .context import *
+from .integration_next_provider_smoke_fields import (
+    _api_key_integration_next_provider_smoke_fields,
+)
 
 
 __all__ = ('_api_key_setup_file_summary', '_api_key_dotenv_loading_summary', '_api_key_pipeline_smoke_summary', '_api_key_pipeline_provider_route_summary', '_api_key_provider_selection_summary', '_api_key_integration_status_summary')
@@ -844,12 +847,6 @@ def _api_key_integration_status_summary(
     next_provider_smoke = _optional_mapping(
         api_key_command_summary.get("next_provider_smoke")
     ) or {}
-    next_provider_smoke_selected_provider_class = next_provider_smoke.get(
-        "selected_provider_class"
-    )
-    next_provider_smoke_provider_route_data_mode = next_provider_smoke.get(
-        "provider_route_data_mode"
-    )
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):
@@ -879,18 +876,7 @@ def _api_key_integration_status_summary(
         summary["next_action_expected_live_checks"] = (
             next_action_expected_live_checks
         )
-    if isinstance(next_provider_smoke_selected_provider_class, str):
-        summary["next_action_next_provider_smoke_selected_provider_class"] = (
-            next_provider_smoke_selected_provider_class
-        )
-    if isinstance(next_provider_smoke_provider_route_data_mode, str):
-        summary["next_action_next_provider_smoke_provider_route_data_mode"] = (
-            next_provider_smoke_provider_route_data_mode
-        )
-    if isinstance(next_provider_smoke.get("provider_family"), str):
-        summary["next_action_next_provider_smoke_provider_route_live_data_required"] = (
-            next_provider_smoke.get("provider_route_live_data_required") is True
-        )
+    summary.update(_api_key_integration_next_provider_smoke_fields(next_provider_smoke))
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:

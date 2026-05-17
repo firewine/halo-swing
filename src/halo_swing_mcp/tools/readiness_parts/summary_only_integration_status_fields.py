@@ -221,6 +221,41 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_next_provider_smoke_network_call_policy": (
             next_provider_smoke.get("network_call_policy")
         ),
+        "api_key_integration_next_action_next_provider_smoke_expected_live_contract": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_expected_live_contract"
+            )
+            or next_provider_smoke.get("expected_live_contract")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_expected_live_checks": (
+            _string_list(
+                api_key_integration_status_summary.get(
+                    "next_action_next_provider_smoke_expected_live_checks"
+                )
+            )
+            or _string_list(next_provider_smoke.get("expected_live_checks"))
+        ),
+        "api_key_integration_next_action_next_provider_smoke_preferred_env_key": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_preferred_env_key"
+            )
+            or next_provider_smoke.get("preferred_env_key")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_keys": (
+            _string_list(
+                api_key_integration_status_summary.get(
+                    "next_action_next_provider_smoke_accepted_env_keys"
+                )
+            )
+            or _string_list(next_provider_smoke.get("accepted_env_keys"))
+        ),
+        "api_key_integration_next_action_next_provider_smoke_mutates_local_state": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_mutates_local_state"
+            )
+            is True
+            or next_provider_smoke.get("mutates_local_state") is True
+        ),
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned": (
             next_provider_smoke.get("secret_values_returned") is True
         ),

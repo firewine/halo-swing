@@ -2956,6 +2956,18 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ),
         "next_action_next_provider_smoke_provider_route_data_mode": "live",
         "next_action_next_provider_smoke_provider_route_live_data_required": True,
+        "next_action_next_provider_smoke_expected_live_contract": (
+            "market_snapshot_contract"
+        ),
+        "next_action_next_provider_smoke_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
+        "next_action_next_provider_smoke_preferred_env_key": "POLYGON_API_KEY",
+        "next_action_next_provider_smoke_accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
+        "next_action_next_provider_smoke_mutates_local_state": False,
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
             "live_data_boundary_declared",
@@ -5542,6 +5554,18 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ),
         "next_action_next_provider_smoke_provider_route_data_mode": "live",
         "next_action_next_provider_smoke_provider_route_live_data_required": True,
+        "next_action_next_provider_smoke_expected_live_contract": (
+            "market_snapshot_contract"
+        ),
+        "next_action_next_provider_smoke_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
+        "next_action_next_provider_smoke_preferred_env_key": "POLYGON_API_KEY",
+        "next_action_next_provider_smoke_accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
+        "next_action_next_provider_smoke_mutates_local_state": False,
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
             "live_data_boundary_declared",
@@ -9313,6 +9337,61 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_expected_live_contract"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_expected_live_contract"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "expected_live_contract"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_expected_live_checks"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_expected_live_checks"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "expected_live_checks"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_preferred_env_key"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "preferred_env_key"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_accepted_env_keys"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "accepted_env_keys"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_mutates_local_state"
+        ]
+        is integration_status[
+            "next_action_next_provider_smoke_mutates_local_state"
+        ]
+        is payload["next_operator_action"]["next_provider_smoke"][
+            "mutates_local_state"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
         ]
         is payload["next_operator_action"]["next_provider_smoke"][
@@ -9359,6 +9438,41 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
         ]
         is next_provider_smoke["provider_route_live_data_required"]
         is True
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_expected_live_contract"
+        ]
+        == next_provider_smoke["expected_live_contract"]
+        == "market_snapshot_contract"
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_expected_live_checks"
+        ]
+        == next_provider_smoke["expected_live_checks"]
+        == ["live_data_boundary_declared"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
+        ]
+        == next_provider_smoke["preferred_env_key"]
+        == "POLYGON_API_KEY"
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        ]
+        == next_provider_smoke["accepted_env_keys"]
+        == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_mutates_local_state"
+        ]
+        is next_provider_smoke["mutates_local_state"]
+        is False
     )
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized

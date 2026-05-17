@@ -466,6 +466,26 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         in guide
     )
     assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_contract"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_checks"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_mutates_local_state"
+        in guide
+    )
+    assert (
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
         in guide
     )
@@ -622,6 +642,26 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
         in readme
     )
     assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_contract"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_checks"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_mutates_local_state"
+        in readme
+    )
+    assert (
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
         in readme
     )
@@ -644,6 +684,11 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_next_provider_smoke_status",
         "api_key_integration_next_action_next_provider_smoke_network_call",
         "api_key_integration_next_action_next_provider_smoke_network_call_policy",
+        "api_key_integration_next_action_next_provider_smoke_expected_live_contract",
+        "api_key_integration_next_action_next_provider_smoke_expected_live_checks",
+        "api_key_integration_next_action_next_provider_smoke_preferred_env_key",
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_keys",
+        "api_key_integration_next_action_next_provider_smoke_mutates_local_state",
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned",
     )
 
