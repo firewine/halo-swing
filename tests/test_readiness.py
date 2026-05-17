@@ -1494,6 +1494,15 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_primary_setup_action"
     ] == expected_next_action_primary_row.get("next_setup_action")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_preferred_env_key"
+    ] == expected_next_action_primary_row.get("preferred_env_key")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_accepted_env_keys"
+    ] == expected_next_action_primary_row.get("accepted_env_keys", [])
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_accepted_env_key_count"
+    ] == len(expected_next_action_primary_row.get("accepted_env_keys", []))
     assert payload["api_key_provider_smoke_next_action_command_count"] == len(
         expected_next_action_command_names
     )

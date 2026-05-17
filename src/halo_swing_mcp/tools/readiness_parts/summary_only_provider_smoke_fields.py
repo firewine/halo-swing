@@ -306,6 +306,9 @@ def _api_key_provider_smoke_top_level_fields(
         if provider_smoke_next_action_rows_by_family
         else {}
     )
+    provider_smoke_next_action_primary_accepted_env_keys = _string_list(
+        provider_smoke_next_action_primary_row.get("accepted_env_keys")
+    )
     provider_smoke_next_action_kinds_by_family = {
         family: row.get("kind")
         for family, row in provider_smoke_next_action_rows_by_family.items()
@@ -502,6 +505,15 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_primary_setup_action": (
             provider_smoke_next_action_primary_row.get("next_setup_action")
+        ),
+        "api_key_provider_smoke_next_action_primary_preferred_env_key": (
+            provider_smoke_next_action_primary_row.get("preferred_env_key")
+        ),
+        "api_key_provider_smoke_next_action_primary_accepted_env_keys": (
+            provider_smoke_next_action_primary_accepted_env_keys
+        ),
+        "api_key_provider_smoke_next_action_primary_accepted_env_key_count": len(
+            provider_smoke_next_action_primary_accepted_env_keys
         ),
         "api_key_provider_smoke_next_action_command_count": len(
             provider_smoke_next_action_command_names
