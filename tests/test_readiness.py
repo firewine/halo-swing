@@ -1366,6 +1366,45 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         row["provider_family"]: row["secret_values_returned"]
         for row in expected_next_action_env_key_rows
     }
+    expected_next_action_selected_provider_class_by_family = {
+        row["provider_family"]: (
+            row["selected_provider_class"]
+            or payload["api_key_provider_smoke_selected_provider_class_by_family"][
+                row["provider_family"]
+            ]
+        )
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_provider_route_data_mode_by_family = {
+        row["provider_family"]: (
+            row["provider_route_data_mode"]
+            or payload["api_key_provider_smoke_provider_route_data_mode_by_family"][
+                row["provider_family"]
+            ]
+        )
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_provider_route_live_data_required_by_family = {
+        row["provider_family"]: (
+            row["provider_route_live_data_required"]
+            or payload[
+                "api_key_provider_smoke_provider_route_live_data_required_by_family"
+            ][row["provider_family"]]
+        )
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_route_families = (
+        set(expected_next_action_selected_provider_class_by_family)
+        | set(expected_next_action_provider_route_data_mode_by_family)
+        | set(expected_next_action_provider_route_live_data_required_by_family)
+    )
+    expected_next_action_provider_route_data_mode_counts: dict[str, int] = {}
+    for data_mode in expected_next_action_provider_route_data_mode_by_family.values():
+        if data_mode:
+            expected_next_action_provider_route_data_mode_counts[data_mode] = (
+                expected_next_action_provider_route_data_mode_counts.get(data_mode, 0)
+                + 1
+            )
     expected_next_action_expected_live_contracts_by_family = {
         row["provider_family"]: row["expected_live_contract"]
         for row in expected_next_action_env_key_rows
@@ -1474,6 +1513,46 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_any_secret_values_returned"
     ] is any(expected_next_action_secret_values_returned_by_family.values())
+    assert payload[
+        "api_key_provider_smoke_next_action_selected_provider_class_by_family"
+    ] == expected_next_action_selected_provider_class_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_route_data_mode_by_family"
+    ] == expected_next_action_provider_route_data_mode_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_route_live_data_required_by_family"
+    ] == expected_next_action_provider_route_live_data_required_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_all_selected_routes_live"
+    ] is (
+        bool(expected_next_action_provider_route_data_mode_by_family)
+        and all(
+            data_mode == "live"
+            for data_mode in (
+                expected_next_action_provider_route_data_mode_by_family.values()
+            )
+        )
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_route_family_count"
+    ] == len(expected_next_action_route_families)
+    assert payload[
+        "api_key_provider_smoke_next_action_selected_provider_family_count"
+    ] == sum(
+        1
+        for selected_provider_class in (
+            expected_next_action_selected_provider_class_by_family.values()
+        )
+        if selected_provider_class
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_route_live_data_required_family_count"
+    ] == sum(
+        expected_next_action_provider_route_live_data_required_by_family.values()
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_route_data_mode_counts"
+    ] == expected_next_action_provider_route_data_mode_counts
     assert payload[
         "api_key_provider_smoke_next_action_expected_live_contracts"
     ] == expected_next_action_expected_live_contracts

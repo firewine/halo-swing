@@ -7,6 +7,7 @@ from typing import Any
 from .live_data_setup import _ordered_unique_strings, _string_list
 from .summary_only_provider_route_fields import (
     _api_key_provider_smoke_route_count_top_level_fields,
+    _route_family_summary_top_level_fields,
 )
 
 
@@ -333,6 +334,34 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("secret_values_returned") is True
         for family, row in provider_smoke_next_action_rows_by_family.items()
     }
+    provider_smoke_next_action_route_summary = {
+        "selected_provider_class_by_family": {
+            family: row.get("selected_provider_class")
+            or selected_provider_class_by_family.get(family)
+            for family, row in provider_smoke_next_action_rows_by_family.items()
+        },
+        "provider_route_data_mode_by_family": {
+            family: row.get("provider_route_data_mode")
+            or provider_route_data_mode_by_family.get(family)
+            for family, row in provider_smoke_next_action_rows_by_family.items()
+        },
+        "provider_route_live_data_required_by_family": {
+            family: row.get("provider_route_live_data_required") is True
+            or provider_route_live_data_required_by_family.get(family) is True
+            for family, row in provider_smoke_next_action_rows_by_family.items()
+        },
+        "all_selected_routes_live": (
+            bool(provider_smoke_next_action_rows_by_family)
+            and all(
+                (
+                    row.get("provider_route_data_mode")
+                    or provider_route_data_mode_by_family.get(family)
+                )
+                == "live"
+                for family, row in provider_smoke_next_action_rows_by_family.items()
+            )
+        ),
+    }
     provider_smoke_next_action_expected_live_contracts_by_family = {
         family: row.get("expected_live_contract")
         for family, row in provider_smoke_next_action_rows_by_family.items()
@@ -492,6 +521,10 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_any_secret_values_returned": any(
             provider_smoke_next_action_secret_values_returned_by_family.values()
+        ),
+        **_route_family_summary_top_level_fields(
+            prefix="api_key_provider_smoke_next_action",
+            source_summary=provider_smoke_next_action_route_summary,
         ),
         "api_key_provider_smoke_next_action_expected_live_contracts": (
             provider_smoke_next_action_expected_live_contracts
