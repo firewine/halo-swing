@@ -2726,6 +2726,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "failure_category": "provider_recovery",
         "has_failures": True,
         "next_action_name": "recover_failed_providers",
+        "next_action_status": "pending",
+        "next_action_command": payload["provider_recovery_smokes"][0]["command"],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
@@ -2735,6 +2737,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ],
         "next_action_is_recovery": True,
         "next_action_network_call": True,
+        "next_action_mutates_local_state": False,
+        "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "ready_to_retry",
         "provider_recovery_item_count": 3,
         "provider_recovery_pending_count": 3,
@@ -5022,6 +5026,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "failure_category": "none",
         "has_failures": False,
         "next_action_name": "run_provider_smokes",
+        "next_action_status": "ready",
+        "next_action_command": fake_next_operator_action["next_provider_smoke"][
+            "command"
+        ],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
@@ -5036,6 +5044,8 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ],
         "next_action_is_recovery": False,
         "next_action_network_call": True,
+        "next_action_mutates_local_state": False,
+        "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",
         "provider_recovery_item_count": 0,
         "provider_recovery_pending_count": 0,
@@ -5440,8 +5450,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "failure_category": "setup",
         "has_failures": True,
         "next_action_name": "prepare_dotenv",
+        "next_action_status": "pending",
+        "next_action_command": "cp .env.example .env",
         "next_action_is_recovery": False,
         "next_action_network_call": False,
+        "next_action_mutates_local_state": True,
+        "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",
         "provider_recovery_item_count": 0,
         "provider_recovery_pending_count": 0,
@@ -7962,6 +7976,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     payload = run_api_key_pipeline_smoke(summary_only=True)
     next_operator_action = payload["next_operator_action"]
     next_action_summary = payload["api_key_next_action_summary"]
+    integration_status = payload["api_key_integration_status_summary"]
     readiness_summary = payload["readiness_summary"]
     serialized = json.dumps(payload, sort_keys=True)
 
@@ -7974,6 +7989,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["next_operator_action_command"] == next_action_summary[
         "next_action_command"
     ]
+    assert integration_status["next_action_status"] == next_action_summary[
+        "next_action_status"
+    ]
+    assert integration_status["next_action_command"] == next_action_summary[
+        "next_action_command"
+    ]
+    assert integration_status["next_action_mutates_local_state"] == (
+        next_action_summary["next_action_mutates_local_state"]
+    )
+    assert integration_status["next_action_secret_values_returned"] is False
     assert payload["next_operator_action_provider_family"] == "market"
     assert payload["next_operator_action_provider"] == "polygon"
     assert payload["next_operator_action_smoke_command_name"] == (
@@ -8346,8 +8371,12 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "failure_category": "setup",
         "has_failures": True,
         "next_action_name": "prepare_dotenv",
+        "next_action_status": "pending",
+        "next_action_command": "cp .env.example .env",
         "next_action_is_recovery": False,
         "next_action_network_call": False,
+        "next_action_mutates_local_state": True,
+        "next_action_secret_values_returned": False,
         "provider_recovery_action_status": "no_recovery_required",
         "provider_recovery_item_count": 0,
         "provider_recovery_pending_count": 0,

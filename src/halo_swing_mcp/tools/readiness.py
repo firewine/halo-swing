@@ -4872,12 +4872,23 @@ def _api_key_integration_status_summary(
             api_key_pipeline_failure_summary.get("has_failures") is True
         ),
         "next_action_name": api_key_next_action_summary.get("next_action_name"),
+        "next_action_status": api_key_next_action_summary.get(
+            "next_action_status"
+        ),
+        "next_action_command": api_key_next_action_summary.get(
+            "next_action_command"
+        ),
         "next_action_is_recovery": (
             api_key_next_action_summary.get("next_action_is_recovery") is True
         ),
         "next_action_network_call": (
             api_key_next_action_summary.get("next_action_network_call") is True
         ),
+        "next_action_mutates_local_state": (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
+        ),
+        "next_action_secret_values_returned": False,
         "provider_recovery_action_status": (
             api_key_provider_recovery_summary.get(
                 "provider_recovery_action_status"

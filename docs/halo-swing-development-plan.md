@@ -874,6 +874,63 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.859 API Key Integration Status Next Action Execution Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.833에서 summary-only top-level payload는 `api_key_integration_next_action_*`
+prefix로 next action status, command, mutation, and secret-safety fields를
+미러링했다. 하지만 nested `api_key_integration_status_summary`만 읽는 compact
+client는 아직 `api_key_next_action_summary`나 top-level mirrors를 추가로 확인해야 실제
+다음 실행 명령과 실행 안전 플래그를 알 수 있다. 이번 slice는 no-secret
+`next_action_status`, `next_action_command`, `next_action_mutates_local_state`,
+`next_action_secret_values_returned`를 integration status summary 안에도 포함해, API 키
+입력 전후 다음 실행 판단을 한 summary row에서 끝낼 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary now includes next_action_status and next_action_command copied from api_key_next_action_summary
+  - api_key_integration_status_summary now includes next_action_mutates_local_state and next_action_secret_values_returned safety fields
+  - README and DevOps setup guide document nested integration status next-action execution fields
+  - focused readiness and setup-docs tests assert nested integration status next-action execution fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key integration status next-action execution fields pytest: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 30 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 822 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: pending cp .env.example .env True False False
+```
+
 ## 3.858 API Key Setup Docs Pipeline Stage Summary Parity Guard Record - 2026-05-17
 
 ### A. 목적

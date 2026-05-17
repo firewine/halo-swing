@@ -42,17 +42,21 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SETUP_DOCS_PIPELINE_STAGE_SUMMARY_PARITY_VERIFIED
-gate_id: API_KEY_SETUP_DOCS_PIPELINE_STAGE_SUMMARY_PARITY_GATE
+status: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_EXECUTION_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_EXECUTION_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: lock README and DevOps API-key pipeline stage summary field parity
+next_atomic_step: carry next action execution fields into API-key integration status summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -70,22 +74,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_stage_summary_fields_in_sync -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide coverage assert the same API-key pipeline stage summary schema, status, stage count, failure, and first failed stage field names
-  - README and DevOps setup guide coverage assert the same per-stage provider recovery, env-key, network, mutation, and secret-safety field names
+  - api_key_integration_status_summary exposes next_action_status and next_action_command copied from the next action summary
+  - api_key_integration_status_summary exposes next_action_mutates_local_state and next_action_secret_values_returned without returning secret values
+  - README and DevOps setup guide document the nested integration status next-action execution fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified README/DevOps pipeline stage summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key integration status next-action execution fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SETUP_DOCS_PIPELINE_STAGE_SUMMARY_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_PIPELINE_STAGE_SUMMARY_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock README and DevOps API-key pipeline stage summary field parity
 ```
 
 Previous completed directive:
@@ -3378,6 +3394,60 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Integration Status Next Action Execution Fields Gate is
+verified. `api_key_integration_status_summary` now carries next action status,
+command, local mutation, and secret-safety fields copied from the next action
+summary, so the nested integration status row can show the next executable
+API-key setup action without secret values. Focused readiness/setup-docs
+coverage, setup-docs coverage, direct summary-only smoke, full pytest, ruff,
+and health_check passed.
+
+```yaml
+api_key_integration_status_next_action_execution_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_integration_status_summary exposes next_action_status and next_action_command copied from api_key_next_action_summary
+    - api_key_integration_status_summary exposes next_action_mutates_local_state and next_action_secret_values_returned safety fields
+    - README and DevOps setup guide document nested integration status next-action execution fields
+    - focused readiness and setup-docs tests assert nested integration status next-action execution fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; api_key_integration_status_summary next_action_status pending; next_action_command cp .env.example .env; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "30 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "822 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: targeted payload print
+      result: "pending cp .env.example .env True False False"
+```
+
+Previous verification:
 
 Summary: API Key Setup Docs Pipeline Stage Summary Parity Guard is verified.
 README and DevOps setup-guide coverage now assert the same API-key pipeline
