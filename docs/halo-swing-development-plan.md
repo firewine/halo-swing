@@ -28,6 +28,77 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.901 API Key Quickstart Command Plan Next Ready/Blocked Context Gate Record - 2026-05-18
+
+### A. 목적
+
+3.900에서 quickstart command plan provider-smoke rows의 next ready/blocked route
+scalars는 top-level로 올라왔다. 하지만 compact client가 다음 ready 또는 blocked smoke
+command를 실행 전 검토하려면 아직 expected live contract, expected checks, preferred env
+key, accepted env keys, next setup action, status를 provider-smoke row에서 다시 찾아야
+한다. 이번 slice는 next ready/blocked provider-smoke execution context scalars를
+top-level로 올려 다음 smoke action의 계약/체크/env/status 맥락을 바로 보여주게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract mirrors the first ready provider-smoke row expected live contract
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_checks mirrors the first ready provider-smoke row expected live checks
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key mirrors the first ready provider-smoke row preferred env key name
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys mirrors the first ready provider-smoke row accepted env key names
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_next_setup_action mirrors the first ready provider-smoke row next setup action
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status mirrors the first ready provider-smoke row status
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract mirrors the first blocked provider-smoke row expected live contract
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_checks mirrors the first blocked provider-smoke row expected live checks
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key mirrors the first blocked provider-smoke row preferred env key name
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys mirrors the first blocked provider-smoke row accepted env key names
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_next_setup_action mirrors the first blocked provider-smoke row next setup action
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_status mirrors the first blocked provider-smoke row status
+  - README and DevOps setup guide document the quickstart command plan next ready/blocked execution context scalar fields
+  - setup docs tests assert the documented next ready/blocked execution context field list stays in sync
+  - fake-key offline verification confirmed next ready context points to market contract/checks/env/action/status, next blocked context is absent/empty, and no secret values
+  - no-key offline verification confirmed next ready context is absent/empty, next blocked context points to market contract/checks/env/action/status, and no secret values
+  - partial-key offline verification confirmed next ready context points to market and next blocked context points to macro, without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan next ready/blocked execution context pytest: 3 passed
+  - direct fake-key next ready/blocked execution context assertion: next ready market contract/checks/env/action/status, next blocked empty, secret_values_returned false
+  - direct no-key next ready/blocked execution context assertion: next ready empty, next blocked market contract/checks/env/action/status, secret_values_returned false
+  - direct partial-key next ready/blocked execution context assertion: next ready market context, next blocked macro context, secret_values_returned false
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.900 API Key Quickstart Command Plan Next Ready/Blocked Route Gate Record - 2026-05-18
 
 ### A. 목적

@@ -524,6 +524,12 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_live_data_required`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_checks`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_next_setup_action`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call_policy`,
 `api_key_setup_quickstart_command_plan_next_ready_provider_smoke_mutates_local_state`,
@@ -535,6 +541,12 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_live_data_required`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_checks`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_next_setup_action`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_status`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call_policy`,
 `api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_mutates_local_state`,
@@ -567,9 +579,9 @@ and `api_key_setup_quickstart_next_command_plan_item`, so compact clients can
 show the copy/status/provider-smoke/one-shot commands in operator order with
 provider route evidence, expected live checks, env-key hints, next setup
 actions, ready/blocked provider-family lists, ready/blocked command lists, first
-ready/blocked provider-smoke commands with route evidence and safety flags,
-aggregate provider-smoke readiness/safety flags, and safety/status maps on
-provider-smoke rows.
+ready/blocked provider-smoke commands with route, expected-contract, env-key,
+status, and safety flags, aggregate provider-smoke readiness/safety flags, and
+safety/status maps on provider-smoke rows.
 It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,

@@ -129,6 +129,24 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command": (
             next_ready_row.get("command")
         ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract": (
+            next_ready_row.get("expected_live_contract")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_checks": (
+            _string_list(next_ready_row.get("expected_live_checks"))
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key": (
+            next_ready_row.get("preferred_env_key")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys": (
+            _string_list(next_ready_row.get("accepted_env_keys"))
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_next_setup_action": (
+            next_ready_row.get("next_setup_action")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status": (
+            next_ready_row.get("status")
+        ),
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call": (
             next_ready_row.get("network_call") is True
         ),
@@ -161,6 +179,24 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command": (
             next_blocked_row.get("command")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract": (
+            next_blocked_row.get("expected_live_contract")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_checks": (
+            _string_list(next_blocked_row.get("expected_live_checks"))
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key": (
+            next_blocked_row.get("preferred_env_key")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys": (
+            _string_list(next_blocked_row.get("accepted_env_keys"))
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_next_setup_action": (
+            next_blocked_row.get("next_setup_action")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_status": (
+            next_blocked_row.get("status")
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_network_call": (
             next_blocked_row.get("network_call") is True

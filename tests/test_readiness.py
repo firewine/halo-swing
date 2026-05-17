@@ -6506,6 +6506,42 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract"
+        ]
+        == first_ready_command_row.get("expected_live_contract")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_checks"
+        ]
+        == first_ready_command_row.get("expected_live_checks", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key"
+        ]
+        == first_ready_command_row.get("preferred_env_key")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys"
+        ]
+        == first_ready_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_next_setup_action"
+        ]
+        == first_ready_command_row.get("next_setup_action")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status"
+        ]
+        == first_ready_command_row.get("status")
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call"
         ]
         == (first_ready_command_row.get("network_call") is True)
@@ -6572,6 +6608,42 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
         ]
         == first_blocked_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract"
+        ]
+        == first_blocked_command_row.get("expected_live_contract")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_checks"
+        ]
+        == first_blocked_command_row.get("expected_live_checks", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key"
+        ]
+        == first_blocked_command_row.get("preferred_env_key")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys"
+        ]
+        == first_blocked_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_next_setup_action"
+        ]
+        == first_blocked_command_row.get("next_setup_action")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_status"
+        ]
+        == first_blocked_command_row.get("status")
     )
     assert (
         payload[
@@ -8806,6 +8878,42 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract"
+        ]
+        == first_ready_command_row.get("expected_live_contract")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_checks"
+        ]
+        == first_ready_command_row.get("expected_live_checks", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key"
+        ]
+        == first_ready_command_row.get("preferred_env_key")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys"
+        ]
+        == first_ready_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_next_setup_action"
+        ]
+        == first_ready_command_row.get("next_setup_action")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status"
+        ]
+        == first_ready_command_row.get("status")
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_network_call"
         ]
         == (first_ready_command_row.get("network_call") is True)
@@ -8872,6 +8980,42 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
         ]
         == first_blocked_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract"
+        ]
+        == first_blocked_command_row.get("expected_live_contract")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_checks"
+        ]
+        == first_blocked_command_row.get("expected_live_checks", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key"
+        ]
+        == first_blocked_command_row.get("preferred_env_key")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys"
+        ]
+        == first_blocked_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_next_setup_action"
+        ]
+        == first_blocked_command_row.get("next_setup_action")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_status"
+        ]
+        == first_blocked_command_row.get("status")
     )
     assert (
         payload[
