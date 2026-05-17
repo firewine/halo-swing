@@ -2703,6 +2703,13 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_required": True,
         "provider_error_count": 3,
         "provider_recovery_smoke_count": 3,
+        "provider_recovery_provider_families": ["market", "macro", "news"],
+        "provider_recovery_providers": ["polygon", "fred", "newsapi"],
+        "provider_recovery_smoke_command_names": [
+            "get_market_snapshot_live_smoke",
+            "get_macro_snapshot_live_smoke",
+            "get_news_bundle_live_smoke",
+        ],
         "item_count": 3,
         "next_recovery_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_recovery_smoke_command": payload["provider_recovery_smokes"][0][
@@ -4875,6 +4882,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_required": False,
         "provider_error_count": 0,
         "provider_recovery_smoke_count": 0,
+        "provider_recovery_provider_families": [],
+        "provider_recovery_providers": [],
+        "provider_recovery_smoke_command_names": [],
         "item_count": 0,
         "next_recovery_smoke_command_name": None,
         "next_recovery_smoke_command": None,

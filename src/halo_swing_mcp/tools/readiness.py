@@ -2645,6 +2645,15 @@ def _api_key_provider_recovery_summary(
             "provider_recovery_smoke_count",
             0,
         ),
+        "provider_recovery_provider_families": _ordered_unique_strings(
+            [item.get("provider_family") for item in compact_items]
+        ),
+        "provider_recovery_providers": _ordered_unique_strings(
+            [item.get("provider") for item in compact_items]
+        ),
+        "provider_recovery_smoke_command_names": _ordered_unique_strings(
+            [item.get("smoke_command_name") for item in compact_items]
+        ),
         "item_count": len(compact_items),
         "next_recovery_smoke_command_name": (
             first_item.get("smoke_command_name") if first_item else None
