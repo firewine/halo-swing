@@ -947,6 +947,58 @@ def test_setup_docs_keep_api_key_integration_recovery_command_fields_in_sync() -
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_integration_status_summary",
+        "api_key_integration_status_summary.v1",
+        "next_pending_recovery_smoke_command_name",
+        "next_pending_recovery_smoke_command",
+        "next_pending_recovery_provider_family",
+        "next_pending_recovery_provider",
+        "next_pending_recovery_next_setup_action",
+        "next_pending_recovery_preferred_env_key",
+        "next_pending_recovery_accepted_env_keys",
+        "next_pending_recovery_network_call_policy",
+        "next_pending_recovery_smoke_available",
+        "next_pending_recovery_network_call",
+        "next_pending_recovery_mutates_local_state",
+        "next_pending_recovery_secret_values_returned",
+        "next_blocked_recovery_smoke_command_name",
+        "next_blocked_recovery_smoke_command",
+        "next_blocked_recovery_provider_family",
+        "next_blocked_recovery_provider",
+        "next_blocked_recovery_next_setup_action",
+        "next_blocked_recovery_preferred_env_key",
+        "next_blocked_recovery_accepted_env_keys",
+        "next_blocked_recovery_network_call_policy",
+        "next_blocked_recovery_smoke_available",
+        "next_blocked_recovery_network_call",
+        "next_blocked_recovery_mutates_local_state",
+        "next_blocked_recovery_secret_values_returned",
+        "next_recovery_smoke_command_name",
+        "next_recovery_smoke_command",
+        "next_recovery_provider_family",
+        "next_recovery_provider",
+        "next_recovery_smoke_available",
+        "next_recovery_next_setup_action",
+        "next_recovery_preferred_env_key",
+        "next_recovery_accepted_env_keys",
+        "next_recovery_network_call_policy",
+        "next_recovery_network_call",
+        "next_recovery_mutates_local_state",
+        "next_recovery_exception_type",
+        "next_recovery_exception_message_returned",
+        "next_recovery_url_returned",
+        "next_recovery_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

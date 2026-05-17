@@ -874,6 +874,63 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.852 API Key Setup Docs Integration Next Recovery Item Parity Guard Record - 2026-05-17
+
+### A. 목적
+
+3.851에서 README와 DevOps guide의 integration recovery command list field parity를
+고정했다. API-key-only setup compact output은 `api_key_integration_status_summary`와
+provider recovery summary에 first pending recovery, first blocked recovery, generic
+next recovery item의 command/provider/network/mutation/diagnostic/safety field를 함께
+노출한다. 기존 setup-docs coverage는 DevOps guide field 존재를 직접 고정하지만 README와 같은
+next recovery item detail 목록을 계속 유지하는지는 별도 guard가 없었다. 이번 slice는 README와
+DevOps guide가 같은 pending/blocked/generic next recovery item field 이름들을 계속 포함하는지
+parity coverage로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only/docs guard asserts README and DevOps guide both include API-key integration status summary first pending and first blocked recovery detail field names
+  - parity coverage asserts both docs include generic next recovery command, provider identity, network, mutation, exception, URL, and secret-safety field names
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused README/DevOps integration next recovery item parity setup-docs pytest: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 24 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 816 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations: passed, no blocked-path changes
+  - git status --short --ignored state: ignored local state/ only
+```
+
 ## 3.851 API Key Setup Docs Integration Recovery Command Parity Guard Record - 2026-05-17
 
 ### A. 목적

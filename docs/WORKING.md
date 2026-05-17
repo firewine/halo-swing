@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_COMMAND_PARITY_VERIFIED
-gate_id: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_COMMAND_PARITY_GATE
+status: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_NEXT_ITEM_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_NEXT_ITEM_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: lock README and DevOps API-key integration recovery command field parity
+next_atomic_step: lock README and DevOps API-key integration next recovery item field parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,7 +70,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_recovery_command_fields_in_sync -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -78,14 +78,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide coverage assert the same API-key integration status summary recovery command list heading and provider recovery smoke command field names
-  - README and DevOps setup guide coverage assert the same provider recovery all/pending/blocked smoke command name and command list field names
+  - README and DevOps setup guide coverage assert the same API-key integration status summary first pending and first blocked recovery detail field names
+  - README and DevOps setup guide coverage assert the same generic next recovery command, provider identity, network, mutation, exception, URL, and secret-safety field names
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified README/DevOps integration recovery command parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified README/DevOps integration next recovery item parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_COMMAND_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_COMMAND_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock README and DevOps API-key integration recovery command field parity
 ```
 
 Previous completed directive:
@@ -3301,6 +3312,58 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Setup Docs Integration Next Recovery Item Parity Guard is
+verified. README and DevOps setup-guide coverage now assert the same
+`api_key_integration_status_summary` first pending, first blocked, and generic
+next recovery item command/provider/network/mutation/diagnostic/safety field
+names. Focused parity coverage, setup-docs coverage, direct summary-only smoke,
+full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_setup_docs_integration_recovery_next_item_parity_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_setup_docs.py
+  implementation:
+    - tests-only/docs guard asserts README and DevOps guide both include API-key integration status summary first pending and first blocked recovery detail field names
+    - parity coverage asserts both docs include generic next recovery command, provider identity, network, mutation, exception, URL, and secret-safety field names
+    - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "24 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "816 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed; no blocked-path changes
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+    - command: git diff -- src/halo_swing_mcp
+      result: passed; no source changes
+```
+
+Previous verification:
 
 Summary: API Key Setup Docs Integration Recovery Command Parity Guard is
 verified. README and DevOps setup-guide coverage now assert the same
