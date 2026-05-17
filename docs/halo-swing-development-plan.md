@@ -253,6 +253,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.910 API Key Pipeline Check Top-Level Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.909는 project-specific alias `.env`만으로 summary-only API-key pipeline CLI가
+live provider route를 선택할 수 있음을 증명했다. 하지만 compact client가 check
+실패 상태와 첫 실패 check를 확인하려면 아직 `api_key_pipeline_check_summary` nested
+object를 열어야 한다. 이번 slice는 no-secret check summary evidence를 top-level
+`api_key_check_*` scalar/map/list 필드로 올려 API 키 입력 후 남은 실패 check를 바로
+확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors pipeline check status, total/passed/failed counts, failed check keys, tools with failures, and tool failure counts without secret values
+  - summary-only output mirrors first failed check tool/name/key/expected/actual/provider/env-key context without secret values
+  - summary-only pipeline check safety fields expose network_call, mutates_local_state, and secret_values_returned
+  - blocked default and ready fake-key summary-only tests prove top-level fields match api_key_pipeline_check_summary
+  - README and DevOps guide document top-level api_key_check_* check summary fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 101 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 838 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.909 API Key Pipeline CLI Project-Alias Dotenv Summary Gate Record - 2026-05-18
 
 ### A. 목적

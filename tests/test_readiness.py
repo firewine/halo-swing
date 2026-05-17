@@ -1150,6 +1150,70 @@ def assert_provider_route_summary_top_level_fields(payload: dict[str, Any]) -> N
     )
 
 
+def assert_pipeline_check_summary_top_level_fields(payload: dict[str, Any]) -> None:
+    check_summary = payload["api_key_pipeline_check_summary"]
+    first_failed_check = check_summary["first_failed_check"] or {}
+    assert payload["api_key_check_status"] == check_summary["status"]
+    assert payload["api_key_check_count"] == check_summary["check_count"]
+    assert payload["api_key_check_passed_count"] == (
+        check_summary["passed_check_count"]
+    )
+    assert payload["api_key_check_failed_count"] == (
+        check_summary["failed_check_count"]
+    )
+    assert payload["api_key_check_failed_keys"] == (
+        check_summary["failed_check_keys"]
+    )
+    assert payload["api_key_check_tools_with_failures"] == (
+        check_summary["tools_with_failures"]
+    )
+    assert payload["api_key_check_tool_failure_counts"] == (
+        check_summary["tool_failure_counts"]
+    )
+    assert payload["api_key_check_first_failed_tool"] == (
+        first_failed_check.get("tool")
+    )
+    assert payload["api_key_check_first_failed_name"] == (
+        first_failed_check.get("name")
+    )
+    assert payload["api_key_check_first_failed_key"] == (
+        first_failed_check.get("key")
+    )
+    assert payload["api_key_check_first_failed_expected"] == (
+        first_failed_check.get("expected")
+    )
+    assert payload["api_key_check_first_failed_actual"] == (
+        first_failed_check.get("actual")
+    )
+    assert payload["api_key_check_first_failed_provider_family"] == (
+        first_failed_check.get("provider_family")
+    )
+    assert payload["api_key_check_first_failed_provider"] == (
+        first_failed_check.get("provider")
+    )
+    assert payload["api_key_check_first_failed_smoke_command_name"] == (
+        first_failed_check.get("smoke_command_name")
+    )
+    assert payload["api_key_check_first_failed_preferred_env_key"] == (
+        first_failed_check.get("preferred_env_key")
+    )
+    assert payload["api_key_check_first_failed_accepted_env_keys"] == (
+        first_failed_check.get("accepted_env_keys") or []
+    )
+    assert payload["api_key_check_first_failed_secret_values_returned"] is (
+        first_failed_check.get("secret_values_returned") is True
+    )
+    assert payload["api_key_check_network_call"] is (
+        check_summary["network_call"]
+    )
+    assert payload["api_key_check_mutates_local_state"] is (
+        check_summary["mutates_local_state"]
+    )
+    assert payload["api_key_check_secret_values_returned"] is (
+        check_summary["secret_values_returned"]
+    )
+
+
 @pytest.fixture(autouse=True)
 def clear_settings_cache_after_readiness_env_tests() -> None:
     get_settings.cache_clear()
@@ -6215,6 +6279,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         live_http_timeout_summary["secret_values_returned"]
     )
     assert_provider_route_summary_top_level_fields(payload)
+    assert_pipeline_check_summary_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -8695,6 +8760,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     assert payload["api_key_check_all_selected_routes_live"] is (
         check_summary["all_selected_routes_live"]
     )
+    assert_pipeline_check_summary_top_level_fields(payload)
     assert all(
         failed_check["secret_values_returned"] is False
         for failed_check in check_summary["failed_checks"]

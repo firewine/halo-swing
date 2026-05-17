@@ -1157,6 +1157,40 @@ def test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync() -> None
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_pipeline_check_summary",
+        "api_key_pipeline_check_summary.v1",
+        "api_key_check_status",
+        "api_key_check_count",
+        "api_key_check_passed_count",
+        "api_key_check_failed_count",
+        "api_key_check_failed_keys",
+        "api_key_check_tools_with_failures",
+        "api_key_check_tool_failure_counts",
+        "api_key_check_first_failed_tool",
+        "api_key_check_first_failed_name",
+        "api_key_check_first_failed_key",
+        "api_key_check_first_failed_expected",
+        "api_key_check_first_failed_actual",
+        "api_key_check_first_failed_provider_family",
+        "api_key_check_first_failed_provider",
+        "api_key_check_first_failed_smoke_command_name",
+        "api_key_check_first_failed_preferred_env_key",
+        "api_key_check_first_failed_accepted_env_keys",
+        "api_key_check_first_failed_secret_values_returned",
+        "api_key_check_network_call",
+        "api_key_check_mutates_local_state",
+        "api_key_check_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
@@ -1832,6 +1866,27 @@ def test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync() -> None
         "api_key_check_provider_route_data_mode_by_family",
         "api_key_check_provider_route_live_data_required_by_family",
         "api_key_check_all_selected_routes_live",
+        "api_key_check_status",
+        "api_key_check_count",
+        "api_key_check_passed_count",
+        "api_key_check_failed_count",
+        "api_key_check_failed_keys",
+        "api_key_check_tools_with_failures",
+        "api_key_check_tool_failure_counts",
+        "api_key_check_network_call",
+        "api_key_check_mutates_local_state",
+        "api_key_check_secret_values_returned",
+        "api_key_check_first_failed_tool",
+        "api_key_check_first_failed_name",
+        "api_key_check_first_failed_key",
+        "api_key_check_first_failed_expected",
+        "api_key_check_first_failed_actual",
+        "api_key_check_first_failed_provider_family",
+        "api_key_check_first_failed_provider",
+        "api_key_check_first_failed_smoke_command_name",
+        "api_key_check_first_failed_preferred_env_key",
+        "api_key_check_first_failed_accepted_env_keys",
+        "api_key_check_first_failed_secret_values_returned",
         "tool",
         "name",
         "key",

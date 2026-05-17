@@ -1055,7 +1055,22 @@ mirrors check route-family evidence as
 `api_key_check_selected_provider_class_by_family`,
 `api_key_check_provider_route_data_mode_by_family`,
 `api_key_check_provider_route_live_data_required_by_family`, and
-`api_key_check_all_selected_routes_live`. The
+`api_key_check_all_selected_routes_live`. It also mirrors the check summary
+status fields as `api_key_check_status`, `api_key_check_count`,
+`api_key_check_passed_count`, `api_key_check_failed_count`,
+`api_key_check_failed_keys`, `api_key_check_tools_with_failures`,
+`api_key_check_tool_failure_counts`, `api_key_check_network_call`,
+`api_key_check_mutates_local_state`, and
+`api_key_check_secret_values_returned`. The first failed check is mirrored as
+`api_key_check_first_failed_tool`, `api_key_check_first_failed_name`,
+`api_key_check_first_failed_key`, `api_key_check_first_failed_expected`,
+`api_key_check_first_failed_actual`,
+`api_key_check_first_failed_provider_family`,
+`api_key_check_first_failed_provider`,
+`api_key_check_first_failed_smoke_command_name`,
+`api_key_check_first_failed_preferred_env_key`,
+`api_key_check_first_failed_accepted_env_keys`, and
+`api_key_check_first_failed_secret_values_returned`. The
 top-level `api_key_pipeline_failure_summary`
 (`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
 operator-facing row with `status`, `has_failures`, `failure_category`,

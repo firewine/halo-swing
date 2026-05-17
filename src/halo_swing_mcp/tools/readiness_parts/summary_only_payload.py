@@ -13,6 +13,9 @@ from .summary_only_live_http_timeout_fields import (
 from .summary_only_pipeline_route_fields import (
     _api_key_pipeline_route_top_level_fields,
 )
+from .summary_only_pipeline_check_fields import (
+    _api_key_pipeline_check_top_level_fields,
+)
 from .provider_recovery_checklist_summary import (
     _api_key_provider_recovery_checklist_summary,
 )
@@ -496,6 +499,9 @@ def _api_key_pipeline_summary_only_payload(
         or {},
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
         "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
+        **_api_key_pipeline_check_top_level_fields(
+            api_key_pipeline_check_summary
+        ),
         **_api_key_pipeline_route_top_level_fields(
             api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
             api_key_pipeline_check_summary=api_key_pipeline_check_summary,

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_GATE
+status: API_KEY_PIPELINE_CHECK_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PIPELINE_CHECK_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline reads project-specific live-data aliases from launch-directory dotenv
+next_atomic_step: surface summary-only API-key pipeline check summary as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,6 +55,8 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_pipeline_check_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -73,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_document_project_alias_dotenv_cli_summary tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_project_alias_dotenv_without_exported_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -81,29 +83,30 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - launch-directory .env with HALO_SWING_MARKET_DATA_API_KEY, HALO_SWING_MACRO_API_KEY, and HALO_SWING_NEWS_API_KEY configures all live-data provider families without exported API-key env vars
-  - summary-only CLI output reports ready API-key setup, live selected provider classes, live provider route modes, and no missing provider route keys
-  - summary-only CLI output does not return project-specific alias secret values
-  - README and DevOps guide document project-specific alias .env keys work with summary-only pipeline CLI
+  - summary-only output mirrors pipeline check status, total/passed/failed counts, failed check keys, tools with failures, and tool failure counts without secret values
+  - summary-only output mirrors first failed check tool/name/key/expected/actual/provider/env-key context without secret values
+  - summary-only pipeline check safety fields expose network_call, mutates_local_state, and secret_values_returned
+  - blocked default and ready fake-key summary-only tests prove top-level fields match api_key_pipeline_check_summary
+  - README and DevOps guide document top-level api_key_check_* check summary fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key project-alias dotenv CLI summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key pipeline check top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_GATE
+gate_id: API_KEY_PIPELINE_CHECK_TOP_LEVEL_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_document_project_alias_dotenv_cli_summary tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_project_alias_dotenv_without_exported_secrets -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 101 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 838 passed
@@ -116,11 +119,25 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_pipeline_check_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key project-alias dotenv CLI summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key pipeline check top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - project-specific API-key aliases in launch-directory .env are enough for summary-only CLI live-provider selection
+  - summary-only payload now exposes api_key_check_* top-level check status, counts, failures, first failed check context, and no-secret safety fields
+  - summary_only_payload.py remains below the 900-line warning point at 888 lines
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline reads project-specific live-data aliases from launch-directory dotenv
 ```
 
 Previous completed directive:

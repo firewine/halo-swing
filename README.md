@@ -347,6 +347,24 @@ It mirrors the same no-secret provider route status as top-level
 `api_key_provider_route_summary_secret_values_returned`, so compact clients can
 show selected live/replay provider state and missing route keys without opening
 the nested summary.
+It mirrors `api_key_pipeline_check_summary`
+(`api_key_pipeline_check_summary.v1`) as top-level `api_key_check_status`,
+`api_key_check_count`, `api_key_check_passed_count`,
+`api_key_check_failed_count`, `api_key_check_failed_keys`,
+`api_key_check_tools_with_failures`, `api_key_check_tool_failure_counts`,
+`api_key_check_first_failed_tool`, `api_key_check_first_failed_name`,
+`api_key_check_first_failed_key`, `api_key_check_first_failed_expected`,
+`api_key_check_first_failed_actual`,
+`api_key_check_first_failed_provider_family`,
+`api_key_check_first_failed_provider`,
+`api_key_check_first_failed_smoke_command_name`,
+`api_key_check_first_failed_preferred_env_key`,
+`api_key_check_first_failed_accepted_env_keys`,
+`api_key_check_first_failed_secret_values_returned`,
+`api_key_check_network_call`, `api_key_check_mutates_local_state`, and
+`api_key_check_secret_values_returned`, so compact clients can show failed check
+context and safety state without opening the nested summary or exposing secret
+values.
 It also keeps top-level `provider_smoke_summaries` and
 `provider_smoke_summary_count` copied from the omitted
 `live_data_smoke_summary`, so compact output still shows provider success
@@ -878,6 +896,22 @@ The compact top-level payload mirrors check route-family evidence as
 `api_key_check_provider_route_data_mode_by_family`,
 `api_key_check_provider_route_live_data_required_by_family`, and
 `api_key_check_all_selected_routes_live`.
+It also mirrors the check summary status fields as
+`api_key_check_status`, `api_key_check_count`,
+`api_key_check_passed_count`, `api_key_check_failed_count`,
+`api_key_check_failed_keys`, `api_key_check_tools_with_failures`,
+`api_key_check_tool_failure_counts`, `api_key_check_network_call`,
+`api_key_check_mutates_local_state`, and
+`api_key_check_secret_values_returned`. The first failed check is mirrored as
+`api_key_check_first_failed_tool`, `api_key_check_first_failed_name`,
+`api_key_check_first_failed_key`, `api_key_check_first_failed_expected`,
+`api_key_check_first_failed_actual`,
+`api_key_check_first_failed_provider_family`,
+`api_key_check_first_failed_provider`,
+`api_key_check_first_failed_smoke_command_name`,
+`api_key_check_first_failed_preferred_env_key`,
+`api_key_check_first_failed_accepted_env_keys`, and
+`api_key_check_first_failed_secret_values_returned`.
 The compact `api_key_pipeline_failure_summary`
 (`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
 operator-facing row with `status`, `has_failures`, `failure_category`,
