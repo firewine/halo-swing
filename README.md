@@ -719,7 +719,15 @@ The top-level `readiness_summary` mirrors the selected `next_operator_action`
 and, when that action carries provider smoke or recovery env-key hints, also
 includes `preferred_env_key`, `accepted_env_keys`,
 `next_operator_action_expected_live_contract`, and
-`next_operator_action_expected_live_checks` without returning key values.
+`next_operator_action_expected_live_checks` without returning key values. It
+also carries route-family readiness evidence with
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, and
+`all_selected_routes_live`, mirrored at top level as
+`api_key_readiness_selected_provider_class_by_family`,
+`api_key_readiness_provider_route_data_mode_by_family`,
+`api_key_readiness_provider_route_live_data_required_by_family`, and
+`api_key_readiness_all_selected_routes_live`.
 The top-level `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
 provider selection, failure, and next-action evidence into one operator row with

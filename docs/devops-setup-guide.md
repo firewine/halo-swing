@@ -900,7 +900,15 @@ compact clients can show the actual API-key-selected route and confirm
 `readiness_summary` mirrors provider smoke or recovery `preferred_env_key` and
 `accepted_env_keys`, plus `next_operator_action_expected_live_contract` and
 `next_operator_action_expected_live_checks`, from the next operator action
-without returning key values.
+without returning key values. It also carries route-family readiness evidence
+with `selected_provider_class_by_family`,
+`provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, and
+`all_selected_routes_live`, mirrored at top level as
+`api_key_readiness_selected_provider_class_by_family`,
+`api_key_readiness_provider_route_data_mode_by_family`,
+`api_key_readiness_provider_route_live_data_required_by_family`, and
+`api_key_readiness_all_selected_routes_live`.
 The top-level
 `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,

@@ -959,6 +959,14 @@ def test_setup_docs_keep_api_key_readiness_summary_fields_in_sync() -> None:
         "next_operator_action_mutates_local_state",
         "next_operator_action_secret_input_required",
         "next_operator_action_secret_values_returned",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "api_key_readiness_selected_provider_class_by_family",
+        "api_key_readiness_provider_route_data_mode_by_family",
+        "api_key_readiness_provider_route_live_data_required_by_family",
+        "api_key_readiness_all_selected_routes_live",
     )
 
     for field_name in field_names:

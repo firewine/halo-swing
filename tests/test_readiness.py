@@ -8450,6 +8450,33 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert readiness_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert readiness_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert readiness_summary["provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert readiness_summary["all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_readiness_selected_provider_class_by_family"] == (
+        readiness_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_readiness_provider_route_data_mode_by_family"] == (
+        readiness_summary["provider_route_data_mode_by_family"]
+    )
+    assert (
+        payload["api_key_readiness_provider_route_live_data_required_by_family"]
+        == readiness_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_readiness_all_selected_routes_live"] is (
+        readiness_summary["all_selected_routes_live"]
+    )
     assert readiness_summary["secret_values_returned"] is False
     assert "next_operator_action" not in payload["omitted_sections"]
     assert "readiness_summary" not in payload["omitted_sections"]

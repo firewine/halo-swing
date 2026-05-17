@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 from .context import *
+from .api_key_readiness_route_family_fields import (
+    _api_key_readiness_route_family_fields,
+)
 
 
 __all__ = ('_api_key_pipeline_checks', '_api_key_pipeline_readiness_summary', '_api_key_pipeline_next_operator_action', '_api_key_pipeline_next_action_summary', '_api_key_operator_checklist_summary', '_api_key_operator_checklist_step_summary', '_api_key_pipeline_stage_summary', '_api_key_pipeline_stage_row', '_api_key_pipeline_check_summary', '_api_key_pipeline_stage_recovery_hints_by_tool', '_api_key_pipeline_check_row', '_api_key_pipeline_failure_summary', '_api_key_pipeline_failure_category', '_api_key_live_http_timeout_summary')
@@ -145,6 +148,7 @@ def _api_key_pipeline_readiness_summary(
         "provider_route_status": live_data_setup_summary.get(
             "provider_route_status"
         ),
+        **_api_key_readiness_route_family_fields(live_data_setup_summary),
         "ready_to_run_live_smoke": live_data_setup_summary.get(
             "ready_to_run_live_smoke"
         ),
