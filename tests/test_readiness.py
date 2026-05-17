@@ -2731,6 +2731,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["live_data_smoke_summary"]["provider_recovery_smokes"]
     )
     assert payload["provider_recovery_smoke_count"] == 3
+    assert payload["provider_recovery_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert payload["provider_recovery_smoke_commands"] == [
+        payload["provider_recovery_smokes"][0]["command"],
+        payload["provider_recovery_smokes"][1]["command"],
+        payload["provider_recovery_smokes"][2]["command"],
+    ]
+    assert payload["provider_recovery_pending_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert payload["provider_recovery_pending_smoke_commands"] == [
+        payload["provider_recovery_smokes"][0]["command"],
+        payload["provider_recovery_smokes"][1]["command"],
+        payload["provider_recovery_smokes"][2]["command"],
+    ]
+    assert payload["provider_recovery_blocked_smoke_command_names"] == []
+    assert payload["provider_recovery_blocked_smoke_commands"] == []
     recovery_checklist = payload["api_key_provider_recovery_checklist"]
     assert recovery_checklist["schema_version"] == (
         "api_key_provider_recovery_checklist.v1"
@@ -2780,6 +2802,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     provider_recovery_summary = summary_payload[
         "api_key_provider_recovery_summary"
     ]
+    assert summary_payload["provider_recovery_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert summary_payload["provider_recovery_smoke_commands"] == [
+        payload["provider_recovery_smokes"][0]["command"],
+        payload["provider_recovery_smokes"][1]["command"],
+        payload["provider_recovery_smokes"][2]["command"],
+    ]
+    assert summary_payload["provider_recovery_pending_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
+    assert summary_payload["provider_recovery_pending_smoke_commands"] == [
+        payload["provider_recovery_smokes"][0]["command"],
+        payload["provider_recovery_smokes"][1]["command"],
+        payload["provider_recovery_smokes"][2]["command"],
+    ]
+    assert summary_payload["provider_recovery_blocked_smoke_command_names"] == []
+    assert summary_payload["provider_recovery_blocked_smoke_commands"] == []
     assert provider_recovery_summary == {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": "conflict",
@@ -5255,6 +5299,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["failed_provider_families"] == []
     assert payload["failed_provider_count"] == 0
     assert payload["provider_recovery_smoke_count"] == 0
+    assert payload["provider_recovery_smoke_command_names"] == []
+    assert payload["provider_recovery_smoke_commands"] == []
+    assert payload["provider_recovery_pending_smoke_command_names"] == []
+    assert payload["provider_recovery_pending_smoke_commands"] == []
+    assert payload["provider_recovery_blocked_smoke_command_names"] == []
+    assert payload["provider_recovery_blocked_smoke_commands"] == []
     assert "live_data_smoke_summary" in payload["omitted_sections"]
     assert "signal_workflow_smoke_summary" in payload["omitted_sections"]
     assert "recording_smoke_summary" in payload["omitted_sections"]

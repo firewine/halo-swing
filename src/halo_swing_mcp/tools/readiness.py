@@ -997,6 +997,34 @@ def run_api_key_pipeline_smoke(
         "provider_recovery_smoke_count": live_data_smoke_summary[
             "provider_recovery_smoke_count"
         ],
+        "provider_recovery_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_smoke_command_names"
+            )
+        ),
+        "provider_recovery_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get("provider_recovery_smoke_commands")
+        ),
+        "provider_recovery_pending_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_smoke_command_names"
+            )
+        ),
+        "provider_recovery_pending_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_smoke_commands"
+            )
+        ),
+        "provider_recovery_blocked_smoke_command_names": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_smoke_command_names"
+            )
+        ),
+        "provider_recovery_blocked_smoke_commands": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_smoke_commands"
+            )
+        ),
         "signal_workflow_smoke_summary": signal_workflow_smoke_summary,
         "recording_smoke_summary": recording_smoke_summary,
         "checks": checks,
@@ -2610,6 +2638,24 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_recovery_smoke_count": payload.get(
             "provider_recovery_smoke_count"
+        ),
+        "provider_recovery_smoke_command_names": _string_list(
+            payload.get("provider_recovery_smoke_command_names")
+        ),
+        "provider_recovery_smoke_commands": _string_list(
+            payload.get("provider_recovery_smoke_commands")
+        ),
+        "provider_recovery_pending_smoke_command_names": _string_list(
+            payload.get("provider_recovery_pending_smoke_command_names")
+        ),
+        "provider_recovery_pending_smoke_commands": _string_list(
+            payload.get("provider_recovery_pending_smoke_commands")
+        ),
+        "provider_recovery_blocked_smoke_command_names": _string_list(
+            payload.get("provider_recovery_blocked_smoke_command_names")
+        ),
+        "provider_recovery_blocked_smoke_commands": _string_list(
+            payload.get("provider_recovery_blocked_smoke_commands")
         ),
         "omitted_sections": [
             "api_key_operator_checklist",

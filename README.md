@@ -328,6 +328,13 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_network_call_policy`,
 `next_operator_action_mutates_local_state`, and
 `next_operator_action_secret_values_returned`.
+When provider recovery is required, the compact top-level payload also exposes
+top-level summary-only recovery command lists:
+`provider_recovery_smoke_command_names`, `provider_recovery_smoke_commands`,
+`provider_recovery_pending_smoke_command_names`,
+`provider_recovery_pending_smoke_commands`,
+`provider_recovery_blocked_smoke_command_names`, and
+`provider_recovery_blocked_smoke_commands`, without returning secret values.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,
