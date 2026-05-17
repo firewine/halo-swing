@@ -714,8 +714,14 @@ readiness values as top-level scalars/lists:
 `api_key_integration_configured_provider_families`,
 `api_key_integration_missing_provider_families`,
 `api_key_integration_selected_provider_classes`, and
-`api_key_integration_next_action_name`, so compact clients can show whether
-API keys are configured and live providers are selected without nested parsing.
+`api_key_integration_next_action_name`. It also mirrors next-action details as
+`api_key_integration_next_action_provider_family`,
+`api_key_integration_next_action_provider`,
+`api_key_integration_next_action_smoke_command_name`,
+`api_key_integration_next_action_is_recovery`, and
+`api_key_integration_next_action_network_call`, so compact clients can show
+whether API keys are configured, live providers are selected, and the next
+live/recovery step can call the network without nested parsing.
 It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,

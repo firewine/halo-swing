@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_TOP_LEVEL_INTEGRATION_STATUS_MIRRORS_GATE",
+  "gate_id": "API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_MIRRORS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.831",
-  "next_atomic_step": "mirror API-key integration readiness onto summary-only top-level fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.832",
+  "next_atomic_step": "mirror API-key integration next-action details onto summary-only top-level fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.831",
+    "docs/halo-swing-development-plan.md#3.832",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,14 +56,14 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level api_key_integration_status, api_key_integration_api_keys_configured, api_key_integration_live_providers_selected, and api_key_integration_ready_to_run_live_smoke mirror integration readiness",
-    "summary-only top-level api_key_integration_dotenv_loading_enabled, api_key_integration_dotenv_target_exists, api_key_integration_configured_provider_families, api_key_integration_missing_provider_families, api_key_integration_selected_provider_classes, and api_key_integration_next_action_name mirror the nested integration summary",
-    "README and DevOps setup guide document top-level API-key integration readiness mirrors",
-    "setup docs tests assert the new top-level integration readiness guidance",
+    "summary-only top-level api_key_integration_next_action_provider_family, api_key_integration_next_action_provider, and api_key_integration_next_action_smoke_command_name mirror the nested integration summary",
+    "summary-only top-level api_key_integration_next_action_is_recovery and api_key_integration_next_action_network_call mirror the nested integration summary",
+    "README and DevOps setup guide document top-level API-key integration next-action mirrors",
+    "setup docs tests assert the new top-level integration next-action guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified top-level integration readiness mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified top-level integration next-action mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
