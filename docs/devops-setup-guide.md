@@ -429,7 +429,10 @@ those keys without making provider network calls. Use
 `run_live_data_smoke` for the same validation in one command after filling the
 market, macro, and news API keys; its payload now includes the same no-network
 provider route evidence and `live_data_setup_summary` before provider smoke
-outputs. Use
+outputs. Successful direct provider smoke rows are aggregated as no-secret
+`provider_smoke_summaries` with `provider_smoke_summary_count`, and the API-key
+pipeline `live_data_smoke_summary` mirrors those fields so one-shot smoke output
+shows each provider success contract without opening nested smoke payloads. Use
 `run_integration_smoke` to combine offline readiness gates and the live data
 smoke result without starting Hermes, sending Telegram messages, submitting
 orders, or returning secrets. Its top-level `provider_route_summary` mirrors the

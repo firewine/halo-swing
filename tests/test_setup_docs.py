@@ -53,6 +53,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_smoke_summary" in guide
     assert "provider_smoke_summary.v1" in guide
     assert "Direct live provider smoke success payloads" in guide
+    assert "provider_smoke_summaries" in guide
+    assert "provider_smoke_summary_count" in guide
+    assert "live_data_smoke_summary` mirrors those fields" in guide
     assert "provider_error_summaries" in guide
     assert "Direct provider\nsmoke `error_summary` rows include" in guide
     assert "expected_live_contract" in guide

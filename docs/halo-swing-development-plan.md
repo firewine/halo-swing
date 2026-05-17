@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.805 API Key Live Data Smoke Success Aggregate Gate Record - 2026-05-17
+
+### A. 목적
+
+Direct provider smoke success payload에는 `provider_smoke_summary`가 생겼지만,
+operator가 API 키 입력 후 가장 자주 실행할 one-shot `run_live_data_smoke` payload는
+성공한 provider summaries를 top-level로 모아주지 않는다. 따라서 provider별 성공
+계약을 보려면 nested `market_snapshot`, `macro_snapshot`, `news_bundle`을 각각 열어야
+한다. 이번 slice는 `run_live_data_smoke`와 API-key pipeline
+`live_data_smoke_summary`에 no-secret `provider_smoke_summaries`와
+`provider_smoke_summary_count`를 추가해, one-shot 결과만으로도 어떤 provider smoke가
+어떤 contract/check 기준으로 통과했는지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - run_live_data_smoke aggregates provider_smoke_summary rows from market, macro, and news payloads
+  - run_live_data_smoke exposes provider_smoke_summaries and provider_smoke_summary_count without returning secret values
+  - API-key pipeline live_data_smoke_summary mirrors provider_smoke_summaries and provider_smoke_summary_count
+  - README and DevOps setup guide document one-shot provider smoke success summary aggregation
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 2 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools import market; from halo_swing_mcp.tools.readiness import run_live_data_smoke; market.get_market_snapshot=lambda symbols=None:{"live_data_required":True,"market_snapshot_contract":{"live_data_required":True,"network_call":True},"market_snapshot_guard":{"status":"ok","checks":[{"name":"live_data_boundary_declared","passed":True}]},"provider_smoke_summary":{"provider_family":"market","provider":"polygon","expected_live_contract":"market_snapshot_contract","expected_live_checks":["live_data_boundary_declared"],"secret_values_returned":False}}; market.get_macro_snapshot=lambda:{"live_data_required":True,"macro_filter_contract":{"live_data_required":True,"network_call":True},"macro_filter_guard":{"status":"ok","checks":[{"name":"live_data_boundary_declared","passed":True},{"name":"network_call_declared","passed":True}]},"provider_smoke_summary":{"provider_family":"macro","provider":"fred","expected_live_contract":"macro_filter_contract","expected_live_checks":["live_data_boundary_declared","network_call_declared"],"secret_values_returned":False}}; market.get_news_bundle=lambda topic="macro":{"live_data_required":True,"news_source_policy_contract":{"live_data_required":True,"network_call":True,"secret_values_returned":False},"news_source_policy_guard":{"status":"ok","checks":[{"name":"live_data_boundary_declared","passed":True},{"name":"network_call_declared","passed":True},{"name":"secret_values_not_returned","passed":True}]},"news_score_contract":{"secret_values_returned":False},"provider_smoke_summary":{"provider_family":"news","provider":"newsapi","expected_live_contract":"news_source_policy_contract","expected_live_checks":["live_data_boundary_declared","network_call_declared","secret_values_not_returned"],"secret_values_returned":False}}; payload=run_live_data_smoke(symbols=["QQQ"], topic="macro"); print(payload["provider_smoke_summary_count"], payload["provider_smoke_summaries"][0]["provider_family"], payload["provider_smoke_summaries"][0]["expected_live_contract"], payload["secret_values_returned"])': 3 market market_snapshot_contract False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.804 API Key Provider Smoke Success Summary Gate Record - 2026-05-17
 
 ### A. 목적

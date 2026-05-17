@@ -1909,6 +1909,26 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     def fake_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         return {
             "live_data_required": True,
+            "provider_smoke_summary": {
+                "schema_version": "provider_smoke_summary.v1",
+                "status": "ok",
+                "passed": True,
+                "tool": "get_market_snapshot",
+                "provider_family": "market",
+                "provider": "polygon",
+                "smoke_command_name": "get_market_snapshot_live_smoke",
+                "preferred_env_key": "POLYGON_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MARKET_DATA_API_KEY",
+                    "POLYGON_API_KEY",
+                ],
+                "expected_live_contract": "market_snapshot_contract",
+                "expected_live_checks": ["live_data_boundary_declared"],
+                "network_call": True,
+                "network_call_policy": "only_when_matching_provider_selects_live_route",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
             "market_snapshot_contract": {
                 "live_data_required": True,
                 "network_call": True,
@@ -1925,6 +1945,30 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     def fake_macro_snapshot() -> dict[str, Any]:
         return {
             "live_data_required": True,
+            "provider_smoke_summary": {
+                "schema_version": "provider_smoke_summary.v1",
+                "status": "ok",
+                "passed": True,
+                "tool": "get_macro_snapshot",
+                "provider_family": "macro",
+                "provider": "fred",
+                "smoke_command_name": "get_macro_snapshot_live_smoke",
+                "preferred_env_key": "FRED_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_MACRO_API_KEY",
+                    "HALO_SWING_FRED_API_KEY",
+                    "FRED_API_KEY",
+                ],
+                "expected_live_contract": "macro_filter_contract",
+                "expected_live_checks": [
+                    "live_data_boundary_declared",
+                    "network_call_declared",
+                ],
+                "network_call": True,
+                "network_call_policy": "only_when_matching_provider_selects_live_route",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
             "macro_filter_contract": {
                 "live_data_required": True,
                 "network_call": True,
@@ -1942,6 +1986,30 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
         return {
             "topic": topic,
             "live_data_required": True,
+            "provider_smoke_summary": {
+                "schema_version": "provider_smoke_summary.v1",
+                "status": "ok",
+                "passed": True,
+                "tool": "get_news_bundle",
+                "provider_family": "news",
+                "provider": "newsapi",
+                "smoke_command_name": "get_news_bundle_live_smoke",
+                "preferred_env_key": "NEWS_API_KEY",
+                "accepted_env_keys": [
+                    "HALO_SWING_NEWS_API_KEY",
+                    "NEWS_API_KEY",
+                ],
+                "expected_live_contract": "news_source_policy_contract",
+                "expected_live_checks": [
+                    "live_data_boundary_declared",
+                    "network_call_declared",
+                    "secret_values_not_returned",
+                ],
+                "network_call": True,
+                "network_call_policy": "only_when_matching_provider_selects_live_route",
+                "mutates_local_state": False,
+                "secret_values_returned": False,
+            },
             "news_source_policy_contract": {
                 "live_data_required": True,
                 "network_call": True,
@@ -2017,6 +2085,18 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
     )
     assert payload["live_data_setup_summary"]["network_call"] is False
     assert payload["live_data_setup_summary"]["secret_values_returned"] is False
+    assert payload["provider_smoke_summary_count"] == 3
+    assert [
+        row["provider_family"] for row in payload["provider_smoke_summaries"]
+    ] == ["market", "macro", "news"]
+    assert payload["provider_smoke_summaries"][0]["expected_live_contract"] == (
+        "market_snapshot_contract"
+    )
+    assert payload["provider_smoke_summaries"][1]["expected_live_checks"] == [
+        "live_data_boundary_declared",
+        "network_call_declared",
+    ]
+    assert payload["provider_smoke_summaries"][2]["secret_values_returned"] is False
     assert payload["validation"]["status"] == "ok"
     assert all(check["passed"] for check in payload["validation"]["checks"])
     assert payload["provider_error_summaries"] == []
@@ -4435,6 +4515,73 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    fake_provider_smoke_summaries = [
+        {
+            "schema_version": "provider_smoke_summary.v1",
+            "status": "ok",
+            "passed": True,
+            "tool": "get_market_snapshot",
+            "provider_family": "market",
+            "provider": "polygon",
+            "smoke_command_name": "get_market_snapshot_live_smoke",
+            "preferred_env_key": "POLYGON_API_KEY",
+            "accepted_env_keys": [
+                "HALO_SWING_MARKET_DATA_API_KEY",
+                "POLYGON_API_KEY",
+            ],
+            "expected_live_contract": "market_snapshot_contract",
+            "expected_live_checks": ["live_data_boundary_declared"],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "schema_version": "provider_smoke_summary.v1",
+            "status": "ok",
+            "passed": True,
+            "tool": "get_macro_snapshot",
+            "provider_family": "macro",
+            "provider": "fred",
+            "smoke_command_name": "get_macro_snapshot_live_smoke",
+            "preferred_env_key": "FRED_API_KEY",
+            "accepted_env_keys": [
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+            ],
+            "expected_live_contract": "macro_filter_contract",
+            "expected_live_checks": [
+                "live_data_boundary_declared",
+                "network_call_declared",
+            ],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+        {
+            "schema_version": "provider_smoke_summary.v1",
+            "status": "ok",
+            "passed": True,
+            "tool": "get_news_bundle",
+            "provider_family": "news",
+            "provider": "newsapi",
+            "smoke_command_name": "get_news_bundle_live_smoke",
+            "preferred_env_key": "NEWS_API_KEY",
+            "accepted_env_keys": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            "expected_live_contract": "news_source_policy_contract",
+            "expected_live_checks": [
+                "live_data_boundary_declared",
+                "network_call_declared",
+                "secret_values_not_returned",
+            ],
+            "network_call": True,
+            "network_call_policy": "only_when_matching_provider_selects_live_route",
+            "mutates_local_state": False,
+            "secret_values_returned": False,
+        },
+    ]
 
     def fake_readiness() -> dict[str, Any]:
         return {
@@ -4510,6 +4657,8 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "network_call": True,
             "live_data_required": True,
             "live_data_setup_summary": fake_setup_summary,
+            "provider_smoke_summaries": fake_provider_smoke_summaries,
+            "provider_smoke_summary_count": 3,
             "mutates_local_state": False,
             "secret_values_returned": False,
         }
@@ -4606,6 +4755,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         payload["live_data_setup_summary"]["next_operator_action"]
     )
     assert payload["next_operator_action"] == fake_next_operator_action
+    assert payload["live_data_smoke_summary"]["provider_smoke_summaries"] == (
+        fake_provider_smoke_summaries
+    )
+    assert payload["live_data_smoke_summary"]["provider_smoke_summary_count"] == 3
     assert payload["api_key_pipeline_stage_summary"] == {
         "schema_version": "api_key_pipeline_stage_summary.v1",
         "status": "ok",

@@ -444,6 +444,11 @@ def run_live_data_smoke(
         macro_snapshot=macro_snapshot,
         news_bundle=news_bundle,
     )
+    provider_smoke_summaries = _provider_smoke_summaries(
+        market_snapshot=market_snapshot,
+        macro_snapshot=macro_snapshot,
+        news_bundle=news_bundle,
+    )
     live_data_setup_summary = _live_data_setup_summary(
         api_key_status,
         provider_route,
@@ -468,6 +473,8 @@ def run_live_data_smoke(
         "news_bundle": news_bundle,
         "provider_route": provider_route,
         "live_data_setup_summary": live_data_setup_summary,
+        "provider_smoke_summaries": provider_smoke_summaries,
+        "provider_smoke_summary_count": len(provider_smoke_summaries),
         "provider_error_summaries": provider_error_summaries,
         "provider_error_summary_count": len(provider_error_summaries),
         "failed_provider_families": provider_error_compact_summary[
@@ -514,6 +521,20 @@ def _provider_error_summaries(
     summaries: list[dict[str, Any]] = []
     for payload in [market_snapshot, macro_snapshot, news_bundle]:
         summary = _optional_mapping(payload.get("error_summary"))
+        if summary is not None:
+            summaries.append(summary)
+    return summaries
+
+
+def _provider_smoke_summaries(
+    *,
+    market_snapshot: dict[str, Any],
+    macro_snapshot: dict[str, Any],
+    news_bundle: dict[str, Any],
+) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for payload in [market_snapshot, macro_snapshot, news_bundle]:
+        summary = _optional_mapping(payload.get("provider_smoke_summary"))
         if summary is not None:
             summaries.append(summary)
     return summaries
@@ -3868,6 +3889,16 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         if isinstance(provider_error_summaries, list)
         else []
     )
+    provider_smoke_summaries = smoke.get("provider_smoke_summaries")
+    provider_smoke_rows = (
+        [
+            row
+            for row in provider_smoke_summaries
+            if isinstance(row, dict)
+        ]
+        if isinstance(provider_smoke_summaries, list)
+        else []
+    )
     provider_error_compact_summary = _provider_error_compact_summary(
         provider_error_rows,
         provider_smoke_plan=provider_smoke_plan,
@@ -3914,6 +3945,8 @@ def _api_key_pipeline_smoke_summary(smoke: dict[str, Any]) -> dict[str, Any]:
         "blocked_provider_smoke_count": provider_smoke_plan.get(
             "blocked_provider_smoke_count"
         ),
+        "provider_smoke_summaries": provider_smoke_rows,
+        "provider_smoke_summary_count": len(provider_smoke_rows),
         "provider_error_summaries": provider_error_rows,
         "provider_error_summary_count": len(provider_error_rows),
         "failed_provider_families": provider_error_compact_summary[
