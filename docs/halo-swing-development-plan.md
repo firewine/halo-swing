@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.801 API Key Next Action Expected Contract Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_command_summary.provider_smoke_commands` row에는 실행할 provider smoke의
+`expected_live_contract`와 `expected_live_checks`가 보이지만,
+`run_api_key_pipeline_smoke(summary_only=true)` 최상위 one-line next action과
+`api_key_next_action_summary`, integration status, failure summary는 여전히 command,
+provider, env-key hint까지만 보여준다. 이번 slice는 no-secret
+`next_action_expected_live_contract`, `next_action_expected_live_checks`와 top-level
+`next_operator_action_expected_live_contract`,
+`next_operator_action_expected_live_checks`를 추가해, API key 입력 후 compact row만으로
+다음 실행 명령의 성공 판정 기준까지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key next action summary exposes next_action_expected_live_contract and next_action_expected_live_checks
+  - summary-only top-level payload exposes next_operator_action_expected_live_contract and next_operator_action_expected_live_checks
+  - API-key integration status and pipeline failure summaries mirror the same expected live contract/check fields
+  - tests lock provider smoke and provider recovery next-action expected contract/check metadata without returning secret values
+  - README and DevOps setup guide document the top-level next operator expected contract/check fields
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; top-level next operator expected live contract/check fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_operator_action_expected_live_contract"], ",".join(payload["next_operator_action_expected_live_checks"]), payload["api_key_next_action_summary"]["next_action_expected_live_contract"], payload["secret_values_returned"])': market_snapshot_contract live_data_boundary_declared market_snapshot_contract False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.800 API Key Provider Smoke Command Expected Contract Gate Record - 2026-05-17
 
 ### A. 목적

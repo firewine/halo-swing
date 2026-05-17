@@ -2265,6 +2265,9 @@ def _api_key_pipeline_next_action_summary(
     next_provider_recovery_action = _optional_mapping(
         next_operator_action.get("next_provider_recovery_action")
     ) or {}
+    next_provider_recovery_smoke = _optional_mapping(
+        next_provider_recovery_action.get("recovery_smoke")
+    ) or {}
     next_action_command = (
         next_operator_action.get("recovery_smoke_command")
         or next_operator_action.get("command")
@@ -2322,12 +2325,32 @@ def _api_key_pipeline_next_action_summary(
         or next_provider_recovery_action.get("smoke_command_name")
         or next_provider_smoke.get("smoke_command_name")
     )
+    next_action_expected_live_contract = (
+        next_operator_action.get("expected_live_contract")
+        or next_provider_recovery_action.get("expected_live_contract")
+        or next_provider_recovery_smoke.get("expected_live_contract")
+        or next_provider_smoke.get("expected_live_contract")
+    )
+    next_action_expected_live_checks = _string_list(
+        next_operator_action.get("expected_live_checks")
+        or next_provider_recovery_action.get("expected_live_checks")
+        or next_provider_recovery_smoke.get("expected_live_checks")
+        or next_provider_smoke.get("expected_live_checks")
+    )
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):
         summary["next_action_provider"] = next_action_provider
     if isinstance(next_action_smoke_command_name, str):
         summary["next_action_smoke_command_name"] = next_action_smoke_command_name
+    if isinstance(next_action_expected_live_contract, str):
+        summary["next_action_expected_live_contract"] = (
+            next_action_expected_live_contract
+        )
+    if next_action_expected_live_checks:
+        summary["next_action_expected_live_checks"] = (
+            next_action_expected_live_checks
+        )
     preferred_env_key = next_operator_action.get(
         "preferred_env_key"
     ) or next_provider_smoke.get("preferred_env_key")
@@ -2802,12 +2825,26 @@ def _api_key_pipeline_failure_summary(
     next_action_smoke_command_name = api_key_next_action_summary.get(
         "next_action_smoke_command_name"
     )
+    next_action_expected_live_contract = api_key_next_action_summary.get(
+        "next_action_expected_live_contract"
+    )
+    next_action_expected_live_checks = _string_list(
+        api_key_next_action_summary.get("next_action_expected_live_checks")
+    )
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):
         summary["next_action_provider"] = next_action_provider
     if isinstance(next_action_smoke_command_name, str):
         summary["next_action_smoke_command_name"] = next_action_smoke_command_name
+    if isinstance(next_action_expected_live_contract, str):
+        summary["next_action_expected_live_contract"] = (
+            next_action_expected_live_contract
+        )
+    if next_action_expected_live_checks:
+        summary["next_action_expected_live_checks"] = (
+            next_action_expected_live_checks
+        )
     if provider_recovery_required and isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if provider_recovery_required and accepted_env_keys:
@@ -2904,6 +2941,12 @@ def _api_key_pipeline_summary_only_payload(
             or next_operator_action.get("next_provider_recovery_smoke_command_name")
             or next_provider_recovery_action.get("smoke_command_name")
             or next_provider_smoke.get("smoke_command_name")
+        ),
+        "next_operator_action_expected_live_contract": (
+            api_key_next_action_summary.get("next_action_expected_live_contract")
+        ),
+        "next_operator_action_expected_live_checks": _string_list(
+            api_key_next_action_summary.get("next_action_expected_live_checks")
         ),
         "next_operator_action_network_call": (
             api_key_next_action_summary.get("next_action_network_call") is True
@@ -4298,12 +4341,26 @@ def _api_key_integration_status_summary(
     next_action_smoke_command_name = api_key_next_action_summary.get(
         "next_action_smoke_command_name"
     )
+    next_action_expected_live_contract = api_key_next_action_summary.get(
+        "next_action_expected_live_contract"
+    )
+    next_action_expected_live_checks = _string_list(
+        api_key_next_action_summary.get("next_action_expected_live_checks")
+    )
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):
         summary["next_action_provider"] = next_action_provider
     if isinstance(next_action_smoke_command_name, str):
         summary["next_action_smoke_command_name"] = next_action_smoke_command_name
+    if isinstance(next_action_expected_live_contract, str):
+        summary["next_action_expected_live_contract"] = (
+            next_action_expected_live_contract
+        )
+    if next_action_expected_live_checks:
+        summary["next_action_expected_live_checks"] = (
+            next_action_expected_live_checks
+        )
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:

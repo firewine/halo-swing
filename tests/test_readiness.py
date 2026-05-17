@@ -2472,6 +2472,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "provider_recovery_required": True,
         "provider_recovery_item_count": 3,
         "preferred_env_key": "POLYGON_API_KEY",
@@ -2586,6 +2590,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "next_action_is_recovery": True,
         "next_action_network_call": True,
         "provider_recovery_action_status": "ready_to_retry",
@@ -3412,6 +3420,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "next_action_is_recovery": True,
         "next_action_network_call": True,
         "next_action_mutates_local_state": False,
@@ -4679,6 +4691,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "provider_recovery_required": False,
         "provider_recovery_item_count": 0,
         "network_call": False,
@@ -4788,6 +4804,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -4858,6 +4878,10 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_expected_live_contract": "market_snapshot_contract",
+        "next_action_expected_live_checks": [
+            "live_data_boundary_declared",
+        ],
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -6571,6 +6595,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smok
     assert next_action_summary["next_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
+    assert next_action_summary["next_action_expected_live_contract"] == (
+        "market_snapshot_contract"
+    )
+    assert next_action_summary["next_action_expected_live_checks"] == [
+        "live_data_boundary_declared",
+    ]
     assert next_action_summary["preferred_env_key"] == "POLYGON_API_KEY"
     assert next_action_summary["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -6743,6 +6773,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["next_operator_action_provider"] == "polygon"
     assert payload["next_operator_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_operator_action_expected_live_contract"] == (
+        next_action_summary["next_action_expected_live_contract"]
+    )
+    assert payload["next_operator_action_expected_live_checks"] == (
+        next_action_summary["next_action_expected_live_checks"]
     )
     assert payload["next_operator_action_network_call"] == (
         next_action_summary["next_action_network_call"]
