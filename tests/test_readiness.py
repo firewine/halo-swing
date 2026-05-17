@@ -1311,6 +1311,20 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
             for env_key in group
         )
     )
+    expected_next_action_preferred_env_keys_by_family = {
+        row["provider_family"]: row["preferred_env_key"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_accepted_env_keys_by_family = {
+        row["provider_family"]: row["accepted_env_keys"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in (
+            expected_next_action_accepted_env_keys_by_family.items()
+        )
+    }
     assert payload["api_key_provider_smoke_action_status"] == (
         expected_action_status
     )
@@ -1342,6 +1356,15 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_accepted_env_key_group_count"
     ] == len(expected_next_action_accepted_env_key_groups)
+    assert payload[
+        "api_key_provider_smoke_next_action_preferred_env_keys_by_family"
+    ] == expected_next_action_preferred_env_keys_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_accepted_env_keys_by_family"
+    ] == expected_next_action_accepted_env_keys_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_accepted_env_key_counts_by_family"
+    ] == expected_next_action_accepted_env_key_counts_by_family
     expected_ready_preferred_env_keys = list(
         dict.fromkeys(row["preferred_env_key"] for row in ready_provider_smoke_rows)
     )

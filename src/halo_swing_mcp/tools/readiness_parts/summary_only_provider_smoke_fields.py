@@ -278,6 +278,27 @@ def _api_key_provider_smoke_top_level_fields(
             for env_key in group
         ]
     )
+    provider_smoke_next_action_preferred_env_keys_by_family = (
+        provider_smoke_ready_preferred_env_keys_by_family
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else provider_smoke_blocked_preferred_env_keys_by_family
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else {}
+    )
+    provider_smoke_next_action_accepted_env_keys_by_family = (
+        provider_smoke_ready_accepted_env_keys_by_family
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else provider_smoke_blocked_accepted_env_keys_by_family
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else {}
+    )
+    provider_smoke_next_action_accepted_env_key_counts_by_family = (
+        provider_smoke_ready_accepted_env_key_counts_by_family
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else provider_smoke_blocked_accepted_env_key_counts_by_family
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else {}
+    )
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -320,6 +341,15 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_accepted_env_key_group_count": len(
             provider_smoke_next_action_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_next_action_preferred_env_keys_by_family": (
+            provider_smoke_next_action_preferred_env_keys_by_family
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_keys_by_family": (
+            provider_smoke_next_action_accepted_env_keys_by_family
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_key_counts_by_family": (
+            provider_smoke_next_action_accepted_env_key_counts_by_family
         ),
         "api_key_provider_smoke_ready_preferred_env_keys": (
             provider_smoke_ready_preferred_env_keys
