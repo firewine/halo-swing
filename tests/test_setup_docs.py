@@ -1083,6 +1083,34 @@ def test_setup_docs_keep_api_key_stage_level_setup_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_error_recovery_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "provider_error_summaries",
+        "provider_error_summary_count",
+        "failed_provider_families",
+        "failed_provider_count",
+        "first_provider_error_summary",
+        "next_provider_recovery_action",
+        "next_provider_recovery_smoke",
+        "next_provider_recovery_smoke_command_name",
+        "provider_recovery_smokes",
+        "provider_recovery_smoke_count",
+        "api_key_provider_recovery_checklist",
+        "api_key_provider_recovery_checklist.v1",
+        "recovery_smoke_command",
+        "recovery_smoke_available",
+        "error_summary",
+        "expected_live_contract",
+        "expected_live_checks",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
