@@ -1056,6 +1056,9 @@ It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_expected_live_check_count`,
 `api_key_provider_smoke_expected_live_check_counts_by_family`,
 `api_key_provider_smoke_accepted_env_keys_by_family`,
+`api_key_provider_smoke_preferred_env_keys_by_family`,
+`api_key_provider_smoke_preferred_env_keys`,
+`api_key_provider_smoke_preferred_env_key_count`,
 `api_key_provider_smoke_accepted_env_key_count`, and
 `api_key_provider_smoke_accepted_env_key_counts_by_family`.
 Returned one-shot command summaries use `--summary-only --no-audit` for

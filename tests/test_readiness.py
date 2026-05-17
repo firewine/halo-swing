@@ -1346,6 +1346,22 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
             for env_key in group
         )
     )
+    expected_preferred_env_keys_by_family = {
+        row["provider_family"]: row["preferred_env_key"]
+        for row in provider_smoke_rows
+    }
+    expected_preferred_env_keys = list(
+        dict.fromkeys(expected_preferred_env_keys_by_family.values())
+    )
+    assert payload["api_key_provider_smoke_preferred_env_keys_by_family"] == (
+        expected_preferred_env_keys_by_family
+    )
+    assert payload["api_key_provider_smoke_preferred_env_keys"] == (
+        expected_preferred_env_keys
+    )
+    assert payload["api_key_provider_smoke_preferred_env_key_count"] == len(
+        expected_preferred_env_keys
+    )
     assert payload["api_key_provider_smoke_blocked_preferred_env_keys"] == (
         expected_blocked_preferred_env_keys
     )
