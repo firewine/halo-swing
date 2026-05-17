@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.894 API Key Quickstart Command Plan Family Index Gate Record - 2026-05-18
+
+### A. 목적
+
+3.893에서 quickstart command plan provider-smoke row의 command name과 command는
+provider-family map으로 올라왔다. 하지만 compact client가 quickstart plan family maps만
+순회하려면 provider family 목록과 row kind를 다른 dict key나 command plan row에서 추론해야
+한다. 이번 slice는 API 키만 넣은 뒤 quickstart command plan family index만 읽어도
+market/macro/news provider-smoke rows를 순서 있게 표시할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_provider_families lists provider-smoke rows in command-plan order
+  - summary-only top-level api_key_setup_quickstart_command_plan_provider_family_count mirrors the provider-smoke family count
+  - summary-only top-level api_key_setup_quickstart_command_plan_kinds_by_family maps market, macro, and news to provider_smoke
+  - README and DevOps setup guide document the quickstart command plan family-index fields
+  - setup docs tests assert the documented family-index field list stays in sync
+  - fake-key offline verification confirmed market/macro/news family index and kind map without secret values
+  - blocked no-key test coverage keeps the family index tied to provider smoke command rows without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan family index pytest: 3 passed
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key family-index assertion: market, macro, news; count 3; secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.893 API Key Quickstart Command Plan Command Maps Gate Record - 2026-05-18
 
 ### A. 목적

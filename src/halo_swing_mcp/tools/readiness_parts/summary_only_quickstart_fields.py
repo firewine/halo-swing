@@ -57,7 +57,20 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         for row in quickstart_command_plan
         if isinstance(row.get("provider_family"), str)
     ]
+    provider_families = _ordered_unique_strings(
+        [row.get("provider_family") for row in provider_rows]
+    )
     return {
+        "api_key_setup_quickstart_command_plan_provider_families": (
+            provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_provider_family_count": len(
+            provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_kinds_by_family": {
+            row["provider_family"]: row.get("kind")
+            for row in provider_rows
+        },
         "api_key_setup_quickstart_command_plan_command_names_by_family": {
             row["provider_family"]: row.get("name")
             for row in provider_rows

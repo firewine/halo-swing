@@ -6408,6 +6408,17 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_quickstart_command_plan"][2][
         "provider_family"
     ] == "market"
+    assert payload["api_key_setup_quickstart_command_plan_provider_families"] == [
+        row["provider_family"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_provider_family_count"] == (
+        payload["api_key_command_summary"]["provider_smoke_command_count"]
+    )
+    assert payload["api_key_setup_quickstart_command_plan_kinds_by_family"] == {
+        row["provider_family"]: "provider_smoke"
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
     assert (
         payload[
             "api_key_setup_quickstart_command_plan_command_names_by_family"
@@ -8473,6 +8484,17 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "run_api_key_pipeline_smoke",
     ]
     assert payload["api_key_setup_quickstart_command_plan_count"] == 6
+    assert payload["api_key_setup_quickstart_command_plan_provider_families"] == [
+        row["provider_family"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_provider_family_count"] == (
+        payload["api_key_command_summary"]["provider_smoke_command_count"]
+    )
+    assert payload["api_key_setup_quickstart_command_plan_kinds_by_family"] == {
+        row["provider_family"]: "provider_smoke"
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
     assert payload["api_key_setup_quickstart_command_plan"][2:5] == [
         {
             "name": row["smoke_command_name"],
