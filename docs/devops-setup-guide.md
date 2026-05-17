@@ -793,8 +793,10 @@ provider smoke or provider recovery command, it also includes
 `preferred_env_key` and `accepted_env_keys`, so the single next setup or
 recovery command, provider identity, and accepted API-key aliases are visible.
 When the next action is `fill_live_data_api_keys`, it also includes
-`required_env_keys` and no-secret `dotenv_examples`, so the compact row shows
-the `KEY=placeholder` lines to fill
+`required_env_keys`, `next_after_action`, `dotenv_target_path`, `source_path`,
+`target_path`, `secret_input_required`, and no-secret `dotenv_examples` /
+`dotenv_example_count`, so the compact row shows the `KEY=placeholder` lines
+to fill
 without reading nested payloads. It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in

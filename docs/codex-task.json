@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_STATUS_NEXT_ACTION_DOTENV_FIELDS_GATE",
+  "gate_id": "API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.861",
-  "next_atomic_step": "carry next action dotenv handoff fields into API-key integration status summary",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.862",
+  "next_atomic_step": "lock API-key next action summary dotenv handoff field docs parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -19,7 +19,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.861",
+    "docs/halo-swing-development-plan.md#3.862",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness.py",
@@ -41,7 +41,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -59,13 +59,12 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_next_action_summary preserves next_after_action and dotenv path/secret-input fields when the next operator action carries them",
-    "api_key_integration_status_summary exposes next_action_next_after_action, dotenv path, secret-input, and dotenv example fields copied from the next action summary",
-    "README and DevOps setup guide document the nested integration status next-action dotenv handoff fields",
+    "README and DevOps setup guide document api_key_next_action_summary next_after_action, dotenv path, secret-input, and dotenv example count fields",
+    "setup docs guard keeps README and DevOps API-key next action summary dotenv handoff fields in sync",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key integration status next-action dotenv fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key next action summary dotenv docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -1038,7 +1038,13 @@ def test_setup_docs_keep_api_key_next_action_summary_fields_in_sync() -> None:
         "preferred_env_key",
         "accepted_env_keys",
         "required_env_keys",
+        "next_after_action",
+        "dotenv_target_path",
+        "source_path",
+        "target_path",
+        "secret_input_required",
         "dotenv_examples",
+        "dotenv_example_count",
     )
 
     for field_name in field_names:

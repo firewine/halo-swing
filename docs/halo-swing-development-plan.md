@@ -874,6 +874,61 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.862 API Key Next Action Summary Dotenv Docs Parity Gate Record - 2026-05-17
+
+### A. 목적
+
+3.861에서 `api_key_next_action_summary`와 nested
+`api_key_integration_status_summary`가 dotenv handoff fields를 보존하도록 만들었다.
+하지만 README와 DevOps guide의 `api_key_next_action_summary.v1` 설명은 아직
+`next_after_action`, dotenv path fields, `secret_input_required`,
+`dotenv_example_count`를 명시적으로 잠그지 않았다. 이번 slice는 실제 payload contract와
+setup docs guard를 맞춰, compact client 문서가 API 키 입력 흐름의 next-action summary
+필드를 놓치지 않게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README documents api_key_next_action_summary next_after_action, dotenv_target_path, source_path, target_path, secret_input_required, dotenv_examples, and dotenv_example_count
+  - DevOps setup guide documents the same api_key_next_action_summary dotenv handoff fields
+  - tests/test_setup_docs.py keeps README and DevOps guide API-key next action summary field parity in sync
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key next action summary dotenv docs parity pytest: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 30 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 822 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct summary-only smoke confirmed api_key_next_action_summary next_after_action fill_live_data_api_keys, dotenv_target_path .env, secret_input_required false, and secret_values_returned false
+```
+
 ## 3.861 API Key Integration Status Next Action Dotenv Fields Gate Record - 2026-05-17
 
 ### A. 목적

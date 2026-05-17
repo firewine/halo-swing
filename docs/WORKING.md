@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_DOTENV_FIELDS_VERIFIED
-gate_id: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_DOTENV_FIELDS_GATE
+status: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: carry next action dotenv handoff fields into API-key integration status summary
+next_atomic_step: lock API-key next action summary dotenv handoff field docs parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,15 +83,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_next_action_summary preserves next_after_action and dotenv path/secret-input fields when the next operator action carries them
-  - api_key_integration_status_summary exposes next_action_next_after_action, dotenv path, secret-input, and dotenv example fields copied from the next action summary
-  - README and DevOps setup guide document the nested integration status next-action dotenv handoff fields
+  - README and DevOps setup guide document api_key_next_action_summary next_after_action, dotenv path, secret-input, and dotenv example count fields
+  - setup docs guard keeps README and DevOps API-key next action summary dotenv handoff fields in sync
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key integration status next-action dotenv fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key next action summary dotenv docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_DOTENV_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_NEXT_ACTION_DOTENV_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: carry next action dotenv handoff fields into API-key integration status summary
 ```
 
 Previous completed directive:
@@ -3418,6 +3428,54 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
+Summary: API Key Next Action Summary Dotenv Docs Parity Gate is verified.
+README and DevOps setup guide now document `api_key_next_action_summary.v1`
+dotenv handoff fields: `next_after_action`, `dotenv_target_path`,
+`source_path`, `target_path`, `secret_input_required`, `dotenv_examples`, and
+`dotenv_example_count`. Focused docs/readiness coverage, setup-docs coverage,
+direct summary-only smoke, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_next_action_summary_dotenv_docs_parity_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_setup_docs.py
+  implementation:
+    - README documents api_key_next_action_summary next_after_action, dotenv_target_path, source_path, target_path, secret_input_required, dotenv_examples, and dotenv_example_count
+    - DevOps setup guide documents the same api_key_next_action_summary dotenv handoff fields
+    - tests/test_setup_docs.py keeps README and DevOps guide API-key next action summary field parity in sync
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; api_key_next_action_summary next_after_action fill_live_data_api_keys; dotenv_target_path .env; secret_input_required false; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "30 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "822 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
+
 Summary: API Key Integration Status Next Action Dotenv Fields Gate is verified.
 `api_key_next_action_summary` now preserves next-action dotenv handoff fields,
 and `api_key_integration_status_summary` now carries
@@ -3429,44 +3487,6 @@ full pytest, ruff, and health_check passed.
 ```yaml
 api_key_integration_status_next_action_dotenv_fields_gate:
   status: verified
-  changed_files:
-    - .codex/tasks/current.json
-    - README.md
-    - docs/WORKING.md
-    - docs/codex-task.json
-    - docs/devops-setup-guide.md
-    - docs/halo-swing-development-plan.md
-    - src/halo_swing_mcp/tools/readiness.py
-    - src/halo_swing_mcp/tools/readiness_parts/
-    - tests/test_readiness.py
-    - tests/test_setup_docs.py
-  implementation:
-    - api_key_next_action_summary preserves next_after_action, dotenv_target_path, source_path, target_path, and secret_input_required when the next operator action carries them
-    - api_key_integration_status_summary exposes next_action_next_after_action, next_action_dotenv_target_path, next_action_source_path, next_action_target_path, next_action_secret_input_required, next_action_dotenv_examples, and next_action_dotenv_example_count copied from api_key_next_action_summary
-    - README and DevOps setup guide document nested integration status next-action dotenv handoff fields
-    - focused readiness and setup-docs tests assert nested integration status next-action dotenv handoff fields
-    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
-  verification:
-    - command: diff -u .codex/tasks/current.json docs/codex-task.json
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
-      result: passed
-    - command: git diff --check
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync -q
-      result: "3 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; api_key_integration_status_summary next_action_next_after_action fill_live_data_api_keys; next_action_dotenv_target_path .env; next_action_secret_input_required false; secret_values_returned false
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
-      result: "30 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "822 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
-      result: passed
 ```
 
 Previous verification:

@@ -295,8 +295,10 @@ the compact `api_key_next_action_summary.v1` with `status`, `current_step`,
 `next_action_status`, `next_action_is_recovery`, `next_action_network_call`,
 `next_action_mutates_local_state`, `next_action_provider_family`,
 `next_action_provider`, `next_action_smoke_command_name`, `preferred_env_key`,
-`accepted_env_keys`, `required_env_keys`, and no-secret `dotenv_examples` when
-the next action points at a provider smoke command, provider recovery, or
+`accepted_env_keys`, `required_env_keys`, `next_after_action`,
+`dotenv_target_path`, `source_path`, `target_path`, `secret_input_required`,
+and no-secret `dotenv_examples` / `dotenv_example_count` when the next action
+points at a provider smoke command, provider recovery, dotenv setup, or
 API-key fill step, plus provider
 family counts, API-key setup status inside `readiness_summary`, the next local
 action mirrored inside `readiness_summary`, readiness summary
