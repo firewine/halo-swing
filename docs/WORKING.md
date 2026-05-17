@@ -55,7 +55,6 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness.py
   - src/halo_swing_mcp/tools/readiness_parts/
   - tests/test_readiness.py
   - tests/test_setup_docs.py
@@ -3607,7 +3606,7 @@ api_key_check_summary_provider_route_family_fields_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
       result: "33 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
-      result: "97 passed"
+      result: "96 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "825 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
