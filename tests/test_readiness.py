@@ -5507,9 +5507,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
 
     payload = run_api_key_pipeline_smoke(summary_only=True)
     next_operator_action = payload["next_operator_action"]
+    next_action_summary = payload["api_key_next_action_summary"]
     readiness_summary = payload["readiness_summary"]
     serialized = json.dumps(payload, sort_keys=True)
 
+    assert payload["next_operator_action_name"] == next_action_summary[
+        "next_action_name"
+    ]
+    assert payload["next_operator_action_command"] == next_action_summary[
+        "next_action_command"
+    ]
+    assert payload["next_operator_action_preferred_env_key"] == (
+        next_action_summary["preferred_env_key"]
+    )
+    assert payload["next_operator_action_accepted_env_keys"] == (
+        next_action_summary["accepted_env_keys"]
+    )
     assert next_operator_action == readiness_summary["next_operator_action"]
     assert next_operator_action["name"] == "run_provider_smokes"
     assert next_operator_action["next_provider_smoke"]["preferred_env_key"] == (

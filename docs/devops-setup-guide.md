@@ -488,6 +488,10 @@ The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command
 without returning secret values.
+For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
+`next_operator_action_name`, `next_operator_action_command`,
+`next_operator_action_preferred_env_key`, and
+`next_operator_action_accepted_env_keys`.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,

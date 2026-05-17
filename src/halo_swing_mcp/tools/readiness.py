@@ -2333,6 +2333,10 @@ def _api_key_pipeline_summary_only_payload(
     payload: dict[str, Any],
 ) -> dict[str, Any]:
     input_payload = _optional_mapping(payload.get("input")) or {}
+    next_operator_action = _optional_mapping(payload.get("next_operator_action")) or {}
+    api_key_next_action_summary = _optional_mapping(
+        payload.get("api_key_next_action_summary")
+    ) or {}
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -2345,20 +2349,27 @@ def _api_key_pipeline_summary_only_payload(
             "summary_only": True,
         },
         "executed_tools": _string_list(payload.get("executed_tools")),
-        "next_operator_action": _optional_mapping(
-            payload.get("next_operator_action")
-        )
-        or {},
+        "next_operator_action_name": (
+            next_operator_action.get("name")
+            or api_key_next_action_summary.get("next_action_name")
+        ),
+        "next_operator_action_command": api_key_next_action_summary.get(
+            "next_action_command"
+        ),
+        "next_operator_action_preferred_env_key": api_key_next_action_summary.get(
+            "preferred_env_key"
+        ),
+        "next_operator_action_accepted_env_keys": _string_list(
+            api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
         "api_key_integration_status_summary": _optional_mapping(
             payload.get("api_key_integration_status_summary")
         )
         or {},
-        "api_key_next_action_summary": _optional_mapping(
-            payload.get("api_key_next_action_summary")
-        )
-        or {},
+        "api_key_next_action_summary": api_key_next_action_summary,
         "api_key_operator_checklist_summary": (
             _api_key_operator_checklist_summary(
                 _optional_mapping(payload.get("api_key_operator_checklist")) or {}
