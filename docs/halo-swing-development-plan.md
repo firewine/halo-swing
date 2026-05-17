@@ -199,6 +199,64 @@ verification:
   - targeted payload print: preferred env-key map, accepted env-key map, setup status map, configured map present, secret_values_returned false
 ```
 
+## 3.824 API Key Top-Level Provider Smoke Command Maps Gate Record - 2026-05-17
+
+### A. 목적
+
+3.823에서 summary-only top-level payload는 provider family별 key alias와 setup
+상태를 직접 보여주게 됐다. 하지만 compact row만 읽는 operator는 API 키 입력 후
+실행할 provider smoke command 문자열, live-call policy, expected live contract/checks를
+아직 nested `api_key_command_summary.provider_smoke_commands`에서 확인해야 한다. 이번
+slice는 이 no-secret provider smoke command metadata를 top-level by-family map으로
+올려, 사용자가 market/macro/news별 smoke 명령을 compact response 첫 레벨에서 바로
+확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_provider_smoke_commands_by_family mirrors provider-family smoke command strings
+  - summary-only top-level api_key_provider_smoke_statuses_by_family mirrors provider-family smoke readiness states
+  - summary-only top-level api_key_provider_smoke_network_call_policies_by_family mirrors provider-family live-call policies
+  - summary-only top-level api_key_provider_smoke_expected_live_contracts_by_family and api_key_provider_smoke_expected_live_checks_by_family mirror expected live contract/check metadata
+  - README and DevOps setup guide document top-level API-key provider smoke command maps
+  - setup docs tests assert top-level provider smoke command map guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: provider smoke command map, expected contracts map, expected checks map present, secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

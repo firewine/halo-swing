@@ -645,6 +645,12 @@ mirrors the no-secret command metadata as `api_key_copy_dotenv_command`,
 `api_key_next_smoke_command_name`, `api_key_one_shot_pipeline_smoke_command`,
 `api_key_provider_smoke_command_count`, and
 `api_key_provider_smoke_command_names`.
+It also mirrors provider smoke command details by family as
+`api_key_provider_smoke_commands_by_family`,
+`api_key_provider_smoke_statuses_by_family`,
+`api_key_provider_smoke_network_call_policies_by_family`,
+`api_key_provider_smoke_expected_live_contracts_by_family`, and
+`api_key_provider_smoke_expected_live_checks_by_family`.
 Returned one-shot command summaries use `--summary-only --no-audit` for
 `run_api_key_pipeline_smoke`, so the displayed post-setup command opens the same
 compact response without requiring input JSON edits.

@@ -5598,6 +5598,45 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "get_macro_snapshot_live_smoke",
         "get_news_bundle_live_smoke",
     ]
+    assert payload["api_key_provider_smoke_commands_by_family"] == {
+        "market": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "get_market_snapshot --input-json '{\"symbols\":[\"QQQ\"]}' "
+            "--no-audit"
+        ),
+        "macro": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "get_macro_snapshot --no-audit"
+        ),
+        "news": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "get_news_bundle --input-json '{\"topic\":\"macro\"}' --no-audit"
+        ),
+    }
+    assert payload["api_key_provider_smoke_statuses_by_family"] == {
+        "market": "blocked",
+        "macro": "blocked",
+        "news": "blocked",
+    }
+    assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
+        "market": "only_when_matching_api_key_selects_live_provider",
+        "macro": "only_when_matching_api_key_selects_live_provider",
+        "news": "only_when_matching_api_key_selects_live_provider",
+    }
+    assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
+        "market": "market_snapshot_contract",
+        "macro": "macro_filter_contract",
+        "news": "news_source_policy_contract",
+    }
+    assert payload["api_key_provider_smoke_expected_live_checks_by_family"] == {
+        "market": ["live_data_boundary_declared"],
+        "macro": ["live_data_boundary_declared", "network_call_declared"],
+        "news": [
+            "live_data_boundary_declared",
+            "network_call_declared",
+            "secret_values_not_returned",
+        ],
+    }
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
@@ -6993,6 +7032,26 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         ready_to_run_live_smoke=True,
     )
     assert command_summary["provider_smoke_command_count"] == 3
+    assert payload["api_key_provider_smoke_commands_by_family"] == {
+        row["provider_family"]: row["command"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_statuses_by_family"] == {
+        row["provider_family"]: row["status"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
+        row["provider_family"]: row["network_call_policy"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
+        row["provider_family"]: row["expected_live_contract"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_expected_live_checks_by_family"] == {
+        row["provider_family"]: row["expected_live_checks"]
+        for row in command_summary["provider_smoke_commands"]
+    }
     assert command_summary["next_provider_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )

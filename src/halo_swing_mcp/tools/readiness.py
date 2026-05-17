@@ -3064,6 +3064,11 @@ def _api_key_pipeline_summary_only_payload(
         if isinstance(raw_provider_smoke_command_count, int)
         else len(provider_smoke_command_rows)
     )
+    provider_smoke_command_rows_by_family = {
+        row["provider_family"]: row
+        for row in provider_smoke_command_rows
+        if isinstance(row.get("provider_family"), str)
+    }
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3248,6 +3253,26 @@ def _api_key_pipeline_summary_only_payload(
                 for row in provider_smoke_command_rows
             ]
         ),
+        "api_key_provider_smoke_commands_by_family": {
+            family: row.get("command")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_statuses_by_family": {
+            family: row.get("status")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_network_call_policies_by_family": {
+            family: row.get("network_call_policy")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_expected_live_contracts_by_family": {
+            family: row.get("expected_live_contract")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_expected_live_checks_by_family": {
+            family: _string_list(row.get("expected_live_checks"))
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
