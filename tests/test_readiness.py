@@ -1366,6 +1366,34 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         row["provider_family"]: row["secret_values_returned"]
         for row in expected_next_action_env_key_rows
     }
+    expected_next_action_expected_live_contracts_by_family = {
+        row["provider_family"]: row["expected_live_contract"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_expected_live_contracts = list(
+        dict.fromkeys(
+            expected_next_action_expected_live_contracts_by_family.values()
+        )
+    )
+    expected_next_action_expected_live_checks_by_family = {
+        row["provider_family"]: row["expected_live_checks"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_expected_live_checks = list(
+        dict.fromkeys(
+            check
+            for checks in (
+                expected_next_action_expected_live_checks_by_family.values()
+            )
+            for check in checks
+        )
+    )
+    expected_next_action_expected_live_check_counts_by_family = {
+        family: len(checks)
+        for family, checks in (
+            expected_next_action_expected_live_checks_by_family.items()
+        )
+    }
     assert payload["api_key_provider_smoke_action_status"] == (
         expected_action_status
     )
@@ -1446,6 +1474,27 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_any_secret_values_returned"
     ] is any(expected_next_action_secret_values_returned_by_family.values())
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_contracts"
+    ] == expected_next_action_expected_live_contracts
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_contract_count"
+    ] == len(expected_next_action_expected_live_contracts)
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_contracts_by_family"
+    ] == expected_next_action_expected_live_contracts_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_checks"
+    ] == expected_next_action_expected_live_checks
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_check_count"
+    ] == len(expected_next_action_expected_live_checks)
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_checks_by_family"
+    ] == expected_next_action_expected_live_checks_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_expected_live_check_counts_by_family"
+    ] == expected_next_action_expected_live_check_counts_by_family
     assert payload["api_key_provider_smoke_next_action_preferred_env_keys"] == (
         expected_next_action_preferred_env_keys
     )

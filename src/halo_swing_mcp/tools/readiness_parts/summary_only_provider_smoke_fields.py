@@ -333,6 +333,32 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("secret_values_returned") is True
         for family, row in provider_smoke_next_action_rows_by_family.items()
     }
+    provider_smoke_next_action_expected_live_contracts_by_family = {
+        family: row.get("expected_live_contract")
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_expected_live_contracts = _ordered_unique_strings(
+        provider_smoke_next_action_expected_live_contracts_by_family.values()
+    )
+    provider_smoke_next_action_expected_live_checks_by_family = {
+        family: _string_list(row.get("expected_live_checks"))
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_expected_live_checks = _ordered_unique_strings(
+        [
+            check
+            for checks in (
+                provider_smoke_next_action_expected_live_checks_by_family.values()
+            )
+            for check in checks
+        ]
+    )
+    provider_smoke_next_action_expected_live_check_counts_by_family = {
+        family: len(checks)
+        for family, checks in (
+            provider_smoke_next_action_expected_live_checks_by_family.items()
+        )
+    }
     provider_smoke_next_action_preferred_env_keys = (
         provider_smoke_ready_preferred_env_keys
         if provider_smoke_next_action == "run_ready_provider_smokes"
@@ -466,6 +492,27 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_any_secret_values_returned": any(
             provider_smoke_next_action_secret_values_returned_by_family.values()
+        ),
+        "api_key_provider_smoke_next_action_expected_live_contracts": (
+            provider_smoke_next_action_expected_live_contracts
+        ),
+        "api_key_provider_smoke_next_action_expected_live_contract_count": len(
+            provider_smoke_next_action_expected_live_contracts
+        ),
+        "api_key_provider_smoke_next_action_expected_live_contracts_by_family": (
+            provider_smoke_next_action_expected_live_contracts_by_family
+        ),
+        "api_key_provider_smoke_next_action_expected_live_checks": (
+            provider_smoke_next_action_expected_live_checks
+        ),
+        "api_key_provider_smoke_next_action_expected_live_check_count": len(
+            provider_smoke_next_action_expected_live_checks
+        ),
+        "api_key_provider_smoke_next_action_expected_live_checks_by_family": (
+            provider_smoke_next_action_expected_live_checks_by_family
+        ),
+        "api_key_provider_smoke_next_action_expected_live_check_counts_by_family": (
+            provider_smoke_next_action_expected_live_check_counts_by_family
         ),
         "api_key_provider_smoke_next_action_preferred_env_keys": (
             provider_smoke_next_action_preferred_env_keys
