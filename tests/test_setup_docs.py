@@ -369,6 +369,13 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "expected live\ncontract/checks" in guide
     assert "one_shot_pipeline_smoke" in guide
     assert "next_provider_smoke_command_name" in guide
+    assert "api_key_copy_dotenv_command" in guide
+    assert "api_key_copy_dotenv_required" in guide
+    assert "api_key_next_smoke_command" in guide
+    assert "api_key_next_smoke_command_name" in guide
+    assert "api_key_one_shot_pipeline_smoke_command" in guide
+    assert "api_key_provider_smoke_command_count" in guide
+    assert "api_key_provider_smoke_command_names" in guide
     assert "accepted API-key aliases" in guide
     assert "next_blocking_action_preferred_env_key" in guide
     assert "keeps `api_key_setup_file_summary`" in guide

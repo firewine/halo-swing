@@ -3021,6 +3021,36 @@ def _api_key_pipeline_summary_only_payload(
         _optional_mapping(payload.get("api_key_operator_checklist")) or {}
     )
     setup_status_summary = _optional_mapping(payload.get("setup_status_summary")) or {}
+    api_key_command_summary = _optional_mapping(
+        payload.get("api_key_command_summary")
+    ) or {}
+    copy_dotenv_command = _optional_mapping(
+        api_key_command_summary.get("copy_dotenv_command")
+    ) or {}
+    next_smoke_command = _optional_mapping(
+        api_key_command_summary.get("next_smoke_command")
+    ) or {}
+    one_shot_pipeline_smoke = _optional_mapping(
+        api_key_command_summary.get("one_shot_pipeline_smoke")
+    ) or {}
+    provider_smoke_commands = api_key_command_summary.get("provider_smoke_commands")
+    provider_smoke_command_rows = (
+        [
+            row
+            for row in provider_smoke_commands
+            if isinstance(row, dict)
+        ]
+        if isinstance(provider_smoke_commands, list)
+        else []
+    )
+    raw_provider_smoke_command_count = api_key_command_summary.get(
+        "provider_smoke_command_count"
+    )
+    provider_smoke_command_count = (
+        raw_provider_smoke_command_count
+        if isinstance(raw_provider_smoke_command_count, int)
+        else len(provider_smoke_command_rows)
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3147,6 +3177,20 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_provider_route_status": setup_status_summary.get(
             "provider_route_status"
         ),
+        "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
+        "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
+        "api_key_next_smoke_command": next_smoke_command.get("command"),
+        "api_key_next_smoke_command_name": next_smoke_command.get("name"),
+        "api_key_one_shot_pipeline_smoke_command": one_shot_pipeline_smoke.get(
+            "command"
+        ),
+        "api_key_provider_smoke_command_count": provider_smoke_command_count,
+        "api_key_provider_smoke_command_names": _ordered_unique_strings(
+            [
+                row.get("smoke_command_name")
+                for row in provider_smoke_command_rows
+            ]
+        ),
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
@@ -3165,10 +3209,7 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_requirements_summary")
         )
         or {},
-        "api_key_command_summary": _optional_mapping(
-            payload.get("api_key_command_summary")
-        )
-        or {},
+        "api_key_command_summary": api_key_command_summary,
         "api_key_setup_file_summary": _optional_mapping(
             payload.get("api_key_setup_file_summary")
         )

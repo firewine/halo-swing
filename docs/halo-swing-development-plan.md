@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.821 API Key Top-Level Command Summary Mirrors Gate Record - 2026-05-17
+
+### A. 목적
+
+3.820에서 summary-only top-level payload는 provider-family readiness를 직접
+보여주게 됐다. 하지만 compact row만 읽는 operator는 아직 `.env` 복사 명령,
+다음 smoke 명령, one-shot pipeline smoke 명령, provider smoke command 목록을
+nested `api_key_command_summary`에서 다시 확인해야 한다. 이번 slice는 no-secret
+command summary metadata를 top-level mirrors로 올려, 사용자가 API 키만 채운 뒤
+실행할 다음 명령을 compact response만 보고 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_copy_dotenv_command and api_key_copy_dotenv_required mirror command summary dotenv copy metadata
+  - summary-only top-level api_key_next_smoke_command and api_key_next_smoke_command_name mirror command summary next smoke metadata
+  - summary-only top-level api_key_one_shot_pipeline_smoke_command mirrors the compact one-shot pipeline smoke command
+  - summary-only top-level api_key_provider_smoke_command_count and api_key_provider_smoke_command_names mirror provider smoke command metadata
+  - README and DevOps setup guide document top-level API-key command summary mirrors
+  - setup docs tests assert top-level command summary mirror guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

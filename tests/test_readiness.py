@@ -5525,6 +5525,25 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_required_provider_family_count"] == 3
     assert payload["api_key_setup_ready_to_run_live_smoke"] is False
     assert payload["api_key_setup_provider_route_status"] == "blocked"
+    assert payload["api_key_copy_dotenv_command"] == "cp .env.example .env"
+    assert payload["api_key_copy_dotenv_required"] is True
+    assert payload["api_key_next_smoke_command_name"] == (
+        "get_live_data_api_key_status"
+    )
+    assert payload["api_key_next_smoke_command"] == (
+        "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        "get_live_data_api_key_status --no-audit"
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_command"] == (
+        "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        "run_api_key_pipeline_smoke --summary-only --no-audit"
+    )
+    assert payload["api_key_provider_smoke_command_count"] == 3
+    assert payload["api_key_provider_smoke_command_names"] == [
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+    ]
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
@@ -6676,6 +6695,28 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert payload["api_key_setup_provider_route_status"] == (
         payload["setup_status_summary"]["provider_route_status"]
     )
+    assert payload["api_key_copy_dotenv_command"] == (
+        payload["api_key_command_summary"]["copy_dotenv_command"]["command"]
+    )
+    assert payload["api_key_copy_dotenv_required"] == (
+        payload["api_key_command_summary"]["copy_dotenv_command"]["required"]
+    )
+    assert payload["api_key_next_smoke_command"] == (
+        payload["api_key_command_summary"]["next_smoke_command"]["command"]
+    )
+    assert payload["api_key_next_smoke_command_name"] == (
+        payload["api_key_command_summary"]["next_smoke_command"]["name"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_command"] == (
+        payload["api_key_command_summary"]["one_shot_pipeline_smoke"]["command"]
+    )
+    assert payload["api_key_provider_smoke_command_count"] == (
+        payload["api_key_command_summary"]["provider_smoke_command_count"]
+    )
+    assert payload["api_key_provider_smoke_command_names"] == [
+        row["smoke_command_name"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    ]
     assert checklist_summary["ready"] is False
     assert checklist_summary["ready_step_names"] == [
         "prepare_dotenv",
