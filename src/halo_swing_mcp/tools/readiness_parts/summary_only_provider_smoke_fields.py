@@ -313,6 +313,10 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("command")
         for family, row in provider_smoke_next_action_rows_by_family.items()
     }
+    provider_smoke_next_action_provider_by_family = {
+        family: row.get("provider")
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
     provider_smoke_next_action_statuses_by_family = {
         family: row.get("status")
         for family, row in provider_smoke_next_action_rows_by_family.items()
@@ -475,6 +479,9 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_commands_by_family": (
             provider_smoke_next_action_commands_by_family
+        ),
+        "api_key_provider_smoke_next_action_provider_by_family": (
+            provider_smoke_next_action_provider_by_family
         ),
         "api_key_provider_smoke_next_action_provider_families": (
             provider_smoke_next_action_provider_families

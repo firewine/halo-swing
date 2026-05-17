@@ -855,6 +855,7 @@ def test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync() -> None:
         "api_key_provider_smoke_next_action_kinds_by_family",
         "api_key_provider_smoke_next_action_command_names_by_family",
         "api_key_provider_smoke_next_action_commands_by_family",
+        "api_key_provider_smoke_next_action_provider_by_family",
         "api_key_provider_smoke_next_action_provider_families",
         "api_key_provider_smoke_next_action_provider_family_count",
         "api_key_provider_smoke_next_action_providers",

@@ -1337,6 +1337,10 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         row["provider_family"]: row["command"]
         for row in expected_next_action_env_key_rows
     }
+    expected_next_action_provider_by_family = {
+        row["provider_family"]: row["provider"]
+        for row in expected_next_action_env_key_rows
+    }
     expected_next_action_provider_families = list(
         dict.fromkeys(
             row["provider_family"] for row in expected_next_action_env_key_rows
@@ -1467,6 +1471,9 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_commands_by_family"
     ] == expected_next_action_commands_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_provider_by_family"
+    ] == expected_next_action_provider_by_family
     assert payload["api_key_provider_smoke_next_action_provider_families"] == (
         expected_next_action_provider_families
     )
