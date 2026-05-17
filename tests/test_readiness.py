@@ -5950,6 +5950,43 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "get_macro_snapshot_live_smoke",
         "get_news_bundle_live_smoke",
     ]
+    first_success = fake_provider_smoke_summaries[0]
+    assert summary_payload["provider_smoke_first_success_provider_family"] == (
+        first_success["provider_family"]
+    )
+    assert summary_payload["provider_smoke_first_success_provider"] == (
+        first_success["provider"]
+    )
+    assert summary_payload["provider_smoke_first_success_smoke_command_name"] == (
+        first_success["smoke_command_name"]
+    )
+    assert summary_payload["provider_smoke_first_success_status"] == (
+        first_success["status"]
+    )
+    assert summary_payload[
+        "provider_smoke_first_success_expected_live_contract"
+    ] == first_success["expected_live_contract"]
+    assert summary_payload[
+        "provider_smoke_first_success_expected_live_checks"
+    ] == first_success["expected_live_checks"]
+    assert summary_payload["provider_smoke_first_success_preferred_env_key"] == (
+        first_success["preferred_env_key"]
+    )
+    assert summary_payload[
+        "provider_smoke_first_success_accepted_env_keys"
+    ] == first_success["accepted_env_keys"]
+    assert summary_payload["provider_smoke_first_success_network_call"] == (
+        first_success["network_call"]
+    )
+    assert summary_payload[
+        "provider_smoke_first_success_network_call_policy"
+    ] == first_success["network_call_policy"]
+    assert summary_payload["provider_smoke_first_success_mutates_local_state"] == (
+        first_success["mutates_local_state"]
+    )
+    assert summary_payload[
+        "provider_smoke_first_success_secret_values_returned"
+    ] == first_success["secret_values_returned"]
     assert summary_payload["provider_smoke_success_expected_live_contracts"] == [
         "market_snapshot_contract",
         "macro_filter_contract",
@@ -6056,6 +6093,19 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "topic": "macro",
         "summary_only": True,
     }
+    assert payload["provider_smoke_success_count"] == 0
+    assert payload["provider_smoke_first_success_provider_family"] is None
+    assert payload["provider_smoke_first_success_provider"] is None
+    assert payload["provider_smoke_first_success_smoke_command_name"] is None
+    assert payload["provider_smoke_first_success_status"] is None
+    assert payload["provider_smoke_first_success_expected_live_contract"] is None
+    assert payload["provider_smoke_first_success_expected_live_checks"] == []
+    assert payload["provider_smoke_first_success_preferred_env_key"] is None
+    assert payload["provider_smoke_first_success_accepted_env_keys"] == []
+    assert payload["provider_smoke_first_success_network_call"] is False
+    assert payload["provider_smoke_first_success_network_call_policy"] is None
+    assert payload["provider_smoke_first_success_mutates_local_state"] is False
+    assert payload["provider_smoke_first_success_secret_values_returned"] is False
     assert payload["api_key_integration_status_summary"] == {
         "schema_version": "api_key_integration_status_summary.v1",
         "status": "blocked",

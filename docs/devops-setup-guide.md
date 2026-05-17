@@ -499,6 +499,21 @@ The summary-only provider smoke status aggregate also exposes
 `provider_smoke_success_providers`, and
 `provider_smoke_success_smoke_command_names` so compact output shows which live
 provider smokes succeeded without scanning nested sections.
+It also mirrors the first successful provider smoke as compact scalars:
+`provider_smoke_first_success_provider_family`,
+`provider_smoke_first_success_provider`,
+`provider_smoke_first_success_smoke_command_name`,
+`provider_smoke_first_success_status`,
+`provider_smoke_first_success_expected_live_contract`,
+`provider_smoke_first_success_expected_live_checks`,
+`provider_smoke_first_success_preferred_env_key`,
+`provider_smoke_first_success_accepted_env_keys`,
+`provider_smoke_first_success_network_call`,
+`provider_smoke_first_success_network_call_policy`,
+`provider_smoke_first_success_mutates_local_state`, and
+`provider_smoke_first_success_secret_values_returned`, so a one-line client can
+show the first passing live provider contract/env/safety context without reading
+the provider smoke row list.
 It also keeps summary-only provider smoke contract/check aggregates:
 `provider_smoke_success_expected_live_contracts`,
 `provider_smoke_success_expected_live_checks`, and

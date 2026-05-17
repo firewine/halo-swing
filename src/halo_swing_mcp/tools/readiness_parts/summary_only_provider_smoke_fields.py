@@ -157,6 +157,9 @@ def _api_key_provider_smoke_success_top_level_fields(
     provider_smoke_success_secret_values_returned_count: int,
     provider_smoke_success_accepted_env_key_groups: list[list[str]],
 ) -> dict[str, Any]:
+    first_success_row = (
+        provider_smoke_success_rows[0] if provider_smoke_success_rows else {}
+    )
     return {
         "provider_smoke_success_count": provider_smoke_success_count,
         "provider_smoke_all_successful": (
@@ -171,6 +174,38 @@ def _api_key_provider_smoke_success_top_level_fields(
         ),
         "provider_smoke_success_smoke_command_names": _ordered_unique_strings(
             [row.get("smoke_command_name") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_first_success_provider_family": (
+            first_success_row.get("provider_family")
+        ),
+        "provider_smoke_first_success_provider": first_success_row.get("provider"),
+        "provider_smoke_first_success_smoke_command_name": (
+            first_success_row.get("smoke_command_name")
+        ),
+        "provider_smoke_first_success_status": first_success_row.get("status"),
+        "provider_smoke_first_success_expected_live_contract": (
+            first_success_row.get("expected_live_contract")
+        ),
+        "provider_smoke_first_success_expected_live_checks": _string_list(
+            first_success_row.get("expected_live_checks")
+        ),
+        "provider_smoke_first_success_preferred_env_key": (
+            first_success_row.get("preferred_env_key")
+        ),
+        "provider_smoke_first_success_accepted_env_keys": _string_list(
+            first_success_row.get("accepted_env_keys")
+        ),
+        "provider_smoke_first_success_network_call": (
+            first_success_row.get("network_call") is True
+        ),
+        "provider_smoke_first_success_network_call_policy": (
+            first_success_row.get("network_call_policy")
+        ),
+        "provider_smoke_first_success_mutates_local_state": (
+            first_success_row.get("mutates_local_state") is True
+        ),
+        "provider_smoke_first_success_secret_values_returned": (
+            first_success_row.get("secret_values_returned") is True
         ),
         "provider_smoke_success_expected_live_contracts": _ordered_unique_strings(
             [

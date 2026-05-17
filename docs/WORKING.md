@@ -42,18 +42,22 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_GATE
+status: API_KEY_PROVIDER_SMOKE_FIRST_SUCCESS_CONTEXT_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_FIRST_SUCCESS_CONTEXT_GATE
 review_tier: S1_small
 
-next_atomic_step: add CLI regression coverage proving summary-only API-key pipeline reads API keys from a local .env without exported secrets
+next_atomic_step: surface API-key provider smoke first success execution context scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -70,49 +74,69 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_dotenv_without_exported_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - a subprocess harness invocation of run_api_key_pipeline_smoke --summary-only reads POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY from a launch-directory .env without those keys exported
-  - the subprocess summary-only payload reports all three provider families configured, no missing provider families, dotenv loading enabled, and provider routes selected as live
-  - the subprocess summary-only payload exposes the next ready provider-smoke command and context without returning secret values
-  - the serialized subprocess output does not contain the fake secret values
+  - summary-only top-level provider smoke output exposes first successful provider family, provider, smoke command name, and status scalars
+  - summary-only top-level provider smoke output exposes first successful expected live contract, expected checks, preferred env key, and accepted env keys without secret values
+  - summary-only top-level provider smoke output exposes first successful network call, network policy, mutation, and secret-return safety scalars
+  - full fake-key live path verification proves first success scalars point at the first provider smoke success row without secret values
+  - blocked no-key verification proves first success scalars are absent/empty/false without secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI dotenv-only API-key pipeline summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke first success context gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_FIRST_SUCCESS_CONTEXT_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_dotenv_without_exported_secrets -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 98 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: pending
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 832 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
-next_state: commit this verified CLI dotenv-only API-key pipeline summary gate
+  - tests/test_setup_docs.py
+next_state: commit this verified API-key provider smoke first success context gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - subprocess CLI coverage proves summary-only API-key pipeline reads launch-directory .env API keys without exported secrets and without returning secret values
+  - first-success provider smoke scalars mirror the first successful provider_smoke_summary row without returning secret values
+```
+
+Earlier completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add CLI regression coverage proving summary-only API-key pipeline reads API keys from a local .env without exported secrets
 ```
 
 Previous completed directive:

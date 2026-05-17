@@ -82,6 +82,65 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.903 API Key Provider Smoke First Success Context Gate Record - 2026-05-18
+
+### A. 목적
+
+3.902까지 API-key pipeline summary-only 출력은 provider-smoke success aggregate와
+전체 success rows를 보존한다. 하지만 compact client가 첫 번째 성공 provider smoke의
+계약, env-key, safety 상태를 한 줄로 표시하려면 아직 `provider_smoke_summaries[0]`를
+직접 열어야 한다. 이번 slice는 first successful provider-smoke execution context를
+top-level scalar로 올려 API 키를 채운 뒤 첫 성공 smoke evidence를 즉시 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only top-level provider_smoke_first_success_provider_family mirrors the first successful provider_smoke_summary row provider family
+  - summary-only top-level provider_smoke_first_success_provider mirrors the first successful provider
+  - summary-only top-level provider_smoke_first_success_smoke_command_name mirrors the first successful smoke command name
+  - summary-only top-level provider_smoke_first_success_status mirrors the first successful status
+  - summary-only top-level provider_smoke_first_success_expected_live_contract and expected_live_checks mirror the first successful live contract evidence
+  - summary-only top-level provider_smoke_first_success_preferred_env_key and accepted_env_keys mirror the first successful env-key hints without secret values
+  - summary-only top-level provider_smoke_first_success_network_call, network_call_policy, mutates_local_state, and secret_values_returned mirror the first successful safety context
+  - README and DevOps setup guide document the first-success provider smoke scalar fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: pending
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 832 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.901 API Key Quickstart Command Plan Next Ready/Blocked Context Gate Record - 2026-05-18
 
 ### A. 목적

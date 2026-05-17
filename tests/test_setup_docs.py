@@ -288,6 +288,18 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_smoke_success_provider_families" in guide
     assert "provider_smoke_success_providers" in guide
     assert "provider_smoke_success_smoke_command_names" in guide
+    assert "provider_smoke_first_success_provider_family" in guide
+    assert "provider_smoke_first_success_provider" in guide
+    assert "provider_smoke_first_success_smoke_command_name" in guide
+    assert "provider_smoke_first_success_status" in guide
+    assert "provider_smoke_first_success_expected_live_contract" in guide
+    assert "provider_smoke_first_success_expected_live_checks" in guide
+    assert "provider_smoke_first_success_preferred_env_key" in guide
+    assert "provider_smoke_first_success_accepted_env_keys" in guide
+    assert "provider_smoke_first_success_network_call" in guide
+    assert "provider_smoke_first_success_network_call_policy" in guide
+    assert "provider_smoke_first_success_mutates_local_state" in guide
+    assert "provider_smoke_first_success_secret_values_returned" in guide
     assert "summary-only provider smoke contract/check aggregates" in guide
     assert "provider_smoke_success_expected_live_contracts" in guide
     assert "provider_smoke_success_expected_live_checks" in guide
