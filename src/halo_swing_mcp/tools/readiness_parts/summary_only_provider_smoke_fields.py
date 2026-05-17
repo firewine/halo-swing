@@ -285,6 +285,35 @@ def _api_key_provider_smoke_top_level_fields(
         if provider_smoke_next_action == "fill_live_data_api_keys"
         else []
     )
+    provider_smoke_next_action_rows_by_family = (
+        {
+            family: row
+            for family, row in provider_smoke_command_rows_by_family.items()
+            if row.get("status") == "ready"
+        }
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else {
+            family: row
+            for family, row in provider_smoke_command_rows_by_family.items()
+            if row.get("status") != "ready"
+        }
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else {}
+    )
+    provider_smoke_next_action_statuses_by_family = {
+        family: row.get("status")
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_statuses = _ordered_unique_strings(
+        provider_smoke_next_action_statuses_by_family.values()
+    )
+    provider_smoke_next_action_setup_actions_by_family = {
+        family: row.get("next_setup_action")
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_setup_actions = _ordered_unique_strings(
+        provider_smoke_next_action_setup_actions_by_family.values()
+    )
     provider_smoke_next_action_preferred_env_keys = (
         provider_smoke_ready_preferred_env_keys
         if provider_smoke_next_action == "run_ready_provider_smokes"
@@ -363,6 +392,24 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_provider_count": len(
             provider_smoke_next_action_providers
+        ),
+        "api_key_provider_smoke_next_action_statuses": (
+            provider_smoke_next_action_statuses
+        ),
+        "api_key_provider_smoke_next_action_status_count": len(
+            provider_smoke_next_action_statuses
+        ),
+        "api_key_provider_smoke_next_action_statuses_by_family": (
+            provider_smoke_next_action_statuses_by_family
+        ),
+        "api_key_provider_smoke_next_action_setup_actions": (
+            provider_smoke_next_action_setup_actions
+        ),
+        "api_key_provider_smoke_next_action_setup_action_count": len(
+            provider_smoke_next_action_setup_actions
+        ),
+        "api_key_provider_smoke_next_action_setup_actions_by_family": (
+            provider_smoke_next_action_setup_actions_by_family
         ),
         "api_key_provider_smoke_next_action_preferred_env_keys": (
             provider_smoke_next_action_preferred_env_keys

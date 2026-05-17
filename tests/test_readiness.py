@@ -1333,6 +1333,20 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     expected_next_action_providers = list(
         dict.fromkeys(row["provider"] for row in expected_next_action_env_key_rows)
     )
+    expected_next_action_statuses_by_family = {
+        row["provider_family"]: row["status"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_statuses = list(
+        dict.fromkeys(expected_next_action_statuses_by_family.values())
+    )
+    expected_next_action_setup_actions_by_family = {
+        row["provider_family"]: row["next_setup_action"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_setup_actions = list(
+        dict.fromkeys(expected_next_action_setup_actions_by_family.values())
+    )
     assert payload["api_key_provider_smoke_action_status"] == (
         expected_action_status
     )
@@ -1358,6 +1372,24 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_provider_smoke_next_action_provider_count"] == len(
         expected_next_action_providers
     )
+    assert payload["api_key_provider_smoke_next_action_statuses"] == (
+        expected_next_action_statuses
+    )
+    assert payload["api_key_provider_smoke_next_action_status_count"] == len(
+        expected_next_action_statuses
+    )
+    assert payload["api_key_provider_smoke_next_action_statuses_by_family"] == (
+        expected_next_action_statuses_by_family
+    )
+    assert payload["api_key_provider_smoke_next_action_setup_actions"] == (
+        expected_next_action_setup_actions
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_setup_action_count"
+    ] == len(expected_next_action_setup_actions)
+    assert payload[
+        "api_key_provider_smoke_next_action_setup_actions_by_family"
+    ] == expected_next_action_setup_actions_by_family
     assert payload["api_key_provider_smoke_next_action_preferred_env_keys"] == (
         expected_next_action_preferred_env_keys
     )
