@@ -2648,6 +2648,12 @@ def _api_key_provider_recovery_summary(
     secret_values_returned_count = sum(
         1 for item in compact_items if item.get("secret_values_returned") is True
     )
+    exception_message_returned_count = sum(
+        1 for item in compact_items if item.get("exception_message_returned") is True
+    )
+    url_returned_count = sum(
+        1 for item in compact_items if item.get("url_returned") is True
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2676,6 +2682,20 @@ def _api_key_provider_recovery_summary(
         "provider_recovery_any_secret_values_returned": (
             secret_values_returned_count > 0
         ),
+        "provider_recovery_next_setup_actions": _ordered_unique_strings(
+            [item.get("next_setup_action") for item in compact_items]
+        ),
+        "provider_recovery_exception_types": _ordered_unique_strings(
+            [item.get("exception_type") for item in compact_items]
+        ),
+        "provider_recovery_exception_message_returned_count": (
+            exception_message_returned_count
+        ),
+        "provider_recovery_any_exception_messages_returned": (
+            exception_message_returned_count > 0
+        ),
+        "provider_recovery_url_returned_count": url_returned_count,
+        "provider_recovery_any_urls_returned": url_returned_count > 0,
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
         ),

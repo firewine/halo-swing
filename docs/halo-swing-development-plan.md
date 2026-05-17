@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.777 API Key Provider Recovery Summary Diagnostic Aggregate Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 첫 recovery item의 exception/url 진단만
+top-level에 보여주고, 동시에 실패한 provider 전체의 진단 범위는 item row를 열어야
+확인할 수 있었다. 이번 slice는 no-secret
+`provider_recovery_next_setup_actions`, `provider_recovery_exception_types`,
+`provider_recovery_exception_message_returned_count`,
+`provider_recovery_any_exception_messages_returned`,
+`provider_recovery_url_returned_count`, `provider_recovery_any_urls_returned`를
+추가해, API key 입력 후 live provider 복구가 필요할 때 compact summary만으로 전체
+provider 실패 진단과 secret-safe 출력 여부를 판단할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes provider_recovery_next_setup_actions for compact recovery items
+  - api_key_provider_recovery_summary includes provider_recovery_exception_types for compact recovery items
+  - api_key_provider_recovery_summary includes provider_recovery_exception_message_returned_count and provider_recovery_any_exception_messages_returned for compact recovery items
+  - api_key_provider_recovery_summary includes provider_recovery_url_returned_count and provider_recovery_any_urls_returned for compact recovery items
+  - diagnostic aggregate fields return empty lists, zero counts, and false booleans when no recovery items exist
+  - focused tests cover aggregate recovery diagnostic fields in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns aggregate recovery diagnostic fields without secret values
+  - README and DevOps setup guide document aggregate recovery diagnostic fields
+  - tests/test_setup_docs.py asserts aggregate recovery diagnostic field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only aggregate recovery diagnostic fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_next_setup_actions"], summary["provider_recovery_exception_types"], summary["provider_recovery_exception_message_returned_count"], summary["provider_recovery_any_exception_messages_returned"], summary["provider_recovery_url_returned_count"], summary["provider_recovery_any_urls_returned"])': ['verify_provider_credentials_or_network'] ['URLError'] 0 False 0 False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.776 API Key Provider Recovery Summary Safety Aggregate Gate Record - 2026-05-17
 
 ### A. 목적

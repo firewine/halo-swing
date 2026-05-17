@@ -2712,6 +2712,14 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_any_mutates_local_state": False,
         "provider_recovery_secret_values_returned_count": 0,
         "provider_recovery_any_secret_values_returned": False,
+        "provider_recovery_next_setup_actions": [
+            "verify_provider_credentials_or_network"
+        ],
+        "provider_recovery_exception_types": ["RuntimeError"],
+        "provider_recovery_exception_message_returned_count": 0,
+        "provider_recovery_any_exception_messages_returned": False,
+        "provider_recovery_url_returned_count": 0,
+        "provider_recovery_any_urls_returned": False,
         "provider_recovery_provider_families": ["market", "macro", "news"],
         "provider_recovery_providers": ["polygon", "fred", "newsapi"],
         "provider_recovery_smoke_command_names": [
@@ -4934,6 +4942,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_any_mutates_local_state": False,
         "provider_recovery_secret_values_returned_count": 0,
         "provider_recovery_any_secret_values_returned": False,
+        "provider_recovery_next_setup_actions": [],
+        "provider_recovery_exception_types": [],
+        "provider_recovery_exception_message_returned_count": 0,
+        "provider_recovery_any_exception_messages_returned": False,
+        "provider_recovery_url_returned_count": 0,
+        "provider_recovery_any_urls_returned": False,
         "provider_recovery_provider_families": [],
         "provider_recovery_providers": [],
         "provider_recovery_smoke_command_names": [],

@@ -151,6 +151,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_any_mutates_local_state" in guide
     assert "provider_recovery_secret_values_returned_count" in guide
     assert "provider_recovery_any_secret_values_returned" in guide
+    assert "provider_recovery_next_setup_actions" in guide
+    assert "provider_recovery_exception_types" in guide
+    assert "provider_recovery_exception_message_returned_count" in guide
+    assert "provider_recovery_any_exception_messages_returned" in guide
+    assert "provider_recovery_url_returned_count" in guide
+    assert "provider_recovery_any_urls_returned" in guide
     assert "provider_recovery_provider_families" in guide
     assert "provider_recovery_providers" in guide
     assert "provider_recovery_smoke_command_names" in guide
