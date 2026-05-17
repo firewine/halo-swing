@@ -49,6 +49,7 @@ implemented:
   - summary-only api_key_setup_quickstart_next_command_plan execution detail scalar fields mirror the immediate command plan item
   - README and DevOps setup guide document quickstart command plan execution detail fields
   - setup docs guard keeps README and DevOps API-key quickstart command plan execution detail field parity in sync
+  - quickstart top-level projection is split into summary_only_quickstart_fields.py so summary_only_payload.py stays below the 900-line warning point
   - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
 ```
 

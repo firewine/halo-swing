@@ -13,6 +13,7 @@
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_context.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py",
+    "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
@@ -24,6 +25,7 @@
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_context.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py",
+    "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],

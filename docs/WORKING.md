@@ -57,6 +57,7 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_context.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -123,12 +124,14 @@ files_changed:
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_context.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 next_state: commit this verified gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
   - quickstart command plan provider-smoke rows now carry provider, expected_live_contract, expected_live_checks, preferred_env_key, and accepted_env_keys
   - top-level quickstart command plan by-family maps and next-command scalar mirrors expose the same execution details without secret values
+  - quickstart top-level projection is split into summary_only_quickstart_fields.py so summary_only_payload.py stays below the 900-line warning point
 ```
 
 Previous completed directive:
