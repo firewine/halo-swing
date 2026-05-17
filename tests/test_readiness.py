@@ -2727,6 +2727,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_pending_count": 3,
         "provider_recovery_blocked_count": 0,
         "provider_recovery_all_pending": True,
+        "provider_recovery_pending_provider_families": [
+            "market",
+            "macro",
+            "news",
+        ],
+        "provider_recovery_blocked_provider_families": [],
         "provider_recovery_provider_families": ["market", "macro", "news"],
         "provider_recovery_providers": ["polygon", "fred", "newsapi"],
         "provider_recovery_smoke_command_names": [
@@ -4963,6 +4969,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_pending_count": 0,
         "provider_recovery_blocked_count": 0,
         "provider_recovery_all_pending": False,
+        "provider_recovery_pending_provider_families": [],
+        "provider_recovery_blocked_provider_families": [],
         "provider_recovery_provider_families": [],
         "provider_recovery_providers": [],
         "provider_recovery_smoke_command_names": [],

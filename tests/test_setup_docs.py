@@ -162,6 +162,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_pending_count" in guide
     assert "provider_recovery_blocked_count" in guide
     assert "provider_recovery_all_pending" in guide
+    assert "provider_recovery_pending_provider_families" in guide
+    assert "provider_recovery_blocked_provider_families" in guide
     assert "provider_recovery_provider_families" in guide
     assert "provider_recovery_providers" in guide
     assert "provider_recovery_smoke_command_names" in guide

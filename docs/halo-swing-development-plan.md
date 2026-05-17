@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.780 API Key Provider Recovery Summary Status-Family Aggregate Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 recovery status count를 보여주지만, 어떤 provider
+family가 즉시 재시도 가능한 `pending` 상태인지 또는 recovery smoke가 없어 `blocked`
+상태인지는 item row를 열어야 확인할 수 있었다. 이번 slice는 no-secret
+`provider_recovery_pending_provider_families`,
+`provider_recovery_blocked_provider_families`를 추가해, API key 입력 후 live provider
+복구가 필요할 때 compact summary만으로 재시도 가능한 provider family와 막힌 provider
+family를 구분할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes provider_recovery_pending_provider_families for compact recovery items
+  - api_key_provider_recovery_summary includes provider_recovery_blocked_provider_families for compact recovery items
+  - status-grouped provider-family fields preserve ordered unique no-secret provider family values
+  - status-grouped provider-family fields return empty lists when no recovery items exist
+  - focused tests cover status-grouped provider-family fields in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns status-grouped provider-family fields without secret values
+  - README and DevOps setup guide document status-grouped provider-family fields
+  - tests/test_setup_docs.py asserts status-grouped provider-family field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only status-grouped provider-family fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_pending_provider_families"], summary["provider_recovery_blocked_provider_families"], summary["secret_values_returned"])': ['market', 'macro', 'news'] [] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.779 API Key Provider Recovery Summary Status Aggregate Gate Record - 2026-05-17
 
 ### A. 목적
