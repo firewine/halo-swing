@@ -855,11 +855,19 @@ It keeps `api_key_pipeline_check_summary`
 (`api_key_pipeline_check_summary.v1`) summarizing the pipeline `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,
 `failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
-`first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
-`name`, `key`, `expected`, `actual`, and `passed=false`. When the matching
-stage has provider recovery metadata, the check summary includes
+`first_failed_check`,
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`, and
+no-secret `failed_checks` rows containing `tool`, `name`, `key`, `expected`,
+`actual`, and `passed=false`. When the matching stage has provider recovery metadata,
+the check summary includes
 `provider_family`, `provider`, `smoke_command_name`, `preferred_env_key`, and
-`accepted_env_keys` without returning key values. The
+`accepted_env_keys` without returning key values. The compact top-level payload
+mirrors check route-family evidence as
+`api_key_check_selected_provider_class_by_family`,
+`api_key_check_provider_route_data_mode_by_family`,
+`api_key_check_provider_route_live_data_required_by_family`, and
+`api_key_check_all_selected_routes_live`. The
 top-level `api_key_pipeline_failure_summary`
 (`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
 operator-facing row with `status`, `has_failures`, `failure_category`,

@@ -1365,6 +1365,47 @@ def test_setup_docs_keep_api_key_pipeline_stage_summary_fields_in_sync() -> None
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_pipeline_check_summary",
+        "api_key_pipeline_check_summary.v1",
+        "check_count",
+        "passed_check_count",
+        "failed_check_count",
+        "failed_check_keys",
+        "tools_with_failures",
+        "tool_failure_counts",
+        "first_failed_check",
+        "failed_checks",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "api_key_check_selected_provider_class_by_family",
+        "api_key_check_provider_route_data_mode_by_family",
+        "api_key_check_provider_route_live_data_required_by_family",
+        "api_key_check_all_selected_routes_live",
+        "tool",
+        "name",
+        "key",
+        "expected",
+        "actual",
+        "passed=false",
+        "provider_family",
+        "provider",
+        "smoke_command_name",
+        "preferred_env_key",
+        "accepted_env_keys",
+        "secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

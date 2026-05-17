@@ -2693,6 +2693,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "secret_values_returned": False,
             }
         ],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -5086,6 +5096,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "tool_failure_counts": {},
         "first_failed_check": None,
         "failed_checks": [],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -6610,6 +6630,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
                 "secret_values_returned": False,
             },
         ],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -7359,6 +7389,32 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert check_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert check_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert check_summary["provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert check_summary["all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_check_selected_provider_class_by_family"] == (
+        check_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_check_provider_route_data_mode_by_family"] == (
+        check_summary["provider_route_data_mode_by_family"]
+    )
+    assert payload["api_key_check_provider_route_live_data_required_by_family"] == (
+        check_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_check_all_selected_routes_live"] is (
+        check_summary["all_selected_routes_live"]
+    )
     assert all(
         failed_check["secret_values_returned"] is False
         for failed_check in check_summary["failed_checks"]
@@ -8924,6 +8980,19 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["api_key_pipeline_check_summary"]["first_failed_check"][
         "key"
     ] == "get_integration_readiness.live_data_readiness_ready"
+    assert payload["api_key_pipeline_check_summary"][
+        "selected_provider_class_by_family"
+    ] == expected_selected_provider_class_by_family(configured=False)
+    assert payload["api_key_pipeline_check_summary"][
+        "provider_route_data_mode_by_family"
+    ] == expected_provider_route_data_mode_by_family(configured=False)
+    assert payload["api_key_pipeline_check_summary"][
+        "provider_route_live_data_required_by_family"
+    ] == expected_provider_route_live_data_required_by_family(configured=False)
+    assert (
+        payload["api_key_pipeline_check_summary"]["all_selected_routes_live"]
+        is False
+    )
     assert payload["api_key_pipeline_check_summary"]["secret_values_returned"] is False
     assert payload["api_key_pipeline_failure_summary"]["status"] == "conflict"
     assert payload["api_key_pipeline_failure_summary"]["failure_category"] == "setup"

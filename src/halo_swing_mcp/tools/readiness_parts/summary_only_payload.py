@@ -7,6 +7,9 @@ from .context import *
 from .summary_only_integration_status_fields import (
     _api_key_integration_status_top_level_fields,
 )
+from .summary_only_pipeline_route_fields import (
+    _api_key_pipeline_route_top_level_fields,
+)
 from .summary_only_provider_selection_fields import (
     _api_key_provider_selection_top_level_fields,
 )
@@ -58,6 +61,9 @@ def _api_key_pipeline_summary_only_payload(
     readiness_summary = _optional_mapping(payload.get("readiness_summary")) or {}
     api_key_pipeline_stage_summary = _optional_mapping(
         payload.get("api_key_pipeline_stage_summary")
+    ) or {}
+    api_key_pipeline_check_summary = _optional_mapping(
+        payload.get("api_key_pipeline_check_summary")
     ) or {}
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
@@ -438,38 +444,11 @@ def _api_key_pipeline_summary_only_payload(
         )
         or {},
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
-        "api_key_stage_selected_provider_class_by_family": (
-            _optional_mapping(
-                api_key_pipeline_stage_summary.get(
-                    "selected_provider_class_by_family"
-                )
-            )
-            or {}
+        "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
+        **_api_key_pipeline_route_top_level_fields(
+            api_key_pipeline_stage_summary=api_key_pipeline_stage_summary,
+            api_key_pipeline_check_summary=api_key_pipeline_check_summary,
         ),
-        "api_key_stage_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                api_key_pipeline_stage_summary.get(
-                    "provider_route_data_mode_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_stage_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                api_key_pipeline_stage_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_stage_all_selected_routes_live": (
-            api_key_pipeline_stage_summary.get("all_selected_routes_live")
-            is True
-        ),
-        "api_key_pipeline_check_summary": _optional_mapping(
-            payload.get("api_key_pipeline_check_summary")
-        )
-        or {},
         "api_key_provider_selection_summary": api_key_provider_selection_summary,
         "api_key_live_http_timeout_summary": _optional_mapping(
             payload.get("api_key_live_http_timeout_summary")

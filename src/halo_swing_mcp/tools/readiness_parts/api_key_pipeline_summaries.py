@@ -510,7 +510,7 @@ def _api_key_pipeline_check_summary(
     for check in failed_checks:
         tool = check["tool"]
         tool_failure_counts[tool] = tool_failure_counts.get(tool, 0) + 1
-    return {
+    summary = {
         "schema_version": "api_key_pipeline_check_summary.v1",
         "status": "conflict" if failed_checks else "ok",
         "check_count": len(checks),
@@ -525,6 +525,8 @@ def _api_key_pipeline_check_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    summary.update(_api_key_route_family_fields(api_key_pipeline_stage_summary or {}))
+    return summary
 
 
 def _api_key_pipeline_stage_recovery_hints_by_tool(
