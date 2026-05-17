@@ -722,7 +722,10 @@ provider selection, failure, and next-action evidence into one operator row with
 `status`, `api_keys_configured`, `dotenv_loading_enabled`,
 `dotenv_target_exists`, `live_providers_selected`, `ready_to_run_live_smoke`,
 `configured_provider_families`, `missing_provider_families`,
-`selected_provider_classes`, `failure_category`, `has_failures`,
+`selected_provider_classes`, `selected_provider_class_by_family`,
+`provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`,
+`failure_category`, `has_failures`,
 `next_action_name`, `next_action_provider_family`, `next_action_provider`,
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`, plus `next_action_status`, `next_action_command`,
@@ -759,7 +762,11 @@ readiness values as top-level scalars/lists:
 `api_key_integration_ready_to_run_live_smoke`,
 `api_key_integration_configured_provider_families`,
 `api_key_integration_missing_provider_families`,
-`api_key_integration_selected_provider_classes`, and
+`api_key_integration_selected_provider_classes`,
+`api_key_integration_selected_provider_class_by_family`,
+`api_key_integration_provider_route_data_mode_by_family`,
+`api_key_integration_provider_route_live_data_required_by_family`,
+`api_key_integration_all_selected_routes_live`, and
 `api_key_integration_next_action_name`. It also mirrors next-action details as
 `api_key_integration_next_action_provider_family`,
 `api_key_integration_next_action_provider`,

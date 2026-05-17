@@ -2828,6 +2828,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "FredMacroDataProvider",
             "NewsApiDataProvider",
         ],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "failure_category": "provider_recovery",
         "has_failures": True,
         "next_action_name": "recover_failed_providers",
@@ -5167,6 +5177,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "FredMacroDataProvider",
             "NewsApiDataProvider",
         ],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "failure_category": "none",
         "has_failures": False,
         "next_action_name": "run_provider_smokes",
@@ -5608,6 +5628,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "configured_provider_families": [],
         "missing_provider_families": ["market", "macro", "news"],
         "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "failure_category": "setup",
         "has_failures": True,
         "next_action_name": "prepare_dotenv",
@@ -7923,7 +7953,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smok
     assert "news-secret" not in serialized
 
 
-def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provider_smoke_env_hints(
+def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summary(
     monkeypatch,
 ) -> None:
     from halo_swing_mcp.tools import readiness as readiness_tools
@@ -8040,6 +8070,39 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     )
     assert payload["api_key_integration_selected_provider_classes"] == (
         integration_status["selected_provider_classes"]
+    )
+    assert integration_status["selected_provider_class_by_family"] == (
+        payload["api_key_provider_selection_summary"][
+            "selected_provider_class_by_family"
+        ]
+    )
+    assert integration_status["provider_route_data_mode_by_family"] == (
+        payload["api_key_provider_selection_summary"][
+            "provider_route_data_mode_by_family"
+        ]
+    )
+    assert integration_status["provider_route_live_data_required_by_family"] == (
+        payload["api_key_provider_selection_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert integration_status["all_selected_routes_live"] is (
+        payload["api_key_provider_selection_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_integration_selected_provider_class_by_family"] == (
+        integration_status["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_integration_provider_route_data_mode_by_family"] == (
+        integration_status["provider_route_data_mode_by_family"]
+    )
+    assert (
+        payload[
+            "api_key_integration_provider_route_live_data_required_by_family"
+        ]
+        == integration_status["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_integration_all_selected_routes_live"] is (
+        integration_status["all_selected_routes_live"]
     )
     assert payload["api_key_integration_next_action_name"] == (
         integration_status["next_action_name"]
@@ -8685,6 +8748,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "configured_provider_families": [],
         "missing_provider_families": ["market", "macro", "news"],
         "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "failure_category": "setup",
         "has_failures": True,
         "next_action_name": "prepare_dotenv",
