@@ -683,19 +683,23 @@ It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.
 Provider smoke plan rows include `network_call`, `network_call_policy`,
-`preferred_env_key`, and `accepted_env_keys`, so the compact response shows the
-same local setup readiness, live-call policy, and key-alias evidence as the full
-one-shot pipeline response without returning secret values.
+`preferred_env_key`, `accepted_env_keys`, `selected_provider_class`,
+`provider_route_data_mode`, and `provider_route_live_data_required`, so the
+compact response shows the same local setup readiness, live-call policy,
+key-alias evidence, and selected live provider route as the full one-shot
+pipeline response without returning secret values.
 It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,
 `provider_smoke_commands`, `provider_smoke_command_count`, and
 `next_provider_smoke_command_name`. Provider smoke rows include `network_call`,
 `network_call_policy`, `expected_live_contract`, `expected_live_checks`,
-`preferred_env_key`, and `accepted_env_keys` without returning key values, so
-the compact response still shows accepted API-key aliases, expected live
-contract/checks, live-call policy, and the exact local smoke commands to use
-after API keys are configured.
+`preferred_env_key`, `accepted_env_keys`, `selected_provider_class`,
+`provider_route_data_mode`, and `provider_route_live_data_required` without
+returning key values, so the compact response still shows accepted API-key
+aliases, expected live
+contract/checks, live-call policy, selected live provider route, and the exact
+local smoke commands to use after API keys are configured.
 For compact clients that read only top-level fields, summary-only output also
 mirrors the no-secret command metadata as `api_key_copy_dotenv_command`,
 `api_key_copy_dotenv_required`, `api_key_next_smoke_command`,
@@ -707,7 +711,11 @@ It also mirrors provider smoke progress as
 `api_key_provider_smoke_blocked_count`,
 `api_key_next_provider_smoke_command_name`,
 `api_key_next_provider_smoke_provider_family`,
-`api_key_next_provider_smoke_provider`, `api_key_next_provider_smoke_command`,
+`api_key_next_provider_smoke_provider`,
+`api_key_next_provider_smoke_selected_provider_class`,
+`api_key_next_provider_smoke_provider_route_data_mode`,
+`api_key_next_provider_smoke_provider_route_live_data_required`,
+`api_key_next_provider_smoke_command`,
 `api_key_next_provider_smoke_status`,
 `api_key_next_provider_smoke_network_call`,
 `api_key_next_provider_smoke_network_call_policy`,
@@ -720,6 +728,9 @@ It also mirrors provider smoke progress as
 It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_commands_by_family`,
 `api_key_provider_smoke_statuses_by_family`,
+`api_key_provider_smoke_selected_provider_class_by_family`,
+`api_key_provider_smoke_provider_route_data_mode_by_family`,
+`api_key_provider_smoke_provider_route_live_data_required_by_family`,
 `api_key_provider_smoke_network_call_policies_by_family`,
 `api_key_provider_smoke_expected_live_contracts_by_family`, and
 `api_key_provider_smoke_expected_live_checks_by_family`.

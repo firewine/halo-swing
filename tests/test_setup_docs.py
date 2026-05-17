@@ -45,6 +45,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert (
         "Provider smoke plan rows include `network_call`, `network_call_policy`,"
     ) in guide
+    assert "selected_provider_class" in guide
+    assert "provider_route_data_mode" in guide
+    assert "provider_route_live_data_required" in guide
     assert "--summary-only" in guide
     assert "without editing" in guide
     assert "Returned one-shot command summaries use `--summary-only --no-audit`" in guide
@@ -399,6 +402,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_next_provider_smoke_command_name" in guide
     assert "api_key_next_provider_smoke_provider_family" in guide
     assert "api_key_next_provider_smoke_provider" in guide
+    assert "api_key_next_provider_smoke_selected_provider_class" in guide
+    assert "api_key_next_provider_smoke_provider_route_data_mode" in guide
+    assert (
+        "api_key_next_provider_smoke_provider_route_live_data_required" in guide
+    )
     assert "api_key_next_provider_smoke_command" in guide
     assert "api_key_next_provider_smoke_status" in guide
     assert "api_key_integration_status" in guide
@@ -506,6 +514,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_provider_smoke_command_names" in guide
     assert "api_key_provider_smoke_commands_by_family" in guide
     assert "api_key_provider_smoke_statuses_by_family" in guide
+    assert "api_key_provider_smoke_selected_provider_class_by_family" in guide
+    assert "api_key_provider_smoke_provider_route_data_mode_by_family" in guide
+    assert (
+        "api_key_provider_smoke_provider_route_live_data_required_by_family"
+        in guide
+    )
     assert "api_key_provider_smoke_network_call_policies_by_family" in guide
     assert "api_key_provider_smoke_expected_live_contracts_by_family" in guide
     assert "api_key_provider_smoke_expected_live_checks_by_family" in guide
@@ -616,6 +630,26 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_next_provider_smoke_network_call",
         "api_key_integration_next_action_next_provider_smoke_network_call_policy",
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
+def test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "selected_provider_class",
+        "provider_route_data_mode",
+        "provider_route_live_data_required",
+        "api_key_next_provider_smoke_selected_provider_class",
+        "api_key_next_provider_smoke_provider_route_data_mode",
+        "api_key_next_provider_smoke_provider_route_live_data_required",
+        "api_key_provider_smoke_selected_provider_class_by_family",
+        "api_key_provider_smoke_provider_route_data_mode_by_family",
+        "api_key_provider_smoke_provider_route_live_data_required_by_family",
     )
 
     for field_name in field_names:

@@ -566,6 +566,15 @@ def expected_provider_setup_actions(
                 if configured_env_keys
                 else "fill_preferred_env_key"
             ),
+            "selected_provider_class": (
+                expected_selected_provider_class_by_family(configured=True)[
+                    provider_family
+                ]
+                if configured_env_keys
+                else None
+            ),
+            "provider_route_data_mode": "live" if configured_env_keys else None,
+            "provider_route_live_data_required": bool(configured_env_keys),
             "dotenv_target_path": ".env",
             "example": example,
             "smoke_command_name": smoke_command_name,
@@ -696,6 +705,11 @@ def expected_provider_smoke_plan(
             "preferred_env_key": action["preferred_env_key"],
             "accepted_env_keys": action["accepted_env_keys"],
             "next_setup_action": action["next_setup_action"],
+            "selected_provider_class": action["selected_provider_class"],
+            "provider_route_data_mode": action["provider_route_data_mode"],
+            "provider_route_live_data_required": action[
+                "provider_route_live_data_required"
+            ],
             "smoke_command_name": action["smoke_command"]["name"],
             "command": action["smoke_command"]["command"],
             "network_call": True,
@@ -826,6 +840,11 @@ def expected_api_key_command_summary(
             "status": provider_smoke["status"],
             "smoke_command_name": provider_smoke["smoke_command_name"],
             "command": provider_smoke["command"],
+            "selected_provider_class": provider_smoke["selected_provider_class"],
+            "provider_route_data_mode": provider_smoke["provider_route_data_mode"],
+            "provider_route_live_data_required": provider_smoke[
+                "provider_route_live_data_required"
+            ],
             "network_call": True,
             "network_call_policy": provider_smoke["network_call_policy"],
             "expected_live_contract": provider_smoke["expected_live_contract"],
@@ -6430,6 +6449,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_provider_smoke_command_name"] is None
     assert payload["api_key_next_provider_smoke_provider_family"] is None
     assert payload["api_key_next_provider_smoke_provider"] is None
+    assert payload["api_key_next_provider_smoke_selected_provider_class"] is None
+    assert payload["api_key_next_provider_smoke_provider_route_data_mode"] is None
+    assert (
+        payload["api_key_next_provider_smoke_provider_route_live_data_required"]
+        is False
+    )
     assert payload["api_key_next_provider_smoke_command"] is None
     assert payload["api_key_next_provider_smoke_status"] is None
     assert payload["api_key_next_provider_smoke_network_call"] is False
@@ -6470,6 +6495,24 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "macro": "blocked",
         "news": "blocked",
     }
+    assert payload["api_key_provider_smoke_selected_provider_class_by_family"] == {
+        "market": None,
+        "macro": None,
+        "news": None,
+    }
+    assert payload["api_key_provider_smoke_provider_route_data_mode_by_family"] == {
+        "market": None,
+        "macro": None,
+        "news": None,
+    }
+    assert (
+        payload["api_key_provider_smoke_provider_route_live_data_required_by_family"]
+        == {
+            "market": False,
+            "macro": False,
+            "news": False,
+        }
+    )
     assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
         "market": "only_when_matching_api_key_selects_live_provider",
         "macro": "only_when_matching_api_key_selects_live_provider",
@@ -8346,6 +8389,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         row["provider_family"]: row["status"]
         for row in command_summary["provider_smoke_commands"]
     }
+    assert payload["api_key_provider_smoke_selected_provider_class_by_family"] == {
+        row["provider_family"]: row["selected_provider_class"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_provider_route_data_mode_by_family"] == {
+        row["provider_family"]: row["provider_route_data_mode"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert (
+        payload["api_key_provider_smoke_provider_route_live_data_required_by_family"]
+        == {
+            row["provider_family"]: row["provider_route_live_data_required"]
+            for row in command_summary["provider_smoke_commands"]
+        }
+    )
     assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
         row["provider_family"]: row["network_call_policy"]
         for row in command_summary["provider_smoke_commands"]
@@ -8379,6 +8437,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert payload["api_key_next_provider_smoke_provider"] == (
         command_summary["next_provider_smoke"]["provider"]
     )
+    assert payload["api_key_next_provider_smoke_selected_provider_class"] == (
+        command_summary["next_provider_smoke"]["selected_provider_class"]
+    )
+    assert payload["api_key_next_provider_smoke_provider_route_data_mode"] == (
+        command_summary["next_provider_smoke"]["provider_route_data_mode"]
+    )
+    assert (
+        payload["api_key_next_provider_smoke_provider_route_live_data_required"]
+        is True
+    )
     assert payload["api_key_next_provider_smoke_command"] == (
         command_summary["next_provider_smoke"]["command"]
     )
@@ -8405,6 +8473,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert payload["api_key_next_provider_smoke_secret_values_returned"] is False
     assert command_summary["next_provider_smoke"]["preferred_env_key"] == (
         "POLYGON_API_KEY"
+    )
+    assert command_summary["next_provider_smoke"]["selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert command_summary["next_provider_smoke"]["provider_route_data_mode"] == (
+        "live"
+    )
+    assert (
+        command_summary["next_provider_smoke"]["provider_route_live_data_required"]
+        is True
     )
     assert command_summary["next_provider_smoke"]["network_call"] is True
     assert command_summary["next_provider_smoke"]["expected_live_contract"] == (

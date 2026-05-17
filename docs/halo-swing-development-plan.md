@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.883 API Key Provider Smoke Plan Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.882에서 next operator action mirrors가 route evidence를 갖게 됐다. 하지만
+provider smoke plan rows와 summary-only `api_key_next_provider_smoke_*` mirrors는 아직
+selected provider class, route data mode, live-data-required evidence를 직접 갖지 않는다.
+이번 slice는 API 키만 넣고 provider smoke row를 바로 실행하는 client가 route family map을
+다시 파싱하지 않아도 각 smoke command가 실제 live provider route를 향하는지 확인할 수
+있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - live_data_setup_summary provider_setup_actions rows include selected provider class, route data mode, and live-data-required evidence
+  - live_data_setup_summary provider_smoke_plan rows and next_provider_smoke carry the same route evidence
+  - api_key_command_summary provider_smoke_commands and next_provider_smoke mirror the provider route evidence
+  - summary-only api_key_next_provider_smoke_* fields expose selected provider class, route data mode, and live-data-required evidence
+  - summary-only api_key_provider_smoke_*_by_family maps expose provider smoke route evidence for compact clients
+  - README and DevOps setup guide document provider smoke route fields
+  - setup docs guard keeps README and DevOps API-key provider smoke route field parity in sync
+  - tests cover provider setup actions, provider smoke plan rows, command summary rows, summary-only top-level mirrors, fake-key no-secret paths, and docs parity
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key provider smoke plan route fields pytest: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 37 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 829 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed provider_smoke_plan rows, api_key_command_summary provider_smoke_commands, next_provider_smoke, and top-level api_key_next_provider_smoke route mirrors without secret values
+```
+
 ## 3.881 API Key Pending And Blocked Recovery Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

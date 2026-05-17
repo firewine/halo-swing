@@ -9,6 +9,13 @@ from .context import *
 __all__ = ('_live_data_setup_summary', '_live_data_provider_family_summary', '_live_data_provider_setup_actions', '_live_data_provider_setup_actions_from_providers', '_live_data_provider_smoke_plan', '_string_list', '_ordered_unique_strings', '_live_data_dotenv_template', '_live_data_dotenv_examples', '_live_data_dotenv_file_status', '_live_data_setup_steps', '_live_data_next_operator_action')
 
 
+_LIVE_PROVIDER_CLASS_BY_FAMILY = {
+    "market": "PolygonMarketDataProvider",
+    "macro": "FredMacroDataProvider",
+    "news": "NewsApiDataProvider",
+}
+
+
 def _live_data_setup_summary(
     api_key_status: dict[str, Any],
     provider_route: dict[str, Any],
@@ -66,7 +73,14 @@ def _live_data_setup_summary(
     )
     dotenv_file_status = _live_data_dotenv_file_status()
     one_shot_smoke_command = api_key_status.get("one_shot_smoke_command")
-    provider_setup_actions = _live_data_provider_setup_actions(api_key_status)
+    provider_setup_actions = _live_data_provider_setup_actions(
+        api_key_status,
+        selected_provider_class_by_family=selected_provider_class_by_family,
+        provider_route_data_mode_by_family=provider_route_data_mode_by_family,
+        provider_route_live_data_required_by_family=(
+            provider_route_live_data_required_by_family
+        ),
+    )
     provider_smoke_plan = _live_data_provider_smoke_plan(
         provider_setup_actions=provider_setup_actions,
         one_shot_smoke_command=one_shot_smoke_command,
@@ -161,21 +175,59 @@ def _live_data_provider_family_summary(
 
 def _live_data_provider_setup_actions(
     api_key_status: dict[str, Any],
+    *,
+    selected_provider_class_by_family: dict[str, Any] | None = None,
+    provider_route_data_mode_by_family: dict[str, Any] | None = None,
+    provider_route_live_data_required_by_family: dict[str, Any] | None = None,
 ) -> dict[str, dict[str, Any]]:
     providers = _optional_mapping(api_key_status.get("providers")) or {}
-    return _live_data_provider_setup_actions_from_providers(providers)
+    return _live_data_provider_setup_actions_from_providers(
+        providers,
+        selected_provider_class_by_family=selected_provider_class_by_family,
+        provider_route_data_mode_by_family=provider_route_data_mode_by_family,
+        provider_route_live_data_required_by_family=(
+            provider_route_live_data_required_by_family
+        ),
+    )
 
 
 def _live_data_provider_setup_actions_from_providers(
     providers: dict[str, Any],
+    *,
+    selected_provider_class_by_family: dict[str, Any] | None = None,
+    provider_route_data_mode_by_family: dict[str, Any] | None = None,
+    provider_route_live_data_required_by_family: dict[str, Any] | None = None,
 ) -> dict[str, dict[str, Any]]:
     actions: dict[str, dict[str, Any]] = {}
+    selected_provider_class_by_family = selected_provider_class_by_family or {}
+    provider_route_data_mode_by_family = provider_route_data_mode_by_family or {}
+    provider_route_live_data_required_by_family = (
+        provider_route_live_data_required_by_family or {}
+    )
     for provider_family, raw_provider_status in providers.items():
         provider_status = _optional_mapping(raw_provider_status) or {}
         smoke_command = _optional_mapping(provider_status.get("smoke_command")) or {}
+        configured = provider_status.get("configured") is True
+        selected_provider_class = _provider_route_value(
+            selected_provider_class_by_family,
+            provider_family,
+            _LIVE_PROVIDER_CLASS_BY_FAMILY.get(provider_family)
+            if configured
+            else None,
+        )
+        provider_route_data_mode = _provider_route_value(
+            provider_route_data_mode_by_family,
+            provider_family,
+            "live" if configured else None,
+        )
+        provider_route_live_data_required = _provider_route_value(
+            provider_route_live_data_required_by_family,
+            provider_family,
+            configured,
+        )
         actions[provider_family] = {
             "provider": provider_status.get("provider"),
-            "configured": provider_status.get("configured"),
+            "configured": configured,
             "configured_env_keys": provider_status.get("configured_env_keys"),
             "preferred_env_key": provider_status.get("preferred_env_key"),
             "accepted_env_keys": provider_status.get("accepted_env_keys"),
@@ -186,6 +238,11 @@ def _live_data_provider_setup_actions_from_providers(
             "optional_live_mode_env": provider_status.get("optional_live_mode_env"),
             "setup_status": provider_status.get("setup_status"),
             "next_setup_action": provider_status.get("next_setup_action"),
+            "selected_provider_class": selected_provider_class,
+            "provider_route_data_mode": provider_route_data_mode,
+            "provider_route_live_data_required": (
+                provider_route_live_data_required is True
+            ),
             "dotenv_target_path": provider_status.get("dotenv_target_path"),
             "example": provider_status.get("example"),
             "smoke_command_name": smoke_command.get("name"),
@@ -195,6 +252,16 @@ def _live_data_provider_setup_actions_from_providers(
             "secret_values_returned": False,
         }
     return actions
+
+
+def _provider_route_value(
+    values_by_family: dict[str, Any],
+    provider_family: str,
+    fallback: Any,
+) -> Any:
+    if provider_family in values_by_family:
+        return values_by_family.get(provider_family)
+    return fallback
 
 
 def _live_data_provider_smoke_plan(
@@ -215,6 +282,11 @@ def _live_data_provider_smoke_plan(
                 "preferred_env_key": action.get("preferred_env_key"),
                 "accepted_env_keys": _string_list(action.get("accepted_env_keys")),
                 "next_setup_action": action.get("next_setup_action"),
+                "selected_provider_class": action.get("selected_provider_class"),
+                "provider_route_data_mode": action.get("provider_route_data_mode"),
+                "provider_route_live_data_required": (
+                    action.get("provider_route_live_data_required") is True
+                ),
                 "smoke_command_name": smoke_command.get("name"),
                 "command": smoke_command.get("command"),
                 "network_call": True,

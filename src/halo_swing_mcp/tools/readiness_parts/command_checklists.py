@@ -345,6 +345,11 @@ def _api_key_command_provider_smoke_row(
         "status": provider_smoke.get("status"),
         "smoke_command_name": provider_smoke.get("smoke_command_name"),
         "command": provider_smoke.get("command"),
+        "selected_provider_class": provider_smoke.get("selected_provider_class"),
+        "provider_route_data_mode": provider_smoke.get("provider_route_data_mode"),
+        "provider_route_live_data_required": (
+            provider_smoke.get("provider_route_live_data_required") is True
+        ),
         "network_call": True,
         "network_call_policy": provider_smoke.get("network_call_policy"),
         "expected_live_contract": provider_smoke.get("expected_live_contract"),
