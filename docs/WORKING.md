@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_ENV_KEY_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_ENV_KEY_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_EXPECTED_LIVE_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_EXPECTED_LIVE_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider smoke next-action primary env-key fields
+next_atomic_step: surface summary-only API-key provider smoke next-action primary expected-live fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key provider smoke next-action primary preferred env key, accepted env keys, and accepted env-key count
-  - summary-only tests prove provider smoke next-action primary env-key fields match the first selected ready or blocked command row
-  - README and DevOps guide document the top-level API-key provider smoke next-action primary env-key fields
+  - summary-only output exposes API-key provider smoke next-action primary expected live contract, expected live checks, and expected live-check count
+  - summary-only tests prove provider smoke next-action primary expected-live fields match the first selected ready or blocked command row
+  - README and DevOps guide document the top-level API-key provider smoke next-action primary expected-live fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider smoke next-action primary env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke next-action primary expected-live fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_ENV_KEY_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_EXPECTED_LIVE_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider smoke next-action primary env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key provider smoke next-action primary expected-live fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes provider-smoke next-action primary preferred env key, accepted env keys, and accepted env-key count without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes provider-smoke next-action primary expected live contract, expected live checks, and expected live-check count without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_ENV_KEY_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PRIMARY_ENV_KEY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider smoke next-action primary env-key fields
 ```
 
 Previous completed directive:

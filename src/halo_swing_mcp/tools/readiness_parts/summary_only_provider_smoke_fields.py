@@ -309,6 +309,9 @@ def _api_key_provider_smoke_top_level_fields(
     provider_smoke_next_action_primary_accepted_env_keys = _string_list(
         provider_smoke_next_action_primary_row.get("accepted_env_keys")
     )
+    provider_smoke_next_action_primary_expected_live_checks = _string_list(
+        provider_smoke_next_action_primary_row.get("expected_live_checks")
+    )
     provider_smoke_next_action_kinds_by_family = {
         family: row.get("kind")
         for family, row in provider_smoke_next_action_rows_by_family.items()
@@ -514,6 +517,15 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_primary_accepted_env_key_count": len(
             provider_smoke_next_action_primary_accepted_env_keys
+        ),
+        "api_key_provider_smoke_next_action_primary_expected_live_contract": (
+            provider_smoke_next_action_primary_row.get("expected_live_contract")
+        ),
+        "api_key_provider_smoke_next_action_primary_expected_live_checks": (
+            provider_smoke_next_action_primary_expected_live_checks
+        ),
+        "api_key_provider_smoke_next_action_primary_expected_live_check_count": len(
+            provider_smoke_next_action_primary_expected_live_checks
         ),
         "api_key_provider_smoke_next_action_command_count": len(
             provider_smoke_next_action_command_names
