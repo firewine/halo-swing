@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from .context import *
+from .api_key_route_family_fields import _api_key_route_family_fields
 
 
 __all__ = ('_api_key_provider_recovery_checklist', '_api_key_pipeline_setup_status_summary', '_api_key_pipeline_api_key_requirements_summary', '_api_key_pipeline_api_key_command_summary', '_api_key_command_provider_smoke_row', '_api_key_command_provider_smoke_env_hint', '_api_key_pipeline_operator_checklist')
@@ -224,6 +225,7 @@ def _api_key_pipeline_api_key_requirements_summary(
             "configured_provider_families"
         ),
         "provider_requirements": provider_requirements,
+        **_api_key_route_family_fields(live_data_setup_summary),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

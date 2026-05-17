@@ -469,6 +469,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_provider_requirement_configured" in guide
     assert "api_key_provider_requirement_next_setup_actions" in guide
     assert "api_key_provider_requirement_smoke_command_names" in guide
+    assert "api_key_requirement_selected_provider_class_by_family" in guide
+    assert "api_key_requirement_provider_route_data_mode_by_family" in guide
+    assert "api_key_requirement_provider_route_live_data_required_by_family" in guide
+    assert "api_key_requirement_all_selected_routes_live" in guide
     assert "keeps `api_key_command_summary`" in guide
     assert "api_key_pipeline_api_key_command_summary.v1" in guide
     assert "provider_smoke_commands" in guide
@@ -762,6 +766,14 @@ def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
         "api_key_provider_requirement_configured",
         "api_key_provider_requirement_next_setup_actions",
         "api_key_provider_requirement_smoke_command_names",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "api_key_requirement_selected_provider_class_by_family",
+        "api_key_requirement_provider_route_data_mode_by_family",
+        "api_key_requirement_provider_route_live_data_required_by_family",
+        "api_key_requirement_all_selected_routes_live",
     )
 
     for field_name in field_names:
@@ -1280,6 +1292,14 @@ def test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync() -> N
         "api_key_provider_recovery_summary",
         "api_key_provider_recovery_summary.v1",
         "provider_error_count",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "api_key_provider_recovery_selected_provider_class_by_family",
+        "api_key_provider_recovery_provider_route_data_mode_by_family",
+        "api_key_provider_recovery_provider_route_live_data_required_by_family",
+        "api_key_provider_recovery_all_selected_routes_live",
         "provider_recovery_smoke_available_count",
         "provider_recovery_smoke_unavailable_count",
         "provider_recovery_all_smokes_available",

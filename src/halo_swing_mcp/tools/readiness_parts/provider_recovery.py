@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from .api_key_route_family_fields import _api_key_route_family_fields
 from .context import *
 
 
@@ -11,6 +12,8 @@ __all__ = ('_api_key_provider_recovery_summary', '_api_key_provider_recovery_sum
 
 def _api_key_provider_recovery_summary(
     recovery_checklist: dict[str, Any],
+    *,
+    route_family_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     raw_items = recovery_checklist.get("items")
     items = (
@@ -327,6 +330,7 @@ def _api_key_provider_recovery_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    summary.update(_api_key_route_family_fields(route_family_summary or {}))
     if first_item:
         provider_family = first_item.get("provider_family")
         provider = first_item.get("provider")

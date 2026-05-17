@@ -90,7 +90,8 @@ def run_api_key_pipeline_smoke(
         live_data_smoke_summary
     )
     api_key_provider_recovery_summary = _api_key_provider_recovery_summary(
-        api_key_provider_recovery_checklist
+        api_key_provider_recovery_checklist,
+        route_family_summary=live_data_setup_summary,
     )
     api_key_operator_checklist = _api_key_pipeline_operator_checklist(
         setup_status_summary=setup_status_summary,

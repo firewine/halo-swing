@@ -10,6 +10,10 @@ from .summary_only_integration_status_fields import (
 from .summary_only_pipeline_route_fields import (
     _api_key_pipeline_route_top_level_fields,
 )
+from .summary_only_provider_route_fields import (
+    _api_key_provider_recovery_route_top_level_fields,
+    _api_key_requirement_route_top_level_fields,
+)
 from .summary_only_provider_selection_fields import (
     _api_key_provider_selection_top_level_fields,
 )
@@ -65,6 +69,11 @@ def _api_key_pipeline_summary_only_payload(
     api_key_pipeline_check_summary = _optional_mapping(
         payload.get("api_key_pipeline_check_summary")
     ) or {}
+    api_key_provider_recovery_summary = _api_key_provider_recovery_summary(
+        _optional_mapping(payload.get("api_key_provider_recovery_checklist"))
+        or {},
+        route_family_summary=setup_status_summary,
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -408,6 +417,9 @@ def _api_key_pipeline_summary_only_payload(
             family: row.get("smoke_command_name")
             for family, row in provider_requirement_rows.items()
         },
+        **_api_key_requirement_route_top_level_fields(
+            api_key_requirements_summary
+        ),
         "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
         "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
         "api_key_next_smoke_command": next_smoke_command.get("command"),
@@ -455,12 +467,7 @@ def _api_key_pipeline_summary_only_payload(
         )
         or {},
         "api_key_provider_recovery_summary": (
-            _api_key_provider_recovery_summary(
-                _optional_mapping(
-                    payload.get("api_key_provider_recovery_checklist")
-                )
-                or {}
-            )
+            api_key_provider_recovery_summary
         ),
         "provider_smoke_summaries": provider_smoke_rows,
         "provider_smoke_summary_count": provider_smoke_summary_count,
@@ -589,6 +596,9 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_recovery_required": (
             payload.get("provider_recovery_required") is True
+        ),
+        **_api_key_provider_recovery_route_top_level_fields(
+            api_key_provider_recovery_summary
         ),
         "provider_recovery_summary_status": payload.get(
             "provider_recovery_summary_status"

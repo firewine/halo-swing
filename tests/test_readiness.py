@@ -742,6 +742,10 @@ def expected_api_key_requirements_summary(
     configured_provider_families: list[str],
     missing_provider_families: list[str],
 ) -> dict[str, Any]:
+    configured_family_set = set(configured_provider_families)
+    selected_provider_classes = expected_selected_provider_class_by_family(
+        configured=True
+    )
     provider_setup_actions = expected_provider_setup_actions(
         market_configured_env_keys=market_configured_env_keys,
         macro_configured_env_keys=macro_configured_env_keys,
@@ -772,6 +776,23 @@ def expected_api_key_requirements_summary(
         "missing_provider_families": missing_provider_families,
         "configured_provider_families": configured_provider_families,
         "provider_requirements": provider_requirements,
+        "selected_provider_class_by_family": {
+            family: (
+                selected_provider_classes[family]
+                if family in configured_family_set
+                else None
+            )
+            for family in provider_setup_actions
+        },
+        "provider_route_data_mode_by_family": {
+            family: "live" if family in configured_family_set else None
+            for family in provider_setup_actions
+        },
+        "provider_route_live_data_required_by_family": {
+            family: family in configured_family_set
+            for family in provider_setup_actions
+        },
+        "all_selected_routes_live": bool(configured_provider_families),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -3271,6 +3292,30 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         == expected_provider_route_live_data_required_by_family(configured=True)
     )
     assert summary_payload["api_key_failure_all_selected_routes_live"] is True
+    assert provider_recovery_summary["selected_provider_class_by_family"] == (
+        expected_selected_provider_class_by_family(configured=True)
+    )
+    assert provider_recovery_summary["provider_route_data_mode_by_family"] == (
+        expected_provider_route_data_mode_by_family(configured=True)
+    )
+    assert provider_recovery_summary[
+        "provider_route_live_data_required_by_family"
+    ] == expected_provider_route_live_data_required_by_family(configured=True)
+    assert provider_recovery_summary["all_selected_routes_live"] is True
+    assert summary_payload[
+        "api_key_provider_recovery_selected_provider_class_by_family"
+    ] == provider_recovery_summary["selected_provider_class_by_family"]
+    assert summary_payload[
+        "api_key_provider_recovery_provider_route_data_mode_by_family"
+    ] == provider_recovery_summary["provider_route_data_mode_by_family"]
+    assert summary_payload[
+        "api_key_provider_recovery_provider_route_live_data_required_by_family"
+    ] == provider_recovery_summary[
+        "provider_route_live_data_required_by_family"
+    ]
+    assert summary_payload["api_key_provider_recovery_all_selected_routes_live"] is (
+        provider_recovery_summary["all_selected_routes_live"]
+    )
     assert summary_payload["provider_recovery_action_status"] == "ready_to_retry"
     assert summary_payload["provider_recovery_item_count"] == 3
     assert summary_payload["provider_recovery_pending_count"] == 3
@@ -3436,6 +3481,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": "conflict",
         "provider_recovery_required": True,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "provider_error_count": 3,
         "provider_recovery_smoke_count": 3,
         "provider_recovery_smoke_available_count": 3,
@@ -6663,6 +6718,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": "ok",
         "provider_recovery_required": False,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "provider_error_count": 0,
         "provider_recovery_smoke_count": 0,
         "provider_recovery_smoke_available_count": 0,
@@ -6743,6 +6808,27 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["failed_provider_count"] == 0
     assert payload["provider_recovery_smoke_count"] == 0
     assert payload["provider_recovery_required"] is False
+    assert payload["api_key_provider_recovery_selected_provider_class_by_family"] == (
+        payload["api_key_provider_recovery_summary"][
+            "selected_provider_class_by_family"
+        ]
+    )
+    assert payload["api_key_provider_recovery_provider_route_data_mode_by_family"] == (
+        payload["api_key_provider_recovery_summary"][
+            "provider_route_data_mode_by_family"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_provider_recovery_provider_route_live_data_required_by_family"
+        ]
+        == payload["api_key_provider_recovery_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert payload["api_key_provider_recovery_all_selected_routes_live"] is (
+        payload["api_key_provider_recovery_summary"]["all_selected_routes_live"]
+    )
     assert payload["provider_recovery_summary_status"] == "ok"
     assert payload["provider_recovery_action_status"] == "no_recovery_required"
     assert payload["provider_recovery_item_count"] == 0
@@ -7861,6 +7947,35 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         family: row["smoke_command_name"]
         for family, row in requirements["provider_requirements"].items()
     }
+    assert requirements["selected_provider_class_by_family"] == {
+        "market": "PolygonMarketDataProvider",
+        "macro": None,
+        "news": None,
+    }
+    assert requirements["provider_route_data_mode_by_family"] == {
+        "market": "live",
+        "macro": None,
+        "news": None,
+    }
+    assert requirements["provider_route_live_data_required_by_family"] == {
+        "market": True,
+        "macro": False,
+        "news": False,
+    }
+    assert requirements["all_selected_routes_live"] is True
+    assert payload["api_key_requirement_selected_provider_class_by_family"] == (
+        requirements["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_requirement_provider_route_data_mode_by_family"] == (
+        requirements["provider_route_data_mode_by_family"]
+    )
+    assert (
+        payload["api_key_requirement_provider_route_live_data_required_by_family"]
+        == requirements["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_requirement_all_selected_routes_live"] is (
+        requirements["all_selected_routes_live"]
+    )
     assert requirements["provider_requirements"]["market"]["configured"] is True
     assert requirements["provider_requirements"]["macro"]["preferred_env_key"] == (
         "FRED_API_KEY"

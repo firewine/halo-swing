@@ -1040,6 +1040,65 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.876 API Key Requirements Summary Provider Route Family Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.875에서 pipeline check summary row는 family별 selected provider class, route data
+mode, live-data-required evidence를 직접 보여주게 됐다. 하지만
+`api_key_requirements_summary`는 API 키 이름과 family별 key requirement를 보여주는 핵심
+setup row이면서도, 채워진 key가 어떤 selected live provider route로 이어지는지는 다른
+summary에서 다시 조합해야 한다. 이번 slice는 같은 no-secret route-family evidence를
+requirements summary와 `api_key_requirement_*` top-level mirrors로 올려, API 키를 채우는
+화면에서도 실제 live provider route 선택 상태를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_requirements_summary mirrors selected provider class by family
+  - api_key_requirements_summary mirrors provider route data_mode and live_data_required by family
+  - api_key_requirements_summary mirrors all_selected_routes_live
+  - summary-only top-level api_key_requirement_* mirrors expose the same route family evidence without nested parsing
+  - README and DevOps setup guide document requirements summary provider route family fields
+  - tests cover fake-key requirements summary route family mirrors without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key requirements summary route family pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 825 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed api_key_requirements_summary and api_key_requirement_* top-level route maps, all_selected_routes_live true, and secret_values_returned false
+```
+
 ## 3.875 API Key Pipeline Check Summary Provider Route Family Fields Gate Record - 2026-05-17
 
 ### A. 목적
@@ -1099,6 +1158,69 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
   - direct fake-key summary-only output confirmed api_key_pipeline_check_summary and api_key_check_* top-level route maps, all_selected_routes_live true, and secret_values_returned false
+```
+
+## 3.877 API Key Requirements And Provider Recovery Route Family Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.876에서 requirements summary가 family별 selected provider class, route data
+mode, live-data-required evidence를 직접 보여주게 됐다. 이어서
+`api_key_provider_recovery_summary`도 같은 no-secret route-family evidence를 갖게 해,
+API 키 요구사항 화면과 provider recovery 화면 모두에서 API 키 이름과 실제 selected
+live provider route 상태를 한 번에 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_requirements_summary mirrors selected provider class by family
+  - api_key_requirements_summary mirrors provider route data_mode and live_data_required by family
+  - api_key_requirements_summary mirrors all_selected_routes_live
+  - api_key_provider_recovery_summary mirrors selected provider class by family
+  - api_key_provider_recovery_summary mirrors provider route data_mode and live_data_required by family
+  - api_key_provider_recovery_summary mirrors all_selected_routes_live
+  - summary-only top-level api_key_requirement_* mirrors expose the same route family evidence without nested parsing
+  - summary-only top-level api_key_provider_recovery_* mirrors expose the same route family evidence without nested parsing
+  - summary_only_provider_route_fields.py owns requirements/provider recovery top-level route-family projection so summary_only_payload.py stays below the 900-line warning point
+  - README and DevOps setup guide document requirements summary provider route family fields
+  - README and DevOps setup guide document provider recovery summary provider route family fields
+  - tests cover fake-key requirements and provider recovery summary route family mirrors without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key requirements and provider recovery summary route family pytest: 8 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 825 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed api_key_requirements_summary, api_key_requirement_* top-level route maps, api_key_provider_recovery_summary, and api_key_provider_recovery_* top-level route maps, all_selected_routes_live true, and secret_values_returned false
 ```
 
 ## 3.874 API Key Pipeline Stage Summary Provider Route Family Fields Gate Record - 2026-05-17

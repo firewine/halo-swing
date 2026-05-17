@@ -596,8 +596,11 @@ It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,
 `configured_provider_families`, and per-family `provider_requirements`
-including `preferred_env_key` and `accepted_env_keys`, so the compact response
-still shows which API-key names to fill without returning secret values.
+including `preferred_env_key` and `accepted_env_keys`, plus
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, and `all_selected_routes_live`,
+so the compact response still shows which API-key names to fill and how those
+keys map to live provider routes without returning secret values.
 For compact clients that read only top-level fields, summary-only output also
 mirrors requirement metadata as `api_key_required_env_keys`,
 `api_key_required_env_key_count`, `api_key_configured_env_keys`,
@@ -612,7 +615,11 @@ It also mirrors per-family provider requirement hints as
 `api_key_provider_requirement_setup_statuses`,
 `api_key_provider_requirement_configured`,
 `api_key_provider_requirement_next_setup_actions`, and
-`api_key_provider_requirement_smoke_command_names`.
+`api_key_provider_requirement_smoke_command_names`. Route-family evidence is
+mirrored as `api_key_requirement_selected_provider_class_by_family`,
+`api_key_requirement_provider_route_data_mode_by_family`,
+`api_key_requirement_provider_route_live_data_required_by_family`, and
+`api_key_requirement_all_selected_routes_live`.
 It keeps `api_key_operator_checklist_summary`
 (`api_key_operator_checklist_summary.v1`) with `current_step`, `ready`,
 ready/blocking step names and counts, `next_blocking_action_name`,
@@ -731,6 +738,8 @@ listed in `applies_to`, so API-key smoke calls show the active live HTTP
 timeout without returning secret values. `api_key_provider_recovery_summary`
 (`api_key_provider_recovery_summary.v1`) exposes
 `provider_recovery_required`, `provider_error_count`,
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`,
 `provider_recovery_smoke_count`, `provider_recovery_smoke_available_count`,
 `provider_recovery_smoke_unavailable_count`,
 `provider_recovery_all_smokes_available`,
@@ -801,6 +810,11 @@ items with `provider_family`, `provider`,
 `next_setup_action`, `preferred_env_key`, `accepted_env_keys`,
 `network_call_policy`, `network_call`, `mutates_local_state`,
 `exception_type`, `exception_message_returned`, and `url_returned`.
+The compact top-level payload mirrors provider recovery route-family evidence as
+`api_key_provider_recovery_selected_provider_class_by_family`,
+`api_key_provider_recovery_provider_route_data_mode_by_family`,
+`api_key_provider_recovery_provider_route_live_data_required_by_family`, and
+`api_key_provider_recovery_all_selected_routes_live`.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret
