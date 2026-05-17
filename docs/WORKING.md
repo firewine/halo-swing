@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_NEXT_ACTION_FLOW_HINTS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_NEXT_ACTION_FLOW_HINTS_GATE
+status: API_KEY_TOP_LEVEL_SETUP_PROGRESS_MIRRORS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_SETUP_PROGRESS_MIRRORS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror next operator action flow hints onto summary-only top-level fields
+next_atomic_step: mirror API-key setup progress onto summary-only top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,24 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secrets tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level next_operator_action_next_after_action mirrors the nested next operator action flow
-  - summary-only top-level next_operator_action_dotenv_target_path, source_path, and target_path mirror nested local file hints
-  - summary-only top-level next_operator_action_secret_input_required mirrors whether the current action requires entering API keys
-  - README and DevOps setup guide document top-level next_operator_action flow hint mirrors
-  - setup docs tests assert the new top-level next action flow hints
+  - summary-only top-level api_key_setup_current_step mirrors operator checklist current_step
+  - summary-only top-level api_key_setup_ready, step counts, ready step names, and blocking step names mirror operator checklist progress
+  - summary-only top-level api_key_setup_next_blocking_step mirrors the next local setup blocker
+  - README and DevOps setup guide document top-level API-key setup progress mirrors
+  - setup docs tests assert the new top-level setup progress guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level next action flow hints gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level setup progress mirrors gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_NEXT_ACTION_FLOW_HINTS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_NEXT_ACTION_FLOW_HINTS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror next operator action flow hints onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -2944,6 +2955,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Top-Level Setup Progress Mirrors Gate is verified.
+Summary-only top-level payload now mirrors API-key setup current step, ready
+state, ready/blocking step names and counts, and next blocking setup step from
+the operator checklist summary. Focused tests, direct summary-only smoke, full
+pytest, ruff, and health_check passed.
+
+```yaml
+api_key_top_level_setup_progress_mirrors_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - summary-only top-level api_key_setup_current_step mirrors operator checklist current_step
+    - summary-only top-level api_key_setup_ready, step counts, ready step names, and blocking step names mirror operator checklist progress
+    - summary-only top-level api_key_setup_next_blocking_step mirrors the next local setup blocker
+    - README and DevOps setup guide document top-level API-key setup progress mirrors
+    - setup docs tests assert top-level setup progress guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level setup progress mirrors present; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "800 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Top-Level Next Action Flow Hints Gate is verified.
 Summary-only top-level `next_operator_action_*` fields now mirror the nested

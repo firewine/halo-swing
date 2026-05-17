@@ -3017,6 +3017,9 @@ def _api_key_pipeline_summary_only_payload(
         for row in provider_smoke_success_rows
         if _string_list(row.get("accepted_env_keys"))
     ]
+    api_key_operator_checklist_summary = _api_key_operator_checklist_summary(
+        _optional_mapping(payload.get("api_key_operator_checklist")) or {}
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3103,6 +3106,28 @@ def _api_key_pipeline_summary_only_payload(
             next_operator_action.get("secret_values_returned") is True
             or api_key_next_action_summary.get("secret_values_returned") is True
         ),
+        "api_key_setup_current_step": api_key_operator_checklist_summary.get(
+            "current_step"
+        ),
+        "api_key_setup_ready": api_key_operator_checklist_summary.get("ready") is True,
+        "api_key_setup_step_count": api_key_operator_checklist_summary.get(
+            "step_count"
+        ),
+        "api_key_setup_ready_step_names": _string_list(
+            api_key_operator_checklist_summary.get("ready_step_names")
+        ),
+        "api_key_setup_ready_step_count": api_key_operator_checklist_summary.get(
+            "ready_step_count"
+        ),
+        "api_key_setup_blocking_step_names": _string_list(
+            api_key_operator_checklist_summary.get("blocking_step_names")
+        ),
+        "api_key_setup_blocking_step_count": api_key_operator_checklist_summary.get(
+            "blocking_step_count"
+        ),
+        "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
+            "next_blocking_step"
+        ),
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
@@ -3111,11 +3136,7 @@ def _api_key_pipeline_summary_only_payload(
         )
         or {},
         "api_key_next_action_summary": api_key_next_action_summary,
-        "api_key_operator_checklist_summary": (
-            _api_key_operator_checklist_summary(
-                _optional_mapping(payload.get("api_key_operator_checklist")) or {}
-            )
-        ),
+        "api_key_operator_checklist_summary": api_key_operator_checklist_summary,
         "setup_status_summary": _optional_mapping(
             payload.get("setup_status_summary")
         )

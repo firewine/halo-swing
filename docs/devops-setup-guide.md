@@ -537,6 +537,12 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_mutates_local_state`,
 `next_operator_action_secret_input_required`, and
 `next_operator_action_secret_values_returned`.
+It also mirrors top-level API-key setup progress fields:
+`api_key_setup_current_step`, `api_key_setup_ready`,
+`api_key_setup_step_count`, `api_key_setup_ready_step_names`,
+`api_key_setup_ready_step_count`, `api_key_setup_blocking_step_names`,
+`api_key_setup_blocking_step_count`, and
+`api_key_setup_next_blocking_step`.
 When provider recovery is required, the compact top-level payload also exposes
 top-level summary-only recovery command lists:
 `provider_recovery_smoke_command_names`, `provider_recovery_smoke_commands`,

@@ -5502,6 +5502,19 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["next_operator_action_source_path"] == ".env.example"
     assert payload["next_operator_action_target_path"] == ".env"
     assert payload["next_operator_action_secret_input_required"] is False
+    assert payload["api_key_setup_current_step"] == "prepare_dotenv"
+    assert payload["api_key_setup_ready"] is False
+    assert payload["api_key_setup_step_count"] == 4
+    assert payload["api_key_setup_ready_step_names"] == []
+    assert payload["api_key_setup_ready_step_count"] == 0
+    assert payload["api_key_setup_blocking_step_names"] == [
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+        "run_provider_smokes",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert payload["api_key_setup_blocking_step_count"] == 4
+    assert payload["api_key_setup_next_blocking_step"] == "prepare_dotenv"
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
@@ -6617,6 +6630,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert checklist_summary["status"] == "conflict"
     assert checklist_summary["current_step"] == "recover_failed_providers"
+    assert payload["api_key_setup_current_step"] == checklist_summary["current_step"]
+    assert payload["api_key_setup_ready"] == checklist_summary["ready"]
+    assert payload["api_key_setup_step_count"] == checklist_summary["step_count"]
+    assert payload["api_key_setup_ready_step_names"] == (
+        checklist_summary["ready_step_names"]
+    )
+    assert payload["api_key_setup_ready_step_count"] == (
+        checklist_summary["ready_step_count"]
+    )
+    assert payload["api_key_setup_blocking_step_names"] == (
+        checklist_summary["blocking_step_names"]
+    )
+    assert payload["api_key_setup_blocking_step_count"] == (
+        checklist_summary["blocking_step_count"]
+    )
+    assert payload["api_key_setup_next_blocking_step"] == (
+        checklist_summary["next_blocking_step"]
+    )
     assert checklist_summary["ready"] is False
     assert checklist_summary["ready_step_names"] == [
         "prepare_dotenv",

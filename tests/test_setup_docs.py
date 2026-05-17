@@ -327,6 +327,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_operator_action_mutates_local_state" in guide
     assert "next_operator_action_secret_input_required" in guide
     assert "next_operator_action_secret_values_returned" in guide
+    assert "api_key_setup_current_step" in guide
+    assert "api_key_setup_ready" in guide
+    assert "api_key_setup_step_count" in guide
+    assert "api_key_setup_ready_step_names" in guide
+    assert "api_key_setup_ready_step_count" in guide
+    assert "api_key_setup_blocking_step_names" in guide
+    assert "api_key_setup_blocking_step_count" in guide
+    assert "api_key_setup_next_blocking_step" in guide
     assert "top-level summary-only recovery command lists" in guide
     assert "top-level summary-only recovery status and identity fields" in guide
     assert "top-level summary-only next recovery fields" in guide

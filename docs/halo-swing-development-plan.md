@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.819 API Key Top-Level Setup Progress Mirrors Gate Record - 2026-05-17
+
+### A. 목적
+
+3.818에서 summary-only top-level `next_operator_action_*` fields는 다음 액션의 흐름
+힌트를 직접 보여주게 됐다. 하지만 compact row만 읽는 operator는 API-key-only setup의
+현재 단계, 완료된 단계, 남은 blocker 단계 목록을 여전히 nested
+`api_key_operator_checklist_summary`에서 확인해야 한다. 이번 slice는 이 진행상태를
+top-level mirrors로 올려 API 키만 넣고 다음 smoke로 넘어가는 흐름을 더 직접화한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_current_step mirrors operator checklist current_step
+  - summary-only top-level api_key_setup_ready, step counts, ready step names, and blocking step names mirror operator checklist progress
+  - summary-only top-level api_key_setup_next_blocking_step mirrors the next local setup blocker
+  - README and DevOps setup guide document top-level API-key setup progress mirrors
+  - setup docs tests assert top-level setup progress guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.818 API Key Top-Level Next Action Flow Hints Gate Record - 2026-05-17
 
 ### A. 목적
