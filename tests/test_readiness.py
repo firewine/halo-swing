@@ -1302,6 +1302,37 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_provider_smoke_next_action_commands"] == (
         expected_next_action_commands
     )
+    expected_ready_preferred_env_keys = list(
+        dict.fromkeys(row["preferred_env_key"] for row in ready_provider_smoke_rows)
+    )
+    expected_ready_accepted_env_key_groups = [
+        row["accepted_env_keys"] for row in ready_provider_smoke_rows
+    ]
+    expected_ready_accepted_env_keys = list(
+        dict.fromkeys(
+            env_key
+            for group in expected_ready_accepted_env_key_groups
+            for env_key in group
+        )
+    )
+    assert payload["api_key_provider_smoke_ready_preferred_env_keys"] == (
+        expected_ready_preferred_env_keys
+    )
+    assert payload["api_key_provider_smoke_ready_preferred_env_key_count"] == len(
+        expected_ready_preferred_env_keys
+    )
+    assert payload["api_key_provider_smoke_ready_accepted_env_keys"] == (
+        expected_ready_accepted_env_keys
+    )
+    assert payload["api_key_provider_smoke_ready_accepted_env_key_count"] == len(
+        expected_ready_accepted_env_keys
+    )
+    assert payload["api_key_provider_smoke_ready_accepted_env_key_groups"] == (
+        expected_ready_accepted_env_key_groups
+    )
+    assert payload[
+        "api_key_provider_smoke_ready_accepted_env_key_group_count"
+    ] == len(expected_ready_accepted_env_key_groups)
     expected_blocked_preferred_env_keys = list(
         dict.fromkeys(row["preferred_env_key"] for row in blocked_provider_smoke_rows)
     )

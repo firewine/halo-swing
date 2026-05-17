@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_BLOCKED_ENV_KEY_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_BLOCKED_ENV_KEY_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_READY_ENV_KEY_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_READY_ENV_KEY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider smoke blocked env-key fields
+next_atomic_step: surface summary-only API-key provider smoke ready env-key fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes blocked API-key provider smoke preferred and accepted env-key fields without secret values
-  - summary-only tests prove blocked provider smoke env-key fields match blocked provider smoke command rows
-  - README and DevOps guide document the top-level API-key provider smoke blocked env-key fields
+  - summary-only output exposes ready API-key provider smoke preferred and accepted env-key fields without secret values
+  - summary-only tests prove ready provider smoke env-key fields match ready provider smoke command rows
+  - README and DevOps guide document the top-level API-key provider smoke ready env-key fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider smoke blocked env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke ready env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_SMOKE_BLOCKED_ENV_KEY_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_READY_ENV_KEY_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider smoke blocked env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key provider smoke ready env-key fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only top-level output now exposes blocked provider smoke env-key names and alias groups without secret values
+  - summary-only top-level output now exposes ready provider smoke env-key names and alias groups without secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_BLOCKED_ENV_KEY_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_BLOCKED_ENV_KEY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider smoke blocked env-key fields
 ```
 
 Previous completed directive:
