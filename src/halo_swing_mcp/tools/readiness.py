@@ -1675,10 +1675,7 @@ def _setup_local_commands() -> list[dict[str, Any]]:
             ),
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
-                "run_api_key_pipeline_smoke --input-json "
-                "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
-                "--summary-only --no-audit"
+                "run_api_key_pipeline_smoke --summary-only --no-audit"
             ),
             "network_call": True,
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",

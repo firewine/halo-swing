@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_VERIFIED
-gate_id: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_GATE
+status: API_KEY_PIPELINE_NO_INPUT_SUMMARY_COMMAND_VERIFIED
+gate_id: API_KEY_PIPELINE_NO_INPUT_SUMMARY_COMMAND_GATE
 review_tier: S1_small
 
-next_atomic_step: make live data dotenv_template examples copy-paste compatible KEY=value lines
+next_atomic_step: make API-key one-shot summary commands omit input-json by relying on run_api_key_pipeline_smoke defaults
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -56,8 +56,8 @@ allowed_edit_paths:
   - README.md
   - docs/devops-setup-guide.md
   - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_harness.py
   - tests/test_readiness.py
-  - tests/test_env_template.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -75,23 +75,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status; payload=get_live_data_api_key_status(); print([entry["example"] for entry in payload["dotenv_template"]["entries"]], payload["secret_values_returned"])'
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_uses_api_key_pipeline_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - live data dotenv_template examples use copy-paste compatible KEY=value strings with no spaces around equals
-  - readiness and env-template tests prove dotenv_template examples match .env documentation for Polygon, FRED, and NewsAPI
-  - README and DevOps setup guide keep the same KEY=value examples
-  - setup docs tests assert the KEY=value examples remain documented
+  - get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke --summary-only --no-audit without input-json
+  - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the no-input compact one-shot command
+  - harness focused test proves --summary-only works without input-json using run_api_key_pipeline_smoke defaults
+  - README and DevOps setup guide document the no-input compact one-shot command
+  - setup docs tests assert no-input compact one-shot command guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified dotenv template example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified no-input summary command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_VERIFIED
+gate_id: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_GATE
+review_tier: S1_small
+
+next_atomic_step: make live data dotenv_template examples copy-paste compatible KEY=value lines
 ```
 
 Previous completed directive:
@@ -2889,6 +2901,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline No-Input Summary Command Gate is verified.
+Returned one-shot API-key pipeline command summaries and setup docs now point at
+`run_api_key_pipeline_smoke --summary-only --no-audit` without `--input-json`.
+The harness summary-only path works with built-in defaults, returns no secret
+values, and all required verification passed.
+
+```yaml
+api_key_pipeline_no_input_summary_command_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_harness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - get_live_data_api_key_status one_shot_smoke_command now points at run_api_key_pipeline_smoke --summary-only --no-audit without input-json
+    - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the no-input compact one-shot command
+    - harness focused test proves --summary-only works without input-json using run_api_key_pipeline_smoke defaults
+    - README and DevOps setup guide document the no-input compact one-shot command
+    - setup docs test asserts old input-json guidance is absent
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_uses_api_key_pipeline_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; one_shot_pipeline_smoke command omits input-json; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "800 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Dotenv Template Copy-Paste Example Gate is verified.
 `get_live_data_api_key_status().dotenv_template.entries[].example` now returns

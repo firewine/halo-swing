@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_GATE",
+  "gate_id": "API_KEY_PIPELINE_NO_INPUT_SUMMARY_COMMAND_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.813",
-  "next_atomic_step": "make live data dotenv_template examples copy-paste compatible KEY=value lines",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.814",
+  "next_atomic_step": "make API-key one-shot summary commands omit input-json by relying on run_api_key_pipeline_smoke defaults",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -12,17 +12,17 @@
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_harness.py",
     "tests/test_readiness.py",
-    "tests/test_env_template.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.813",
+    "docs/halo-swing-development-plan.md#3.814",
     "src/halo_swing_mcp/tools/readiness.py",
+    "tests/test_harness.py",
     "tests/test_readiness.py",
-    "tests/test_env_template.py",
     "README.md",
     "docs/devops-setup-guide.md",
     "tests/test_setup_docs.py"
@@ -41,8 +41,8 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
-    "PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status; payload=get_live_data_api_key_status(); print([entry[\"example\"] for entry in payload[\"dotenv_template\"][\"entries\"]], payload[\"secret_values_returned\"])'",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_uses_api_key_pipeline_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -58,14 +58,15 @@
     "read_only": true
   },
   "done_means": [
-    "live_data dotenv_template examples use copy-paste compatible KEY=value strings with no spaces around equals",
-    "readiness and env-template tests prove dotenv_template examples match .env documentation for Polygon, FRED, and NewsAPI",
-    "README and DevOps setup guide keep the same KEY=value examples",
-    "setup docs tests assert the KEY=value examples remain documented",
+    "get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke --summary-only --no-audit without input-json",
+    "live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the no-input compact one-shot command",
+    "harness focused test proves --summary-only works without input-json using run_api_key_pipeline_smoke defaults",
+    "README and DevOps setup guide document the no-input compact one-shot command",
+    "setup docs tests assert no-input compact one-shot command guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified dotenv template example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified no-input summary command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

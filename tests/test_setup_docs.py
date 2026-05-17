@@ -48,6 +48,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "--summary-only" in guide
     assert "without editing" in guide
     assert "Returned one-shot command summaries use `--summary-only --no-audit`" in guide
+    assert (
+        "run_api_key_pipeline_smoke --input-json "
+        "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\""
+    ) not in guide
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
     assert "blocked_provider_smoke_count" in guide

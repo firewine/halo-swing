@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.814 API Key Pipeline No-Input Summary Command Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`는 `asset`, `timeframe`, `symbols`, `topic` 기본값을 이미
+갖고 있어서 `--summary-only --no-audit`만으로 compact smoke를 실행할 수 있다. 그러나
+readiness payload와 README/DevOps guide의 one-shot 명령은 아직 `--input-json`을 요구한다.
+실제 API 키 입력 후 사용자가 복사할 명령을 더 단순하게 만들기 위해, 이번 slice는 returned
+one-shot command summaries와 문서 예시를 no-input compact command로 맞춘다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status one_shot_smoke_command now uses run_api_key_pipeline_smoke --summary-only --no-audit without input-json
+  - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the no-input compact one-shot command
+  - harness focused test proves --summary-only works without input-json using run_api_key_pipeline_smoke defaults
+  - README and DevOps setup guide document the no-input compact one-shot command
+  - setup docs test asserts old input-json guidance is absent
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for harness/readiness/setup docs: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.813 API Key Dotenv Template Copy-Paste Example Gate Record - 2026-05-17
 
 ### A. 목적

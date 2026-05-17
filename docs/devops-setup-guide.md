@@ -368,7 +368,7 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_live_recording_s
 one-shot API-key pipeline smoke runner:
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
 ```
 
 API-key-backed live provider HTTP calls use
@@ -474,7 +474,7 @@ the input JSON. For MCP callers, set `summary_only=true` or `"summary_only":true
 in the request payload for the same compact response:
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps

@@ -201,9 +201,7 @@ def expected_pipeline_smoke_command() -> dict[str, Any]:
         ),
         "command": (
             "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
-            "run_api_key_pipeline_smoke --input-json "
-            "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-            "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --summary-only --no-audit"
+            "run_api_key_pipeline_smoke --summary-only --no-audit"
         ),
         "network_call": True,
         "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -3653,9 +3651,6 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
                 "command": (
                     "PYTHONPATH=src ./.venv/bin/python -m "
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
-                    "--input-json "
-                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
                     "--summary-only --no-audit"
                 ),
                 "network_call": True,
@@ -3884,9 +3879,6 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
                 "command": (
                     "PYTHONPATH=src ./.venv/bin/python -m "
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
-                    "--input-json "
-                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
                     "--summary-only --no-audit"
                 ),
                 "network_call": True,
@@ -4105,9 +4097,6 @@ def test_run_live_recording_smoke_executes_with_fake_live_metadata(
                 "command": (
                     "PYTHONPATH=src ./.venv/bin/python -m "
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
-                    "--input-json "
-                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
                     "--summary-only --no-audit"
                 ),
                 "network_call": True,
@@ -4630,9 +4619,6 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
                 "command": (
                     "PYTHONPATH=src ./.venv/bin/python -m "
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
-                    "--input-json "
-                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
                     "--summary-only --no-audit"
                 ),
                 "network_call": True,
@@ -5533,10 +5519,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
                 "command": (
                     "PYTHONPATH=src ./.venv/bin/python -m "
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
-                    "--input-json "
-                    "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                        "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
-                        "--summary-only --no-audit"
+                    "--summary-only --no-audit"
                 ),
                 "required_env_keys": [],
                 "configured_env_keys": [],
