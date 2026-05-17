@@ -382,6 +382,7 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `provider_recovery_smoke_count`, `item_count`,
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,
+`next_recovery_next_setup_action`,
 `next_recovery_preferred_env_key`, `next_recovery_accepted_env_keys`,
 `next_recovery_network_call_policy`, `next_recovery_network_call`,
 `next_recovery_mutates_local_state`,

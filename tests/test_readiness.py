@@ -2710,6 +2710,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ],
         "next_recovery_provider_family": "market",
         "next_recovery_provider": "polygon",
+        "next_recovery_next_setup_action": (
+            "verify_provider_credentials_or_network"
+        ),
         "next_recovery_preferred_env_key": "POLYGON_API_KEY",
         "next_recovery_accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",

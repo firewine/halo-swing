@@ -2664,10 +2664,13 @@ def _api_key_provider_recovery_summary(
         accepted_env_keys = _string_list(first_item.get("accepted_env_keys"))
         network_call_policy = first_item.get("network_call_policy")
         next_recovery_command = first_item.get("recovery_smoke_command")
+        next_setup_action = first_item.get("next_setup_action")
         if isinstance(provider_family, str):
             summary["next_recovery_provider_family"] = provider_family
         if isinstance(provider, str):
             summary["next_recovery_provider"] = provider
+        if isinstance(next_setup_action, str):
+            summary["next_recovery_next_setup_action"] = next_setup_action
         if isinstance(preferred_env_key, str):
             summary["next_recovery_preferred_env_key"] = preferred_env_key
         if accepted_env_keys:
