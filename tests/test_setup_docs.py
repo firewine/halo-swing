@@ -388,6 +388,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_setup_quickstart_next_command_plan_kind" in guide
     assert "api_key_setup_quickstart_next_command_plan_command" in guide
     assert "api_key_setup_quickstart_next_command_plan_has_command" in guide
+    assert (
+        "api_key_setup_quickstart_next_command_plan_expected_live_check_count"
+        in guide
+    )
+    assert (
+        "api_key_setup_quickstart_next_command_plan_accepted_env_key_count"
+        in guide
+    )
     assert "api_key_setup_quickstart_next_command_plan_next_setup_action" in guide
     assert "api_key_setup_quickstart_next_command_plan_status" in guide
     assert "api_key_setup_quickstart_next_command_plan_ready_to_run" in guide
@@ -1210,8 +1218,10 @@ def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
         "api_key_setup_quickstart_next_command_plan_provider_route_live_data_required",
         "api_key_setup_quickstart_next_command_plan_expected_live_contract",
         "api_key_setup_quickstart_next_command_plan_expected_live_checks",
+        "api_key_setup_quickstart_next_command_plan_expected_live_check_count",
         "api_key_setup_quickstart_next_command_plan_preferred_env_key",
         "api_key_setup_quickstart_next_command_plan_accepted_env_keys",
+        "api_key_setup_quickstart_next_command_plan_accepted_env_key_count",
         "api_key_setup_quickstart_next_command_plan_next_setup_action",
         "api_key_setup_quickstart_next_command_plan_status",
         "api_key_setup_quickstart_next_command_plan_ready_to_run",

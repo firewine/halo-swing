@@ -9008,12 +9008,24 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == []
     )
     assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_expected_live_check_count"
+        ]
+        == 0
+    )
+    assert (
         payload["api_key_setup_quickstart_next_command_plan_preferred_env_key"]
         is None
     )
     assert (
         payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
         == []
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_accepted_env_key_count"
+        ]
+        == 0
     )
     assert (
         payload["api_key_setup_quickstart_next_command_plan_next_setup_action"]
@@ -11744,6 +11756,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "expected_live_checks"
         ]
     )
+    assert payload[
+        "api_key_setup_quickstart_next_command_plan_expected_live_check_count"
+    ] == len(
+        payload["api_key_setup_quickstart_next_command_plan_item"][
+            "expected_live_checks"
+        ]
+    )
     assert (
         payload["api_key_setup_quickstart_next_command_plan_preferred_env_key"]
         == payload["api_key_setup_quickstart_next_command_plan_item"][
@@ -11753,6 +11772,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert (
         payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
         == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "accepted_env_keys"
+        ]
+    )
+    assert payload[
+        "api_key_setup_quickstart_next_command_plan_accepted_env_key_count"
+    ] == len(
+        payload["api_key_setup_quickstart_next_command_plan_item"][
             "accepted_env_keys"
         ]
     )

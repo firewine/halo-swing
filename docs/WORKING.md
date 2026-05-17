@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_COUNT_FIELDS_VERIFIED
-gate_id: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_COUNT_FIELDS_GATE
+status: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_COUNT_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key quickstart next provider-smoke count fields
+next_atomic_step: surface summary-only API-key quickstart next-command-plan count fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key quickstart next ready and blocked provider-smoke expected live-check count and accepted env-key count fields
-  - summary-only tests prove quickstart next ready and blocked provider-smoke count fields match their selected command rows
-  - README and DevOps guide document the top-level API-key quickstart next provider-smoke count fields
+  - summary-only output exposes API-key quickstart next command-plan expected live-check count and accepted env-key count fields
+  - summary-only tests prove quickstart next command-plan count fields match the selected command row
+  - README and DevOps guide document the top-level API-key quickstart next command-plan count fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart next provider-smoke count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart next command-plan count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_COUNT_FIELDS_GATE
+gate_id: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_COUNT_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart next provider-smoke count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key quickstart next command-plan count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes quickstart next ready and blocked provider-smoke expected live-check counts and accepted env-key counts without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes quickstart next command-plan expected live-check count and accepted env-key count without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_COUNT_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key quickstart next provider-smoke count fields
 ```
 
 Previous completed directive:

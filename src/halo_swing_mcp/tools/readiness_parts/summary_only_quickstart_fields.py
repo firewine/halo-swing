@@ -390,6 +390,9 @@ def _provider_smoke_readiness_fields(
 def _api_key_setup_quickstart_next_command_plan_fields(
     next_quickstart_command_plan_row: dict[str, Any],
 ) -> dict[str, Any]:
+    expected_live_checks = _string_list(
+        next_quickstart_command_plan_row.get("expected_live_checks")
+    )
     accepted_env_keys = _string_list(
         next_quickstart_command_plan_row.get("accepted_env_keys")
     )
@@ -435,13 +438,19 @@ def _api_key_setup_quickstart_next_command_plan_fields(
             next_quickstart_command_plan_row.get("expected_live_contract")
         ),
         "api_key_setup_quickstart_next_command_plan_expected_live_checks": (
-            _string_list(next_quickstart_command_plan_row.get("expected_live_checks"))
+            expected_live_checks
+        ),
+        "api_key_setup_quickstart_next_command_plan_expected_live_check_count": (
+            len(expected_live_checks)
         ),
         "api_key_setup_quickstart_next_command_plan_preferred_env_key": (
             next_quickstart_command_plan_row.get("preferred_env_key")
         ),
         "api_key_setup_quickstart_next_command_plan_accepted_env_keys": (
             accepted_env_keys
+        ),
+        "api_key_setup_quickstart_next_command_plan_accepted_env_key_count": (
+            len(accepted_env_keys)
         ),
         "api_key_setup_quickstart_next_command_plan_next_setup_action": (
             next_quickstart_command_plan_row.get("next_setup_action")
