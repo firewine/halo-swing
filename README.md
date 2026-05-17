@@ -965,7 +965,11 @@ The compact top-level payload mirrors stage route-family evidence as
 `api_key_stage_selected_provider_class_by_family`,
 `api_key_stage_provider_route_data_mode_by_family`,
 `api_key_stage_provider_route_live_data_required_by_family`, and
-`api_key_stage_all_selected_routes_live`.
+`api_key_stage_all_selected_routes_live`, plus route count aggregates
+`api_key_stage_provider_route_family_count`,
+`api_key_stage_selected_provider_family_count`,
+`api_key_stage_provider_route_live_data_required_family_count`, and
+`api_key_stage_provider_route_data_mode_counts`.
 It keeps `api_key_pipeline_check_summary`
 (`api_key_pipeline_check_summary.v1`) summarizing the top-level `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,
@@ -982,7 +986,11 @@ The compact top-level payload mirrors check route-family evidence as
 `api_key_check_selected_provider_class_by_family`,
 `api_key_check_provider_route_data_mode_by_family`,
 `api_key_check_provider_route_live_data_required_by_family`, and
-`api_key_check_all_selected_routes_live`.
+`api_key_check_all_selected_routes_live`, plus route count aggregates
+`api_key_check_provider_route_family_count`,
+`api_key_check_selected_provider_family_count`,
+`api_key_check_provider_route_live_data_required_family_count`, and
+`api_key_check_provider_route_data_mode_counts`.
 It also mirrors the check summary status fields as
 `api_key_check_status`, `api_key_check_count`,
 `api_key_check_passed_count`, `api_key_check_failed_count`,

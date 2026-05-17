@@ -14,96 +14,77 @@ __all__ = (
     "_api_key_readiness_route_top_level_fields",
     "_api_key_requirement_route_top_level_fields",
     "_api_key_setup_route_top_level_fields",
+    "_route_family_summary_top_level_fields",
 )
 
 
 def _api_key_failure_route_top_level_fields(
     api_key_pipeline_failure_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
-        **_route_family_top_level_fields(
-            prefix="api_key_failure",
-            source_summary=api_key_pipeline_failure_summary,
-        ),
-        **_route_family_count_top_level_fields(
-            prefix="api_key_failure",
-            source_summary=api_key_pipeline_failure_summary,
-        ),
-    }
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_failure",
+        source_summary=api_key_pipeline_failure_summary,
+    )
 
 
 def _api_key_requirement_route_top_level_fields(
     api_key_requirements_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    prefix = "api_key_requirement"
-    return {
-        **_route_family_top_level_fields(
-            prefix=prefix,
-            source_summary=api_key_requirements_summary,
-        ),
-        **_route_family_count_top_level_fields(
-            prefix=prefix,
-            source_summary=api_key_requirements_summary,
-        ),
-    }
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_requirement",
+        source_summary=api_key_requirements_summary,
+    )
 
 
 def _api_key_setup_route_top_level_fields(
     setup_status_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
-        **_route_family_top_level_fields(
-            prefix="api_key_setup",
-            source_summary=setup_status_summary,
-        ),
-        **_route_family_count_top_level_fields(
-            prefix="api_key_setup",
-            source_summary=setup_status_summary,
-        ),
-    }
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_setup",
+        source_summary=setup_status_summary,
+    )
 
 
 def _api_key_readiness_route_top_level_fields(
     readiness_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
-        **_route_family_top_level_fields(
-            prefix="api_key_readiness",
-            source_summary=readiness_summary,
-        ),
-        **_route_family_count_top_level_fields(
-            prefix="api_key_readiness",
-            source_summary=readiness_summary,
-        ),
-    }
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_readiness",
+        source_summary=readiness_summary,
+    )
 
 
 def _api_key_provider_recovery_route_top_level_fields(
     api_key_provider_recovery_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
-        **_route_family_top_level_fields(
-            prefix="api_key_provider_recovery",
-            source_summary=api_key_provider_recovery_summary,
-        ),
-        **_route_family_count_top_level_fields(
-            prefix="api_key_provider_recovery",
-            source_summary=api_key_provider_recovery_summary,
-        ),
-    }
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_provider_recovery",
+        source_summary=api_key_provider_recovery_summary,
+    )
 
 
 def _api_key_provider_recovery_checklist_route_top_level_fields(
     api_key_provider_recovery_checklist_summary: dict[str, Any],
 ) -> dict[str, Any]:
+    return _route_family_summary_top_level_fields(
+        prefix="api_key_provider_recovery_checklist",
+        source_summary=api_key_provider_recovery_checklist_summary,
+    )
+
+
+def _route_family_summary_top_level_fields(
+    *,
+    prefix: str,
+    source_summary: dict[str, Any],
+) -> dict[str, Any]:
     return {
         **_route_family_top_level_fields(
-            prefix="api_key_provider_recovery_checklist",
-            source_summary=api_key_provider_recovery_checklist_summary,
+            prefix=prefix,
+            source_summary=source_summary,
         ),
         **_route_family_count_top_level_fields(
-            prefix="api_key_provider_recovery_checklist",
-            source_summary=api_key_provider_recovery_checklist_summary,
+            prefix=prefix,
+            source_summary=source_summary,
         ),
     }
 

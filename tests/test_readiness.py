@@ -9430,6 +9430,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
     assert payload["api_key_stage_all_selected_routes_live"] is (
         stage_summary["all_selected_routes_live"]
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_stage",
+        source_summary=stage_summary,
+    )
     assert stage_summary["stages"][0]["preferred_env_key"] == "POLYGON_API_KEY"
     assert stage_summary["stages"][0]["provider_family"] == "market"
     assert stage_summary["stages"][0]["provider"] == "polygon"
@@ -9534,6 +9539,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     )
     assert payload["api_key_check_all_selected_routes_live"] is (
         check_summary["all_selected_routes_live"]
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_check",
+        source_summary=check_summary,
     )
     assert_pipeline_check_summary_top_level_fields(payload)
     assert all(
