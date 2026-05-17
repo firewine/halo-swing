@@ -1234,6 +1234,41 @@ def quickstart_command_plan_route_summary_from_payload(
     }
 
 
+def assert_quickstart_command_plan_list_count_fields(
+    payload: dict[str, Any],
+) -> None:
+    expected_live_check_counts_by_family = {
+        family: len(expected_live_checks)
+        for family, expected_live_checks in payload[
+            "api_key_setup_quickstart_command_plan_expected_live_checks_by_family"
+        ].items()
+    }
+    accepted_env_key_counts_by_family = {
+        family: len(accepted_env_keys)
+        for family, accepted_env_keys in payload[
+            "api_key_setup_quickstart_command_plan_accepted_env_keys_by_family"
+        ].items()
+    }
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_expected_live_check_counts_by_family"
+        ]
+        == expected_live_check_counts_by_family
+    )
+    assert payload[
+        "api_key_setup_quickstart_command_plan_expected_live_check_count"
+    ] == sum(expected_live_check_counts_by_family.values())
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_accepted_env_key_counts_by_family"
+        ]
+        == accepted_env_key_counts_by_family
+    )
+    assert payload[
+        "api_key_setup_quickstart_command_plan_accepted_env_key_count"
+    ] == sum(accepted_env_key_counts_by_family.values())
+
+
 def assert_pipeline_check_summary_top_level_fields(payload: dict[str, Any]) -> None:
     check_summary = payload["api_key_pipeline_check_summary"]
     first_failed_check = check_summary["first_failed_check"] or {}
@@ -7106,6 +7141,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_setup_quickstart_command_plan",
         source_summary=quickstart_command_plan_route_summary_from_payload(payload),
     )
+    assert_quickstart_command_plan_list_count_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -10607,6 +10643,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         prefix="api_key_setup_quickstart_command_plan",
         source_summary=quickstart_command_plan_route_summary_from_payload(payload),
     )
+    assert_quickstart_command_plan_list_count_fields(payload)
     assert payload["api_key_setup_quickstart_next_command_plan_item"] == (
         payload["api_key_setup_quickstart_command_plan"][0]
     )
@@ -10916,6 +10953,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         prefix="api_key_setup_quickstart_command_plan",
         source_summary=quickstart_command_plan_route_summary_from_payload(payload),
     )
+    assert_quickstart_command_plan_list_count_fields(payload)
     assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
         row["provider_family"]: row["network_call_policy"]
         for row in command_summary["provider_smoke_commands"]

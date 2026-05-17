@@ -107,6 +107,14 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             provider_route_live_data_required_by_family
         ),
     }
+    expected_live_check_counts_by_family = {
+        row["provider_family"]: len(_string_list(row.get("expected_live_checks")))
+        for row in provider_rows
+    }
+    accepted_env_key_counts_by_family = {
+        row["provider_family"]: len(_string_list(row.get("accepted_env_keys")))
+        for row in provider_rows
+    }
     return {
         "api_key_setup_quickstart_command_plan_provider_families": (
             provider_families
@@ -289,6 +297,12 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         **_api_key_quickstart_command_plan_route_count_top_level_fields(
             provider_route_summary
         ),
+        "api_key_setup_quickstart_command_plan_expected_live_check_count": sum(
+            expected_live_check_counts_by_family.values()
+        ),
+        "api_key_setup_quickstart_command_plan_expected_live_check_counts_by_family": (
+            expected_live_check_counts_by_family
+        ),
         "api_key_setup_quickstart_command_plan_expected_live_contracts_by_family": {
             row["provider_family"]: row.get("expected_live_contract")
             for row in provider_rows
@@ -297,6 +311,12 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             row["provider_family"]: _string_list(row.get("expected_live_checks"))
             for row in provider_rows
         },
+        "api_key_setup_quickstart_command_plan_accepted_env_key_count": sum(
+            accepted_env_key_counts_by_family.values()
+        ),
+        "api_key_setup_quickstart_command_plan_accepted_env_key_counts_by_family": (
+            accepted_env_key_counts_by_family
+        ),
         "api_key_setup_quickstart_command_plan_preferred_env_key_by_family": {
             row["provider_family"]: row.get("preferred_env_key")
             for row in provider_rows

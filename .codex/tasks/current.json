@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_COUNT_FIELDS_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_LIST_COUNT_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.931",
-  "next_atomic_step": "surface summary-only API-key quickstart command plan route count fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.932",
+  "next_atomic_step": "surface summary-only API-key quickstart command plan list count fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -11,7 +11,6 @@
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
@@ -19,10 +18,9 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.931",
+    "docs/halo-swing-development-plan.md#3.932",
     "README.md",
     "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
@@ -59,13 +57,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output mirrors API-key quickstart command plan route family, selected provider, live-required, and data-mode count fields",
-    "summary-only tests prove quickstart command plan route count fields match their route maps",
-    "README and DevOps guide document the top-level API-key quickstart command plan route count fields",
+    "summary-only output mirrors API-key quickstart command plan expected live-check and accepted env-key count fields",
+    "summary-only tests prove quickstart command plan list count fields match their by-family list maps",
+    "README and DevOps guide document the top-level API-key quickstart command plan list count fields",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan list count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

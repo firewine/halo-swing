@@ -413,6 +413,60 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.932 API Key Quickstart Command Plan List Count Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.931까지 quickstart command plan route evidence는 compact client가 map 순회 없이
+route count를 읽을 수 있다. 하지만 provider-family별 `expected_live_checks`와
+`accepted_env_keys`는 list map으로만 노출되어, API-key-only setup 화면이 live-check
+수와 허용 env-key alias 수를 표시하려면 각 list 길이를 직접 계산해야 한다. 이번 slice는
+quickstart command plan의 list count를 top-level로 제공한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors API-key quickstart command plan expected live-check total and per-family count fields
+  - summary-only output mirrors API-key quickstart command plan accepted env-key total and per-family count fields
+  - summary-only tests prove quickstart command plan list count fields match their by-family list maps
+  - README and DevOps guide document the top-level API-key quickstart command plan list count fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.931 API Key Quickstart Command Plan Route Count Fields Gate Record - 2026-05-18
 
 ### A. 목적
