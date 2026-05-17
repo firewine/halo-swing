@@ -769,6 +769,31 @@ def test_setup_docs_keep_api_key_command_summary_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_setup_file_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_setup_file_summary",
+        "api_key_setup_file_summary.v1",
+        "source_path",
+        "target_path",
+        "source_exists",
+        "target_exists",
+        "copy_required",
+        "copy_command",
+        "preferred_env_keys",
+        "dotenv_examples",
+        "configured_provider_families",
+        "missing_provider_families",
+        "next_setup_step",
+        "ready_to_run_live_smoke",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
