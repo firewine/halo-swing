@@ -141,6 +141,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.904 API Key Pipeline CLI Exported-Env Summary Gate Record - 2026-05-18
+
+### A. 목적
+
+3.902는 launch-directory `.env`에만 API 키가 있을 때 subprocess CLI harness가
+summary-only API-key pipeline에서 live provider route와 next smoke context를 읽는지
+고정했다. 하지만 실제 실행 환경에서는 shell, launch agent, CI secret injection처럼
+API 키가 exported environment variable로만 들어오는 경우도 있다. 이번 slice는
+launch-directory `.env` 없이 exported API keys와 disabled dotenv isolation만으로
+`run_api_key_pipeline_smoke --summary-only --no-audit`가 live provider route와 next
+provider-smoke context를 인식하는지 회귀 테스트로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - add a subprocess readiness test that exports POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY only through the subprocess environment
+  - run PYTHONPATH=repo/src python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit from a temporary launch directory without a generated .env file
+  - assert summary-only output reports all provider families configured, no missing provider families, dotenv loading disabled for isolation, ready_to_run_live_smoke true, live provider routes selected, and next ready provider-smoke context present
+  - assert the temporary launch directory remains without a generated .env file
+  - assert serialized subprocess output excludes fake secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 833 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.901 API Key Quickstart Command Plan Next Ready/Blocked Context Gate Record - 2026-05-18
 
 ### A. 목적
