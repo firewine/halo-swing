@@ -536,6 +536,7 @@ It also mirrors per-family provider requirement hints as
 `api_key_provider_requirement_required_env_keys`,
 `api_key_provider_requirement_required_env_key_counts`,
 `api_key_provider_requirement_configured_env_keys`,
+`api_key_provider_requirement_configured_env_key_counts`,
 `api_key_provider_requirement_missing_env_keys`,
 `api_key_provider_requirement_missing_env_key_counts`,
 `api_key_provider_requirement_preferred_env_keys`,

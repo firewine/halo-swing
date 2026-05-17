@@ -1690,6 +1690,10 @@ def assert_api_key_requirements_summary_top_level_fields(
         family: row["configured_env_keys"]
         for family, row in provider_requirements.items()
     }
+    assert payload["api_key_provider_requirement_configured_env_key_counts"] == {
+        family: len(row["configured_env_keys"])
+        for family, row in provider_requirements.items()
+    }
     assert payload["api_key_provider_requirement_required_env_keys"] == {
         family: row["required_env_keys"]
         for family, row in provider_requirements.items()
@@ -10493,6 +10497,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "market": 1,
         "macro": 1,
         "news": 1,
+    }
+    assert payload["api_key_provider_requirement_configured_env_key_counts"] == {
+        "market": 1,
+        "macro": 0,
+        "news": 0,
     }
     assert payload["api_key_provider_requirement_missing_env_keys"] == {
         "market": [],
