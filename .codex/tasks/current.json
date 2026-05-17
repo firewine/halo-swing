@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_STATUS_ROUTE_COUNT_FIELDS_GATE",
+  "gate_id": "API_KEY_PROVIDER_SMOKE_ROUTE_COUNT_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.929",
-  "next_atomic_step": "surface summary-only API-key integration status route count fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.930",
+  "next_atomic_step": "surface summary-only API-key provider smoke route count fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -11,7 +11,7 @@
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
+    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
@@ -19,11 +19,11 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.929",
+    "docs/halo-swing-development-plan.md#3.930",
     "README.md",
     "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_fields.py",
+    "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
@@ -41,7 +41,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_status_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -59,13 +59,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output mirrors API-key integration status route family, selected provider, live-required, and data-mode count fields",
-    "summary-only tests prove integration status route count fields match their route maps",
-    "README and DevOps guide document the top-level API-key integration status route count fields",
+    "summary-only output mirrors API-key provider smoke route family, selected provider, live-required, and data-mode count fields",
+    "summary-only tests prove provider smoke route count fields match their route maps",
+    "README and DevOps guide document the top-level API-key provider smoke route count fields",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key integration status route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key provider smoke route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

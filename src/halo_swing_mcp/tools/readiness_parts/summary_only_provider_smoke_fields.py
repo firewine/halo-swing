@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 from .live_data_setup import _ordered_unique_strings, _string_list
+from .summary_only_provider_route_fields import (
+    _api_key_provider_smoke_route_count_top_level_fields,
+)
 
 
 __all__ = (
@@ -32,6 +35,32 @@ def _api_key_provider_smoke_top_level_fields(
     provider_route_live_data_required_by_family = _mapping_or_empty(
         setup_status_summary.get("provider_route_live_data_required_by_family")
     )
+    provider_smoke_selected_provider_class_by_family = {
+        family: row.get("selected_provider_class")
+        or selected_provider_class_by_family.get(family)
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_provider_route_data_mode_by_family = {
+        family: row.get("provider_route_data_mode")
+        or provider_route_data_mode_by_family.get(family)
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_provider_route_live_data_required_by_family = {
+        family: row.get("provider_route_live_data_required") is True
+        or provider_route_live_data_required_by_family.get(family) is True
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_route_summary = {
+        "selected_provider_class_by_family": (
+            provider_smoke_selected_provider_class_by_family
+        ),
+        "provider_route_data_mode_by_family": (
+            provider_smoke_provider_route_data_mode_by_family
+        ),
+        "provider_route_live_data_required_by_family": (
+            provider_smoke_provider_route_live_data_required_by_family
+        ),
+    }
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -112,21 +141,18 @@ def _api_key_provider_smoke_top_level_fields(
             family: row.get("status")
             for family, row in provider_smoke_command_rows_by_family.items()
         },
-        "api_key_provider_smoke_selected_provider_class_by_family": {
-            family: row.get("selected_provider_class")
-            or selected_provider_class_by_family.get(family)
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_provider_route_data_mode_by_family": {
-            family: row.get("provider_route_data_mode")
-            or provider_route_data_mode_by_family.get(family)
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_provider_route_live_data_required_by_family": {
-            family: row.get("provider_route_live_data_required") is True
-            or provider_route_live_data_required_by_family.get(family) is True
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
+        "api_key_provider_smoke_selected_provider_class_by_family": (
+            provider_smoke_selected_provider_class_by_family
+        ),
+        "api_key_provider_smoke_provider_route_data_mode_by_family": (
+            provider_smoke_provider_route_data_mode_by_family
+        ),
+        "api_key_provider_smoke_provider_route_live_data_required_by_family": (
+            provider_smoke_provider_route_live_data_required_by_family
+        ),
+        **_api_key_provider_smoke_route_count_top_level_fields(
+            provider_smoke_route_summary
+        ),
         "api_key_provider_smoke_network_call_policies_by_family": {
             family: row.get("network_call_policy")
             for family, row in provider_smoke_command_rows_by_family.items()

@@ -1202,6 +1202,22 @@ def assert_route_count_top_level_fields(
     )
 
 
+def provider_smoke_route_summary_from_payload(
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "selected_provider_class_by_family": payload[
+            "api_key_provider_smoke_selected_provider_class_by_family"
+        ],
+        "provider_route_data_mode_by_family": payload[
+            "api_key_provider_smoke_provider_route_data_mode_by_family"
+        ],
+        "provider_route_live_data_required_by_family": payload[
+            "api_key_provider_smoke_provider_route_live_data_required_by_family"
+        ],
+    }
+
+
 def assert_pipeline_check_summary_top_level_fields(payload: dict[str, Any]) -> None:
     check_summary = payload["api_key_pipeline_check_summary"]
     first_failed_check = check_summary["first_failed_check"] or {}
@@ -7064,6 +7080,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_integration",
         source_summary=payload["api_key_integration_status_summary"],
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider_smoke",
+        source_summary=provider_smoke_route_summary_from_payload(payload),
+    )
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -10858,6 +10879,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
             row["provider_family"]: row["provider_route_live_data_required"]
             for row in command_summary["provider_smoke_commands"]
         }
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider_smoke",
+        source_summary=provider_smoke_route_summary_from_payload(payload),
     )
     assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
         row["provider_family"]: row["network_call_policy"]

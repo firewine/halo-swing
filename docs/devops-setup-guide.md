@@ -955,6 +955,10 @@ It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_selected_provider_class_by_family`,
 `api_key_provider_smoke_provider_route_data_mode_by_family`,
 `api_key_provider_smoke_provider_route_live_data_required_by_family`,
+`api_key_provider_smoke_provider_route_family_count`,
+`api_key_provider_smoke_selected_provider_family_count`,
+`api_key_provider_smoke_provider_route_live_data_required_family_count`,
+`api_key_provider_smoke_provider_route_data_mode_counts`,
 `api_key_provider_smoke_network_call_policies_by_family`,
 `api_key_provider_smoke_next_setup_actions_by_family`,
 `api_key_provider_smoke_expected_live_contracts_by_family`, and
