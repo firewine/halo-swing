@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_SUMMARY_POLICY_AGGREGATE_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_SUMMARY_POLICY_AGGREGATE_GATE
+status: API_KEY_PROVIDER_RECOVERY_SUMMARY_STATUS_AGGREGATE_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SUMMARY_STATUS_AGGREGATE_GATE
 review_tier: S1_small
 
-next_atomic_step: add aggregate recovery network-call policy field to API-key provider recovery summary
+next_atomic_step: add aggregate recovery item status fields to API-key provider recovery summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -76,25 +76,38 @@ required_verification:
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_network_call_policies"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_statuses"], summary["provider_recovery_pending_count"], summary["provider_recovery_blocked_count"], summary["provider_recovery_all_pending"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_provider_recovery_summary includes provider_recovery_network_call_policies for compact recovery items
-  - provider_recovery_network_call_policies preserves ordered unique no-secret network-call policy values
-  - provider_recovery_network_call_policies returns an empty list when no recovery items exist
-  - focused tests cover aggregate recovery network-call policy field in summary_only API-key provider recovery summary
-  - fake-key API-key pipeline summary-only CLI returns aggregate recovery network-call policy field without secret values
-  - README and DevOps setup guide document aggregate recovery network-call policy field
-  - setup docs tests assert aggregate recovery network-call policy field guidance
+  - api_key_provider_recovery_summary includes provider_recovery_statuses for compact recovery items
+  - api_key_provider_recovery_summary includes provider_recovery_pending_count and provider_recovery_blocked_count
+  - api_key_provider_recovery_summary includes provider_recovery_all_pending
+  - compact recovery items include recovery_status without secret values
+  - status aggregate fields return empty list, zero counts, and false all-pending when no recovery items exist
+  - focused tests cover aggregate recovery status fields in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns aggregate recovery status fields without secret values
+  - README and DevOps setup guide document aggregate recovery status fields
+  - setup docs tests assert aggregate recovery status field guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery summary policy aggregate gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider recovery summary status aggregate gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_SUMMARY_POLICY_AGGREGATE_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SUMMARY_POLICY_AGGREGATE_GATE
+review_tier: S1_small
+
+next_atomic_step: add aggregate recovery network-call policy field to API-key provider recovery summary
 ```
 
 Previous completed directive:
@@ -2507,6 +2520,65 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Recovery Summary Status Aggregate Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes
+`provider_recovery_statuses`, `provider_recovery_pending_count`,
+`provider_recovery_blocked_count`, and `provider_recovery_all_pending` at the
+top level of `api_key_provider_recovery_summary`, and compact recovery items
+now include no-secret `recovery_status`. The compact summary can show whether
+all provider recovery rows are immediately retryable without reading item rows
+and without returning secret values. Focused tests, fake-key CLI, full pytest,
+ruff, and health_check passed.
+
+```yaml
+api_key_provider_recovery_summary_status_aggregate_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_recovery_summary includes provider_recovery_statuses for compact recovery items
+    - api_key_provider_recovery_summary includes provider_recovery_pending_count and provider_recovery_blocked_count
+    - api_key_provider_recovery_summary includes provider_recovery_all_pending
+    - compact recovery items include recovery_status without secret values
+    - status aggregate fields return empty list, zero counts, and false all-pending when no recovery items exist
+    - focused tests cover aggregate recovery status fields in summary_only API-key provider recovery summary
+    - fake-key API-key pipeline summary-only CLI returns aggregate recovery status fields without secret values
+    - README and DevOps setup guide document aggregate recovery status fields
+    - tests/test_setup_docs.py asserts aggregate recovery status field guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only aggregate recovery status fields returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_statuses"], summary["provider_recovery_pending_count"], summary["provider_recovery_blocked_count"], summary["provider_recovery_all_pending"], summary["secret_values_returned"])'
+      result: "['pending'] 3 0 True False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "792 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Summary Policy Aggregate Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now exposes

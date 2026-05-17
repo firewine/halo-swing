@@ -2723,6 +2723,10 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_network_call_policies": [
             "only_when_matching_api_key_selects_live_provider"
         ],
+        "provider_recovery_statuses": ["pending"],
+        "provider_recovery_pending_count": 3,
+        "provider_recovery_blocked_count": 0,
+        "provider_recovery_all_pending": True,
         "provider_recovery_provider_families": ["market", "macro", "news"],
         "provider_recovery_providers": ["polygon", "fred", "newsapi"],
         "provider_recovery_smoke_command_names": [
@@ -2807,6 +2811,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "recovery_status": "pending",
                 "network_call": True,
                 "mutates_local_state": False,
                 "exception_type": "RuntimeError",
@@ -2832,6 +2837,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "recovery_status": "pending",
                 "network_call": True,
                 "mutates_local_state": False,
                 "exception_type": "RuntimeError",
@@ -2856,6 +2862,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "recovery_status": "pending",
                 "network_call": True,
                 "mutates_local_state": False,
                 "exception_type": "RuntimeError",
@@ -4952,6 +4959,10 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_url_returned_count": 0,
         "provider_recovery_any_urls_returned": False,
         "provider_recovery_network_call_policies": [],
+        "provider_recovery_statuses": [],
+        "provider_recovery_pending_count": 0,
+        "provider_recovery_blocked_count": 0,
+        "provider_recovery_all_pending": False,
         "provider_recovery_provider_families": [],
         "provider_recovery_providers": [],
         "provider_recovery_smoke_command_names": [],

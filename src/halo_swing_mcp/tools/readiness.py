@@ -2654,6 +2654,12 @@ def _api_key_provider_recovery_summary(
     url_returned_count = sum(
         1 for item in compact_items if item.get("url_returned") is True
     )
+    recovery_pending_count = sum(
+        1 for item in compact_items if item.get("recovery_status") == "pending"
+    )
+    recovery_blocked_count = sum(
+        1 for item in compact_items if item.get("recovery_status") == "blocked"
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2698,6 +2704,14 @@ def _api_key_provider_recovery_summary(
         "provider_recovery_any_urls_returned": url_returned_count > 0,
         "provider_recovery_network_call_policies": _ordered_unique_strings(
             [item.get("network_call_policy") for item in compact_items]
+        ),
+        "provider_recovery_statuses": _ordered_unique_strings(
+            [item.get("recovery_status") for item in compact_items]
+        ),
+        "provider_recovery_pending_count": recovery_pending_count,
+        "provider_recovery_blocked_count": recovery_blocked_count,
+        "provider_recovery_all_pending": (
+            bool(compact_items) and recovery_pending_count == len(compact_items)
         ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
@@ -2785,12 +2799,14 @@ def _api_key_provider_recovery_summary_item(
     item: dict[str, Any],
 ) -> dict[str, Any]:
     recovery_smoke = _optional_mapping(item.get("recovery_smoke")) or {}
+    recovery_smoke_available = item.get("recovery_smoke_available") is True
     summary = {
         "provider_family": item.get("provider_family"),
         "provider": item.get("provider"),
         "smoke_command_name": item.get("smoke_command_name"),
         "recovery_smoke_command": item.get("recovery_smoke_command"),
-        "recovery_smoke_available": item.get("recovery_smoke_available") is True,
+        "recovery_smoke_available": recovery_smoke_available,
+        "recovery_status": "pending" if recovery_smoke_available else "blocked",
         "next_setup_action": item.get("next_setup_action"),
         "preferred_env_key": item.get("preferred_env_key"),
         "accepted_env_keys": _string_list(item.get("accepted_env_keys")),
