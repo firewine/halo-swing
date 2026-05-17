@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.787 API Key Integration Status Next Pending Recovery Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 첫 pending recovery smoke command를 보여주지만,
+상위 `api_key_integration_status_summary`만 확인하는 operator는 API key 입력 후 바로
+실행할 provider recovery command를 찾기 위해 nested summary를 다시 열어야 했다. 이번
+slice는 no-secret `next_pending_recovery_smoke_command_name`,
+`next_pending_recovery_smoke_command`, provider identity, setup-action, env-key hint,
+network-call policy, safety flags를 integration status summary로 올려, API-key-only
+summary row만으로 다음 recovery smoke를 실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary includes next_pending_recovery_smoke_command_name and next_pending_recovery_smoke_command copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes next_pending_recovery_provider_family and next_pending_recovery_provider
+  - api_key_integration_status_summary includes next_pending_recovery_next_setup_action, next_pending_recovery_preferred_env_key, next_pending_recovery_accepted_env_keys, and next_pending_recovery_network_call_policy
+  - api_key_integration_status_summary includes next_pending_recovery_smoke_available, next_pending_recovery_network_call, next_pending_recovery_mutates_local_state, and next_pending_recovery_secret_values_returned safety fields
+  - fake-key API-key pipeline summary-only CLI returns integration status next pending recovery command fields without secret values
+  - blocked setup summary returns null, empty-list, or false next pending recovery fields without secret values
+  - ready fake-live summary returns null, empty-list, or false next pending recovery fields without secret values
+  - focused tests cover integration status next pending recovery fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document integration status next pending recovery fields
+  - tests/test_setup_docs.py asserts integration status next pending recovery field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only integration status next pending recovery fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["next_pending_recovery_smoke_command_name"], summary["next_pending_recovery_provider_family"], summary["next_pending_recovery_provider"], summary["next_pending_recovery_smoke_available"], summary["next_pending_recovery_network_call"], summary["next_pending_recovery_secret_values_returned"], summary["secret_values_returned"])': get_market_snapshot_live_smoke market polygon True True False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 795 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.786 API Key Integration Status Recovery Action Gate Record - 2026-05-17
 
 ### A. 목적

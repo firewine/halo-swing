@@ -137,6 +137,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_all_retryable" in guide
     assert "provider_recovery_has_pending" in guide
     assert "provider_recovery_has_blocked" in guide
+    assert "mirrors the first pending recovery command" in guide
     assert "next action summary carries provider smoke" in guide
     assert "next_action_provider_family" in guide
     assert "next_action_provider" in guide

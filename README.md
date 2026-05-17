@@ -518,7 +518,19 @@ provider selection, failure, and next-action evidence into one operator row with
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`, plus `provider_recovery_action_status`,
 `provider_recovery_retry_ready`, `provider_recovery_all_retryable`,
-`provider_recovery_has_pending`, and `provider_recovery_has_blocked`. When the
+`provider_recovery_has_pending`, and `provider_recovery_has_blocked`. It also
+mirrors the first pending recovery command as
+`next_pending_recovery_smoke_command_name`,
+`next_pending_recovery_smoke_command`,
+`next_pending_recovery_provider_family`, `next_pending_recovery_provider`,
+`next_pending_recovery_next_setup_action`,
+`next_pending_recovery_preferred_env_key`,
+`next_pending_recovery_accepted_env_keys`,
+`next_pending_recovery_network_call_policy`,
+`next_pending_recovery_smoke_available`,
+`next_pending_recovery_network_call`,
+`next_pending_recovery_mutates_local_state`, and
+`next_pending_recovery_secret_values_returned`. When the
 next action summary carries provider smoke
 or recovery metadata, it also includes `preferred_env_key` and
 `accepted_env_keys`, so a key-only live setup can be checked with provider
