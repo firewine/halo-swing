@@ -2584,6 +2584,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         },
         "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
         "preferred_env_key_count": 3,
+        "dotenv_examples": [
+            "POLYGON_API_KEY=your_polygon_key",
+            "FRED_API_KEY=your_fred_key",
+            "NEWS_API_KEY=your_newsapi_key",
+        ],
+        "dotenv_example_count": 3,
         "configured_provider_families": ["market", "macro", "news"],
         "missing_provider_families": [],
         "configured_provider_family_count": 3,
@@ -4874,6 +4880,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         },
         "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
         "preferred_env_key_count": 3,
+        "dotenv_examples": [
+            "POLYGON_API_KEY=your_polygon_key",
+            "FRED_API_KEY=your_fred_key",
+            "NEWS_API_KEY=your_newsapi_key",
+        ],
+        "dotenv_example_count": 3,
         "configured_provider_families": ["market", "macro", "news"],
         "missing_provider_families": [],
         "configured_provider_family_count": 3,
@@ -5618,6 +5630,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "NEWS_API_KEY",
         ],
         "preferred_env_key_count": 3,
+        "dotenv_examples": [
+            "POLYGON_API_KEY=your_polygon_key",
+            "FRED_API_KEY=your_fred_key",
+            "NEWS_API_KEY=your_newsapi_key",
+        ],
+        "dotenv_example_count": 3,
         "configured_provider_families": [],
         "missing_provider_families": ["market", "macro", "news"],
         "configured_provider_family_count": 0,
@@ -6310,6 +6328,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
         "FRED_API_KEY",
         "NEWS_API_KEY",
     ]
+    assert setup_file_summary["dotenv_examples"] == [
+        "POLYGON_API_KEY=your_polygon_key",
+        "FRED_API_KEY=your_fred_key",
+        "NEWS_API_KEY=your_newsapi_key",
+    ]
+    assert setup_file_summary["dotenv_example_count"] == 3
     assert setup_file_summary["configured_provider_families"] == [
         "market",
         "macro",
@@ -7350,6 +7374,12 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "FRED_API_KEY",
         "NEWS_API_KEY",
     ]
+    assert payload["api_key_setup_file_summary"]["dotenv_examples"] == [
+        "POLYGON_API_KEY=your_polygon_key",
+        "FRED_API_KEY=your_fred_key",
+        "NEWS_API_KEY=your_newsapi_key",
+    ]
+    assert payload["api_key_setup_file_summary"]["dotenv_example_count"] == 3
     assert payload["api_key_setup_file_summary"]["missing_provider_families"] == [
         "market",
         "macro",

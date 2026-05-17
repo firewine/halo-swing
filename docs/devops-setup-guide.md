@@ -610,9 +610,10 @@ compact response without requiring input JSON edits.
 It keeps `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) with `.env.example`/`.env` source and target
 status, `copy_required`, `copy_command`, `preferred_env_keys`,
-configured/missing provider families, and `ready_to_run_live_smoke`, so the
-compact response still shows whether the local setup file must be copied before
-API keys are filled.
+`dotenv_examples`, configured/missing provider families, and
+`ready_to_run_live_smoke`, so the compact response still shows whether the local
+setup file must be copied and which no-secret `KEY=placeholder` lines to fill
+before API keys are entered.
 It keeps `api_key_dotenv_loading_summary`
 (`api_key_dotenv_loading_summary.v1`) with `dotenv_loading_enabled`,
 `disabled`, `disabled_env_key`, `configuration_precedence`, `.env` file status,
@@ -751,7 +752,7 @@ failure summary provider identity is visible in compact output. The
 top-level `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) keeps `.env.example` and `.env` setup state
 visible with `source_path`, `target_path`, `source_exists`, `target_exists`,
-`copy_required`, `copy_command`, `preferred_env_keys`,
+`copy_required`, `copy_command`, `preferred_env_keys`, `dotenv_examples`,
 `configured_provider_families`, `missing_provider_families`,
 `next_setup_step`, and `ready_to_run_live_smoke`, without returning secret
 values or mutating files. The top-level `api_key_dotenv_loading_summary`

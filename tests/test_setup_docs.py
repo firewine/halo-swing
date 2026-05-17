@@ -133,6 +133,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "target_exists" in guide
     assert "copy_required" in guide
     assert "preferred_env_keys" in guide
+    assert "dotenv_examples" in guide
     assert "api_key_dotenv_loading_summary" in guide
     assert "api_key_dotenv_loading_summary.v1" in guide
     assert "dotenv_supported" in guide
@@ -352,6 +353,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "keeps `api_key_setup_file_summary`" in guide
     assert "api_key_setup_file_summary.v1" in guide
     assert "preferred_env_keys" in guide
+    assert "dotenv_examples" in guide
+    assert "KEY=placeholder" in guide
     assert "copy_command" in guide
     assert "copy_required" in guide
     assert "keeps `api_key_dotenv_loading_summary`" in guide

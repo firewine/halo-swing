@@ -3911,6 +3911,11 @@ def _api_key_setup_file_summary(
         for entry in template_entries
         if isinstance(entry, dict) and isinstance(entry.get("preferred_env_key"), str)
     ]
+    dotenv_examples = [
+        entry["example"]
+        for entry in template_entries
+        if isinstance(entry, dict) and isinstance(entry.get("example"), str)
+    ]
     return {
         "schema_version": "api_key_setup_file_summary.v1",
         "source_path": dotenv_file_status.get("source_path"),
@@ -3921,6 +3926,8 @@ def _api_key_setup_file_summary(
         "copy_command": _optional_mapping(dotenv_file_status.get("copy_command")),
         "preferred_env_keys": preferred_env_keys,
         "preferred_env_key_count": len(preferred_env_keys),
+        "dotenv_examples": dotenv_examples,
+        "dotenv_example_count": len(dotenv_examples),
         "configured_provider_families": _string_list(
             provider_family_summary.get("configured_provider_families")
         ),

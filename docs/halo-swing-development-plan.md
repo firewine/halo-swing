@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.815 API Key Setup File Summary Dotenv Examples Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_setup_file_summary`는 `.env.example`/`.env` 상태와 `preferred_env_keys`를
+compact payload에 노출하지만, 실제 사용자가 `.env`에 채울 `KEY=placeholder` 예시는
+`dotenv_template.entries[]`까지 내려가야 확인할 수 있다. 실제 API 키만 교체하면 되는
+연동 흐름을 더 직접적으로 만들기 위해, 이번 slice는 setup file summary에 no-secret
+`dotenv_examples`와 count를 미러링한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_setup_file_summary exposes dotenv_examples copied from live_data_setup_summary.dotenv_template entries
+  - api_key_setup_file_summary exposes dotenv_example_count matching the no-secret example line count
+  - summary-only API-key pipeline payload keeps setup file examples without returning API key values
+  - README and DevOps setup guide document dotenv_examples on api_key_setup_file_summary
+  - setup docs tests assert setup file summary example guidance
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.814 API Key Pipeline No-Input Summary Command Gate Record - 2026-05-17
 
 ### A. 목적
