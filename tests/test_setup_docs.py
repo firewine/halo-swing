@@ -1033,6 +1033,27 @@ def test_setup_docs_keep_api_key_next_action_summary_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_command_summary",
+        "api_key_operator_checklist",
+        "setup_status_summary",
+        "next_provider_smoke",
+        "next_provider_smoke_command_name",
+        "api_key_next_provider_smoke_command_name",
+        "api_key_next_provider_smoke_provider_family",
+        "api_key_next_provider_smoke_provider",
+        "api_key_next_provider_smoke_command",
+        "api_key_next_provider_smoke_status",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

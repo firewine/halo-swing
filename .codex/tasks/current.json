@@ -1,22 +1,20 @@
 {
-  "gate_id": "API_KEY_SETUP_DOCS_NEXT_ACTION_SUMMARY_PARITY_GATE",
+  "gate_id": "API_KEY_SETUP_DOCS_NEXT_PROVIDER_SMOKE_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.853",
-  "next_atomic_step": "lock README and DevOps API-key next action summary field parity",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.854",
+  "next_atomic_step": "lock README and DevOps API-key next provider smoke field parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "docs/devops-setup-guide.md",
-    "README.md",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.853",
+    "docs/halo-swing-development-plan.md#3.854",
     "README.md",
     "docs/devops-setup-guide.md",
     "tests/test_setup_docs.py"
@@ -35,7 +33,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -53,12 +51,12 @@
     "read_only": true
   },
   "done_means": [
-    "README and DevOps setup guide coverage assert the same API-key next action summary status, readiness, blocking, and provider recovery field names",
-    "README and DevOps setup guide coverage assert the same next action command, provider identity, env-key hint, dotenv example, network, and mutation field names",
+    "README and DevOps setup guide coverage assert the same top-level command summary, checklist, and setup status summary next provider smoke object and command-name field names",
+    "README and DevOps setup guide coverage assert the same top-level API-key next provider smoke command, provider identity, and status scalar field names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified README/DevOps next action summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README/DevOps next provider smoke parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
