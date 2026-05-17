@@ -8656,6 +8656,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_check_count"
+        ]
+        == len(first_ready_command_row.get("expected_live_checks", []))
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key"
         ]
         == first_ready_command_row.get("preferred_env_key")
@@ -8665,6 +8671,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_keys"
         ]
         == first_ready_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_accepted_env_key_count"
+        ]
+        == len(first_ready_command_row.get("accepted_env_keys", []))
     )
     assert (
         payload[
@@ -8785,6 +8797,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_check_count"
+        ]
+        == len(first_blocked_command_row.get("expected_live_checks", []))
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_preferred_env_key"
         ]
         == first_blocked_command_row.get("preferred_env_key")
@@ -8794,6 +8812,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_keys"
         ]
         == first_blocked_command_row.get("accepted_env_keys", [])
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_accepted_env_key_count"
+        ]
+        == len(first_blocked_command_row.get("accepted_env_keys", []))
     )
     assert (
         payload[
