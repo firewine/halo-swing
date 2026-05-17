@@ -618,8 +618,11 @@ Each sub-smoke summary also includes stage-level setup fields such as
 `ready_provider_smoke_count`, `blocked_provider_smoke_count`, and
 `next_smoke_command_name`. Provider or network failures during live sub-smokes
 are reported as no-secret `conflict` payloads without returning exception
-messages, URLs, or API key values. When provider failures occur,
-`provider_error_summaries`, `provider_error_summary_count`,
+messages, URLs, or API key values. Direct provider smoke `error_summary` rows
+include no-secret `preferred_env_key`, `accepted_env_keys`,
+`expected_live_contract`, and `expected_live_checks` so the failing API-key
+source and success contract are visible without exposing the key. When provider
+failures occur, `provider_error_summaries`, `provider_error_summary_count`,
 `failed_provider_families`, `failed_provider_count`,
 `first_provider_error_summary`, `next_provider_recovery_action`,
 `next_provider_recovery_smoke`, `next_provider_recovery_smoke_command_name`,

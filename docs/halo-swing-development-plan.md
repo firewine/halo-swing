@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.803 API Key Provider Error Hints Gate Record - 2026-05-17
+
+### A. 목적
+
+API key 입력 후 개별 provider smoke 명령이 provider/network 예외로 실패하면
+`error_summary`는 provider와 exception type만 보여준다. pipeline summary에는 recovery
+smoke와 env-key hint가 있지만, operator가 개별 smoke payload만 확인하는 경우 다시
+pipeline summary를 찾아야 한다. 이번 slice는 direct provider smoke failure row에
+no-secret `preferred_env_key`, `accepted_env_keys`, `expected_live_contract`,
+`expected_live_checks`를 추가해, API 키만 넣고 실행한 실제 연동 검증 실패도 바로
+다음 수정 포인트와 성공 판정 기준을 보여주게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - direct provider smoke error_summary exposes preferred_env_key and accepted_env_keys for market, macro, and news
+  - direct provider smoke error_summary exposes expected_live_contract and expected_live_checks for market, macro, and news
+  - provider exception tests prove exception messages, URLs, API key values, and secret values are not returned
+  - README and DevOps setup guide document direct provider error-summary hints
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.market import get_market_snapshot; from halo_swing_mcp.providers import PolygonMarketDataProvider; import halo_swing_mcp.tools.market as market; provider=PolygonMarketDataProvider(api_key="fake", http_get=lambda url: (_ for _ in ()).throw(RuntimeError("provider failed at https://provider.example/?apiKey=fake"))); market.get_market_data_provider=lambda: provider; payload=get_market_snapshot(["QQQ"]); error=payload["error_summary"]; print(error["preferred_env_key"], ",".join(error["accepted_env_keys"]), error["expected_live_contract"], ",".join(error["expected_live_checks"]), payload["secret_values_returned"])': POLYGON_API_KEY HALO_SWING_MARKET_DATA_API_KEY,POLYGON_API_KEY market_snapshot_contract live_data_boundary_declared False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.802 API Key Readiness Summary Expected Contract Gate Record - 2026-05-17
 
 ### A. 목적

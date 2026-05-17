@@ -43,6 +43,43 @@ REQUIRED_NEWS_SOURCE_GROUPS = [
     "ai_semiconductor",
 ]
 PROVIDER_SMOKE_ERROR_SCHEMA_VERSION = "provider_smoke_error.v1"
+PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
+    "market": {
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
+        "expected_live_contract": "market_snapshot_contract",
+        "expected_live_checks": ["live_data_boundary_declared"],
+    },
+    "macro": {
+        "preferred_env_key": "FRED_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MACRO_API_KEY",
+            "HALO_SWING_FRED_API_KEY",
+            "FRED_API_KEY",
+        ],
+        "expected_live_contract": "macro_filter_contract",
+        "expected_live_checks": [
+            "live_data_boundary_declared",
+            "network_call_declared",
+        ],
+    },
+    "news": {
+        "preferred_env_key": "NEWS_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_NEWS_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "expected_live_contract": "news_source_policy_contract",
+        "expected_live_checks": [
+            "live_data_boundary_declared",
+            "network_call_declared",
+            "secret_values_not_returned",
+        ],
+    },
+}
 
 
 def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
@@ -292,13 +329,18 @@ def _provider_smoke_error_summary(
     provider: str,
     smoke_command_name: str,
 ) -> dict[str, Any]:
+    hints = PROVIDER_SMOKE_ERROR_HINTS.get(provider_family, {})
     return {
         "schema_version": PROVIDER_SMOKE_ERROR_SCHEMA_VERSION,
         "tool": tool,
         "provider_family": provider_family,
         "provider": provider,
         "smoke_command_name": smoke_command_name,
+        "preferred_env_key": hints.get("preferred_env_key"),
+        "accepted_env_keys": hints.get("accepted_env_keys", []),
         "next_setup_action": "verify_provider_credentials_or_network",
+        "expected_live_contract": hints.get("expected_live_contract"),
+        "expected_live_checks": hints.get("expected_live_checks", []),
         "network_call_policy": "only_when_matching_provider_selects_live_route",
         "exception_type": type(exc).__name__,
         "exception_message_returned": False,

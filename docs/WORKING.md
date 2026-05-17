@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_READINESS_SUMMARY_EXPECTED_CONTRACT_VERIFIED
-gate_id: API_KEY_READINESS_SUMMARY_EXPECTED_CONTRACT_GATE
+status: API_KEY_PROVIDER_ERROR_HINTS_VERIFIED
+gate_id: API_KEY_PROVIDER_ERROR_HINTS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror next action expected live contract and checks into API-key readiness summary
+next_atomic_step: add no-secret env and expected contract hints to live provider smoke error summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,8 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -74,25 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); readiness=payload["readiness_summary"]; print(readiness["next_operator_action_expected_live_contract"], ",".join(readiness["next_operator_action_expected_live_checks"]), payload["next_operator_action_expected_live_contract"], payload["secret_values_returned"])'
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.market import get_market_snapshot; from halo_swing_mcp.providers import PolygonMarketDataProvider; import halo_swing_mcp.tools.market as market; provider=PolygonMarketDataProvider(api_key="fake", http_get=lambda url: (_ for _ in ()).throw(RuntimeError("provider failed at https://provider.example/?apiKey=fake"))); market.get_market_data_provider=lambda: provider; payload=get_market_snapshot(["QQQ"]); error=payload["error_summary"]; print(error["preferred_env_key"], ",".join(error["accepted_env_keys"]), error["expected_live_contract"], ",".join(error["expected_live_checks"]), payload["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - API-key readiness summary includes next_operator_action_expected_live_contract and next_operator_action_expected_live_checks for provider smoke and provider recovery actions without returning secret values
-  - API-key readiness summary expected live contract/check fields match the summary-only top-level next operator expected fields
-  - focused tests cover readiness summary expected live contract/check fields in ready API-key summary_only output
-  - README and DevOps setup guide document readiness summary next operator expected live contract/check fields
-  - setup docs tests assert readiness summary expected contract/check guidance
+  - direct live provider smoke error summaries include preferred_env_key and accepted_env_keys without returning secret values
+  - direct live provider smoke error summaries include expected_live_contract and expected_live_checks for market, macro, and news provider smokes
+  - provider exception tests prove URLs, exception messages, API key values, and secret values are not returned
+  - README and DevOps setup guide document direct provider smoke error summary env and expected contract/check hints
+  - setup docs tests assert direct provider error-summary hint guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key readiness summary expected contract gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider error hints gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_READINESS_SUMMARY_EXPECTED_CONTRACT_VERIFIED
+gate_id: API_KEY_READINESS_SUMMARY_EXPECTED_CONTRACT_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror next action expected live contract and checks into API-key readiness summary
 ```
 
 Previous completed directive:
@@ -2769,6 +2779,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Error Hints Gate is verified.
+Direct live provider smoke error summaries now expose no-secret env-key and
+expected live contract/check hints for market, macro, and news provider
+failures. Focused provider exception tests, direct no-secret failure smoke,
+full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_provider_error_hints_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/market.py
+    - tests/test_providers.py
+    - tests/test_setup_docs.py
+  implementation:
+    - direct live provider smoke error summaries include preferred_env_key and accepted_env_keys without returning secret values
+    - direct live provider smoke error summaries include expected_live_contract and expected_live_checks for market, macro, and news provider smokes
+    - provider exception tests prove URLs, exception messages, API key values, and secret values are not returned
+    - README and DevOps setup guide document direct provider smoke error summary env and expected contract/check hints
+    - tests/test_setup_docs.py asserts direct provider error-summary hint guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.market import get_market_snapshot; from halo_swing_mcp.providers import PolygonMarketDataProvider; import halo_swing_mcp.tools.market as market; provider=PolygonMarketDataProvider(api_key="fake", http_get=lambda url: (_ for _ in ()).throw(RuntimeError("provider failed at https://provider.example/?apiKey=fake"))); market.get_market_data_provider=lambda: provider; payload=get_market_snapshot(["QQQ"]); error=payload["error_summary"]; print(error["preferred_env_key"], ",".join(error["accepted_env_keys"]), error["expected_live_contract"], ",".join(error["expected_live_checks"]), payload["secret_values_returned"])'
+      result: "POLYGON_API_KEY HALO_SWING_MARKET_DATA_API_KEY,POLYGON_API_KEY market_snapshot_contract live_data_boundary_declared False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "796 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Readiness Summary Expected Contract Gate is verified.
 API-key readiness summary now exposes no-secret next operator expected live
