@@ -2154,6 +2154,18 @@ def _api_key_pipeline_stage_row(
         next_provider_recovery_smoke.get("accepted_env_keys")
         or provider_setup_action.get("accepted_env_keys")
     )
+    provider = next_provider_recovery_smoke.get("provider") or (
+        provider_setup_action.get("provider")
+    )
+    smoke_command_name = next_provider_recovery_smoke.get(
+        "smoke_command_name"
+    ) or stage_summary.get("next_provider_recovery_smoke_command_name")
+    if isinstance(provider_family, str):
+        row["provider_family"] = provider_family
+    if isinstance(provider, str):
+        row["provider"] = provider
+    if isinstance(smoke_command_name, str):
+        row["smoke_command_name"] = smoke_command_name
     if isinstance(preferred_env_key, str):
         row["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
@@ -2214,15 +2226,25 @@ def _api_key_pipeline_stage_recovery_hints_by_tool(
         stage_name = stage_row.get("stage_name")
         preferred_env_key = stage_row.get("preferred_env_key")
         accepted_env_keys = _string_list(stage_row.get("accepted_env_keys"))
+        provider_family = stage_row.get("provider_family")
+        provider = stage_row.get("provider")
+        smoke_command_name = stage_row.get("smoke_command_name")
         if (
             isinstance(stage_name, str)
             and isinstance(preferred_env_key, str)
             and accepted_env_keys
         ):
-            hints_by_tool[stage_name] = {
+            hint = {
                 "preferred_env_key": preferred_env_key,
                 "accepted_env_keys": accepted_env_keys,
             }
+            if isinstance(provider_family, str):
+                hint["provider_family"] = provider_family
+            if isinstance(provider, str):
+                hint["provider"] = provider
+            if isinstance(smoke_command_name, str):
+                hint["smoke_command_name"] = smoke_command_name
+            hints_by_tool[stage_name] = hint
     return hints_by_tool
 
 
@@ -2245,6 +2267,15 @@ def _api_key_pipeline_check_row(
     if recovery_hint is not None:
         preferred_env_key = recovery_hint.get("preferred_env_key")
         accepted_env_keys = _string_list(recovery_hint.get("accepted_env_keys"))
+        provider_family = recovery_hint.get("provider_family")
+        provider = recovery_hint.get("provider")
+        smoke_command_name = recovery_hint.get("smoke_command_name")
+        if isinstance(provider_family, str):
+            row["provider_family"] = provider_family
+        if isinstance(provider, str):
+            row["provider"] = provider
+        if isinstance(smoke_command_name, str):
+            row["smoke_command_name"] = smoke_command_name
         if isinstance(preferred_env_key, str):
             row["preferred_env_key"] = preferred_env_key
         if accepted_env_keys:

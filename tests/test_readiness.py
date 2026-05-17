@@ -2385,6 +2385,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_provider_recovery_smoke_command_name": (
             "get_market_snapshot_live_smoke"
         ),
+        "provider_family": "market",
+        "provider": "polygon",
+        "smoke_command_name": "get_market_snapshot_live_smoke",
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -2414,6 +2417,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "passed": False,
             "expected": "ok",
             "actual": "conflict",
+            "provider_family": "market",
+            "provider": "polygon",
+            "smoke_command_name": "get_market_snapshot_live_smoke",
             "preferred_env_key": "POLYGON_API_KEY",
             "accepted_env_keys": [
                 "HALO_SWING_MARKET_DATA_API_KEY",
@@ -2429,6 +2435,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "passed": False,
                 "expected": "ok",
                 "actual": "conflict",
+                "provider_family": "market",
+                "provider": "polygon",
+                "smoke_command_name": "get_market_snapshot_live_smoke",
                 "preferred_env_key": "POLYGON_API_KEY",
                 "accepted_env_keys": [
                     "HALO_SWING_MARKET_DATA_API_KEY",
@@ -4990,11 +4999,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
     assert stage_summary["first_failed_stage"]["preferred_env_key"] == (
         "POLYGON_API_KEY"
     )
+    assert stage_summary["first_failed_stage"]["provider_family"] == "market"
+    assert stage_summary["first_failed_stage"]["provider"] == "polygon"
+    assert stage_summary["first_failed_stage"]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert stage_summary["first_failed_stage"]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
     assert stage_summary["stages"][0]["preferred_env_key"] == "POLYGON_API_KEY"
+    assert stage_summary["stages"][0]["provider_family"] == "market"
+    assert stage_summary["stages"][0]["provider"] == "polygon"
+    assert stage_summary["stages"][0]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert stage_summary["stages"][0]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
@@ -5047,12 +5066,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     assert check_summary["first_failed_check"]["preferred_env_key"] == (
         "POLYGON_API_KEY"
     )
+    assert check_summary["first_failed_check"]["provider_family"] == "market"
+    assert check_summary["first_failed_check"]["provider"] == "polygon"
+    assert check_summary["first_failed_check"]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert check_summary["first_failed_check"]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
     assert check_summary["failed_checks"][0]["preferred_env_key"] == (
         "POLYGON_API_KEY"
+    )
+    assert check_summary["failed_checks"][0]["provider_family"] == "market"
+    assert check_summary["failed_checks"][0]["provider"] == "polygon"
+    assert check_summary["failed_checks"][0]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
     )
     assert check_summary["failed_checks"][0]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",

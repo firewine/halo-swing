@@ -387,19 +387,21 @@ It keeps `api_key_pipeline_stage_summary`
 execution order with `status`, `stage_count`, `failed_stage_count`,
 `failed_stage_names`, `first_failed_stage`, and per-stage `stage_name`,
 `failed`, `error_summary`, `provider_error_summary_count`,
-`provider_recovery_smoke_count`, `preferred_env_key`, `accepted_env_keys`,
-`network_call`, `mutates_local_state`, and `secret_values_returned` fields.
+`provider_recovery_smoke_count`, `provider_family`, `provider`,
+`smoke_command_name`, `preferred_env_key`, `accepted_env_keys`, `network_call`,
+`mutates_local_state`, and `secret_values_returned` fields.
 When provider recovery smoke metadata exists, the stage summary includes stage
-recovery env-key hints without returning key values, so the failed smoke stage
-is visible without reading every nested summary.
+recovery provider identity and env-key hints without returning key values, so
+the failed smoke stage is visible without reading every nested summary.
 It keeps `api_key_pipeline_check_summary`
 (`api_key_pipeline_check_summary.v1`) summarizing the top-level `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,
 `failed_check_keys`, `tools_with_failures`, `tool_failure_counts`,
 `first_failed_check`, and no-secret `failed_checks` rows containing `tool`,
 `name`, `key`, `expected`, `actual`, and `passed=false`. When the matching
-stage has provider recovery env-key hints, the check summary includes
-`preferred_env_key` and `accepted_env_keys` without returning key values.
+stage has provider recovery metadata, the check summary includes
+`provider_family`, `provider`, `smoke_command_name`, `preferred_env_key`, and
+`accepted_env_keys` without returning key values.
 The compact `api_key_pipeline_failure_summary`
 (`api_key_pipeline_failure_summary.v1`) correlates those summaries into one
 operator-facing row with `status`, `has_failures`, `failure_category`,
