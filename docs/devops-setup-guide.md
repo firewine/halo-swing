@@ -622,6 +622,11 @@ recovery `provider_family`, `provider`, `smoke_command_name`,
 `fill_live_data_api_keys`, so the compact response still shows the next local
 setup or recovery action and the `KEY=placeholder` lines to fill without
 returning the full checklist payload.
+For compact clients that read only top-level fields, summary-only output also
+mirrors the no-secret setup sequence as `api_key_setup_quickstart_steps`,
+`api_key_setup_quickstart_step_names`,
+`api_key_setup_quickstart_step_count`, `api_key_setup_quickstart_next_step`,
+and `api_key_setup_quickstart_next_command`.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

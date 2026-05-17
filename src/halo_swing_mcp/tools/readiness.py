@@ -3020,6 +3020,41 @@ def _api_key_pipeline_summary_only_payload(
     api_key_operator_checklist_summary = _api_key_operator_checklist_summary(
         _optional_mapping(payload.get("api_key_operator_checklist")) or {}
     )
+    setup_quickstart_steps = api_key_operator_checklist_summary.get("steps")
+    setup_quickstart_step_rows = (
+        [
+            row
+            for row in setup_quickstart_steps
+            if isinstance(row, dict)
+        ]
+        if isinstance(setup_quickstart_steps, list)
+        else []
+    )
+    setup_quickstart_rows = [
+        {
+            "name": row.get("name"),
+            "status": row.get("status"),
+            "command": row.get("command"),
+            "required_env_keys": _string_list(row.get("required_env_keys")),
+            "configured_env_keys": _string_list(row.get("configured_env_keys")),
+            "missing_provider_families": _string_list(
+                row.get("missing_provider_families")
+            ),
+            "dotenv_examples": _string_list(row.get("dotenv_examples")),
+            "dotenv_example_count": row.get("dotenv_example_count"),
+            "provider_smoke_command_count": row.get(
+                "provider_smoke_command_count"
+            ),
+            "next_provider_smoke_command_name": row.get(
+                "next_provider_smoke_command_name"
+            ),
+            "network_call": row.get("network_call") is True,
+            "network_call_policy": row.get("network_call_policy"),
+            "mutates_local_state": row.get("mutates_local_state") is True,
+            "secret_values_returned": row.get("secret_values_returned") is True,
+        }
+        for row in setup_quickstart_step_rows
+    ]
     setup_status_summary = _optional_mapping(payload.get("setup_status_summary")) or {}
     api_key_requirements_summary = _optional_mapping(
         payload.get("api_key_requirements_summary")
@@ -3176,6 +3211,17 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
             "next_blocking_step"
+        ),
+        "api_key_setup_quickstart_steps": setup_quickstart_rows,
+        "api_key_setup_quickstart_step_names": _ordered_unique_strings(
+            [row.get("name") for row in setup_quickstart_rows]
+        ),
+        "api_key_setup_quickstart_step_count": len(setup_quickstart_rows),
+        "api_key_setup_quickstart_next_step": (
+            api_key_operator_checklist_summary.get("next_blocking_step")
+        ),
+        "api_key_setup_quickstart_next_command": (
+            api_key_operator_checklist_summary.get("next_blocking_action_command")
         ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")

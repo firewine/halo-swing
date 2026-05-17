@@ -351,6 +351,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_blocking_action_provider_family" in guide
     assert "next_blocking_action_provider" in guide
     assert "next_blocking_action_smoke_command_name" in guide
+    assert "api_key_setup_quickstart_steps" in guide
+    assert "api_key_setup_quickstart_step_names" in guide
+    assert "api_key_setup_quickstart_step_count" in guide
+    assert "api_key_setup_quickstart_next_step" in guide
+    assert "api_key_setup_quickstart_next_command" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

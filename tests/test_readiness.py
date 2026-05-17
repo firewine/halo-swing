@@ -5515,6 +5515,57 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     ]
     assert payload["api_key_setup_blocking_step_count"] == 4
     assert payload["api_key_setup_next_blocking_step"] == "prepare_dotenv"
+    assert payload["api_key_setup_quickstart_step_names"] == [
+        "prepare_dotenv",
+        "fill_live_data_api_keys",
+        "run_provider_smokes",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert payload["api_key_setup_quickstart_step_count"] == 4
+    assert payload["api_key_setup_quickstart_next_step"] == "prepare_dotenv"
+    assert payload["api_key_setup_quickstart_next_command"] == (
+        "cp .env.example .env"
+    )
+    assert payload["api_key_setup_quickstart_steps"][0] == {
+        "name": "prepare_dotenv",
+        "status": "pending",
+        "command": "cp .env.example .env",
+        "required_env_keys": [],
+        "configured_env_keys": [],
+        "missing_provider_families": [],
+        "dotenv_examples": [],
+        "dotenv_example_count": None,
+        "provider_smoke_command_count": None,
+        "next_provider_smoke_command_name": None,
+        "network_call": False,
+        "network_call_policy": None,
+        "mutates_local_state": True,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_quickstart_steps"][1] == {
+        "name": "fill_live_data_api_keys",
+        "status": "pending",
+        "command": None,
+        "required_env_keys": [
+            "POLYGON_API_KEY",
+            "FRED_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "configured_env_keys": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
+        "dotenv_example_count": 3,
+        "provider_smoke_command_count": None,
+        "next_provider_smoke_command_name": None,
+        "network_call": False,
+        "network_call_policy": None,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_quickstart_steps"][3]["command"] == (
+        "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        "run_api_key_pipeline_smoke --summary-only --no-audit"
+    )
     assert payload["api_key_setup_configured_provider_families"] == []
     assert payload["api_key_setup_missing_provider_families"] == [
         "market",
@@ -6971,6 +7022,41 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "news",
     ]
     assert payload["api_key_provider_requirement_count"] == 3
+    assert payload["api_key_setup_quickstart_steps"] == [
+        {
+            "name": row["name"],
+            "status": row["status"],
+            "command": row["command"],
+            "required_env_keys": row["required_env_keys"],
+            "configured_env_keys": row["configured_env_keys"],
+            "missing_provider_families": row["missing_provider_families"],
+            "dotenv_examples": row.get("dotenv_examples", []),
+            "dotenv_example_count": row.get("dotenv_example_count"),
+            "provider_smoke_command_count": row["provider_smoke_command_count"],
+            "next_provider_smoke_command_name": row[
+                "next_provider_smoke_command_name"
+            ],
+            "network_call": row["network_call"],
+            "network_call_policy": row["network_call_policy"],
+            "mutates_local_state": row["mutates_local_state"],
+            "secret_values_returned": row["secret_values_returned"],
+        }
+        for row in payload["api_key_operator_checklist_summary"]["steps"]
+    ]
+    assert payload["api_key_setup_quickstart_step_names"] == [
+        row["name"] for row in payload["api_key_operator_checklist_summary"]["steps"]
+    ]
+    assert payload["api_key_setup_quickstart_step_count"] == (
+        payload["api_key_operator_checklist_summary"]["step_count"]
+    )
+    assert payload["api_key_setup_quickstart_next_step"] == (
+        payload["api_key_operator_checklist_summary"]["next_blocking_step"]
+    )
+    assert payload["api_key_setup_quickstart_next_command"] == (
+        payload["api_key_operator_checklist_summary"][
+            "next_blocking_action_command"
+        ]
+    )
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
         family: row["preferred_env_key"]
         for family, row in requirements["provider_requirements"].items()

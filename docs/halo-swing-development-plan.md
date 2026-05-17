@@ -257,6 +257,63 @@ verification:
   - targeted payload print: provider smoke command map, expected contracts map, expected checks map present, secret_values_returned false
 ```
 
+## 3.825 API Key Top-Level Setup Quickstart Gate Record - 2026-05-17
+
+### A. 목적
+
+3.824에서 summary-only top-level payload는 provider family별 smoke command까지
+직접 보여주게 됐다. 하지만 compact row만 읽는 operator는 전체 setup sequence
+(`prepare_dotenv`, `fill_live_data_api_keys`, provider smokes, one-shot smoke)를
+아직 nested `api_key_operator_checklist_summary.steps`에서 확인해야 한다. 이번 slice는
+no-secret setup step rows를 top-level quickstart fields로 올려, 사용자가 API 키만
+넣고 연동할 때 첫 compact response만 보고 순서와 즉시 실행할 명령을 확인할 수 있게
+한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_steps mirrors no-secret setup step rows
+  - summary-only top-level api_key_setup_quickstart_step_names and api_key_setup_quickstart_step_count mirror quickstart sequence identity
+  - summary-only top-level api_key_setup_quickstart_next_step and api_key_setup_quickstart_next_command mirror the immediate local action
+  - README and DevOps setup guide document top-level API-key setup quickstart mirrors
+  - setup docs tests assert top-level setup quickstart guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: quickstart step names, step count, next step, next command, dotenv examples present, secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

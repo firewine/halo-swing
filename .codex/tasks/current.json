@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_TOP_LEVEL_PROVIDER_SMOKE_COMMAND_MAPS_GATE",
+  "gate_id": "API_KEY_TOP_LEVEL_SETUP_QUICKSTART_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.824",
-  "next_atomic_step": "mirror API-key provider smoke command maps onto summary-only top-level fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.825",
+  "next_atomic_step": "mirror API-key setup quickstart steps onto summary-only top-level fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.824",
+    "docs/halo-swing-development-plan.md#3.825",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,16 +56,15 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level api_key_provider_smoke_commands_by_family mirrors provider-family smoke command strings",
-    "summary-only top-level api_key_provider_smoke_statuses_by_family mirrors provider-family smoke readiness states",
-    "summary-only top-level api_key_provider_smoke_network_call_policies_by_family mirrors provider-family live-call policies",
-    "summary-only top-level api_key_provider_smoke_expected_live_contracts_by_family and api_key_provider_smoke_expected_live_checks_by_family mirror expected live contract/check metadata",
-    "README and DevOps setup guide document top-level API-key provider smoke command maps",
-    "setup docs tests assert the new top-level provider smoke command map guidance",
+    "summary-only top-level api_key_setup_quickstart_steps mirrors no-secret setup step rows",
+    "summary-only top-level api_key_setup_quickstart_step_names and api_key_setup_quickstart_step_count mirror quickstart sequence identity",
+    "summary-only top-level api_key_setup_quickstart_next_step and api_key_setup_quickstart_next_command mirror the immediate local action",
+    "README and DevOps setup guide document top-level API-key setup quickstart mirrors",
+    "setup docs tests assert the new top-level setup quickstart guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified top-level provider smoke command maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified top-level setup quickstart gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

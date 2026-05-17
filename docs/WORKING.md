@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_COMMAND_MAPS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_COMMAND_MAPS_GATE
+status: API_KEY_TOP_LEVEL_SETUP_QUICKSTART_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_SETUP_QUICKSTART_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror API-key provider smoke command maps onto summary-only top-level fields
+next_atomic_step: mirror API-key setup quickstart steps onto summary-only top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,18 +81,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_provider_smoke_commands_by_family mirrors provider-family smoke command strings
-  - summary-only top-level api_key_provider_smoke_statuses_by_family mirrors provider-family smoke readiness states
-  - summary-only top-level api_key_provider_smoke_network_call_policies_by_family mirrors provider-family live-call policies
-  - summary-only top-level api_key_provider_smoke_expected_live_contracts_by_family and api_key_provider_smoke_expected_live_checks_by_family mirror expected live contract/check metadata
-  - README and DevOps setup guide document top-level API-key provider smoke command maps
-  - setup docs tests assert the new top-level provider smoke command map guidance
+  - summary-only top-level api_key_setup_quickstart_steps mirrors no-secret setup step rows
+  - summary-only top-level api_key_setup_quickstart_step_names and api_key_setup_quickstart_step_count mirror quickstart sequence identity
+  - summary-only top-level api_key_setup_quickstart_next_step and api_key_setup_quickstart_next_command mirror the immediate local action
+  - README and DevOps setup guide document top-level API-key setup quickstart mirrors
+  - setup docs tests assert the new top-level setup quickstart guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level provider smoke command maps gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level setup quickstart gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_COMMAND_MAPS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_COMMAND_MAPS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror API-key provider smoke command maps onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -3012,14 +3022,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Top-Level Provider Smoke Command Maps Gate is verified.
-Summary-only top-level payload now mirrors no-secret provider-family smoke
-command strings, smoke statuses, live-call policies, and expected live
-contract/check metadata. Focused tests, direct summary-only smoke, targeted
-payload print, full pytest, ruff, and health_check passed.
+Summary: API Key Top-Level Setup Quickstart Gate is verified. Summary-only
+top-level payload now mirrors the no-secret setup sequence, step names/count,
+immediate next setup step, and next local command. Focused tests, direct
+summary-only smoke, targeted payload print, full pytest, ruff, and health_check
+passed.
 
 ```yaml
-api_key_top_level_provider_smoke_command_maps_gate:
+api_key_top_level_setup_quickstart_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3032,12 +3042,11 @@ api_key_top_level_provider_smoke_command_maps_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary-only top-level api_key_provider_smoke_commands_by_family mirrors provider-family smoke command strings
-    - summary-only top-level api_key_provider_smoke_statuses_by_family mirrors provider-family smoke readiness states
-    - summary-only top-level api_key_provider_smoke_network_call_policies_by_family mirrors provider-family live-call policies
-    - summary-only top-level api_key_provider_smoke_expected_live_contracts_by_family and api_key_provider_smoke_expected_live_checks_by_family mirror expected live contract/check metadata
-    - README and DevOps setup guide document top-level API-key provider smoke command maps
-    - setup docs tests assert top-level provider smoke command map guidance
+    - summary-only top-level api_key_setup_quickstart_steps mirrors no-secret setup step rows
+    - summary-only top-level api_key_setup_quickstart_step_names and api_key_setup_quickstart_step_count mirror quickstart sequence identity
+    - summary-only top-level api_key_setup_quickstart_next_step and api_key_setup_quickstart_next_command mirror the immediate local action
+    - README and DevOps setup guide document top-level API-key setup quickstart mirrors
+    - setup docs tests assert top-level setup quickstart guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3051,15 +3060,28 @@ api_key_top_level_provider_smoke_command_maps_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level provider smoke command maps present; secret_values_returned false
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level setup quickstart fields present; secret_values_returned false
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "800 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_provider_smoke_commands_by_family"], p["api_key_provider_smoke_expected_live_contracts_by_family"], p["api_key_provider_smoke_expected_live_checks_by_family"], p["secret_values_returned"])'
-      result: "provider smoke command map present; expected contracts market/macro/news present; expected checks map present; secret_values_returned false"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_setup_quickstart_step_names"], p["api_key_setup_quickstart_step_count"], p["api_key_setup_quickstart_next_step"], p["api_key_setup_quickstart_next_command"], p["api_key_setup_quickstart_steps"][1]["dotenv_examples"], p["secret_values_returned"])'
+      result: "['prepare_dotenv', 'fill_live_data_api_keys', 'run_provider_smokes', 'run_api_key_pipeline_smoke'] 4 prepare_dotenv cp .env.example .env dotenv examples present False"
+```
+
+Previous verification:
+
+Summary: API Key Top-Level Provider Smoke Command Maps Gate is verified.
+Summary-only top-level payload now mirrors no-secret provider-family smoke
+command strings, smoke statuses, live-call policies, and expected live
+contract/check metadata. Focused tests, direct summary-only smoke, targeted
+payload print, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_top_level_provider_smoke_command_maps_gate:
+  status: verified
 ```
 
 Previous verification:
