@@ -212,6 +212,63 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_next_provider_smoke_secret_values_returned": (
             next_provider_smoke.get("secret_values_returned") is True
         ),
+        "api_key_next_ready_provider_smoke_provider_family": (
+            next_provider_smoke.get("provider_family")
+        ),
+        "api_key_next_ready_provider_smoke_provider": (
+            next_provider_smoke.get("provider")
+        ),
+        "api_key_next_ready_provider_smoke_selected_provider_class": (
+            next_provider_smoke.get("selected_provider_class")
+            or setup_next_provider_smoke.get("selected_provider_class")
+        ),
+        "api_key_next_ready_provider_smoke_provider_route_data_mode": (
+            next_provider_smoke.get("provider_route_data_mode")
+            or setup_next_provider_smoke.get("provider_route_data_mode")
+        ),
+        "api_key_next_ready_provider_smoke_provider_route_live_data_required": (
+            next_provider_smoke.get("provider_route_live_data_required") is True
+            or setup_next_provider_smoke.get("provider_route_live_data_required")
+            is True
+        ),
+        "api_key_next_ready_provider_smoke_command_name": (
+            setup_status_summary.get("next_provider_smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "api_key_next_ready_provider_smoke_command": next_provider_smoke.get(
+            "command"
+        ),
+        "api_key_next_ready_provider_smoke_expected_live_contract": (
+            next_provider_smoke.get("expected_live_contract")
+        ),
+        "api_key_next_ready_provider_smoke_expected_live_checks": _string_list(
+            next_provider_smoke.get("expected_live_checks")
+        ),
+        "api_key_next_ready_provider_smoke_preferred_env_key": (
+            next_provider_smoke.get("preferred_env_key")
+        ),
+        "api_key_next_ready_provider_smoke_accepted_env_keys": _string_list(
+            next_provider_smoke.get("accepted_env_keys")
+        ),
+        "api_key_next_ready_provider_smoke_next_setup_action": (
+            next_provider_smoke.get("next_setup_action")
+            or setup_next_provider_smoke.get("next_setup_action")
+        ),
+        "api_key_next_ready_provider_smoke_status": next_provider_smoke.get(
+            "status"
+        ),
+        "api_key_next_ready_provider_smoke_network_call": (
+            next_provider_smoke.get("network_call") is True
+        ),
+        "api_key_next_ready_provider_smoke_network_call_policy": (
+            next_provider_smoke.get("network_call_policy")
+        ),
+        "api_key_next_ready_provider_smoke_mutates_local_state": (
+            next_provider_smoke.get("mutates_local_state") is True
+        ),
+        "api_key_next_ready_provider_smoke_secret_values_returned": (
+            next_provider_smoke.get("secret_values_returned") is True
+        ),
         "api_key_next_blocked_provider_smoke_provider_family": (
             next_blocked_provider_smoke.get("provider_family")
         ),

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_NEXT_READY_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_READY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key next blocked provider smoke fields
+next_atomic_step: surface summary-only API-key next ready provider smoke fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output mirrors the first blocked API-key provider smoke row as top-level no-secret scalar fields
-  - summary-only tests prove next blocked provider smoke fields match provider smoke command rows
-  - README and DevOps guide document the top-level API-key next blocked provider smoke fields
+  - summary-only output mirrors the first ready API-key provider smoke row as explicit top-level no-secret scalar fields
+  - summary-only tests prove next ready provider smoke fields match provider smoke command rows and existing next provider smoke fields
+  - README and DevOps guide document the top-level API-key next ready provider smoke fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key next blocked provider smoke fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key next ready provider smoke fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_READY_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key next blocked provider smoke fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key next ready provider smoke fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only top-level output now mirrors the first blocked provider smoke row for partial API-key setup without secret values
+  - summary-only top-level output now mirrors the first ready provider smoke row with explicit ready-prefixed fields
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key next blocked provider smoke fields
 ```
 
 Previous completed directive:

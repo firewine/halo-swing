@@ -1258,6 +1258,77 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_provider_smoke_blocked_commands"] == [
         row["command"] for row in provider_smoke_rows if row["status"] != "ready"
     ]
+    next_ready_provider_smoke = next(
+        (row for row in provider_smoke_rows if row["status"] == "ready"),
+        {},
+    )
+    next_ready_live_data_required = (
+        next_ready_provider_smoke.get("provider_route_live_data_required") is True
+    )
+    assert payload["api_key_next_ready_provider_smoke_provider_family"] == (
+        payload["api_key_next_provider_smoke_provider_family"]
+    ) == next_ready_provider_smoke.get("provider_family")
+    assert payload["api_key_next_ready_provider_smoke_provider"] == (
+        payload["api_key_next_provider_smoke_provider"]
+    ) == next_ready_provider_smoke.get("provider")
+    assert payload[
+        "api_key_next_ready_provider_smoke_selected_provider_class"
+    ] == payload["api_key_next_provider_smoke_selected_provider_class"]
+    assert payload[
+        "api_key_next_ready_provider_smoke_selected_provider_class"
+    ] == next_ready_provider_smoke.get("selected_provider_class")
+    assert payload[
+        "api_key_next_ready_provider_smoke_provider_route_data_mode"
+    ] == payload["api_key_next_provider_smoke_provider_route_data_mode"]
+    assert payload[
+        "api_key_next_ready_provider_smoke_provider_route_data_mode"
+    ] == next_ready_provider_smoke.get("provider_route_data_mode")
+    assert (
+        payload[
+            "api_key_next_ready_provider_smoke_provider_route_live_data_required"
+        ]
+        is payload["api_key_next_provider_smoke_provider_route_live_data_required"]
+        is next_ready_live_data_required
+    )
+    assert payload["api_key_next_ready_provider_smoke_command_name"] == (
+        payload["api_key_next_provider_smoke_command_name"]
+    ) == next_ready_provider_smoke.get("smoke_command_name")
+    assert payload["api_key_next_ready_provider_smoke_command"] == (
+        payload["api_key_next_provider_smoke_command"]
+    ) == next_ready_provider_smoke.get("command")
+    assert payload[
+        "api_key_next_ready_provider_smoke_expected_live_contract"
+    ] == payload["api_key_next_provider_smoke_expected_live_contract"]
+    assert payload[
+        "api_key_next_ready_provider_smoke_expected_live_contract"
+    ] == next_ready_provider_smoke.get("expected_live_contract")
+    assert payload["api_key_next_ready_provider_smoke_expected_live_checks"] == (
+        payload["api_key_next_provider_smoke_expected_live_checks"]
+    ) == (next_ready_provider_smoke.get("expected_live_checks") or [])
+    assert payload["api_key_next_ready_provider_smoke_preferred_env_key"] == (
+        payload["api_key_next_provider_smoke_preferred_env_key"]
+    ) == next_ready_provider_smoke.get("preferred_env_key")
+    assert payload["api_key_next_ready_provider_smoke_accepted_env_keys"] == (
+        payload["api_key_next_provider_smoke_accepted_env_keys"]
+    ) == (next_ready_provider_smoke.get("accepted_env_keys") or [])
+    assert payload["api_key_next_ready_provider_smoke_next_setup_action"] == (
+        payload["api_key_next_provider_smoke_next_setup_action"]
+    ) == next_ready_provider_smoke.get("next_setup_action")
+    assert payload["api_key_next_ready_provider_smoke_status"] == (
+        payload["api_key_next_provider_smoke_status"]
+    ) == next_ready_provider_smoke.get("status")
+    assert payload["api_key_next_ready_provider_smoke_network_call"] is (
+        payload["api_key_next_provider_smoke_network_call"]
+    ) is (next_ready_provider_smoke.get("network_call") is True)
+    assert payload["api_key_next_ready_provider_smoke_network_call_policy"] == (
+        payload["api_key_next_provider_smoke_network_call_policy"]
+    ) == next_ready_provider_smoke.get("network_call_policy")
+    assert payload["api_key_next_ready_provider_smoke_mutates_local_state"] is (
+        payload["api_key_next_provider_smoke_mutates_local_state"]
+    ) is (next_ready_provider_smoke.get("mutates_local_state") is True)
+    assert payload["api_key_next_ready_provider_smoke_secret_values_returned"] is (
+        payload["api_key_next_provider_smoke_secret_values_returned"]
+    ) is (next_ready_provider_smoke.get("secret_values_returned") is True)
     next_blocked_provider_smoke = next(
         (row for row in provider_smoke_rows if row["status"] != "ready"),
         {},
