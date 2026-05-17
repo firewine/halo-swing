@@ -935,8 +935,14 @@ mirrors the no-secret command metadata as `api_key_copy_dotenv_command`,
 `api_key_one_shot_pipeline_smoke_network_call_policy`,
 `api_key_one_shot_pipeline_smoke_mutates_local_state`,
 `api_key_one_shot_pipeline_smoke_secret_values_returned`,
-`api_key_provider_smoke_command_count`, and
-`api_key_provider_smoke_command_names`.
+`api_key_provider_smoke_command_count`,
+`api_key_provider_smoke_command_names`,
+`api_key_provider_smoke_provider_families`,
+`api_key_provider_smoke_provider_family_count`,
+`api_key_provider_smoke_ready_provider_families`,
+`api_key_provider_smoke_blocked_provider_families`,
+`api_key_provider_smoke_ready_command_names`, and
+`api_key_provider_smoke_blocked_command_names`.
 It also mirrors provider smoke progress as
 `api_key_provider_smoke_total_count`, `api_key_provider_smoke_ready_count`,
 `api_key_provider_smoke_blocked_count`,
@@ -960,7 +966,10 @@ It also mirrors provider smoke progress as
 `api_key_next_provider_smoke_mutates_local_state`, and
 `api_key_next_provider_smoke_secret_values_returned`.
 It also mirrors provider smoke command details by family as
+`api_key_provider_smoke_kinds_by_family`,
+`api_key_provider_smoke_command_names_by_family`,
 `api_key_provider_smoke_commands_by_family`,
+`api_key_provider_smoke_provider_by_family`,
 `api_key_provider_smoke_statuses_by_family`,
 `api_key_provider_smoke_selected_provider_class_by_family`,
 `api_key_provider_smoke_provider_route_data_mode_by_family`,

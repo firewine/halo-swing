@@ -1218,6 +1218,49 @@ def provider_smoke_route_summary_from_payload(
     }
 
 
+def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> None:
+    provider_smoke_rows = payload["api_key_command_summary"][
+        "provider_smoke_commands"
+    ]
+    provider_families = [row["provider_family"] for row in provider_smoke_rows]
+    assert payload["api_key_provider_smoke_provider_families"] == (
+        provider_families
+    )
+    assert payload["api_key_provider_smoke_provider_family_count"] == len(
+        provider_families
+    )
+    assert payload["api_key_provider_smoke_ready_provider_families"] == [
+        row["provider_family"]
+        for row in provider_smoke_rows
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_provider_smoke_blocked_provider_families"] == [
+        row["provider_family"]
+        for row in provider_smoke_rows
+        if row["status"] != "ready"
+    ]
+    assert payload["api_key_provider_smoke_ready_command_names"] == [
+        row["smoke_command_name"]
+        for row in provider_smoke_rows
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_provider_smoke_blocked_command_names"] == [
+        row["smoke_command_name"]
+        for row in provider_smoke_rows
+        if row["status"] != "ready"
+    ]
+    assert payload["api_key_provider_smoke_kinds_by_family"] == {
+        row["provider_family"]: row.get("kind") for row in provider_smoke_rows
+    }
+    assert payload["api_key_provider_smoke_command_names_by_family"] == {
+        row["provider_family"]: row["smoke_command_name"]
+        for row in provider_smoke_rows
+    }
+    assert payload["api_key_provider_smoke_provider_by_family"] == {
+        row["provider_family"]: row["provider"] for row in provider_smoke_rows
+    }
+
+
 def assert_provider_smoke_readiness_flag_fields(payload: dict[str, Any]) -> None:
     provider_smoke_command_count = payload["api_key_provider_smoke_command_count"]
     live_data_required_by_family = payload[
@@ -7229,6 +7272,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_family_metadata_fields(payload)
     assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_list_count_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)
@@ -8336,6 +8380,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         row["provider_family"]: row["secret_values_returned"]
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
     }
+    assert_provider_smoke_family_metadata_fields(payload)
     assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)
     assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
@@ -11063,6 +11108,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         prefix="api_key_provider_smoke",
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
+    assert_provider_smoke_family_metadata_fields(payload)
     assert_provider_smoke_readiness_flag_fields(payload)
     assert_provider_smoke_list_count_fields(payload)
     assert_provider_smoke_safety_count_fields(payload)

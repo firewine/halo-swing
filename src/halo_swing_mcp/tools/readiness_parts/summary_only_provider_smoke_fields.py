@@ -87,6 +87,37 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("secret_values_returned") is True
         for family, row in provider_smoke_command_rows_by_family.items()
     }
+    provider_smoke_provider_families = _ordered_unique_strings(
+        [row.get("provider_family") for row in provider_smoke_command_rows]
+    )
+    provider_smoke_ready_provider_families = _ordered_unique_strings(
+        [
+            family
+            for family, row in provider_smoke_command_rows_by_family.items()
+            if row.get("status") == "ready"
+        ]
+    )
+    provider_smoke_blocked_provider_families = _ordered_unique_strings(
+        [
+            family
+            for family, row in provider_smoke_command_rows_by_family.items()
+            if row.get("status") != "ready"
+        ]
+    )
+    provider_smoke_ready_command_names = _ordered_unique_strings(
+        [
+            row.get("smoke_command_name")
+            for row in provider_smoke_command_rows
+            if row.get("status") == "ready"
+        ]
+    )
+    provider_smoke_blocked_command_names = _ordered_unique_strings(
+        [
+            row.get("smoke_command_name")
+            for row in provider_smoke_command_rows
+            if row.get("status") != "ready"
+        ]
+    )
     ready_provider_smoke_count = setup_status_summary.get("ready_provider_smoke_count")
     blocked_provider_smoke_count = setup_status_summary.get(
         "blocked_provider_smoke_count"
@@ -157,14 +188,44 @@ def _api_key_provider_smoke_top_level_fields(
             next_provider_smoke.get("secret_values_returned") is True
         ),
         "api_key_provider_smoke_command_count": provider_smoke_command_count,
+        "api_key_provider_smoke_provider_families": (
+            provider_smoke_provider_families
+        ),
+        "api_key_provider_smoke_provider_family_count": len(
+            provider_smoke_provider_families
+        ),
+        "api_key_provider_smoke_ready_provider_families": (
+            provider_smoke_ready_provider_families
+        ),
+        "api_key_provider_smoke_blocked_provider_families": (
+            provider_smoke_blocked_provider_families
+        ),
+        "api_key_provider_smoke_ready_command_names": (
+            provider_smoke_ready_command_names
+        ),
+        "api_key_provider_smoke_blocked_command_names": (
+            provider_smoke_blocked_command_names
+        ),
         "api_key_provider_smoke_command_names": _ordered_unique_strings(
             [
                 row.get("smoke_command_name")
                 for row in provider_smoke_command_rows
             ]
         ),
+        "api_key_provider_smoke_kinds_by_family": {
+            family: row.get("kind")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_command_names_by_family": {
+            family: row.get("smoke_command_name")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
         "api_key_provider_smoke_commands_by_family": {
             family: row.get("command")
+            for family, row in provider_smoke_command_rows_by_family.items()
+        },
+        "api_key_provider_smoke_provider_by_family": {
+            family: row.get("provider")
             for family, row in provider_smoke_command_rows_by_family.items()
         },
         "api_key_provider_smoke_next_setup_actions_by_family": {
