@@ -849,6 +849,8 @@ def test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync() -> None:
         "api_key_provider_smoke_any_blocked",
         "api_key_provider_smoke_action_status",
         "api_key_provider_smoke_next_action",
+        "api_key_provider_smoke_next_action_ready_to_run",
+        "api_key_provider_smoke_next_action_requires_api_keys",
         "api_key_provider_smoke_next_action_command_count",
         "api_key_provider_smoke_next_action_command_names",
         "api_key_provider_smoke_next_action_commands",

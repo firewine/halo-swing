@@ -1463,6 +1463,14 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         expected_action_status
     )
     assert payload["api_key_provider_smoke_next_action"] == expected_next_action
+    assert payload["api_key_provider_smoke_next_action_ready_to_run"] is (
+        expected_next_action == "run_ready_provider_smokes"
+        and bool(expected_next_action_command_names)
+    )
+    assert payload["api_key_provider_smoke_next_action_requires_api_keys"] is (
+        expected_next_action == "fill_live_data_api_keys"
+        and bool(expected_next_action_provider_families)
+    )
     assert payload["api_key_provider_smoke_next_action_command_count"] == len(
         expected_next_action_command_names
     )

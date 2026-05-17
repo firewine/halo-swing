@@ -472,6 +472,14 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_action_status": provider_smoke_action_status,
         "api_key_provider_smoke_next_action": provider_smoke_next_action,
+        "api_key_provider_smoke_next_action_ready_to_run": (
+            provider_smoke_next_action == "run_ready_provider_smokes"
+            and bool(provider_smoke_next_action_command_names)
+        ),
+        "api_key_provider_smoke_next_action_requires_api_keys": (
+            provider_smoke_next_action == "fill_live_data_api_keys"
+            and bool(provider_smoke_next_action_provider_families)
+        ),
         "api_key_provider_smoke_next_action_command_count": len(
             provider_smoke_next_action_command_names
         ),
