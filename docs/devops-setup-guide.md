@@ -487,6 +487,10 @@ top-level `next_operator_action`, `readiness_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
+The summary-only top-level provider smoke aggregates keep
+`provider_smoke_summaries` and `provider_smoke_summary_count` copied from the
+omitted `live_data_smoke_summary`, so compact output still shows provider
+success contracts/checks without returning secret values.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command

@@ -263,6 +263,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_pipeline_smoke_summary_only.v1" in guide
     assert '"summary_only":true' in guide
     assert "keeps\ntop-level `next_operator_action`" in guide
+    assert "summary-only top-level provider smoke aggregates" in guide
+    assert "provider\nsuccess contracts/checks" in guide
     assert "matches\n`readiness_summary.next_operator_action`" in guide
     assert "next_operator_action_command" in guide
     assert "top-level summary-only recovery env hints and network policies" in guide

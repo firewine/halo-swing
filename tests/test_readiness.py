@@ -5224,6 +5224,53 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert "fred_api_key=test" not in payload_repr
     assert "news_api_key=test" not in payload_repr
 
+    summary_payload = run_api_key_pipeline_smoke(
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+        symbols=["QQQ"],
+        topic="macro",
+        summary_only=True,
+    )
+
+    assert (
+        summary_payload["schema_version"]
+        == "api_key_pipeline_smoke_summary_only.v1"
+    )
+    assert summary_payload["summary_only"] is True
+    assert summary_payload["provider_smoke_summaries"] == (
+        fake_provider_smoke_summaries
+    )
+    assert summary_payload["provider_smoke_summary_count"] == 3
+    assert (
+        summary_payload["provider_smoke_summaries"][0]["provider_family"]
+        == "market"
+    )
+    assert (
+        summary_payload["provider_smoke_summaries"][1]["smoke_command_name"]
+        == "get_macro_snapshot_live_smoke"
+    )
+    assert (
+        summary_payload["provider_smoke_summaries"][2]["expected_live_checks"]
+        == [
+            "live_data_boundary_declared",
+            "network_call_declared",
+            "secret_values_not_returned",
+        ]
+    )
+    assert (
+        summary_payload["provider_smoke_summaries"][2][
+            "secret_values_returned"
+        ]
+        is False
+    )
+    assert "live_data_smoke_summary" in summary_payload["omitted_sections"]
+    assert "live_data_smoke_summary" not in summary_payload
+    assert summary_payload["secret_values_returned"] is False
+    summary_payload_repr = repr(summary_payload).lower()
+    assert "polygon_api_key=test" not in summary_payload_repr
+    assert "fred_api_key=test" not in summary_payload_repr
+    assert "news_api_key=test" not in summary_payload_repr
+
 
 def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     monkeypatch,

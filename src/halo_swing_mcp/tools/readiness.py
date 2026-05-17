@@ -2947,6 +2947,21 @@ def _api_key_pipeline_summary_only_payload(
     api_key_next_action_summary = _optional_mapping(
         payload.get("api_key_next_action_summary")
     ) or {}
+    live_data_smoke_summary = _optional_mapping(
+        payload.get("live_data_smoke_summary")
+    ) or {}
+    provider_smoke_summaries = live_data_smoke_summary.get(
+        "provider_smoke_summaries"
+    )
+    provider_smoke_rows = (
+        [
+            row
+            for row in provider_smoke_summaries
+            if isinstance(row, dict)
+        ]
+        if isinstance(provider_smoke_summaries, list)
+        else []
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3077,6 +3092,11 @@ def _api_key_pipeline_summary_only_payload(
                 )
                 or {}
             )
+        ),
+        "provider_smoke_summaries": provider_smoke_rows,
+        "provider_smoke_summary_count": live_data_smoke_summary.get(
+            "provider_smoke_summary_count",
+            len(provider_smoke_rows),
         ),
         "api_key_failure_category": payload.get("api_key_failure_category"),
         "api_key_has_failures": payload.get("api_key_has_failures") is True,
