@@ -279,6 +279,23 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_quickstart_command_plan_count": len(
             quickstart_command_plan
         ),
+        "api_key_setup_quickstart_command_plan_selected_provider_class_by_family": {
+            row["provider_family"]: row.get("selected_provider_class")
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family": {
+            row["provider_family"]: row.get("provider_route_data_mode")
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_provider_route_live_data_required_by_family": {
+            row["provider_family"]: (
+                row.get("provider_route_live_data_required") is True
+            )
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
         "api_key_setup_quickstart_next_command_plan_item": (
             next_quickstart_command_plan_item
         ),
@@ -293,6 +310,18 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_setup_quickstart_next_command_plan_provider_family": (
             next_quickstart_command_plan_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_next_command_plan_selected_provider_class": (
+            next_quickstart_command_plan_row.get("selected_provider_class")
+        ),
+        "api_key_setup_quickstart_next_command_plan_provider_route_data_mode": (
+            next_quickstart_command_plan_row.get("provider_route_data_mode")
+        ),
+        "api_key_setup_quickstart_next_command_plan_provider_route_live_data_required": (
+            next_quickstart_command_plan_row.get(
+                "provider_route_live_data_required"
+            )
+            is True
         ),
         "api_key_setup_quickstart_next_command_plan_status": (
             next_quickstart_command_plan_row.get("status")

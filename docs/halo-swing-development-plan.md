@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.885 API Key Quickstart Command Plan Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.884에서 integration next-provider-smoke scalar mirrors가 route evidence를 갖게 됐다.
+하지만 quickstart command plan을 읽는 compact client는 provider-smoke rows 안에서 각
+명령이 어떤 live provider route를 향하는지 바로 확인할 수 없고, 즉시 실행할
+`api_key_setup_quickstart_next_command_plan_*` scalar에도 route evidence가 없다. 이번
+slice는 API 키만 넣고 quickstart command plan 한 벌만 읽어도 provider smoke 명령이
+실제 live provider route를 향하는지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_setup_quickstart_command_plan provider-smoke rows mirror selected provider class, route data mode, and live-data-required evidence
+  - summary-only api_key_setup_quickstart_command_plan_*_by_family fields expose provider-smoke route evidence
+  - summary-only api_key_setup_quickstart_next_command_plan_* scalar fields mirror route evidence from the immediate command plan item
+  - README and DevOps setup guide document quickstart command plan route fields
+  - setup docs guard keeps README and DevOps API-key quickstart command plan route field parity in sync
+  - existing integration next-provider-smoke docs now include expected live contract/check, env hint, and mutation fields required by docs parity guards
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan route fields pytest: 2 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key summary-only output confirmed quickstart provider-smoke route fields, by-family maps, next command plan no-secret scalar fields, and secret_values_returned=false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.884 API Key Integration Next Provider Smoke Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

@@ -6287,6 +6287,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "kind": "copy_dotenv",
         "command": "cp .env.example .env",
         "provider_family": None,
+        "selected_provider_class": None,
+        "provider_route_data_mode": None,
+        "provider_route_live_data_required": False,
         "status": "required",
         "network_call": False,
         "network_call_policy": None,
@@ -6301,6 +6304,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "get_live_data_api_key_status --no-audit"
         ),
         "provider_family": None,
+        "selected_provider_class": None,
+        "provider_route_data_mode": None,
+        "provider_route_live_data_required": False,
         "status": "ready",
         "network_call": False,
         "network_call_policy": None,
@@ -6332,6 +6338,24 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert (
         payload["api_key_setup_quickstart_next_command_plan_provider_family"]
         is None
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_selected_provider_class"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_provider_route_data_mode"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_provider_route_live_data_required"
+        ]
+        is False
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         "required"
@@ -8283,6 +8307,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "kind": "provider_smoke",
             "command": row["command"],
             "provider_family": row["provider_family"],
+            "selected_provider_class": row["selected_provider_class"],
+            "provider_route_data_mode": row["provider_route_data_mode"],
+            "provider_route_live_data_required": row[
+                "provider_route_live_data_required"
+            ],
             "status": row["status"],
             "network_call": row["network_call"],
             "network_call_policy": row["network_call_policy"],
@@ -8291,6 +8320,33 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         }
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
     ]
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_selected_provider_class_by_family"
+        ]
+        == {
+            row["provider_family"]: row["selected_provider_class"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family"
+        ]
+        == {
+            row["provider_family"]: row["provider_route_data_mode"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_provider_route_live_data_required_by_family"
+        ]
+        == {
+            row["provider_family"]: row["provider_route_live_data_required"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
     assert payload["api_key_setup_quickstart_next_command_plan_item"] == (
         payload["api_key_setup_quickstart_command_plan"][0]
     )
@@ -8302,6 +8358,36 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     )
     assert payload["api_key_setup_quickstart_next_command_plan_command"] == (
         payload["api_key_setup_quickstart_next_command_plan_item"]["command"]
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_provider_family"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "provider_family"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_selected_provider_class"
+        ]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "selected_provider_class"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_provider_route_data_mode"
+        ]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "provider_route_data_mode"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_provider_route_live_data_required"
+        ]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "provider_route_live_data_required"
+        ]
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         payload["api_key_setup_quickstart_next_command_plan_item"]["status"]
