@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 from .live_data_setup import _ordered_unique_strings, _string_list
+from .summary_only_provider_route_fields import (
+    _api_key_quickstart_command_plan_route_count_top_level_fields,
+)
 
 
 __all__ = ("_api_key_setup_quickstart_top_level_fields",)
@@ -83,6 +86,27 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         row.get("status") == "ready" for row in provider_rows
     )
     has_provider_smokes = provider_smoke_count > 0
+    selected_provider_class_by_family = {
+        row["provider_family"]: row.get("selected_provider_class")
+        for row in provider_rows
+    }
+    provider_route_data_mode_by_family = {
+        row["provider_family"]: row.get("provider_route_data_mode")
+        for row in provider_rows
+    }
+    provider_route_live_data_required_by_family = {
+        row["provider_family"]: (
+            row.get("provider_route_live_data_required") is True
+        )
+        for row in provider_rows
+    }
+    provider_route_summary = {
+        "selected_provider_class_by_family": selected_provider_class_by_family,
+        "provider_route_data_mode_by_family": provider_route_data_mode_by_family,
+        "provider_route_live_data_required_by_family": (
+            provider_route_live_data_required_by_family
+        ),
+    }
     return {
         "api_key_setup_quickstart_command_plan_provider_families": (
             provider_families
@@ -253,20 +277,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             row["provider_family"]: row.get("provider")
             for row in provider_rows
         },
-        "api_key_setup_quickstart_command_plan_selected_provider_class_by_family": {
-            row["provider_family"]: row.get("selected_provider_class")
-            for row in provider_rows
-        },
-        "api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family": {
-            row["provider_family"]: row.get("provider_route_data_mode")
-            for row in provider_rows
-        },
-        "api_key_setup_quickstart_command_plan_provider_route_live_data_required_by_family": {
-            row["provider_family"]: (
-                row.get("provider_route_live_data_required") is True
-            )
-            for row in provider_rows
-        },
+        "api_key_setup_quickstart_command_plan_selected_provider_class_by_family": (
+            selected_provider_class_by_family
+        ),
+        "api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family": (
+            provider_route_data_mode_by_family
+        ),
+        "api_key_setup_quickstart_command_plan_provider_route_live_data_required_by_family": (
+            provider_route_live_data_required_by_family
+        ),
+        **_api_key_quickstart_command_plan_route_count_top_level_fields(
+            provider_route_summary
+        ),
         "api_key_setup_quickstart_command_plan_expected_live_contracts_by_family": {
             row["provider_family"]: row.get("expected_live_contract")
             for row in provider_rows

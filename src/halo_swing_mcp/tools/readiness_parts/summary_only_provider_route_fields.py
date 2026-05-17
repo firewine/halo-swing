@@ -13,6 +13,7 @@ __all__ = (
     "_api_key_next_action_route_top_level_fields",
     "_api_key_provider_selection_route_count_top_level_fields",
     "_api_key_provider_smoke_route_count_top_level_fields",
+    "_api_key_quickstart_command_plan_route_count_top_level_fields",
     "_api_key_provider_recovery_checklist_route_top_level_fields",
     "_api_key_provider_recovery_route_top_level_fields",
     "_api_key_readiness_route_top_level_fields",
@@ -64,6 +65,15 @@ def _api_key_provider_smoke_route_count_top_level_fields(
     return _route_family_count_top_level_fields(
         prefix="api_key_provider_smoke",
         source_summary=api_key_provider_smoke_route_summary,
+    )
+
+
+def _api_key_quickstart_command_plan_route_count_top_level_fields(
+    api_key_quickstart_command_plan_route_summary: dict[str, Any],
+) -> dict[str, Any]:
+    return _route_family_count_top_level_fields(
+        prefix="api_key_setup_quickstart_command_plan",
+        source_summary=api_key_quickstart_command_plan_route_summary,
     )
 
 
