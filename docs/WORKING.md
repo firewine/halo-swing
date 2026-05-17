@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_PROGRESS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_PROGRESS_GATE
+status: API_KEY_TOP_LEVEL_INTEGRATION_STATUS_MIRRORS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_INTEGRATION_STATUS_MIRRORS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror API-key provider smoke progress onto summary-only top-level fields
+next_atomic_step: mirror API-key integration readiness onto summary-only top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,16 +81,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_provider_smoke_total_count, api_key_provider_smoke_ready_count, and api_key_provider_smoke_blocked_count mirror provider smoke progress
-  - summary-only top-level api_key_next_provider_smoke_command_name, provider_family, provider, command, and status mirror the next ready provider smoke when available
-  - README and DevOps setup guide document top-level API-key provider smoke progress mirrors
-  - setup docs tests assert the new top-level provider smoke progress guidance
+  - summary-only top-level api_key_integration_status, api_key_integration_api_keys_configured, api_key_integration_live_providers_selected, and api_key_integration_ready_to_run_live_smoke mirror integration readiness
+  - summary-only top-level api_key_integration_dotenv_loading_enabled, api_key_integration_dotenv_target_exists, api_key_integration_configured_provider_families, api_key_integration_missing_provider_families, api_key_integration_selected_provider_classes, and api_key_integration_next_action_name mirror the nested integration summary
+  - README and DevOps setup guide document top-level API-key integration readiness mirrors
+  - setup docs tests assert the new top-level integration readiness guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level provider smoke progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level integration readiness mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_PROGRESS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_PROVIDER_SMOKE_PROGRESS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror API-key provider smoke progress onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -3076,14 +3087,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Top-Level Provider Smoke Progress Gate is verified.
-Summary-only top-level payload now mirrors provider smoke total/ready/blocked
-counts and next provider smoke command metadata. Focused tests, direct
+Summary: API Key Top-Level Integration Status Mirrors Gate is verified.
+Summary-only top-level payload now mirrors integration readiness scalar/list
+fields from api_key_integration_status_summary. Focused tests, direct
 summary-only smoke, targeted payload print, full pytest, ruff, and health_check
 passed.
 
 ```yaml
-api_key_top_level_provider_smoke_progress_gate:
+api_key_top_level_integration_status_mirrors_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3096,10 +3107,10 @@ api_key_top_level_provider_smoke_progress_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary-only top-level api_key_provider_smoke_total_count, api_key_provider_smoke_ready_count, and api_key_provider_smoke_blocked_count mirror provider smoke progress
-    - summary-only top-level api_key_next_provider_smoke_command_name, provider_family, provider, command, and status mirror the next ready provider smoke when available
-    - README and DevOps setup guide document top-level API-key provider smoke progress mirrors
-    - setup docs tests assert top-level provider smoke progress guidance
+    - summary-only top-level api_key_integration_status, api_key_integration_api_keys_configured, api_key_integration_live_providers_selected, and api_key_integration_ready_to_run_live_smoke mirror integration readiness
+    - summary-only top-level api_key_integration_dotenv_loading_enabled, api_key_integration_dotenv_target_exists, api_key_integration_configured_provider_families, api_key_integration_missing_provider_families, api_key_integration_selected_provider_classes, and api_key_integration_next_action_name mirror the nested integration summary
+    - README and DevOps setup guide document top-level API-key integration readiness mirrors
+    - setup docs tests assert top-level integration readiness guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3113,15 +3124,28 @@ api_key_top_level_provider_smoke_progress_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level setup quickstart fields present; secret_values_returned false
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; top-level integration readiness fields present; secret_values_returned false
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "800 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_provider_smoke_total_count"], p["api_key_provider_smoke_ready_count"], p["api_key_provider_smoke_blocked_count"], p["api_key_next_provider_smoke_command_name"], p["api_key_next_provider_smoke_provider_family"], p["api_key_next_provider_smoke_provider"], p["api_key_next_provider_smoke_command"], p["api_key_next_provider_smoke_status"], p["secret_values_returned"])'
-      result: "3 0 3 None None None None None False"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_integration_status"], p["api_key_integration_api_keys_configured"], p["api_key_integration_dotenv_loading_enabled"], p["api_key_integration_dotenv_target_exists"], p["api_key_integration_live_providers_selected"], p["api_key_integration_ready_to_run_live_smoke"], p["api_key_integration_configured_provider_families"], p["api_key_integration_missing_provider_families"], p["api_key_integration_selected_provider_classes"], p["api_key_integration_next_action_name"], p["secret_values_returned"])'
+      result: "blocked False True False False False [] ['market', 'macro', 'news'] ['ReplayMarketDataProvider'] prepare_dotenv False"
+```
+
+Previous verification:
+
+Summary: API Key Top-Level Provider Smoke Progress Gate is verified.
+Summary-only top-level payload now mirrors provider smoke total/ready/blocked
+counts and next provider smoke command metadata. Focused tests, direct
+summary-only smoke, targeted payload print, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_top_level_provider_smoke_progress_gate:
+  status: verified
 ```
 
 Previous verification:

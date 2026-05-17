@@ -5492,6 +5492,22 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_integration_status"] == "blocked"
+    assert payload["api_key_integration_api_keys_configured"] is False
+    assert payload["api_key_integration_dotenv_loading_enabled"] is True
+    assert payload["api_key_integration_dotenv_target_exists"] is False
+    assert payload["api_key_integration_live_providers_selected"] is False
+    assert payload["api_key_integration_ready_to_run_live_smoke"] is False
+    assert payload["api_key_integration_configured_provider_families"] == []
+    assert payload["api_key_integration_missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_integration_selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert payload["api_key_integration_next_action_name"] == "prepare_dotenv"
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
@@ -7642,6 +7658,39 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
         "POLYGON_API_KEY",
     ]
     assert integration_status["secret_values_returned"] is False
+    assert payload["api_key_integration_status"] == integration_status["status"]
+    assert (
+        payload["api_key_integration_api_keys_configured"]
+        is integration_status["api_keys_configured"]
+    )
+    assert (
+        payload["api_key_integration_dotenv_loading_enabled"]
+        is integration_status["dotenv_loading_enabled"]
+    )
+    assert (
+        payload["api_key_integration_dotenv_target_exists"]
+        is integration_status["dotenv_target_exists"]
+    )
+    assert (
+        payload["api_key_integration_live_providers_selected"]
+        is integration_status["live_providers_selected"]
+    )
+    assert (
+        payload["api_key_integration_ready_to_run_live_smoke"]
+        is integration_status["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_integration_configured_provider_families"] == (
+        integration_status["configured_provider_families"]
+    )
+    assert payload["api_key_integration_missing_provider_families"] == (
+        integration_status["missing_provider_families"]
+    )
+    assert payload["api_key_integration_selected_provider_classes"] == (
+        integration_status["selected_provider_classes"]
+    )
+    assert payload["api_key_integration_next_action_name"] == (
+        integration_status["next_action_name"]
+    )
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized

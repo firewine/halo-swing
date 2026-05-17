@@ -886,7 +886,20 @@ provider selection, failure, and next-action evidence into one operator row with
 `provider_recovery_pending_smoke_command_names`,
 `provider_recovery_pending_smoke_commands`,
 `provider_recovery_blocked_smoke_command_names`, and
-`provider_recovery_blocked_smoke_commands`. It also
+`provider_recovery_blocked_smoke_commands`. It mirrors the key integration
+readiness values as top-level scalars/lists:
+`api_key_integration_status`,
+`api_key_integration_api_keys_configured`,
+`api_key_integration_dotenv_loading_enabled`,
+`api_key_integration_dotenv_target_exists`,
+`api_key_integration_live_providers_selected`,
+`api_key_integration_ready_to_run_live_smoke`,
+`api_key_integration_configured_provider_families`,
+`api_key_integration_missing_provider_families`,
+`api_key_integration_selected_provider_classes`, and
+`api_key_integration_next_action_name`, so compact clients can show whether
+API keys are configured and live providers are selected without nested parsing.
+It also
 mirrors the first pending recovery command as
 `next_pending_recovery_smoke_command_name`,
 `next_pending_recovery_smoke_command`,

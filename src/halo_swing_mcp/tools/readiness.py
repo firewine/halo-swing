@@ -2963,6 +2963,9 @@ def _api_key_pipeline_summary_only_payload(
     api_key_next_action_summary = _optional_mapping(
         payload.get("api_key_next_action_summary")
     ) or {}
+    api_key_integration_status_summary = _optional_mapping(
+        payload.get("api_key_integration_status_summary")
+    ) or {}
     live_data_smoke_summary = _optional_mapping(
         payload.get("live_data_smoke_summary")
     ) or {}
@@ -3409,6 +3412,41 @@ def _api_key_pipeline_summary_only_payload(
             )
         )
         or {},
+        "api_key_integration_status": (
+            api_key_integration_status_summary.get("status")
+        ),
+        "api_key_integration_api_keys_configured": (
+            api_key_integration_status_summary.get("api_keys_configured") is True
+        ),
+        "api_key_integration_dotenv_loading_enabled": (
+            api_key_integration_status_summary.get("dotenv_loading_enabled")
+            is True
+        ),
+        "api_key_integration_dotenv_target_exists": (
+            api_key_integration_status_summary.get("dotenv_target_exists") is True
+        ),
+        "api_key_integration_live_providers_selected": (
+            api_key_integration_status_summary.get("live_providers_selected")
+            is True
+        ),
+        "api_key_integration_ready_to_run_live_smoke": (
+            api_key_integration_status_summary.get("ready_to_run_live_smoke")
+            is True
+        ),
+        "api_key_integration_configured_provider_families": _string_list(
+            api_key_integration_status_summary.get(
+                "configured_provider_families"
+            )
+        ),
+        "api_key_integration_missing_provider_families": _string_list(
+            api_key_integration_status_summary.get("missing_provider_families")
+        ),
+        "api_key_integration_selected_provider_classes": _string_list(
+            api_key_integration_status_summary.get("selected_provider_classes")
+        ),
+        "api_key_integration_next_action_name": (
+            api_key_integration_status_summary.get("next_action_name")
+        ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
         ),
@@ -3531,10 +3569,7 @@ def _api_key_pipeline_summary_only_payload(
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
-        "api_key_integration_status_summary": _optional_mapping(
-            payload.get("api_key_integration_status_summary")
-        )
-        or {},
+        "api_key_integration_status_summary": api_key_integration_status_summary,
         "api_key_next_action_summary": api_key_next_action_summary,
         "api_key_operator_checklist_summary": api_key_operator_checklist_summary,
         "setup_status_summary": setup_status_summary,
