@@ -5515,6 +5515,16 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     ]
     assert payload["api_key_setup_blocking_step_count"] == 4
     assert payload["api_key_setup_next_blocking_step"] == "prepare_dotenv"
+    assert payload["api_key_setup_configured_provider_families"] == []
+    assert payload["api_key_setup_missing_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_configured_provider_family_count"] == 0
+    assert payload["api_key_setup_required_provider_family_count"] == 3
+    assert payload["api_key_setup_ready_to_run_live_smoke"] is False
+    assert payload["api_key_setup_provider_route_status"] == "blocked"
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {
@@ -6647,6 +6657,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert payload["api_key_setup_next_blocking_step"] == (
         checklist_summary["next_blocking_step"]
+    )
+    assert payload["api_key_setup_configured_provider_families"] == (
+        payload["setup_status_summary"]["configured_provider_families"]
+    )
+    assert payload["api_key_setup_missing_provider_families"] == (
+        payload["setup_status_summary"]["missing_provider_families"]
+    )
+    assert payload["api_key_setup_configured_provider_family_count"] == (
+        payload["setup_status_summary"]["configured_provider_family_count"]
+    )
+    assert payload["api_key_setup_required_provider_family_count"] == (
+        payload["setup_status_summary"]["required_provider_family_count"]
+    )
+    assert payload["api_key_setup_ready_to_run_live_smoke"] == (
+        payload["setup_status_summary"]["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_setup_provider_route_status"] == (
+        payload["setup_status_summary"]["provider_route_status"]
     )
     assert checklist_summary["ready"] is False
     assert checklist_summary["ready_step_names"] == [

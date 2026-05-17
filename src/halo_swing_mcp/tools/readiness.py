@@ -3020,6 +3020,7 @@ def _api_key_pipeline_summary_only_payload(
     api_key_operator_checklist_summary = _api_key_operator_checklist_summary(
         _optional_mapping(payload.get("api_key_operator_checklist")) or {}
     )
+    setup_status_summary = _optional_mapping(payload.get("setup_status_summary")) or {}
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3128,6 +3129,24 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
             "next_blocking_step"
         ),
+        "api_key_setup_configured_provider_families": _string_list(
+            setup_status_summary.get("configured_provider_families")
+        ),
+        "api_key_setup_missing_provider_families": _string_list(
+            setup_status_summary.get("missing_provider_families")
+        ),
+        "api_key_setup_configured_provider_family_count": (
+            setup_status_summary.get("configured_provider_family_count")
+        ),
+        "api_key_setup_required_provider_family_count": (
+            setup_status_summary.get("required_provider_family_count")
+        ),
+        "api_key_setup_ready_to_run_live_smoke": (
+            setup_status_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "api_key_setup_provider_route_status": setup_status_summary.get(
+            "provider_route_status"
+        ),
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
@@ -3137,10 +3156,7 @@ def _api_key_pipeline_summary_only_payload(
         or {},
         "api_key_next_action_summary": api_key_next_action_summary,
         "api_key_operator_checklist_summary": api_key_operator_checklist_summary,
-        "setup_status_summary": _optional_mapping(
-            payload.get("setup_status_summary")
-        )
-        or {},
+        "setup_status_summary": setup_status_summary,
         "live_data_setup_summary": _optional_mapping(
             payload.get("live_data_setup_summary")
         )

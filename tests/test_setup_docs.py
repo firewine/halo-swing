@@ -335,6 +335,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_setup_blocking_step_names" in guide
     assert "api_key_setup_blocking_step_count" in guide
     assert "api_key_setup_next_blocking_step" in guide
+    assert "api_key_setup_configured_provider_families" in guide
+    assert "api_key_setup_missing_provider_families" in guide
+    assert "api_key_setup_configured_provider_family_count" in guide
+    assert "api_key_setup_required_provider_family_count" in guide
+    assert "api_key_setup_ready_to_run_live_smoke" in guide
+    assert "api_key_setup_provider_route_status" in guide
     assert "top-level summary-only recovery command lists" in guide
     assert "top-level summary-only recovery status and identity fields" in guide
     assert "top-level summary-only next recovery fields" in guide
