@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 from .context import *
+from .summary_only_provider_smoke_fields import (
+    _api_key_provider_smoke_top_level_fields,
+)
 
 
 __all__ = ('_api_key_pipeline_summary_only_payload',)
@@ -453,59 +456,16 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
         "api_key_next_smoke_command": next_smoke_command.get("command"),
         "api_key_next_smoke_command_name": next_smoke_command.get("name"),
-        "api_key_provider_smoke_total_count": setup_status_summary.get(
-            "provider_smoke_count"
+        **_api_key_provider_smoke_top_level_fields(
+            setup_status_summary,
+            next_provider_smoke,
+            provider_smoke_command_rows,
+            provider_smoke_command_count,
+            provider_smoke_command_rows_by_family,
         ),
-        "api_key_provider_smoke_ready_count": setup_status_summary.get(
-            "ready_provider_smoke_count"
-        ),
-        "api_key_provider_smoke_blocked_count": setup_status_summary.get(
-            "blocked_provider_smoke_count"
-        ),
-        "api_key_next_provider_smoke_command_name": (
-            setup_status_summary.get("next_provider_smoke_command_name")
-            or next_provider_smoke.get("smoke_command_name")
-        ),
-        "api_key_next_provider_smoke_provider_family": (
-            next_provider_smoke.get("provider_family")
-        ),
-        "api_key_next_provider_smoke_provider": next_provider_smoke.get(
-            "provider"
-        ),
-        "api_key_next_provider_smoke_command": next_provider_smoke.get(
-            "command"
-        ),
-        "api_key_next_provider_smoke_status": next_provider_smoke.get("status"),
         "api_key_one_shot_pipeline_smoke_command": one_shot_pipeline_smoke.get(
             "command"
         ),
-        "api_key_provider_smoke_command_count": provider_smoke_command_count,
-        "api_key_provider_smoke_command_names": _ordered_unique_strings(
-            [
-                row.get("smoke_command_name")
-                for row in provider_smoke_command_rows
-            ]
-        ),
-        "api_key_provider_smoke_commands_by_family": {
-            family: row.get("command")
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_statuses_by_family": {
-            family: row.get("status")
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_network_call_policies_by_family": {
-            family: row.get("network_call_policy")
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_expected_live_contracts_by_family": {
-            family: row.get("expected_live_contract")
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
-        "api_key_provider_smoke_expected_live_checks_by_family": {
-            family: _string_list(row.get("expected_live_checks"))
-            for family, row in provider_smoke_command_rows_by_family.items()
-        },
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},

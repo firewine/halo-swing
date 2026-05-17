@@ -1136,6 +1136,14 @@ def test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync() -> None:
         "api_key_next_provider_smoke_provider",
         "api_key_next_provider_smoke_command",
         "api_key_next_provider_smoke_status",
+        "api_key_next_provider_smoke_network_call",
+        "api_key_next_provider_smoke_network_call_policy",
+        "api_key_next_provider_smoke_expected_live_contract",
+        "api_key_next_provider_smoke_expected_live_checks",
+        "api_key_next_provider_smoke_preferred_env_key",
+        "api_key_next_provider_smoke_accepted_env_keys",
+        "api_key_next_provider_smoke_mutates_local_state",
+        "api_key_next_provider_smoke_secret_values_returned",
     )
 
     for field_name in field_names:

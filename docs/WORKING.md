@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_VERIFIED
-gate_id: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_GATE
+status: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_VERIFIED
+gate_id: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: lock API-key pipeline failure summary next-action field docs parity
+next_atomic_step: mirror next provider smoke safety and live-contract fields at API-key top level
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,14 +83,26 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide document api_key_pipeline_failure_summary next-action provider identity, env-key hints, expected live contract/checks, and safety fields
-  - setup docs guard keeps README and DevOps API-key pipeline failure summary field parity in sync
+  - summary-only top-level api_key_next_provider_smoke_* mirrors include network call, network-call policy, expected live contract/checks, env-key hints, local-state mutation, and secret-return safety metadata
+  - README and DevOps setup guide document API-key next provider smoke safety and live-contract top-level fields
+  - setup docs guard keeps README and DevOps API-key next provider smoke field parity in sync
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key pipeline failure summary next-action docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key next provider smoke safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock API-key pipeline failure summary next-action field docs parity
 ```
 
 Previous completed directive:
@@ -3449,6 +3461,62 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Next Provider Smoke Top-Level Safety Fields Gate is verified.
+Summary-only top-level `api_key_next_provider_smoke_*` now mirrors network-call
+metadata, expected live contract/checks, env-key hints, local-state mutation,
+and secret-return safety metadata. Focused readiness/docs coverage,
+summary-only smoke, setup-docs coverage, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_next_provider_smoke_top_level_safety_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - summary-only top-level api_key_next_provider_smoke_network_call and api_key_next_provider_smoke_network_call_policy mirror next provider smoke live-call metadata
+    - summary-only top-level api_key_next_provider_smoke_expected_live_contract and api_key_next_provider_smoke_expected_live_checks mirror the expected live validation contract
+    - summary-only top-level api_key_next_provider_smoke_preferred_env_key and api_key_next_provider_smoke_accepted_env_keys mirror no-secret env-key hints
+    - summary-only top-level api_key_next_provider_smoke_mutates_local_state and api_key_next_provider_smoke_secret_values_returned mirror safety metadata
+    - provider-smoke top-level projection was split into summary_only_provider_smoke_fields.py so summary_only_payload.py stays below the 900-line warning point
+    - README and DevOps setup guide document top-level API-key next provider smoke safety and live-contract fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands -q
+      result: "3 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; blocked no-key summary returns null/false/empty next provider smoke safety fields without secrets
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "824 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_next_provider_smoke_network_call"], payload["api_key_next_provider_smoke_network_call_policy"], payload["api_key_next_provider_smoke_expected_live_contract"], payload["api_key_next_provider_smoke_expected_live_checks"], payload["api_key_next_provider_smoke_preferred_env_key"], payload["api_key_next_provider_smoke_accepted_env_keys"], payload["api_key_next_provider_smoke_mutates_local_state"], payload["api_key_next_provider_smoke_secret_values_returned"], payload["secret_values_returned"])'
+      result: "True only_when_matching_api_key_selects_live_provider market_snapshot_contract ['live_data_boundary_declared'] POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False False False"
+```
+
+Previous verification:
 
 Summary: API Key Pipeline Failure Summary Next Action Docs Parity Gate is
 verified. README and DevOps setup guide now document

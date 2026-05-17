@@ -1040,6 +1040,68 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.865 API Key Next Provider Smoke Top-Level Safety Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.864에서 API-key pipeline failure summary next-action 문서 parity를 잠갔다.
+API-key-only compact output은 provider smoke가 다음 단계일 때 이미
+`api_key_next_provider_smoke_*` provider/command/status fields를 top-level에 올린다.
+하지만 이 top-level row만 읽는 operator는 아직 해당 smoke가 live network call인지,
+어떤 live contract/check를 만족해야 하는지, 어떤 env-key alias를 점검해야 하는지,
+그리고 local-state mutation/secret-return 안전성이 어떤지 확인하려면 nested
+`api_key_command_summary.next_provider_smoke`를 다시 읽어야 한다. 이번 slice는
+no-secret safety and live-contract metadata를 같은 top-level prefix로 미러링해,
+사용자가 API 키만 채운 뒤 첫 provider smoke를 한 줄에서 안전하게 실행/해석할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_next_provider_smoke_network_call and api_key_next_provider_smoke_network_call_policy mirror next provider smoke live-call metadata
+  - summary-only top-level api_key_next_provider_smoke_expected_live_contract and api_key_next_provider_smoke_expected_live_checks mirror the expected live validation contract
+  - summary-only top-level api_key_next_provider_smoke_preferred_env_key and api_key_next_provider_smoke_accepted_env_keys mirror no-secret env-key hints
+  - summary-only top-level api_key_next_provider_smoke_mutates_local_state and api_key_next_provider_smoke_secret_values_returned mirror safety metadata
+  - provider-smoke top-level projection was split into summary_only_provider_smoke_fields.py so summary_only_payload.py stays below the 900-line warning point
+  - README and DevOps setup guide document top-level API-key next provider smoke safety and live-contract fields
+  - tests cover blocked no-key null/false/empty defaults and ready fake-key next provider smoke mirrors without secret values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key next provider smoke top-level safety fields pytest: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 824 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct summary-only smoke confirmed blocked next provider smoke safety fields stay null, false, or empty without secret values
+  - fake-key summary-only smoke confirmed next provider smoke network policy, expected live contract/checks, env-key hints, and secret_values_returned false
+```
+
 ## 3.861 API Key Integration Status Next Action Dotenv Fields Gate Record - 2026-05-17
 
 ### A. 목적

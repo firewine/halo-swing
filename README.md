@@ -519,7 +519,15 @@ It also mirrors provider smoke progress as
 `api_key_next_provider_smoke_command_name`,
 `api_key_next_provider_smoke_provider_family`,
 `api_key_next_provider_smoke_provider`, `api_key_next_provider_smoke_command`,
-and `api_key_next_provider_smoke_status`.
+`api_key_next_provider_smoke_status`,
+`api_key_next_provider_smoke_network_call`,
+`api_key_next_provider_smoke_network_call_policy`,
+`api_key_next_provider_smoke_expected_live_contract`,
+`api_key_next_provider_smoke_expected_live_checks`,
+`api_key_next_provider_smoke_preferred_env_key`,
+`api_key_next_provider_smoke_accepted_env_keys`,
+`api_key_next_provider_smoke_mutates_local_state`, and
+`api_key_next_provider_smoke_secret_values_returned`.
 It also mirrors provider smoke command details by family as
 `api_key_provider_smoke_commands_by_family`,
 `api_key_provider_smoke_statuses_by_family`,

@@ -5909,6 +5909,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_provider_smoke_provider"] is None
     assert payload["api_key_next_provider_smoke_command"] is None
     assert payload["api_key_next_provider_smoke_status"] is None
+    assert payload["api_key_next_provider_smoke_network_call"] is False
+    assert payload["api_key_next_provider_smoke_network_call_policy"] is None
+    assert payload["api_key_next_provider_smoke_expected_live_contract"] is None
+    assert payload["api_key_next_provider_smoke_expected_live_checks"] == []
+    assert payload["api_key_next_provider_smoke_preferred_env_key"] is None
+    assert payload["api_key_next_provider_smoke_accepted_env_keys"] == []
+    assert payload["api_key_next_provider_smoke_mutates_local_state"] is False
+    assert payload["api_key_next_provider_smoke_secret_values_returned"] is False
     assert payload["api_key_one_shot_pipeline_smoke_command"] == (
         "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
         "run_api_key_pipeline_smoke --summary-only --no-audit"
@@ -7501,6 +7509,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert payload["api_key_next_provider_smoke_status"] == (
         command_summary["next_provider_smoke"]["status"]
     )
+    assert payload["api_key_next_provider_smoke_network_call"] is True
+    assert payload["api_key_next_provider_smoke_network_call_policy"] == (
+        command_summary["next_provider_smoke"]["network_call_policy"]
+    )
+    assert payload["api_key_next_provider_smoke_expected_live_contract"] == (
+        command_summary["next_provider_smoke"]["expected_live_contract"]
+    )
+    assert payload["api_key_next_provider_smoke_expected_live_checks"] == (
+        command_summary["next_provider_smoke"]["expected_live_checks"]
+    )
+    assert payload["api_key_next_provider_smoke_preferred_env_key"] == (
+        command_summary["next_provider_smoke"]["preferred_env_key"]
+    )
+    assert payload["api_key_next_provider_smoke_accepted_env_keys"] == (
+        command_summary["next_provider_smoke"]["accepted_env_keys"]
+    )
+    assert payload["api_key_next_provider_smoke_mutates_local_state"] is False
+    assert payload["api_key_next_provider_smoke_secret_values_returned"] is False
     assert command_summary["next_provider_smoke"]["preferred_env_key"] == (
         "POLYGON_API_KEY"
     )
