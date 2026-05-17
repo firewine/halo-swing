@@ -145,6 +145,7 @@ def run_api_key_pipeline_smoke(
         api_key_dotenv_loading_summary=api_key_dotenv_loading_summary,
         api_key_provider_selection_summary=api_key_provider_selection_summary,
         api_key_provider_recovery_summary=api_key_provider_recovery_summary,
+        api_key_command_summary=api_key_command_summary,
     )
     api_key_live_http_timeout_summary = _api_key_live_http_timeout_summary()
 

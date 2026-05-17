@@ -193,6 +193,25 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_next_provider_smoke_provider": (
             next_provider_smoke.get("provider")
         ),
+        "api_key_integration_next_action_next_provider_smoke_selected_provider_class": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_selected_provider_class"
+            )
+            or next_provider_smoke.get("selected_provider_class")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_provider_route_data_mode"
+            )
+            or next_provider_smoke.get("provider_route_data_mode")
+        ),
+        "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required": (
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_provider_route_live_data_required"
+            )
+            is True
+            or next_provider_smoke.get("provider_route_live_data_required") is True
+        ),
         "api_key_integration_next_action_next_provider_smoke_status": (
             next_provider_smoke.get("status")
         ),

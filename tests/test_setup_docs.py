@@ -603,6 +603,18 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
         in readme
     )
     assert "api_key_integration_next_action_next_provider_smoke_provider" in readme
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_selected_provider_class"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required"
+        in readme
+    )
     assert "api_key_integration_next_action_next_provider_smoke_status" in readme
     assert "api_key_integration_next_action_next_provider_smoke_network_call" in readme
     assert (
@@ -626,6 +638,9 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_next_provider_smoke_command",
         "api_key_integration_next_action_next_provider_smoke_provider_family",
         "api_key_integration_next_action_next_provider_smoke_provider",
+        "api_key_integration_next_action_next_provider_smoke_selected_provider_class",
+        "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode",
+        "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required",
         "api_key_integration_next_action_next_provider_smoke_status",
         "api_key_integration_next_action_next_provider_smoke_network_call",
         "api_key_integration_next_action_next_provider_smoke_network_call_policy",
@@ -650,6 +665,20 @@ def test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync() -> None:
         "api_key_provider_smoke_selected_provider_class_by_family",
         "api_key_provider_smoke_provider_route_data_mode_by_family",
         "api_key_provider_smoke_provider_route_live_data_required_by_family",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
+def test_setup_docs_keep_api_key_integration_next_provider_smoke_route_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_integration_next_action_next_provider_smoke_selected_provider_class",
+        "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode",
+        "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required",
     )
 
     for field_name in field_names:

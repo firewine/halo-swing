@@ -442,6 +442,7 @@ def _api_key_integration_status_summary(
     api_key_dotenv_loading_summary: dict[str, Any],
     api_key_provider_selection_summary: dict[str, Any],
     api_key_provider_recovery_summary: dict[str, Any],
+    api_key_command_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     configured_provider_families = _string_list(
         setup_status_summary.get("configured_provider_families")
@@ -839,6 +840,16 @@ def _api_key_integration_status_summary(
     next_action_expected_live_checks = _string_list(
         api_key_next_action_summary.get("next_action_expected_live_checks")
     )
+    api_key_command_summary = api_key_command_summary or {}
+    next_provider_smoke = _optional_mapping(
+        api_key_command_summary.get("next_provider_smoke")
+    ) or {}
+    next_provider_smoke_selected_provider_class = next_provider_smoke.get(
+        "selected_provider_class"
+    )
+    next_provider_smoke_provider_route_data_mode = next_provider_smoke.get(
+        "provider_route_data_mode"
+    )
     if isinstance(next_action_provider_family, str):
         summary["next_action_provider_family"] = next_action_provider_family
     if isinstance(next_action_provider, str):
@@ -867,6 +878,18 @@ def _api_key_integration_status_summary(
     if next_action_expected_live_checks:
         summary["next_action_expected_live_checks"] = (
             next_action_expected_live_checks
+        )
+    if isinstance(next_provider_smoke_selected_provider_class, str):
+        summary["next_action_next_provider_smoke_selected_provider_class"] = (
+            next_provider_smoke_selected_provider_class
+        )
+    if isinstance(next_provider_smoke_provider_route_data_mode, str):
+        summary["next_action_next_provider_smoke_provider_route_data_mode"] = (
+            next_provider_smoke_provider_route_data_mode
+        )
+    if isinstance(next_provider_smoke.get("provider_family"), str):
+        summary["next_action_next_provider_smoke_provider_route_live_data_required"] = (
+            next_provider_smoke.get("provider_route_live_data_required") is True
         )
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key

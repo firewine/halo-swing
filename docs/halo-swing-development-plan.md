@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.884 API Key Integration Next Provider Smoke Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.883에서 provider smoke plan rows와 summary-only next provider smoke mirrors가
+route evidence를 갖게 됐다. 하지만 integration status client가 읽는
+`api_key_integration_next_action_next_provider_smoke_*` fields에는 아직 selected provider
+class, route data mode, live-data-required evidence가 직접 붙어 있지 않다. 이번 slice는
+API 키만 넣은 뒤 integration compact status 한 벌만 읽어도 다음 provider smoke가 실제
+live provider route를 향하는지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary mirrors next provider smoke selected provider class, route data mode, and live-data-required evidence
+  - summary-only api_key_integration_next_action_next_provider_smoke_* fields expose the same provider route evidence
+  - README and DevOps setup guide document integration next provider smoke route fields
+  - setup docs guard keeps README and DevOps API-key integration next provider smoke route field parity in sync
+  - tests cover integration status summary, summary-only top-level mirrors, fake-key no-secret paths, and docs parity
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key integration next provider smoke route fields pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed api_key_integration_status_summary and top-level api_key_integration_next_action_next_provider_smoke route mirrors without secret values
+```
+
 ## 3.883 API Key Provider Smoke Plan Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

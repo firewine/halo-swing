@@ -2951,6 +2951,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_provider_route_data_mode": "live",
         "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_next_provider_smoke_selected_provider_class": (
+            "PolygonMarketDataProvider"
+        ),
+        "next_action_next_provider_smoke_provider_route_data_mode": "live",
+        "next_action_next_provider_smoke_provider_route_live_data_required": True,
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
             "live_data_boundary_declared",
@@ -5532,6 +5537,11 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_provider_route_data_mode": "live",
         "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
+        "next_action_next_provider_smoke_selected_provider_class": (
+            "PolygonMarketDataProvider"
+        ),
+        "next_action_next_provider_smoke_provider_route_data_mode": "live",
+        "next_action_next_provider_smoke_provider_route_live_data_required": True,
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
             "live_data_boundary_declared",
@@ -6160,6 +6170,24 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert (
         payload["api_key_integration_next_action_next_provider_smoke_provider"]
         is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_selected_provider_class"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required"
+        ]
+        is False
     )
     assert (
         payload["api_key_integration_next_action_next_provider_smoke_status"]
@@ -8827,6 +8855,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert integration_status["next_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
+    assert (
+        integration_status[
+            "next_action_next_provider_smoke_selected_provider_class"
+        ]
+        == "PolygonMarketDataProvider"
+    )
+    assert (
+        integration_status[
+            "next_action_next_provider_smoke_provider_route_data_mode"
+        ]
+        == "live"
+    )
+    assert (
+        integration_status[
+            "next_action_next_provider_smoke_provider_route_live_data_required"
+        ]
+        is True
+    )
     assert integration_status["preferred_env_key"] == "POLYGON_API_KEY"
     assert integration_status["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -9024,6 +9070,39 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         == payload["next_operator_action"]["next_provider_smoke"]["provider"]
     )
     assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_selected_provider_class"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_selected_provider_class"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "selected_provider_class"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode"
+        ]
+        == integration_status[
+            "next_action_next_provider_smoke_provider_route_data_mode"
+        ]
+        == payload["next_operator_action"]["next_provider_smoke"][
+            "provider_route_data_mode"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required"
+        ]
+        is integration_status[
+            "next_action_next_provider_smoke_provider_route_live_data_required"
+        ]
+        is payload["next_operator_action"]["next_provider_smoke"][
+            "provider_route_live_data_required"
+        ]
+    )
+    assert (
         payload["api_key_integration_next_action_next_provider_smoke_status"]
         == payload["next_operator_action"]["next_provider_smoke"]["status"]
     )
@@ -9048,6 +9127,46 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         ]
     )
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider_smoke_route_fields(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    next_provider_smoke = payload["api_key_command_summary"]["next_provider_smoke"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_selected_provider_class"
+        ]
+        == next_provider_smoke["selected_provider_class"]
+        == "PolygonMarketDataProvider"
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_data_mode"
+        ]
+        == next_provider_smoke["provider_route_data_mode"]
+        == "live"
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_provider_route_live_data_required"
+        ]
+        is next_provider_smoke["provider_route_live_data_required"]
+        is True
+    )
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
