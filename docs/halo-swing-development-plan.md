@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.794 API Key Summary-Only Next Recovery Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 next recovery, first pending recovery,
+first blocked recovery 세부 필드를 보여주지만, 최상위
+`run_api_key_pipeline_smoke(summary_only=true)` row만 스캔하는 operator는 다음 recovery
+provider와 rerun command를 확인하려면 nested summary를 다시 열어야 했다. 이번 slice는
+no-secret `next_recovery_*`, `next_pending_recovery_*`,
+`next_blocked_recovery_*` 필드를 summary-only 최상위 payload로 올려, API-key-only 한 줄
+요약만으로 다음 recovery smoke를 바로 실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level API-key pipeline summary-only payload includes next_recovery_smoke_command_name and next_recovery_smoke_command copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes next_recovery_provider_family, next_recovery_provider, next_recovery_next_setup_action, next_recovery_preferred_env_key, and next_recovery_accepted_env_keys
+  - top-level API-key pipeline summary-only payload includes next_recovery_network_call_policy, next_recovery_smoke_available, next_recovery_network_call, next_recovery_mutates_local_state, and next_recovery_secret_values_returned
+  - top-level API-key pipeline summary-only payload includes first pending and first blocked recovery field groups copied from API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns top-level next recovery fields without secret values
+  - blocked setup summary-only payload returns empty top-level next recovery fields without secret values
+  - focused tests cover top-level next recovery fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document top-level summary-only next recovery fields
+  - tests/test_setup_docs.py asserts top-level summary-only next recovery guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; top-level next recovery fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_recovery_smoke_command_name"], payload["next_recovery_provider_family"], payload["next_recovery_provider"], payload["next_recovery_smoke_available"], payload["next_recovery_network_call"], payload["next_recovery_secret_values_returned"], payload["secret_values_returned"])': get_market_snapshot_live_smoke market polygon True True False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.793 API Key Summary-Only Recovery Status Gate Record - 2026-05-17
 
 ### A. 목적

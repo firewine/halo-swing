@@ -345,6 +345,16 @@ It also exposes top-level summary-only recovery status and identity fields:
 `provider_recovery_pending_providers`,
 `provider_recovery_blocked_provider_families`, and
 `provider_recovery_blocked_providers`.
+It also exposes top-level summary-only next recovery fields:
+`next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
+`next_recovery_provider_family`, `next_recovery_provider`,
+`next_recovery_next_setup_action`, `next_recovery_preferred_env_key`,
+`next_recovery_accepted_env_keys`, `next_recovery_network_call_policy`,
+`next_recovery_smoke_available`, `next_recovery_network_call`,
+`next_recovery_mutates_local_state`, `next_recovery_exception_type`,
+`next_recovery_exception_message_returned`, `next_recovery_url_returned`,
+`next_recovery_secret_values_returned`, plus matching
+`next_pending_recovery_*` and `next_blocked_recovery_*` fields.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,

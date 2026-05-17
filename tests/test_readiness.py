@@ -2784,6 +2784,48 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     ]
     assert payload["provider_recovery_blocked_smoke_command_names"] == []
     assert payload["provider_recovery_blocked_smoke_commands"] == []
+    assert payload["next_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_recovery_smoke_command"] == (
+        payload["provider_recovery_smokes"][0]["command"]
+    )
+    assert payload["next_recovery_provider_family"] == "market"
+    assert payload["next_recovery_provider"] == "polygon"
+    assert payload["next_recovery_next_setup_action"] == (
+        "verify_provider_credentials_or_network"
+    )
+    assert payload["next_recovery_preferred_env_key"] == "POLYGON_API_KEY"
+    assert payload["next_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert payload["next_recovery_network_call_policy"] == (
+        "only_when_matching_api_key_selects_live_provider"
+    )
+    assert payload["next_recovery_smoke_available"] is True
+    assert payload["next_recovery_network_call"] is True
+    assert payload["next_recovery_mutates_local_state"] is False
+    assert payload["next_recovery_exception_type"] == "RuntimeError"
+    assert payload["next_recovery_exception_message_returned"] is False
+    assert payload["next_recovery_url_returned"] is False
+    assert payload["next_recovery_secret_values_returned"] is False
+    assert payload["next_pending_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert payload["next_pending_recovery_provider_family"] == "market"
+    assert payload["next_pending_recovery_provider"] == "polygon"
+    assert payload["next_pending_recovery_smoke_available"] is True
+    assert payload["next_pending_recovery_network_call"] is True
+    assert payload["next_pending_recovery_secret_values_returned"] is False
+    assert payload["next_blocked_recovery_smoke_command_name"] is None
+    assert payload["next_blocked_recovery_smoke_command"] is None
+    assert payload["next_blocked_recovery_provider_family"] is None
+    assert payload["next_blocked_recovery_provider"] is None
+    assert payload["next_blocked_recovery_accepted_env_keys"] == []
+    assert payload["next_blocked_recovery_smoke_available"] is False
+    assert payload["next_blocked_recovery_network_call"] is False
+    assert payload["next_blocked_recovery_secret_values_returned"] is False
     recovery_checklist = payload["api_key_provider_recovery_checklist"]
     assert recovery_checklist["schema_version"] == (
         "api_key_provider_recovery_checklist.v1"
@@ -2886,6 +2928,69 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     ]
     assert summary_payload["provider_recovery_blocked_smoke_command_names"] == []
     assert summary_payload["provider_recovery_blocked_smoke_commands"] == []
+    assert summary_payload["next_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert summary_payload["next_recovery_smoke_command"] == (
+        payload["provider_recovery_smokes"][0]["command"]
+    )
+    assert summary_payload["next_recovery_provider_family"] == "market"
+    assert summary_payload["next_recovery_provider"] == "polygon"
+    assert summary_payload["next_recovery_next_setup_action"] == (
+        "verify_provider_credentials_or_network"
+    )
+    assert summary_payload["next_recovery_preferred_env_key"] == "POLYGON_API_KEY"
+    assert summary_payload["next_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert summary_payload["next_recovery_network_call_policy"] == (
+        "only_when_matching_api_key_selects_live_provider"
+    )
+    assert summary_payload["next_recovery_smoke_available"] is True
+    assert summary_payload["next_recovery_network_call"] is True
+    assert summary_payload["next_recovery_mutates_local_state"] is False
+    assert summary_payload["next_recovery_exception_type"] == "RuntimeError"
+    assert summary_payload["next_recovery_exception_message_returned"] is False
+    assert summary_payload["next_recovery_url_returned"] is False
+    assert summary_payload["next_recovery_secret_values_returned"] is False
+    assert summary_payload["next_pending_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert summary_payload["next_pending_recovery_smoke_command"] == (
+        payload["provider_recovery_smokes"][0]["command"]
+    )
+    assert summary_payload["next_pending_recovery_provider_family"] == "market"
+    assert summary_payload["next_pending_recovery_provider"] == "polygon"
+    assert summary_payload["next_pending_recovery_next_setup_action"] == (
+        "verify_provider_credentials_or_network"
+    )
+    assert summary_payload["next_pending_recovery_preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert summary_payload["next_pending_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert summary_payload["next_pending_recovery_network_call_policy"] == (
+        "only_when_matching_api_key_selects_live_provider"
+    )
+    assert summary_payload["next_pending_recovery_smoke_available"] is True
+    assert summary_payload["next_pending_recovery_network_call"] is True
+    assert summary_payload["next_pending_recovery_mutates_local_state"] is False
+    assert summary_payload["next_pending_recovery_secret_values_returned"] is False
+    assert summary_payload["next_blocked_recovery_smoke_command_name"] is None
+    assert summary_payload["next_blocked_recovery_smoke_command"] is None
+    assert summary_payload["next_blocked_recovery_provider_family"] is None
+    assert summary_payload["next_blocked_recovery_provider"] is None
+    assert summary_payload["next_blocked_recovery_next_setup_action"] is None
+    assert summary_payload["next_blocked_recovery_preferred_env_key"] is None
+    assert summary_payload["next_blocked_recovery_accepted_env_keys"] == []
+    assert summary_payload["next_blocked_recovery_network_call_policy"] is None
+    assert summary_payload["next_blocked_recovery_smoke_available"] is False
+    assert summary_payload["next_blocked_recovery_network_call"] is False
+    assert summary_payload["next_blocked_recovery_mutates_local_state"] is False
+    assert summary_payload["next_blocked_recovery_secret_values_returned"] is False
     assert provider_recovery_summary == {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": "conflict",
@@ -5382,6 +5487,37 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["provider_recovery_pending_smoke_commands"] == []
     assert payload["provider_recovery_blocked_smoke_command_names"] == []
     assert payload["provider_recovery_blocked_smoke_commands"] == []
+    assert payload["next_recovery_smoke_command_name"] is None
+    assert payload["next_recovery_smoke_command"] is None
+    assert payload["next_recovery_provider_family"] is None
+    assert payload["next_recovery_provider"] is None
+    assert payload["next_recovery_next_setup_action"] is None
+    assert payload["next_recovery_preferred_env_key"] is None
+    assert payload["next_recovery_accepted_env_keys"] == []
+    assert payload["next_recovery_network_call_policy"] is None
+    assert payload["next_recovery_smoke_available"] is False
+    assert payload["next_recovery_network_call"] is False
+    assert payload["next_recovery_mutates_local_state"] is False
+    assert payload["next_recovery_exception_type"] is None
+    assert payload["next_recovery_exception_message_returned"] is False
+    assert payload["next_recovery_url_returned"] is False
+    assert payload["next_recovery_secret_values_returned"] is False
+    assert payload["next_pending_recovery_smoke_command_name"] is None
+    assert payload["next_pending_recovery_smoke_command"] is None
+    assert payload["next_pending_recovery_provider_family"] is None
+    assert payload["next_pending_recovery_provider"] is None
+    assert payload["next_pending_recovery_accepted_env_keys"] == []
+    assert payload["next_pending_recovery_smoke_available"] is False
+    assert payload["next_pending_recovery_network_call"] is False
+    assert payload["next_pending_recovery_secret_values_returned"] is False
+    assert payload["next_blocked_recovery_smoke_command_name"] is None
+    assert payload["next_blocked_recovery_smoke_command"] is None
+    assert payload["next_blocked_recovery_provider_family"] is None
+    assert payload["next_blocked_recovery_provider"] is None
+    assert payload["next_blocked_recovery_accepted_env_keys"] == []
+    assert payload["next_blocked_recovery_smoke_available"] is False
+    assert payload["next_blocked_recovery_network_call"] is False
+    assert payload["next_blocked_recovery_secret_values_returned"] is False
     assert "live_data_smoke_summary" in payload["omitted_sections"]
     assert "signal_workflow_smoke_summary" in payload["omitted_sections"]
     assert "recording_smoke_summary" in payload["omitted_sections"]

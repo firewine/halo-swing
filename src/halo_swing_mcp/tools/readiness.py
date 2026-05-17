@@ -1090,6 +1090,172 @@ def run_api_key_pipeline_smoke(
                 "provider_recovery_blocked_smoke_commands"
             )
         ),
+        "next_pending_recovery_smoke_command_name": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_smoke_command_name"
+            )
+        ),
+        "next_pending_recovery_smoke_command": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_smoke_command"
+            )
+        ),
+        "next_pending_recovery_provider_family": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_provider_family"
+            )
+        ),
+        "next_pending_recovery_provider": (
+            api_key_provider_recovery_summary.get("next_pending_recovery_provider")
+        ),
+        "next_pending_recovery_next_setup_action": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_next_setup_action"
+            )
+        ),
+        "next_pending_recovery_preferred_env_key": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_preferred_env_key"
+            )
+        ),
+        "next_pending_recovery_accepted_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_accepted_env_keys"
+            )
+        ),
+        "next_pending_recovery_network_call_policy": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_network_call_policy"
+            )
+        ),
+        "next_pending_recovery_smoke_available": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_smoke_available"
+            )
+            is True
+        ),
+        "next_pending_recovery_network_call": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_network_call"
+            )
+            is True
+        ),
+        "next_pending_recovery_mutates_local_state": (
+            api_key_provider_recovery_summary.get(
+                "next_pending_recovery_mutates_local_state"
+            )
+            is True
+        ),
+        "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_command_name"
+            )
+        ),
+        "next_blocked_recovery_smoke_command": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_command"
+            )
+        ),
+        "next_blocked_recovery_provider_family": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_provider_family"
+            )
+        ),
+        "next_blocked_recovery_provider": (
+            api_key_provider_recovery_summary.get("next_blocked_recovery_provider")
+        ),
+        "next_blocked_recovery_next_setup_action": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_next_setup_action"
+            )
+        ),
+        "next_blocked_recovery_preferred_env_key": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_preferred_env_key"
+            )
+        ),
+        "next_blocked_recovery_accepted_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_accepted_env_keys"
+            )
+        ),
+        "next_blocked_recovery_network_call_policy": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_network_call_policy"
+            )
+        ),
+        "next_blocked_recovery_smoke_available": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_available"
+            )
+            is True
+        ),
+        "next_blocked_recovery_network_call": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_network_call"
+            )
+            is True
+        ),
+        "next_blocked_recovery_mutates_local_state": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_mutates_local_state"
+            )
+            is True
+        ),
+        "next_blocked_recovery_secret_values_returned": False,
+        "next_recovery_smoke_command_name": api_key_provider_recovery_summary.get(
+            "next_recovery_smoke_command_name"
+        ),
+        "next_recovery_smoke_command": api_key_provider_recovery_summary.get(
+            "next_recovery_smoke_command"
+        ),
+        "next_recovery_provider_family": api_key_provider_recovery_summary.get(
+            "next_recovery_provider_family"
+        ),
+        "next_recovery_provider": api_key_provider_recovery_summary.get(
+            "next_recovery_provider"
+        ),
+        "next_recovery_next_setup_action": api_key_provider_recovery_summary.get(
+            "next_recovery_next_setup_action"
+        ),
+        "next_recovery_preferred_env_key": api_key_provider_recovery_summary.get(
+            "next_recovery_preferred_env_key"
+        ),
+        "next_recovery_accepted_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "next_recovery_accepted_env_keys"
+            )
+        ),
+        "next_recovery_network_call_policy": api_key_provider_recovery_summary.get(
+            "next_recovery_network_call_policy"
+        ),
+        "next_recovery_smoke_available": (
+            api_key_provider_recovery_summary.get("next_recovery_smoke_available")
+            is True
+        ),
+        "next_recovery_network_call": (
+            api_key_provider_recovery_summary.get("next_recovery_network_call")
+            is True
+        ),
+        "next_recovery_mutates_local_state": (
+            api_key_provider_recovery_summary.get("next_recovery_mutates_local_state")
+            is True
+        ),
+        "next_recovery_exception_type": api_key_provider_recovery_summary.get(
+            "next_recovery_exception_type"
+        ),
+        "next_recovery_exception_message_returned": (
+            api_key_provider_recovery_summary.get(
+                "next_recovery_exception_message_returned"
+            )
+            is True
+        ),
+        "next_recovery_url_returned": (
+            api_key_provider_recovery_summary.get("next_recovery_url_returned")
+            is True
+        ),
+        "next_recovery_secret_values_returned": False,
         "signal_workflow_smoke_summary": signal_workflow_smoke_summary,
         "recording_smoke_summary": recording_smoke_summary,
         "checks": checks,
@@ -2765,6 +2931,111 @@ def _api_key_pipeline_summary_only_payload(
         "provider_recovery_blocked_smoke_commands": _string_list(
             payload.get("provider_recovery_blocked_smoke_commands")
         ),
+        "next_pending_recovery_smoke_command_name": payload.get(
+            "next_pending_recovery_smoke_command_name"
+        ),
+        "next_pending_recovery_smoke_command": payload.get(
+            "next_pending_recovery_smoke_command"
+        ),
+        "next_pending_recovery_provider_family": payload.get(
+            "next_pending_recovery_provider_family"
+        ),
+        "next_pending_recovery_provider": payload.get(
+            "next_pending_recovery_provider"
+        ),
+        "next_pending_recovery_next_setup_action": payload.get(
+            "next_pending_recovery_next_setup_action"
+        ),
+        "next_pending_recovery_preferred_env_key": payload.get(
+            "next_pending_recovery_preferred_env_key"
+        ),
+        "next_pending_recovery_accepted_env_keys": _string_list(
+            payload.get("next_pending_recovery_accepted_env_keys")
+        ),
+        "next_pending_recovery_network_call_policy": payload.get(
+            "next_pending_recovery_network_call_policy"
+        ),
+        "next_pending_recovery_smoke_available": (
+            payload.get("next_pending_recovery_smoke_available") is True
+        ),
+        "next_pending_recovery_network_call": (
+            payload.get("next_pending_recovery_network_call") is True
+        ),
+        "next_pending_recovery_mutates_local_state": (
+            payload.get("next_pending_recovery_mutates_local_state") is True
+        ),
+        "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": payload.get(
+            "next_blocked_recovery_smoke_command_name"
+        ),
+        "next_blocked_recovery_smoke_command": payload.get(
+            "next_blocked_recovery_smoke_command"
+        ),
+        "next_blocked_recovery_provider_family": payload.get(
+            "next_blocked_recovery_provider_family"
+        ),
+        "next_blocked_recovery_provider": payload.get(
+            "next_blocked_recovery_provider"
+        ),
+        "next_blocked_recovery_next_setup_action": payload.get(
+            "next_blocked_recovery_next_setup_action"
+        ),
+        "next_blocked_recovery_preferred_env_key": payload.get(
+            "next_blocked_recovery_preferred_env_key"
+        ),
+        "next_blocked_recovery_accepted_env_keys": _string_list(
+            payload.get("next_blocked_recovery_accepted_env_keys")
+        ),
+        "next_blocked_recovery_network_call_policy": payload.get(
+            "next_blocked_recovery_network_call_policy"
+        ),
+        "next_blocked_recovery_smoke_available": (
+            payload.get("next_blocked_recovery_smoke_available") is True
+        ),
+        "next_blocked_recovery_network_call": (
+            payload.get("next_blocked_recovery_network_call") is True
+        ),
+        "next_blocked_recovery_mutates_local_state": (
+            payload.get("next_blocked_recovery_mutates_local_state") is True
+        ),
+        "next_blocked_recovery_secret_values_returned": False,
+        "next_recovery_smoke_command_name": payload.get(
+            "next_recovery_smoke_command_name"
+        ),
+        "next_recovery_smoke_command": payload.get("next_recovery_smoke_command"),
+        "next_recovery_provider_family": payload.get(
+            "next_recovery_provider_family"
+        ),
+        "next_recovery_provider": payload.get("next_recovery_provider"),
+        "next_recovery_next_setup_action": payload.get(
+            "next_recovery_next_setup_action"
+        ),
+        "next_recovery_preferred_env_key": payload.get(
+            "next_recovery_preferred_env_key"
+        ),
+        "next_recovery_accepted_env_keys": _string_list(
+            payload.get("next_recovery_accepted_env_keys")
+        ),
+        "next_recovery_network_call_policy": payload.get(
+            "next_recovery_network_call_policy"
+        ),
+        "next_recovery_smoke_available": (
+            payload.get("next_recovery_smoke_available") is True
+        ),
+        "next_recovery_network_call": (
+            payload.get("next_recovery_network_call") is True
+        ),
+        "next_recovery_mutates_local_state": (
+            payload.get("next_recovery_mutates_local_state") is True
+        ),
+        "next_recovery_exception_type": payload.get("next_recovery_exception_type"),
+        "next_recovery_exception_message_returned": (
+            payload.get("next_recovery_exception_message_returned") is True
+        ),
+        "next_recovery_url_returned": (
+            payload.get("next_recovery_url_returned") is True
+        ),
+        "next_recovery_secret_values_returned": False,
         "omitted_sections": [
             "api_key_operator_checklist",
             "api_key_provider_recovery_checklist",
