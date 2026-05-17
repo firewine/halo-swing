@@ -704,7 +704,11 @@ state as `api_key_provider_requirement_network_calls`,
 `api_key_requirement_network_call`,
 `api_key_requirement_mutates_local_state`, and
 `api_key_requirement_secret_values_returned`. Route-family evidence is
-mirrored as `api_key_requirement_selected_provider_class_by_family`,
+mirrored as `api_key_requirement_provider_route_family_count`,
+`api_key_requirement_selected_provider_family_count`,
+`api_key_requirement_provider_route_live_data_required_family_count`,
+`api_key_requirement_provider_route_data_mode_counts`,
+`api_key_requirement_selected_provider_class_by_family`,
 `api_key_requirement_provider_route_data_mode_by_family`,
 `api_key_requirement_provider_route_live_data_required_by_family`, and
 `api_key_requirement_all_selected_routes_live`.

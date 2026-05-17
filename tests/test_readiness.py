@@ -1631,6 +1631,48 @@ def assert_api_key_requirements_summary_top_level_fields(
     assert payload["api_key_provider_requirement_count"] == len(
         provider_requirements
     )
+    selected_provider_class_by_family = requirements[
+        "selected_provider_class_by_family"
+    ]
+    provider_route_data_mode_by_family = requirements[
+        "provider_route_data_mode_by_family"
+    ]
+    provider_route_live_data_required_by_family = requirements[
+        "provider_route_live_data_required_by_family"
+    ]
+    provider_route_families = (
+        set(selected_provider_class_by_family)
+        | set(provider_route_data_mode_by_family)
+        | set(provider_route_live_data_required_by_family)
+    )
+    expected_data_mode_counts: dict[str, int] = {}
+    for data_mode in provider_route_data_mode_by_family.values():
+        if data_mode:
+            expected_data_mode_counts[data_mode] = (
+                expected_data_mode_counts.get(data_mode, 0) + 1
+            )
+    assert payload["api_key_requirement_provider_route_family_count"] == len(
+        provider_route_families
+    )
+    assert payload["api_key_requirement_selected_provider_family_count"] == sum(
+        1 for provider_class in selected_provider_class_by_family.values()
+        if provider_class
+    )
+    assert (
+        payload[
+            "api_key_requirement_provider_route_live_data_required_family_count"
+        ]
+        == sum(
+            1
+            for live_data_required in (
+                provider_route_live_data_required_by_family.values()
+            )
+            if live_data_required is True
+        )
+    )
+    assert payload["api_key_requirement_provider_route_data_mode_counts"] == (
+        expected_data_mode_counts
+    )
     next_missing_provider_family = (
         requirements["missing_provider_families"][0]
         if requirements["missing_provider_families"]
@@ -10615,6 +10657,17 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_requirement_all_selected_routes_live"] is (
         requirements["all_selected_routes_live"]
     )
+    assert payload["api_key_requirement_provider_route_family_count"] == 3
+    assert payload["api_key_requirement_selected_provider_family_count"] == 1
+    assert (
+        payload[
+            "api_key_requirement_provider_route_live_data_required_family_count"
+        ]
+        == 1
+    )
+    assert payload["api_key_requirement_provider_route_data_mode_counts"] == {
+        "live": 1
+    }
     assert requirements["provider_requirements"]["market"]["configured"] is True
     assert requirements["provider_requirements"]["macro"]["preferred_env_key"] == (
         "FRED_API_KEY"

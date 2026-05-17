@@ -413,6 +413,59 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.921 API Key Requirements Route Count Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.920까지 API-key requirement env-key hints와 counts는 compact client가 nested row를
+열지 않아도 읽을 수 있다. 하지만 requirement summary의 route-family evidence는 아직 map
+위주라, 몇 family가 selected provider route를 갖는지와 live/data-mode breakdown을 보려면
+map을 직접 순회해야 한다. 이번 slice는 requirement route evidence의 count aggregate를
+top-level로 제공한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors API-key requirement provider route family, selected provider, live-required, and data-mode count fields
+  - blocked default and partial-key summary-only tests prove route count fields match api_key_requirements_summary route maps
+  - README and DevOps guide document the top-level API-key requirement route count fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.920 API Key Requirements Accepted Env-Key Count Fields Gate Record - 2026-05-18
 
 ### A. 목적
