@@ -344,6 +344,10 @@ Summary-only provider smoke safety aggregates include
 `provider_smoke_success_any_mutates_local_state`,
 `provider_smoke_success_secret_values_returned_count`, and
 `provider_smoke_success_any_secret_values_returned`.
+Summary-only provider smoke env-key aggregates include
+`provider_smoke_success_preferred_env_keys`,
+`provider_smoke_success_accepted_env_keys`, and
+`provider_smoke_success_accepted_env_key_groups` without returning key values.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command

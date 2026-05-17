@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_SAFETY_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_SAFETY_GATE
+status: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_ENV_HINT_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_ENV_HINT_GATE
 review_tier: S1_small
 
-next_atomic_step: add provider smoke success safety aggregates to API-key pipeline summary-only payload
+next_atomic_step: add provider smoke success env-key aggregates to API-key pipeline summary-only payload
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,23 +75,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import _api_key_pipeline_summary_only_payload; payload={"status":"ok","input":{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"},"next_operator_action":{},"api_key_next_action_summary":{},"live_data_smoke_summary":{"provider_smoke_summaries":[{"status":"ok","passed":True,"provider_family":"market","provider":"polygon","smoke_command_name":"get_market_snapshot_live_smoke","network_call":True,"network_call_policy":"only_when_matching_api_key_selects_live_provider","mutates_local_state":False,"secret_values_returned":False}],"provider_smoke_summary_count":1},"secret_values_returned":False}; summary=_api_key_pipeline_summary_only_payload(payload); print(summary["provider_smoke_success_network_call_count"], summary["provider_smoke_success_network_call_policies"][0], summary["provider_smoke_success_any_mutates_local_state"], summary["provider_smoke_success_any_secret_values_returned"], summary["secret_values_returned"])'
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import _api_key_pipeline_summary_only_payload; payload={"status":"ok","input":{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"},"next_operator_action":{},"api_key_next_action_summary":{},"live_data_smoke_summary":{"provider_smoke_summaries":[{"status":"ok","passed":True,"provider_family":"market","provider":"polygon","preferred_env_key":"POLYGON_API_KEY","accepted_env_keys":["HALO_SWING_MARKET_DATA_API_KEY","POLYGON_API_KEY"],"secret_values_returned":False}],"provider_smoke_summary_count":1},"secret_values_returned":False}; summary=_api_key_pipeline_summary_only_payload(payload); print(summary["provider_smoke_success_preferred_env_keys"][0], summary["provider_smoke_success_accepted_env_keys"][0], summary["provider_smoke_success_accepted_env_key_groups"][0][1], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - API-key pipeline summary-only payload exposes provider_smoke_success_network_call_count and provider_smoke_success_all_network_calls from no-secret provider_smoke_summaries
-  - API-key pipeline summary-only payload exposes provider_smoke_success_network_call_policies, mutates-local-state counts, and secret-return counts from no-secret provider_smoke_summaries
-  - focused tests prove compact summary-only provider smoke safety aggregates are present and API key values are not returned
-  - README and DevOps setup guide document summary-only provider smoke safety aggregate fields
-  - setup docs tests assert summary-only provider smoke safety aggregate guidance
+  - API-key pipeline summary-only payload exposes provider_smoke_success_preferred_env_keys from no-secret provider_smoke_summaries
+  - API-key pipeline summary-only payload exposes provider_smoke_success_accepted_env_keys and provider_smoke_success_accepted_env_key_groups from no-secret provider_smoke_summaries
+  - focused tests prove compact summary-only provider smoke env-key aggregates are present and API key values are not returned
+  - README and DevOps setup guide document summary-only provider smoke env-key aggregate fields
+  - setup docs tests assert summary-only provider smoke env-key aggregate guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified summary-only provider success safety gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified summary-only provider success env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_SAFETY_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_PROVIDER_SUCCESS_SAFETY_GATE
+review_tier: S1_small
+
+next_atomic_step: add provider smoke success safety aggregates to API-key pipeline summary-only payload
 ```
 
 Previous completed directive:
@@ -2846,14 +2857,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Summary-Only Provider Success Safety Gate is verified.
+Summary: API Key Summary-Only Provider Success Env Hint Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now exposes no-secret provider
-smoke success safety aggregates: network call counts/policies, local-state
-mutation counts, and secret-return counts. Focused compact payload tests,
-direct helper smoke, full pytest, ruff, and health_check passed.
+smoke success env-key aggregates: preferred env keys, accepted env keys, and
+accepted env-key groups. Focused compact payload tests, direct helper smoke,
+full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_summary_only_provider_success_safety_gate:
+api_key_summary_only_provider_success_env_hint_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2866,11 +2877,11 @@ api_key_summary_only_provider_success_safety_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - API-key pipeline summary-only payload exposes provider_smoke_success_network_call_count and provider_smoke_success_all_network_calls from no-secret provider_smoke_summaries
-    - API-key pipeline summary-only payload exposes provider_smoke_success_network_call_policies, mutates-local-state counts, and secret-return counts from no-secret provider_smoke_summaries
-    - focused tests prove compact summary-only provider smoke safety aggregates are present and API key values are not returned
-    - README and DevOps setup guide document summary-only provider smoke safety aggregate fields
-    - tests/test_setup_docs.py asserts summary-only provider smoke safety aggregate guidance
+    - API-key pipeline summary-only payload exposes provider_smoke_success_preferred_env_keys from no-secret provider_smoke_summaries
+    - API-key pipeline summary-only payload exposes provider_smoke_success_accepted_env_keys and provider_smoke_success_accepted_env_key_groups from no-secret provider_smoke_summaries
+    - focused tests prove compact summary-only provider smoke env-key aggregates are present and API key values are not returned
+    - README and DevOps setup guide document summary-only provider smoke env-key aggregate fields
+    - tests/test_setup_docs.py asserts summary-only provider smoke env-key aggregate guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2883,8 +2894,8 @@ api_key_summary_only_provider_success_safety_gate:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "2 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import _api_key_pipeline_summary_only_payload; payload={"status":"ok","input":{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"},"next_operator_action":{},"api_key_next_action_summary":{},"live_data_smoke_summary":{"provider_smoke_summaries":[{"status":"ok","passed":True,"provider_family":"market","provider":"polygon","smoke_command_name":"get_market_snapshot_live_smoke","network_call":True,"network_call_policy":"only_when_matching_api_key_selects_live_provider","mutates_local_state":False,"secret_values_returned":False}],"provider_smoke_summary_count":1},"secret_values_returned":False}; summary=_api_key_pipeline_summary_only_payload(payload); print(summary["provider_smoke_success_network_call_count"], summary["provider_smoke_success_network_call_policies"][0], summary["provider_smoke_success_any_mutates_local_state"], summary["provider_smoke_success_any_secret_values_returned"], summary["secret_values_returned"])'
-      result: "1 only_when_matching_api_key_selects_live_provider False False False"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import _api_key_pipeline_summary_only_payload; payload={"status":"ok","input":{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"},"next_operator_action":{},"api_key_next_action_summary":{},"live_data_smoke_summary":{"provider_smoke_summaries":[{"status":"ok","passed":True,"provider_family":"market","provider":"polygon","preferred_env_key":"POLYGON_API_KEY","accepted_env_keys":["HALO_SWING_MARKET_DATA_API_KEY","POLYGON_API_KEY"],"secret_values_returned":False}],"provider_smoke_summary_count":1},"secret_values_returned":False}; summary=_api_key_pipeline_summary_only_payload(payload); print(summary["provider_smoke_success_preferred_env_keys"][0], summary["provider_smoke_success_accepted_env_keys"][0], summary["provider_smoke_success_accepted_env_key_groups"][0][1], summary["secret_values_returned"])'
+      result: "POLYGON_API_KEY HALO_SWING_MARKET_DATA_API_KEY POLYGON_API_KEY False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "796 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .

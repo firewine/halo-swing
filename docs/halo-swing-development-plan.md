@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.810 API Key Summary-Only Provider Success Env Hint Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 성공한 provider smoke row를
+top-level에 보존하지만, compact output만 볼 때 성공 provider들이 어떤 preferred env key와
+accepted alias group을 기준으로 검증됐는지는 row를 열어야 한다. 실제 API 키 입력 후
+compact 응답만 보는 운영 흐름에서 key 이름/alias 확인성을 높이기 위해, 이번 slice는
+no-secret provider smoke success env-key aggregate를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key pipeline summary-only payload exposes provider_smoke_success_preferred_env_keys
+  - API-key pipeline summary-only payload exposes provider_smoke_success_accepted_env_keys
+  - API-key pipeline summary-only payload exposes provider_smoke_success_accepted_env_key_groups
+  - README and DevOps setup guide document summary-only provider smoke env-key aggregate fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -c summary-only provider success env hint smoke -> POLYGON_API_KEY HALO_SWING_MARKET_DATA_API_KEY POLYGON_API_KEY False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 3.809 API Key Summary-Only Provider Success Safety Gate Record - 2026-05-17
 
 ### A. 목적

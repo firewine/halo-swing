@@ -283,6 +283,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_smoke_success_any_mutates_local_state" in guide
     assert "provider_smoke_success_secret_values_returned_count" in guide
     assert "provider_smoke_success_any_secret_values_returned" in guide
+    assert "Summary-only provider smoke env-key aggregates" in guide
+    assert "provider_smoke_success_preferred_env_keys" in guide
+    assert "provider_smoke_success_accepted_env_keys" in guide
+    assert "provider_smoke_success_accepted_env_key_groups" in guide
     assert "matches\n`readiness_summary.next_operator_action`" in guide
     assert "next_operator_action_command" in guide
     assert "top-level summary-only recovery env hints and network policies" in guide

@@ -2996,6 +2996,11 @@ def _api_key_pipeline_summary_only_payload(
         for row in provider_smoke_success_rows
         if row.get("secret_values_returned") is True
     )
+    provider_smoke_success_accepted_env_key_groups = [
+        _string_list(row.get("accepted_env_keys"))
+        for row in provider_smoke_success_rows
+        if _string_list(row.get("accepted_env_keys"))
+    ]
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3180,6 +3185,19 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_smoke_success_any_secret_values_returned": (
             provider_smoke_success_secret_values_returned_count > 0
+        ),
+        "provider_smoke_success_preferred_env_keys": _ordered_unique_strings(
+            [row.get("preferred_env_key") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_accepted_env_keys": _ordered_unique_strings(
+            [
+                env_key
+                for group in provider_smoke_success_accepted_env_key_groups
+                for env_key in group
+            ]
+        ),
+        "provider_smoke_success_accepted_env_key_groups": (
+            provider_smoke_success_accepted_env_key_groups
         ),
         "api_key_failure_category": payload.get("api_key_failure_category"),
         "api_key_has_failures": payload.get("api_key_has_failures") is True,

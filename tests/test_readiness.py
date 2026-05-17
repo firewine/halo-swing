@@ -5290,6 +5290,25 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         summary_payload["provider_smoke_success_any_secret_values_returned"]
         is False
     )
+    assert summary_payload["provider_smoke_success_preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["provider_smoke_success_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["provider_smoke_success_accepted_env_key_groups"] == [
+        ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+        ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+    ]
     assert (
         summary_payload["provider_smoke_summaries"][0]["provider_family"]
         == "market"
