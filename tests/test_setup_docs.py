@@ -907,6 +907,26 @@ def test_setup_docs_keep_api_key_integration_recovery_state_fields_in_sync() -> 
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_integration_recovery_identity_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_integration_status_summary",
+        "api_key_integration_status_summary.v1",
+        "recovery identity lists",
+        "provider_recovery_provider_families",
+        "provider_recovery_providers",
+        "provider_recovery_pending_provider_families",
+        "provider_recovery_pending_providers",
+        "provider_recovery_blocked_provider_families",
+        "provider_recovery_blocked_providers",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
