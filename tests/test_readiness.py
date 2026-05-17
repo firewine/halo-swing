@@ -6428,6 +6428,26 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             if row["status"] != "ready"
         ]
     )
+    assert payload["api_key_setup_quickstart_command_plan_ready_command_names"] == [
+        row["smoke_command_name"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_ready_commands"] == [
+        row["command"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_blocked_command_names"] == [
+        row["smoke_command_name"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_blocked_commands"] == [
+        row["command"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
         == sum(
@@ -8559,6 +8579,26 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             if row["status"] != "ready"
         ]
     )
+    assert payload["api_key_setup_quickstart_command_plan_ready_command_names"] == [
+        row["smoke_command_name"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_ready_commands"] == [
+        row["command"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_blocked_command_names"] == [
+        row["smoke_command_name"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_blocked_commands"] == [
+        row["command"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
         == sum(

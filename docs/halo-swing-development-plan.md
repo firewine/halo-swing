@@ -28,6 +28,69 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.897 API Key Quickstart Command Plan Ready/Blocked Commands Gate Record - 2026-05-18
+
+### A. 목적
+
+3.896에서 quickstart command plan provider-smoke rows의 ready/blocked provider family
+lists는 top-level로 올라왔다. 하지만 compact client가 API 키만 넣은 뒤 바로 실행할
+provider-smoke 명령과 아직 막힌 명령을 표시하려면 family list와 command maps를 다시
+조합해야 한다. 이번 slice는 ready/blocked provider-smoke command names와 commands를
+top-level로 올려 no-key, partial-key, all-key 상태에서 실행 가능한 smoke command를 바로
+제시하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_ready_command_names lists ready provider-smoke command names
+  - summary-only top-level api_key_setup_quickstart_command_plan_ready_commands lists ready provider-smoke commands
+  - summary-only top-level api_key_setup_quickstart_command_plan_blocked_command_names lists blocked provider-smoke command names
+  - summary-only top-level api_key_setup_quickstart_command_plan_blocked_commands lists blocked provider-smoke commands
+  - README and DevOps setup guide document the quickstart command plan ready/blocked command fields
+  - setup docs tests assert the documented ready/blocked command field list stays in sync
+  - fake-key offline verification confirmed ready commands for market, macro, news and blocked commands empty without secret values
+  - no-key offline verification confirmed ready commands empty and blocked commands for market, macro, news without secret values
+  - partial-key offline verification confirmed ready command for market and blocked commands for macro, news without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan ready/blocked command pytest: 3 passed
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key ready/blocked command assertion: ready market, macro, news smoke commands; blocked empty; secret_values_returned false
+  - direct no-key ready/blocked command assertion: ready empty; blocked market, macro, news smoke commands; secret_values_returned false
+  - direct partial-key ready/blocked command assertion: ready market smoke command; blocked macro, news smoke commands; secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.896 API Key Quickstart Command Plan Ready/Blocked Families Gate Record - 2026-05-18
 
 ### A. 목적

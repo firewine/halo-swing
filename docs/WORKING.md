@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_FAMILIES_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_FAMILIES_GATE
+status: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key quickstart provider-smoke ready and blocked provider-family lists
+next_atomic_step: surface API-key quickstart provider-smoke ready and blocked command lists
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,34 +82,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level quickstart command plan exposes provider-smoke ready provider families
-  - summary-only top-level quickstart command plan exposes provider-smoke blocked provider families
-  - fake-key offline verification proves ready families report market, macro, and news while blocked families are empty without secret values
-  - blocked no-key verification proves ready families are empty and blocked families report market, macro, and news without secret values
-  - partial-key verification proves ready and blocked family lists stay tied to provider smoke command row status
+  - summary-only top-level quickstart command plan exposes ready provider-smoke command names and commands
+  - summary-only top-level quickstart command plan exposes blocked provider-smoke command names and commands
+  - fake-key offline verification proves ready command lists include market, macro, and news provider smokes while blocked command lists are empty without secret values
+  - blocked no-key verification proves ready command lists are empty and blocked command lists include market, macro, and news provider smokes without secret values
+  - partial-key verification proves ready and blocked command lists stay tied to provider smoke command row status
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan ready/blocked families gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart command plan ready/blocked commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_FAMILIES_GATE
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart ready/blocked family pytest: 3 passed
+  - focused API-key quickstart ready/blocked command pytest: 3 passed
   - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - direct fake-key ready/blocked family assertion: ready market, macro, news; blocked empty; secret_values_returned false
-  - direct no-key ready/blocked family assertion: ready empty; blocked market, macro, news; secret_values_returned false
-  - direct partial-key ready/blocked family assertion: ready market; blocked macro, news; secret_values_returned false
+  - direct fake-key ready/blocked command assertion: ready market, macro, news smoke commands; blocked empty; secret_values_returned false
+  - direct no-key ready/blocked command assertion: ready empty; blocked market, macro, news smoke commands; secret_values_returned false
+  - direct partial-key ready/blocked command assertion: ready market smoke command; blocked macro, news smoke commands; secret_values_returned false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -124,9 +124,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart command plan ready/blocked families gate
+next_state: commit this verified API-key quickstart command plan ready/blocked commands gate
 notes:
-  - quickstart command plan ready/blocked family lists are top-level and tied to provider-smoke row status without returning secret values
+  - quickstart command plan ready/blocked command lists are top-level and tied to provider-smoke row status without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key quickstart provider-smoke ready and blocked command lists
 ```
 
 Previous completed directive:

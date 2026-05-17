@@ -74,6 +74,8 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             if row.get("status") != "ready"
         ]
     )
+    ready_rows = [row for row in provider_rows if row.get("status") == "ready"]
+    blocked_rows = [row for row in provider_rows if row.get("status") != "ready"]
     provider_smoke_count = len(provider_rows)
     ready_provider_smoke_count = sum(
         row.get("status") == "ready" for row in provider_rows
@@ -91,6 +93,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_blocked_provider_families": (
             blocked_provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_ready_command_names": (
+            _string_list([row.get("name") for row in ready_rows])
+        ),
+        "api_key_setup_quickstart_command_plan_ready_commands": (
+            _string_list([row.get("command") for row in ready_rows])
+        ),
+        "api_key_setup_quickstart_command_plan_blocked_command_names": (
+            _string_list([row.get("name") for row in blocked_rows])
+        ),
+        "api_key_setup_quickstart_command_plan_blocked_commands": (
+            _string_list([row.get("command") for row in blocked_rows])
         ),
         "api_key_setup_quickstart_command_plan_ready_provider_smoke_count": (
             ready_provider_smoke_count
