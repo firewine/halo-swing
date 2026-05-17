@@ -617,10 +617,14 @@ such as `next_blocking_action_preferred_env_key`, provider identity fields such
 as `next_blocking_action_provider_family`,
 `next_blocking_action_provider`, and
 `next_blocking_action_smoke_command_name`, and compact setup step rows including
-recovery `provider_family`, `provider`, `smoke_command_name`,
-`preferred_env_key`, `accepted_env_keys`, and no-secret `dotenv_examples` on
-`fill_live_data_api_keys`, so the compact response still shows the next local
-setup or recovery action and the `KEY=placeholder` lines to fill without
+`configured_env_keys`, `missing_provider_families`, `required_env_keys`,
+`network_call_policy`, `next_provider_smoke_command_name`,
+`next_provider_recovery_smoke_command_name`, `provider_smoke_command_count`,
+`recovery_smoke_available`, recovery `provider_family`, `provider`,
+`smoke_command_name`, `preferred_env_key`, `accepted_env_keys`, and no-secret
+`dotenv_examples` / `dotenv_example_count` on `fill_live_data_api_keys`, so the
+compact response still shows the next local setup or recovery action and the
+`KEY=placeholder` lines to fill without
 returning the full checklist payload.
 For compact clients that read only top-level fields, summary-only output also
 mirrors the no-secret setup sequence as `api_key_setup_quickstart_steps`,

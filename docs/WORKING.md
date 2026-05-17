@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_VERIFIED
-gate_id: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_GATE
+status: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: lock API-key next action summary dotenv handoff field docs parity
+next_atomic_step: lock API-key operator checklist summary step field docs parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,14 +83,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide document api_key_next_action_summary next_after_action, dotenv path, secret-input, and dotenv example count fields
-  - setup docs guard keeps README and DevOps API-key next action summary dotenv handoff fields in sync
+  - README and DevOps setup guide document api_key_operator_checklist_summary step rows for required/configured/missing env keys, network policy, provider smoke counts, recovery smoke hints, and dotenv example count fields
+  - setup docs guard keeps README and DevOps API-key operator checklist summary field parity in sync
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key next action summary dotenv docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key operator checklist summary step field docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock API-key next action summary dotenv handoff field docs parity
 ```
 
 Previous completed directive:
@@ -3428,15 +3439,15 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Next Action Summary Dotenv Docs Parity Gate is verified.
-README and DevOps setup guide now document `api_key_next_action_summary.v1`
-dotenv handoff fields: `next_after_action`, `dotenv_target_path`,
-`source_path`, `target_path`, `secret_input_required`, `dotenv_examples`, and
-`dotenv_example_count`. Focused docs/readiness coverage, setup-docs coverage,
-direct summary-only smoke, full pytest, ruff, and health_check passed.
+Summary: API Key Operator Checklist Summary Step Fields Docs Parity Gate is
+verified. README and DevOps setup guide now document
+`api_key_operator_checklist_summary.v1` step row fields for env-key state,
+network policy, provider smoke/recovery hints, and dotenv example counts.
+Focused docs/readiness coverage, setup-docs coverage, direct summary-only
+smoke, full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_next_action_summary_dotenv_docs_parity_gate:
+api_key_operator_checklist_summary_step_fields_docs_parity_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3447,9 +3458,9 @@ api_key_next_action_summary_dotenv_docs_parity_gate:
     - docs/halo-swing-development-plan.md
     - tests/test_setup_docs.py
   implementation:
-    - README documents api_key_next_action_summary next_after_action, dotenv_target_path, source_path, target_path, secret_input_required, dotenv_examples, and dotenv_example_count
-    - DevOps setup guide documents the same api_key_next_action_summary dotenv handoff fields
-    - tests/test_setup_docs.py keeps README and DevOps guide API-key next action summary field parity in sync
+    - README documents api_key_operator_checklist_summary step rows for configured_env_keys, missing_provider_families, required_env_keys, network_call_policy, provider smoke command/count, recovery smoke hint, provider identity, env-key hints, dotenv_examples, and dotenv_example_count
+    - DevOps setup guide documents the same api_key_operator_checklist_summary step row fields
+    - tests/test_setup_docs.py keeps README and DevOps guide API-key operator checklist summary field parity in sync
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3460,18 +3471,32 @@ api_key_next_action_summary_dotenv_docs_parity_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
       result: "2 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; api_key_next_action_summary next_after_action fill_live_data_api_keys; dotenv_target_path .env; secret_input_required false; secret_values_returned false
+      result: passed; api_key_operator_checklist_summary step fill_live_data_api_keys includes required_env_keys, dotenv_examples, dotenv_example_count 3, and secret_values_returned false
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
-      result: "30 passed"
+      result: "31 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "822 passed"
+      result: "823 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
+```
+
+Previous verification:
+
+Summary: API Key Next Action Summary Dotenv Docs Parity Gate is verified.
+README and DevOps setup guide now document `api_key_next_action_summary.v1`
+dotenv handoff fields: `next_after_action`, `dotenv_target_path`,
+`source_path`, `target_path`, `secret_input_required`, `dotenv_examples`, and
+`dotenv_example_count`. Focused docs/readiness coverage, setup-docs coverage,
+direct summary-only smoke, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_next_action_summary_dotenv_docs_parity_gate:
+  status: verified
 ```
 
 Previous verification:

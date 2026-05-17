@@ -1012,6 +1012,40 @@ def test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync()
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_operator_checklist_summary",
+        "api_key_operator_checklist_summary.v1",
+        "next_blocking_action_name",
+        "next_blocking_action_command",
+        "next_blocking_action_preferred_env_key",
+        "next_blocking_action_provider_family",
+        "next_blocking_action_provider",
+        "next_blocking_action_smoke_command_name",
+        "configured_env_keys",
+        "missing_provider_families",
+        "required_env_keys",
+        "network_call_policy",
+        "next_provider_smoke_command_name",
+        "next_provider_recovery_smoke_command_name",
+        "provider_smoke_command_count",
+        "recovery_smoke_available",
+        "provider_family",
+        "provider",
+        "smoke_command_name",
+        "preferred_env_key",
+        "accepted_env_keys",
+        "dotenv_examples",
+        "dotenv_example_count",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_next_action_summary_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

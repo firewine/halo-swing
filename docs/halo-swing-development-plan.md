@@ -929,6 +929,61 @@ verification:
   - direct summary-only smoke confirmed api_key_next_action_summary next_after_action fill_live_data_api_keys, dotenv_target_path .env, secret_input_required false, and secret_values_returned false
 ```
 
+## 3.863 API Key Operator Checklist Summary Step Fields Docs Parity Gate Record - 2026-05-17
+
+### A. 목적
+
+3.862에서 `api_key_next_action_summary.v1` 문서가 dotenv handoff fields를 놓치지
+않도록 잠갔다. 같은 compact API-key setup 흐름에서
+`api_key_operator_checklist_summary.v1`는 step row의 configured/missing/required env-key
+상태, network policy, provider smoke/recovery hint, dotenv example count를 함께 담지만
+README와 DevOps guide의 설명은 일부 step field names를 명시적으로 고정하지 않았다.
+이번 slice는 operator checklist summary docs parity를 잠가 compact client가 full checklist
+payload 없이도 step row를 해석할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README documents api_key_operator_checklist_summary step rows for configured_env_keys, missing_provider_families, required_env_keys, network_call_policy, provider smoke command/count, recovery smoke hint, provider identity, env-key hints, dotenv_examples, and dotenv_example_count
+  - DevOps setup guide documents the same api_key_operator_checklist_summary step row fields
+  - tests/test_setup_docs.py keeps README and DevOps guide API-key operator checklist summary field parity in sync
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key operator checklist summary step fields docs parity pytest: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 31 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 823 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct summary-only smoke confirmed api_key_operator_checklist_summary fill_live_data_api_keys step required_env_keys, dotenv_examples, dotenv_example_count 3, and secret_values_returned false
+```
+
 ## 3.861 API Key Integration Status Next Action Dotenv Fields Gate Record - 2026-05-17
 
 ### A. 목적

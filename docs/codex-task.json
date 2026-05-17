@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_NEXT_ACTION_SUMMARY_DOTENV_DOCS_PARITY_GATE",
+  "gate_id": "API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.862",
-  "next_atomic_step": "lock API-key next action summary dotenv handoff field docs parity",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.863",
+  "next_atomic_step": "lock API-key operator checklist summary step field docs parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -19,7 +19,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.862",
+    "docs/halo-swing-development-plan.md#3.863",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness.py",
@@ -41,7 +41,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -59,12 +59,12 @@
     "read_only": true
   },
   "done_means": [
-    "README and DevOps setup guide document api_key_next_action_summary next_after_action, dotenv path, secret-input, and dotenv example count fields",
-    "setup docs guard keeps README and DevOps API-key next action summary dotenv handoff fields in sync",
+    "README and DevOps setup guide document api_key_operator_checklist_summary step rows for required/configured/missing env keys, network policy, provider smoke counts, recovery smoke hints, and dotenv example count fields",
+    "setup docs guard keeps README and DevOps API-key operator checklist summary field parity in sync",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key next action summary dotenv docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key operator checklist summary step field docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
