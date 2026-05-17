@@ -5270,7 +5270,7 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                     "HALO_SWING_MARKET_DATA_API_KEY",
                     "POLYGON_API_KEY",
                 ],
-                "example": "POLYGON_API_KEY = your_polygon_key",
+                "example": "POLYGON_API_KEY=your_polygon_key",
                 "secret": True,
             },
             {
@@ -5282,7 +5282,7 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                     "HALO_SWING_FRED_API_KEY",
                     "FRED_API_KEY",
                 ],
-                "example": "FRED_API_KEY = your_fred_key",
+                "example": "FRED_API_KEY=your_fred_key",
                 "secret": True,
             },
             {
@@ -5293,7 +5293,7 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
                 ],
-                "example": "NEWS_API_KEY = your_newsapi_key",
+                "example": "NEWS_API_KEY=your_newsapi_key",
                 "secret": True,
             },
         ],

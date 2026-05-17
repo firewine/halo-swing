@@ -99,6 +99,20 @@ def test_readiness_live_data_keys_match_provider_auto_select_keys() -> None:
     )
 
 
+def test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines() -> None:
+    payload = get_live_data_api_key_status()
+    examples = [
+        entry["example"] for entry in payload["dotenv_template"]["entries"]
+    ]
+
+    assert examples == [
+        "POLYGON_API_KEY=your_polygon_key",
+        "FRED_API_KEY=your_fred_key",
+        "NEWS_API_KEY=your_newsapi_key",
+    ]
+    assert all(" = " not in example for example in examples)
+
+
 def test_env_example_telegram_delivery_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 

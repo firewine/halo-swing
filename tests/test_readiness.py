@@ -1160,7 +1160,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
                         "HALO_SWING_MARKET_DATA_API_KEY",
                         "POLYGON_API_KEY",
                     ],
-                    "example": "POLYGON_API_KEY = your_polygon_key",
+                    "example": "POLYGON_API_KEY=your_polygon_key",
                     "secret": True,
                 },
                 {
@@ -1172,7 +1172,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
                         "HALO_SWING_FRED_API_KEY",
                         "FRED_API_KEY",
                     ],
-                    "example": "FRED_API_KEY = your_fred_key",
+                    "example": "FRED_API_KEY=your_fred_key",
                     "secret": True,
                 },
                 {
@@ -1183,7 +1183,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
                     ],
-                    "example": "NEWS_API_KEY = your_newsapi_key",
+                    "example": "NEWS_API_KEY=your_newsapi_key",
                     "secret": True,
                 },
             ],
@@ -1349,7 +1349,7 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["dotenv_template"]["target_path"] == ".env"
     assert payload["dotenv_template"]["source_path"] == ".env.example"
     assert payload["dotenv_template"]["entries"][0]["example"] == (
-        "POLYGON_API_KEY = your_polygon_key"
+        "POLYGON_API_KEY=your_polygon_key"
     )
     assert payload["dotenv_template"]["entries"][1]["accepted_env_keys"] == [
         "HALO_SWING_MACRO_API_KEY",
@@ -1485,7 +1485,7 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     assert payload["providers"]["news"]["next_setup_action"] == "run_provider_smoke"
     assert payload["dotenv_template"]["target_path"] == ".env"
     assert payload["dotenv_template"]["entries"][2]["example"] == (
-        "NEWS_API_KEY = your_newsapi_key"
+        "NEWS_API_KEY=your_newsapi_key"
     )
     assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["dotenv_file_status"] == expected_dotenv_file_status(repo_env)
@@ -3596,7 +3596,7 @@ def test_run_live_data_smoke_flags_fixture_payloads_without_keys(monkeypatch) ->
     )
     assert payload["live_data_setup_summary"]["dotenv_template"]["entries"][
         0
-    ]["example"] == "POLYGON_API_KEY = your_polygon_key"
+    ]["example"] == "POLYGON_API_KEY=your_polygon_key"
     assert payload["live_data_setup_summary"]["dotenv_template"][
         "secret_values_returned"
     ] is False
@@ -3813,7 +3813,7 @@ def test_run_integration_smoke_keeps_fixture_default_blocked_without_side_effect
     )
     assert payload["live_data_setup_summary"]["dotenv_template"]["entries"][
         0
-    ]["example"] == "POLYGON_API_KEY = your_polygon_key"
+    ]["example"] == "POLYGON_API_KEY=your_polygon_key"
     assert payload["live_data_setup_summary"]["dotenv_template"][
         "secret_values_returned"
     ] is False
@@ -4012,7 +4012,12 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
     assert payload["secret_values_returned"] is False
     assert all(check["passed"] for check in payload["checks"])
     serialized = repr(payload).lower()
-    assert "api_key=" not in serialized
+    assert "polygon_api_key=your_polygon_key" in serialized
+    assert "fred_api_key=your_fred_key" in serialized
+    assert "news_api_key=your_newsapi_key" in serialized
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
 
 
 def test_run_live_signal_workflow_smoke_flags_fixture_defaults_without_keys(

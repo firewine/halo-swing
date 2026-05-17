@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.813 API Key Dotenv Template Copy-Paste Example Gate Record - 2026-05-17
+
+### A. 목적
+
+`get_live_data_api_key_status().dotenv_template.entries[].example`은 live data
+API-key setup을 안내하지만, 예시가 `POLYGON_API_KEY = your_polygon_key`처럼 등호 주변에
+공백을 포함한다. `.env.example`과 DevOps guide는 `KEY=value` 형식을 쓰고 있으므로, 실제
+API 키 입력 후 복붙할 운영 흐름을 단순화하기 위해 readiness payload의 dotenv template
+examples도 copy-paste 가능한 `KEY=value` 형식으로 맞춘다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - live data dotenv_template examples use KEY=value strings without spaces around equals
+  - env-template test asserts Polygon, FRED, and NewsAPI examples are copy-paste key-value lines
+  - readiness tests assert placeholders remain non-secret and no secret values are returned
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -c dotenv-template copy-paste smoke -> ['POLYGON_API_KEY=your_polygon_key', 'FRED_API_KEY=your_fred_key', 'NEWS_API_KEY=your_newsapi_key'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 799 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 3.812 API Key Pipeline Summary-Only Command Summary Gate Record - 2026-05-17
 
 ### A. 목적

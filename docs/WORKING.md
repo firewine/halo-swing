@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_GATE
+status: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_VERIFIED
+gate_id: API_KEY_DOTENV_TEMPLATE_COPY_PASTE_EXAMPLE_GATE
 review_tier: S1_small
 
-next_atomic_step: make API-key one-shot command summaries point at the compact --summary-only harness command
+next_atomic_step: make live data dotenv_template examples copy-paste compatible KEY=value lines
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -57,6 +57,7 @@ allowed_edit_paths:
   - docs/devops-setup-guide.md
   - src/halo_swing_mcp/tools/readiness.py
   - tests/test_readiness.py
+  - tests/test_env_template.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -74,24 +75,34 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status, run_api_key_pipeline_smoke; status=get_live_data_api_key_status(); summary=run_api_key_pipeline_smoke(summary_only=True); print(status["one_shot_smoke_command"]["command"].endswith("--summary-only --no-audit"), summary["api_key_command_summary"]["one_shot_pipeline_smoke"]["command"].endswith("--summary-only --no-audit"), summary["secret_values_returned"])'
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status; payload=get_live_data_api_key_status(); print([entry["example"] for entry in payload["dotenv_template"]["entries"]], payload["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke with --summary-only --no-audit
-  - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the compact one-shot command
-  - summary-only API-key pipeline payload exposes the compact one_shot_pipeline_smoke command without secrets
-  - README and DevOps setup guide document returned one-shot command summaries as compact --summary-only commands
-  - setup docs tests assert compact one-shot command summary guidance
+  - live data dotenv_template examples use copy-paste compatible KEY=value strings with no spaces around equals
+  - readiness and env-template tests prove dotenv_template examples match .env documentation for Polygon, FRED, and NewsAPI
+  - README and DevOps setup guide keep the same KEY=value examples
+  - setup docs tests assert the KEY=value examples remain documented
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified summary-only command summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified dotenv template example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: make API-key one-shot command summaries point at the compact --summary-only harness command
 ```
 
 Previous completed directive:
@@ -2879,31 +2890,29 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Pipeline Summary-Only Command Summary Gate is verified.
-API-key setup and pipeline summaries now return `run_api_key_pipeline_smoke`
-one-shot commands with `--summary-only --no-audit`, so the displayed post-setup
-command opens the compact no-secret response. Focused readiness/docs tests,
-direct command-summary smoke, full pytest, ruff, and health_check passed.
+Summary: API Key Dotenv Template Copy-Paste Example Gate is verified.
+`get_live_data_api_key_status().dotenv_template.entries[].example` now returns
+copy-paste compatible `KEY=value` examples for Polygon, FRED, and NewsAPI, with
+no secret values. Focused readiness/env/docs tests, direct dotenv-template
+smoke, full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_pipeline_summary_only_command_summary_gate:
+api_key_dotenv_template_copy_paste_example_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
     - docs/WORKING.md
     - docs/codex-task.json
     - docs/halo-swing-development-plan.md
-    - README.md
-    - docs/devops-setup-guide.md
     - src/halo_swing_mcp/tools/readiness.py
     - tests/test_readiness.py
+    - tests/test_env_template.py
     - tests/test_setup_docs.py
   implementation:
-    - get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke with --summary-only --no-audit
-    - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the compact one-shot command
-    - summary-only API-key pipeline payload exposes the compact one_shot_pipeline_smoke command without secrets
-    - README and DevOps setup guide document returned one-shot command summaries as compact --summary-only commands
-    - tests/test_setup_docs.py asserts compact one-shot command summary guidance
+    - live data dotenv_template examples use copy-paste compatible KEY=value strings with no spaces around equals
+    - readiness and env-template tests prove dotenv_template examples match .env documentation for Polygon, FRED, and NewsAPI
+    - existing README and DevOps setup guide KEY=value examples remain aligned
+    - tests/test_setup_docs.py keeps the documented KEY=value examples covered
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2914,12 +2923,12 @@ api_key_pipeline_summary_only_command_summary_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-      result: "5 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status, run_api_key_pipeline_smoke; status=get_live_data_api_key_status(); summary=run_api_key_pipeline_smoke(summary_only=True); print(status["one_shot_smoke_command"]["command"].endswith("--summary-only --no-audit"), summary["api_key_command_summary"]["one_shot_pipeline_smoke"]["command"].endswith("--summary-only --no-audit"), summary["secret_values_returned"])'
-      result: "True True False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status; payload=get_live_data_api_key_status(); print([entry["example"] for entry in payload["dotenv_template"]["entries"]], payload["secret_values_returned"])'
+      result: "['POLYGON_API_KEY=your_polygon_key', 'FRED_API_KEY=your_fred_key', 'NEWS_API_KEY=your_newsapi_key'] False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
-      result: "798 passed"
+      result: "799 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
