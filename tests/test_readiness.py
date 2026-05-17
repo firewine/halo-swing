@@ -5269,6 +5269,27 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "secret_values_not_returned",
     ]
     assert summary_payload["provider_smoke_success_check_count"] == 3
+    assert summary_payload["provider_smoke_success_network_call_count"] == 3
+    assert summary_payload["provider_smoke_success_all_network_calls"] is True
+    assert summary_payload["provider_smoke_success_network_call_policies"] == [
+        "only_when_matching_provider_selects_live_route"
+    ]
+    assert (
+        summary_payload["provider_smoke_success_mutates_local_state_count"]
+        == 0
+    )
+    assert (
+        summary_payload["provider_smoke_success_any_mutates_local_state"]
+        is False
+    )
+    assert (
+        summary_payload["provider_smoke_success_secret_values_returned_count"]
+        == 0
+    )
+    assert (
+        summary_payload["provider_smoke_success_any_secret_values_returned"]
+        is False
+    )
     assert (
         summary_payload["provider_smoke_summaries"][0]["provider_family"]
         == "market"

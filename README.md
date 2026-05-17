@@ -336,6 +336,14 @@ It also keeps summary-only provider smoke contract/check aggregates:
 `provider_smoke_success_expected_live_contracts`,
 `provider_smoke_success_expected_live_checks`, and
 `provider_smoke_success_check_count`.
+Summary-only provider smoke safety aggregates include
+`provider_smoke_success_network_call_count`,
+`provider_smoke_success_all_network_calls`,
+`provider_smoke_success_network_call_policies`,
+`provider_smoke_success_mutates_local_state_count`,
+`provider_smoke_success_any_mutates_local_state`,
+`provider_smoke_success_secret_values_returned_count`, and
+`provider_smoke_success_any_secret_values_returned`.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command

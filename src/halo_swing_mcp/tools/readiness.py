@@ -2983,6 +2983,19 @@ def _api_key_pipeline_summary_only_payload(
             for check in _string_list(row.get("expected_live_checks"))
         ]
     )
+    provider_smoke_success_network_call_count = sum(
+        1 for row in provider_smoke_success_rows if row.get("network_call") is True
+    )
+    provider_smoke_success_mutates_local_state_count = sum(
+        1
+        for row in provider_smoke_success_rows
+        if row.get("mutates_local_state") is True
+    )
+    provider_smoke_success_secret_values_returned_count = sum(
+        1
+        for row in provider_smoke_success_rows
+        if row.get("secret_values_returned") is True
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3141,6 +3154,32 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_smoke_success_check_count": len(
             provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_network_call_count": (
+            provider_smoke_success_network_call_count
+        ),
+        "provider_smoke_success_all_network_calls": (
+            provider_smoke_success_count > 0
+            and provider_smoke_success_network_call_count
+            == provider_smoke_success_count
+        ),
+        "provider_smoke_success_network_call_policies": _ordered_unique_strings(
+            [
+                row.get("network_call_policy")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_mutates_local_state_count": (
+            provider_smoke_success_mutates_local_state_count
+        ),
+        "provider_smoke_success_any_mutates_local_state": (
+            provider_smoke_success_mutates_local_state_count > 0
+        ),
+        "provider_smoke_success_secret_values_returned_count": (
+            provider_smoke_success_secret_values_returned_count
+        ),
+        "provider_smoke_success_any_secret_values_returned": (
+            provider_smoke_success_secret_values_returned_count > 0
         ),
         "api_key_failure_category": payload.get("api_key_failure_category"),
         "api_key_has_failures": payload.get("api_key_has_failures") is True,

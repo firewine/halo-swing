@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.809 API Key Summary-Only Provider Success Safety Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke(summary_only=true)`는 성공한 provider smoke의 provider,
+command, contract/check를 compact top-level에 노출하지만, 성공 smoke들이 실제 provider
+network call인지, local state를 변경하지 않는지, secret value 반환 플래그가 없는지는
+row를 열어 봐야 한다. 실제 API 키 입력 후 compact 응답만 보는 운영 흐름에서도 안전
+속성을 바로 확인할 수 있도록, 이번 slice는 no-secret provider smoke success safety
+aggregate를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key pipeline summary-only payload exposes provider_smoke_success_network_call_count
+  - API-key pipeline summary-only payload exposes provider_smoke_success_all_network_calls and provider_smoke_success_network_call_policies
+  - API-key pipeline summary-only payload exposes provider_smoke_success_mutates_local_state_count and provider_smoke_success_any_mutates_local_state
+  - API-key pipeline summary-only payload exposes provider_smoke_success_secret_values_returned_count and provider_smoke_success_any_secret_values_returned
+  - README and DevOps setup guide document summary-only provider smoke safety aggregate fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -c summary-only provider success safety smoke -> 1 only_when_matching_api_key_selects_live_provider False False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 3.808 API Key Summary-Only Provider Success Contract Gate Record - 2026-05-17
 
 ### A. 목적
