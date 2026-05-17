@@ -179,10 +179,68 @@ def _api_key_pipeline_readiness_summary(
         or next_provider_recovery_smoke.get("expected_live_checks")
         or next_provider_smoke.get("expected_live_checks")
     )
+    selected_provider_class_by_family = _optional_mapping(
+        live_data_setup_summary.get("selected_provider_class_by_family")
+    ) or {}
+    provider_route_data_mode_by_family = _optional_mapping(
+        live_data_setup_summary.get("provider_route_data_mode_by_family")
+    ) or {}
+    provider_route_live_data_required_by_family = _optional_mapping(
+        live_data_setup_summary.get("provider_route_live_data_required_by_family")
+    ) or {}
+    next_action_provider_family = (
+        next_operator_action.get("provider_family")
+        or next_provider_recovery_action.get("provider_family")
+        or next_provider_smoke.get("provider_family")
+    )
+    next_action_selected_provider_class = (
+        next_operator_action.get("selected_provider_class")
+        or next_provider_recovery_action.get("selected_provider_class")
+        or next_provider_smoke.get("selected_provider_class")
+    )
+    next_action_provider_route_data_mode = (
+        next_operator_action.get("provider_route_data_mode")
+        or next_provider_recovery_action.get("provider_route_data_mode")
+        or next_provider_smoke.get("provider_route_data_mode")
+    )
+    next_action_provider_route_live_data_required = (
+        next_operator_action.get("provider_route_live_data_required") is True
+        or next_provider_recovery_action.get("provider_route_live_data_required")
+        is True
+        or next_provider_smoke.get("provider_route_live_data_required") is True
+    )
+    if isinstance(next_action_provider_family, str):
+        if not isinstance(next_action_selected_provider_class, str):
+            next_action_selected_provider_class = (
+                selected_provider_class_by_family.get(next_action_provider_family)
+            )
+        if not isinstance(next_action_provider_route_data_mode, str):
+            next_action_provider_route_data_mode = (
+                provider_route_data_mode_by_family.get(next_action_provider_family)
+            )
+        next_action_provider_route_live_data_required = (
+            next_action_provider_route_live_data_required
+            or provider_route_live_data_required_by_family.get(
+                next_action_provider_family
+            )
+            is True
+        )
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
         summary["accepted_env_keys"] = accepted_env_keys
+    if isinstance(next_action_selected_provider_class, str):
+        summary["next_operator_action_selected_provider_class"] = (
+            next_action_selected_provider_class
+        )
+    if isinstance(next_action_provider_route_data_mode, str):
+        summary["next_operator_action_provider_route_data_mode"] = (
+            next_action_provider_route_data_mode
+        )
+    if isinstance(next_action_provider_family, str):
+        summary["next_operator_action_provider_route_live_data_required"] = (
+            next_action_provider_route_live_data_required
+        )
     if isinstance(expected_live_contract, str):
         summary["next_operator_action_expected_live_contract"] = (
             expected_live_contract

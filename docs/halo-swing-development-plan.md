@@ -87,6 +87,66 @@ verification:
   - direct fake-key summary-only output confirmed next_pending_recovery_selected_provider_class, next_pending_recovery_provider_route_data_mode, next_pending_recovery_provider_route_live_data_required, and blocked defaults without secret values
 ```
 
+## 3.882 API Key Next Operator Action Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.881에서 pending/blocked recovery rows까지 route evidence를 올렸다. 하지만
+summary-only client가 가장 먼저 읽는 `next_operator_action_*`,
+`api_key_next_action_summary`, `api_key_integration_status_summary`의 next action
+mirrors에는 아직 selected provider class, route data mode, live-data-required evidence가
+직접 붙어 있지 않다. 이번 slice는 API 키만 넣고 다음 한 줄 명령을 실행하는 운영자가
+nested recovery/checklist rows를 파싱하지 않아도 그 명령이 실제 live provider route를
+향하는지 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_next_action_summary mirrors selected provider class, route data mode, and live-data-required evidence for the next operator action
+  - api_key_integration_status_summary mirrors the same next action route evidence
+  - full and summary-only top-level payloads expose next_operator_action_* route evidence without nested parsing
+  - operator checklist next_blocking_action carries route evidence for the immediate recovery command
+  - README and DevOps setup guide document next operator action route fields
+  - setup docs guard keeps README and DevOps API-key next operator action field parity in sync
+  - tests cover next action, integration summary, summary-only, fake-key no-secret paths, and docs parity
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key next operator action route fields pytest: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 36 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 828 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed next_operator_action_selected_provider_class, next_operator_action_provider_route_data_mode, next_operator_action_provider_route_live_data_required, and api_key_integration next action mirrors without secret values
+```
+
 ## 3.880 API Key Next Recovery Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

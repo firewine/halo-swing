@@ -108,6 +108,22 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_provider": (
             api_key_integration_status_summary.get("next_action_provider")
         ),
+        "api_key_integration_next_action_selected_provider_class": (
+            api_key_integration_status_summary.get(
+                "next_action_selected_provider_class"
+            )
+        ),
+        "api_key_integration_next_action_provider_route_data_mode": (
+            api_key_integration_status_summary.get(
+                "next_action_provider_route_data_mode"
+            )
+        ),
+        "api_key_integration_next_action_provider_route_live_data_required": (
+            api_key_integration_status_summary.get(
+                "next_action_provider_route_live_data_required"
+            )
+            is True
+        ),
         "api_key_integration_next_action_smoke_command_name": (
             api_key_integration_status_summary.get(
                 "next_action_smoke_command_name"

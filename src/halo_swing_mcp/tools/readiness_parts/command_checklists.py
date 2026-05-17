@@ -509,6 +509,24 @@ def _api_key_pipeline_operator_checklist(
                 )
                 if next_provider_recovery_action is not None
                 else [],
+                "selected_provider_class": next_provider_recovery_action.get(
+                    "selected_provider_class"
+                )
+                if next_provider_recovery_action is not None
+                else None,
+                "provider_route_data_mode": next_provider_recovery_action.get(
+                    "provider_route_data_mode"
+                )
+                if next_provider_recovery_action is not None
+                else None,
+                "provider_route_live_data_required": (
+                    next_provider_recovery_action.get(
+                        "provider_route_live_data_required"
+                    )
+                    is True
+                    if next_provider_recovery_action is not None
+                    else False
+                ),
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
                 "mutates_local_state": False,

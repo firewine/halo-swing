@@ -312,6 +312,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_summary_status" in guide
     assert "next_operator_action_provider_family" in guide
     assert "next_operator_action_provider" in guide
+    assert "next_operator_action_selected_provider_class" in guide
+    assert "next_operator_action_provider_route_data_mode" in guide
+    assert "next_operator_action_provider_route_live_data_required" in guide
     assert "next_operator_action_smoke_command_name" in guide
     assert "next_operator_action_expected_live_contract" in guide
     assert "next_operator_action_expected_live_checks" in guide
@@ -410,6 +413,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_name" in guide
     assert "api_key_integration_next_action_provider_family" in guide
     assert "api_key_integration_next_action_provider" in guide
+    assert "api_key_integration_next_action_selected_provider_class" in guide
+    assert "api_key_integration_next_action_provider_route_data_mode" in guide
+    assert (
+        "api_key_integration_next_action_provider_route_live_data_required"
+        in guide
+    )
     assert "api_key_integration_next_action_smoke_command_name" in guide
     assert "api_key_integration_next_action_is_recovery" in guide
     assert "api_key_integration_next_action_network_call" in guide
@@ -664,6 +673,9 @@ def test_setup_docs_keep_api_key_integration_next_action_fields_in_sync() -> Non
     field_names = (
         "api_key_integration_next_action_provider_family",
         "api_key_integration_next_action_provider",
+        "api_key_integration_next_action_selected_provider_class",
+        "api_key_integration_next_action_provider_route_data_mode",
+        "api_key_integration_next_action_provider_route_live_data_required",
         "api_key_integration_next_action_smoke_command_name",
         "api_key_integration_next_action_is_recovery",
         "api_key_integration_next_action_network_call",
@@ -972,6 +984,9 @@ def test_setup_docs_keep_api_key_readiness_summary_fields_in_sync() -> None:
         "next_operator_action_target_path",
         "next_operator_action_provider_family",
         "next_operator_action_provider",
+        "next_operator_action_selected_provider_class",
+        "next_operator_action_provider_route_data_mode",
+        "next_operator_action_provider_route_live_data_required",
         "next_operator_action_smoke_command_name",
         "next_operator_action_expected_live_contract",
         "next_operator_action_expected_live_checks",
@@ -993,6 +1008,26 @@ def test_setup_docs_keep_api_key_readiness_summary_fields_in_sync() -> None:
         "api_key_readiness_provider_route_data_mode_by_family",
         "api_key_readiness_provider_route_live_data_required_by_family",
         "api_key_readiness_all_selected_routes_live",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
+def test_setup_docs_keep_api_key_next_operator_action_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "next_operator_action_selected_provider_class",
+        "next_operator_action_provider_route_data_mode",
+        "next_operator_action_provider_route_live_data_required",
+        "next_action_selected_provider_class",
+        "next_action_provider_route_data_mode",
+        "next_action_provider_route_live_data_required",
+        "api_key_integration_next_action_selected_provider_class",
+        "api_key_integration_next_action_provider_route_data_mode",
+        "api_key_integration_next_action_provider_route_live_data_required",
     )
 
     for field_name in field_names:

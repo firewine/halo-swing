@@ -2928,6 +2928,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_command": payload["provider_recovery_smokes"][0]["command"],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
+        "next_action_selected_provider_class": "PolygonMarketDataProvider",
+        "next_action_provider_route_data_mode": "live",
+        "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
@@ -3920,6 +3923,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "HALO_SWING_MARKET_DATA_API_KEY",
             "POLYGON_API_KEY",
         ],
+        "selected_provider_class": "PolygonMarketDataProvider",
+        "provider_route_data_mode": "live",
+        "provider_route_live_data_required": True,
         "network_call": True,
         "network_call_policy": "only_when_matching_api_key_selects_live_provider",
         "mutates_local_state": False,
@@ -3968,6 +3974,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_command": payload["provider_recovery_smokes"][0]["command"],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
+        "next_action_selected_provider_class": "PolygonMarketDataProvider",
+        "next_action_provider_route_data_mode": "live",
+        "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
@@ -5500,6 +5509,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
+        "next_action_selected_provider_class": "PolygonMarketDataProvider",
+        "next_action_provider_route_data_mode": "live",
+        "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
@@ -5603,6 +5615,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         ],
         "next_action_provider_family": "market",
         "next_action_provider": "polygon",
+        "next_action_selected_provider_class": "PolygonMarketDataProvider",
+        "next_action_provider_route_data_mode": "live",
+        "next_action_provider_route_live_data_required": True,
         "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_expected_live_contract": "market_snapshot_contract",
         "next_action_expected_live_checks": [
@@ -6070,6 +6085,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_target_path"] == ".env"
     assert payload["api_key_integration_next_action_provider_family"] is None
     assert payload["api_key_integration_next_action_provider"] is None
+    assert (
+        payload["api_key_integration_next_action_selected_provider_class"]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_provider_route_data_mode"]
+        is None
+    )
+    assert (
+        payload["api_key_integration_next_action_provider_route_live_data_required"]
+        is False
+    )
     assert payload["api_key_integration_next_action_smoke_command_name"] is None
     assert payload["api_key_integration_next_action_is_recovery"] is False
     assert payload["api_key_integration_next_action_network_call"] is False
@@ -8621,6 +8648,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smok
     assert next_action_summary["next_action_is_recovery"] is False
     assert next_action_summary["next_action_provider_family"] == "market"
     assert next_action_summary["next_action_provider"] == "polygon"
+    assert next_action_summary["next_action_selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert next_action_summary["next_action_provider_route_data_mode"] == "live"
+    assert next_action_summary["next_action_provider_route_live_data_required"] is True
     assert next_action_summary["next_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
@@ -8709,6 +8741,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert integration_status["next_action_is_recovery"] is False
     assert integration_status["next_action_provider_family"] == "market"
     assert integration_status["next_action_provider"] == "polygon"
+    assert integration_status["next_action_selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert integration_status["next_action_provider_route_data_mode"] == "live"
+    assert integration_status["next_action_provider_route_live_data_required"] is True
     assert integration_status["next_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
@@ -8819,6 +8856,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert payload["api_key_integration_next_action_provider"] == (
         integration_status["next_action_provider"]
+    )
+    assert payload["api_key_integration_next_action_selected_provider_class"] == (
+        integration_status["next_action_selected_provider_class"]
+    )
+    assert payload["api_key_integration_next_action_provider_route_data_mode"] == (
+        integration_status["next_action_provider_route_data_mode"]
+    )
+    assert (
+        payload["api_key_integration_next_action_provider_route_live_data_required"]
+        is integration_status["next_action_provider_route_live_data_required"]
     )
     assert payload["api_key_integration_next_action_smoke_command_name"] == (
         integration_status["next_action_smoke_command_name"]
@@ -9069,6 +9116,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     )
     assert payload["next_operator_action_provider_family"] == "market"
     assert payload["next_operator_action_provider"] == "polygon"
+    assert payload["next_operator_action_selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert payload["next_operator_action_provider_route_data_mode"] == "live"
+    assert payload["next_operator_action_provider_route_live_data_required"] is True
     assert payload["next_operator_action_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
@@ -9105,6 +9157,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     ]
     assert next_operator_action["secret_values_returned"] is False
     assert readiness_summary["next_operator_action_name"] == "run_provider_smokes"
+    assert readiness_summary["next_operator_action_selected_provider_class"] == (
+        payload["next_operator_action_selected_provider_class"]
+    )
+    assert readiness_summary["next_operator_action_provider_route_data_mode"] == (
+        payload["next_operator_action_provider_route_data_mode"]
+    )
+    assert (
+        readiness_summary["next_operator_action_provider_route_live_data_required"]
+        is payload["next_operator_action_provider_route_live_data_required"]
+    )
     assert readiness_summary["next_operator_action_expected_live_contract"] == (
         payload["next_operator_action_expected_live_contract"]
     )

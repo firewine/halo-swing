@@ -525,6 +525,9 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_dotenv_target_path`,
 `next_operator_action_source_path`, `next_operator_action_target_path`,
 `next_operator_action_provider_family`, `next_operator_action_provider`,
+`next_operator_action_selected_provider_class`,
+`next_operator_action_provider_route_data_mode`,
+`next_operator_action_provider_route_live_data_required`,
 `next_operator_action_smoke_command_name`,
 `next_operator_action_expected_live_contract`,
 `next_operator_action_expected_live_checks`,
@@ -1044,6 +1047,9 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_name`. It also mirrors next-action details as
 `api_key_integration_next_action_provider_family`,
 `api_key_integration_next_action_provider`,
+`api_key_integration_next_action_selected_provider_class`,
+`api_key_integration_next_action_provider_route_data_mode`,
+`api_key_integration_next_action_provider_route_live_data_required`,
 `api_key_integration_next_action_smoke_command_name`,
 `api_key_integration_next_action_is_recovery`, and
 `api_key_integration_next_action_network_call`. It also mirrors
@@ -1166,7 +1172,13 @@ no-secret recovery smoke command. In that recovery state,
 becomes `recover_failed_providers`. The one-shot top-level
 `next_operator_action` and `readiness_summary.next_operator_action` also point
 to `recover_failed_providers` so every summary exposes the same next recovery
-command.
+command. Summary mirrors also expose
+`next_operator_action_selected_provider_class`,
+`next_operator_action_provider_route_data_mode`,
+`next_operator_action_provider_route_live_data_required`,
+`next_action_selected_provider_class`, `next_action_provider_route_data_mode`,
+and `next_action_provider_route_live_data_required`, so the immediate command's
+live provider route is visible without parsing nested rows.
 The Hermes gate returns `hermes_mcp_config_readiness.v1`, including the expected
 stdio server command, server module, MCP server name, config path existence, and
 whether the operator has registered the MCP config. It does not start Hermes.

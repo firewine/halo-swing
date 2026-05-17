@@ -372,6 +372,9 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_dotenv_target_path`,
 `next_operator_action_source_path`, `next_operator_action_target_path`,
 `next_operator_action_provider_family`, `next_operator_action_provider`,
+`next_operator_action_selected_provider_class`,
+`next_operator_action_provider_route_data_mode`,
+`next_operator_action_provider_route_live_data_required`,
 `next_operator_action_smoke_command_name`,
 `next_operator_action_expected_live_contract`,
 `next_operator_action_expected_live_checks`,
@@ -862,6 +865,9 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_name`. It also mirrors next-action details as
 `api_key_integration_next_action_provider_family`,
 `api_key_integration_next_action_provider`,
+`api_key_integration_next_action_selected_provider_class`,
+`api_key_integration_next_action_provider_route_data_mode`,
+`api_key_integration_next_action_provider_route_live_data_required`,
 `api_key_integration_next_action_smoke_command_name`,
 `api_key_integration_next_action_is_recovery`, and
 `api_key_integration_next_action_network_call`. It also mirrors
@@ -996,7 +1002,13 @@ repo-local copy command hint without writing files or returning secret values.
 setup without returning secret values, and points to provider smoke verification
 before the one-shot pipeline smoke once API keys are ready. In that ready state,
 it includes `next_provider_smoke` so the first provider smoke command is visible
-without reading the full provider list.
+without reading the full provider list. Summary mirrors also expose
+`next_operator_action_selected_provider_class`,
+`next_operator_action_provider_route_data_mode`,
+`next_operator_action_provider_route_live_data_required`,
+`next_action_selected_provider_class`, `next_action_provider_route_data_mode`,
+and `next_action_provider_route_live_data_required`, so the immediate command's
+live provider route is visible without parsing nested rows.
 `live_data_setup_steps` orders the local setup path as dotenv preparation, live
 data API-key entry, provider smoke verification, and the one-shot pipeline
 smoke. It also returns

@@ -127,6 +127,18 @@ def _api_key_pipeline_summary_only_payload(
             or next_provider_recovery_action.get("provider")
             or next_provider_smoke.get("provider")
         ),
+        "next_operator_action_selected_provider_class": (
+            api_key_next_action_summary.get("next_action_selected_provider_class")
+        ),
+        "next_operator_action_provider_route_data_mode": (
+            api_key_next_action_summary.get("next_action_provider_route_data_mode")
+        ),
+        "next_operator_action_provider_route_live_data_required": (
+            api_key_next_action_summary.get(
+                "next_action_provider_route_live_data_required"
+            )
+            is True
+        ),
         "next_operator_action_smoke_command_name": (
             next_operator_action.get("smoke_command_name")
             or next_operator_action.get("next_provider_smoke_command_name")
