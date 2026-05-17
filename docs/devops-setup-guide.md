@@ -505,6 +505,16 @@ top-level summary-only recovery command lists:
 `provider_recovery_pending_smoke_commands`,
 `provider_recovery_blocked_smoke_command_names`, and
 `provider_recovery_blocked_smoke_commands`, without returning secret values.
+It also exposes top-level summary-only recovery status and identity fields:
+`provider_recovery_action_status`, `provider_recovery_item_count`,
+`provider_recovery_pending_count`, `provider_recovery_blocked_count`,
+`provider_error_count`, `provider_recovery_retry_ready`,
+`provider_recovery_all_retryable`, `provider_recovery_has_pending`,
+`provider_recovery_has_blocked`, `provider_recovery_provider_families`,
+`provider_recovery_providers`, `provider_recovery_pending_provider_families`,
+`provider_recovery_pending_providers`,
+`provider_recovery_blocked_provider_families`, and
+`provider_recovery_blocked_providers`.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,

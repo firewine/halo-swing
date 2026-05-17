@@ -997,6 +997,71 @@ def run_api_key_pipeline_smoke(
         "provider_recovery_smoke_count": live_data_smoke_summary[
             "provider_recovery_smoke_count"
         ],
+        "provider_recovery_action_status": api_key_provider_recovery_summary.get(
+            "provider_recovery_action_status"
+        ),
+        "provider_recovery_item_count": api_key_provider_recovery_summary.get(
+            "item_count",
+            0,
+        ),
+        "provider_recovery_pending_count": api_key_provider_recovery_summary.get(
+            "provider_recovery_pending_count",
+            0,
+        ),
+        "provider_recovery_blocked_count": api_key_provider_recovery_summary.get(
+            "provider_recovery_blocked_count",
+            0,
+        ),
+        "provider_error_count": api_key_provider_recovery_summary.get(
+            "provider_error_count",
+            0,
+        ),
+        "provider_recovery_retry_ready": (
+            api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
+            is True
+        ),
+        "provider_recovery_all_retryable": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_all_retryable"
+            )
+            is True
+        ),
+        "provider_recovery_has_pending": (
+            api_key_provider_recovery_summary.get("provider_recovery_has_pending")
+            is True
+        ),
+        "provider_recovery_has_blocked": (
+            api_key_provider_recovery_summary.get("provider_recovery_has_blocked")
+            is True
+        ),
+        "provider_recovery_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_provider_families"
+            )
+        ),
+        "provider_recovery_providers": _string_list(
+            api_key_provider_recovery_summary.get("provider_recovery_providers")
+        ),
+        "provider_recovery_pending_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_provider_families"
+            )
+        ),
+        "provider_recovery_pending_providers": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_pending_providers"
+            )
+        ),
+        "provider_recovery_blocked_provider_families": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_provider_families"
+            )
+        ),
+        "provider_recovery_blocked_providers": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_blocked_providers"
+            )
+        ),
         "provider_recovery_smoke_command_names": _string_list(
             api_key_provider_recovery_summary.get(
                 "provider_recovery_smoke_command_names"
@@ -2638,6 +2703,49 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_recovery_smoke_count": payload.get(
             "provider_recovery_smoke_count"
+        ),
+        "provider_recovery_action_status": payload.get(
+            "provider_recovery_action_status"
+        ),
+        "provider_recovery_item_count": payload.get(
+            "provider_recovery_item_count"
+        ),
+        "provider_recovery_pending_count": payload.get(
+            "provider_recovery_pending_count"
+        ),
+        "provider_recovery_blocked_count": payload.get(
+            "provider_recovery_blocked_count"
+        ),
+        "provider_error_count": payload.get("provider_error_count"),
+        "provider_recovery_retry_ready": (
+            payload.get("provider_recovery_retry_ready") is True
+        ),
+        "provider_recovery_all_retryable": (
+            payload.get("provider_recovery_all_retryable") is True
+        ),
+        "provider_recovery_has_pending": (
+            payload.get("provider_recovery_has_pending") is True
+        ),
+        "provider_recovery_has_blocked": (
+            payload.get("provider_recovery_has_blocked") is True
+        ),
+        "provider_recovery_provider_families": _string_list(
+            payload.get("provider_recovery_provider_families")
+        ),
+        "provider_recovery_providers": _string_list(
+            payload.get("provider_recovery_providers")
+        ),
+        "provider_recovery_pending_provider_families": _string_list(
+            payload.get("provider_recovery_pending_provider_families")
+        ),
+        "provider_recovery_pending_providers": _string_list(
+            payload.get("provider_recovery_pending_providers")
+        ),
+        "provider_recovery_blocked_provider_families": _string_list(
+            payload.get("provider_recovery_blocked_provider_families")
+        ),
+        "provider_recovery_blocked_providers": _string_list(
+            payload.get("provider_recovery_blocked_providers")
         ),
         "provider_recovery_smoke_command_names": _string_list(
             payload.get("provider_recovery_smoke_command_names")
