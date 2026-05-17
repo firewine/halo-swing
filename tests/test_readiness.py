@@ -1761,6 +1761,23 @@ def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secr
     assert summary_payload["api_key_operator_checklist_summary"][
         "next_blocking_action_required_env_keys"
     ] == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+    assert summary_payload["api_key_next_action_summary"]["required_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["api_key_next_action_summary"]["dotenv_examples"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert summary_payload["next_operator_action_required_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["next_operator_action_dotenv_examples"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert summary_payload["next_operator_action_dotenv_example_count"] == 3
     assert summary_payload["secret_values_returned"] is False
     assert payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
     for value in secret_env.values():

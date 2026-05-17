@@ -526,7 +526,9 @@ For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_expected_live_contract`,
 `next_operator_action_expected_live_checks`,
 `next_operator_action_preferred_env_key`, and
-`next_operator_action_accepted_env_keys`, plus safety fields
+`next_operator_action_accepted_env_keys`,
+`next_operator_action_required_env_keys`, and no-secret
+`next_operator_action_dotenv_examples`, plus safety fields
 `next_operator_action_status`, `next_operator_action_network_call`,
 `next_operator_action_network_call_policy`,
 `next_operator_action_mutates_local_state`, and
@@ -711,7 +713,10 @@ top-level `api_key_next_action_summary`
 `next_action_smoke_command_name` fields. When the next action points at a
 provider smoke or provider recovery command, it also includes
 `preferred_env_key` and `accepted_env_keys`, so the single next setup or
-recovery command, provider identity, and accepted API-key aliases are visible
+recovery command, provider identity, and accepted API-key aliases are visible.
+When the next action is `fill_live_data_api_keys`, it also includes
+`required_env_keys` and no-secret `dotenv_examples`, so the compact row shows
+the `KEY=placeholder` lines to fill
 without reading nested payloads. It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in

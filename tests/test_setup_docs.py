@@ -315,6 +315,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     ) in guide
     assert "next_operator_action_preferred_env_key" in guide
     assert "next_operator_action_accepted_env_keys" in guide
+    assert "next_operator_action_required_env_keys" in guide
+    assert "next_operator_action_dotenv_examples" in guide
     assert "next_operator_action_status" in guide
     assert "next_operator_action_network_call" in guide
     assert "next_operator_action_network_call_policy" in guide

@@ -2405,6 +2405,9 @@ def _api_key_pipeline_next_action_summary(
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
         summary["accepted_env_keys"] = accepted_env_keys
+    required_env_keys = _string_list(next_operator_action.get("required_env_keys"))
+    if required_env_keys:
+        summary["required_env_keys"] = required_env_keys
     dotenv_examples = _string_list(next_operator_action.get("dotenv_examples"))
     if dotenv_examples:
         summary["dotenv_examples"] = dotenv_examples
@@ -3075,6 +3078,15 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "next_operator_action_accepted_env_keys": _string_list(
             api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "next_operator_action_required_env_keys": _string_list(
+            api_key_next_action_summary.get("required_env_keys")
+        ),
+        "next_operator_action_dotenv_examples": _string_list(
+            api_key_next_action_summary.get("dotenv_examples")
+        ),
+        "next_operator_action_dotenv_example_count": (
+            api_key_next_action_summary.get("dotenv_example_count")
         ),
         "next_operator_action_secret_values_returned": (
             next_operator_action.get("secret_values_returned") is True

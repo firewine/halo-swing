@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.817 API Key Top-Level Next Action Dotenv Examples Gate Record - 2026-05-17
+
+### A. 목적
+
+3.816에서 `fill_live_data_api_keys` checklist row는 no-secret `dotenv_examples`를 갖게 됐다.
+하지만 summary-only output의 최상위 `next_operator_action_*` 필드만 보는 operator는 아직
+fill-key 단계의 required env keys와 `KEY=placeholder` examples를 바로 읽을 수 없다.
+이번 slice는 `api_key_next_action_summary`와 summary-only 최상위 next action mirrors에
+fill-key required env keys와 no-secret examples를 올린다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_next_action_summary exposes required_env_keys for fill_live_data_api_keys
+  - summary-only top-level next_operator_action_required_env_keys mirrors fill-key required env keys
+  - summary-only top-level next_operator_action_dotenv_examples and count mirror fill-key no-secret examples
+  - README and DevOps setup guide document top-level next_operator_action dotenv example mirrors
+  - setup docs tests assert top-level next action example guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.816 API Key Operator Checklist Dotenv Examples Gate Record - 2026-05-17
 
 ### A. 목적

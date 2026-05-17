@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_OPERATOR_CHECKLIST_DOTENV_EXAMPLES_GATE",
+  "gate_id": "API_KEY_TOP_LEVEL_NEXT_ACTION_DOTENV_EXAMPLES_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.816",
-  "next_atomic_step": "add no-secret dotenv examples to API-key operator checklist fill-key action rows",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.817",
+  "next_atomic_step": "mirror fill-key dotenv examples onto summary-only top-level next_operator_action fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.816",
+    "docs/halo-swing-development-plan.md#3.817",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -39,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secrets tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -56,15 +56,15 @@
     "read_only": true
   },
   "done_means": [
-    "live_data_setup_steps fill_live_data_api_keys row exposes no-secret dotenv_examples and dotenv_example_count",
-    "next_operator_action for fill_live_data_api_keys exposes no-secret dotenv_examples and dotenv_example_count",
-    "api_key_operator_checklist and api_key_operator_checklist_summary keep fill-key dotenv examples without returning API key values",
-    "README and DevOps setup guide document dotenv_examples on fill-key checklist/action rows",
-    "setup docs tests assert the new operator checklist example guidance",
+    "api_key_next_action_summary exposes required_env_keys for fill_live_data_api_keys",
+    "summary-only top-level next_operator_action_required_env_keys mirrors fill-key required env keys",
+    "summary-only top-level next_operator_action_dotenv_examples and count mirror fill-key no-secret examples",
+    "README and DevOps setup guide document top-level next_operator_action dotenv example mirrors",
+    "setup docs tests assert the new top-level next action example guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified operator checklist dotenv examples gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified top-level next action dotenv examples gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
