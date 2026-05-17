@@ -1,28 +1,21 @@
 {
-  "gate_id": "API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_GATE",
+  "gate_id": "API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.836",
-  "next_atomic_step": "mirror API-key integration next-action provider smoke progress onto summary-only top-level fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.837",
+  "next_atomic_step": "lock README API-key integration next-action provider smoke progress guidance with setup docs coverage",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "README.md",
-    "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.836",
-    "src/halo_swing_mcp/tools/readiness.py",
-    "tests/test_readiness.py",
+    "docs/halo-swing-development-plan.md#3.837",
     "README.md",
-    "docs/devops-setup-guide.md",
     "tests/test_setup_docs.py"
   ],
   "blocked_path_prefixes": [
@@ -39,7 +32,8 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_readme_shows_api_key_integration_next_action_provider_smoke_progress -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -56,14 +50,12 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count mirror next operator action provider smoke progress",
-    "summary-only top-level api_key_integration_next_action_next_provider_smoke_command_name, command, provider_family, provider, status, network_call, network_call_policy, and secret_values_returned mirror the next provider smoke row",
-    "README and DevOps setup guide document top-level API-key integration next-action provider smoke progress mirrors",
-    "setup docs tests assert the new top-level integration next-action provider smoke progress guidance",
+    "README setup docs coverage asserts every top-level API-key integration next-action provider smoke progress mirror name",
+    "README setup docs coverage asserts the next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified top-level integration next-action provider smoke progress mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README provider smoke progress docs guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -554,6 +554,34 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "export NEWS_API_KEY" not in guide
 
 
+def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() -> None:
+    readme = README.read_text(encoding="utf-8")
+
+    assert "api_key_integration_next_action_provider_smoke_count" in readme
+    assert "api_key_integration_next_action_ready_provider_smoke_count" in readme
+    assert "api_key_integration_next_action_blocked_provider_smoke_count" in readme
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_command_name"
+        in readme
+    )
+    assert "api_key_integration_next_action_next_provider_smoke_command" in readme
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_provider_family"
+        in readme
+    )
+    assert "api_key_integration_next_action_next_provider_smoke_provider" in readme
+    assert "api_key_integration_next_action_next_provider_smoke_status" in readme
+    assert "api_key_integration_next_action_next_provider_smoke_network_call" in readme
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_network_call_policy"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_secret_values_returned"
+        in readme
+    )
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

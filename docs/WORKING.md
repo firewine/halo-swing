@@ -42,21 +42,17 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_GATE
+status: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_VERIFIED
+gate_id: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror API-key integration next-action provider smoke progress onto summary-only top-level fields
+next_atomic_step: lock README API-key integration next-action provider smoke progress guidance with setup docs coverage
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - README.md
-  - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/tools/readiness.py
-  - tests/test_readiness.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -74,23 +70,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_readme_shows_api_key_integration_next_action_provider_smoke_progress -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count mirror next operator action provider smoke progress
-  - summary-only top-level api_key_integration_next_action_next_provider_smoke_command_name, command, provider_family, provider, status, network_call, network_call_policy, and secret_values_returned mirror the next provider smoke row
-  - README and DevOps setup guide document top-level API-key integration next-action provider smoke progress mirrors
-  - setup docs tests assert the new top-level integration next-action provider smoke progress guidance
+  - README setup docs coverage asserts every top-level API-key integration next-action provider smoke progress mirror name
+  - README setup docs coverage asserts the next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level integration next-action provider smoke progress mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified README provider smoke progress docs guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror API-key integration next-action provider smoke progress onto summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -3141,6 +3147,52 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key README Integration Next Action Provider Smoke Progress Docs
+Guard is verified. README setup-docs coverage now asserts the top-level
+API-key integration next-action provider smoke progress mirror names, including
+the next provider smoke command, provider identity, status, network-call policy,
+and secret-values-returned fields. Focused README docs coverage, setup-docs
+coverage, direct summary-only smoke, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_readme_integration_next_action_provider_smoke_progress_docs_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_setup_docs.py
+  implementation:
+    - tests-only/docs guard adds README coverage for api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count
+    - README coverage asserts next provider smoke command name, command, provider family, provider, status, network_call, network_call_policy, and secret_values_returned mirror names
+    - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_readme_shows_api_key_integration_next_action_provider_smoke_progress -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "9 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "801 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Top-Level Integration Next Action Provider Smoke Progress Gate
 is verified. Summary-only top-level payload now mirrors integration next-action
