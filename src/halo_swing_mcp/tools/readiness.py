@@ -2887,15 +2887,9 @@ def _api_key_integration_status_summary(
     accepted_env_keys = _string_list(
         api_key_next_action_summary.get("accepted_env_keys")
     )
-    if (
-        api_key_next_action_summary.get("next_action_is_recovery") is True
-        and isinstance(preferred_env_key, str)
-    ):
+    if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
-    if (
-        api_key_next_action_summary.get("next_action_is_recovery") is True
-        and accepted_env_keys
-    ):
+    if accepted_env_keys:
         summary["accepted_env_keys"] = accepted_env_keys
     return summary
 

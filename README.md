@@ -418,9 +418,10 @@ provider selection, failure, and next-action evidence into one operator row with
 `configured_provider_families`, `missing_provider_families`,
 `selected_provider_classes`, `failure_category`, `has_failures`,
 `next_action_name`, `next_action_is_recovery`, and
-`next_action_network_call`. When the next action is provider recovery, it also
-includes `preferred_env_key` and `accepted_env_keys`, so a key-only live setup
-can be checked without reading every nested summary or returning secret values.
+`next_action_network_call`. When the next action summary carries provider smoke
+or recovery env-key hints, it also includes `preferred_env_key` and
+`accepted_env_keys`, so a key-only live setup can be checked without reading
+every nested summary or returning secret values.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,
