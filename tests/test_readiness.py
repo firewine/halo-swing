@@ -14,6 +14,7 @@ from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.risk_settings import update_btc_risk_settings
 from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
+    _api_key_integration_status_summary,
     _api_key_provider_recovery_summary,
     get_integration_readiness,
     get_integration_setup_checklist,
@@ -2611,6 +2612,18 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_pending_recovery_network_call": True,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -4429,6 +4442,18 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_pending_recovery_network_call": False,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -4687,6 +4712,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "next_pending_recovery_network_call": False,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -5308,6 +5345,100 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
     assert summary["next_blocked_recovery_network_call"] is False
     assert summary["next_blocked_recovery_mutates_local_state"] is False
     assert summary["next_blocked_recovery_secret_values_returned"] is False
+
+
+def test_api_key_integration_status_summary_carries_next_blocked_recovery_fields() -> None:
+    recovery_summary = _api_key_provider_recovery_summary(
+        {
+            "status": "conflict",
+            "provider_error_count": 2,
+            "provider_recovery_smoke_count": 1,
+            "items": [
+                {
+                    "provider_family": "market",
+                    "provider": "polygon",
+                    "smoke_command_name": "get_market_snapshot_live_smoke",
+                    "recovery_smoke_command": "run polygon smoke",
+                    "recovery_smoke_available": True,
+                    "recovery_smoke": {
+                        "network_call_policy": (
+                            "only_when_matching_api_key_selects_live_provider"
+                        ),
+                        "mutates_local_state": False,
+                    },
+                    "next_setup_action": "verify_provider_credentials_or_network",
+                    "preferred_env_key": "POLYGON_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_MARKET_DATA_API_KEY",
+                        "POLYGON_API_KEY",
+                    ],
+                },
+                {
+                    "provider_family": "news",
+                    "provider": "newsapi",
+                    "smoke_command_name": "get_news_bundle_live_smoke",
+                    "recovery_smoke_command": None,
+                    "recovery_smoke_available": False,
+                    "next_setup_action": "fill_provider_key",
+                    "preferred_env_key": "NEWS_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_NEWS_API_KEY",
+                        "NEWS_API_KEY",
+                    ],
+                },
+            ],
+        }
+    )
+
+    summary = _api_key_integration_status_summary(
+        setup_status_summary={
+            "configured_provider_families": ["market", "news"],
+            "missing_provider_families": [],
+            "configured_provider_family_count": 2,
+            "required_provider_family_count": 2,
+            "ready_to_run_live_smoke": True,
+        },
+        api_key_next_action_summary={
+            "status": "conflict",
+            "next_action_name": "recover_failed_providers",
+            "next_action_is_recovery": True,
+            "next_action_network_call": True,
+        },
+        api_key_pipeline_failure_summary={
+            "failure_category": "provider_recovery",
+            "has_failures": True,
+        },
+        api_key_setup_file_summary={"target_exists": True},
+        api_key_dotenv_loading_summary={"dotenv_loading_enabled": True},
+        api_key_provider_selection_summary={
+            "selected_provider_classes": [
+                "PolygonMarketDataProvider",
+                "NewsApiDataProvider",
+            ],
+            "selected_provider_class_count": 2,
+            "ready_to_run_live_smoke": True,
+        },
+        api_key_provider_recovery_summary=recovery_summary,
+    )
+
+    assert summary["next_blocked_recovery_smoke_command_name"] == (
+        "get_news_bundle_live_smoke"
+    )
+    assert summary["next_blocked_recovery_smoke_command"] is None
+    assert summary["next_blocked_recovery_provider_family"] == "news"
+    assert summary["next_blocked_recovery_provider"] == "newsapi"
+    assert summary["next_blocked_recovery_next_setup_action"] == "fill_provider_key"
+    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWS_API_KEY"
+    assert summary["next_blocked_recovery_accepted_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary["next_blocked_recovery_network_call_policy"] is None
+    assert summary["next_blocked_recovery_smoke_available"] is False
+    assert summary["next_blocked_recovery_network_call"] is False
+    assert summary["next_blocked_recovery_mutates_local_state"] is False
+    assert summary["next_blocked_recovery_secret_values_returned"] is False
+    assert summary["secret_values_returned"] is False
 
 
 def test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked() -> None:
@@ -6450,6 +6581,18 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "next_pending_recovery_network_call": False,
         "next_pending_recovery_mutates_local_state": False,
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": None,
+        "next_blocked_recovery_smoke_command": None,
+        "next_blocked_recovery_provider_family": None,
+        "next_blocked_recovery_provider": None,
+        "next_blocked_recovery_next_setup_action": None,
+        "next_blocked_recovery_preferred_env_key": None,
+        "next_blocked_recovery_accepted_env_keys": [],
+        "next_blocked_recovery_network_call_policy": None,
+        "next_blocked_recovery_smoke_available": False,
+        "next_blocked_recovery_network_call": False,
+        "next_blocked_recovery_mutates_local_state": False,
+        "next_blocked_recovery_secret_values_returned": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_STATUS_NEXT_PENDING_RECOVERY_VERIFIED
-gate_id: API_KEY_INTEGRATION_STATUS_NEXT_PENDING_RECOVERY_GATE
+status: API_KEY_INTEGRATION_STATUS_NEXT_BLOCKED_RECOVERY_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_NEXT_BLOCKED_RECOVERY_GATE
 review_tier: S1_small
 
-next_atomic_step: carry next pending provider recovery command fields into API-key integration status summary
+next_atomic_step: carry next blocked provider recovery command fields into API-key integration status summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,30 +74,41 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_integration_status_summary_carries_next_blocked_recovery_fields tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["next_pending_recovery_smoke_command_name"], summary["next_pending_recovery_provider_family"], summary["next_pending_recovery_provider"], summary["next_pending_recovery_smoke_available"], summary["next_pending_recovery_network_call"], summary["next_pending_recovery_secret_values_returned"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["next_blocked_recovery_smoke_command_name"], summary["next_blocked_recovery_provider_family"], summary["next_blocked_recovery_provider"], summary["next_blocked_recovery_smoke_available"], summary["next_blocked_recovery_network_call"], summary["next_blocked_recovery_secret_values_returned"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_integration_status_summary includes next_pending_recovery_smoke_command_name and next_pending_recovery_smoke_command copied from API-key provider recovery summary
-  - api_key_integration_status_summary includes next_pending_recovery_provider_family and next_pending_recovery_provider
-  - api_key_integration_status_summary includes next_pending_recovery_next_setup_action, next_pending_recovery_preferred_env_key, next_pending_recovery_accepted_env_keys, and next_pending_recovery_network_call_policy
-  - api_key_integration_status_summary includes next_pending_recovery_smoke_available, next_pending_recovery_network_call, next_pending_recovery_mutates_local_state, and next_pending_recovery_secret_values_returned safety fields
-  - fake-key API-key pipeline summary-only CLI returns integration status next pending recovery command fields without secret values
-  - blocked setup summary returns null, empty-list, or false next pending recovery fields without secret values
-  - ready fake-live summary returns null, empty-list, or false next pending recovery fields without secret values
-  - focused tests cover integration status next pending recovery fields in summary_only API-key pipeline output
-  - README and DevOps setup guide document integration status next pending recovery fields
-  - setup docs tests assert integration status next pending recovery field guidance
+  - api_key_integration_status_summary includes next_blocked_recovery_smoke_command_name and next_blocked_recovery_smoke_command copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes next_blocked_recovery_provider_family and next_blocked_recovery_provider
+  - api_key_integration_status_summary includes next_blocked_recovery_next_setup_action, next_blocked_recovery_preferred_env_key, next_blocked_recovery_accepted_env_keys, and next_blocked_recovery_network_call_policy
+  - api_key_integration_status_summary includes next_blocked_recovery_smoke_available, next_blocked_recovery_network_call, next_blocked_recovery_mutates_local_state, and next_blocked_recovery_secret_values_returned safety fields
+  - fake-key API-key pipeline summary-only CLI returns integration status next blocked recovery fields without secret values
+  - blocked setup summary returns null, empty-list, or false next blocked recovery fields without secret values
+  - ready fake-live summary returns null, empty-list, or false next blocked recovery fields without secret values
+  - focused tests cover integration status next blocked recovery fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document integration status next blocked recovery fields
+  - setup docs tests assert integration status next blocked recovery field guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key integration status next-pending-recovery gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key integration status next-blocked-recovery gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_STATUS_NEXT_PENDING_RECOVERY_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_NEXT_PENDING_RECOVERY_GATE
+review_tier: S1_small
+
+next_atomic_step: carry next pending provider recovery command fields into API-key integration status summary
 ```
 
 Previous completed directive:
@@ -2609,6 +2620,64 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Integration Status Next Blocked Recovery Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes the first blocked
+provider recovery smoke command, provider identity, setup action, env-key hints,
+network-call policy, and safety flags in the top-level
+`api_key_integration_status_summary`, so the operator-facing integration row
+shows blocked recovery context without opening the nested recovery summary.
+Focused tests, fake-key CLI, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_integration_status_next_blocked_recovery_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_integration_status_summary includes next_blocked_recovery_smoke_command_name and next_blocked_recovery_smoke_command copied from API-key provider recovery summary
+    - api_key_integration_status_summary includes next_blocked_recovery_provider_family and next_blocked_recovery_provider
+    - api_key_integration_status_summary includes next_blocked_recovery_next_setup_action, next_blocked_recovery_preferred_env_key, next_blocked_recovery_accepted_env_keys, and next_blocked_recovery_network_call_policy
+    - api_key_integration_status_summary includes next_blocked_recovery_smoke_available, next_blocked_recovery_network_call, next_blocked_recovery_mutates_local_state, and next_blocked_recovery_secret_values_returned safety fields
+    - fake-key API-key pipeline summary-only CLI returns integration status next blocked recovery fields without secret values
+    - blocked setup summary returns null, empty-list, or false next blocked recovery fields without secret values
+    - ready fake-live summary returns null, empty-list, or false next blocked recovery fields without secret values
+    - focused tests cover integration status next blocked recovery fields in summary_only API-key pipeline output
+    - README and DevOps setup guide document integration status next blocked recovery fields
+    - tests/test_setup_docs.py asserts integration status next blocked recovery field guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_integration_status_summary_carries_next_blocked_recovery_fields tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only integration status next blocked recovery fields returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["next_blocked_recovery_smoke_command_name"], summary["next_blocked_recovery_provider_family"], summary["next_blocked_recovery_provider"], summary["next_blocked_recovery_smoke_available"], summary["next_blocked_recovery_network_call"], summary["next_blocked_recovery_secret_values_returned"], summary["secret_values_returned"])'
+      result: "None None None False False False False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "796 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Integration Status Next Pending Recovery Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now exposes the first pending

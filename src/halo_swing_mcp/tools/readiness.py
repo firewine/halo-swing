@@ -3495,6 +3495,63 @@ def _api_key_integration_status_summary(
             is True
         ),
         "next_pending_recovery_secret_values_returned": False,
+        "next_blocked_recovery_smoke_command_name": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_command_name"
+            )
+        ),
+        "next_blocked_recovery_smoke_command": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_command"
+            )
+        ),
+        "next_blocked_recovery_provider_family": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_provider_family"
+            )
+        ),
+        "next_blocked_recovery_provider": (
+            api_key_provider_recovery_summary.get("next_blocked_recovery_provider")
+        ),
+        "next_blocked_recovery_next_setup_action": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_next_setup_action"
+            )
+        ),
+        "next_blocked_recovery_preferred_env_key": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_preferred_env_key"
+            )
+        ),
+        "next_blocked_recovery_accepted_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_accepted_env_keys"
+            )
+        ),
+        "next_blocked_recovery_network_call_policy": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_network_call_policy"
+            )
+        ),
+        "next_blocked_recovery_smoke_available": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_smoke_available"
+            )
+            is True
+        ),
+        "next_blocked_recovery_network_call": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_network_call"
+            )
+            is True
+        ),
+        "next_blocked_recovery_mutates_local_state": (
+            api_key_provider_recovery_summary.get(
+                "next_blocked_recovery_mutates_local_state"
+            )
+            is True
+        ),
+        "next_blocked_recovery_secret_values_returned": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

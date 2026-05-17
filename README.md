@@ -530,7 +530,18 @@ mirrors the first pending recovery command as
 `next_pending_recovery_smoke_available`,
 `next_pending_recovery_network_call`,
 `next_pending_recovery_mutates_local_state`, and
-`next_pending_recovery_secret_values_returned`. When the
+`next_pending_recovery_secret_values_returned`. It mirrors the first blocked
+recovery item as `next_blocked_recovery_smoke_command_name`,
+`next_blocked_recovery_smoke_command`,
+`next_blocked_recovery_provider_family`, `next_blocked_recovery_provider`,
+`next_blocked_recovery_next_setup_action`,
+`next_blocked_recovery_preferred_env_key`,
+`next_blocked_recovery_accepted_env_keys`,
+`next_blocked_recovery_network_call_policy`,
+`next_blocked_recovery_smoke_available`,
+`next_blocked_recovery_network_call`,
+`next_blocked_recovery_mutates_local_state`, and
+`next_blocked_recovery_secret_values_returned`. When the
 next action summary carries provider smoke
 or recovery metadata, it also includes `preferred_env_key` and
 `accepted_env_keys`, so a key-only live setup can be checked with provider
