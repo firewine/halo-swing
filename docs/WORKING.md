@@ -3662,6 +3662,57 @@ next_state_after_success: commit this verified API-key provider route family top
 
 ## 5. LATEST_VERIFICATION
 
+Summary: API Key Pending And Blocked Recovery Route Fields Gate is verified.
+`api_key_provider_recovery_summary`, integration status summary, full payload
+mirrors, and summary-only top-level fields now carry no-secret selected
+provider class, route data mode, and live-data-required evidence for next
+pending and next blocked recovery items. Focused coverage, fake-key smoke,
+setup-docs coverage, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_pending_blocked_recovery_route_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
+    - src/halo_swing_mcp/tools/readiness_parts/provider_recovery.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_recovery_summary now mirrors next pending and next blocked selected provider class, route data mode, and live-data-required evidence
+    - api_key_integration_status_summary carries the same no-secret pending and blocked route evidence
+    - full and summary-only top-level next_pending_recovery_* and next_blocked_recovery_* mirrors expose the same route evidence without nested parsing
+    - README and DevOps setup guide document pending and blocked recovery route fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_api_key_provider_recovery_summary_next_pending_skips_blocked_item tests/test_readiness.py::test_api_key_provider_recovery_summary_next_blocked_skips_pending_item tests/test_readiness.py::test_api_key_integration_status_summary_carries_next_blocked_recovery_fields tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+      result: "7 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; next_pending recovery route fields present and blocked defaults present without secret values
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "35 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "827 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
 Summary: API Key Next Recovery Route Fields Gate is verified. The provider
 recovery summary, full payload mirrors, and summary-only top-level
 `next_recovery_*` fields now carry no-secret selected provider class, route
