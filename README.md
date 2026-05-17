@@ -1186,6 +1186,10 @@ readiness values as top-level scalars/lists:
 `api_key_integration_provider_route_data_mode_by_family`,
 `api_key_integration_provider_route_live_data_required_by_family`,
 `api_key_integration_all_selected_routes_live`,
+`api_key_integration_provider_route_family_count`,
+`api_key_integration_selected_provider_family_count`,
+`api_key_integration_provider_route_live_data_required_family_count`,
+`api_key_integration_provider_route_data_mode_counts`,
 `api_key_integration_provider_smoke_count`,
 `api_key_integration_ready_provider_smoke_count`,
 `api_key_integration_blocked_provider_smoke_count`, and
