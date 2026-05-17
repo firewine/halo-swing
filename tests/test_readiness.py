@@ -6157,6 +6157,31 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_dotenv_secret_values_returned"] is (
         setup_file_summary["secret_values_returned"]
     )
+    live_http_timeout_summary = payload["api_key_live_http_timeout_summary"]
+    assert payload["api_key_live_http_timeout_seconds"] == (
+        live_http_timeout_summary["timeout_seconds"]
+    )
+    assert payload["api_key_live_http_timeout_env_key"] == (
+        live_http_timeout_summary["env_key"]
+    )
+    assert payload["api_key_live_http_timeout_default_seconds"] == (
+        live_http_timeout_summary["default_timeout_seconds"]
+    )
+    assert payload["api_key_live_http_timeout_applies_to"] == (
+        live_http_timeout_summary["applies_to"]
+    )
+    assert payload["api_key_live_http_timeout_applies_to_count"] == len(
+        live_http_timeout_summary["applies_to"]
+    )
+    assert payload["api_key_live_http_timeout_network_call"] is (
+        live_http_timeout_summary["network_call"]
+    )
+    assert payload["api_key_live_http_timeout_mutates_local_state"] is (
+        live_http_timeout_summary["mutates_local_state"]
+    )
+    assert payload["api_key_live_http_timeout_secret_values_returned"] is (
+        live_http_timeout_summary["secret_values_returned"]
+    )
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -11048,10 +11073,24 @@ def test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_ti
     assert payload["api_key_live_http_timeout_summary"]["env_key"] == (
         "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS"
     )
+    assert payload["api_key_live_http_timeout_seconds"] == 2.5
+    assert payload["api_key_live_http_timeout_env_key"] == (
+        "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS"
+    )
+    assert payload["api_key_live_http_timeout_default_seconds"] == 10.0
+    assert payload["api_key_live_http_timeout_applies_to"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["api_key_live_http_timeout_applies_to_count"] == 3
+    assert payload["api_key_live_http_timeout_network_call"] is False
+    assert payload["api_key_live_http_timeout_mutates_local_state"] is False
     assert (
         payload["api_key_live_http_timeout_summary"]["secret_values_returned"]
         is False
     )
+    assert payload["api_key_live_http_timeout_secret_values_returned"] is False
 
 
 def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(

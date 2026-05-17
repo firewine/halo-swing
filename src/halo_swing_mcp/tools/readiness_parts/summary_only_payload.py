@@ -7,6 +7,9 @@ from .context import *
 from .summary_only_integration_status_fields import (
     _api_key_integration_status_top_level_fields,
 )
+from .summary_only_live_http_timeout_fields import (
+    _api_key_live_http_timeout_top_level_fields,
+)
 from .summary_only_pipeline_route_fields import (
     _api_key_pipeline_route_top_level_fields,
 )
@@ -82,6 +85,9 @@ def _api_key_pipeline_summary_only_payload(
     ) or {}
     api_key_dotenv_loading_summary = (
         _optional_mapping(payload.get("api_key_dotenv_loading_summary")) or {}
+    )
+    api_key_live_http_timeout_summary = (
+        _optional_mapping(payload.get("api_key_live_http_timeout_summary")) or {}
     )
     api_key_provider_recovery_checklist = _optional_mapping(
         payload.get("api_key_provider_recovery_checklist")
@@ -327,6 +333,9 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_dotenv_secret_values_returned": (
             api_key_dotenv_loading_summary.get("secret_values_returned") is True
         ),
+        **_api_key_live_http_timeout_top_level_fields(
+            api_key_live_http_timeout_summary
+        ),
         **_api_key_provider_selection_top_level_fields(
             api_key_provider_selection_summary
         ),
@@ -486,10 +495,10 @@ def _api_key_pipeline_summary_only_payload(
             api_key_pipeline_check_summary=api_key_pipeline_check_summary,
         ),
         "api_key_provider_selection_summary": api_key_provider_selection_summary,
-        "api_key_live_http_timeout_summary": _optional_mapping(
-            payload.get("api_key_live_http_timeout_summary")
-        )
-        or {},
+        "api_key_live_http_timeout_summary": api_key_live_http_timeout_summary,
+        **_api_key_live_http_timeout_top_level_fields(
+            api_key_live_http_timeout_summary
+        ),
         "api_key_provider_recovery_summary": (
             api_key_provider_recovery_summary
         ),

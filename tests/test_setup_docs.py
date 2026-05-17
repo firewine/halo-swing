@@ -1094,6 +1094,31 @@ def test_setup_docs_keep_api_key_setup_file_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_live_http_timeout_summary",
+        "api_key_live_http_timeout_summary.v1",
+        "timeout_seconds",
+        "env_key",
+        "default_timeout_seconds",
+        "applies_to",
+        "api_key_live_http_timeout_seconds",
+        "api_key_live_http_timeout_env_key",
+        "api_key_live_http_timeout_default_seconds",
+        "api_key_live_http_timeout_applies_to",
+        "api_key_live_http_timeout_applies_to_count",
+        "api_key_live_http_timeout_network_call",
+        "api_key_live_http_timeout_mutates_local_state",
+        "api_key_live_http_timeout_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

@@ -866,7 +866,17 @@ output before retrying API-key smokes.
 (`api_key_live_http_timeout_summary.v1`) exposes the configured
 `timeout_seconds`, `env_key`, `default_timeout_seconds`, and provider classes
 listed in `applies_to`, so API-key smoke calls show the active live HTTP
-timeout without returning secret values. `api_key_provider_recovery_summary`
+timeout without returning secret values. It mirrors the same no-secret timeout
+state as top-level `api_key_live_http_timeout_seconds`,
+`api_key_live_http_timeout_env_key`,
+`api_key_live_http_timeout_default_seconds`,
+`api_key_live_http_timeout_applies_to`,
+`api_key_live_http_timeout_applies_to_count`,
+`api_key_live_http_timeout_network_call`,
+`api_key_live_http_timeout_mutates_local_state`, and
+`api_key_live_http_timeout_secret_values_returned`, so compact clients can show
+timeout policy without opening the nested summary.
+`api_key_provider_recovery_summary`
 (`api_key_provider_recovery_summary.v1`) exposes
 `provider_recovery_required`, `provider_error_count`,
 `selected_provider_class_by_family`, `provider_route_data_mode_by_family`,

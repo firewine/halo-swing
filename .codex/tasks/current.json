@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_SETUP_FILE_TOP_LEVEL_FIELDS_GATE",
+  "gate_id": "API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.906",
-  "next_atomic_step": "surface summary-only API-key setup file status as top-level scalars",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.907",
+  "next_atomic_step": "surface summary-only API-key live HTTP timeout policy as top-level scalars",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -12,17 +12,18 @@
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py",
-    "src/halo_swing_mcp/tools/readiness_parts/summary_only_setup_file_fields.py",
+    "src/halo_swing_mcp/tools/readiness_parts/summary_only_live_http_timeout_fields.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.906",
+    "docs/halo-swing-development-plan.md#3.907",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py",
+    "src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_summaries.py",
     "tests/test_readiness.py",
     "tests/test_setup_docs.py"
   ],
@@ -40,7 +41,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_file_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -58,16 +59,15 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level output mirrors setup file source/target paths, source/target existence, copy-required state, and copy command without secret values",
-    "summary-only top-level output mirrors setup file preferred env keys, dotenv examples, configured/missing provider families, next setup step, and ready-to-run-live-smoke state",
-    "summary-only top-level setup file safety fields expose network_call, mutates_local_state, and secret_values_returned booleans",
-    "blocked default and ready setup-file summary-only tests prove the top-level fields match api_key_setup_file_summary without secret values",
-    "README and DevOps guide document the top-level api_key_setup_dotenv_* setup-file fields",
-    "summary-only payload assembly remains below the 900-line warning threshold by delegating setup-file projection to a focused module",
+    "summary-only top-level output mirrors live HTTP timeout seconds, env key, default seconds, provider-class applies-to list, and applies-to count without secret values",
+    "summary-only top-level live HTTP timeout safety fields expose network_call, mutates_local_state, and secret_values_returned booleans",
+    "blocked default and configured-timeout summary-only tests prove the top-level fields match api_key_live_http_timeout_summary without secret values",
+    "README and DevOps guide document the top-level api_key_live_http_timeout_* fields",
+    "summary-only payload assembly remains below the 900-line warning threshold by delegating live HTTP timeout projection to a focused module",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key setup file top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key live HTTP timeout top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

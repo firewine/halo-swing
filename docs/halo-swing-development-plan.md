@@ -253,6 +253,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.907 API Key Live HTTP Timeout Top-Level Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.906은 setup file 상태를 summary-only top-level scalar로 올렸다. 하지만 compact
+client가 live HTTP timeout 상태를 확인하려면 아직
+`api_key_live_http_timeout_summary` nested object를 열어야 한다. 이번 slice는 timeout
+seconds, env key, default, applies-to provider classes, safety state를 top-level로
+올려 API 키 smoke/recovery 호출이 어떤 timeout으로 실행될지 바로 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only top-level output mirrors live HTTP timeout seconds, env key, default seconds, provider-class applies-to list, and applies-to count without secret values
+  - summary-only top-level live HTTP timeout safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
+  - blocked default and configured-timeout summary-only tests prove the top-level fields match api_key_live_http_timeout_summary without secret values
+  - README and DevOps guide document the top-level api_key_live_http_timeout_* fields
+  - summary-only payload assembly remains below the 900-line warning threshold by delegating live HTTP timeout projection to a focused module
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 39 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 834 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.906 API Key Setup File Top-Level Fields Gate Record - 2026-05-18
 
 ### A. 목적
