@@ -819,6 +819,36 @@ def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_selection_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_provider_selection_summary",
+        "api_key_provider_selection_summary.v1",
+        "provider_factory",
+        "selected_provider_classes",
+        "configured_provider_families",
+        "missing_provider_families",
+        "configured_env_keys_by_provider_family",
+        "provider_env_key_hints_by_family",
+        "selected_provider_by_family",
+        "ready_to_run_live_smoke",
+        "preferred_env_key",
+        "accepted_env_keys",
+        "api_key_provider_selection_status",
+        "api_key_provider_factory",
+        "api_key_selected_provider_classes",
+        "api_key_selected_provider_class_count",
+        "api_key_selected_provider_by_family",
+        "api_key_configured_env_keys_by_provider_family",
+        "api_key_provider_env_key_hints_by_family",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

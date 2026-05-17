@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_SETUP_DOCS_DOTENV_LOADING_PARITY_GATE",
+  "gate_id": "API_KEY_SETUP_DOCS_PROVIDER_SELECTION_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.846",
-  "next_atomic_step": "lock README and DevOps API-key dotenv loading summary field parity",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.847",
+  "next_atomic_step": "lock README and DevOps API-key provider selection summary field parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.846",
+    "docs/halo-swing-development-plan.md#3.847",
     "README.md",
     "tests/test_setup_docs.py"
   ],
@@ -32,7 +32,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -50,12 +50,12 @@
     "read_only": true
   },
   "done_means": [
-    "README and DevOps setup guide coverage assert the same API-key dotenv loading summary schema, support/enabled/disabled flags, disabled env key, and configuration precedence field names",
-    "README and DevOps setup guide coverage assert the same dotenv source/target path, source/target existence, copy requirement, next setup step, and live-smoke readiness field names",
+    "README and DevOps setup guide coverage assert the same API-key provider selection summary schema, provider factory, selected provider class, provider-family state, env-key map, selected-provider map, and live-smoke readiness field names",
+    "README and DevOps setup guide coverage assert the same top-level provider selection status, factory, selected provider class, selected provider by-family, configured env-key by-family, and provider env-key hint mirror field names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified README/DevOps dotenv loading summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README/DevOps provider selection summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
