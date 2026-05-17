@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_REQUIREMENTS_AND_PROVIDER_RECOVERY_ROUTE_FAMILY_FIELDS_VERIFIED
-gate_id: API_KEY_REQUIREMENTS_AND_PROVIDER_RECOVERY_ROUTE_FAMILY_FIELDS_GATE
+status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ROUTE_FAMILY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider route family evidence into API-key requirements and provider recovery summaries
+next_atomic_step: mirror provider route family evidence into API-key provider recovery checklist
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,7 +74,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_provider_recovery_summary_next_pending_skips_blocked_item tests/test_readiness.py::test_api_key_provider_recovery_summary_next_blocked_skips_pending_item tests/test_readiness.py::test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,22 +82,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_requirements_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
-  - api_key_provider_recovery_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
-  - summary-only top-level api_key_requirement_* route mirrors expose the same route family evidence without nested parsing
-  - summary-only top-level api_key_provider_recovery_* mirrors expose the same route family evidence without nested parsing
-  - summary-only requirements and provider recovery route-family top-level projection lives in a focused module so summary_only_payload.py stays below the 900-line warning point
-  - README and DevOps setup guide document the requirements summary provider route family fields
-  - README and DevOps setup guide document the provider recovery summary provider route family fields
-  - setup docs guard keeps README and DevOps API-key requirements summary field parity in sync
-  - setup docs guard keeps README and DevOps API-key provider recovery summary field parity in sync
-  - fake-key offline verification proves requirements and provider recovery summaries carry live family routes with expected provider classes and no secret values
+  - api_key_provider_recovery_checklist mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
+  - api_key_operator_checklist provider_recovery_checklist mirror carries the same route family evidence without recomputing from setup summaries
+  - README and DevOps setup guide document the provider recovery checklist provider route family fields
+  - setup docs guard keeps README and DevOps API-key provider recovery checklist field parity in sync
+  - fake-key offline verification proves provider recovery checklist carries live family routes with expected provider classes and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key requirements and provider recovery route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider recovery checklist route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_REQUIREMENTS_AND_PROVIDER_RECOVERY_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_REQUIREMENTS_AND_PROVIDER_RECOVERY_ROUTE_FAMILY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider route family evidence into API-key requirements and provider recovery summaries
 ```
 
 Previous completed directive:
@@ -3586,6 +3592,57 @@ next_state_after_success: commit this verified API-key provider route family top
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Recovery Checklist Route Family Fields Gate is
+verified. `api_key_provider_recovery_checklist` and the
+`api_key_operator_checklist.provider_recovery_checklist` mirror now expose
+selected provider class, route data mode, live-data-required state, and
+all-selected-routes-live state by provider family without secrets. Focused
+coverage, fake-key smoke, setup-docs coverage, full pytest, ruff, and
+health_check passed.
+
+```yaml
+api_key_provider_recovery_checklist_route_family_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_runner.py
+    - src/halo_swing_mcp/tools/readiness_parts/command_checklists.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_recovery_checklist now mirrors selected_provider_class_by_family, provider_route_data_mode_by_family, provider_route_live_data_required_by_family, and all_selected_routes_live
+    - run_api_key_pipeline_smoke passes live_data_setup_summary into the recovery checklist so conflict paths still carry route-family evidence
+    - api_key_operator_checklist.provider_recovery_checklist carries the same route-family fields
+    - README and DevOps setup guide document provider recovery checklist route-family fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; no secret values returned
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "34 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "826 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 Summary: API Key Requirements And Provider Recovery Route Family Fields Gate is
 verified. `api_key_requirements_summary`, `api_key_provider_recovery_summary`,

@@ -1285,6 +1285,26 @@ def test_setup_docs_keep_api_key_provider_error_recovery_fields_in_sync() -> Non
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_provider_recovery_checklist",
+        "api_key_provider_recovery_checklist.v1",
+        "recovery_smoke_command",
+        "recovery_smoke_available",
+        "selected_provider_class_by_family",
+        "provider_route_data_mode_by_family",
+        "provider_route_live_data_required_by_family",
+        "all_selected_routes_live",
+        "provider_recovery_checklist",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

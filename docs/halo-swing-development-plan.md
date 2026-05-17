@@ -1040,6 +1040,66 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.878 API Key Provider Recovery Checklist Route Family Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.877에서 provider recovery summary가 family별 selected provider class, route data
+mode, live-data-required evidence를 직접 보여주게 됐다. 하지만 full payload의
+`api_key_provider_recovery_checklist`는 failed provider row와 recovery smoke command를
+직접 묶으면서도, 해당 recovery checklist만 읽는 client는 실제 live provider route family
+map을 setup/status summary에서 다시 조합해야 한다. 이번 slice는 같은 no-secret
+route-family evidence를 recovery checklist 자체에 올려, API 키만 넣은 뒤 실패한 provider
+별 recovery command와 selected live provider route 상태를 같은 checklist에서 확인할 수
+있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_checklist mirrors selected provider class by family
+  - api_key_provider_recovery_checklist mirrors provider route data_mode and live_data_required by family
+  - api_key_provider_recovery_checklist mirrors all_selected_routes_live
+  - api_key_operator_checklist provider_recovery_checklist mirror carries the same route family evidence
+  - README and DevOps setup guide document provider recovery checklist provider route family fields
+  - tests cover fake-key provider recovery checklist route family mirrors without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key provider recovery checklist route family pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 34 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 826 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed provider recovery route state remains no-secret; full-payload focused tests confirmed api_key_provider_recovery_checklist route maps and operator checklist mirror
+```
+
 ## 3.876 API Key Requirements Summary Provider Route Family Fields Gate Record - 2026-05-17
 
 ### A. 목적

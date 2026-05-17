@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_REQUIREMENTS_AND_PROVIDER_RECOVERY_ROUTE_FAMILY_FIELDS_GATE",
+  "gate_id": "API_KEY_PROVIDER_RECOVERY_CHECKLIST_ROUTE_FAMILY_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.877",
-  "next_atomic_step": "mirror provider route family evidence into API-key requirements and provider recovery summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.878",
+  "next_atomic_step": "mirror provider route family evidence into API-key provider recovery checklist",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.877",
+    "docs/halo-swing-development-plan.md#3.878",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/",
@@ -39,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_provider_recovery_summary_next_pending_skips_blocked_item tests/test_readiness.py::test_api_key_provider_recovery_summary_next_blocked_skips_pending_item tests/test_readiness.py::test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys -q",
     "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -57,20 +57,15 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_requirements_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values",
-    "api_key_provider_recovery_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values",
-    "summary-only top-level api_key_requirement_* route mirrors expose the same route family evidence without nested parsing",
-    "summary-only top-level api_key_provider_recovery_* mirrors expose the same route family evidence without nested parsing",
-    "summary-only requirements and provider recovery route-family top-level projection lives in a focused module so summary_only_payload.py stays below the 900-line warning point",
-    "README and DevOps setup guide document the requirements summary provider route family fields",
-    "README and DevOps setup guide document the provider recovery summary provider route family fields",
-    "setup docs guard keeps README and DevOps API-key requirements summary field parity in sync",
-    "setup docs guard keeps README and DevOps API-key provider recovery summary field parity in sync",
-    "fake-key offline verification proves requirements and provider recovery summaries carry live family routes with expected provider classes and no secret values",
+    "api_key_provider_recovery_checklist mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values",
+    "api_key_operator_checklist provider_recovery_checklist mirror carries the same route family evidence without recomputing from setup summaries",
+    "README and DevOps setup guide document the provider recovery checklist provider route family fields",
+    "setup docs guard keeps README and DevOps API-key provider recovery checklist field parity in sync",
+    "fake-key offline verification proves provider recovery checklist carries live family routes with expected provider classes and no secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key requirements and provider recovery route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key provider recovery checklist route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

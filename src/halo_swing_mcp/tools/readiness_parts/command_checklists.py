@@ -12,6 +12,8 @@ __all__ = ('_api_key_provider_recovery_checklist', '_api_key_pipeline_setup_stat
 
 def _api_key_provider_recovery_checklist(
     live_data_smoke_summary: dict[str, Any],
+    *,
+    route_family_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     provider_errors = live_data_smoke_summary.get("provider_error_summaries")
     provider_error_rows = (
@@ -33,6 +35,9 @@ def _api_key_provider_recovery_checklist(
     live_data_setup_summary = _optional_mapping(
         live_data_smoke_summary.get("live_data_setup_summary")
     ) or {}
+    route_family_summary = (
+        route_family_summary or live_data_setup_summary or live_data_smoke_summary
+    )
     provider_setup_actions = _optional_mapping(
         live_data_setup_summary.get("provider_setup_actions")
     ) or _optional_mapping(live_data_smoke_summary.get("provider_setup_actions")) or {}
@@ -88,6 +93,7 @@ def _api_key_provider_recovery_checklist(
         "provider_recovery_smoke_count": len(recovery_smoke_rows),
         "item_count": len(items),
         "items": items,
+        **_api_key_route_family_fields(route_family_summary),
         "secret_values_returned": False,
     }
 

@@ -924,8 +924,11 @@ failed providers and list the no-secret provider smoke commands to rerun.
 The top-level `api_key_provider_recovery_checklist`
 (`api_key_provider_recovery_checklist.v1`) pairs each failed provider row with
 its matching no-secret `recovery_smoke_command` and
-`recovery_smoke_available` flag so a failed API-key-backed smoke can be rerun
-without manually matching error and recovery arrays. The
+`recovery_smoke_available` flag, plus
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, and `all_selected_routes_live`,
+so a failed API-key-backed smoke can be rerun with the selected live provider
+route evidence visible without manually matching error and recovery arrays. The
 `api_key_operator_checklist` mirrors this as `provider_recovery_status`,
 `provider_recovery_required`, `provider_recovery_item_count`,
 `next_provider_recovery_action`, and `provider_recovery_checklist`, keeping the

@@ -976,6 +976,22 @@ def expected_api_key_operator_checklist(
         "provider_recovery_smoke_count": 0,
         "item_count": 0,
         "items": [],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(
+                configured=ready_to_run_live_smoke
+            )
+        ),
+        "all_selected_routes_live": ready_to_run_live_smoke,
         "secret_values_returned": False,
     }
     provider_recovery_items = provider_recovery_checklist["items"]
@@ -3225,6 +3241,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert recovery_checklist["provider_error_count"] == 3
     assert recovery_checklist["provider_recovery_smoke_count"] == 3
     assert recovery_checklist["item_count"] == 3
+    assert recovery_checklist["selected_provider_class_by_family"] == (
+        expected_selected_provider_class_by_family(configured=True)
+    )
+    assert recovery_checklist["provider_route_data_mode_by_family"] == (
+        expected_provider_route_data_mode_by_family(configured=True)
+    )
+    assert recovery_checklist[
+        "provider_route_live_data_required_by_family"
+    ] == expected_provider_route_live_data_required_by_family(configured=True)
+    assert recovery_checklist["all_selected_routes_live"] is True
     assert [
         item["provider_family"] for item in recovery_checklist["items"]
     ] == ["market", "macro", "news"]
@@ -8990,6 +9016,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "provider_recovery_smoke_count": 0,
         "item_count": 0,
         "items": [],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "secret_values_returned": False,
     }
     assert payload["api_key_operator_checklist"]["provider_recovery_status"] == "ok"
