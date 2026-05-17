@@ -999,6 +999,40 @@ def test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync()
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_next_action_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_next_action_summary",
+        "api_key_next_action_summary.v1",
+        "status",
+        "current_step",
+        "ready",
+        "blocking_step_count",
+        "next_blocking_step",
+        "provider_recovery_required",
+        "provider_recovery_status",
+        "provider_recovery_item_count",
+        "next_action_name",
+        "next_action_command",
+        "next_action_status",
+        "next_action_is_recovery",
+        "next_action_network_call",
+        "next_action_mutates_local_state",
+        "next_action_provider_family",
+        "next_action_provider",
+        "next_action_smoke_command_name",
+        "preferred_env_key",
+        "accepted_env_keys",
+        "required_env_keys",
+        "dotenv_examples",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

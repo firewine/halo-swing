@@ -782,8 +782,10 @@ The checklist includes `ready`,
 its command or key guidance are visible without reading every step. The
 top-level `api_key_next_action_summary`
 (`api_key_next_action_summary.v1`) mirrors the checklist `status`,
-`current_step`, `ready`, blocking counts, provider recovery counts, and compact
-`next_action_name`, `next_action_command`, `next_action_is_recovery`,
+`current_step`, `ready`, `blocking_step_count`, `next_blocking_step`,
+`provider_recovery_required`, `provider_recovery_status`,
+`provider_recovery_item_count`, and compact `next_action_name`,
+`next_action_command`, `next_action_status`, `next_action_is_recovery`,
 `next_action_network_call`, `next_action_mutates_local_state`,
 `next_action_provider_family`, `next_action_provider`, and
 `next_action_smoke_command_name` fields. When the next action points at a

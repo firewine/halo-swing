@@ -1,21 +1,24 @@
 {
-  "gate_id": "API_KEY_SETUP_DOCS_INTEGRATION_RECOVERY_NEXT_ITEM_PARITY_GATE",
+  "gate_id": "API_KEY_SETUP_DOCS_NEXT_ACTION_SUMMARY_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.852",
-  "next_atomic_step": "lock README and DevOps API-key integration next recovery item field parity",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.853",
+  "next_atomic_step": "lock README and DevOps API-key next action summary field parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
+    "docs/devops-setup-guide.md",
+    "README.md",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.852",
+    "docs/halo-swing-development-plan.md#3.853",
     "README.md",
+    "docs/devops-setup-guide.md",
     "tests/test_setup_docs.py"
   ],
   "blocked_path_prefixes": [
@@ -32,7 +35,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_next_recovery_item_fields_in_sync -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -50,12 +53,12 @@
     "read_only": true
   },
   "done_means": [
-    "README and DevOps setup guide coverage assert the same API-key integration status summary first pending and first blocked recovery detail field names",
-    "README and DevOps setup guide coverage assert the same generic next recovery command, provider identity, network, mutation, exception, URL, and secret-safety field names",
+    "README and DevOps setup guide coverage assert the same API-key next action summary status, readiness, blocking, and provider recovery field names",
+    "README and DevOps setup guide coverage assert the same next action command, provider identity, env-key hint, dotenv example, network, and mutation field names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified README/DevOps integration next recovery item parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README/DevOps next action summary parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -288,13 +288,16 @@ top-level `next_operator_action`, `setup_status_summary`,
 provider route summary so the one-shot smoke records API-key readiness, required
 env keys and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
-the compact `api_key_next_action_summary.v1` with `next_action_name`,
-`next_action_command`, `next_action_is_recovery`,
-`next_action_network_call`, `next_action_mutates_local_state`,
-`next_action_provider_family`, `next_action_provider`,
-`next_action_smoke_command_name`, `preferred_env_key`, and
-`accepted_env_keys` when the next action points at a provider smoke command or
-provider recovery, provider
+the compact `api_key_next_action_summary.v1` with `status`, `current_step`,
+`ready`, `blocking_step_count`, `next_blocking_step`,
+`provider_recovery_required`, `provider_recovery_status`,
+`provider_recovery_item_count`, `next_action_name`, `next_action_command`,
+`next_action_status`, `next_action_is_recovery`, `next_action_network_call`,
+`next_action_mutates_local_state`, `next_action_provider_family`,
+`next_action_provider`, `next_action_smoke_command_name`, `preferred_env_key`,
+`accepted_env_keys`, `required_env_keys`, and no-secret `dotenv_examples` when
+the next action points at a provider smoke command, provider recovery, or
+API-key fill step, plus provider
 family counts, API-key setup status inside `readiness_summary`, the next local
 action mirrored inside `readiness_summary`, readiness summary
 `preferred_env_key` and `accepted_env_keys` when that action points at a
