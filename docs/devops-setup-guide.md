@@ -473,7 +473,8 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
-`readiness_summary`, `api_key_integration_status_summary`,
+top-level `next_operator_action`, `readiness_summary`,
+`api_key_integration_status_summary`,
 `api_key_next_action_summary`,
 `api_key_operator_checklist_summary`, `setup_status_summary`,
 `live_data_setup_summary`, `api_key_requirements_summary`,
@@ -483,6 +484,10 @@ The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
+The kept top-level `next_operator_action` matches
+`readiness_summary.next_operator_action`, including provider smoke or recovery
+env-key hints, so the compact response still shows the next local command
+without returning secret values.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,

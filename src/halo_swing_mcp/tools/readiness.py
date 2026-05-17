@@ -2345,6 +2345,10 @@ def _api_key_pipeline_summary_only_payload(
             "summary_only": True,
         },
         "executed_tools": _string_list(payload.get("executed_tools")),
+        "next_operator_action": _optional_mapping(
+            payload.get("next_operator_action")
+        )
+        or {},
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))
         or {},
         "api_key_integration_status_summary": _optional_mapping(

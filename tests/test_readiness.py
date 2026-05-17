@@ -5446,7 +5446,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     assert "news-secret" not in serialized
 
 
-def test_run_api_key_pipeline_smoke_summary_only_keeps_readiness_summary_provider_smoke_env_hints(
+def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     monkeypatch,
 ) -> None:
     from halo_swing_mcp.tools import readiness as readiness_tools
@@ -5506,9 +5506,20 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_readiness_summary_provide
     )
 
     payload = run_api_key_pipeline_smoke(summary_only=True)
+    next_operator_action = payload["next_operator_action"]
     readiness_summary = payload["readiness_summary"]
     serialized = json.dumps(payload, sort_keys=True)
 
+    assert next_operator_action == readiness_summary["next_operator_action"]
+    assert next_operator_action["name"] == "run_provider_smokes"
+    assert next_operator_action["next_provider_smoke"]["preferred_env_key"] == (
+        "POLYGON_API_KEY"
+    )
+    assert next_operator_action["next_provider_smoke"]["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert next_operator_action["secret_values_returned"] is False
     assert readiness_summary["next_operator_action_name"] == "run_provider_smokes"
     assert readiness_summary["preferred_env_key"] == "POLYGON_API_KEY"
     assert readiness_summary["accepted_env_keys"] == [
@@ -5516,6 +5527,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_readiness_summary_provide
         "POLYGON_API_KEY",
     ]
     assert readiness_summary["secret_values_returned"] is False
+    assert "next_operator_action" not in payload["omitted_sections"]
     assert "readiness_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
