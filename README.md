@@ -476,6 +476,11 @@ It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_network_call_policy`,
 `api_key_setup_quickstart_next_command_plan_mutates_local_state`, and
 `api_key_setup_quickstart_next_command_plan_secret_values_returned`.
+It also mirrors the no-secret `.env` lines to fill as
+`api_key_setup_dotenv_example_lines`,
+`api_key_setup_dotenv_example_line_count`,
+`api_key_setup_dotenv_example_env_keys`, `api_key_setup_dotenv_source_path`,
+and `api_key_setup_dotenv_target_path`.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

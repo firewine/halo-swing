@@ -5502,6 +5502,17 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["next_operator_action_source_path"] == ".env.example"
     assert payload["next_operator_action_target_path"] == ".env"
     assert payload["next_operator_action_secret_input_required"] is False
+    assert payload["api_key_setup_dotenv_example_lines"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert payload["api_key_setup_dotenv_example_line_count"] == 3
+    assert payload["api_key_setup_dotenv_example_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["api_key_setup_dotenv_source_path"] == ".env.example"
+    assert payload["api_key_setup_dotenv_target_path"] == ".env"
     assert payload["api_key_setup_current_step"] == "prepare_dotenv"
     assert payload["api_key_setup_ready"] is False
     assert payload["api_key_setup_step_count"] == 4
@@ -6669,6 +6680,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
         "NEWS_API_KEY=your_newsapi_key",
     ]
     assert setup_file_summary["dotenv_example_count"] == 3
+    assert payload["api_key_setup_dotenv_example_lines"] == (
+        setup_file_summary["dotenv_examples"]
+    )
+    assert payload["api_key_setup_dotenv_example_line_count"] == (
+        setup_file_summary["dotenv_example_count"]
+    )
+    assert payload["api_key_setup_dotenv_example_env_keys"] == (
+        setup_file_summary["preferred_env_keys"]
+    )
+    assert payload["api_key_setup_dotenv_source_path"] == (
+        setup_file_summary["source_path"]
+    )
+    assert payload["api_key_setup_dotenv_target_path"] == (
+        setup_file_summary["target_path"]
+    )
     assert setup_file_summary["configured_provider_families"] == [
         "market",
         "macro",

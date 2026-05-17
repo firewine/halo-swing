@@ -3056,6 +3056,9 @@ def _api_key_pipeline_summary_only_payload(
         for row in setup_quickstart_step_rows
     ]
     setup_status_summary = _optional_mapping(payload.get("setup_status_summary")) or {}
+    api_key_setup_file_summary = _optional_mapping(
+        payload.get("api_key_setup_file_summary")
+    ) or {}
     api_key_requirements_summary = _optional_mapping(
         payload.get("api_key_requirements_summary")
     ) or {}
@@ -3357,6 +3360,21 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_quickstart_next_command_plan_secret_values_returned": (
             next_quickstart_command_plan_row.get("secret_values_returned") is True
         ),
+        "api_key_setup_dotenv_example_lines": _string_list(
+            api_key_setup_file_summary.get("dotenv_examples")
+        ),
+        "api_key_setup_dotenv_example_line_count": len(
+            _string_list(api_key_setup_file_summary.get("dotenv_examples"))
+        ),
+        "api_key_setup_dotenv_example_env_keys": _string_list(
+            api_key_setup_file_summary.get("preferred_env_keys")
+        ),
+        "api_key_setup_dotenv_source_path": api_key_setup_file_summary.get(
+            "source_path"
+        ),
+        "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
+            "target_path"
+        ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
         ),
@@ -3469,10 +3487,7 @@ def _api_key_pipeline_summary_only_payload(
         or {},
         "api_key_requirements_summary": api_key_requirements_summary,
         "api_key_command_summary": api_key_command_summary,
-        "api_key_setup_file_summary": _optional_mapping(
-            payload.get("api_key_setup_file_summary")
-        )
-        or {},
+        "api_key_setup_file_summary": api_key_setup_file_summary,
         "api_key_dotenv_loading_summary": _optional_mapping(
             payload.get("api_key_dotenv_loading_summary")
         )
