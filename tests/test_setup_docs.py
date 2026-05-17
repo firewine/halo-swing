@@ -685,6 +685,40 @@ def test_setup_docs_keep_api_key_setup_progress_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_setup_quickstart_steps",
+        "api_key_setup_quickstart_step_names",
+        "api_key_setup_quickstart_step_count",
+        "api_key_setup_quickstart_next_step",
+        "api_key_setup_quickstart_next_command",
+        "api_key_setup_quickstart_command_plan",
+        "api_key_setup_quickstart_command_plan_names",
+        "api_key_setup_quickstart_command_plan_count",
+        "api_key_setup_quickstart_next_command_plan_item",
+        "api_key_setup_quickstart_next_command_plan_name",
+        "api_key_setup_quickstart_next_command_plan_kind",
+        "api_key_setup_quickstart_next_command_plan_command",
+        "api_key_setup_quickstart_next_command_plan_provider_family",
+        "api_key_setup_quickstart_next_command_plan_status",
+        "api_key_setup_quickstart_next_command_plan_network_call",
+        "api_key_setup_quickstart_next_command_plan_network_call_policy",
+        "api_key_setup_quickstart_next_command_plan_mutates_local_state",
+        "api_key_setup_quickstart_next_command_plan_secret_values_returned",
+        "api_key_setup_dotenv_example_lines",
+        "api_key_setup_dotenv_example_line_count",
+        "api_key_setup_dotenv_example_env_keys",
+        "api_key_setup_dotenv_source_path",
+        "api_key_setup_dotenv_target_path",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
