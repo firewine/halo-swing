@@ -551,6 +551,8 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `provider_recovery_required`, `provider_error_count`,
 `provider_recovery_smoke_count`, `provider_recovery_provider_families`,
 `provider_recovery_providers`, `provider_recovery_smoke_command_names`,
+`provider_recovery_preferred_env_keys`, `provider_recovery_accepted_env_keys`,
+`provider_recovery_accepted_env_key_groups`,
 `item_count`,
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,

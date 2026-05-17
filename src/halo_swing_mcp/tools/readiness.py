@@ -2654,6 +2654,23 @@ def _api_key_provider_recovery_summary(
         "provider_recovery_smoke_command_names": _ordered_unique_strings(
             [item.get("smoke_command_name") for item in compact_items]
         ),
+        "provider_recovery_preferred_env_keys": _ordered_unique_strings(
+            [item.get("preferred_env_key") for item in compact_items]
+        ),
+        "provider_recovery_accepted_env_keys": _ordered_unique_strings(
+            [
+                env_key
+                for item in compact_items
+                for env_key in _string_list(item.get("accepted_env_keys"))
+            ]
+        ),
+        "provider_recovery_accepted_env_key_groups": [
+            accepted_env_keys
+            for accepted_env_keys in (
+                _string_list(item.get("accepted_env_keys")) for item in compact_items
+            )
+            if accepted_env_keys
+        ],
         "item_count": len(compact_items),
         "next_recovery_smoke_command_name": (
             first_item.get("smoke_command_name") if first_item else None

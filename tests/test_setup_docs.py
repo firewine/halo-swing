@@ -145,6 +145,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_provider_families" in guide
     assert "provider_recovery_providers" in guide
     assert "provider_recovery_smoke_command_names" in guide
+    assert "provider_recovery_preferred_env_keys" in guide
+    assert "provider_recovery_accepted_env_keys" in guide
+    assert "provider_recovery_accepted_env_key_groups" in guide
     assert "next_recovery_provider_family" in guide
     assert "next_recovery_provider" in guide
     assert "next_recovery_smoke_available" in guide

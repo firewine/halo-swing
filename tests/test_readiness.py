@@ -2710,6 +2710,35 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "get_macro_snapshot_live_smoke",
             "get_news_bundle_live_smoke",
         ],
+        "provider_recovery_preferred_env_keys": [
+            "POLYGON_API_KEY",
+            "FRED_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "provider_recovery_accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+            "HALO_SWING_MACRO_API_KEY",
+            "HALO_SWING_FRED_API_KEY",
+            "FRED_API_KEY",
+            "HALO_SWING_NEWS_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "provider_recovery_accepted_env_key_groups": [
+            [
+                "HALO_SWING_MARKET_DATA_API_KEY",
+                "POLYGON_API_KEY",
+            ],
+            [
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+            ],
+            [
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+            ],
+        ],
         "item_count": 3,
         "next_recovery_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_recovery_smoke_command": payload["provider_recovery_smokes"][0][
@@ -4885,6 +4914,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_provider_families": [],
         "provider_recovery_providers": [],
         "provider_recovery_smoke_command_names": [],
+        "provider_recovery_preferred_env_keys": [],
+        "provider_recovery_accepted_env_keys": [],
+        "provider_recovery_accepted_env_key_groups": [],
         "item_count": 0,
         "next_recovery_smoke_command_name": None,
         "next_recovery_smoke_command": None,
