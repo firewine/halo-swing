@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.785 API Key Provider Recovery Summary Action Status Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 pending/blocked count와 next pending/blocked
+항목을 보여주지만, operator가 compact summary만 보고 provider recovery를 지금 재시도할
+수 있는지, 일부만 가능한지, 또는 모두 막혔는지를 단일 상태로 판단하기는 어려웠다.
+이번 slice는 no-secret `provider_recovery_has_pending`,
+`provider_recovery_has_blocked`, `provider_recovery_retry_ready`,
+`provider_recovery_all_retryable`, `provider_recovery_action_status`를 추가해 API key 입력
+후 recovery action 상태를 summary-only payload에서 즉시 판정할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes provider_recovery_has_pending and provider_recovery_has_blocked aggregate booleans
+  - api_key_provider_recovery_summary includes provider_recovery_retry_ready and provider_recovery_all_retryable aggregate booleans
+  - api_key_provider_recovery_summary includes provider_recovery_action_status with no_recovery_required, ready_to_retry, partially_retryable, and blocked states
+  - provider_recovery_action_status returns ready_to_retry for all-pending fake-key provider recovery summaries
+  - provider_recovery_action_status returns partially_retryable when pending and blocked recovery items are mixed
+  - provider_recovery_action_status returns no_recovery_required when no recovery item exists
+  - focused tests cover action status fields in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns action status fields without secret values
+  - README and DevOps setup guide document action status fields
+  - tests/test_setup_docs.py asserts action status field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only action status fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_action_status"], summary["provider_recovery_has_pending"], summary["provider_recovery_has_blocked"], summary["provider_recovery_retry_ready"], summary["provider_recovery_all_retryable"], summary["secret_values_returned"])': ready_to_retry True False True True False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 795 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.784 API Key Provider Recovery Summary Next Blocked Command Gate Record - 2026-05-17
 
 ### A. 목적

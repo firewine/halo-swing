@@ -2727,6 +2727,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_statuses": ["pending"],
         "provider_recovery_pending_count": 3,
         "provider_recovery_blocked_count": 0,
+        "provider_recovery_has_pending": True,
+        "provider_recovery_has_blocked": False,
+        "provider_recovery_retry_ready": True,
+        "provider_recovery_all_retryable": True,
+        "provider_recovery_action_status": "ready_to_retry",
         "provider_recovery_all_pending": True,
         "provider_recovery_pending_provider_families": [
             "market",
@@ -5018,6 +5023,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_statuses": [],
         "provider_recovery_pending_count": 0,
         "provider_recovery_blocked_count": 0,
+        "provider_recovery_has_pending": False,
+        "provider_recovery_has_blocked": False,
+        "provider_recovery_retry_ready": False,
+        "provider_recovery_all_retryable": False,
+        "provider_recovery_action_status": "no_recovery_required",
         "provider_recovery_all_pending": False,
         "provider_recovery_pending_provider_families": [],
         "provider_recovery_blocked_provider_families": [],
@@ -5236,6 +5246,58 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
     assert summary["next_blocked_recovery_network_call"] is False
     assert summary["next_blocked_recovery_mutates_local_state"] is False
     assert summary["next_blocked_recovery_secret_values_returned"] is False
+
+
+def test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked() -> None:
+    summary = _api_key_provider_recovery_summary(
+        {
+            "status": "conflict",
+            "provider_error_count": 2,
+            "provider_recovery_smoke_count": 1,
+            "items": [
+                {
+                    "provider_family": "market",
+                    "provider": "polygon",
+                    "smoke_command_name": "get_market_snapshot_live_smoke",
+                    "recovery_smoke_command": "run polygon smoke",
+                    "recovery_smoke_available": True,
+                    "recovery_smoke": {
+                        "network_call_policy": (
+                            "only_when_matching_api_key_selects_live_provider"
+                        ),
+                        "mutates_local_state": False,
+                    },
+                    "next_setup_action": "verify_provider_credentials_or_network",
+                    "preferred_env_key": "POLYGON_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_MARKET_DATA_API_KEY",
+                        "POLYGON_API_KEY",
+                    ],
+                },
+                {
+                    "provider_family": "news",
+                    "provider": "newsapi",
+                    "smoke_command_name": "get_news_bundle_live_smoke",
+                    "recovery_smoke_command": None,
+                    "recovery_smoke_available": False,
+                    "next_setup_action": "fill_provider_key",
+                    "preferred_env_key": "NEWS_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_NEWS_API_KEY",
+                        "NEWS_API_KEY",
+                    ],
+                },
+            ],
+        }
+    )
+
+    assert summary["provider_recovery_pending_count"] == 1
+    assert summary["provider_recovery_blocked_count"] == 1
+    assert summary["provider_recovery_has_pending"] is True
+    assert summary["provider_recovery_has_blocked"] is True
+    assert summary["provider_recovery_retry_ready"] is True
+    assert summary["provider_recovery_all_retryable"] is False
+    assert summary["provider_recovery_action_status"] == "partially_retryable"
 
 
 def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(

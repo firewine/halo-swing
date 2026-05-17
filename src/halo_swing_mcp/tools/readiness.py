@@ -2660,6 +2660,16 @@ def _api_key_provider_recovery_summary(
     recovery_blocked_count = sum(
         1 for item in compact_items if item.get("recovery_status") == "blocked"
     )
+    provider_recovery_has_pending = recovery_pending_count > 0
+    provider_recovery_has_blocked = recovery_blocked_count > 0
+    if not compact_items:
+        provider_recovery_action_status = "no_recovery_required"
+    elif provider_recovery_has_pending and provider_recovery_has_blocked:
+        provider_recovery_action_status = "partially_retryable"
+    elif provider_recovery_has_pending:
+        provider_recovery_action_status = "ready_to_retry"
+    else:
+        provider_recovery_action_status = "blocked"
     first_pending_item = next(
         (
             item
@@ -2726,6 +2736,13 @@ def _api_key_provider_recovery_summary(
         ),
         "provider_recovery_pending_count": recovery_pending_count,
         "provider_recovery_blocked_count": recovery_blocked_count,
+        "provider_recovery_has_pending": provider_recovery_has_pending,
+        "provider_recovery_has_blocked": provider_recovery_has_blocked,
+        "provider_recovery_retry_ready": provider_recovery_has_pending,
+        "provider_recovery_all_retryable": (
+            bool(compact_items) and not provider_recovery_has_blocked
+        ),
+        "provider_recovery_action_status": provider_recovery_action_status,
         "provider_recovery_all_pending": (
             bool(compact_items) and recovery_pending_count == len(compact_items)
         ),
