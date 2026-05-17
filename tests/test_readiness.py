@@ -1347,6 +1347,25 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     expected_next_action_setup_actions = list(
         dict.fromkeys(expected_next_action_setup_actions_by_family.values())
     )
+    expected_next_action_network_call_policies_by_family = {
+        row["provider_family"]: row["network_call_policy"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_network_call_policies = list(
+        dict.fromkeys(expected_next_action_network_call_policies_by_family.values())
+    )
+    expected_next_action_network_calls_by_family = {
+        row["provider_family"]: row["network_call"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_mutates_local_state_by_family = {
+        row["provider_family"]: row["mutates_local_state"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_secret_values_returned_by_family = {
+        row["provider_family"]: row["secret_values_returned"]
+        for row in expected_next_action_env_key_rows
+    }
     assert payload["api_key_provider_smoke_action_status"] == (
         expected_action_status
     )
@@ -1390,6 +1409,43 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_setup_actions_by_family"
     ] == expected_next_action_setup_actions_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_network_call_policies"
+    ] == expected_next_action_network_call_policies
+    assert payload[
+        "api_key_provider_smoke_next_action_network_call_policy_count"
+    ] == len(expected_next_action_network_call_policies)
+    assert payload[
+        "api_key_provider_smoke_next_action_network_call_policies_by_family"
+    ] == expected_next_action_network_call_policies_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_network_calls_by_family"
+    ] == expected_next_action_network_calls_by_family
+    assert payload["api_key_provider_smoke_next_action_network_call_count"] == sum(
+        expected_next_action_network_calls_by_family.values()
+    )
+    assert payload["api_key_provider_smoke_next_action_all_network_calls"] is (
+        bool(expected_next_action_network_calls_by_family)
+        and all(expected_next_action_network_calls_by_family.values())
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_mutates_local_state_by_family"
+    ] == expected_next_action_mutates_local_state_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_mutates_local_state_count"
+    ] == sum(expected_next_action_mutates_local_state_by_family.values())
+    assert payload[
+        "api_key_provider_smoke_next_action_any_mutates_local_state"
+    ] is any(expected_next_action_mutates_local_state_by_family.values())
+    assert payload[
+        "api_key_provider_smoke_next_action_secret_values_returned_by_family"
+    ] == expected_next_action_secret_values_returned_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_secret_values_returned_count"
+    ] == sum(expected_next_action_secret_values_returned_by_family.values())
+    assert payload[
+        "api_key_provider_smoke_next_action_any_secret_values_returned"
+    ] is any(expected_next_action_secret_values_returned_by_family.values())
     assert payload["api_key_provider_smoke_next_action_preferred_env_keys"] == (
         expected_next_action_preferred_env_keys
     )

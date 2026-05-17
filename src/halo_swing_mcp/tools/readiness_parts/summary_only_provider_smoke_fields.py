@@ -314,6 +314,25 @@ def _api_key_provider_smoke_top_level_fields(
     provider_smoke_next_action_setup_actions = _ordered_unique_strings(
         provider_smoke_next_action_setup_actions_by_family.values()
     )
+    provider_smoke_next_action_network_call_policies_by_family = {
+        family: row.get("network_call_policy")
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_network_call_policies = _ordered_unique_strings(
+        provider_smoke_next_action_network_call_policies_by_family.values()
+    )
+    provider_smoke_next_action_network_calls_by_family = {
+        family: row.get("network_call") is True
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_mutates_local_state_by_family = {
+        family: row.get("mutates_local_state") is True
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
+    provider_smoke_next_action_secret_values_returned_by_family = {
+        family: row.get("secret_values_returned") is True
+        for family, row in provider_smoke_next_action_rows_by_family.items()
+    }
     provider_smoke_next_action_preferred_env_keys = (
         provider_smoke_ready_preferred_env_keys
         if provider_smoke_next_action == "run_ready_provider_smokes"
@@ -410,6 +429,43 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_setup_actions_by_family": (
             provider_smoke_next_action_setup_actions_by_family
+        ),
+        "api_key_provider_smoke_next_action_network_call_policies": (
+            provider_smoke_next_action_network_call_policies
+        ),
+        "api_key_provider_smoke_next_action_network_call_policy_count": len(
+            provider_smoke_next_action_network_call_policies
+        ),
+        "api_key_provider_smoke_next_action_network_call_policies_by_family": (
+            provider_smoke_next_action_network_call_policies_by_family
+        ),
+        "api_key_provider_smoke_next_action_network_calls_by_family": (
+            provider_smoke_next_action_network_calls_by_family
+        ),
+        "api_key_provider_smoke_next_action_network_call_count": sum(
+            provider_smoke_next_action_network_calls_by_family.values()
+        ),
+        "api_key_provider_smoke_next_action_all_network_calls": (
+            bool(provider_smoke_next_action_network_calls_by_family)
+            and all(provider_smoke_next_action_network_calls_by_family.values())
+        ),
+        "api_key_provider_smoke_next_action_mutates_local_state_by_family": (
+            provider_smoke_next_action_mutates_local_state_by_family
+        ),
+        "api_key_provider_smoke_next_action_mutates_local_state_count": sum(
+            provider_smoke_next_action_mutates_local_state_by_family.values()
+        ),
+        "api_key_provider_smoke_next_action_any_mutates_local_state": any(
+            provider_smoke_next_action_mutates_local_state_by_family.values()
+        ),
+        "api_key_provider_smoke_next_action_secret_values_returned_by_family": (
+            provider_smoke_next_action_secret_values_returned_by_family
+        ),
+        "api_key_provider_smoke_next_action_secret_values_returned_count": sum(
+            provider_smoke_next_action_secret_values_returned_by_family.values()
+        ),
+        "api_key_provider_smoke_next_action_any_secret_values_returned": any(
+            provider_smoke_next_action_secret_values_returned_by_family.values()
         ),
         "api_key_provider_smoke_next_action_preferred_env_keys": (
             provider_smoke_next_action_preferred_env_keys
