@@ -142,6 +142,11 @@ def _live_data_provider_setup_actions_from_providers(
             "configured_env_keys": provider_status.get("configured_env_keys"),
             "preferred_env_key": provider_status.get("preferred_env_key"),
             "accepted_env_keys": provider_status.get("accepted_env_keys"),
+            "auto_selects_live_provider": provider_status.get(
+                "auto_selects_live_provider"
+            ),
+            "live_mode_required": provider_status.get("live_mode_required"),
+            "optional_live_mode_env": provider_status.get("optional_live_mode_env"),
             "setup_status": provider_status.get("setup_status"),
             "next_setup_action": provider_status.get("next_setup_action"),
             "dotenv_target_path": provider_status.get("dotenv_target_path"),

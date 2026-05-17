@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_VERIFIED
-gate_id: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_GATE
+status: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror next provider smoke safety and live-contract fields at API-key top level
+next_atomic_step: mirror provider selection auto-live-mode fields at API-key top level
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,23 +75,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands -q
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_next_provider_smoke_* mirrors include network call, network-call policy, expected live contract/checks, env-key hints, local-state mutation, and secret-return safety metadata
-  - README and DevOps setup guide document API-key next provider smoke safety and live-contract top-level fields
-  - setup docs guard keeps README and DevOps API-key next provider smoke field parity in sync
+  - api_key_provider_selection_summary mirrors provider auto_selects_live_provider, optional live-mode env, and live_mode_required by family without secret values
+  - summary-only top-level api_key_provider_* mirrors expose provider auto-live-mode status without nested parsing
+  - README and DevOps setup guide document the provider selection auto-live-mode top-level fields
+  - setup docs guard keeps README and DevOps API-key provider selection field parity in sync
+  - fake-key offline verification proves API keys alone mark providers as auto-selected while live-mode env remains optional
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key next provider smoke safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider selection auto-live-mode fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_VERIFIED
+gate_id: API_KEY_NEXT_PROVIDER_SMOKE_TOP_LEVEL_SAFETY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror next provider smoke safety and live-contract fields at API-key top level
 ```
 
 Previous completed directive:
@@ -3444,23 +3458,131 @@ cto_call: AUDIT_LOG_JSONL_AND_LOCAL_WEB_VIEWER_KEEP_RUNTIME_ARTIFACTS_IGNORED
 blockers: []
 implementation_ready: true
 
-post_implementation_review:
-  mode: final_completion_audit
-  roles:
-    - be
-    - qc
-    - devops
-    - docs-gardener
-    - cto
-  input_only:
-    - git diff
-    - changed files
-    - verification output
-    - docs/CONTEXT.md
-    - docs/halo-swing-development-plan.md#3.22
+next_state_after_success: commit this verified API-key provider selection auto-live-mode fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Provider Selection Auto-Live-Mode Top-Level Fields Gate is
+verified. Provider-selection summary and summary-only top-level
+`api_key_provider_*` mirrors now expose provider auto-selection, optional
+live-mode env names, and live-mode-required flags without secrets. Focused
+readiness/docs coverage, fake-key harness checks, setup-docs coverage, full
+pytest, ruff, and health_check passed.
+
+```yaml
+api_key_provider_selection_auto_live_mode_top_level_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
+    - src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_selection_fields.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_selection_summary now mirrors provider_auto_selects_live_provider_by_family, provider_optional_live_mode_env_by_family, and provider_live_mode_required_by_family
+    - api_key_provider_selection_summary now reports all_configured_auto_select_live_provider and any_live_mode_required
+    - summary-only top-level api_key_provider_auto_selects_live_provider_by_family, api_key_provider_optional_live_mode_env_by_family, api_key_provider_live_mode_required_by_family, api_key_provider_all_configured_auto_select_live_provider, and api_key_provider_any_live_mode_required mirror the nested summary
+    - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
+    - live_data_setup_summary provider setup actions preserve bounded auto/live-mode metadata so provider-selection fallback paths do not lose it
+    - README and DevOps setup guide document provider selection auto-live-mode top-level fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
+      result: "5 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: passed; providers reported auto_selects_live_provider true, optional live-mode env names, live_mode_required false, and secret_values_returned false
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; fake-key provider recovery remains no-secret while compact top-level mirrors are present
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "824 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_selection_summary"]; print(summary["all_configured_auto_select_live_provider"], summary["any_live_mode_required"], summary["provider_auto_selects_live_provider_by_family"], summary["provider_optional_live_mode_env_by_family"], payload["api_key_provider_all_configured_auto_select_live_provider"], payload["api_key_provider_any_live_mode_required"], payload["secret_values_returned"])'
+      result: "True False {'market': True, 'macro': True, 'news': True} {'market': 'HALO_SWING_MARKET_DATA_MODE', 'macro': 'HALO_SWING_MACRO_DATA_MODE', 'news': 'HALO_SWING_NEWS_DATA_MODE'} True False False"
+```
+
+Previous verification:
+
+Summary: API Key Provider Selection Auto-Live-Mode Top-Level Fields Gate is
+verified. `api_key_provider_selection_summary` and summary-only top-level
+`api_key_provider_*` mirrors now expose provider auto-selection, optional
+live-mode env names, and live-mode-required state without secret values.
+Fake-key offline checks, focused readiness/docs coverage, setup-docs coverage,
+full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_provider_selection_auto_live_mode_top_level_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
+    - src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_selection_fields.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_selection_summary mirrors provider_auto_selects_live_provider_by_family, provider_optional_live_mode_env_by_family, provider_live_mode_required_by_family, all_configured_auto_select_live_provider, and any_live_mode_required
+    - summary-only top-level api_key_provider_* mirrors expose those provider selection fields without nested parsing
+    - live_data_setup_summary provider setup actions preserve bounded auto/live-mode metadata when available
+    - provider selection projection is split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
+    - README and DevOps setup guide document API-key provider selection auto-live-mode fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
+      result: "2 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+      result: passed; all provider families auto_selects_live_provider true, optional live-mode env names present, live_mode_required false, secret_values_returned false
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; compact top-level provider auto-live-mode mirrors returned without secret values
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "824 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: wc -l src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+      result: "845"
+```
+
+Previous verification:
 
 Summary: API Key Next Provider Smoke Top-Level Safety Fields Gate is verified.
 Summary-only top-level `api_key_next_provider_smoke_*` now mirrors network-call
@@ -3492,28 +3614,12 @@ api_key_next_provider_smoke_top_level_safety_fields_gate:
     - README and DevOps setup guide document top-level API-key next provider smoke safety and live-contract fields
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
-    - command: diff -u .codex/tasks/current.json docs/codex-task.json
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
-      result: passed
-    - command: git diff --check
-      result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_provider_smoke_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands -q
-      result: "3 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; blocked no-key summary returns null/false/empty next provider smoke safety fields without secrets
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
-      result: "32 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "824 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_next_provider_smoke_network_call"], payload["api_key_next_provider_smoke_network_call_policy"], payload["api_key_next_provider_smoke_expected_live_contract"], payload["api_key_next_provider_smoke_expected_live_checks"], payload["api_key_next_provider_smoke_preferred_env_key"], payload["api_key_next_provider_smoke_accepted_env_keys"], payload["api_key_next_provider_smoke_mutates_local_state"], payload["api_key_next_provider_smoke_secret_values_returned"], payload["secret_values_returned"])'
-      result: "True only_when_matching_api_key_selects_live_provider market_snapshot_contract ['live_data_boundary_declared'] POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False False False"
 ```
 
 Previous verification:

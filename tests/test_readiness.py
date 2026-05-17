@@ -553,6 +553,13 @@ def expected_provider_setup_actions(
             "configured_env_keys": configured_env_keys,
             "preferred_env_key": preferred_env_key,
             "accepted_env_keys": accepted_env_keys,
+            "auto_selects_live_provider": bool(configured_env_keys),
+            "live_mode_required": False,
+            "optional_live_mode_env": (
+                expected_provider_optional_live_mode_env_by_family()[
+                    provider_family
+                ]
+            ),
             "setup_status": "ready" if configured_env_keys else "pending",
             "next_setup_action": (
                 "run_provider_smoke"
@@ -592,6 +599,24 @@ def expected_provider_env_key_hints_by_family() -> dict[str, dict[str, Any]]:
         }
         for family, action in provider_setup_actions.items()
     }
+
+
+def expected_provider_optional_live_mode_env_by_family() -> dict[str, str]:
+    return {
+        "market": "HALO_SWING_MARKET_DATA_MODE",
+        "macro": "HALO_SWING_MACRO_DATA_MODE",
+        "news": "HALO_SWING_NEWS_DATA_MODE",
+    }
+
+
+def expected_provider_live_mode_required_by_family() -> dict[str, bool]:
+    return {"market": False, "macro": False, "news": False}
+
+
+def expected_provider_auto_selects_live_provider_by_family(
+    *, configured: bool
+) -> dict[str, bool]:
+    return {"market": configured, "macro": configured, "news": configured}
 
 
 def expected_provider_smoke_plan(
@@ -2698,6 +2723,19 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_env_key_hints_by_family": (
             expected_provider_env_key_hints_by_family()
         ),
+        "provider_auto_selects_live_provider_by_family": (
+            expected_provider_auto_selects_live_provider_by_family(
+                configured=True
+            )
+        ),
+        "provider_optional_live_mode_env_by_family": (
+            expected_provider_optional_live_mode_env_by_family()
+        ),
+        "provider_live_mode_required_by_family": (
+            expected_provider_live_mode_required_by_family()
+        ),
+        "all_configured_auto_select_live_provider": True,
+        "any_live_mode_required": False,
         "selected_provider_by_family": {
             "market": "polygon",
             "macro": "fred",
@@ -5012,6 +5050,19 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "provider_env_key_hints_by_family": (
             expected_provider_env_key_hints_by_family()
         ),
+        "provider_auto_selects_live_provider_by_family": (
+            expected_provider_auto_selects_live_provider_by_family(
+                configured=True
+            )
+        ),
+        "provider_optional_live_mode_env_by_family": (
+            expected_provider_optional_live_mode_env_by_family()
+        ),
+        "provider_live_mode_required_by_family": (
+            expected_provider_live_mode_required_by_family()
+        ),
+        "all_configured_auto_select_live_provider": True,
+        "any_live_mode_required": False,
         "selected_provider_by_family": {
             "market": "polygon",
             "macro": "fred",
@@ -7635,6 +7686,35 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summar
     assert payload["api_key_provider_env_key_hints_by_family"] == (
         provider_selection_summary["provider_env_key_hints_by_family"]
     )
+    assert provider_selection_summary[
+        "provider_auto_selects_live_provider_by_family"
+    ] == expected_provider_auto_selects_live_provider_by_family(configured=True)
+    assert provider_selection_summary[
+        "provider_optional_live_mode_env_by_family"
+    ] == expected_provider_optional_live_mode_env_by_family()
+    assert provider_selection_summary[
+        "provider_live_mode_required_by_family"
+    ] == expected_provider_live_mode_required_by_family()
+    assert provider_selection_summary[
+        "all_configured_auto_select_live_provider"
+    ] is True
+    assert provider_selection_summary["any_live_mode_required"] is False
+    assert payload["api_key_provider_auto_selects_live_provider_by_family"] == (
+        provider_selection_summary[
+            "provider_auto_selects_live_provider_by_family"
+        ]
+    )
+    assert payload["api_key_provider_optional_live_mode_env_by_family"] == (
+        provider_selection_summary["provider_optional_live_mode_env_by_family"]
+    )
+    assert payload["api_key_provider_live_mode_required_by_family"] == (
+        provider_selection_summary["provider_live_mode_required_by_family"]
+    )
+    assert (
+        payload["api_key_provider_all_configured_auto_select_live_provider"]
+        is True
+    )
+    assert payload["api_key_provider_any_live_mode_required"] is False
     assert provider_selection_summary["provider_env_key_hints_by_family"] == (
         expected_provider_env_key_hints_by_family()
     )
@@ -8457,6 +8537,19 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "provider_env_key_hints_by_family": (
             expected_provider_env_key_hints_by_family()
         ),
+        "provider_auto_selects_live_provider_by_family": (
+            expected_provider_auto_selects_live_provider_by_family(
+                configured=False
+            )
+        ),
+        "provider_optional_live_mode_env_by_family": (
+            expected_provider_optional_live_mode_env_by_family()
+        ),
+        "provider_live_mode_required_by_family": (
+            expected_provider_live_mode_required_by_family()
+        ),
+        "all_configured_auto_select_live_provider": False,
+        "any_live_mode_required": False,
         "selected_provider_by_family": {
             "market": None,
             "macro": None,

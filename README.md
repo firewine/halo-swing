@@ -684,15 +684,25 @@ The top-level `api_key_provider_selection_summary`
 selection with `provider_factory`, `selected_provider_classes`,
 `configured_provider_families`, `missing_provider_families`,
 `configured_env_keys_by_provider_family`, `provider_env_key_hints_by_family`,
+`provider_auto_selects_live_provider_by_family`,
+`provider_optional_live_mode_env_by_family`,
+`provider_live_mode_required_by_family`,
+`all_configured_auto_select_live_provider`, `any_live_mode_required`,
 `selected_provider_by_family`, and `ready_to_run_live_smoke`, so API-key
-auto-selection and each provider family's `preferred_env_key` /
-`accepted_env_keys` can be verified without secret values.
+auto-selection, each provider family's `optional_live_mode_env`, and whether
+`live_mode_required` is false can be verified without secret values.
 It mirrors those values as top-level `api_key_provider_selection_status`,
 `api_key_provider_factory`, `api_key_selected_provider_classes`,
 `api_key_selected_provider_class_count`, `api_key_selected_provider_by_family`,
 `api_key_configured_env_keys_by_provider_family`, and
-`api_key_provider_env_key_hints_by_family`, so compact clients can show the
-actual API-key-selected route without reading the nested summary.
+`api_key_provider_env_key_hints_by_family`,
+`api_key_provider_auto_selects_live_provider_by_family`,
+`api_key_provider_optional_live_mode_env_by_family`,
+`api_key_provider_live_mode_required_by_family`,
+`api_key_provider_all_configured_auto_select_live_provider`, and
+`api_key_provider_any_live_mode_required`, so compact clients can show the
+actual API-key-selected route and confirm `auto_selects_live_provider` without
+reading the nested summary.
 The top-level `readiness_summary` mirrors the selected `next_operator_action`
 and, when that action carries provider smoke or recovery env-key hints, also
 includes `preferred_env_key`, `accepted_env_keys`,

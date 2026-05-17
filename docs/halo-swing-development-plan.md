@@ -1040,6 +1040,70 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.866 API Key Provider Selection Auto-Live-Mode Top-Level Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.865에서 다음 provider smoke의 안전/live-contract top-level fields를 잠갔다.
+API-key-only setup은 fake-key/current-env 상태에서 provider route가 live provider를
+자동 선택하는지 이미 nested provider rows로 보여준다. 하지만 compact top-level만 읽는
+operator는 아직 `auto_selects_live_provider`, optional `*_DATA_MODE` env, 그리고
+`live_mode_required` 상태를 nested `api_key_provider_selection_summary` 또는
+`get_live_data_api_key_status.providers`에서 다시 확인해야 한다. 이번 slice는 API 키만
+채우면 별도 live-mode env 없이 provider가 live로 자동 선택된다는 사실을 no-secret
+top-level mirrors로 올려 실제 연동 handoff를 더 직접화한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_selection_summary mirrors auto_selects_live_provider by family
+  - api_key_provider_selection_summary mirrors optional live-mode env and live_mode_required by family
+  - summary-only top-level api_key_provider_* mirrors expose those fields without nested parsing
+  - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
+  - live_data_setup_summary provider setup actions preserve bounded auto/live-mode metadata so provider-selection fallback paths do not lose it
+  - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
+  - README and DevOps setup guide document the provider selection auto-live-mode top-level fields
+  - tests cover fake-key provider selection auto-live-mode mirrors without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key provider selection auto-live-mode pytest: 2 passed
+  - regression targeted provider setup fallback pytest: 5 passed
+  - fake-key get_live_data_api_key_status confirms API keys auto-select live providers without secret values
+  - fake-key run_api_key_pipeline_smoke --summary-only confirms compact top-level mirrors
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 824 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only print confirmed auto-select maps true, optional live-mode env names, any_live_mode_required false, and secret_values_returned false
+```
+
 ## 3.865 API Key Next Provider Smoke Top-Level Safety Fields Gate Record - 2026-05-17
 
 ### A. 목적

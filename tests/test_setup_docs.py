@@ -880,8 +880,16 @@ def test_setup_docs_keep_api_key_provider_selection_fields_in_sync() -> None:
         "missing_provider_families",
         "configured_env_keys_by_provider_family",
         "provider_env_key_hints_by_family",
+        "provider_auto_selects_live_provider_by_family",
+        "provider_optional_live_mode_env_by_family",
+        "provider_live_mode_required_by_family",
+        "all_configured_auto_select_live_provider",
+        "any_live_mode_required",
         "selected_provider_by_family",
         "ready_to_run_live_smoke",
+        "auto_selects_live_provider",
+        "optional_live_mode_env",
+        "live_mode_required",
         "preferred_env_key",
         "accepted_env_keys",
         "api_key_provider_selection_status",
@@ -891,6 +899,11 @@ def test_setup_docs_keep_api_key_provider_selection_fields_in_sync() -> None:
         "api_key_selected_provider_by_family",
         "api_key_configured_env_keys_by_provider_family",
         "api_key_provider_env_key_hints_by_family",
+        "api_key_provider_auto_selects_live_provider_by_family",
+        "api_key_provider_optional_live_mode_env_by_family",
+        "api_key_provider_live_mode_required_by_family",
+        "api_key_provider_all_configured_auto_select_live_provider",
+        "api_key_provider_any_live_mode_required",
     )
 
     for field_name in field_names:

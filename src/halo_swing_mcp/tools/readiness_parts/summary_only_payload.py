@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 from .context import *
+from .summary_only_provider_selection_fields import (
+    _api_key_provider_selection_top_level_fields,
+)
 from .summary_only_provider_smoke_fields import (
     _api_key_provider_smoke_top_level_fields,
 )
@@ -220,34 +223,9 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
             "target_path"
         ),
-        "api_key_provider_selection_status": (
-            api_key_provider_selection_summary.get("status")
+        **_api_key_provider_selection_top_level_fields(
+            api_key_provider_selection_summary
         ),
-        "api_key_provider_factory": (
-            api_key_provider_selection_summary.get("provider_factory")
-        ),
-        "api_key_selected_provider_classes": _string_list(
-            api_key_provider_selection_summary.get("selected_provider_classes")
-        ),
-        "api_key_selected_provider_class_count": (
-            api_key_provider_selection_summary.get("selected_provider_class_count")
-        ),
-        "api_key_selected_provider_by_family": _optional_mapping(
-            api_key_provider_selection_summary.get("selected_provider_by_family")
-        )
-        or {},
-        "api_key_configured_env_keys_by_provider_family": _optional_mapping(
-            api_key_provider_selection_summary.get(
-                "configured_env_keys_by_provider_family"
-            )
-        )
-        or {},
-        "api_key_provider_env_key_hints_by_family": _optional_mapping(
-            api_key_provider_selection_summary.get(
-                "provider_env_key_hints_by_family"
-            )
-        )
-        or {},
         "api_key_integration_status": (
             api_key_integration_status_summary.get("status")
         ),

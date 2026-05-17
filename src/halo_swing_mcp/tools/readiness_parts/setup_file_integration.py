@@ -9,6 +9,19 @@ from .context import *
 __all__ = ('_api_key_setup_file_summary', '_api_key_dotenv_loading_summary', '_api_key_pipeline_smoke_summary', '_api_key_pipeline_provider_route_summary', '_api_key_provider_selection_summary', '_api_key_integration_status_summary')
 
 
+_OPTIONAL_LIVE_MODE_ENV_BY_PROVIDER_FAMILY = {
+    "market": "HALO_SWING_MARKET_DATA_MODE",
+    "macro": "HALO_SWING_MACRO_DATA_MODE",
+    "news": "HALO_SWING_NEWS_DATA_MODE",
+}
+
+
+def _provider_auto_selects_live_provider(row: dict[str, Any]) -> bool:
+    if row.get("auto_selects_live_provider") is not None:
+        return row.get("auto_selects_live_provider") is True
+    return row.get("configured") is True and row.get("live_mode_required") is not True
+
+
 def _api_key_setup_file_summary(
     live_data_setup_summary: dict[str, Any],
 ) -> dict[str, Any]:
@@ -299,6 +312,28 @@ def _api_key_provider_selection_summary(
         }
         for family, row in provider_rows
     }
+    provider_auto_selects_live_provider_by_family = {
+        family: _provider_auto_selects_live_provider(row)
+        for family, row in provider_rows
+    }
+    provider_optional_live_mode_env_by_family = {
+        family: row.get("optional_live_mode_env")
+        or (
+            _optional_mapping(provider_setup_actions.get(family)) or {}
+        ).get("optional_live_mode_env")
+        or _OPTIONAL_LIVE_MODE_ENV_BY_PROVIDER_FAMILY.get(family)
+        for family, row in provider_rows
+    }
+    provider_live_mode_required_by_family = {
+        family: row.get("live_mode_required") is True
+        for family, row in provider_rows
+    }
+    all_configured_auto_select_live_provider = bool(
+        configured_provider_families
+    ) and all(
+        provider_auto_selects_live_provider_by_family.get(family) is True
+        for family in configured_provider_families
+    )
     selected_provider_classes = _string_list(
         provider_route.get("selected_provider_classes")
     )
@@ -329,6 +364,21 @@ def _api_key_provider_selection_summary(
             configured_env_keys_by_provider_family
         ),
         "provider_env_key_hints_by_family": provider_env_key_hints_by_family,
+        "provider_auto_selects_live_provider_by_family": (
+            provider_auto_selects_live_provider_by_family
+        ),
+        "provider_optional_live_mode_env_by_family": (
+            provider_optional_live_mode_env_by_family
+        ),
+        "provider_live_mode_required_by_family": (
+            provider_live_mode_required_by_family
+        ),
+        "all_configured_auto_select_live_provider": (
+            all_configured_auto_select_live_provider
+        ),
+        "any_live_mode_required": any(
+            provider_live_mode_required_by_family.values()
+        ),
         "selected_provider_by_family": selected_provider_by_family,
         "ready_to_run_live_smoke": (
             provider_route.get("status") == "ready"
