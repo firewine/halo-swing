@@ -296,6 +296,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_pipeline_api_key_command_summary.v1" in guide
     assert "provider_smoke_commands" in guide
     assert "Provider smoke rows include `network_call`" in guide
+    assert "expected_live_contract" in guide
+    assert "expected_live_checks" in guide
+    assert "expected live\ncontract/checks" in guide
     assert "one_shot_pipeline_smoke" in guide
     assert "next_provider_smoke_command_name" in guide
     assert "accepted API-key aliases" in guide

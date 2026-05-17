@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_COMMAND_NETWORK_FLAG_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_COMMAND_NETWORK_FLAG_GATE
+status: API_KEY_PROVIDER_SMOKE_COMMAND_EXPECTED_CONTRACT_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_COMMAND_EXPECTED_CONTRACT_GATE
 review_tier: S1_small
 
-next_atomic_step: add no-secret network_call booleans to API-key provider smoke command rows
+next_atomic_step: add expected live contract and check names to API-key provider smoke command rows
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -76,25 +76,34 @@ required_verification:
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; setup_summary=payload["live_data_setup_summary"]; print(command_summary["next_provider_smoke"]["network_call"], command_summary["provider_smoke_commands"][0]["network_call"], setup_summary["provider_smoke_plan"]["provider_smokes"][0]["network_call"], setup_summary["live_data_setup_steps"]["steps"][2]["next_provider_smoke"]["network_call"], payload["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; first=command_summary["provider_smoke_commands"][0]; print(first["expected_live_contract"], ",".join(first["expected_live_checks"]), command_summary["next_provider_smoke"]["expected_live_contract"], payload["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - API-key command summary provider_smoke_commands rows include network_call=true beside network_call_policy without returning secret values
-  - API-key command summary next_provider_smoke includes network_call=true when API keys make provider smokes ready
-  - live_data_setup_summary provider_smoke_plan provider_smokes rows include network_call=true beside network_call_policy without returning secret values
-  - live_data_setup_steps run_provider_smokes next_provider_smoke includes network_call=true when API keys make provider smokes ready
-  - focused tests cover provider smoke command network_call flags in ready API-key summary_only output
-  - README and DevOps setup guide document per-provider smoke command network_call flags
-  - setup docs tests assert per-provider smoke command network_call guidance
+  - API-key command summary provider_smoke_commands rows include expected_live_contract and expected_live_checks copied from provider smoke plan without returning secret values
+  - API-key command summary next_provider_smoke includes expected_live_contract and expected_live_checks when API keys make provider smokes ready
+  - focused tests cover expected live contract and check fields in ready API-key summary_only output
+  - README and DevOps setup guide document expected live contract and check fields on provider smoke command rows
+  - setup docs tests assert provider smoke command expected contract/check guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider smoke command network flag gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key provider smoke command expected contract gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_COMMAND_NETWORK_FLAG_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_COMMAND_NETWORK_FLAG_GATE
+review_tier: S1_small
+
+next_atomic_step: add no-secret network_call booleans to API-key provider smoke command rows
 ```
 
 Previous completed directive:
@@ -2739,14 +2748,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Provider Smoke Command Network Flag Gate is verified.
-API-key provider smoke command rows now expose no-secret `network_call=true`
-beside `network_call_policy` in command summaries, provider smoke plans, and
-ready `next_provider_smoke` rows. Focused tests, fake-key CLI, full pytest,
+Summary: API Key Provider Smoke Command Expected Contract Gate is verified.
+API-key provider smoke command rows now expose no-secret
+`expected_live_contract` and `expected_live_checks` beside the runnable command,
+network policy, and env-key hints. Focused tests, fake-key CLI, full pytest,
 ruff, and health_check passed.
 
 ```yaml
-api_key_provider_smoke_command_network_flag_gate:
+api_key_provider_smoke_command_expected_contract_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2759,13 +2768,11 @@ api_key_provider_smoke_command_network_flag_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - API-key command summary provider_smoke_commands rows include network_call=true beside network_call_policy without returning secret values
-    - API-key command summary next_provider_smoke includes network_call=true when API keys make provider smokes ready
-    - live_data_setup_summary provider_smoke_plan provider_smokes rows include network_call=true beside network_call_policy without returning secret values
-    - live_data_setup_steps run_provider_smokes next_provider_smoke includes network_call=true when API keys make provider smokes ready
-    - focused tests cover provider smoke command network_call flags in ready API-key summary_only output
-    - README and DevOps setup guide document per-provider smoke command network_call flags
-    - tests/test_setup_docs.py asserts per-provider smoke command network_call guidance
+    - API-key command summary provider_smoke_commands rows include expected_live_contract and expected_live_checks copied from provider smoke plan without returning secret values
+    - API-key command summary next_provider_smoke includes expected_live_contract and expected_live_checks when API keys make provider smokes ready
+    - focused tests cover expected live contract and check fields in ready API-key summary_only output
+    - README and DevOps setup guide document expected live contract and check fields on provider smoke command rows
+    - tests/test_setup_docs.py asserts provider smoke command expected contract/check guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2779,9 +2786,9 @@ api_key_provider_smoke_command_network_flag_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; provider smoke command rows returned network_call=true beside network_call_policy without secret values"
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; setup_summary=payload["live_data_setup_summary"]; print(command_summary["next_provider_smoke"]["network_call"], command_summary["provider_smoke_commands"][0]["network_call"], setup_summary["provider_smoke_plan"]["provider_smokes"][0]["network_call"], setup_summary["live_data_setup_steps"]["steps"][2]["next_provider_smoke"]["network_call"], payload["secret_values_returned"])'
-      result: "True True True True False"
+      result: "exit 0; provider smoke command rows returned expected_live_contract and expected_live_checks without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; first=command_summary["provider_smoke_commands"][0]; print(first["expected_live_contract"], ",".join(first["expected_live_checks"]), command_summary["next_provider_smoke"]["expected_live_contract"], payload["secret_values_returned"])'
+      result: "market_snapshot_contract live_data_boundary_declared market_snapshot_contract False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "796 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .

@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.800 API Key Provider Smoke Command Expected Contract Gate Record - 2026-05-17
+
+### A. 목적
+
+`live_data_setup_summary.provider_smoke_plan.provider_smokes`는 provider별 smoke가
+어떤 live contract와 check를 증명해야 하는지 `expected_live_contract`와
+`expected_live_checks`로 보여준다. 하지만 operator가 compact
+`api_key_command_summary.provider_smoke_commands` row만 보고 실제 smoke command를
+실행할 때는 기대 contract/check를 다시 provider smoke plan에서 찾아야 했다. 이번
+slice는 command summary row와 ready `next_provider_smoke`에 no-secret
+`expected_live_contract`, `expected_live_checks`를 함께 유지해, API key 입력 후 실행할
+명령과 성공 판정 기준을 같은 row에서 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key command summary provider_smoke_commands rows expose expected_live_contract and expected_live_checks
+  - API-key command summary next_provider_smoke exposes the same expected live contract/check metadata when provider smokes are ready
+  - focused tests lock expected live contract/check metadata in ready summary_only output
+  - README and DevOps setup guide document provider smoke command expected contract/check fields
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; provider smoke command rows returned expected_live_contract and expected_live_checks without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; first=command_summary["provider_smoke_commands"][0]; print(first["expected_live_contract"], ",".join(first["expected_live_checks"]), command_summary["next_provider_smoke"]["expected_live_contract"], payload["secret_values_returned"])': market_snapshot_contract live_data_boundary_declared market_snapshot_contract False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.799 API Key Provider Smoke Command Network Flag Gate Record - 2026-05-17
 
 ### A. 목적

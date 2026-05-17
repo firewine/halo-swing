@@ -4590,6 +4590,10 @@ def _api_key_command_provider_smoke_row(
         "command": provider_smoke.get("command"),
         "network_call": True,
         "network_call_policy": provider_smoke.get("network_call_policy"),
+        "expected_live_contract": provider_smoke.get("expected_live_contract"),
+        "expected_live_checks": _string_list(
+            provider_smoke.get("expected_live_checks")
+        ),
         "preferred_env_key": env_hint.get("preferred_env_key"),
         "accepted_env_keys": env_hint.get("accepted_env_keys", []),
         "mutates_local_state": False,

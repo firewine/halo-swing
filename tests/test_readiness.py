@@ -717,6 +717,8 @@ def expected_api_key_command_summary(
             "command": provider_smoke["command"],
             "network_call": True,
             "network_call_policy": provider_smoke["network_call_policy"],
+            "expected_live_contract": provider_smoke["expected_live_contract"],
+            "expected_live_checks": provider_smoke["expected_live_checks"],
             "preferred_env_key": provider_smoke["preferred_env_key"],
             "accepted_env_keys": provider_setup_actions[
                 provider_smoke["provider_family"]
@@ -6412,11 +6414,23 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         "POLYGON_API_KEY"
     )
     assert command_summary["next_provider_smoke"]["network_call"] is True
+    assert command_summary["next_provider_smoke"]["expected_live_contract"] == (
+        "market_snapshot_contract"
+    )
+    assert command_summary["next_provider_smoke"]["expected_live_checks"] == [
+        "live_data_boundary_declared",
+    ]
     assert command_summary["next_provider_smoke"]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
     assert command_summary["provider_smoke_commands"][0]["network_call"] is True
+    assert command_summary["provider_smoke_commands"][0][
+        "expected_live_contract"
+    ] == "market_snapshot_contract"
+    assert command_summary["provider_smoke_commands"][0]["expected_live_checks"] == [
+        "live_data_boundary_declared",
+    ]
     assert setup_summary["provider_smoke_plan"]["provider_smokes"][0][
         "network_call"
     ] is True
@@ -6430,6 +6444,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         "HALO_SWING_MACRO_API_KEY",
         "HALO_SWING_FRED_API_KEY",
         "FRED_API_KEY",
+    ]
+    assert command_summary["provider_smoke_commands"][1][
+        "expected_live_contract"
+    ] == "macro_filter_contract"
+    assert command_summary["provider_smoke_commands"][1]["expected_live_checks"] == [
+        "live_data_boundary_declared",
+        "network_call_declared",
     ]
     assert command_summary["one_shot_pipeline_smoke"]["name"] == (
         "run_api_key_pipeline_smoke"
