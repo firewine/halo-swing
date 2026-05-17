@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_GATE",
+  "gate_id": "API_KEY_SETUP_DOCS_INTEGRATION_PROVIDER_SMOKE_PROGRESS_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.837",
-  "next_atomic_step": "lock README API-key integration next-action provider smoke progress guidance with setup docs coverage",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.838",
+  "next_atomic_step": "lock README and DevOps API-key integration provider smoke progress field parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.837",
+    "docs/halo-swing-development-plan.md#3.838",
     "README.md",
     "tests/test_setup_docs.py"
   ],
@@ -32,7 +32,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_readme_shows_api_key_integration_next_action_provider_smoke_progress -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_sync -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -50,12 +50,12 @@
     "read_only": true
   },
   "done_means": [
-    "README setup docs coverage asserts every top-level API-key integration next-action provider smoke progress mirror name",
-    "README setup docs coverage asserts the next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names",
+    "README and DevOps setup guide coverage assert the same top-level API-key integration next-action provider smoke progress mirror names",
+    "README and DevOps setup guide coverage assert the same next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified README provider smoke progress docs guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README/DevOps provider smoke progress parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

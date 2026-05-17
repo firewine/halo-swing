@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_VERIFIED
-gate_id: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_GATE
+status: API_KEY_SETUP_DOCS_INTEGRATION_PROVIDER_SMOKE_PROGRESS_PARITY_VERIFIED
+gate_id: API_KEY_SETUP_DOCS_INTEGRATION_PROVIDER_SMOKE_PROGRESS_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: lock README API-key integration next-action provider smoke progress guidance with setup docs coverage
+next_atomic_step: lock README and DevOps API-key integration provider smoke progress field parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,7 +70,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_readme_shows_api_key_integration_next_action_provider_smoke_progress -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_sync -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -78,14 +78,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README setup docs coverage asserts every top-level API-key integration next-action provider smoke progress mirror name
-  - README setup docs coverage asserts the next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names
+  - README and DevOps setup guide coverage assert the same top-level API-key integration next-action provider smoke progress mirror names
+  - README and DevOps setup guide coverage assert the same next provider smoke command, provider identity, status, network-call policy, and secret-values-returned mirror names
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified README provider smoke progress docs guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified README/DevOps provider smoke progress parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_VERIFIED
+gate_id: API_KEY_README_INTEGRATION_NEXT_ACTION_PROVIDER_SMOKE_PROGRESS_DOCS_GATE
+review_tier: S1_small
+
+next_atomic_step: lock README API-key integration next-action provider smoke progress guidance with setup docs coverage
 ```
 
 Previous completed directive:
@@ -3147,6 +3158,56 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Setup Docs Integration Provider Smoke Progress Parity Guard is
+verified. README and DevOps setup-guide coverage now assert the same API-key
+integration next-action provider smoke progress mirror names, including the next
+provider smoke command, provider identity, status, network-call policy, and
+secret-values-returned fields. Focused parity coverage, setup-docs coverage,
+direct summary-only smoke, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_setup_docs_integration_provider_smoke_progress_parity_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - tests/test_setup_docs.py
+  implementation:
+    - tests-only/docs guard asserts README and DevOps guide both include api_key_integration_next_action_provider_smoke_count, ready_provider_smoke_count, and blocked_provider_smoke_count
+    - parity coverage asserts both docs include the same next provider smoke command, provider identity, status, network_call, network_call_policy, and secret_values_returned mirror names
+    - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_sync -q
+      result: "1 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "10 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "802 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations
+      result: passed; no blocked-path changes
+    - command: git status --short --ignored state
+      result: ignored local state/ only
+```
+
+Previous verification:
 
 Summary: API Key README Integration Next Action Provider Smoke Progress Docs
 Guard is verified. README setup-docs coverage now asserts the top-level
