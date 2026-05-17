@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SMOKE_NEXT_ACTION_ROUTE_FIELDS_GATE",
+  "gate_id": "API_KEY_PROVIDER_SMOKE_NEXT_ACTION_COMMAND_MAP_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.953",
-  "next_atomic_step": "surface summary-only API-key provider smoke next-action route fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.954",
+  "next_atomic_step": "surface summary-only API-key provider smoke next-action command map fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.953",
+    "docs/halo-swing-development-plan.md#3.954",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
@@ -57,13 +57,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output exposes API-key provider smoke next-action selected provider class, route mode, live-required maps, and route counts",
-    "summary-only tests prove provider smoke next-action route fields match the selected ready or blocked command rows",
-    "README and DevOps guide document the top-level API-key provider smoke next-action route fields",
+    "summary-only output exposes API-key provider smoke next-action kind, command-name, and command maps by family",
+    "summary-only tests prove provider smoke next-action command map fields match the selected ready or blocked command rows",
+    "README and DevOps guide document the top-level API-key provider smoke next-action command map fields",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key provider smoke next-action route fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key provider smoke next-action command map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

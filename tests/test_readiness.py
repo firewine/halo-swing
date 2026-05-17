@@ -1325,6 +1325,18 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
             expected_next_action_accepted_env_keys_by_family.items()
         )
     }
+    expected_next_action_kinds_by_family = {
+        row["provider_family"]: row.get("kind")
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_command_names_by_family = {
+        row["provider_family"]: row["smoke_command_name"]
+        for row in expected_next_action_env_key_rows
+    }
+    expected_next_action_commands_by_family = {
+        row["provider_family"]: row["command"]
+        for row in expected_next_action_env_key_rows
+    }
     expected_next_action_provider_families = list(
         dict.fromkeys(
             row["provider_family"] for row in expected_next_action_env_key_rows
@@ -1446,6 +1458,15 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_provider_smoke_next_action_commands"] == (
         expected_next_action_commands
     )
+    assert payload[
+        "api_key_provider_smoke_next_action_kinds_by_family"
+    ] == expected_next_action_kinds_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_command_names_by_family"
+    ] == expected_next_action_command_names_by_family
+    assert payload[
+        "api_key_provider_smoke_next_action_commands_by_family"
+    ] == expected_next_action_commands_by_family
     assert payload["api_key_provider_smoke_next_action_provider_families"] == (
         expected_next_action_provider_families
     )
