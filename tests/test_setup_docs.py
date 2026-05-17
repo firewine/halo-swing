@@ -604,6 +604,29 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_integration_status_summary",
+        "api_key_integration_status_summary.v1",
+        "api_key_integration_status",
+        "api_key_integration_api_keys_configured",
+        "api_key_integration_dotenv_loading_enabled",
+        "api_key_integration_dotenv_target_exists",
+        "api_key_integration_live_providers_selected",
+        "api_key_integration_ready_to_run_live_smoke",
+        "api_key_integration_configured_provider_families",
+        "api_key_integration_missing_provider_families",
+        "api_key_integration_selected_provider_classes",
+        "api_key_integration_next_action_name",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

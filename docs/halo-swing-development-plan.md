@@ -874,6 +874,61 @@ verification:
   - targeted payload print: fill_live_data_api_keys .env .env.example .env False [] None False
 ```
 
+## 3.839 API Key Setup Docs Integration Status Parity Guard Record - 2026-05-17
+
+### A. 목적
+
+3.838에서 README와 DevOps guide의 provider-smoke progress field parity를
+고정했다. 하지만 compact client/operator가 API-key-only setup row를 처음 렌더링할
+때 읽는 integration status core field 목록은 별도 parity guard가 없으면 두 문서가
+서로 다른 readiness 계약을 설명할 수 있다. 이번 slice는 README와 DevOps guide가
+같은 integration status summary schema와 top-level integration status mirror 이름들을
+계속 포함하는지 setup-docs coverage로 고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - tests-only/docs guard asserts README and DevOps guide both include api_key_integration_status_summary and api_key_integration_status_summary.v1
+  - parity coverage asserts both docs include API-key integration status, key readiness, dotenv status, provider selection, configured/missing family, selected class, and next action names
+  - no source files changed; user clarified test files are excluded from the sub-1000-line source-file rule
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused README/DevOps integration status parity setup-docs pytest: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 11 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 803 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - git status --short -- data artifacts src/halo_swing_mcp/broker src/halo_swing_mcp/live_adapters migrations: passed, no blocked-path changes
+  - git status --short --ignored state: ignored local state/ only
+```
+
 ## 3.838 API Key Setup Docs Integration Provider Smoke Progress Parity Guard Record - 2026-05-17
 
 ### A. 목적
