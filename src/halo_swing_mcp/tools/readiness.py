@@ -3447,6 +3447,12 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_integration_next_action_name": (
             api_key_integration_status_summary.get("next_action_name")
         ),
+        "api_key_integration_next_action_status": (
+            api_key_next_action_summary.get("next_action_status")
+        ),
+        "api_key_integration_next_action_command": (
+            api_key_next_action_summary.get("next_action_command")
+        ),
         "api_key_integration_next_action_provider_family": (
             api_key_integration_status_summary.get(
                 "next_action_provider_family"
@@ -3467,6 +3473,13 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_integration_next_action_network_call": (
             api_key_integration_status_summary.get("next_action_network_call")
             is True
+        ),
+        "api_key_integration_next_action_mutates_local_state": (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
+        ),
+        "api_key_integration_next_action_secret_values_returned": (
+            api_key_next_action_summary.get("secret_values_returned") is True
         ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")

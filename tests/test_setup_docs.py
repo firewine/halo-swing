@@ -407,6 +407,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_smoke_command_name" in guide
     assert "api_key_integration_next_action_is_recovery" in guide
     assert "api_key_integration_next_action_network_call" in guide
+    assert "api_key_integration_next_action_status" in guide
+    assert "api_key_integration_next_action_command" in guide
+    assert "api_key_integration_next_action_mutates_local_state" in guide
+    assert "api_key_integration_next_action_secret_values_returned" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

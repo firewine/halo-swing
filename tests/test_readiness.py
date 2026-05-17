@@ -5508,11 +5508,19 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "ReplayMarketDataProvider"
     ]
     assert payload["api_key_integration_next_action_name"] == "prepare_dotenv"
+    assert payload["api_key_integration_next_action_status"] == "pending"
+    assert payload["api_key_integration_next_action_command"] == (
+        "cp .env.example .env"
+    )
     assert payload["api_key_integration_next_action_provider_family"] is None
     assert payload["api_key_integration_next_action_provider"] is None
     assert payload["api_key_integration_next_action_smoke_command_name"] is None
     assert payload["api_key_integration_next_action_is_recovery"] is False
     assert payload["api_key_integration_next_action_network_call"] is False
+    assert payload["api_key_integration_next_action_mutates_local_state"] is True
+    assert (
+        payload["api_key_integration_next_action_secret_values_returned"] is False
+    )
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
@@ -7696,6 +7704,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     assert payload["api_key_integration_next_action_name"] == (
         integration_status["next_action_name"]
     )
+    assert payload["api_key_integration_next_action_status"] == (
+        payload["api_key_next_action_summary"]["next_action_status"]
+    )
+    assert payload["api_key_integration_next_action_command"] == (
+        payload["api_key_next_action_summary"]["next_action_command"]
+    )
     assert payload["api_key_integration_next_action_provider_family"] == (
         integration_status["next_action_provider_family"]
     )
@@ -7712,6 +7726,14 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
     assert (
         payload["api_key_integration_next_action_network_call"]
         is integration_status["next_action_network_call"]
+    )
+    assert (
+        payload["api_key_integration_next_action_mutates_local_state"]
+        is payload["api_key_next_action_summary"]["next_action_mutates_local_state"]
+    )
+    assert (
+        payload["api_key_integration_next_action_secret_values_returned"]
+        is payload["api_key_next_action_summary"]["secret_values_returned"]
     )
     assert "api_key_integration_status_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
