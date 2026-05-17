@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_FAILURE_TOP_LEVEL_FIELDS_VERIFIED
-gate_id: API_KEY_PIPELINE_FAILURE_TOP_LEVEL_FIELDS_GATE
+status: API_KEY_COMMAND_TOP_LEVEL_SAFETY_FIELDS_VERIFIED
+gate_id: API_KEY_COMMAND_TOP_LEVEL_SAFETY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key pipeline failure summary next-action and safety fields as top-level scalars
+next_atomic_step: surface summary-only API-key command summary safety and network policy fields as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,7 +55,7 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_command_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_failure_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_command_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,28 +83,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output mirrors pipeline failure status, next action, provider recovery, preferred/accepted env-key hints, and safety fields without secret values
-  - blocked default and ready fake-key summary-only tests prove top-level failure fields match api_key_pipeline_failure_summary
-  - README and DevOps guide document top-level api_key_failure_* next-action and safety fields
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+  - summary-only output mirrors copy dotenv, next smoke, and one-shot pipeline command safety/network policy fields without secret values
+  - blocked default and ready fake-key summary-only tests prove top-level command fields match api_key_command_summary
+  - README and DevOps guide document top-level api_key_* command safety fields
+  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation beyond documented copy command, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key pipeline failure top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key command top-level safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PIPELINE_FAILURE_TOP_LEVEL_FIELDS_GATE
+gate_id: API_KEY_COMMAND_TOP_LEVEL_SAFETY_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_failure_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_command_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
@@ -117,14 +117,25 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_command_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key pipeline failure top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key command top-level safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes api_key_failure_* top-level next-action, provider recovery, env-key hint, and no-secret safety fields
-  - summary_only_payload.py is 852 lines after reusing the shared failure projection
+  - summary-only payload now exposes top-level copy dotenv, next smoke, and one-shot pipeline command safety/network policy fields
+  - summary_only_payload.py is 587 lines after moving command projection to summary_only_command_fields.py
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_FAILURE_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PIPELINE_FAILURE_TOP_LEVEL_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key pipeline failure summary next-action and safety fields as top-level scalars
 ```
 
 Previous completed directive:

@@ -18,13 +18,13 @@ from .summary_only_pipeline_check_fields import (
 )
 from .api_key_pipeline_payload_mirrors import (
     _api_key_failure_top_level_fields,
+    _api_key_provider_recovery_top_level_fields,
 )
 from .provider_recovery_checklist_summary import (
     _api_key_provider_recovery_checklist_summary,
 )
 from .summary_only_provider_route_fields import (
     _api_key_provider_recovery_checklist_route_top_level_fields,
-    _api_key_provider_recovery_route_top_level_fields,
     _api_key_requirement_route_top_level_fields,
 )
 from .summary_only_provider_route_summary_fields import (
@@ -42,6 +42,9 @@ from .summary_only_quickstart_fields import (
 )
 from .summary_only_setup_file_fields import (
     _api_key_setup_file_top_level_fields,
+)
+from .summary_only_command_fields import (
+    _api_key_command_top_level_fields,
 )
 
 
@@ -471,19 +474,17 @@ def _api_key_pipeline_summary_only_payload(
         **_api_key_requirement_route_top_level_fields(
             api_key_requirements_summary
         ),
-        "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
-        "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
-        "api_key_next_smoke_command": next_smoke_command.get("command"),
-        "api_key_next_smoke_command_name": next_smoke_command.get("name"),
+        **_api_key_command_top_level_fields(
+            copy_dotenv_command=copy_dotenv_command,
+            next_smoke_command=next_smoke_command,
+            one_shot_pipeline_smoke=one_shot_pipeline_smoke,
+        ),
         **_api_key_provider_smoke_top_level_fields(
             setup_status_summary,
             next_provider_smoke,
             provider_smoke_command_rows,
             provider_smoke_command_count,
             provider_smoke_command_rows_by_family,
-        ),
-        "api_key_one_shot_pipeline_smoke_command": one_shot_pipeline_smoke.get(
-            "command"
         ),
         "next_operator_action": next_operator_action,
         "readiness_summary": readiness_summary,
@@ -561,278 +562,12 @@ def _api_key_pipeline_summary_only_payload(
         "provider_recovery_smoke_count": payload.get(
             "provider_recovery_smoke_count"
         ),
-        "provider_recovery_required": (
-            payload.get("provider_recovery_required") is True
-        ),
-        **_api_key_provider_recovery_route_top_level_fields(
+        **_api_key_provider_recovery_top_level_fields(
             api_key_provider_recovery_summary
         ),
         **_api_key_provider_recovery_checklist_route_top_level_fields(
             api_key_provider_recovery_checklist_summary
         ),
-        "provider_recovery_summary_status": payload.get(
-            "provider_recovery_summary_status"
-        ),
-        "provider_recovery_action_status": payload.get(
-            "provider_recovery_action_status"
-        ),
-        "provider_recovery_item_count": payload.get(
-            "provider_recovery_item_count"
-        ),
-        "provider_recovery_pending_count": payload.get(
-            "provider_recovery_pending_count"
-        ),
-        "provider_recovery_blocked_count": payload.get(
-            "provider_recovery_blocked_count"
-        ),
-        "provider_error_count": payload.get("provider_error_count"),
-        "provider_recovery_smoke_available_count": payload.get(
-            "provider_recovery_smoke_available_count"
-        ),
-        "provider_recovery_smoke_unavailable_count": payload.get(
-            "provider_recovery_smoke_unavailable_count"
-        ),
-        "provider_recovery_all_smokes_available": (
-            payload.get("provider_recovery_all_smokes_available") is True
-        ),
-        "provider_recovery_network_call_count": payload.get(
-            "provider_recovery_network_call_count"
-        ),
-        "provider_recovery_all_network_calls": (
-            payload.get("provider_recovery_all_network_calls") is True
-        ),
-        "provider_recovery_mutates_local_state_count": payload.get(
-            "provider_recovery_mutates_local_state_count"
-        ),
-        "provider_recovery_any_mutates_local_state": (
-            payload.get("provider_recovery_any_mutates_local_state") is True
-        ),
-        "provider_recovery_secret_values_returned_count": payload.get(
-            "provider_recovery_secret_values_returned_count"
-        ),
-        "provider_recovery_any_secret_values_returned": (
-            payload.get("provider_recovery_any_secret_values_returned") is True
-        ),
-        "provider_recovery_next_setup_actions": _string_list(
-            payload.get("provider_recovery_next_setup_actions")
-        ),
-        "provider_recovery_exception_types": _string_list(
-            payload.get("provider_recovery_exception_types")
-        ),
-        "provider_recovery_exception_message_returned_count": payload.get(
-            "provider_recovery_exception_message_returned_count"
-        ),
-        "provider_recovery_any_exception_messages_returned": (
-            payload.get("provider_recovery_any_exception_messages_returned") is True
-        ),
-        "provider_recovery_url_returned_count": payload.get(
-            "provider_recovery_url_returned_count"
-        ),
-        "provider_recovery_any_urls_returned": (
-            payload.get("provider_recovery_any_urls_returned") is True
-        ),
-        "provider_recovery_statuses": _string_list(
-            payload.get("provider_recovery_statuses")
-        ),
-        "provider_recovery_all_pending": (
-            payload.get("provider_recovery_all_pending") is True
-        ),
-        "provider_recovery_retry_ready": (
-            payload.get("provider_recovery_retry_ready") is True
-        ),
-        "provider_recovery_all_retryable": (
-            payload.get("provider_recovery_all_retryable") is True
-        ),
-        "provider_recovery_has_pending": (
-            payload.get("provider_recovery_has_pending") is True
-        ),
-        "provider_recovery_has_blocked": (
-            payload.get("provider_recovery_has_blocked") is True
-        ),
-        "provider_recovery_provider_families": _string_list(
-            payload.get("provider_recovery_provider_families")
-        ),
-        "provider_recovery_providers": _string_list(
-            payload.get("provider_recovery_providers")
-        ),
-        "provider_recovery_pending_provider_families": _string_list(
-            payload.get("provider_recovery_pending_provider_families")
-        ),
-        "provider_recovery_pending_providers": _string_list(
-            payload.get("provider_recovery_pending_providers")
-        ),
-        "provider_recovery_blocked_provider_families": _string_list(
-            payload.get("provider_recovery_blocked_provider_families")
-        ),
-        "provider_recovery_blocked_providers": _string_list(
-            payload.get("provider_recovery_blocked_providers")
-        ),
-        "provider_recovery_smoke_command_names": _string_list(
-            payload.get("provider_recovery_smoke_command_names")
-        ),
-        "provider_recovery_smoke_commands": _string_list(
-            payload.get("provider_recovery_smoke_commands")
-        ),
-        "provider_recovery_pending_smoke_command_names": _string_list(
-            payload.get("provider_recovery_pending_smoke_command_names")
-        ),
-        "provider_recovery_pending_smoke_commands": _string_list(
-            payload.get("provider_recovery_pending_smoke_commands")
-        ),
-        "provider_recovery_blocked_smoke_command_names": _string_list(
-            payload.get("provider_recovery_blocked_smoke_command_names")
-        ),
-        "provider_recovery_blocked_smoke_commands": _string_list(
-            payload.get("provider_recovery_blocked_smoke_commands")
-        ),
-        "provider_recovery_network_call_policies": _string_list(
-            payload.get("provider_recovery_network_call_policies")
-        ),
-        "provider_recovery_preferred_env_keys": _string_list(
-            payload.get("provider_recovery_preferred_env_keys")
-        ),
-        "provider_recovery_accepted_env_keys": _string_list(
-            payload.get("provider_recovery_accepted_env_keys")
-        ),
-        "provider_recovery_accepted_env_key_groups": [
-            _string_list(group)
-            for group in payload.get("provider_recovery_accepted_env_key_groups", [])
-            if isinstance(group, list)
-        ],
-        "next_pending_recovery_smoke_command_name": payload.get(
-            "next_pending_recovery_smoke_command_name"
-        ),
-        "next_pending_recovery_smoke_command": payload.get(
-            "next_pending_recovery_smoke_command"
-        ),
-        "next_pending_recovery_provider_family": payload.get(
-            "next_pending_recovery_provider_family"
-        ),
-        "next_pending_recovery_provider": payload.get(
-            "next_pending_recovery_provider"
-        ),
-        "next_pending_recovery_selected_provider_class": payload.get(
-            "next_pending_recovery_selected_provider_class"
-        ),
-        "next_pending_recovery_provider_route_data_mode": payload.get(
-            "next_pending_recovery_provider_route_data_mode"
-        ),
-        "next_pending_recovery_provider_route_live_data_required": (
-            payload.get("next_pending_recovery_provider_route_live_data_required")
-            is True
-        ),
-        "next_pending_recovery_next_setup_action": payload.get(
-            "next_pending_recovery_next_setup_action"
-        ),
-        "next_pending_recovery_preferred_env_key": payload.get(
-            "next_pending_recovery_preferred_env_key"
-        ),
-        "next_pending_recovery_accepted_env_keys": _string_list(
-            payload.get("next_pending_recovery_accepted_env_keys")
-        ),
-        "next_pending_recovery_network_call_policy": payload.get(
-            "next_pending_recovery_network_call_policy"
-        ),
-        "next_pending_recovery_smoke_available": (
-            payload.get("next_pending_recovery_smoke_available") is True
-        ),
-        "next_pending_recovery_network_call": (
-            payload.get("next_pending_recovery_network_call") is True
-        ),
-        "next_pending_recovery_mutates_local_state": (
-            payload.get("next_pending_recovery_mutates_local_state") is True
-        ),
-        "next_pending_recovery_secret_values_returned": False,
-        "next_blocked_recovery_smoke_command_name": payload.get(
-            "next_blocked_recovery_smoke_command_name"
-        ),
-        "next_blocked_recovery_smoke_command": payload.get(
-            "next_blocked_recovery_smoke_command"
-        ),
-        "next_blocked_recovery_provider_family": payload.get(
-            "next_blocked_recovery_provider_family"
-        ),
-        "next_blocked_recovery_provider": payload.get(
-            "next_blocked_recovery_provider"
-        ),
-        "next_blocked_recovery_selected_provider_class": payload.get(
-            "next_blocked_recovery_selected_provider_class"
-        ),
-        "next_blocked_recovery_provider_route_data_mode": payload.get(
-            "next_blocked_recovery_provider_route_data_mode"
-        ),
-        "next_blocked_recovery_provider_route_live_data_required": (
-            payload.get("next_blocked_recovery_provider_route_live_data_required")
-            is True
-        ),
-        "next_blocked_recovery_next_setup_action": payload.get(
-            "next_blocked_recovery_next_setup_action"
-        ),
-        "next_blocked_recovery_preferred_env_key": payload.get(
-            "next_blocked_recovery_preferred_env_key"
-        ),
-        "next_blocked_recovery_accepted_env_keys": _string_list(
-            payload.get("next_blocked_recovery_accepted_env_keys")
-        ),
-        "next_blocked_recovery_network_call_policy": payload.get(
-            "next_blocked_recovery_network_call_policy"
-        ),
-        "next_blocked_recovery_smoke_available": (
-            payload.get("next_blocked_recovery_smoke_available") is True
-        ),
-        "next_blocked_recovery_network_call": (
-            payload.get("next_blocked_recovery_network_call") is True
-        ),
-        "next_blocked_recovery_mutates_local_state": (
-            payload.get("next_blocked_recovery_mutates_local_state") is True
-        ),
-        "next_blocked_recovery_secret_values_returned": False,
-        "next_recovery_smoke_command_name": payload.get(
-            "next_recovery_smoke_command_name"
-        ),
-        "next_recovery_smoke_command": payload.get("next_recovery_smoke_command"),
-        "next_recovery_provider_family": payload.get(
-            "next_recovery_provider_family"
-        ),
-        "next_recovery_provider": payload.get("next_recovery_provider"),
-        "next_recovery_selected_provider_class": payload.get(
-            "next_recovery_selected_provider_class"
-        ),
-        "next_recovery_provider_route_data_mode": payload.get(
-            "next_recovery_provider_route_data_mode"
-        ),
-        "next_recovery_provider_route_live_data_required": (
-            payload.get("next_recovery_provider_route_live_data_required") is True
-        ),
-        "next_recovery_next_setup_action": payload.get(
-            "next_recovery_next_setup_action"
-        ),
-        "next_recovery_preferred_env_key": payload.get(
-            "next_recovery_preferred_env_key"
-        ),
-        "next_recovery_accepted_env_keys": _string_list(
-            payload.get("next_recovery_accepted_env_keys")
-        ),
-        "next_recovery_network_call_policy": payload.get(
-            "next_recovery_network_call_policy"
-        ),
-        "next_recovery_smoke_available": (
-            payload.get("next_recovery_smoke_available") is True
-        ),
-        "next_recovery_network_call": (
-            payload.get("next_recovery_network_call") is True
-        ),
-        "next_recovery_mutates_local_state": (
-            payload.get("next_recovery_mutates_local_state") is True
-        ),
-        "next_recovery_exception_type": payload.get("next_recovery_exception_type"),
-        "next_recovery_exception_message_returned": (
-            payload.get("next_recovery_exception_message_returned") is True
-        ),
-        "next_recovery_url_returned": (
-            payload.get("next_recovery_url_returned") is True
-        ),
-        "next_recovery_secret_values_returned": False,
         "omitted_sections": [
             "api_key_operator_checklist",
             "api_key_provider_recovery_checklist",

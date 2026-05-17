@@ -253,6 +253,60 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.912 API Key Command Top-Level Safety Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.911은 failure summary의 next action과 recovery context를 top-level로 올렸다. 하지만
+compact client가 `copy_dotenv_command`, `next_smoke_command`,
+`one_shot_pipeline_smoke`의 network policy, mutation, secret-return safety를 보려면
+아직 `api_key_command_summary` nested object를 열어야 한다. 이번 slice는 API 키 입력
+후 표시되는 명령이 어떤 네트워크/로컬 상태 영향을 갖는지 top-level에서 바로 확인하게
+한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors copy dotenv, next smoke, and one-shot pipeline command safety/network policy fields without secret values
+  - blocked default and ready fake-key summary-only tests prove top-level command fields match api_key_command_summary
+  - README and DevOps guide document top-level api_key_* command safety fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation beyond documented copy command, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation beyond documented copy command
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_command_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.911 API Key Pipeline Failure Top-Level Fields Gate Record - 2026-05-18
 
 ### A. 목적

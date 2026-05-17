@@ -843,8 +843,21 @@ contract/checks, live-call policy, selected live provider route, and the exact
 local smoke commands to use after API keys are configured.
 For compact clients that read only top-level fields, summary-only output also
 mirrors the no-secret command metadata as `api_key_copy_dotenv_command`,
-`api_key_copy_dotenv_required`, `api_key_next_smoke_command`,
-`api_key_next_smoke_command_name`, `api_key_one_shot_pipeline_smoke_command`,
+`api_key_copy_dotenv_required`, `api_key_copy_dotenv_command_name`,
+`api_key_copy_dotenv_command_network_call`,
+`api_key_copy_dotenv_command_mutates_local_state`,
+`api_key_copy_dotenv_command_secret_values_returned`,
+`api_key_next_smoke_command`, `api_key_next_smoke_command_name`,
+`api_key_next_smoke_command_network_call`,
+`api_key_next_smoke_command_network_call_policy`,
+`api_key_next_smoke_command_mutates_local_state`,
+`api_key_next_smoke_command_secret_values_returned`,
+`api_key_one_shot_pipeline_smoke_command`,
+`api_key_one_shot_pipeline_smoke_command_name`,
+`api_key_one_shot_pipeline_smoke_network_call`,
+`api_key_one_shot_pipeline_smoke_network_call_policy`,
+`api_key_one_shot_pipeline_smoke_mutates_local_state`,
+`api_key_one_shot_pipeline_smoke_secret_values_returned`,
 `api_key_provider_smoke_command_count`, and
 `api_key_provider_smoke_command_names`.
 It also mirrors provider smoke progress as

@@ -1300,6 +1300,289 @@ def assert_pipeline_failure_summary_top_level_fields(
     )
 
 
+def assert_provider_recovery_summary_top_level_fields(
+    payload: dict[str, Any],
+) -> None:
+    recovery_summary = payload["api_key_provider_recovery_summary"]
+    mapped_fields = {
+        "provider_recovery_required": "provider_recovery_required",
+        "api_key_provider_recovery_selected_provider_class_by_family": (
+            "selected_provider_class_by_family"
+        ),
+        "api_key_provider_recovery_provider_route_data_mode_by_family": (
+            "provider_route_data_mode_by_family"
+        ),
+        "api_key_provider_recovery_provider_route_live_data_required_by_family": (
+            "provider_route_live_data_required_by_family"
+        ),
+        "api_key_provider_recovery_all_selected_routes_live": (
+            "all_selected_routes_live"
+        ),
+        "provider_recovery_summary_status": "status",
+        "provider_recovery_action_status": "provider_recovery_action_status",
+        "provider_recovery_item_count": "item_count",
+        "provider_recovery_pending_count": "provider_recovery_pending_count",
+        "provider_recovery_blocked_count": "provider_recovery_blocked_count",
+        "provider_error_count": "provider_error_count",
+        "provider_recovery_smoke_available_count": (
+            "provider_recovery_smoke_available_count"
+        ),
+        "provider_recovery_smoke_unavailable_count": (
+            "provider_recovery_smoke_unavailable_count"
+        ),
+        "provider_recovery_all_smokes_available": (
+            "provider_recovery_all_smokes_available"
+        ),
+        "provider_recovery_network_call_count": (
+            "provider_recovery_network_call_count"
+        ),
+        "provider_recovery_all_network_calls": "provider_recovery_all_network_calls",
+        "provider_recovery_mutates_local_state_count": (
+            "provider_recovery_mutates_local_state_count"
+        ),
+        "provider_recovery_any_mutates_local_state": (
+            "provider_recovery_any_mutates_local_state"
+        ),
+        "provider_recovery_secret_values_returned_count": (
+            "provider_recovery_secret_values_returned_count"
+        ),
+        "provider_recovery_any_secret_values_returned": (
+            "provider_recovery_any_secret_values_returned"
+        ),
+        "provider_recovery_next_setup_actions": (
+            "provider_recovery_next_setup_actions"
+        ),
+        "provider_recovery_exception_types": "provider_recovery_exception_types",
+        "provider_recovery_exception_message_returned_count": (
+            "provider_recovery_exception_message_returned_count"
+        ),
+        "provider_recovery_any_exception_messages_returned": (
+            "provider_recovery_any_exception_messages_returned"
+        ),
+        "provider_recovery_url_returned_count": "provider_recovery_url_returned_count",
+        "provider_recovery_any_urls_returned": "provider_recovery_any_urls_returned",
+        "provider_recovery_statuses": "provider_recovery_statuses",
+        "provider_recovery_all_pending": "provider_recovery_all_pending",
+        "provider_recovery_retry_ready": "provider_recovery_retry_ready",
+        "provider_recovery_all_retryable": "provider_recovery_all_retryable",
+        "provider_recovery_has_pending": "provider_recovery_has_pending",
+        "provider_recovery_has_blocked": "provider_recovery_has_blocked",
+        "provider_recovery_provider_families": "provider_recovery_provider_families",
+        "provider_recovery_providers": "provider_recovery_providers",
+        "provider_recovery_pending_provider_families": (
+            "provider_recovery_pending_provider_families"
+        ),
+        "provider_recovery_pending_providers": (
+            "provider_recovery_pending_providers"
+        ),
+        "provider_recovery_blocked_provider_families": (
+            "provider_recovery_blocked_provider_families"
+        ),
+        "provider_recovery_blocked_providers": (
+            "provider_recovery_blocked_providers"
+        ),
+        "provider_recovery_smoke_command_names": (
+            "provider_recovery_smoke_command_names"
+        ),
+        "provider_recovery_smoke_commands": "provider_recovery_smoke_commands",
+        "provider_recovery_pending_smoke_command_names": (
+            "provider_recovery_pending_smoke_command_names"
+        ),
+        "provider_recovery_pending_smoke_commands": (
+            "provider_recovery_pending_smoke_commands"
+        ),
+        "provider_recovery_blocked_smoke_command_names": (
+            "provider_recovery_blocked_smoke_command_names"
+        ),
+        "provider_recovery_blocked_smoke_commands": (
+            "provider_recovery_blocked_smoke_commands"
+        ),
+        "provider_recovery_network_call_policies": (
+            "provider_recovery_network_call_policies"
+        ),
+        "provider_recovery_preferred_env_keys": (
+            "provider_recovery_preferred_env_keys"
+        ),
+        "provider_recovery_accepted_env_keys": (
+            "provider_recovery_accepted_env_keys"
+        ),
+        "provider_recovery_accepted_env_key_groups": (
+            "provider_recovery_accepted_env_key_groups"
+        ),
+        "next_pending_recovery_smoke_command_name": (
+            "next_pending_recovery_smoke_command_name"
+        ),
+        "next_pending_recovery_smoke_command": "next_pending_recovery_smoke_command",
+        "next_pending_recovery_provider_family": (
+            "next_pending_recovery_provider_family"
+        ),
+        "next_pending_recovery_provider": "next_pending_recovery_provider",
+        "next_pending_recovery_selected_provider_class": (
+            "next_pending_recovery_selected_provider_class"
+        ),
+        "next_pending_recovery_provider_route_data_mode": (
+            "next_pending_recovery_provider_route_data_mode"
+        ),
+        "next_pending_recovery_provider_route_live_data_required": (
+            "next_pending_recovery_provider_route_live_data_required"
+        ),
+        "next_pending_recovery_next_setup_action": (
+            "next_pending_recovery_next_setup_action"
+        ),
+        "next_pending_recovery_preferred_env_key": (
+            "next_pending_recovery_preferred_env_key"
+        ),
+        "next_pending_recovery_accepted_env_keys": (
+            "next_pending_recovery_accepted_env_keys"
+        ),
+        "next_pending_recovery_network_call_policy": (
+            "next_pending_recovery_network_call_policy"
+        ),
+        "next_pending_recovery_smoke_available": (
+            "next_pending_recovery_smoke_available"
+        ),
+        "next_pending_recovery_network_call": "next_pending_recovery_network_call",
+        "next_pending_recovery_mutates_local_state": (
+            "next_pending_recovery_mutates_local_state"
+        ),
+        "next_pending_recovery_secret_values_returned": (
+            "next_pending_recovery_secret_values_returned"
+        ),
+        "next_blocked_recovery_smoke_command_name": (
+            "next_blocked_recovery_smoke_command_name"
+        ),
+        "next_blocked_recovery_smoke_command": "next_blocked_recovery_smoke_command",
+        "next_blocked_recovery_provider_family": (
+            "next_blocked_recovery_provider_family"
+        ),
+        "next_blocked_recovery_provider": "next_blocked_recovery_provider",
+        "next_blocked_recovery_selected_provider_class": (
+            "next_blocked_recovery_selected_provider_class"
+        ),
+        "next_blocked_recovery_provider_route_data_mode": (
+            "next_blocked_recovery_provider_route_data_mode"
+        ),
+        "next_blocked_recovery_provider_route_live_data_required": (
+            "next_blocked_recovery_provider_route_live_data_required"
+        ),
+        "next_blocked_recovery_next_setup_action": (
+            "next_blocked_recovery_next_setup_action"
+        ),
+        "next_blocked_recovery_preferred_env_key": (
+            "next_blocked_recovery_preferred_env_key"
+        ),
+        "next_blocked_recovery_accepted_env_keys": (
+            "next_blocked_recovery_accepted_env_keys"
+        ),
+        "next_blocked_recovery_network_call_policy": (
+            "next_blocked_recovery_network_call_policy"
+        ),
+        "next_blocked_recovery_smoke_available": (
+            "next_blocked_recovery_smoke_available"
+        ),
+        "next_blocked_recovery_network_call": "next_blocked_recovery_network_call",
+        "next_blocked_recovery_mutates_local_state": (
+            "next_blocked_recovery_mutates_local_state"
+        ),
+        "next_blocked_recovery_secret_values_returned": (
+            "next_blocked_recovery_secret_values_returned"
+        ),
+        "next_recovery_smoke_command_name": "next_recovery_smoke_command_name",
+        "next_recovery_smoke_command": "next_recovery_smoke_command",
+        "next_recovery_provider_family": "next_recovery_provider_family",
+        "next_recovery_provider": "next_recovery_provider",
+        "next_recovery_selected_provider_class": (
+            "next_recovery_selected_provider_class"
+        ),
+        "next_recovery_provider_route_data_mode": (
+            "next_recovery_provider_route_data_mode"
+        ),
+        "next_recovery_provider_route_live_data_required": (
+            "next_recovery_provider_route_live_data_required"
+        ),
+        "next_recovery_next_setup_action": "next_recovery_next_setup_action",
+        "next_recovery_preferred_env_key": "next_recovery_preferred_env_key",
+        "next_recovery_accepted_env_keys": "next_recovery_accepted_env_keys",
+        "next_recovery_network_call_policy": "next_recovery_network_call_policy",
+        "next_recovery_smoke_available": "next_recovery_smoke_available",
+        "next_recovery_network_call": "next_recovery_network_call",
+        "next_recovery_mutates_local_state": "next_recovery_mutates_local_state",
+        "next_recovery_exception_type": "next_recovery_exception_type",
+        "next_recovery_exception_message_returned": (
+            "next_recovery_exception_message_returned"
+        ),
+        "next_recovery_url_returned": "next_recovery_url_returned",
+        "next_recovery_secret_values_returned": (
+            "next_recovery_secret_values_returned"
+        ),
+    }
+    for payload_key, summary_key in mapped_fields.items():
+        assert payload[payload_key] == recovery_summary[summary_key]
+
+
+def assert_api_key_command_summary_top_level_fields(
+    payload: dict[str, Any],
+) -> None:
+    command_summary = payload["api_key_command_summary"]
+    copy_dotenv_command = command_summary["copy_dotenv_command"]
+    next_smoke_command = command_summary["next_smoke_command"]
+    one_shot_pipeline_smoke = command_summary["one_shot_pipeline_smoke"]
+    assert payload["api_key_copy_dotenv_command"] == (
+        copy_dotenv_command["command"]
+    )
+    assert payload["api_key_copy_dotenv_required"] is (
+        copy_dotenv_command["required"]
+    )
+    assert payload["api_key_copy_dotenv_command_name"] == (
+        copy_dotenv_command.get("name")
+    )
+    assert payload["api_key_copy_dotenv_command_network_call"] is (
+        copy_dotenv_command["network_call"]
+    )
+    assert payload["api_key_copy_dotenv_command_mutates_local_state"] is (
+        copy_dotenv_command["mutates_local_state"]
+    )
+    assert payload["api_key_copy_dotenv_command_secret_values_returned"] is (
+        copy_dotenv_command["secret_values_returned"]
+    )
+    assert payload["api_key_next_smoke_command"] == (
+        next_smoke_command["command"]
+    )
+    assert payload["api_key_next_smoke_command_name"] == (
+        next_smoke_command["name"]
+    )
+    assert payload["api_key_next_smoke_command_network_call"] is (
+        next_smoke_command["network_call"]
+    )
+    assert payload["api_key_next_smoke_command_network_call_policy"] == (
+        next_smoke_command.get("network_call_policy")
+    )
+    assert payload["api_key_next_smoke_command_mutates_local_state"] is (
+        next_smoke_command.get("mutates_local_state") is True
+    )
+    assert payload["api_key_next_smoke_command_secret_values_returned"] is (
+        next_smoke_command.get("secret_values_returned") is True
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_command"] == (
+        one_shot_pipeline_smoke["command"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_command_name"] == (
+        one_shot_pipeline_smoke["name"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_network_call"] is (
+        one_shot_pipeline_smoke["network_call"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_network_call_policy"] == (
+        one_shot_pipeline_smoke["network_call_policy"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_mutates_local_state"] is (
+        one_shot_pipeline_smoke["mutates_local_state"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_secret_values_returned"] is (
+        one_shot_pipeline_smoke["secret_values_returned"]
+    )
+
+
 @pytest.fixture(autouse=True)
 def clear_settings_cache_after_readiness_env_tests() -> None:
     get_settings.cache_clear()
@@ -3630,6 +3913,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert summary_payload["api_key_provider_recovery_all_selected_routes_live"] is (
         provider_recovery_summary["all_selected_routes_live"]
     )
+    assert_provider_recovery_summary_top_level_fields(summary_payload)
     assert summary_payload["provider_recovery_action_status"] == "ready_to_retry"
     assert summary_payload["provider_recovery_item_count"] == 3
     assert summary_payload["provider_recovery_pending_count"] == 3
@@ -6367,6 +6651,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert_provider_route_summary_top_level_fields(payload)
     assert_pipeline_check_summary_top_level_fields(payload)
     assert_pipeline_failure_summary_top_level_fields(payload)
+    assert_api_key_command_summary_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -8007,6 +8292,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_provider_recovery_all_selected_routes_live"] is (
         payload["api_key_provider_recovery_summary"]["all_selected_routes_live"]
     )
+    assert_provider_recovery_summary_top_level_fields(payload)
     recovery_checklist_summary = payload[
         "api_key_provider_recovery_checklist_summary"
     ]
@@ -10036,6 +10322,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         news_configured_env_keys=["NEWS_API_KEY"],
         ready_to_run_live_smoke=True,
     )
+    assert_api_key_command_summary_top_level_fields(payload)
     assert command_summary["provider_smoke_command_count"] == 3
     assert payload["api_key_provider_smoke_commands_by_family"] == {
         row["provider_family"]: row["command"]
