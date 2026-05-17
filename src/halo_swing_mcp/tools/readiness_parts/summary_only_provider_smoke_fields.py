@@ -69,6 +69,17 @@ def _api_key_provider_smoke_top_level_fields(
         family: _string_list(row.get("accepted_env_keys"))
         for family, row in provider_smoke_command_rows_by_family.items()
     }
+    provider_smoke_accepted_env_key_groups = [
+        _string_list(row.get("accepted_env_keys"))
+        for row in provider_smoke_command_rows
+    ]
+    provider_smoke_unique_accepted_env_keys = _ordered_unique_strings(
+        [
+            env_key
+            for group in provider_smoke_accepted_env_key_groups
+            for env_key in group
+        ]
+    )
     provider_smoke_preferred_env_keys_by_family = {
         family: row.get("preferred_env_key")
         for family, row in provider_smoke_command_rows_by_family.items()
@@ -555,6 +566,18 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_accepted_env_keys_by_family": (
             provider_smoke_accepted_env_keys_by_family
+        ),
+        "api_key_provider_smoke_accepted_env_key_groups": (
+            provider_smoke_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_accepted_env_key_group_count": len(
+            provider_smoke_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_unique_accepted_env_keys": (
+            provider_smoke_unique_accepted_env_keys
+        ),
+        "api_key_provider_smoke_unique_accepted_env_key_count": len(
+            provider_smoke_unique_accepted_env_keys
         ),
         "api_key_provider_smoke_preferred_env_keys_by_family": (
             provider_smoke_preferred_env_keys_by_family

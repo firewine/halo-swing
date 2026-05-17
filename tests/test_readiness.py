@@ -1353,6 +1353,28 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     expected_preferred_env_keys = list(
         dict.fromkeys(expected_preferred_env_keys_by_family.values())
     )
+    expected_accepted_env_key_groups = [
+        row["accepted_env_keys"] for row in provider_smoke_rows
+    ]
+    expected_unique_accepted_env_keys = list(
+        dict.fromkeys(
+            env_key
+            for group in expected_accepted_env_key_groups
+            for env_key in group
+        )
+    )
+    assert payload["api_key_provider_smoke_accepted_env_key_groups"] == (
+        expected_accepted_env_key_groups
+    )
+    assert payload["api_key_provider_smoke_accepted_env_key_group_count"] == len(
+        expected_accepted_env_key_groups
+    )
+    assert payload["api_key_provider_smoke_unique_accepted_env_keys"] == (
+        expected_unique_accepted_env_keys
+    )
+    assert payload["api_key_provider_smoke_unique_accepted_env_key_count"] == len(
+        expected_unique_accepted_env_keys
+    )
     assert payload["api_key_provider_smoke_preferred_env_keys_by_family"] == (
         expected_preferred_env_keys_by_family
     )
