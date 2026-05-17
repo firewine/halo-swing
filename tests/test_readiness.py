@@ -1353,6 +1353,16 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         row["provider_family"]: row["status"]
         for row in expected_next_action_env_key_rows
     }
+    expected_next_action_ready_count = sum(
+        1
+        for status in expected_next_action_statuses_by_family.values()
+        if status == "ready"
+    )
+    expected_next_action_blocked_count = sum(
+        1
+        for status in expected_next_action_statuses_by_family.values()
+        if status != "ready"
+    )
     expected_next_action_statuses = list(
         dict.fromkeys(expected_next_action_statuses_by_family.values())
     )
@@ -1494,6 +1504,20 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     )
     assert payload["api_key_provider_smoke_next_action_statuses_by_family"] == (
         expected_next_action_statuses_by_family
+    )
+    assert payload["api_key_provider_smoke_next_action_ready_count"] == (
+        expected_next_action_ready_count
+    )
+    assert payload["api_key_provider_smoke_next_action_blocked_count"] == (
+        expected_next_action_blocked_count
+    )
+    assert payload["api_key_provider_smoke_next_action_all_ready"] is (
+        bool(expected_next_action_statuses_by_family)
+        and expected_next_action_ready_count
+        == len(expected_next_action_statuses_by_family)
+    )
+    assert payload["api_key_provider_smoke_next_action_any_blocked"] is (
+        expected_next_action_blocked_count > 0
     )
     assert payload["api_key_provider_smoke_next_action_setup_actions"] == (
         expected_next_action_setup_actions

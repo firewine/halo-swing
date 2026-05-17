@@ -321,6 +321,16 @@ def _api_key_provider_smoke_top_level_fields(
         family: row.get("status")
         for family, row in provider_smoke_next_action_rows_by_family.items()
     }
+    provider_smoke_next_action_ready_count = sum(
+        1
+        for status in provider_smoke_next_action_statuses_by_family.values()
+        if status == "ready"
+    )
+    provider_smoke_next_action_blocked_count = sum(
+        1
+        for status in provider_smoke_next_action_statuses_by_family.values()
+        if status != "ready"
+    )
     provider_smoke_next_action_statuses = _ordered_unique_strings(
         provider_smoke_next_action_statuses_by_family.values()
     )
@@ -503,6 +513,20 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_statuses_by_family": (
             provider_smoke_next_action_statuses_by_family
+        ),
+        "api_key_provider_smoke_next_action_ready_count": (
+            provider_smoke_next_action_ready_count
+        ),
+        "api_key_provider_smoke_next_action_blocked_count": (
+            provider_smoke_next_action_blocked_count
+        ),
+        "api_key_provider_smoke_next_action_all_ready": (
+            bool(provider_smoke_next_action_statuses_by_family)
+            and provider_smoke_next_action_ready_count
+            == len(provider_smoke_next_action_statuses_by_family)
+        ),
+        "api_key_provider_smoke_next_action_any_blocked": (
+            provider_smoke_next_action_blocked_count > 0
         ),
         "api_key_provider_smoke_next_action_setup_actions": (
             provider_smoke_next_action_setup_actions

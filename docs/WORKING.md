@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PROVIDER_MAP_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PROVIDER_MAP_FIELDS_GATE
+status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_READINESS_AGGREGATE_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_READINESS_AGGREGATE_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider smoke next-action provider map fields
+next_atomic_step: surface summary-only API-key provider smoke next-action readiness aggregate fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key provider smoke next-action provider map by family
-  - summary-only tests prove provider smoke next-action provider map fields match the selected ready or blocked command rows
-  - README and DevOps guide document the top-level API-key provider smoke next-action provider map fields
+  - summary-only output exposes API-key provider smoke next-action ready/blocked counts and aggregate readiness flags
+  - summary-only tests prove provider smoke next-action readiness aggregates match the selected ready or blocked command rows
+  - README and DevOps guide document the top-level API-key provider smoke next-action readiness aggregate fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider smoke next-action provider map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider smoke next-action readiness aggregate fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PROVIDER_MAP_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_READINESS_AGGREGATE_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider smoke next-action provider map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key provider smoke next-action readiness aggregate fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes provider-smoke next-action provider by family without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes provider-smoke next-action readiness aggregate fields without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PROVIDER_MAP_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_NEXT_ACTION_PROVIDER_MAP_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider smoke next-action provider map fields
 ```
 
 Previous completed directive:
