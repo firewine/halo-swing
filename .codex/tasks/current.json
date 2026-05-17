@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_SETUP_DOCS_INTEGRATION_NEXT_ACTION_PARITY_GATE",
+  "gate_id": "API_KEY_SETUP_DOCS_SETUP_PROGRESS_PARITY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.840",
-  "next_atomic_step": "lock README and DevOps API-key integration next-action field parity",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.841",
+  "next_atomic_step": "lock README and DevOps API-key setup progress field parity",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.840",
+    "docs/halo-swing-development-plan.md#3.841",
     "README.md",
     "tests/test_setup_docs.py"
   ],
@@ -32,7 +32,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_integration_next_action_fields_in_sync -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_progress_fields_in_sync -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -50,12 +50,12 @@
     "read_only": true
   },
   "done_means": [
-    "README and DevOps setup guide coverage assert the same API-key integration next-action provider, command, status, and safety field names",
-    "README and DevOps setup guide coverage assert the same API-key integration next-action env-key, expected contract/check, dotenv setup, and example-count field names",
+    "README and DevOps setup guide coverage assert the same API-key setup checklist progress, ready/blocking, and next-blocking field names",
+    "README and DevOps setup guide coverage assert the same API-key setup configured/missing provider-family count and route-status field names",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified README/DevOps integration next-action parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified README/DevOps setup progress parity guard, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

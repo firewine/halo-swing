@@ -660,6 +660,31 @@ def test_setup_docs_keep_api_key_integration_next_action_fields_in_sync() -> Non
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_setup_progress_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_setup_current_step",
+        "api_key_setup_ready",
+        "api_key_setup_step_count",
+        "api_key_setup_ready_step_names",
+        "api_key_setup_ready_step_count",
+        "api_key_setup_blocking_step_names",
+        "api_key_setup_blocking_step_count",
+        "api_key_setup_next_blocking_step",
+        "api_key_setup_configured_provider_families",
+        "api_key_setup_missing_provider_families",
+        "api_key_setup_configured_provider_family_count",
+        "api_key_setup_required_provider_family_count",
+        "api_key_setup_ready_to_run_live_smoke",
+        "api_key_setup_provider_route_status",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
