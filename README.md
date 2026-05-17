@@ -461,6 +461,11 @@ mirrors the no-secret setup sequence as `api_key_setup_quickstart_steps`,
 `api_key_setup_quickstart_step_names`,
 `api_key_setup_quickstart_step_count`, `api_key_setup_quickstart_next_step`,
 and `api_key_setup_quickstart_next_command`.
+It also exposes `api_key_setup_quickstart_command_plan`,
+`api_key_setup_quickstart_command_plan_names`,
+`api_key_setup_quickstart_command_plan_count`, and
+`api_key_setup_quickstart_next_command_plan_item`, so compact clients can show
+the copy/status/provider-smoke/one-shot commands in operator order.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

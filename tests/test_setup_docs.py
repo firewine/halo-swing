@@ -356,6 +356,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_setup_quickstart_step_count" in guide
     assert "api_key_setup_quickstart_next_step" in guide
     assert "api_key_setup_quickstart_next_command" in guide
+    assert "api_key_setup_quickstart_command_plan" in guide
+    assert "api_key_setup_quickstart_command_plan_names" in guide
+    assert "api_key_setup_quickstart_command_plan_count" in guide
+    assert "api_key_setup_quickstart_next_command_plan_item" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

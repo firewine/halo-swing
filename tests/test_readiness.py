@@ -5526,6 +5526,53 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_quickstart_next_command"] == (
         "cp .env.example .env"
     )
+    assert payload["api_key_setup_quickstart_command_plan_names"] == [
+        "copy_env_example_to_env",
+        "get_live_data_api_key_status",
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_count"] == 6
+    assert payload["api_key_setup_quickstart_command_plan"][0] == {
+        "name": "copy_env_example_to_env",
+        "kind": "copy_dotenv",
+        "command": "cp .env.example .env",
+        "provider_family": None,
+        "status": "required",
+        "network_call": False,
+        "network_call_policy": None,
+        "mutates_local_state": True,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_quickstart_command_plan"][1] == {
+        "name": "get_live_data_api_key_status",
+        "kind": "status_check",
+        "command": (
+            "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+            "get_live_data_api_key_status --no-audit"
+        ),
+        "provider_family": None,
+        "status": "ready",
+        "network_call": False,
+        "network_call_policy": None,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["api_key_setup_quickstart_command_plan"][2]["kind"] == (
+        "provider_smoke"
+    )
+    assert payload["api_key_setup_quickstart_command_plan"][2][
+        "provider_family"
+    ] == "market"
+    assert payload["api_key_setup_quickstart_command_plan"][-1]["kind"] == (
+        "pipeline_smoke"
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_item"]["command"] == (
+        payload["api_key_setup_quickstart_next_command"]
+        or payload["api_key_setup_quickstart_command_plan"][0]["command"]
+    )
     assert payload["api_key_setup_quickstart_steps"][0] == {
         "name": "prepare_dotenv",
         "status": "pending",
@@ -7056,6 +7103,32 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         payload["api_key_operator_checklist_summary"][
             "next_blocking_action_command"
         ]
+    )
+    assert payload["api_key_setup_quickstart_command_plan_names"] == [
+        "copy_env_example_to_env",
+        "get_live_data_api_key_status",
+        "get_market_snapshot_live_smoke",
+        "get_macro_snapshot_live_smoke",
+        "get_news_bundle_live_smoke",
+        "run_api_key_pipeline_smoke",
+    ]
+    assert payload["api_key_setup_quickstart_command_plan_count"] == 6
+    assert payload["api_key_setup_quickstart_command_plan"][2:5] == [
+        {
+            "name": row["smoke_command_name"],
+            "kind": "provider_smoke",
+            "command": row["command"],
+            "provider_family": row["provider_family"],
+            "status": row["status"],
+            "network_call": row["network_call"],
+            "network_call_policy": row["network_call_policy"],
+            "mutates_local_state": row["mutates_local_state"],
+            "secret_values_returned": row["secret_values_returned"],
+        }
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    ]
+    assert payload["api_key_setup_quickstart_next_command_plan_item"] == (
+        payload["api_key_setup_quickstart_command_plan"][0]
     )
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
         family: row["preferred_env_key"]

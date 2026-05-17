@@ -3104,6 +3104,102 @@ def _api_key_pipeline_summary_only_payload(
         for row in provider_smoke_command_rows
         if isinstance(row.get("provider_family"), str)
     }
+    quickstart_command_plan: list[dict[str, Any]] = []
+    if copy_dotenv_command.get("command"):
+        quickstart_command_plan.append(
+            {
+                "name": copy_dotenv_command.get("name"),
+                "kind": "copy_dotenv",
+                "command": copy_dotenv_command.get("command"),
+                "provider_family": None,
+                "status": "required"
+                if copy_dotenv_command.get("required") is True
+                else "ready",
+                "network_call": copy_dotenv_command.get("network_call") is True,
+                "network_call_policy": copy_dotenv_command.get(
+                    "network_call_policy"
+                ),
+                "mutates_local_state": (
+                    copy_dotenv_command.get("mutates_local_state") is True
+                ),
+                "secret_values_returned": (
+                    copy_dotenv_command.get("secret_values_returned") is True
+                ),
+            }
+        )
+    if (
+        next_smoke_command.get("command")
+        and next_smoke_command.get("command")
+        != one_shot_pipeline_smoke.get("command")
+    ):
+        quickstart_command_plan.append(
+            {
+                "name": next_smoke_command.get("name"),
+                "kind": "status_check",
+                "command": next_smoke_command.get("command"),
+                "provider_family": None,
+                "status": "ready",
+                "network_call": next_smoke_command.get("network_call") is True,
+                "network_call_policy": next_smoke_command.get(
+                    "network_call_policy"
+                ),
+                "mutates_local_state": (
+                    next_smoke_command.get("mutates_local_state") is True
+                ),
+                "secret_values_returned": (
+                    next_smoke_command.get("secret_values_returned") is True
+                ),
+            }
+        )
+    for row in provider_smoke_command_rows:
+        quickstart_command_plan.append(
+            {
+                "name": row.get("smoke_command_name"),
+                "kind": "provider_smoke",
+                "command": row.get("command"),
+                "provider_family": row.get("provider_family"),
+                "status": row.get("status"),
+                "network_call": row.get("network_call") is True,
+                "network_call_policy": row.get("network_call_policy"),
+                "mutates_local_state": row.get("mutates_local_state") is True,
+                "secret_values_returned": (
+                    row.get("secret_values_returned") is True
+                ),
+            }
+        )
+    if one_shot_pipeline_smoke.get("command"):
+        quickstart_command_plan.append(
+            {
+                "name": one_shot_pipeline_smoke.get("name"),
+                "kind": "pipeline_smoke",
+                "command": one_shot_pipeline_smoke.get("command"),
+                "provider_family": None,
+                "status": "ready"
+                if setup_status_summary.get("ready_to_run_live_smoke") is True
+                else "blocked",
+                "network_call": one_shot_pipeline_smoke.get("network_call") is True,
+                "network_call_policy": one_shot_pipeline_smoke.get(
+                    "network_call_policy"
+                ),
+                "mutates_local_state": (
+                    one_shot_pipeline_smoke.get("mutates_local_state") is True
+                ),
+                "secret_values_returned": (
+                    one_shot_pipeline_smoke.get("secret_values_returned") is True
+                ),
+            }
+        )
+    next_quickstart_command = api_key_operator_checklist_summary.get(
+        "next_blocking_action_command"
+    )
+    next_quickstart_command_plan_item = next(
+        (
+            row
+            for row in quickstart_command_plan
+            if row.get("command") == next_quickstart_command
+        ),
+        quickstart_command_plan[0] if quickstart_command_plan else None,
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3222,6 +3318,16 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_setup_quickstart_next_command": (
             api_key_operator_checklist_summary.get("next_blocking_action_command")
+        ),
+        "api_key_setup_quickstart_command_plan": quickstart_command_plan,
+        "api_key_setup_quickstart_command_plan_names": _string_list(
+            [row.get("name") for row in quickstart_command_plan]
+        ),
+        "api_key_setup_quickstart_command_plan_count": len(
+            quickstart_command_plan
+        ),
+        "api_key_setup_quickstart_next_command_plan_item": (
+            next_quickstart_command_plan_item
         ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
