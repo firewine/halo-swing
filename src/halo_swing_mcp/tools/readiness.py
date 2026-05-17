@@ -2015,6 +2015,33 @@ def _api_key_operator_checklist_summary(
     }
     preferred_env_key = next_blocking_action.get("preferred_env_key")
     accepted_env_keys = _string_list(next_blocking_action.get("accepted_env_keys"))
+    next_blocking_provider_family = (
+        next_blocking_action.get("provider_family")
+        or next_provider_recovery_action.get("provider_family")
+        or next_provider_smoke.get("provider_family")
+    )
+    next_blocking_provider = (
+        next_blocking_action.get("provider")
+        or next_provider_recovery_action.get("provider")
+        or next_provider_smoke.get("provider")
+    )
+    next_blocking_smoke_command_name = (
+        next_blocking_action.get("smoke_command_name")
+        or next_blocking_action.get("next_provider_smoke_command_name")
+        or next_blocking_action.get("next_provider_recovery_smoke_command_name")
+        or next_provider_recovery_action.get("smoke_command_name")
+        or next_provider_smoke.get("smoke_command_name")
+    )
+    if isinstance(next_blocking_provider_family, str):
+        summary["next_blocking_action_provider_family"] = (
+            next_blocking_provider_family
+        )
+    if isinstance(next_blocking_provider, str):
+        summary["next_blocking_action_provider"] = next_blocking_provider
+    if isinstance(next_blocking_smoke_command_name, str):
+        summary["next_blocking_action_smoke_command_name"] = (
+            next_blocking_smoke_command_name
+        )
     if isinstance(preferred_env_key, str):
         summary["next_blocking_action_preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
@@ -2060,6 +2087,29 @@ def _api_key_operator_checklist_step_summary(
         step.get("accepted_env_keys")
         or next_provider_recovery_action.get("accepted_env_keys")
     )
+    provider_family = (
+        step.get("provider_family")
+        or next_provider_recovery_action.get("provider_family")
+        or next_provider_smoke.get("provider_family")
+    )
+    provider = (
+        step.get("provider")
+        or next_provider_recovery_action.get("provider")
+        or next_provider_smoke.get("provider")
+    )
+    smoke_command_name = (
+        step.get("smoke_command_name")
+        or step.get("next_provider_smoke_command_name")
+        or step.get("next_provider_recovery_smoke_command_name")
+        or next_provider_recovery_action.get("smoke_command_name")
+        or next_provider_smoke.get("smoke_command_name")
+    )
+    if isinstance(provider_family, str):
+        summary["provider_family"] = provider_family
+    if isinstance(provider, str):
+        summary["provider"] = provider
+    if isinstance(smoke_command_name, str):
+        summary["smoke_command_name"] = smoke_command_name
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:

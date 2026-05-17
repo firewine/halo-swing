@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_STAGE_CHECK_SUMMARY_PROVIDER_FIELDS_GATE",
+  "gate_id": "API_KEY_OPERATOR_CHECKLIST_SUMMARY_PROVIDER_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.765",
-  "next_atomic_step": "add provider identity fields to API-key pipeline stage and check summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.766",
+  "next_atomic_step": "add provider identity fields to API-key operator checklist summary",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.764",
+    "docs/halo-swing-development-plan.md#3.766",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -39,9 +39,9 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\",\"symbols\":[\"QQQ\"],\"topic\":\"macro\",\"summary_only\":true}' --no-audit",
-    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); stage=payload[\"api_key_pipeline_stage_summary\"][\"first_failed_stage\"]; check=payload[\"api_key_pipeline_check_summary\"][\"first_failed_check\"]; print(stage[\"provider_family\"], stage[\"provider\"], stage[\"next_provider_recovery_smoke_command_name\"], check[\"provider_family\"], check[\"provider\"], check[\"smoke_command_name\"], stage[\"secret_values_returned\"], check[\"secret_values_returned\"])'",
+    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload[\"api_key_operator_checklist_summary\"]; step=summary[\"steps\"][-1]; print(summary[\"next_blocking_action_provider_family\"], summary[\"next_blocking_action_provider\"], summary[\"next_blocking_action_smoke_command_name\"], step[\"provider_family\"], step[\"provider\"], step[\"smoke_command_name\"], summary[\"secret_values_returned\"], step[\"secret_values_returned\"])'",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -57,16 +57,16 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_pipeline_stage_summary failed stage rows include provider_family, provider, and next_provider_recovery_smoke_command_name when recovery smoke metadata exists",
-    "api_key_pipeline_check_summary failed check rows mirror provider_family, provider, and smoke_command_name from the matching failed stage without secret values",
-    "focused tests cover provider identity fields in summary_only API-key stage and check summaries",
-    "fake-key API-key pipeline summary-only CLI returns stage/check provider identity without secret values",
-    "README and DevOps setup guide document stage/check provider identity",
-    "setup docs tests assert stage/check provider identity guidance",
+    "api_key_operator_checklist_summary next blocking action includes provider_family, provider, and smoke_command_name when provider smoke or recovery metadata exists",
+    "api_key_operator_checklist_summary step rows include provider_family, provider, and smoke_command_name without secret values",
+    "focused tests cover provider identity fields in summary_only API-key operator checklist summary",
+    "fake-key API-key pipeline summary-only CLI returns operator checklist provider identity without secret values",
+    "README and DevOps setup guide document operator checklist provider identity",
+    "setup docs tests assert operator checklist provider identity guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key stage/check summary provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key operator checklist summary provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

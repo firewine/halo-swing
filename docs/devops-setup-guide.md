@@ -508,10 +508,14 @@ It keeps `api_key_operator_checklist_summary`
 (`api_key_operator_checklist_summary.v1`) with `current_step`, `ready`,
 ready/blocking step names and counts, `next_blocking_action_name`,
 `next_blocking_action_command`, provider recovery status, recovery env-key hints
-such as `next_blocking_action_preferred_env_key`, and compact setup step rows
-including recovery `preferred_env_key` and `accepted_env_keys`, so the compact
-response still shows the next local setup or recovery action without returning
-the full checklist payload.
+such as `next_blocking_action_preferred_env_key`, provider identity fields such
+as `next_blocking_action_provider_family`,
+`next_blocking_action_provider`, and
+`next_blocking_action_smoke_command_name`, and compact setup step rows including
+recovery `provider_family`, `provider`, `smoke_command_name`,
+`preferred_env_key`, and `accepted_env_keys`, so the compact response still
+shows the next local setup or recovery action without returning the full
+checklist payload.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

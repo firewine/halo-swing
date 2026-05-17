@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.766 API Key Operator Checklist Summary Provider Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_operator_checklist_summary`는 next blocking action의 command, recovery
+상태, env-key alias를 보여주지만 provider recovery 또는 provider smoke 단계에서 provider
+family/provider/smoke command identity를 직접 노출하지 않았다. 이번 slice는 no-secret
+`next_blocking_action_provider_family`, `next_blocking_action_provider`,
+`next_blocking_action_smoke_command_name`과 step row의 `provider_family`, `provider`,
+`smoke_command_name`을 추가해, compact operator checklist만으로 다음 provider 대상과
+command를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_operator_checklist_summary next blocking action includes next_blocking_action_provider_family, next_blocking_action_provider, and next_blocking_action_smoke_command_name when provider smoke or recovery metadata exists
+  - api_key_operator_checklist_summary step rows include provider_family, provider, and smoke_command_name without secret values
+  - focused tests cover provider identity fields in summary_only API-key operator checklist summary
+  - fake-key API-key pipeline summary-only CLI returns operator checklist provider identity without secret values
+  - README and DevOps setup guide document operator checklist provider identity
+  - tests/test_setup_docs.py asserts operator checklist provider identity guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only operator checklist provider identity returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_operator_checklist_summary"]; step=summary["steps"][-1]; print(summary["next_blocking_action_provider_family"], summary["next_blocking_action_provider"], summary["next_blocking_action_smoke_command_name"], step["provider_family"], step["provider"], step["smoke_command_name"], summary["secret_values_returned"], step["secret_values_returned"])' -> market polygon get_market_snapshot_live_smoke market polygon get_market_snapshot_live_smoke False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.765 API Key Stage/Check Summary Provider Fields Gate Record - 2026-05-17
 
 ### A. 목적

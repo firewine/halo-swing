@@ -5132,6 +5132,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert checklist_summary["next_blocking_action_network_call"] is True
     assert checklist_summary["next_blocking_action_mutates_local_state"] is False
+    assert checklist_summary["next_blocking_action_provider_family"] == "market"
+    assert checklist_summary["next_blocking_action_provider"] == "polygon"
+    assert checklist_summary["next_blocking_action_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert checklist_summary["next_blocking_action_preferred_env_key"] == (
         "POLYGON_API_KEY"
     )
@@ -5150,6 +5155,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert checklist_summary["steps"][-1][
         "next_provider_recovery_smoke_command_name"
     ] == "get_market_snapshot_live_smoke"
+    assert checklist_summary["steps"][-1]["provider_family"] == "market"
+    assert checklist_summary["steps"][-1]["provider"] == "polygon"
+    assert checklist_summary["steps"][-1]["smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert checklist_summary["steps"][-1]["preferred_env_key"] == "POLYGON_API_KEY"
     assert checklist_summary["steps"][-1]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
