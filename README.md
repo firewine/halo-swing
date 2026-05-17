@@ -393,6 +393,7 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `provider_recovery_any_exception_messages_returned`,
 `provider_recovery_url_returned_count`,
 `provider_recovery_any_urls_returned`,
+`provider_recovery_network_call_policies`,
 `provider_recovery_provider_families`,
 `provider_recovery_providers`, `provider_recovery_smoke_command_names`,
 `provider_recovery_smoke_commands`,

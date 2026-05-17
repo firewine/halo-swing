@@ -2696,6 +2696,9 @@ def _api_key_provider_recovery_summary(
         ),
         "provider_recovery_url_returned_count": url_returned_count,
         "provider_recovery_any_urls_returned": url_returned_count > 0,
+        "provider_recovery_network_call_policies": _ordered_unique_strings(
+            [item.get("network_call_policy") for item in compact_items]
+        ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
         ),
