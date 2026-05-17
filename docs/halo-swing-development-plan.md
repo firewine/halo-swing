@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.816 API Key Operator Checklist Dotenv Examples Gate Record - 2026-05-17
+
+### A. 목적
+
+3.815에서 `api_key_setup_file_summary`는 no-secret `dotenv_examples`를 갖게 됐다.
+그러나 `.env`가 준비된 뒤 실제 다음 blocker가 되는 `fill_live_data_api_keys` 단계와
+operator checklist/action row에는 아직 예시가 없어, 사용자가 compact checklist만 볼 때
+`KEY=placeholder` 줄을 다시 setup file summary에서 찾아야 한다. 이번 slice는 fill-key
+operator row에도 같은 no-secret examples를 미러링해 API 키만 교체하는 흐름을 더 직접화한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - live_data_setup_steps fill_live_data_api_keys row exposes no-secret dotenv_examples and dotenv_example_count
+  - next_operator_action for fill_live_data_api_keys exposes no-secret dotenv_examples and dotenv_example_count
+  - api_key_operator_checklist and api_key_operator_checklist_summary keep fill-key dotenv examples without returning API key values
+  - README and DevOps setup guide document dotenv_examples on fill-key checklist/action rows
+  - setup docs tests assert operator checklist example guidance
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.815 API Key Setup File Summary Dotenv Examples Gate Record - 2026-05-17
 
 ### A. 목적

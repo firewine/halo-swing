@@ -2405,6 +2405,10 @@ def _api_key_pipeline_next_action_summary(
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
         summary["accepted_env_keys"] = accepted_env_keys
+    dotenv_examples = _string_list(next_operator_action.get("dotenv_examples"))
+    if dotenv_examples:
+        summary["dotenv_examples"] = dotenv_examples
+        summary["dotenv_example_count"] = len(dotenv_examples)
     return summary
 
 
@@ -2514,6 +2518,13 @@ def _api_key_operator_checklist_summary(
         summary["next_blocking_action_preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
         summary["next_blocking_action_accepted_env_keys"] = accepted_env_keys
+    required_env_keys = _string_list(next_blocking_action.get("required_env_keys"))
+    dotenv_examples = _string_list(next_blocking_action.get("dotenv_examples"))
+    if required_env_keys:
+        summary["next_blocking_action_required_env_keys"] = required_env_keys
+    if dotenv_examples:
+        summary["next_blocking_action_dotenv_examples"] = dotenv_examples
+        summary["next_blocking_action_dotenv_example_count"] = len(dotenv_examples)
     return summary
 
 
@@ -2582,6 +2593,10 @@ def _api_key_operator_checklist_step_summary(
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:
         summary["accepted_env_keys"] = accepted_env_keys
+    dotenv_examples = _string_list(step.get("dotenv_examples"))
+    if dotenv_examples:
+        summary["dotenv_examples"] = dotenv_examples
+        summary["dotenv_example_count"] = len(dotenv_examples)
     return summary
 
 
@@ -4906,6 +4921,7 @@ def _api_key_pipeline_operator_checklist(
     next_provider_recovery_action = (
         provider_recovery_rows[0] if provider_recovery_rows else None
     )
+    dotenv_examples = _live_data_dotenv_examples()
     steps = [
         {
             "name": "prepare_dotenv",
@@ -4926,6 +4942,8 @@ def _api_key_pipeline_operator_checklist(
             ),
             "missing_provider_families": missing_provider_families,
             "provider_requirements": provider_requirements,
+            "dotenv_examples": dotenv_examples,
+            "dotenv_example_count": len(dotenv_examples),
             "network_call": False,
             "mutates_local_state": False,
             "secret_values_returned": False,
@@ -5307,6 +5325,17 @@ def _live_data_dotenv_template() -> dict[str, Any]:
     }
 
 
+def _live_data_dotenv_examples() -> list[str]:
+    template = _live_data_dotenv_template()
+    entries = template.get("entries")
+    template_entries = entries if isinstance(entries, list) else []
+    return [
+        entry["example"]
+        for entry in template_entries
+        if isinstance(entry, dict) and isinstance(entry.get("example"), str)
+    ]
+
+
 def _live_data_dotenv_file_status() -> dict[str, Any]:
     target_path = local_env.REPO_ROOT_ENV_PATH
     source_path = target_path.with_name(".env.example")
@@ -5361,6 +5390,7 @@ def _live_data_setup_steps(
     smoke_command = _optional_mapping(one_shot_smoke_command)
     raw_provider_smokes = provider_smoke_plan.get("provider_smokes")
     provider_smokes = raw_provider_smokes if isinstance(raw_provider_smokes, list) else []
+    dotenv_examples = _live_data_dotenv_examples()
     next_provider_smoke = _next_ready_provider_smoke(provider_smokes)
     target_exists = dotenv_file_status.get("target_exists") is True
     source_exists = dotenv_file_status.get("source_exists") is True
@@ -5414,6 +5444,8 @@ def _live_data_setup_steps(
                     "fill_keys_after_copy",
                     {},
                 ).get("required_env_keys"),
+                "dotenv_examples": dotenv_examples,
+                "dotenv_example_count": len(dotenv_examples),
                 "network_call": False,
                 "mutates_local_state": False,
                 "secret_values_returned": False,
@@ -5473,12 +5505,15 @@ def _live_data_next_operator_action(
     setup_step_rows = live_data_setup_steps.get("steps")
     setup_steps = setup_step_rows if isinstance(setup_step_rows, list) else []
     provider_smoke_step: dict[str, Any] = {}
+    fill_key_step: dict[str, Any] = {}
     for step in setup_steps:
         step_mapping = _optional_mapping(step)
-        if step_mapping is None or step_mapping.get("name") != "run_provider_smokes":
+        if step_mapping is None:
             continue
-        provider_smoke_step = step_mapping
-        break
+        if step_mapping.get("name") == "run_provider_smokes":
+            provider_smoke_step = step_mapping
+        if step_mapping.get("name") == "fill_live_data_api_keys":
+            fill_key_step = step_mapping
     base = {
         "schema_version": "live_data_next_operator_action.v1",
         "name": next_step,
@@ -5542,6 +5577,8 @@ def _live_data_next_operator_action(
         "name": "fill_live_data_api_keys",
         "status": "pending",
         "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "dotenv_examples": _string_list(fill_key_step.get("dotenv_examples")),
+        "dotenv_example_count": fill_key_step.get("dotenv_example_count"),
         "configured_provider_families": provider_family_summary.get(
             "configured_provider_families",
             [],

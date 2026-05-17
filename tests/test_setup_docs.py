@@ -355,6 +355,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "preferred_env_keys" in guide
     assert "dotenv_examples" in guide
     assert "KEY=placeholder" in guide
+    assert "fill_live_data_api_keys" in guide
     assert "copy_command" in guide
     assert "copy_required" in guide
     assert "keeps `api_key_dotenv_loading_summary`" in guide

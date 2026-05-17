@@ -418,9 +418,10 @@ as `next_blocking_action_provider_family`,
 `next_blocking_action_provider`, and
 `next_blocking_action_smoke_command_name`, and compact setup step rows including
 recovery `provider_family`, `provider`, `smoke_command_name`,
-`preferred_env_key`, and `accepted_env_keys`, so the compact response still
-shows the next local setup or recovery action without returning the full
-checklist payload.
+`preferred_env_key`, `accepted_env_keys`, and no-secret `dotenv_examples` on
+`fill_live_data_api_keys`, so the compact response still shows the next local
+setup or recovery action and the `KEY=placeholder` lines to fill without
+returning the full checklist payload.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

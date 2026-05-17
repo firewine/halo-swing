@@ -149,6 +149,12 @@ EXPECTED_READINESS_EVIDENCE_KEYS_BY_GATE = {
     ],
 }
 
+EXPECTED_DOTENV_EXAMPLES = [
+    "POLYGON_API_KEY=your_polygon_key",
+    "FRED_API_KEY=your_fred_key",
+    "NEWS_API_KEY=your_newsapi_key",
+]
+
 
 def expected_dotenv_file_status(target_path: Path) -> dict[str, Any]:
     source_path = target_path.with_name(".env.example")
@@ -295,6 +301,8 @@ def expected_live_data_setup_steps(
                 "configured_count": configured_count,
                 "required_count": required_count,
                 "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+                "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
+                "dotenv_example_count": 3,
                 "network_call": False,
                 "mutates_local_state": False,
                 "secret_values_returned": False,
@@ -417,6 +425,8 @@ def expected_next_operator_action(
         "name": "fill_live_data_api_keys",
         "status": "pending",
         "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
+        "dotenv_example_count": 3,
         "configured_provider_families": configured_provider_families,
         "missing_provider_families": missing_provider_families,
         "next_after_action": "run_provider_smokes",
@@ -816,6 +826,8 @@ def expected_api_key_operator_checklist(
             "configured_env_keys": requirements_summary["configured_env_keys"],
             "missing_provider_families": missing_provider_families,
             "provider_requirements": requirements_summary["provider_requirements"],
+            "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
+            "dotenv_example_count": 3,
             "network_call": False,
             "mutates_local_state": False,
             "secret_values_returned": False,
@@ -1731,6 +1743,25 @@ def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secr
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "fill_live_data_api_keys"
     )
+    assert payload["api_key_next_action_summary"]["dotenv_examples"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert payload["api_key_next_action_summary"]["dotenv_example_count"] == 3
+    assert payload["next_operator_action"]["dotenv_examples"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert payload["next_operator_action"]["dotenv_example_count"] == 3
+    assert payload["api_key_operator_checklist"]["next_blocking_action"][
+        "dotenv_examples"
+    ] == EXPECTED_DOTENV_EXAMPLES
+    summary_payload = run_api_key_pipeline_smoke(summary_only=True)
+    assert summary_payload["api_key_operator_checklist_summary"][
+        "next_blocking_action_dotenv_examples"
+    ] == EXPECTED_DOTENV_EXAMPLES
+    assert summary_payload["api_key_operator_checklist_summary"][
+        "next_blocking_action_required_env_keys"
+    ] == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+    assert summary_payload["secret_values_returned"] is False
     assert payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
     for value in secret_env.values():
         assert value not in serialized
@@ -5496,6 +5527,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
                 ],
                 "configured_env_keys": [],
                 "missing_provider_families": ["market", "macro", "news"],
+                "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
+                "dotenv_example_count": 3,
                 "provider_smoke_command_count": None,
                 "next_provider_smoke_command_name": None,
                 "provider_recovery_item_count": None,
@@ -6383,6 +6416,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary(
     assert setup_summary["live_data_setup_steps"]["next_step"] == (
         "run_provider_smokes"
     )
+    assert setup_summary["live_data_setup_steps"]["steps"][1][
+        "dotenv_examples"
+    ] == EXPECTED_DOTENV_EXAMPLES
+    assert setup_summary["live_data_setup_steps"]["steps"][1][
+        "dotenv_example_count"
+    ] == 3
     assert setup_summary["next_operator_action"]["name"] == "run_provider_smokes"
     assert setup_summary["next_operator_action"][
         "next_provider_smoke_command_name"
@@ -6554,6 +6593,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
         "run_provider_smokes",
         "run_api_key_pipeline_smoke",
     ]
+    assert checklist_summary["steps"][1]["name"] == "fill_live_data_api_keys"
+    assert checklist_summary["steps"][1]["dotenv_examples"] == (
+        EXPECTED_DOTENV_EXAMPLES
+    )
+    assert checklist_summary["steps"][1]["dotenv_example_count"] == 3
     assert checklist_summary["blocking_step_names"] == [
         "recover_failed_providers"
     ]

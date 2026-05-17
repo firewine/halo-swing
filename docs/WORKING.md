@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SETUP_FILE_SUMMARY_DOTENV_EXAMPLES_VERIFIED
-gate_id: API_KEY_SETUP_FILE_SUMMARY_DOTENV_EXAMPLES_GATE
+status: API_KEY_OPERATOR_CHECKLIST_DOTENV_EXAMPLES_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_DOTENV_EXAMPLES_GATE
 review_tier: S1_small
 
-next_atomic_step: add no-secret dotenv example lines to API-key setup file summary
+next_atomic_step: add no-secret dotenv examples to API-key operator checklist fill-key action rows
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,24 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_setup_file_summary exposes dotenv_examples copied from live_data_setup_summary.dotenv_template entries
-  - api_key_setup_file_summary exposes dotenv_example_count matching the no-secret example line count
-  - summary-only API-key pipeline payload keeps the setup file examples without returning API key values
-  - README and DevOps setup guide document dotenv_examples on api_key_setup_file_summary
-  - setup docs tests assert the new setup file summary example guidance
+  - live_data_setup_steps fill_live_data_api_keys row exposes no-secret dotenv_examples and dotenv_example_count
+  - next_operator_action for fill_live_data_api_keys exposes no-secret dotenv_examples and dotenv_example_count
+  - api_key_operator_checklist and api_key_operator_checklist_summary keep fill-key dotenv examples without returning API key values
+  - README and DevOps setup guide document dotenv_examples on fill-key checklist/action rows
+  - setup docs tests assert the new operator checklist example guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified setup file summary dotenv examples gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified operator checklist dotenv examples gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SETUP_FILE_SUMMARY_DOTENV_EXAMPLES_VERIFIED
+gate_id: API_KEY_SETUP_FILE_SUMMARY_DOTENV_EXAMPLES_GATE
+review_tier: S1_small
+
+next_atomic_step: add no-secret dotenv example lines to API-key setup file summary
 ```
 
 Previous completed directive:
@@ -2911,6 +2922,55 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Operator Checklist Dotenv Examples Gate is verified.
+`fill_live_data_api_keys` rows now carry no-secret `dotenv_examples` and
+`dotenv_example_count` through live setup steps, next operator action,
+`api_key_operator_checklist`, and summary-only checklist rows. Focused tests,
+direct summary-only smoke, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_operator_checklist_dotenv_examples_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - live_data_setup_steps fill_live_data_api_keys row exposes no-secret dotenv_examples and dotenv_example_count
+    - next_operator_action for fill_live_data_api_keys exposes no-secret dotenv_examples and dotenv_example_count
+    - api_key_operator_checklist and api_key_operator_checklist_summary keep fill-key dotenv examples without returning API key values
+    - README and DevOps setup guide document dotenv_examples on fill-key checklist/action rows
+    - setup docs tests assert operator checklist example guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; schema_version api_key_pipeline_smoke_summary_only.v1; api_key_operator_checklist_summary steps include fill-key dotenv_examples; secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "800 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Setup File Summary Dotenv Examples Gate is verified.
 `api_key_setup_file_summary` now carries no-secret `dotenv_examples` and
