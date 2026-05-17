@@ -109,7 +109,7 @@ commands:
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: pending
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 98 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 832 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
