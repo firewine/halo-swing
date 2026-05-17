@@ -1495,6 +1495,20 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         "api_key_provider_smoke_next_action_primary_setup_action"
     ] == expected_next_action_primary_row.get("next_setup_action")
     assert payload[
+        "api_key_provider_smoke_next_action_primary_network_call"
+    ] is (expected_next_action_primary_row.get("network_call") is True)
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_network_call_policy"
+    ] == expected_next_action_primary_row.get("network_call_policy")
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_mutates_local_state"
+    ] is (expected_next_action_primary_row.get("mutates_local_state") is True)
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_secret_values_returned"
+    ] is (
+        expected_next_action_primary_row.get("secret_values_returned") is True
+    )
+    assert payload[
         "api_key_provider_smoke_next_action_primary_preferred_env_key"
     ] == expected_next_action_primary_row.get("preferred_env_key")
     assert payload[

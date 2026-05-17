@@ -509,6 +509,19 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_next_action_primary_setup_action": (
             provider_smoke_next_action_primary_row.get("next_setup_action")
         ),
+        "api_key_provider_smoke_next_action_primary_network_call": (
+            provider_smoke_next_action_primary_row.get("network_call") is True
+        ),
+        "api_key_provider_smoke_next_action_primary_network_call_policy": (
+            provider_smoke_next_action_primary_row.get("network_call_policy")
+        ),
+        "api_key_provider_smoke_next_action_primary_mutates_local_state": (
+            provider_smoke_next_action_primary_row.get("mutates_local_state") is True
+        ),
+        "api_key_provider_smoke_next_action_primary_secret_values_returned": (
+            provider_smoke_next_action_primary_row.get("secret_values_returned")
+            is True
+        ),
         "api_key_provider_smoke_next_action_primary_preferred_env_key": (
             provider_smoke_next_action_primary_row.get("preferred_env_key")
         ),
