@@ -611,6 +611,30 @@ def test_macro_snapshot_declares_live_fred_boundary_without_secret(
     assert payload["macro_filter_contract"]["network_call"] is True
     assert payload["macro_filter_contract"]["live_data_required"] is True
     assert payload["macro_filter_guard"]["status"] == "ok"
+    assert payload["provider_smoke_summary"] == {
+        "schema_version": "provider_smoke_summary.v1",
+        "status": "ok",
+        "passed": True,
+        "tool": "get_macro_snapshot",
+        "provider_family": "macro",
+        "provider": "fred",
+        "smoke_command_name": "get_macro_snapshot_live_smoke",
+        "preferred_env_key": "FRED_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MACRO_API_KEY",
+            "HALO_SWING_FRED_API_KEY",
+            "FRED_API_KEY",
+        ],
+        "expected_live_contract": "macro_filter_contract",
+        "expected_live_checks": [
+            "live_data_boundary_declared",
+            "network_call_declared",
+        ],
+        "network_call": True,
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert guard_checks["required_indicators_present"]["passed"] is True
     assert guard_checks["live_data_boundary_declared"]["passed"] is True
     assert guard_checks["network_call_declared"]["passed"] is True
@@ -691,6 +715,30 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
     assert bundle["news_source_policy_contract"]["live_data_required"] is True
     assert bundle["news_source_policy_contract"]["secret_values_returned"] is False
     assert bundle["news_source_policy_guard"]["status"] == "ok"
+    assert bundle["provider_smoke_summary"] == {
+        "schema_version": "provider_smoke_summary.v1",
+        "status": "ok",
+        "passed": True,
+        "tool": "get_news_bundle",
+        "provider_family": "news",
+        "provider": "newsapi",
+        "smoke_command_name": "get_news_bundle_live_smoke",
+        "preferred_env_key": "NEWS_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_NEWS_API_KEY",
+            "NEWS_API_KEY",
+        ],
+        "expected_live_contract": "news_source_policy_contract",
+        "expected_live_checks": [
+            "live_data_boundary_declared",
+            "network_call_declared",
+            "secret_values_not_returned",
+        ],
+        "network_call": True,
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     source_policy_checks = {
         check["name"]: check["passed"]
         for check in bundle["news_source_policy_guard"]["checks"]
@@ -752,6 +800,26 @@ def test_market_snapshot_declares_live_provider_boundary_without_secret(
     assert payload["market_snapshot_contract"]["network_call"] is True
     assert payload["market_snapshot_contract"]["live_data_required"] is True
     assert payload["market_snapshot_guard"]["status"] == "ok"
+    assert payload["provider_smoke_summary"] == {
+        "schema_version": "provider_smoke_summary.v1",
+        "status": "ok",
+        "passed": True,
+        "tool": "get_market_snapshot",
+        "provider_family": "market",
+        "provider": "polygon",
+        "smoke_command_name": "get_market_snapshot_live_smoke",
+        "preferred_env_key": "POLYGON_API_KEY",
+        "accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
+        "expected_live_contract": "market_snapshot_contract",
+        "expected_live_checks": ["live_data_boundary_declared"],
+        "network_call": True,
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
     assert "no_live_data_required" not in guard_checks
     assert guard_checks["live_data_boundary_declared"]["passed"] is True
     assert guard_checks["feature_store_not_persisted"]["passed"] is True

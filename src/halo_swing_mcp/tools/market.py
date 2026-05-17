@@ -43,6 +43,7 @@ REQUIRED_NEWS_SOURCE_GROUPS = [
     "ai_semiconductor",
 ]
 PROVIDER_SMOKE_ERROR_SCHEMA_VERSION = "provider_smoke_error.v1"
+PROVIDER_SMOKE_SUMMARY_SCHEMA_VERSION = "provider_smoke_summary.v1"
 PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
     "market": {
         "preferred_env_key": "POLYGON_API_KEY",
@@ -166,7 +167,11 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         },
         _market_snapshot_live_data_guard_check(live_data_required, contract),
     ]
-    return {
+    market_snapshot_guard = {
+        "status": "ok" if all(check["passed"] for check in guard_checks) else "conflict",
+        "checks": guard_checks,
+    }
+    payload = {
         "as_of": provider.as_of,
         "data_mode": provider.data_mode,
         "live_data_required": live_data_required,
@@ -176,12 +181,18 @@ def get_market_snapshot(symbols: list[str] | None = None) -> dict[str, Any]:
         "supported_assets": supported_assets,
         "supported_timeframes": supported_timeframes,
         "market_snapshot_contract": contract,
-        "market_snapshot_guard": {
-            "status": "ok" if all(check["passed"] for check in guard_checks) else "conflict",
-            "checks": guard_checks,
-        },
+        "market_snapshot_guard": market_snapshot_guard,
         "snapshots": snapshots,
     }
+    if live_data_required:
+        payload["provider_smoke_summary"] = _provider_smoke_summary(
+            tool="get_market_snapshot",
+            provider_family="market",
+            provider="polygon",
+            smoke_command_name="get_market_snapshot_live_smoke",
+            status=market_snapshot_guard["status"],
+        )
+    return payload
 
 
 def _market_snapshot_live_data_guard_check(
@@ -237,15 +248,25 @@ def get_macro_snapshot() -> dict[str, Any]:
             "DXY, rates, and oil change fields."
         ),
     }
-    return {
+    macro_filter_guard = _macro_filter_guard(contract, indicators)
+    payload = {
         **snapshot,
         "macro_filter_contract": contract,
-        "macro_filter_guard": _macro_filter_guard(contract, indicators),
+        "macro_filter_guard": macro_filter_guard,
         "macro_filter_summary": _macro_filter_summary(
             indicators,
             live_data_required=live_data_required,
         ),
     }
+    if live_data_required:
+        payload["provider_smoke_summary"] = _provider_smoke_summary(
+            tool="get_macro_snapshot",
+            provider_family="macro",
+            provider="fred",
+            smoke_command_name="get_macro_snapshot_live_smoke",
+            status=macro_filter_guard["status"],
+        )
+    return payload
 
 
 def _macro_filter_guard(
@@ -345,6 +366,34 @@ def _provider_smoke_error_summary(
         "exception_type": type(exc).__name__,
         "exception_message_returned": False,
         "url_returned": False,
+        "secret_values_returned": False,
+    }
+
+
+def _provider_smoke_summary(
+    *,
+    tool: str,
+    provider_family: str,
+    provider: str,
+    smoke_command_name: str,
+    status: str,
+) -> dict[str, Any]:
+    hints = PROVIDER_SMOKE_ERROR_HINTS.get(provider_family, {})
+    return {
+        "schema_version": PROVIDER_SMOKE_SUMMARY_SCHEMA_VERSION,
+        "status": status,
+        "passed": status == "ok",
+        "tool": tool,
+        "provider_family": provider_family,
+        "provider": provider,
+        "smoke_command_name": smoke_command_name,
+        "preferred_env_key": hints.get("preferred_env_key"),
+        "accepted_env_keys": hints.get("accepted_env_keys", []),
+        "expected_live_contract": hints.get("expected_live_contract"),
+        "expected_live_checks": hints.get("expected_live_checks", []),
+        "network_call": True,
+        "network_call_policy": "only_when_matching_provider_selects_live_route",
+        "mutates_local_state": False,
         "secret_values_returned": False,
     }
 
@@ -712,18 +761,19 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
                 },
             ]
         )
-    return {
+    news_source_policy_guard = {
+        "status": "ok"
+        if all(check["passed"] for check in source_policy_guard_checks)
+        else "conflict",
+        "checks": source_policy_guard_checks,
+    }
+    payload = {
         "as_of": provider.as_of,
         "topic": normalized_topic,
         "data_mode": collection_mode,
         "live_data_required": live_collection_enabled or provider.live_data_required,
         "news_source_policy_contract": source_policy_contract,
-        "news_source_policy_guard": {
-            "status": "ok"
-            if all(check["passed"] for check in source_policy_guard_checks)
-            else "conflict",
-            "checks": source_policy_guard_checks,
-        },
+        "news_source_policy_guard": news_source_policy_guard,
         "news_score_contract": {
             "schema_version": "news_score.v1",
             "required_scores": [
@@ -752,6 +802,15 @@ def get_news_bundle(topic: str = "macro") -> dict[str, Any]:
         "multimodal_evidence_guard": _multimodal_evidence_guard(cards),
         "evidence_cards": cards,
     }
+    if live_collection_enabled:
+        payload["provider_smoke_summary"] = _provider_smoke_summary(
+            tool="get_news_bundle",
+            provider_family="news",
+            provider="newsapi",
+            smoke_command_name="get_news_bundle_live_smoke",
+            status=news_source_policy_guard["status"],
+        )
+    return payload
 
 
 def _macro_filter_summary(

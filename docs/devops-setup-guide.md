@@ -895,6 +895,14 @@ the live NewsAPI provider, `get_news_bundle` declares `live_data_required=true`,
 `news_source_policy_guard` reports `live_data_boundary_declared` and
 `network_call_declared`.
 
+Direct live provider smoke success payloads for `get_market_snapshot`,
+`get_macro_snapshot`, and `get_news_bundle` include `provider_smoke_summary`
+(`provider_smoke_summary.v1`) with provider identity, smoke command name,
+`preferred_env_key`, `accepted_env_keys`, `expected_live_contract`,
+`expected_live_checks`, `network_call`, and `secret_values_returned=false`.
+This keeps each successful API-key-backed provider smoke self-describing without
+returning the API key value.
+
 The optional `HALO_SWING_MARKET_DATA_MODE=live`,
 `HALO_SWING_MACRO_DATA_MODE=live`, and `HALO_SWING_NEWS_DATA_MODE=live` env
 values are still accepted for explicit operator intent and source validation,

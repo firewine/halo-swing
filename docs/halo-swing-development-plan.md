@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.804 API Key Provider Smoke Success Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+API key 입력 후 개별 provider smoke가 성공하면 contract와 guard는 통과 상태를
+보여주지만, provider identity, smoke command name, env-key hint, expected
+contract/check를 한 row로 묶은 summary가 없다. operator가 개별 smoke payload 하나만
+보고도 어떤 provider 연동이 어떤 성공 기준으로 통과했는지 확인할 수 있도록, 이번
+slice는 direct live provider smoke success payload에 no-secret
+`provider_smoke_summary`를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - direct live provider smoke success payloads expose provider_smoke_summary for market, macro, and news
+  - provider_smoke_summary includes provider identity, smoke command name, env-key hints, expected contract/checks, status, network_call, and secret safety fields
+  - provider success tests prove provider_smoke_summary is present without returning API key values
+  - README and DevOps setup guide document direct provider smoke success summaries
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.market import get_market_snapshot; from halo_swing_mcp.providers import PolygonMarketDataProvider; import halo_swing_mcp.tools.market as market; provider=PolygonMarketDataProvider(api_key="fake", http_get=lambda url: {"results":[{"t":1700000000000,"o":100.0,"h":102.0,"l":99.5,"c":101.0,"v":1000},{"t":1700086400000,"o":101.0,"h":103.0,"l":100.5,"c":102.5,"v":1100}]}); market.get_market_data_provider=lambda: provider; payload=get_market_snapshot(["QQQ"]); summary=payload["provider_smoke_summary"]; print(summary["provider_family"], summary["provider"], summary["status"], summary["expected_live_contract"], ",".join(summary["expected_live_checks"]), summary["secret_values_returned"])': market polygon ok market_snapshot_contract live_data_boundary_declared False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.803 API Key Provider Error Hints Gate Record - 2026-05-17
 
 ### A. 목적

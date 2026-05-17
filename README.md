@@ -162,7 +162,13 @@ next setup action moves directly to provider smokes. Without those keys, runs
 remain fixture-backed and offline. When a NewsAPI key selects live news,
 `get_news_bundle` declares `live_data_required=true`, `network_call=true`, and
 `secret_values_returned=false`, with guard checks for the live data boundary and
-network call declaration. Live provider HTTP calls use
+network call declaration. Direct live provider smoke success payloads include
+`provider_smoke_summary` (`provider_smoke_summary.v1`) with provider identity,
+smoke command name, `preferred_env_key`, `accepted_env_keys`,
+`expected_live_contract`, `expected_live_checks`, `network_call`, and
+`secret_values_returned=false`, so a single successful smoke result shows what
+API-key-backed provider contract passed without exposing the key. Live provider
+HTTP calls use
 `HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS` with a default of `10` seconds, so
 API-key-backed smokes fail back into no-secret provider recovery instead of
 waiting indefinitely. The optional `*_DATA_MODE=live` env values are still
