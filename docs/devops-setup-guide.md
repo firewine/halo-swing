@@ -469,10 +469,12 @@ the no-secret `next_operator_action` separately from broader integration gates.
 When the mirrored next action carries provider smoke or recovery env-key hints,
 `readiness_summary` also includes `preferred_env_key` and `accepted_env_keys`
 without returning key values.
-Pass `summary_only=true` when you want the compact CLI/MCP response:
+Pass `--summary-only` when you want the compact harness response without editing
+the input JSON. For MCP callers, set `summary_only=true` or `"summary_only":true`
+in the request payload for the same compact response:
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps

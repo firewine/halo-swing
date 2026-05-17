@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.811 API Key Pipeline Summary-Only CLI Flag Gate Record - 2026-05-17
+
+### A. 목적
+
+`run_api_key_pipeline_smoke`의 compact output은 MCP payload에서 `summary_only=true`를
+넣으면 사용할 수 있지만, 로컬 harness에서는 사용자가 입력 JSON 안에 boolean을 직접 넣어야
+한다. 실제 API 키를 채운 뒤 한 줄 smoke로 확인하는 운영 흐름을 단순화하기 위해, 이번
+slice는 `run_api_key_pipeline_smoke`에 한정된 no-secret `--summary-only` harness flag를
+추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - harness accepts --summary-only for run_api_key_pipeline_smoke
+  - --summary-only injects summary_only=true without requiring input JSON edits
+  - harness rejects --summary-only for non-API-key-pipeline commands before tool execution
+  - README and DevOps setup guide document the compact API-key smoke flag and MCP payload equivalent
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_maps_api_key_pipeline tests/test_harness.py::test_harness_summary_only_flag_rejects_other_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit -> passed, schema_version api_key_pipeline_smoke_summary_only.v1 and secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 798 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 3.810 API Key Summary-Only Provider Success Env Hint Gate Record - 2026-05-17
 
 ### A. 목적

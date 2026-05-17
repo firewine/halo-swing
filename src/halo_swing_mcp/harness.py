@@ -31,6 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Disable audit logging for this harness invocation.",
     )
+    parser.add_argument(
+        "--summary-only",
+        action="store_true",
+        help="Request compact output for run_api_key_pipeline_smoke.",
+    )
     return parser
 
 
@@ -134,6 +139,24 @@ def main(argv: Sequence[str] | None = None) -> int:
                 error=repr(error),
             )
         raise error
+
+    if args.summary_only:
+        if args.command != "run_api_key_pipeline_smoke":
+            error = ValueError(
+                "summary-only is only supported for run_api_key_pipeline_smoke"
+            )
+            if not args.no_audit:
+                append_tool_audit_event(
+                    command_name=args.command,
+                    input_payload=input_payload,
+                    result=None,
+                    outcome="failure",
+                    actor="harness",
+                    audit_log_path=args.audit_log_path,
+                    error=repr(error),
+                )
+            raise error
+        input_payload = {**input_payload, "summary_only": True}
 
     try:
         payload = call_tool(args.command, input_payload)

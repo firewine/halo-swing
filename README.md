@@ -303,11 +303,12 @@ provider smoke command or provider recovery, the first no-secret
 when a provider smoke is ready, the same no-secret `next_provider_smoke` object
 and command name in `setup_status_summary`, and which provider factory route was
 selected.
-Pass `summary_only=true` when you want a compact CLI/MCP response after filling
-API keys:
+Pass `--summary-only` when you want a compact harness response after filling API
+keys without editing the input JSON. For MCP callers, set `summary_only=true`
+or `"summary_only":true` in the request payload for the same compact response.
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
 ```
 
 The compact response uses `api_key_pipeline_smoke_summary_only.v1` and keeps

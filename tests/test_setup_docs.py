@@ -45,6 +45,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert (
         "Provider smoke plan rows include `network_call`, `network_call_policy`,"
     ) in guide
+    assert "--summary-only" in guide
+    assert "without editing" in guide
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
     assert "blocked_provider_smoke_count" in guide
