@@ -2334,6 +2334,12 @@ def _api_key_pipeline_summary_only_payload(
 ) -> dict[str, Any]:
     input_payload = _optional_mapping(payload.get("input")) or {}
     next_operator_action = _optional_mapping(payload.get("next_operator_action")) or {}
+    next_provider_smoke = _optional_mapping(
+        next_operator_action.get("next_provider_smoke")
+    ) or {}
+    next_provider_recovery_action = _optional_mapping(
+        next_operator_action.get("next_provider_recovery_action")
+    ) or {}
     api_key_next_action_summary = _optional_mapping(
         payload.get("api_key_next_action_summary")
     ) or {}
@@ -2359,6 +2365,23 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "next_operator_action_command": api_key_next_action_summary.get(
             "next_action_command"
+        ),
+        "next_operator_action_provider_family": (
+            next_operator_action.get("provider_family")
+            or next_provider_recovery_action.get("provider_family")
+            or next_provider_smoke.get("provider_family")
+        ),
+        "next_operator_action_provider": (
+            next_operator_action.get("provider")
+            or next_provider_recovery_action.get("provider")
+            or next_provider_smoke.get("provider")
+        ),
+        "next_operator_action_smoke_command_name": (
+            next_operator_action.get("smoke_command_name")
+            or next_operator_action.get("next_provider_smoke_command_name")
+            or next_operator_action.get("next_provider_recovery_smoke_command_name")
+            or next_provider_recovery_action.get("smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
         ),
         "next_operator_action_network_call": (
             api_key_next_action_summary.get("next_action_network_call") is True

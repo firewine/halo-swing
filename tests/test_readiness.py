@@ -5520,6 +5520,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["next_operator_action_command"] == next_action_summary[
         "next_action_command"
     ]
+    assert payload["next_operator_action_provider_family"] == "market"
+    assert payload["next_operator_action_provider"] == "polygon"
+    assert payload["next_operator_action_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert payload["next_operator_action_network_call"] == (
         next_action_summary["next_action_network_call"]
     )

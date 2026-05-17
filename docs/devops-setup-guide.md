@@ -490,6 +490,8 @@ env-key hints, so the compact response still shows the next local command
 without returning secret values.
 For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_name`, `next_operator_action_command`,
+`next_operator_action_provider_family`, `next_operator_action_provider`,
+`next_operator_action_smoke_command_name`,
 `next_operator_action_preferred_env_key`, and
 `next_operator_action_accepted_env_keys`, plus safety fields
 `next_operator_action_status`, `next_operator_action_network_call`,
