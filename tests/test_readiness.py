@@ -2784,6 +2784,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     ]
     assert payload["provider_recovery_blocked_smoke_command_names"] == []
     assert payload["provider_recovery_blocked_smoke_commands"] == []
+    assert payload["provider_recovery_network_call_policies"] == [
+        "only_when_matching_api_key_selects_live_provider"
+    ]
+    assert payload["provider_recovery_preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["provider_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert payload["provider_recovery_accepted_env_key_groups"] == [
+        ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+        ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+    ]
     assert payload["next_recovery_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
@@ -2928,6 +2950,28 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     ]
     assert summary_payload["provider_recovery_blocked_smoke_command_names"] == []
     assert summary_payload["provider_recovery_blocked_smoke_commands"] == []
+    assert summary_payload["provider_recovery_network_call_policies"] == [
+        "only_when_matching_api_key_selects_live_provider"
+    ]
+    assert summary_payload["provider_recovery_preferred_env_keys"] == [
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["provider_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert summary_payload["provider_recovery_accepted_env_key_groups"] == [
+        ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+        ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+    ]
     assert summary_payload["next_recovery_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
     )
@@ -5487,6 +5531,10 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["provider_recovery_pending_smoke_commands"] == []
     assert payload["provider_recovery_blocked_smoke_command_names"] == []
     assert payload["provider_recovery_blocked_smoke_commands"] == []
+    assert payload["provider_recovery_network_call_policies"] == []
+    assert payload["provider_recovery_preferred_env_keys"] == []
+    assert payload["provider_recovery_accepted_env_keys"] == []
+    assert payload["provider_recovery_accepted_env_key_groups"] == []
     assert payload["next_recovery_smoke_command_name"] is None
     assert payload["next_recovery_smoke_command"] is None
     assert payload["next_recovery_provider_family"] is None

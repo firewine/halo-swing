@@ -1090,6 +1090,28 @@ def run_api_key_pipeline_smoke(
                 "provider_recovery_blocked_smoke_commands"
             )
         ),
+        "provider_recovery_network_call_policies": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_network_call_policies"
+            )
+        ),
+        "provider_recovery_preferred_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_preferred_env_keys"
+            )
+        ),
+        "provider_recovery_accepted_env_keys": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_accepted_env_keys"
+            )
+        ),
+        "provider_recovery_accepted_env_key_groups": [
+            _string_list(group)
+            for group in api_key_provider_recovery_summary.get(
+                "provider_recovery_accepted_env_key_groups", []
+            )
+            if isinstance(group, list)
+        ],
         "next_pending_recovery_smoke_command_name": (
             api_key_provider_recovery_summary.get(
                 "next_pending_recovery_smoke_command_name"
@@ -2931,6 +2953,20 @@ def _api_key_pipeline_summary_only_payload(
         "provider_recovery_blocked_smoke_commands": _string_list(
             payload.get("provider_recovery_blocked_smoke_commands")
         ),
+        "provider_recovery_network_call_policies": _string_list(
+            payload.get("provider_recovery_network_call_policies")
+        ),
+        "provider_recovery_preferred_env_keys": _string_list(
+            payload.get("provider_recovery_preferred_env_keys")
+        ),
+        "provider_recovery_accepted_env_keys": _string_list(
+            payload.get("provider_recovery_accepted_env_keys")
+        ),
+        "provider_recovery_accepted_env_key_groups": [
+            _string_list(group)
+            for group in payload.get("provider_recovery_accepted_env_key_groups", [])
+            if isinstance(group, list)
+        ],
         "next_pending_recovery_smoke_command_name": payload.get(
             "next_pending_recovery_smoke_command_name"
         ),

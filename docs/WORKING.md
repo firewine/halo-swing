@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_NEXT_RECOVERY_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_NEXT_RECOVERY_GATE
+status: API_KEY_SUMMARY_ONLY_RECOVERY_ENV_HINT_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_RECOVERY_ENV_HINT_GATE
 review_tier: S1_small
 
-next_atomic_step: carry next provider recovery action fields into top-level API-key pipeline summary-only payload
+next_atomic_step: carry provider recovery env-key hints and network policies into top-level API-key pipeline summary-only payload
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -76,27 +76,38 @@ required_verification:
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_recovery_smoke_command_name"], payload["next_recovery_provider_family"], payload["next_recovery_provider"], payload["next_recovery_smoke_available"], payload["next_recovery_network_call"], payload["next_recovery_secret_values_returned"], payload["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(",".join(payload["provider_recovery_preferred_env_keys"]), ",".join(payload["provider_recovery_network_call_policies"]), len(payload["provider_recovery_accepted_env_keys"]), len(payload["provider_recovery_accepted_env_key_groups"]), payload["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - top-level API-key pipeline summary-only payload includes next_recovery_smoke_command_name and next_recovery_smoke_command copied from API-key provider recovery summary
-  - top-level API-key pipeline summary-only payload includes next_recovery_provider_family, next_recovery_provider, next_recovery_next_setup_action, next_recovery_preferred_env_key, and next_recovery_accepted_env_keys
-  - top-level API-key pipeline summary-only payload includes next_recovery_network_call_policy, next_recovery_smoke_available, next_recovery_network_call, next_recovery_mutates_local_state, and next_recovery_secret_values_returned
-  - top-level API-key pipeline summary-only payload includes first pending and first blocked recovery field groups copied from API-key provider recovery summary
-  - fake-key API-key pipeline summary-only CLI returns top-level next recovery fields without secret values
-  - blocked setup summary-only payload returns empty top-level next recovery fields without secret values
-  - focused tests cover top-level next recovery fields in summary_only API-key pipeline output
-  - README and DevOps setup guide document top-level summary-only next recovery fields
-  - setup docs tests assert top-level summary-only next recovery guidance
+  - top-level API-key pipeline summary-only payload includes provider_recovery_preferred_env_keys copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_keys copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_key_groups copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_network_call_policies copied from API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns top-level recovery env hints and network policies without secret values
+  - blocked setup summary-only payload returns empty top-level recovery env hints and network policies without secret values
+  - focused tests cover top-level recovery env hints and network policies in summary_only API-key pipeline output
+  - README and DevOps setup guide document top-level summary-only recovery env hints and network policies
+  - setup docs tests assert top-level summary-only recovery env hint and network policy guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only next-recovery gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key summary-only recovery env-hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_NEXT_RECOVERY_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_NEXT_RECOVERY_GATE
+review_tier: S1_small
+
+next_atomic_step: carry next provider recovery action fields into top-level API-key pipeline summary-only payload
 ```
 
 Previous completed directive:
@@ -2686,16 +2697,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Summary-Only Next Recovery Gate is verified.
-`run_api_key_pipeline_smoke(summary_only=true)` now exposes the next recovery
-command, provider identity, setup action, env-key aliases, network policy, and
-safety flags in the top-level summary-only payload. It also exposes first
-pending and first blocked recovery field groups without opening nested recovery
-summaries. Focused tests, fake-key CLI, full pytest, ruff, and health_check
-passed.
+Summary: API Key Summary-Only Recovery Env Hint Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes provider recovery
+preferred env keys, accepted env keys, accepted env key groups, and network
+policies in the top-level summary-only payload. Focused tests, fake-key CLI,
+full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_summary_only_next_recovery_gate:
+api_key_summary_only_recovery_env_hint_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2708,15 +2717,15 @@ api_key_summary_only_next_recovery_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - top-level API-key pipeline summary-only payload includes next_recovery_smoke_command_name and next_recovery_smoke_command copied from API-key provider recovery summary
-    - top-level API-key pipeline summary-only payload includes next_recovery_provider_family, next_recovery_provider, next_recovery_next_setup_action, next_recovery_preferred_env_key, and next_recovery_accepted_env_keys
-    - top-level API-key pipeline summary-only payload includes next_recovery_network_call_policy, next_recovery_smoke_available, next_recovery_network_call, next_recovery_mutates_local_state, and next_recovery_secret_values_returned
-    - top-level API-key pipeline summary-only payload includes first pending and first blocked recovery field groups copied from API-key provider recovery summary
-    - fake-key API-key pipeline summary-only CLI returns top-level next recovery fields without secret values
-    - blocked setup summary-only payload returns empty top-level next recovery fields without secret values
-    - focused tests cover top-level next recovery fields in summary_only API-key pipeline output
-    - README and DevOps setup guide document top-level summary-only next recovery fields
-    - tests/test_setup_docs.py asserts top-level summary-only next recovery guidance
+    - top-level API-key pipeline summary-only payload includes provider_recovery_preferred_env_keys copied from API-key provider recovery summary
+    - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_keys copied from API-key provider recovery summary
+    - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_key_groups copied from API-key provider recovery summary
+    - top-level API-key pipeline summary-only payload includes provider_recovery_network_call_policies copied from API-key provider recovery summary
+    - fake-key API-key pipeline summary-only CLI returns top-level recovery env hints and network policies without secret values
+    - blocked setup summary-only payload returns empty top-level recovery env hints and network policies without secret values
+    - focused tests cover top-level recovery env hints and network policies in summary_only API-key pipeline output
+    - README and DevOps setup guide document top-level summary-only recovery env hints and network policies
+    - tests/test_setup_docs.py asserts top-level summary-only recovery env hint and network policy guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2730,9 +2739,9 @@ api_key_summary_only_next_recovery_gate:
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
       result: "3 passed"
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-      result: "exit 0; top-level next recovery fields returned without secret values"
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_recovery_smoke_command_name"], payload["next_recovery_provider_family"], payload["next_recovery_provider"], payload["next_recovery_smoke_available"], payload["next_recovery_network_call"], payload["next_recovery_secret_values_returned"], payload["secret_values_returned"])'
-      result: "get_market_snapshot_live_smoke market polygon True True False False"
+      result: "exit 0; top-level recovery env hints and network policies returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(",".join(payload["provider_recovery_preferred_env_keys"]), ",".join(payload["provider_recovery_network_call_policies"]), len(payload["provider_recovery_accepted_env_keys"]), len(payload["provider_recovery_accepted_env_key_groups"]), payload["secret_values_returned"])'
+      result: "POLYGON_API_KEY,FRED_API_KEY,NEWS_API_KEY only_when_matching_api_key_selects_live_provider 7 3 False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "796 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .

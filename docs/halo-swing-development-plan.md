@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.795 API Key Summary-Only Recovery Env Hint Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 provider recovery별 preferred env key,
+accepted env key group, network policy를 보여주지만, 최상위
+`run_api_key_pipeline_smoke(summary_only=true)` row만 스캔하는 operator는 nested
+summary를 다시 열어야 했다. 이번 slice는 no-secret
+`provider_recovery_preferred_env_keys`, `provider_recovery_accepted_env_keys`,
+`provider_recovery_accepted_env_key_groups`,
+`provider_recovery_network_call_policies`를 summary-only 최상위 payload로 올려,
+API-key-only 한 줄 요약만으로 어떤 키를 채우고 어떤 live smoke가 네트워크를 호출하는지
+확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - top-level API-key pipeline summary-only payload includes provider_recovery_preferred_env_keys copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_keys copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_accepted_env_key_groups copied from API-key provider recovery summary
+  - top-level API-key pipeline summary-only payload includes provider_recovery_network_call_policies copied from API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns top-level recovery env hints and network policies without secret values
+  - blocked setup summary-only payload returns empty top-level recovery env hints and network policies without secret values
+  - focused tests cover top-level recovery env hints and network policies in summary_only API-key pipeline output
+  - README and DevOps setup guide document top-level summary-only recovery env hints and network policies
+  - tests/test_setup_docs.py asserts top-level summary-only recovery env hint and network policy guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; top-level recovery env hints and network policies returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(",".join(payload["provider_recovery_preferred_env_keys"]), ",".join(payload["provider_recovery_network_call_policies"]), len(payload["provider_recovery_accepted_env_keys"]), len(payload["provider_recovery_accepted_env_key_groups"]), payload["secret_values_returned"])': POLYGON_API_KEY,FRED_API_KEY,NEWS_API_KEY only_when_matching_api_key_selects_live_provider 7 3 False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.794 API Key Summary-Only Next Recovery Gate Record - 2026-05-17
 
 ### A. 목적
