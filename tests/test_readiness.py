@@ -2710,6 +2710,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "get_macro_snapshot_live_smoke",
             "get_news_bundle_live_smoke",
         ],
+        "provider_recovery_smoke_commands": [
+            payload["provider_recovery_smokes"][0]["command"],
+            payload["provider_recovery_smokes"][1]["command"],
+            payload["provider_recovery_smokes"][2]["command"],
+        ],
         "provider_recovery_preferred_env_keys": [
             "POLYGON_API_KEY",
             "FRED_API_KEY",
@@ -4914,6 +4919,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_provider_families": [],
         "provider_recovery_providers": [],
         "provider_recovery_smoke_command_names": [],
+        "provider_recovery_smoke_commands": [],
         "provider_recovery_preferred_env_keys": [],
         "provider_recovery_accepted_env_keys": [],
         "provider_recovery_accepted_env_key_groups": [],

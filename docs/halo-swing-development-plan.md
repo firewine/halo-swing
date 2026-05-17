@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.774 API Key Provider Recovery Summary Command Aggregate Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 첫 provider recovery command만
+`next_recovery_smoke_command`로 top-level에 보여주고, 나머지 provider별 recovery
+command는 item row를 열어야 확인할 수 있었다. 이번 slice는 no-secret
+`provider_recovery_smoke_commands`를 추가해, API key 입력 후 live provider 복구가
+필요할 때 compact summary만으로 market/macro/news provider smoke command 전체를
+순서대로 재실행할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes provider_recovery_smoke_commands for all compact recovery items
+  - provider_recovery_smoke_commands preserves compact item order and returns an empty list when no recovery items exist
+  - provider_recovery_smoke_commands mirrors item recovery_smoke_command values without secret values
+  - focused tests cover aggregate recovery command field in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns aggregate recovery command field without secret values
+  - README and DevOps setup guide document aggregate recovery command field
+  - tests/test_setup_docs.py asserts aggregate recovery command field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only aggregate recovery command field returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_smoke_commands"], summary["provider_recovery_smoke_command_names"], summary["secret_values_returned"])' -> ['PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_market_snapshot --input-json '\''{"symbols":["QQQ"]}'\'' --no-audit', 'PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_macro_snapshot --no-audit', 'PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_news_bundle --input-json '\''{"topic":"macro"}'\'' --no-audit'] ['get_market_snapshot_live_smoke', 'get_macro_snapshot_live_smoke', 'get_news_bundle_live_smoke'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.773 API Key Provider Recovery Summary Env-Key Aggregate Gate Record - 2026-05-17
 
 ### A. 목적
