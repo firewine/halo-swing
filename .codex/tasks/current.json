@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SMOKE_COMMAND_LIST_FIELDS_GATE",
+  "gate_id": "API_KEY_PROVIDER_SMOKE_NEXT_BLOCKED_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.938",
-  "next_atomic_step": "surface summary-only API-key provider smoke command list fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.939",
+  "next_atomic_step": "surface summary-only API-key next blocked provider smoke fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.938",
+    "docs/halo-swing-development-plan.md#3.939",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py",
@@ -57,13 +57,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output mirrors API-key provider smoke command string lists for all, ready, and blocked provider smoke rows",
-    "summary-only tests prove provider smoke command list fields match provider smoke command rows",
-    "README and DevOps guide document the top-level API-key provider smoke command list fields",
+    "summary-only output mirrors the first blocked API-key provider smoke row as top-level no-secret scalar fields",
+    "summary-only tests prove next blocked provider smoke fields match provider smoke command rows",
+    "README and DevOps guide document the top-level API-key next blocked provider smoke fields",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key provider smoke command list fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key next blocked provider smoke fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
