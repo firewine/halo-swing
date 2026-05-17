@@ -829,17 +829,19 @@ operator-facing row with `status`, `has_failures`, `failure_category`,
 `first_failed_stage_name`, `first_failed_check_key`, `next_action_name`,
 `next_action_command`, `next_action_provider_family`,
 `next_action_provider`, `next_action_smoke_command_name`,
-`next_action_is_recovery`,
-`provider_recovery_required`, and `provider_recovery_item_count`. When the
-failure category is provider recovery, it also includes recovery env-key hints
-The compact top-level payload also mirrors API-key failure one-line fields:
+`next_action_expected_live_contract`, `next_action_expected_live_checks`,
+`next_action_is_recovery`, `provider_recovery_required`,
+`provider_recovery_item_count`, `network_call`, `mutates_local_state`, and
+`secret_values_returned`. When the failure category is provider recovery, it
+also includes `preferred_env_key` and `accepted_env_keys` without returning key
+values, so failure summary provider identity, expected live checks, and safety
+flags are visible in compact output. The
+compact top-level payload also mirrors API-key failure one-line fields:
 `api_key_failure_category`, `api_key_has_failures`,
 `api_key_failed_stage_names`, `api_key_failed_check_keys`,
 `api_key_tools_with_failures`, `api_key_first_failed_stage_name`, and
 `api_key_first_failed_check_key`.
-with `preferred_env_key` and `accepted_env_keys` without returning key values, so
-failure summary provider identity is visible in compact output. The
-top-level `api_key_setup_file_summary`
+The top-level `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) keeps `.env.example` and `.env` setup state
 visible with `source_path`, `target_path`, `source_exists`, `target_exists`,
 `copy_required`, `copy_command`, `preferred_env_keys`, `dotenv_examples`,

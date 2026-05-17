@@ -832,6 +832,42 @@ def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_pipeline_failure_summary",
+        "api_key_pipeline_failure_summary.v1",
+        "status",
+        "has_failures",
+        "failure_category",
+        "failed_stage_names",
+        "failed_check_keys",
+        "tools_with_failures",
+        "first_failed_stage_name",
+        "first_failed_check_key",
+        "next_action_name",
+        "next_action_command",
+        "next_action_provider_family",
+        "next_action_provider",
+        "next_action_smoke_command_name",
+        "next_action_expected_live_contract",
+        "next_action_expected_live_checks",
+        "next_action_is_recovery",
+        "provider_recovery_required",
+        "provider_recovery_item_count",
+        "preferred_env_key",
+        "accepted_env_keys",
+        "network_call",
+        "mutates_local_state",
+        "secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_provider_selection_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

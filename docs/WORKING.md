@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_VERIFIED
-gate_id: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_GATE
+status: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_PIPELINE_FAILURE_SUMMARY_NEXT_ACTION_DOCS_PARITY_GATE
 review_tier: S1_small
 
-next_atomic_step: lock API-key operator checklist summary step field docs parity
+next_atomic_step: lock API-key pipeline failure summary next-action field docs parity
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,14 +83,25 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README and DevOps setup guide document api_key_operator_checklist_summary step rows for required/configured/missing env keys, network policy, provider smoke counts, recovery smoke hints, and dotenv example count fields
-  - setup docs guard keeps README and DevOps API-key operator checklist summary field parity in sync
+  - README and DevOps setup guide document api_key_pipeline_failure_summary next-action provider identity, env-key hints, expected live contract/checks, and safety fields
+  - setup docs guard keeps README and DevOps API-key pipeline failure summary field parity in sync
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key operator checklist summary step field docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key pipeline failure summary next-action docs parity gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_SUMMARY_STEP_FIELDS_DOCS_PARITY_GATE
+review_tier: S1_small
+
+next_atomic_step: lock API-key operator checklist summary step field docs parity
 ```
 
 Previous completed directive:
@@ -3438,6 +3449,54 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Pipeline Failure Summary Next Action Docs Parity Gate is
+verified. README and DevOps setup guide now document
+`api_key_pipeline_failure_summary.v1` next-action provider identity, env-key
+hints, expected live contract/checks, and safety fields. Focused docs/readiness
+coverage, setup-docs coverage, direct summary-only smoke, full pytest, ruff,
+and health_check passed.
+
+```yaml
+api_key_pipeline_failure_summary_next_action_docs_parity_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_setup_docs.py
+  implementation:
+    - README documents api_key_pipeline_failure_summary next-action provider identity, env-key hints, expected live contract/checks, and safety fields
+    - DevOps setup guide documents the same api_key_pipeline_failure_summary next-action fields
+    - tests/test_setup_docs.py keeps README and DevOps guide API-key pipeline failure summary field parity in sync
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action -q
+      result: "2 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; api_key_pipeline_failure_summary kept next action and secret_values_returned false
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "824 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Operator Checklist Summary Step Fields Docs Parity Gate is
 verified. README and DevOps setup guide now document

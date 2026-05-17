@@ -984,6 +984,62 @@ verification:
   - direct summary-only smoke confirmed api_key_operator_checklist_summary fill_live_data_api_keys step required_env_keys, dotenv_examples, dotenv_example_count 3, and secret_values_returned false
 ```
 
+## 3.864 API Key Pipeline Failure Summary Next Action Docs Parity Gate Record - 2026-05-17
+
+### A. 목적
+
+3.863에서 operator checklist summary step row 문서 parity를 잠갔다. 같은
+API-key-only compact output에서 `api_key_pipeline_failure_summary.v1`는 실패한
+stage/check와 다음 provider recovery action을 한 row로 보여주며 provider identity,
+env-key hints, expected live contract/checks, and safety fields를 이미 담는다.
+하지만 README와 DevOps guide는 이 next-action detail field set을 명시적으로 모두
+고정하지 않았다. 이번 slice는 failure summary docs parity를 잠가, API 키만 채운 뒤
+실패한 live smoke의 다음 조치와 검증해야 할 live contract를 compact client가 안정적으로
+표시할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README documents api_key_pipeline_failure_summary next-action provider identity, env-key hints, expected live contract/checks, and safety fields
+  - DevOps setup guide documents the same api_key_pipeline_failure_summary next-action fields
+  - tests/test_setup_docs.py keeps README and DevOps guide API-key pipeline failure summary field parity in sync
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key pipeline failure summary next-action docs parity pytest: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 824 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
+```
+
 ## 3.861 API Key Integration Status Next Action Dotenv Fields Gate Record - 2026-05-17
 
 ### A. 목적
