@@ -60,6 +60,20 @@ def _api_key_setup_quickstart_command_plan_family_fields(
     provider_families = _ordered_unique_strings(
         [row.get("provider_family") for row in provider_rows]
     )
+    ready_provider_families = _ordered_unique_strings(
+        [
+            row.get("provider_family")
+            for row in provider_rows
+            if row.get("status") == "ready"
+        ]
+    )
+    blocked_provider_families = _ordered_unique_strings(
+        [
+            row.get("provider_family")
+            for row in provider_rows
+            if row.get("status") != "ready"
+        ]
+    )
     provider_smoke_count = len(provider_rows)
     ready_provider_smoke_count = sum(
         row.get("status") == "ready" for row in provider_rows
@@ -71,6 +85,12 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_provider_family_count": len(
             provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_ready_provider_families": (
+            ready_provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_blocked_provider_families": (
+            blocked_provider_families
         ),
         "api_key_setup_quickstart_command_plan_ready_provider_smoke_count": (
             ready_provider_smoke_count

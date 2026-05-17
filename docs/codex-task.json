@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_FAMILIES_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.895",
-  "next_atomic_step": "surface API-key quickstart provider-smoke aggregate readiness and safety flags",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.896",
+  "next_atomic_step": "surface API-key quickstart provider-smoke ready and blocked provider-family lists",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.895",
+    "docs/halo-swing-development-plan.md#3.896",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
@@ -57,14 +57,15 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level quickstart command plan exposes provider-smoke ready and blocked counts",
-    "summary-only top-level quickstart command plan exposes aggregate ready, network, live-required, mutation, and secret-return flags for provider-smoke rows",
-    "fake-key offline verification proves provider-smoke aggregate flags report ready/live/safe state for market, macro, and news without secret values",
-    "blocked no-key verification proves aggregate flags stay tied to provider smoke command rows without secret values",
+    "summary-only top-level quickstart command plan exposes provider-smoke ready provider families",
+    "summary-only top-level quickstart command plan exposes provider-smoke blocked provider families",
+    "fake-key offline verification proves ready families report market, macro, and news while blocked families are empty without secret values",
+    "blocked no-key verification proves ready families are empty and blocked families report market, macro, and news without secret values",
+    "partial-key verification proves ready and blocked family lists stay tied to provider smoke command row status",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan aggregate flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan ready/blocked families gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

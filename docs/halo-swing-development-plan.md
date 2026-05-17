@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.896 API Key Quickstart Command Plan Ready/Blocked Families Gate Record - 2026-05-18
+
+### A. 목적
+
+3.895에서 quickstart command plan provider-smoke rows의 aggregate ready/blocked count와
+safety flags는 top-level로 올라왔다. 하지만 compact client가 API 키만 넣은 뒤 어느
+provider family가 바로 smoke 실행 가능하고 어느 family가 아직 blocked인지 보여주려면
+여전히 status map을 순회해야 한다. 이번 slice는 provider-smoke ready/blocked provider
+family lists를 top-level로 올려 partial-key, no-key, all-key 상태를 한눈에 표시하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_ready_provider_families lists provider-smoke rows whose status is ready
+  - summary-only top-level api_key_setup_quickstart_command_plan_blocked_provider_families lists provider-smoke rows whose status is not ready
+  - README and DevOps setup guide document the quickstart command plan ready/blocked provider-family fields
+  - setup docs tests assert the documented ready/blocked field list stays in sync
+  - fake-key offline verification confirmed ready families market, macro, news and blocked families empty without secret values
+  - no-key offline verification confirmed ready families empty and blocked families market, macro, news without secret values
+  - partial-key test coverage keeps ready and blocked families tied to provider smoke command row status
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan ready/blocked family pytest: 3 passed
+  - direct fake-key ready/blocked family assertion: ready market, macro, news; blocked empty; secret_values_returned false
+  - direct no-key ready/blocked family assertion: ready empty; blocked market, macro, news; secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.895 API Key Quickstart Command Plan Aggregate Flags Gate Record - 2026-05-18
 
 ### A. 목적

@@ -885,6 +885,8 @@ def test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync() -> None:
         "api_key_setup_quickstart_command_plan_count",
         "api_key_setup_quickstart_command_plan_provider_families",
         "api_key_setup_quickstart_command_plan_provider_family_count",
+        "api_key_setup_quickstart_command_plan_ready_provider_families",
+        "api_key_setup_quickstart_command_plan_blocked_provider_families",
         "api_key_setup_quickstart_command_plan_ready_provider_smoke_count",
         "api_key_setup_quickstart_command_plan_blocked_provider_smoke_count",
         "api_key_setup_quickstart_command_plan_all_provider_smokes_ready",
