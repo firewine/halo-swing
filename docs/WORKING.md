@@ -58,6 +58,7 @@ allowed_edit_paths:
   - src/halo_swing_mcp/tools/readiness_parts/provider_recovery.py
   - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -76,7 +77,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -86,6 +87,7 @@ required_verification:
 done_means:
   - api_key_provider_recovery_summary mirrors selected provider class, route data_mode, and live_data_required evidence for the next recovery item without secret values
   - full and summary-only top-level next_recovery_* fields expose the same next recovery route evidence without nested parsing
+  - summary-only provider smoke success aggregate projection is split into the focused provider smoke field module so summary_only_payload.py stays below the 900-line warning point
   - README and DevOps setup guide document the next recovery route fields
   - setup docs guard keeps README and DevOps API-key provider recovery summary field parity in sync
   - fake-key offline verification proves next recovery fields carry live route evidence with expected provider class and no secret values
