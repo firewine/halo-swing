@@ -1653,6 +1653,12 @@ def assert_api_key_requirements_summary_top_level_fields(
     assert payload["api_key_requirement_next_missing_required_env_key_count"] == len(
         next_missing_requirement.get("required_env_keys", [])
     )
+    assert payload["api_key_requirement_next_missing_configured_env_keys"] == (
+        next_missing_requirement.get("configured_env_keys", [])
+    )
+    assert payload[
+        "api_key_requirement_next_missing_configured_env_key_count"
+    ] == len(next_missing_requirement.get("configured_env_keys", []))
     assert payload["api_key_requirement_next_missing_missing_env_keys"] == (
         next_missing_requirement.get("missing_env_keys", [])
     )
@@ -1667,6 +1673,9 @@ def assert_api_key_requirements_summary_top_level_fields(
     )
     assert payload["api_key_requirement_next_missing_setup_status"] == (
         next_missing_requirement.get("setup_status")
+    )
+    assert payload["api_key_requirement_next_missing_configured"] is (
+        next_missing_requirement.get("configured") is True
     )
     assert payload["api_key_requirement_next_missing_next_setup_action"] == (
         next_missing_requirement.get("next_setup_action")
@@ -10519,6 +10528,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "FRED_API_KEY"
     ]
     assert payload["api_key_requirement_next_missing_required_env_key_count"] == 1
+    assert payload["api_key_requirement_next_missing_configured_env_keys"] == []
+    assert (
+        payload["api_key_requirement_next_missing_configured_env_key_count"] == 0
+    )
     assert payload["api_key_requirement_next_missing_missing_env_keys"] == [
         "FRED_API_KEY"
     ]
@@ -10532,6 +10545,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "FRED_API_KEY",
     ]
     assert payload["api_key_requirement_next_missing_setup_status"] == "pending"
+    assert payload["api_key_requirement_next_missing_configured"] is False
     assert payload["api_key_requirement_next_missing_next_setup_action"] == (
         "fill_preferred_env_key"
     )

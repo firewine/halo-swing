@@ -413,6 +413,60 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.919 API Key Requirements Next Missing Configured Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.917은 next missing provider requirement row의 provider, required/missing env-key,
+setup action, smoke command, safety fields를 top-level로 펼쳤다. 3.918은 per-family
+configured env-key count를 추가했다. 하지만 compact client가 다음 missing row에 이미
+어떤 env-key alias가 configured 되었는지, 그리고 row 자체가 configured 상태인지 보려면
+아직 nested requirement row를 열어야 한다. 이번 slice는 next missing row의 configured
+flag와 configured env-key hint를 top-level로 제공한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors the next missing provider requirement configured flag and configured env-key hints as top-level fields
+  - blocked default and partial-key summary-only tests prove top-level next missing configured fields match api_key_requirements_summary
+  - README and DevOps guide document the top-level next missing configured provider requirement fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.918 API Key Requirements Configured Env-Key Count Map Fields Gate Record - 2026-05-18
 
 ### A. 목적
