@@ -8900,6 +8900,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "cp .env.example .env"
     )
     assert (
+        payload["api_key_setup_quickstart_next_command_plan_has_command"] is True
+    )
+    assert (
         payload["api_key_setup_quickstart_next_command_plan_provider_family"]
         is None
     )
@@ -8946,6 +8949,13 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         "required"
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_ready_to_run"] is False
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_requires_api_keys"]
+        is False
     )
     assert (
         payload["api_key_setup_quickstart_next_command_plan_network_call"]
@@ -11611,6 +11621,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_setup_quickstart_next_command_plan_command"] == (
         payload["api_key_setup_quickstart_next_command_plan_item"]["command"]
     )
+    assert payload["api_key_setup_quickstart_next_command_plan_has_command"] is (
+        bool(payload["api_key_setup_quickstart_next_command_plan_item"]["command"])
+    )
     assert (
         payload["api_key_setup_quickstart_next_command_plan_provider_family"]
         == payload["api_key_setup_quickstart_next_command_plan_item"][
@@ -11679,6 +11692,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         payload["api_key_setup_quickstart_next_command_plan_item"]["status"]
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_ready_to_run"] is (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["status"]
+        == "ready"
+        and bool(payload["api_key_setup_quickstart_next_command_plan_item"]["command"])
+    )
+    assert payload[
+        "api_key_setup_quickstart_next_command_plan_requires_api_keys"
+    ] is (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["status"]
+        != "ready"
+        and bool(
+            payload["api_key_setup_quickstart_next_command_plan_item"].get(
+                "accepted_env_keys", []
+            )
+        )
     )
     assert payload["api_key_setup_quickstart_next_command_plan_network_call"] == (
         payload["api_key_setup_quickstart_next_command_plan_item"]["network_call"]

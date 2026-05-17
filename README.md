@@ -717,6 +717,7 @@ It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,
 `api_key_setup_quickstart_next_command_plan_command`,
+`api_key_setup_quickstart_next_command_plan_has_command`,
 `api_key_setup_quickstart_next_command_plan_provider_family`,
 `api_key_setup_quickstart_next_command_plan_provider`,
 `api_key_setup_quickstart_next_command_plan_selected_provider_class`,
@@ -728,6 +729,8 @@ It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_accepted_env_keys`,
 `api_key_setup_quickstart_next_command_plan_next_setup_action`,
 `api_key_setup_quickstart_next_command_plan_status`,
+`api_key_setup_quickstart_next_command_plan_ready_to_run`,
+`api_key_setup_quickstart_next_command_plan_requires_api_keys`,
 `api_key_setup_quickstart_next_command_plan_network_call`,
 `api_key_setup_quickstart_next_command_plan_network_call_policy`,
 `api_key_setup_quickstart_next_command_plan_mutates_local_state`, and

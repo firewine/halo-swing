@@ -355,6 +355,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
 def _api_key_setup_quickstart_next_command_plan_fields(
     next_quickstart_command_plan_row: dict[str, Any],
 ) -> dict[str, Any]:
+    accepted_env_keys = _string_list(
+        next_quickstart_command_plan_row.get("accepted_env_keys")
+    )
+    has_command = bool(next_quickstart_command_plan_row.get("command"))
+    ready_to_run = (
+        next_quickstart_command_plan_row.get("status") == "ready"
+        and has_command
+    )
+    requires_api_keys = (
+        next_quickstart_command_plan_row.get("status") != "ready"
+        and bool(accepted_env_keys)
+    )
     return {
         "api_key_setup_quickstart_next_command_plan_name": (
             next_quickstart_command_plan_row.get("name")
@@ -365,6 +377,7 @@ def _api_key_setup_quickstart_next_command_plan_fields(
         "api_key_setup_quickstart_next_command_plan_command": (
             next_quickstart_command_plan_row.get("command")
         ),
+        "api_key_setup_quickstart_next_command_plan_has_command": has_command,
         "api_key_setup_quickstart_next_command_plan_provider_family": (
             next_quickstart_command_plan_row.get("provider_family")
         ),
@@ -393,13 +406,17 @@ def _api_key_setup_quickstart_next_command_plan_fields(
             next_quickstart_command_plan_row.get("preferred_env_key")
         ),
         "api_key_setup_quickstart_next_command_plan_accepted_env_keys": (
-            _string_list(next_quickstart_command_plan_row.get("accepted_env_keys"))
+            accepted_env_keys
         ),
         "api_key_setup_quickstart_next_command_plan_next_setup_action": (
             next_quickstart_command_plan_row.get("next_setup_action")
         ),
         "api_key_setup_quickstart_next_command_plan_status": (
             next_quickstart_command_plan_row.get("status")
+        ),
+        "api_key_setup_quickstart_next_command_plan_ready_to_run": ready_to_run,
+        "api_key_setup_quickstart_next_command_plan_requires_api_keys": (
+            requires_api_keys
         ),
         "api_key_setup_quickstart_next_command_plan_network_call": (
             next_quickstart_command_plan_row.get("network_call") is True
