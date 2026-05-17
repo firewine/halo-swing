@@ -1950,6 +1950,11 @@ def assert_api_key_operator_checklist_top_level_fields(
     assert payload["api_key_operator_checklist_all_selected_routes_live"] is (
         checklist_summary["all_selected_routes_live"]
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_operator_checklist",
+        source_summary=checklist_summary,
+    )
     assert payload["api_key_operator_checklist_network_call"] is (
         checklist_summary["network_call"]
     )

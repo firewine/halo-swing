@@ -760,7 +760,11 @@ It also mirrors checklist route-family evidence as
 `api_key_operator_checklist_selected_provider_class_by_family`,
 `api_key_operator_checklist_provider_route_data_mode_by_family`,
 `api_key_operator_checklist_provider_route_live_data_required_by_family`,
-`api_key_operator_checklist_all_selected_routes_live`,
+`api_key_operator_checklist_all_selected_routes_live`, plus route count
+aggregates `api_key_operator_checklist_provider_route_family_count`,
+`api_key_operator_checklist_selected_provider_family_count`,
+`api_key_operator_checklist_provider_route_live_data_required_family_count`,
+`api_key_operator_checklist_provider_route_data_mode_counts`,
 `api_key_operator_checklist_network_call`,
 `api_key_operator_checklist_mutates_local_state`, and
 `api_key_operator_checklist_secret_values_returned`.

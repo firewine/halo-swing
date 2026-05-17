@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from .contract_checks import _optional_mapping
 from .live_data_setup import _string_list
+from .summary_only_provider_route_fields import (
+    _route_family_summary_top_level_fields,
+)
 
 
 __all__ = ("_api_key_operator_checklist_top_level_fields",)
@@ -98,33 +100,9 @@ def _api_key_operator_checklist_top_level_fields(
                 "next_blocking_action_accepted_env_keys"
             )
         ),
-        "api_key_operator_checklist_selected_provider_class_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "selected_provider_class_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "provider_route_data_mode_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_all_selected_routes_live": (
-            api_key_operator_checklist_summary.get("all_selected_routes_live")
-            is True
+        **_route_family_summary_top_level_fields(
+            prefix="api_key_operator_checklist",
+            source_summary=api_key_operator_checklist_summary,
         ),
         "api_key_operator_checklist_network_call": (
             api_key_operator_checklist_summary.get("network_call") is True
