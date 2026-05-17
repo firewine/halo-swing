@@ -2741,6 +2741,34 @@ def _api_key_provider_recovery_summary(
                 if item.get("recovery_status") == "blocked"
             ]
         ),
+        "provider_recovery_pending_smoke_command_names": _ordered_unique_strings(
+            [
+                item.get("smoke_command_name")
+                for item in compact_items
+                if item.get("recovery_status") == "pending"
+            ]
+        ),
+        "provider_recovery_pending_smoke_commands": _string_list(
+            [
+                item.get("recovery_smoke_command")
+                for item in compact_items
+                if item.get("recovery_status") == "pending"
+            ]
+        ),
+        "provider_recovery_blocked_smoke_command_names": _ordered_unique_strings(
+            [
+                item.get("smoke_command_name")
+                for item in compact_items
+                if item.get("recovery_status") == "blocked"
+            ]
+        ),
+        "provider_recovery_blocked_smoke_commands": _string_list(
+            [
+                item.get("recovery_smoke_command")
+                for item in compact_items
+                if item.get("recovery_status") == "blocked"
+            ]
+        ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
         ),
