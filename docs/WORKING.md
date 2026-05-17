@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_READINESS_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
-gate_id: API_KEY_READINESS_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
+status: API_KEY_NEXT_ACTION_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_NEXT_ACTION_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider route family evidence into API-key readiness summary
+next_atomic_step: mirror provider route family evidence into API-key next action summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,7 +74,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_readiness_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,17 +82,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - readiness_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
-  - summary-only top-level api_key_readiness_* mirrors expose the same route family evidence without nested parsing
-  - README and DevOps setup guide document the readiness summary provider route family fields
-  - setup docs guard keeps README and DevOps API-key readiness summary field parity in sync
-  - fake-key offline verification proves readiness summary carries live family routes with expected provider classes and no secret values
+  - api_key_next_action_summary mirrors selected provider class, route data_mode, live_data_required, and all-selected-live route evidence by provider family without secret values
+  - summary-only top-level api_key_next_action_* mirrors expose the same route family evidence without nested parsing
+  - README and DevOps setup guide document the next-action summary provider route family fields
+  - setup docs guard keeps README and DevOps API-key next-action summary field parity in sync
+  - fake-key offline verification proves next-action summary carries live family routes with expected provider classes and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key readiness summary provider route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key next-action summary provider route family fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_READINESS_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_VERIFIED
+gate_id: API_KEY_READINESS_SUMMARY_PROVIDER_ROUTE_FAMILY_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider route family evidence into API-key readiness summary
 ```
 
 Previous completed directive:
@@ -3504,6 +3515,66 @@ next_state_after_success: commit this verified API-key provider route family top
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Next Action Summary Provider Route Family Fields Gate is
+verified. `api_key_next_action_summary` and summary-only top-level
+`api_key_next_action_*` mirrors now expose selected provider class, route data
+mode, live-data-required state, and all-selected-routes-live state by provider
+family without secrets. Shared route-family projection now supports both
+readiness and next-action summary rows. Focused next-action/docs coverage,
+fake-key smoke checks, setup-docs coverage, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_next_action_summary_provider_route_family_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_summaries.py
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_runner.py
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_route_family_fields.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_next_action_summary now mirrors selected_provider_class_by_family, provider_route_data_mode_by_family, provider_route_live_data_required_by_family, and all_selected_routes_live
+    - summary-only top-level api_key_next_action_selected_provider_class_by_family, api_key_next_action_provider_route_data_mode_by_family, api_key_next_action_provider_route_live_data_required_by_family, and api_key_next_action_all_selected_routes_live mirror the next-action summary
+    - api_key_route_family_fields.py owns shared route-family projection for readiness and next-action rows
+    - README and DevOps setup guide document next-action summary provider route family fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_next_action_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; next-action summary route family mirrors returned without secret values
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "32 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+      result: "96 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "824 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+    - command: direct fake-key summary-only output inspection
+      result: "{'market': 'PolygonMarketDataProvider', 'macro': 'FredMacroDataProvider', 'news': 'NewsApiDataProvider'} {'market': 'live', 'macro': 'live', 'news': 'live'} {'market': True, 'macro': True, 'news': True} True False"
+```
+
+Previous verification:
 
 Summary: API Key Readiness Summary Provider Route Family Fields Gate is
 verified. Readiness summary and summary-only top-level `api_key_readiness_*`

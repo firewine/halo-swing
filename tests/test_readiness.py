@@ -3699,6 +3699,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "status": "conflict",
         "current_step": "recover_failed_providers",
         "ready": False,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "next_action_name": "recover_failed_providers",
         "next_action_status": "pending",
         "next_action_command": payload["provider_recovery_smokes"][0]["command"],
@@ -5286,6 +5296,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "status": "ready",
         "current_step": "run_provider_smokes",
         "ready": True,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "next_action_name": "run_provider_smokes",
         "next_action_status": "ready",
         "next_action_command": fake_next_operator_action["next_provider_smoke"][
@@ -8401,6 +8421,33 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
         next_action_summary["next_action_mutates_local_state"]
     )
     assert integration_status["next_action_secret_values_returned"] is False
+    assert next_action_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert next_action_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert next_action_summary["provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert next_action_summary["all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_next_action_selected_provider_class_by_family"] == (
+        next_action_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_next_action_provider_route_data_mode_by_family"] == (
+        next_action_summary["provider_route_data_mode_by_family"]
+    )
+    assert (
+        payload["api_key_next_action_provider_route_live_data_required_by_family"]
+        == next_action_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_next_action_all_selected_routes_live"] is (
+        next_action_summary["all_selected_routes_live"]
+    )
     assert payload["next_operator_action_provider_family"] == "market"
     assert payload["next_operator_action_provider"] == "polygon"
     assert payload["next_operator_action_smoke_command_name"] == (
@@ -8649,6 +8696,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "status": "blocked",
         "current_step": "prepare_dotenv",
         "ready": False,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "next_action_name": "prepare_dotenv",
         "next_action_status": "pending",
         "next_action_command": "cp .env.example .env",

@@ -294,12 +294,14 @@ the compact `api_key_next_action_summary.v1` with `status`, `current_step`,
 `provider_recovery_item_count`, `next_action_name`, `next_action_command`,
 `next_action_status`, `next_action_is_recovery`, `next_action_network_call`,
 `next_action_mutates_local_state`, `next_action_provider_family`,
-`next_action_provider`, `next_action_smoke_command_name`, `preferred_env_key`,
-`accepted_env_keys`, `required_env_keys`, `next_after_action`,
-`dotenv_target_path`, `source_path`, `target_path`, `secret_input_required`,
-and no-secret `dotenv_examples` / `dotenv_example_count` when the next action
-points at a provider smoke command, provider recovery, dotenv setup, or
-API-key fill step, plus provider
+`next_action_provider`, `next_action_smoke_command_name`,
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`,
+`preferred_env_key`, `accepted_env_keys`, `required_env_keys`,
+`next_after_action`, `dotenv_target_path`, `source_path`, `target_path`,
+`secret_input_required`, and no-secret `dotenv_examples` /
+`dotenv_example_count` when the next action points at a provider smoke command,
+provider recovery, dotenv setup, or API-key fill step, plus provider
 family counts, API-key setup status inside `readiness_summary`, the next local
 action mirrored inside `readiness_summary`, readiness summary
 `preferred_env_key` and `accepted_env_keys` when that action points at a
@@ -354,6 +356,12 @@ Summary-only provider smoke env-key aggregates include
 `provider_smoke_success_preferred_env_keys`,
 `provider_smoke_success_accepted_env_keys`, and
 `provider_smoke_success_accepted_env_key_groups` without returning key values.
+Summary-only next-action route evidence is mirrored at top level as
+`api_key_next_action_selected_provider_class_by_family`,
+`api_key_next_action_provider_route_data_mode_by_family`,
+`api_key_next_action_provider_route_live_data_required_by_family`, and
+`api_key_next_action_all_selected_routes_live`, so compact clients can verify
+the full provider-family route map beside the single next command.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command

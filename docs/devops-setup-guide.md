@@ -804,10 +804,18 @@ top-level `api_key_next_action_summary`
 `next_action_command`, `next_action_status`, `next_action_is_recovery`,
 `next_action_network_call`, `next_action_mutates_local_state`,
 `next_action_provider_family`, `next_action_provider`, and
-`next_action_smoke_command_name` fields. When the next action points at a
-provider smoke or provider recovery command, it also includes
-`preferred_env_key` and `accepted_env_keys`, so the single next setup or
-recovery command, provider identity, and accepted API-key aliases are visible.
+`next_action_smoke_command_name` fields, plus
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, and `all_selected_routes_live`
+route evidence. When the next action points at a provider smoke or provider
+recovery command, it also includes `preferred_env_key` and `accepted_env_keys`,
+so the single next setup or recovery command, provider identity, and accepted API-key aliases are visible.
+The compact row also shows the full provider route family map.
+Summary-only top-level mirrors expose the same next-action route evidence as
+`api_key_next_action_selected_provider_class_by_family`,
+`api_key_next_action_provider_route_data_mode_by_family`,
+`api_key_next_action_provider_route_live_data_required_by_family`, and
+`api_key_next_action_all_selected_routes_live`.
 When the next action is `fill_live_data_api_keys`, it also includes
 `required_env_keys`, `next_after_action`, `dotenv_target_path`, `source_path`,
 `target_path`, `secret_input_required`, and no-secret `dotenv_examples` /

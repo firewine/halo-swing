@@ -98,6 +98,7 @@ def run_api_key_pipeline_smoke(
     )
     api_key_next_action_summary = _api_key_pipeline_next_action_summary(
         api_key_operator_checklist=api_key_operator_checklist,
+        live_data_setup_summary=live_data_setup_summary,
         next_operator_action=next_operator_action,
     )
     api_key_pipeline_stage_summary = _api_key_pipeline_stage_summary(

@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 from .context import *
-from .api_key_readiness_route_family_fields import (
-    _api_key_readiness_route_family_fields,
+from .api_key_route_family_fields import (
+    _api_key_route_family_fields,
 )
 
 
@@ -148,7 +148,7 @@ def _api_key_pipeline_readiness_summary(
         "provider_route_status": live_data_setup_summary.get(
             "provider_route_status"
         ),
-        **_api_key_readiness_route_family_fields(live_data_setup_summary),
+        **_api_key_route_family_fields(live_data_setup_summary),
         "ready_to_run_live_smoke": live_data_setup_summary.get(
             "ready_to_run_live_smoke"
         ),
@@ -210,6 +210,7 @@ def _api_key_pipeline_next_operator_action(
 def _api_key_pipeline_next_action_summary(
     *,
     api_key_operator_checklist: dict[str, Any],
+    live_data_setup_summary: dict[str, Any],
     next_operator_action: dict[str, Any],
 ) -> dict[str, Any]:
     next_provider_smoke = _optional_mapping(
@@ -261,6 +262,7 @@ def _api_key_pipeline_next_action_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    summary.update(_api_key_route_family_fields(live_data_setup_summary))
     next_after_action = next_operator_action.get("next_after_action")
     dotenv_target_path = next_operator_action.get("dotenv_target_path")
     source_path = next_operator_action.get("source_path")
