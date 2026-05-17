@@ -2718,6 +2718,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_recovery_network_call_policy": (
             "only_when_matching_api_key_selects_live_provider"
         ),
+        "next_recovery_network_call": True,
+        "next_recovery_mutates_local_state": False,
+        "next_recovery_secret_values_returned": False,
         "items": [
             {
                 "provider_family": "market",
@@ -2736,6 +2739,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "network_call": True,
+                "mutates_local_state": False,
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2759,6 +2764,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "network_call": True,
+                "mutates_local_state": False,
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2781,6 +2788,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
                 ),
+                "network_call": True,
+                "mutates_local_state": False,
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,

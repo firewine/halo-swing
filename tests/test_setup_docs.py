@@ -147,7 +147,11 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_recovery_preferred_env_key" in guide
     assert "next_recovery_accepted_env_keys" in guide
     assert "next_recovery_network_call_policy" in guide
+    assert "next_recovery_network_call" in guide
+    assert "next_recovery_mutates_local_state" in guide
+    assert "next_recovery_secret_values_returned" in guide
     assert "network_call_policy" in guide
+    assert "mutates_local_state" in guide
     assert "summary_only" in guide
     assert "api_key_pipeline_smoke_summary_only.v1" in guide
     assert '"summary_only":true' in guide

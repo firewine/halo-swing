@@ -2663,6 +2663,7 @@ def _api_key_provider_recovery_summary(
         preferred_env_key = first_item.get("preferred_env_key")
         accepted_env_keys = _string_list(first_item.get("accepted_env_keys"))
         network_call_policy = first_item.get("network_call_policy")
+        next_recovery_command = first_item.get("recovery_smoke_command")
         if isinstance(provider_family, str):
             summary["next_recovery_provider_family"] = provider_family
         if isinstance(provider, str):
@@ -2673,6 +2674,14 @@ def _api_key_provider_recovery_summary(
             summary["next_recovery_accepted_env_keys"] = accepted_env_keys
         if isinstance(network_call_policy, str):
             summary["next_recovery_network_call_policy"] = network_call_policy
+        summary["next_recovery_network_call"] = isinstance(
+            next_recovery_command,
+            str,
+        )
+        summary["next_recovery_mutates_local_state"] = (
+            first_item.get("mutates_local_state") is True
+        )
+        summary["next_recovery_secret_values_returned"] = False
     return summary
 
 
@@ -2689,6 +2698,8 @@ def _api_key_provider_recovery_summary_item(
         "next_setup_action": item.get("next_setup_action"),
         "preferred_env_key": item.get("preferred_env_key"),
         "accepted_env_keys": _string_list(item.get("accepted_env_keys")),
+        "network_call": isinstance(item.get("recovery_smoke_command"), str),
+        "mutates_local_state": recovery_smoke.get("mutates_local_state") is True,
         "exception_type": item.get("exception_type"),
         "exception_message_returned": item.get("exception_message_returned") is True,
         "url_returned": item.get("url_returned") is True,
