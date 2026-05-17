@@ -75,6 +75,18 @@ def _api_key_provider_smoke_top_level_fields(
             provider_smoke_accepted_env_keys_by_family.items()
         )
     }
+    provider_smoke_network_calls_by_family = {
+        family: row.get("network_call") is True
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_mutates_local_state_by_family = {
+        family: row.get("mutates_local_state") is True
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
+    provider_smoke_secret_values_returned_by_family = {
+        family: row.get("secret_values_returned") is True
+        for family, row in provider_smoke_command_rows_by_family.items()
+    }
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -171,6 +183,24 @@ def _api_key_provider_smoke_top_level_fields(
             family: row.get("network_call_policy")
             for family, row in provider_smoke_command_rows_by_family.items()
         },
+        "api_key_provider_smoke_network_calls_by_family": (
+            provider_smoke_network_calls_by_family
+        ),
+        "api_key_provider_smoke_network_call_count": sum(
+            provider_smoke_network_calls_by_family.values()
+        ),
+        "api_key_provider_smoke_mutates_local_state_by_family": (
+            provider_smoke_mutates_local_state_by_family
+        ),
+        "api_key_provider_smoke_mutates_local_state_count": sum(
+            provider_smoke_mutates_local_state_by_family.values()
+        ),
+        "api_key_provider_smoke_secret_values_returned_by_family": (
+            provider_smoke_secret_values_returned_by_family
+        ),
+        "api_key_provider_smoke_secret_values_returned_count": sum(
+            provider_smoke_secret_values_returned_by_family.values()
+        ),
         "api_key_provider_smoke_expected_live_contracts_by_family": {
             family: row.get("expected_live_contract")
             for family, row in provider_smoke_command_rows_by_family.items()

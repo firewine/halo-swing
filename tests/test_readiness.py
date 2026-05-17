@@ -1245,6 +1245,30 @@ def assert_provider_smoke_list_count_fields(payload: dict[str, Any]) -> None:
     )
 
 
+def assert_provider_smoke_safety_count_fields(payload: dict[str, Any]) -> None:
+    network_calls_by_family = payload[
+        "api_key_provider_smoke_network_calls_by_family"
+    ]
+    mutates_local_state_by_family = payload[
+        "api_key_provider_smoke_mutates_local_state_by_family"
+    ]
+    secret_values_returned_by_family = payload[
+        "api_key_provider_smoke_secret_values_returned_by_family"
+    ]
+    assert payload["api_key_provider_smoke_network_call_count"] == sum(
+        network_call is True
+        for network_call in network_calls_by_family.values()
+    )
+    assert payload["api_key_provider_smoke_mutates_local_state_count"] == sum(
+        mutates_local_state is True
+        for mutates_local_state in mutates_local_state_by_family.values()
+    )
+    assert payload["api_key_provider_smoke_secret_values_returned_count"] == sum(
+        secret_values_returned is True
+        for secret_values_returned in secret_values_returned_by_family.values()
+    )
+
+
 def quickstart_command_plan_route_summary_from_payload(
     payload: dict[str, Any],
 ) -> dict[str, Any]:
@@ -7164,6 +7188,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
     assert_provider_smoke_list_count_fields(payload)
+    assert_provider_smoke_safety_count_fields(payload)
     assert_route_count_top_level_fields(
         payload,
         prefix="api_key_setup_quickstart_command_plan",
@@ -8256,6 +8281,19 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "macro": "only_when_matching_api_key_selects_live_provider",
         "news": "only_when_matching_api_key_selects_live_provider",
     }
+    assert payload["api_key_provider_smoke_network_calls_by_family"] == {
+        row["provider_family"]: row["network_call"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_mutates_local_state_by_family"] == {
+        row["provider_family"]: row["mutates_local_state"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_secret_values_returned_by_family"] == {
+        row["provider_family"]: row["secret_values_returned"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
+    assert_provider_smoke_safety_count_fields(payload)
     assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
         "market": "market_snapshot_contract",
         "macro": "macro_filter_contract",
@@ -10982,6 +11020,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
         source_summary=provider_smoke_route_summary_from_payload(payload),
     )
     assert_provider_smoke_list_count_fields(payload)
+    assert_provider_smoke_safety_count_fields(payload)
     assert_route_count_top_level_fields(
         payload,
         prefix="api_key_setup_quickstart_command_plan",
@@ -10990,6 +11029,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert_quickstart_command_plan_list_count_fields(payload)
     assert payload["api_key_provider_smoke_network_call_policies_by_family"] == {
         row["provider_family"]: row["network_call_policy"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_network_calls_by_family"] == {
+        row["provider_family"]: row["network_call"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_mutates_local_state_by_family"] == {
+        row["provider_family"]: row["mutates_local_state"]
+        for row in command_summary["provider_smoke_commands"]
+    }
+    assert payload["api_key_provider_smoke_secret_values_returned_by_family"] == {
+        row["provider_family"]: row["secret_values_returned"]
         for row in command_summary["provider_smoke_commands"]
     }
     assert payload["api_key_provider_smoke_expected_live_contracts_by_family"] == {
