@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_SAFETY_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_ROUTE_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.899",
-  "next_atomic_step": "surface API-key quickstart next ready and next blocked provider-smoke safety scalars",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.900",
+  "next_atomic_step": "surface API-key quickstart next ready and next blocked provider-smoke route scalars",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.899",
+    "docs/halo-swing-development-plan.md#3.900",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
@@ -57,15 +57,15 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level quickstart command plan exposes next ready provider-smoke network, mutation, and secret-return safety scalars",
-    "summary-only top-level quickstart command plan exposes next blocked provider-smoke network, mutation, and secret-return safety scalars",
-    "fake-key offline verification proves next ready safety is network true, local mutation false, secret false, and next blocked safety is absent/false without secret values",
-    "blocked no-key verification proves next ready safety is absent/false and next blocked safety is network true, local mutation false, secret false without secret values",
-    "partial-key verification proves next ready and next blocked safety scalars stay tied to provider smoke command row status without secret values",
+    "summary-only top-level quickstart command plan exposes next ready provider-smoke provider identity and selected route evidence scalars",
+    "summary-only top-level quickstart command plan exposes next blocked provider-smoke provider identity and selected route evidence scalars",
+    "fake-key offline verification proves next ready route points to market polygon live provider evidence and next blocked route is absent/false without secret values",
+    "blocked no-key verification proves next ready route is absent/false and next blocked provider identity points to market polygon while selected route evidence is absent/false without secret values",
+    "partial-key verification proves next ready route points to market live provider evidence and next blocked provider identity points to macro fred while selected route evidence is absent/false without secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan next ready/blocked safety gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan next ready/blocked route gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

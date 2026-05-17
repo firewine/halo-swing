@@ -28,6 +28,73 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.900 API Key Quickstart Command Plan Next Ready/Blocked Route Gate Record - 2026-05-18
+
+### A. 목적
+
+3.899에서 quickstart command plan provider-smoke rows의 next ready/blocked safety
+scalars는 top-level로 올라왔다. 하지만 compact client가 다음 ready 또는 blocked smoke
+command가 어떤 provider route를 타는지 표시하려면 아직 provider-smoke row에서 provider
+identity, selected provider class, data mode, live-data-required evidence를 다시 찾아야
+한다. 이번 slice는 next ready/blocked provider-smoke route scalars를 top-level로 올려
+다음 smoke action의 provider identity와 selected route evidence를 바로 보여주게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider mirrors the first ready provider-smoke row provider
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_selected_provider_class mirrors the first ready provider-smoke row selected provider class
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_data_mode mirrors the first ready provider-smoke row route data mode
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_live_data_required mirrors the first ready provider-smoke row live-data-required flag
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider mirrors the first blocked provider-smoke row provider
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_selected_provider_class mirrors the first blocked provider-smoke row selected provider class
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_data_mode mirrors the first blocked provider-smoke row route data mode
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_live_data_required mirrors the first blocked provider-smoke row live-data-required flag
+  - README and DevOps setup guide document the quickstart command plan next ready/blocked route scalar fields
+  - setup docs tests assert the documented next ready/blocked route field list stays in sync
+  - fake-key offline verification confirmed next ready route points to market/polygon/PolygonMarketDataProvider/live/true, next blocked route is absent/false, and no secret values
+  - no-key offline verification confirmed next ready route is absent/false, next blocked route points to market/polygon with no selected live route yet, and no secret values
+  - partial-key offline verification confirmed next ready route points to market/polygon live and next blocked route points to macro/fred pending route, without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan next ready/blocked route pytest: 3 passed
+  - direct fake-key next ready/blocked route assertion: next ready market/polygon/PolygonMarketDataProvider/live/true, next blocked absent/false, secret_values_returned false
+  - direct no-key next ready/blocked route assertion: next ready absent/false, next blocked market/polygon/null/null/false, secret_values_returned false
+  - direct partial-key next ready/blocked route assertion: next ready market/polygon/PolygonMarketDataProvider/live/true, next blocked macro/fred/null/null/false, secret_values_returned false
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.899 API Key Quickstart Command Plan Next Ready/Blocked Safety Gate Record - 2026-05-18
 
 ### A. 목적

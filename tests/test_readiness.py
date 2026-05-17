@@ -6470,6 +6470,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider"
+        ]
+        == first_ready_command_row.get("provider")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_selected_provider_class"
+        ]
+        == first_ready_command_row.get("selected_provider_class")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_data_mode"
+        ]
+        == first_ready_command_row.get("provider_route_data_mode")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_live_data_required"
+        ]
+        == (first_ready_command_row.get("provider_route_live_data_required") is True)
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name"
         ]
         == first_ready_command_row.get("smoke_command_name")
@@ -6509,6 +6533,33 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
         ]
         == first_blocked_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider"
+        ]
+        == first_blocked_command_row.get("provider")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_selected_provider_class"
+        ]
+        == first_blocked_command_row.get("selected_provider_class")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_data_mode"
+        ]
+        == first_blocked_command_row.get("provider_route_data_mode")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_live_data_required"
+        ]
+        == (
+            first_blocked_command_row.get("provider_route_live_data_required")
+            is True
+        )
     )
     assert (
         payload[
@@ -8719,6 +8770,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider"
+        ]
+        == first_ready_command_row.get("provider")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_selected_provider_class"
+        ]
+        == first_ready_command_row.get("selected_provider_class")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_data_mode"
+        ]
+        == first_ready_command_row.get("provider_route_data_mode")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_live_data_required"
+        ]
+        == (first_ready_command_row.get("provider_route_live_data_required") is True)
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name"
         ]
         == first_ready_command_row.get("smoke_command_name")
@@ -8758,6 +8833,33 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
         ]
         == first_blocked_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider"
+        ]
+        == first_blocked_command_row.get("provider")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_selected_provider_class"
+        ]
+        == first_blocked_command_row.get("selected_provider_class")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_data_mode"
+        ]
+        == first_blocked_command_row.get("provider_route_data_mode")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_live_data_required"
+        ]
+        == (
+            first_blocked_command_row.get("provider_route_live_data_required")
+            is True
+        )
     )
     assert (
         payload[

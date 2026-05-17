@@ -111,6 +111,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family": (
             next_ready_row.get("provider_family")
         ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider": (
+            next_ready_row.get("provider")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_selected_provider_class": (
+            next_ready_row.get("selected_provider_class")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_data_mode": (
+            next_ready_row.get("provider_route_data_mode")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_route_live_data_required": (
+            next_ready_row.get("provider_route_live_data_required") is True
+        ),
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name": (
             next_ready_row.get("name")
         ),
@@ -131,6 +143,18 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family": (
             next_blocked_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider": (
+            next_blocked_row.get("provider")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_selected_provider_class": (
+            next_blocked_row.get("selected_provider_class")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_data_mode": (
+            next_blocked_row.get("provider_route_data_mode")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_route_live_data_required": (
+            next_blocked_row.get("provider_route_live_data_required") is True
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name": (
             next_blocked_row.get("name")
