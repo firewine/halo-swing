@@ -536,6 +536,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_requirement_next_missing_missing_env_keys" in guide
     assert "api_key_requirement_next_missing_preferred_env_key" in guide
     assert "api_key_requirement_next_missing_accepted_env_keys" in guide
+    assert "api_key_requirement_next_missing_accepted_env_key_count" in guide
     assert "api_key_requirement_next_missing_next_setup_action" in guide
     assert "api_key_requirement_next_missing_smoke_command_name" in guide
     assert "api_key_provider_requirement_required_env_keys" in guide
@@ -1049,6 +1050,7 @@ def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
         "api_key_requirement_next_missing_missing_env_key_count",
         "api_key_requirement_next_missing_preferred_env_key",
         "api_key_requirement_next_missing_accepted_env_keys",
+        "api_key_requirement_next_missing_accepted_env_key_count",
         "api_key_requirement_next_missing_setup_status",
         "api_key_requirement_next_missing_configured",
         "api_key_requirement_next_missing_next_setup_action",
@@ -1065,6 +1067,7 @@ def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
         "api_key_provider_requirement_missing_env_key_counts",
         "api_key_provider_requirement_preferred_env_keys",
         "api_key_provider_requirement_accepted_env_keys",
+        "api_key_provider_requirement_accepted_env_key_counts",
         "api_key_provider_requirement_setup_statuses",
         "api_key_provider_requirement_configured",
         "api_key_provider_requirement_next_setup_actions",

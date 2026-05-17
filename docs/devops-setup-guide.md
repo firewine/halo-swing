@@ -675,6 +675,7 @@ It mirrors the next missing provider requirement as
 `api_key_requirement_next_missing_missing_env_key_count`,
 `api_key_requirement_next_missing_preferred_env_key`,
 `api_key_requirement_next_missing_accepted_env_keys`,
+`api_key_requirement_next_missing_accepted_env_key_count`,
 `api_key_requirement_next_missing_setup_status`,
 `api_key_requirement_next_missing_configured`,
 `api_key_requirement_next_missing_next_setup_action`,
@@ -692,6 +693,7 @@ It also mirrors per-family provider requirement hints as
 `api_key_provider_requirement_missing_env_key_counts`,
 `api_key_provider_requirement_preferred_env_keys`,
 `api_key_provider_requirement_accepted_env_keys`,
+`api_key_provider_requirement_accepted_env_key_counts`,
 `api_key_provider_requirement_setup_statuses`,
 `api_key_provider_requirement_configured`,
 `api_key_provider_requirement_next_setup_actions`, and

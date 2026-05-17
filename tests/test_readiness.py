@@ -1671,6 +1671,9 @@ def assert_api_key_requirements_summary_top_level_fields(
     assert payload["api_key_requirement_next_missing_accepted_env_keys"] == (
         next_missing_requirement.get("accepted_env_keys", [])
     )
+    assert payload["api_key_requirement_next_missing_accepted_env_key_count"] == len(
+        next_missing_requirement.get("accepted_env_keys", [])
+    )
     assert payload["api_key_requirement_next_missing_setup_status"] == (
         next_missing_requirement.get("setup_status")
     )
@@ -1725,6 +1728,10 @@ def assert_api_key_requirements_summary_top_level_fields(
     }
     assert payload["api_key_provider_requirement_accepted_env_keys"] == {
         family: row["accepted_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_accepted_env_key_counts"] == {
+        family: len(row["accepted_env_keys"])
         for family, row in provider_requirements.items()
     }
     assert payload["api_key_provider_requirement_setup_statuses"] == {
@@ -10497,6 +10504,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         family: row["accepted_env_keys"]
         for family, row in requirements["provider_requirements"].items()
     }
+    assert payload["api_key_provider_requirement_accepted_env_key_counts"] == {
+        "market": 2,
+        "macro": 3,
+        "news": 2,
+    }
     assert payload["api_key_provider_requirement_required_env_keys"] == {
         "market": ["POLYGON_API_KEY"],
         "macro": ["FRED_API_KEY"],
@@ -10544,6 +10556,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "HALO_SWING_FRED_API_KEY",
         "FRED_API_KEY",
     ]
+    assert payload["api_key_requirement_next_missing_accepted_env_key_count"] == 3
     assert payload["api_key_requirement_next_missing_setup_status"] == "pending"
     assert payload["api_key_requirement_next_missing_configured"] is False
     assert payload["api_key_requirement_next_missing_next_setup_action"] == (

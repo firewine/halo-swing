@@ -42,6 +42,9 @@ def _api_key_requirements_top_level_fields(
     next_missing_configured_env_keys = _string_list(
         next_missing_requirement.get("configured_env_keys")
     )
+    next_missing_accepted_env_keys = _string_list(
+        next_missing_requirement.get("accepted_env_keys")
+    )
     next_missing_missing_env_keys = _string_list(
         next_missing_requirement.get("missing_env_keys")
     )
@@ -106,8 +109,11 @@ def _api_key_requirements_top_level_fields(
         "api_key_requirement_next_missing_preferred_env_key": (
             next_missing_requirement.get("preferred_env_key")
         ),
-        "api_key_requirement_next_missing_accepted_env_keys": _string_list(
-            next_missing_requirement.get("accepted_env_keys")
+        "api_key_requirement_next_missing_accepted_env_keys": (
+            next_missing_accepted_env_keys
+        ),
+        "api_key_requirement_next_missing_accepted_env_key_count": len(
+            next_missing_accepted_env_keys
         ),
         "api_key_requirement_next_missing_setup_status": (
             next_missing_requirement.get("setup_status")
@@ -148,6 +154,10 @@ def _api_key_requirements_top_level_fields(
         },
         "api_key_provider_requirement_accepted_env_keys": {
             family: _string_list(row.get("accepted_env_keys"))
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_accepted_env_key_counts": {
+            family: len(_string_list(row.get("accepted_env_keys")))
             for family, row in provider_requirement_rows.items()
         },
         "api_key_provider_requirement_configured_env_keys": {
