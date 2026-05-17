@@ -5514,15 +5514,25 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["next_operator_action_name"] == next_action_summary[
         "next_action_name"
     ]
+    assert payload["next_operator_action_status"] == next_action_summary[
+        "next_action_status"
+    ]
     assert payload["next_operator_action_command"] == next_action_summary[
         "next_action_command"
     ]
+    assert payload["next_operator_action_network_call"] == (
+        next_action_summary["next_action_network_call"]
+    )
+    assert payload["next_operator_action_mutates_local_state"] == (
+        next_action_summary["next_action_mutates_local_state"]
+    )
     assert payload["next_operator_action_preferred_env_key"] == (
         next_action_summary["preferred_env_key"]
     )
     assert payload["next_operator_action_accepted_env_keys"] == (
         next_action_summary["accepted_env_keys"]
     )
+    assert payload["next_operator_action_secret_values_returned"] is False
     assert next_operator_action == readiness_summary["next_operator_action"]
     assert next_operator_action["name"] == "run_provider_smokes"
     assert next_operator_action["next_provider_smoke"]["preferred_env_key"] == (

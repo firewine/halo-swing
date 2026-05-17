@@ -146,6 +146,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_operator_action_command" in guide
     assert "next_operator_action_preferred_env_key" in guide
     assert "next_operator_action_accepted_env_keys" in guide
+    assert "next_operator_action_status" in guide
+    assert "next_operator_action_network_call" in guide
+    assert "next_operator_action_mutates_local_state" in guide
+    assert "next_operator_action_secret_values_returned" in guide
     assert "top-level `next_operator_action`, `readiness_summary`" in guide
     assert "keeps `api_key_operator_checklist_summary`" in guide
     assert "api_key_operator_checklist_summary.v1" in guide

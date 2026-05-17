@@ -2353,14 +2353,29 @@ def _api_key_pipeline_summary_only_payload(
             next_operator_action.get("name")
             or api_key_next_action_summary.get("next_action_name")
         ),
+        "next_operator_action_status": (
+            next_operator_action.get("status")
+            or api_key_next_action_summary.get("next_action_status")
+        ),
         "next_operator_action_command": api_key_next_action_summary.get(
             "next_action_command"
+        ),
+        "next_operator_action_network_call": (
+            api_key_next_action_summary.get("next_action_network_call") is True
+        ),
+        "next_operator_action_mutates_local_state": (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
         ),
         "next_operator_action_preferred_env_key": api_key_next_action_summary.get(
             "preferred_env_key"
         ),
         "next_operator_action_accepted_env_keys": _string_list(
             api_key_next_action_summary.get("accepted_env_keys")
+        ),
+        "next_operator_action_secret_values_returned": (
+            next_operator_action.get("secret_values_returned") is True
+            or api_key_next_action_summary.get("secret_values_returned") is True
         ),
         "next_operator_action": next_operator_action,
         "readiness_summary": _optional_mapping(payload.get("readiness_summary"))

@@ -491,7 +491,10 @@ without returning secret values.
 For direct CLI/MCP consumers, the compact payload also mirrors one-line fields:
 `next_operator_action_name`, `next_operator_action_command`,
 `next_operator_action_preferred_env_key`, and
-`next_operator_action_accepted_env_keys`.
+`next_operator_action_accepted_env_keys`, plus safety fields
+`next_operator_action_status`, `next_operator_action_network_call`,
+`next_operator_action_mutates_local_state`, and
+`next_operator_action_secret_values_returned`.
 It keeps `api_key_requirements_summary`
 (`api_key_pipeline_api_key_requirements_summary.v1`) with
 `required_env_keys`, configured env-key names, `missing_provider_families`,
