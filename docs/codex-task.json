@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_EXECUTION_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.885",
-  "next_atomic_step": "mirror provider route evidence into API-key quickstart command plan fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.886",
+  "next_atomic_step": "mirror provider smoke execution details into API-key quickstart command plan fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -19,7 +19,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.885",
+    "docs/halo-swing-development-plan.md#3.886",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_context.py",
@@ -59,16 +59,16 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_setup_quickstart_command_plan provider-smoke rows mirror selected provider class, route data_mode, and live_data_required evidence without secret values",
-    "summary-only api_key_setup_quickstart_command_plan_*_by_family fields expose provider-smoke route evidence without parsing command summary rows",
-    "summary-only api_key_setup_quickstart_next_command_plan_* scalar fields mirror route evidence from the immediate command plan item",
-    "README and DevOps setup guide document quickstart command plan route fields",
-    "setup docs guard keeps README and DevOps API-key quickstart command plan route field parity in sync",
-    "fake-key offline verification proves quickstart command plan route fields carry live route evidence with expected provider class and no secret values",
+    "api_key_setup_quickstart_command_plan provider-smoke rows mirror provider, expected live contract/check, preferred env key, and accepted env keys without secret values",
+    "summary-only api_key_setup_quickstart_command_plan execution detail by-family maps expose provider-smoke execution evidence without parsing command summary rows",
+    "summary-only api_key_setup_quickstart_next_command_plan execution detail scalar fields mirror the immediate command plan item",
+    "README and DevOps setup guide document quickstart command plan execution detail fields",
+    "setup docs guard keeps README and DevOps API-key quickstart command plan execution detail field parity in sync",
+    "fake-key offline verification proves quickstart command plan execution detail fields carry live route evidence, expected checks, env hints, and no secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan route fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan execution fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

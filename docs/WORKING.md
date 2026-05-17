@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_GATE
+status: API_KEY_QUICKSTART_COMMAND_PLAN_EXECUTION_FIELDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_EXECUTION_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider route evidence into API-key quickstart command plan fields
+next_atomic_step: mirror provider smoke execution details into API-key quickstart command plan fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -83,33 +83,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_setup_quickstart_command_plan provider-smoke rows mirror selected provider class, route data_mode, and live_data_required evidence without secret values
-  - summary-only api_key_setup_quickstart_command_plan_*_by_family fields expose provider-smoke route evidence without parsing command summary rows
-  - summary-only api_key_setup_quickstart_next_command_plan_* scalar fields mirror route evidence from the immediate command plan item
-  - README and DevOps setup guide document quickstart command plan route fields
-  - setup docs guard keeps README and DevOps API-key quickstart command plan route field parity in sync
-  - fake-key offline verification proves quickstart command plan route fields carry live route evidence with expected provider class and no secret values
+  - api_key_setup_quickstart_command_plan provider-smoke rows mirror provider, expected live contract/check, preferred env key, and accepted env keys without secret values
+  - summary-only api_key_setup_quickstart_command_plan execution detail by-family maps expose provider-smoke execution evidence without parsing command summary rows
+  - summary-only api_key_setup_quickstart_next_command_plan execution detail scalar fields mirror the immediate command plan item
+  - README and DevOps setup guide document quickstart command plan execution detail fields
+  - setup docs guard keeps README and DevOps API-key quickstart command plan execution detail field parity in sync
+  - fake-key offline verification proves quickstart command plan execution detail fields carry live route evidence, expected checks, env hints, and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan route fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart command plan execution fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_GATE
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_EXECUTION_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart command plan route fields pytest: 2 passed
+  - focused API-key quickstart command plan execution fields pytest: 2 passed
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - direct fake-key summary-only output confirmed quickstart provider-smoke route fields, by-family maps, next command plan no-secret scalar fields, and secret_values_returned=false
+  - direct fake-key summary-only output confirmed quickstart provider-smoke provider, expected live contract/check, env hints, by-family maps, and secret_values_returned=false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -127,9 +127,19 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: commit this verified gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - quickstart command plan provider-smoke rows now carry selected_provider_class, provider_route_data_mode, and provider_route_live_data_required
-  - top-level quickstart command plan by-family maps and next-command scalar mirrors expose the same route evidence without secret values
-  - existing integration next-provider-smoke docs were repaired to include expected live contract/check, env hint, and mutation fields required by docs parity guards
+  - quickstart command plan provider-smoke rows now carry provider, expected_live_contract, expected_live_checks, preferred_env_key, and accepted_env_keys
+  - top-level quickstart command plan by-family maps and next-command scalar mirrors expose the same execution details without secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_ROUTE_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider route evidence into API-key quickstart command plan fields
 ```
 
 Previous completed directive:

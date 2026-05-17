@@ -184,9 +184,14 @@ def _api_key_pipeline_summary_only_context(
                 "kind": "copy_dotenv",
                 "command": copy_dotenv_command.get("command"),
                 "provider_family": None,
+                "provider": None,
                 "selected_provider_class": None,
                 "provider_route_data_mode": None,
                 "provider_route_live_data_required": False,
+                "expected_live_contract": None,
+                "expected_live_checks": [],
+                "preferred_env_key": None,
+                "accepted_env_keys": [],
                 "status": "required"
                 if copy_dotenv_command.get("required") is True
                 else "ready",
@@ -213,9 +218,14 @@ def _api_key_pipeline_summary_only_context(
                 "kind": "status_check",
                 "command": next_smoke_command.get("command"),
                 "provider_family": None,
+                "provider": None,
                 "selected_provider_class": None,
                 "provider_route_data_mode": None,
                 "provider_route_live_data_required": False,
+                "expected_live_contract": None,
+                "expected_live_checks": [],
+                "preferred_env_key": None,
+                "accepted_env_keys": [],
                 "status": "ready",
                 "network_call": next_smoke_command.get("network_call") is True,
                 "network_call_policy": next_smoke_command.get(
@@ -236,11 +246,18 @@ def _api_key_pipeline_summary_only_context(
                 "kind": "provider_smoke",
                 "command": row.get("command"),
                 "provider_family": row.get("provider_family"),
+                "provider": row.get("provider"),
                 "selected_provider_class": row.get("selected_provider_class"),
                 "provider_route_data_mode": row.get("provider_route_data_mode"),
                 "provider_route_live_data_required": (
                     row.get("provider_route_live_data_required") is True
                 ),
+                "expected_live_contract": row.get("expected_live_contract"),
+                "expected_live_checks": _string_list(
+                    row.get("expected_live_checks")
+                ),
+                "preferred_env_key": row.get("preferred_env_key"),
+                "accepted_env_keys": _string_list(row.get("accepted_env_keys")),
                 "status": row.get("status"),
                 "network_call": row.get("network_call") is True,
                 "network_call_policy": row.get("network_call_policy"),
@@ -257,9 +274,14 @@ def _api_key_pipeline_summary_only_context(
                 "kind": "pipeline_smoke",
                 "command": one_shot_pipeline_smoke.get("command"),
                 "provider_family": None,
+                "provider": None,
                 "selected_provider_class": None,
                 "provider_route_data_mode": None,
                 "provider_route_live_data_required": False,
+                "expected_live_contract": None,
+                "expected_live_checks": [],
+                "preferred_env_key": None,
+                "accepted_env_keys": [],
                 "status": "ready"
                 if setup_status_summary.get("ready_to_run_live_smoke") is True
                 else "blocked",

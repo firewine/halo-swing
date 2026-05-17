@@ -6287,9 +6287,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "kind": "copy_dotenv",
         "command": "cp .env.example .env",
         "provider_family": None,
+        "provider": None,
         "selected_provider_class": None,
         "provider_route_data_mode": None,
         "provider_route_live_data_required": False,
+        "expected_live_contract": None,
+        "expected_live_checks": [],
+        "preferred_env_key": None,
+        "accepted_env_keys": [],
         "status": "required",
         "network_call": False,
         "network_call_policy": None,
@@ -6304,9 +6309,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "get_live_data_api_key_status --no-audit"
         ),
         "provider_family": None,
+        "provider": None,
         "selected_provider_class": None,
         "provider_route_data_mode": None,
         "provider_route_live_data_required": False,
+        "expected_live_contract": None,
+        "expected_live_checks": [],
+        "preferred_env_key": None,
+        "accepted_env_keys": [],
         "status": "ready",
         "network_call": False,
         "network_call_policy": None,
@@ -6339,6 +6349,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         payload["api_key_setup_quickstart_next_command_plan_provider_family"]
         is None
     )
+    assert payload["api_key_setup_quickstart_next_command_plan_provider"] is None
     assert (
         payload[
             "api_key_setup_quickstart_next_command_plan_selected_provider_class"
@@ -6356,6 +6367,24 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_next_command_plan_provider_route_live_data_required"
         ]
         is False
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_expected_live_contract"
+        ]
+        is None
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_expected_live_checks"]
+        == []
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_preferred_env_key"]
+        is None
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
+        == []
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
         "required"
@@ -8307,11 +8336,16 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
             "kind": "provider_smoke",
             "command": row["command"],
             "provider_family": row["provider_family"],
+            "provider": row["provider"],
             "selected_provider_class": row["selected_provider_class"],
             "provider_route_data_mode": row["provider_route_data_mode"],
             "provider_route_live_data_required": row[
                 "provider_route_live_data_required"
             ],
+            "expected_live_contract": row["expected_live_contract"],
+            "expected_live_checks": row["expected_live_checks"],
+            "preferred_env_key": row["preferred_env_key"],
+            "accepted_env_keys": row["accepted_env_keys"],
             "status": row["status"],
             "network_call": row["network_call"],
             "network_call_policy": row["network_call_policy"],
@@ -8320,6 +8354,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         }
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
     ]
+    assert (
+        payload["api_key_setup_quickstart_command_plan_provider_by_family"]
+        == {
+            row["provider_family"]: row["provider"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
     assert (
         payload[
             "api_key_setup_quickstart_command_plan_selected_provider_class_by_family"
@@ -8335,6 +8376,42 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         ]
         == {
             row["provider_family"]: row["provider_route_data_mode"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_expected_live_contracts_by_family"
+        ]
+        == {
+            row["provider_family"]: row["expected_live_contract"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_expected_live_checks_by_family"
+        ]
+        == {
+            row["provider_family"]: row["expected_live_checks"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_preferred_env_key_by_family"
+        ]
+        == {
+            row["provider_family"]: row["preferred_env_key"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_accepted_env_keys_by_family"
+        ]
+        == {
+            row["provider_family"]: row["accepted_env_keys"]
             for row in payload["api_key_command_summary"]["provider_smoke_commands"]
         }
     )
@@ -8366,6 +8443,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         ]
     )
     assert (
+        payload["api_key_setup_quickstart_next_command_plan_provider"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"]["provider"]
+    )
+    assert (
         payload[
             "api_key_setup_quickstart_next_command_plan_selected_provider_class"
         ]
@@ -8387,6 +8468,32 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         ]
         == payload["api_key_setup_quickstart_next_command_plan_item"][
             "provider_route_live_data_required"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_expected_live_contract"
+        ]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "expected_live_contract"
+        ]
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_expected_live_checks"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "expected_live_checks"
+        ]
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_preferred_env_key"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "preferred_env_key"
+        ]
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_accepted_env_keys"]
+        == payload["api_key_setup_quickstart_next_command_plan_item"][
+            "accepted_env_keys"
         ]
     )
     assert payload["api_key_setup_quickstart_next_command_plan_status"] == (

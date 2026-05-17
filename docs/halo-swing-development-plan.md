@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.886 API Key Quickstart Command Plan Execution Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.885에서 quickstart command plan provider-smoke rows가 route evidence를 갖게 됐다.
+하지만 quickstart plan만 읽는 compact client는 아직 provider id, expected live
+contract/check, preferred env key, accepted env key aliases를 보기 위해
+`api_key_command_summary.provider_smoke_commands`를 다시 파싱해야 한다. 이번 slice는 API
+키만 넣은 뒤 quickstart command plan 한 벌만 읽어도 다음 provider smoke 명령의 실행
+조건과 검증 기준을 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_setup_quickstart_command_plan provider-smoke rows mirror provider, expected live contract/check, preferred env key, and accepted env keys
+  - summary-only api_key_setup_quickstart_command_plan execution detail by-family maps expose provider-smoke execution evidence
+  - summary-only api_key_setup_quickstart_next_command_plan execution detail scalar fields mirror the immediate command plan item
+  - README and DevOps setup guide document quickstart command plan execution detail fields
+  - setup docs guard keeps README and DevOps API-key quickstart command plan execution detail field parity in sync
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan execution fields pytest: 2 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key summary-only output confirmed quickstart provider-smoke provider, expected live contract/check, env hints, by-family maps, and secret_values_returned=false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.885 API Key Quickstart Command Plan Route Fields Gate Record - 2026-05-17
 
 ### A. 목적

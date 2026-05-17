@@ -509,20 +509,31 @@ and `api_key_setup_quickstart_next_command`.
 It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_names`,
 `api_key_setup_quickstart_command_plan_count`,
+`api_key_setup_quickstart_command_plan_provider_by_family`,
 `api_key_setup_quickstart_command_plan_selected_provider_class_by_family`,
 `api_key_setup_quickstart_command_plan_provider_route_data_mode_by_family`,
 `api_key_setup_quickstart_command_plan_provider_route_live_data_required_by_family`,
+`api_key_setup_quickstart_command_plan_expected_live_contracts_by_family`,
+`api_key_setup_quickstart_command_plan_expected_live_checks_by_family`,
+`api_key_setup_quickstart_command_plan_preferred_env_key_by_family`,
+`api_key_setup_quickstart_command_plan_accepted_env_keys_by_family`,
 and `api_key_setup_quickstart_next_command_plan_item`, so compact clients can
 show the copy/status/provider-smoke/one-shot commands in operator order with
-provider route evidence on provider-smoke rows.
+provider route evidence, expected live checks, and env-key hints on
+provider-smoke rows.
 It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,
 `api_key_setup_quickstart_next_command_plan_command`,
 `api_key_setup_quickstart_next_command_plan_provider_family`,
+`api_key_setup_quickstart_next_command_plan_provider`,
 `api_key_setup_quickstart_next_command_plan_selected_provider_class`,
 `api_key_setup_quickstart_next_command_plan_provider_route_data_mode`,
 `api_key_setup_quickstart_next_command_plan_provider_route_live_data_required`,
+`api_key_setup_quickstart_next_command_plan_expected_live_contract`,
+`api_key_setup_quickstart_next_command_plan_expected_live_checks`,
+`api_key_setup_quickstart_next_command_plan_preferred_env_key`,
+`api_key_setup_quickstart_next_command_plan_accepted_env_keys`,
 `api_key_setup_quickstart_next_command_plan_status`,
 `api_key_setup_quickstart_next_command_plan_network_call`,
 `api_key_setup_quickstart_next_command_plan_network_call_policy`,

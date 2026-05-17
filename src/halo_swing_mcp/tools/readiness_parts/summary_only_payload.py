@@ -279,6 +279,11 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_quickstart_command_plan_count": len(
             quickstart_command_plan
         ),
+        "api_key_setup_quickstart_command_plan_provider_by_family": {
+            row["provider_family"]: row.get("provider")
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
         "api_key_setup_quickstart_command_plan_selected_provider_class_by_family": {
             row["provider_family"]: row.get("selected_provider_class")
             for row in quickstart_command_plan
@@ -293,6 +298,26 @@ def _api_key_pipeline_summary_only_payload(
             row["provider_family"]: (
                 row.get("provider_route_live_data_required") is True
             )
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_expected_live_contracts_by_family": {
+            row["provider_family"]: row.get("expected_live_contract")
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_expected_live_checks_by_family": {
+            row["provider_family"]: _string_list(row.get("expected_live_checks"))
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_preferred_env_key_by_family": {
+            row["provider_family"]: row.get("preferred_env_key")
+            for row in quickstart_command_plan
+            if isinstance(row.get("provider_family"), str)
+        },
+        "api_key_setup_quickstart_command_plan_accepted_env_keys_by_family": {
+            row["provider_family"]: _string_list(row.get("accepted_env_keys"))
             for row in quickstart_command_plan
             if isinstance(row.get("provider_family"), str)
         },
@@ -311,6 +336,9 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_quickstart_next_command_plan_provider_family": (
             next_quickstart_command_plan_row.get("provider_family")
         ),
+        "api_key_setup_quickstart_next_command_plan_provider": (
+            next_quickstart_command_plan_row.get("provider")
+        ),
         "api_key_setup_quickstart_next_command_plan_selected_provider_class": (
             next_quickstart_command_plan_row.get("selected_provider_class")
         ),
@@ -322,6 +350,18 @@ def _api_key_pipeline_summary_only_payload(
                 "provider_route_live_data_required"
             )
             is True
+        ),
+        "api_key_setup_quickstart_next_command_plan_expected_live_contract": (
+            next_quickstart_command_plan_row.get("expected_live_contract")
+        ),
+        "api_key_setup_quickstart_next_command_plan_expected_live_checks": (
+            _string_list(next_quickstart_command_plan_row.get("expected_live_checks"))
+        ),
+        "api_key_setup_quickstart_next_command_plan_preferred_env_key": (
+            next_quickstart_command_plan_row.get("preferred_env_key")
+        ),
+        "api_key_setup_quickstart_next_command_plan_accepted_env_keys": (
+            _string_list(next_quickstart_command_plan_row.get("accepted_env_keys"))
         ),
         "api_key_setup_quickstart_next_command_plan_status": (
             next_quickstart_command_plan_row.get("status")
