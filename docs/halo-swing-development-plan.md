@@ -83,6 +83,7 @@ verification:
   - focused API-key quickstart command plan aggregate flags pytest: 3 passed
   - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
   - direct fake-key aggregate assertion: ready count 3, blocked count 0, all ready/network/live true, mutation false, secret false
+  - direct no-key aggregate assertion: ready count 0, blocked count 3, all ready/live false, network true, mutation false, secret false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
