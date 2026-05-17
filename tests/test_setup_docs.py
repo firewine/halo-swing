@@ -82,6 +82,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_action_is_recovery" in guide
     assert "next_action_network_call" in guide
     assert "next_action_mutates_local_state" in guide
+    assert "accepted API-key aliases are visible" in guide
     assert "api_key_pipeline_stage_summary" in guide
     assert "api_key_pipeline_stage_summary.v1" in guide
     assert "stage_count" in guide

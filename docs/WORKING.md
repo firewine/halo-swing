@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SMOKE_PLAN_ENV_HINT_VERIFIED
-gate_id: API_KEY_PROVIDER_SMOKE_PLAN_ENV_HINT_GATE
+status: API_KEY_NEXT_ACTION_PROVIDER_SMOKE_ENV_HINT_VERIFIED
+gate_id: API_KEY_NEXT_ACTION_PROVIDER_SMOKE_ENV_HINT_GATE
 review_tier: S1_small
 
-next_atomic_step: add accepted env-key hints to API-key provider smoke plan rows
+next_atomic_step: add provider smoke env-key hints to API-key next action summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,26 +74,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); smoke=payload["live_data_setup_summary"]["provider_smoke_plan"]["provider_smokes"][0]; print(smoke["preferred_env_key"], smoke["accepted_env_keys"], payload["live_data_setup_summary"]["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload["api_key_next_action_summary"]; print(action["next_action_name"], action["preferred_env_key"], action["accepted_env_keys"], action["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - live_data_setup_summary provider_smoke_plan provider_smokes include accepted_env_keys alongside preferred_env_key for each provider smoke row
-  - provider smoke plan env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
-  - focused tests cover provider smoke plan accepted env-key hints in live data setup and summary_only API-key pipeline output
-  - fake-key API-key pipeline summary-only CLI returns provider smoke plan accepted env-key names without secret values
-  - README and DevOps setup guide document provider smoke plan accepted env-key hints
-  - setup docs tests assert provider smoke plan accepted env-key hint guidance
+  - api_key_next_action_summary includes preferred_env_key and accepted_env_keys when next action points at a provider smoke command
+  - next action provider smoke env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
+  - focused tests cover next action provider smoke env-key hints in full and summary_only API-key pipeline output
+  - fake-key API-key pipeline summary-only CLI returns next action provider smoke env-key names without secret values
+  - README and DevOps setup guide document next action provider smoke env-key hints
+  - setup docs tests assert next action provider smoke env-key hint guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider smoke plan env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key next action provider smoke env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SMOKE_PLAN_ENV_HINT_VERIFIED
+gate_id: API_KEY_PROVIDER_SMOKE_PLAN_ENV_HINT_GATE
+review_tier: S1_small
+
+next_atomic_step: add accepted env-key hints to API-key provider smoke plan rows
 ```
 
 Previous completed directive:
@@ -2242,6 +2253,60 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Next Action Provider Smoke Env Hint Gate is verified.
+`api_key_next_action_summary` now carries `preferred_env_key` and
+`accepted_env_keys` when the next action points at a provider smoke command, so
+the single next-action row shows the accepted API-key aliases without returning
+API key values. Focused tests, fake-key CLI, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_next_action_provider_smoke_env_hint_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_next_action_summary includes preferred_env_key and accepted_env_keys when next action points at a provider smoke command
+    - next action provider smoke env-key hints fall back from next_provider_smoke when the top-level next_operator_action does not carry env-key fields
+    - next action provider smoke env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
+    - focused tests cover next action provider smoke env-key hints in full and summary_only API-key pipeline output
+    - fake-key API-key pipeline summary-only CLI returns next action provider smoke env-key names without secret values
+    - README and DevOps setup guide document next action provider smoke env-key hints
+    - tests/test_setup_docs.py asserts next action provider smoke env-key hint guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "4 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only next action returned preferred_env_key and accepted_env_keys without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload["api_key_next_action_summary"]; print(action["next_action_name"], action["preferred_env_key"], action["accepted_env_keys"], action["secret_values_returned"])'
+      result: "recover_failed_providers POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "790 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Smoke Plan Env Hint Gate is verified.
 `live_data_setup_summary.provider_smoke_plan.provider_smokes` now carries

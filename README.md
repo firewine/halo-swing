@@ -282,7 +282,9 @@ env keys and aliases, copy/smoke commands, ordered local setup steps, checklist
 ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
 the compact `api_key_next_action_summary.v1` with `next_action_name`,
 `next_action_command`, `next_action_is_recovery`,
-`next_action_network_call`, and `next_action_mutates_local_state`, provider
+`next_action_network_call`, `next_action_mutates_local_state`,
+`preferred_env_key`, and `accepted_env_keys` when the next action points at a
+provider smoke command or provider recovery, provider
 family counts, API-key setup status inside `readiness_summary`, the next local
 action mirrored inside `readiness_summary`, the first no-secret
 `next_provider_smoke` command in the top-level command summary and checklist

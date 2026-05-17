@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.755 API Key Next Action Provider Smoke Env Hint Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_next_action_summary`는 다음 실행 command를 한 줄로 보여주지만, 다음 action이
+`run_provider_smokes`이고 실제 command가 `next_provider_smoke`에서 온 경우에도
+`preferred_env_key`와 `accepted_env_keys`는 summary row에 올라오지 않았다. 이번 slice는
+provider smoke command를 가리키는 next-action row에 env key alias 힌트를 유지해, API
+key를 넣은 뒤 next-action summary 하나만 보아도 어떤 key 이름을 확인해야 하는지 알 수
+있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_next_action_summary includes preferred_env_key and accepted_env_keys when next action points at a provider smoke command
+  - next action provider smoke env-key hints fall back from next_provider_smoke when the top-level next_operator_action does not carry env-key fields
+  - next action provider smoke env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values
+  - focused tests cover next action provider smoke env-key hints in full and summary_only API-key pipeline output
+  - fake-key API-key pipeline summary-only CLI returns next action provider smoke env-key names without secret values
+  - README and DevOps setup guide document next action provider smoke env-key hints
+  - tests/test_setup_docs.py asserts next action provider smoke env-key hint guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only next action returned preferred_env_key and accepted_env_keys without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload["api_key_next_action_summary"]; print(action["next_action_name"], action["preferred_env_key"], action["accepted_env_keys"], action["secret_values_returned"])' -> recover_failed_providers POLYGON_API_KEY ['HALO_SWING_MARKET_DATA_API_KEY', 'POLYGON_API_KEY'] False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 790 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.754 API Key Provider Smoke Plan Env Hint Gate Record - 2026-05-17
 
 ### A. 목적

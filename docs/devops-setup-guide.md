@@ -541,9 +541,11 @@ top-level `api_key_next_action_summary`
 (`api_key_next_action_summary.v1`) mirrors the checklist `status`,
 `current_step`, `ready`, blocking counts, provider recovery counts, and compact
 `next_action_name`, `next_action_command`, `next_action_is_recovery`,
-`next_action_network_call`, and `next_action_mutates_local_state` fields so the
-single next setup or recovery command is visible without reading nested
-payloads. It keeps `api_key_pipeline_stage_summary`
+`next_action_network_call`, and `next_action_mutates_local_state` fields. When
+the next action points at a provider smoke or provider recovery command, it also
+includes `preferred_env_key` and `accepted_env_keys`, so the single next setup
+or recovery command and its accepted API-key aliases are visible without
+reading nested payloads. It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in
 execution order with `status`, `stage_count`, `failed_stage_count`,
