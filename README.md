@@ -379,7 +379,10 @@ listed in `applies_to`, so API-key smoke calls show the active live HTTP
 timeout without returning secret values. `api_key_provider_recovery_summary`
 (`api_key_provider_recovery_summary.v1`) exposes
 `provider_recovery_required`, `provider_error_count`,
-`provider_recovery_smoke_count`, `provider_recovery_provider_families`,
+`provider_recovery_smoke_count`, `provider_recovery_smoke_available_count`,
+`provider_recovery_smoke_unavailable_count`,
+`provider_recovery_all_smokes_available`,
+`provider_recovery_provider_families`,
 `provider_recovery_providers`, `provider_recovery_smoke_command_names`,
 `provider_recovery_smoke_commands`,
 `provider_recovery_preferred_env_keys`, `provider_recovery_accepted_env_keys`,

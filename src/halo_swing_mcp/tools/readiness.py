@@ -2636,6 +2636,9 @@ def _api_key_provider_recovery_summary(
     )
     compact_items = [_api_key_provider_recovery_summary_item(item) for item in items]
     first_item = compact_items[0] if compact_items else None
+    smoke_available_count = sum(
+        1 for item in compact_items if item.get("recovery_smoke_available") is True
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2644,6 +2647,13 @@ def _api_key_provider_recovery_summary(
         "provider_recovery_smoke_count": recovery_checklist.get(
             "provider_recovery_smoke_count",
             0,
+        ),
+        "provider_recovery_smoke_available_count": smoke_available_count,
+        "provider_recovery_smoke_unavailable_count": (
+            len(compact_items) - smoke_available_count
+        ),
+        "provider_recovery_all_smokes_available": (
+            bool(compact_items) and smoke_available_count == len(compact_items)
         ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
