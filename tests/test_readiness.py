@@ -1631,6 +1631,58 @@ def assert_api_key_requirements_summary_top_level_fields(
     assert payload["api_key_provider_requirement_count"] == len(
         provider_requirements
     )
+    next_missing_provider_family = (
+        requirements["missing_provider_families"][0]
+        if requirements["missing_provider_families"]
+        else None
+    )
+    next_missing_requirement = (
+        provider_requirements[next_missing_provider_family]
+        if next_missing_provider_family is not None
+        else {}
+    )
+    assert payload["api_key_requirement_next_missing_provider_family"] == (
+        next_missing_provider_family
+    )
+    assert payload["api_key_requirement_next_missing_provider"] == (
+        next_missing_requirement.get("provider")
+    )
+    assert payload["api_key_requirement_next_missing_required_env_keys"] == (
+        next_missing_requirement.get("required_env_keys", [])
+    )
+    assert payload["api_key_requirement_next_missing_required_env_key_count"] == len(
+        next_missing_requirement.get("required_env_keys", [])
+    )
+    assert payload["api_key_requirement_next_missing_missing_env_keys"] == (
+        next_missing_requirement.get("missing_env_keys", [])
+    )
+    assert payload["api_key_requirement_next_missing_missing_env_key_count"] == len(
+        next_missing_requirement.get("missing_env_keys", [])
+    )
+    assert payload["api_key_requirement_next_missing_preferred_env_key"] == (
+        next_missing_requirement.get("preferred_env_key")
+    )
+    assert payload["api_key_requirement_next_missing_accepted_env_keys"] == (
+        next_missing_requirement.get("accepted_env_keys", [])
+    )
+    assert payload["api_key_requirement_next_missing_setup_status"] == (
+        next_missing_requirement.get("setup_status")
+    )
+    assert payload["api_key_requirement_next_missing_next_setup_action"] == (
+        next_missing_requirement.get("next_setup_action")
+    )
+    assert payload["api_key_requirement_next_missing_smoke_command_name"] == (
+        next_missing_requirement.get("smoke_command_name")
+    )
+    assert payload["api_key_requirement_next_missing_network_call"] is (
+        next_missing_requirement.get("network_call") is True
+    )
+    assert payload["api_key_requirement_next_missing_mutates_local_state"] is (
+        next_missing_requirement.get("mutates_local_state") is True
+    )
+    assert payload["api_key_requirement_next_missing_secret_values_returned"] is (
+        next_missing_requirement.get("secret_values_returned") is True
+    )
     assert payload["api_key_provider_requirement_providers"] == {
         family: row["provider"] for family, row in provider_requirements.items()
     }
@@ -10452,6 +10504,36 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "macro": 1,
         "news": 1,
     }
+    assert payload["api_key_requirement_next_missing_provider_family"] == "macro"
+    assert payload["api_key_requirement_next_missing_provider"] == "fred"
+    assert payload["api_key_requirement_next_missing_required_env_keys"] == [
+        "FRED_API_KEY"
+    ]
+    assert payload["api_key_requirement_next_missing_required_env_key_count"] == 1
+    assert payload["api_key_requirement_next_missing_missing_env_keys"] == [
+        "FRED_API_KEY"
+    ]
+    assert payload["api_key_requirement_next_missing_missing_env_key_count"] == 1
+    assert payload["api_key_requirement_next_missing_preferred_env_key"] == (
+        "FRED_API_KEY"
+    )
+    assert payload["api_key_requirement_next_missing_accepted_env_keys"] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
+    assert payload["api_key_requirement_next_missing_setup_status"] == "pending"
+    assert payload["api_key_requirement_next_missing_next_setup_action"] == (
+        "fill_preferred_env_key"
+    )
+    assert payload["api_key_requirement_next_missing_smoke_command_name"] == (
+        "get_macro_snapshot_live_smoke"
+    )
+    assert payload["api_key_requirement_next_missing_network_call"] is False
+    assert payload["api_key_requirement_next_missing_mutates_local_state"] is False
+    assert (
+        payload["api_key_requirement_next_missing_secret_values_returned"] is False
+    )
     assert payload["api_key_provider_requirement_setup_statuses"] == {
         family: row["setup_status"]
         for family, row in requirements["provider_requirements"].items()

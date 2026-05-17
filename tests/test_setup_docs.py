@@ -529,6 +529,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_requirement_missing_provider_families" in guide
     assert "api_key_provider_requirement_families" in guide
     assert "api_key_provider_requirement_count" in guide
+    assert "api_key_requirement_next_missing_provider_family" in guide
+    assert "api_key_requirement_next_missing_provider" in guide
+    assert "api_key_requirement_next_missing_required_env_keys" in guide
+    assert "api_key_requirement_next_missing_missing_env_keys" in guide
+    assert "api_key_requirement_next_missing_preferred_env_key" in guide
+    assert "api_key_requirement_next_missing_accepted_env_keys" in guide
+    assert "api_key_requirement_next_missing_next_setup_action" in guide
+    assert "api_key_requirement_next_missing_smoke_command_name" in guide
     assert "api_key_provider_requirement_required_env_keys" in guide
     assert "api_key_provider_requirement_required_env_key_counts" in guide
     assert "api_key_provider_requirement_missing_env_keys" in guide
@@ -1029,6 +1037,20 @@ def test_setup_docs_keep_api_key_provider_requirement_fields_in_sync() -> None:
         "api_key_requirement_missing_provider_family_count",
         "api_key_provider_requirement_families",
         "api_key_provider_requirement_count",
+        "api_key_requirement_next_missing_provider_family",
+        "api_key_requirement_next_missing_provider",
+        "api_key_requirement_next_missing_required_env_keys",
+        "api_key_requirement_next_missing_required_env_key_count",
+        "api_key_requirement_next_missing_missing_env_keys",
+        "api_key_requirement_next_missing_missing_env_key_count",
+        "api_key_requirement_next_missing_preferred_env_key",
+        "api_key_requirement_next_missing_accepted_env_keys",
+        "api_key_requirement_next_missing_setup_status",
+        "api_key_requirement_next_missing_next_setup_action",
+        "api_key_requirement_next_missing_smoke_command_name",
+        "api_key_requirement_next_missing_network_call",
+        "api_key_requirement_next_missing_mutates_local_state",
+        "api_key_requirement_next_missing_secret_values_returned",
         "api_key_provider_requirement_providers",
         "api_key_provider_requirement_required_env_keys",
         "api_key_provider_requirement_required_env_key_counts",

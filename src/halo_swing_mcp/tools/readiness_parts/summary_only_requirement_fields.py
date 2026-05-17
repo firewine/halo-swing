@@ -28,6 +28,20 @@ def _api_key_requirements_top_level_fields(
         api_key_requirements_summary.get("missing_provider_families")
     )
     provider_requirement_families = list(provider_requirement_rows)
+    next_missing_provider_family = (
+        missing_provider_families[0] if missing_provider_families else None
+    )
+    next_missing_requirement = (
+        provider_requirement_rows.get(next_missing_provider_family)
+        if isinstance(next_missing_provider_family, str)
+        else None
+    ) or {}
+    next_missing_required_env_keys = _string_list(
+        next_missing_requirement.get("required_env_keys")
+    )
+    next_missing_missing_env_keys = _string_list(
+        next_missing_requirement.get("missing_env_keys")
+    )
     return {
         "api_key_requirement_schema_version": (
             api_key_requirements_summary.get("schema_version")
@@ -62,6 +76,48 @@ def _api_key_requirements_top_level_fields(
             provider_requirement_families
         ),
         "api_key_provider_requirement_count": len(provider_requirement_families),
+        "api_key_requirement_next_missing_provider_family": (
+            next_missing_provider_family
+        ),
+        "api_key_requirement_next_missing_provider": (
+            next_missing_requirement.get("provider")
+        ),
+        "api_key_requirement_next_missing_required_env_keys": (
+            next_missing_required_env_keys
+        ),
+        "api_key_requirement_next_missing_required_env_key_count": len(
+            next_missing_required_env_keys
+        ),
+        "api_key_requirement_next_missing_missing_env_keys": (
+            next_missing_missing_env_keys
+        ),
+        "api_key_requirement_next_missing_missing_env_key_count": len(
+            next_missing_missing_env_keys
+        ),
+        "api_key_requirement_next_missing_preferred_env_key": (
+            next_missing_requirement.get("preferred_env_key")
+        ),
+        "api_key_requirement_next_missing_accepted_env_keys": _string_list(
+            next_missing_requirement.get("accepted_env_keys")
+        ),
+        "api_key_requirement_next_missing_setup_status": (
+            next_missing_requirement.get("setup_status")
+        ),
+        "api_key_requirement_next_missing_next_setup_action": (
+            next_missing_requirement.get("next_setup_action")
+        ),
+        "api_key_requirement_next_missing_smoke_command_name": (
+            next_missing_requirement.get("smoke_command_name")
+        ),
+        "api_key_requirement_next_missing_network_call": (
+            next_missing_requirement.get("network_call") is True
+        ),
+        "api_key_requirement_next_missing_mutates_local_state": (
+            next_missing_requirement.get("mutates_local_state") is True
+        ),
+        "api_key_requirement_next_missing_secret_values_returned": (
+            next_missing_requirement.get("secret_values_returned") is True
+        ),
         "api_key_provider_requirement_providers": {
             family: row.get("provider")
             for family, row in provider_requirement_rows.items()

@@ -516,6 +516,21 @@ mirrors requirement metadata as `api_key_requirement_schema_version`,
 `api_key_requirement_missing_provider_family_count`,
 `api_key_provider_requirement_families`, and
 `api_key_provider_requirement_count`.
+It mirrors the next missing provider requirement as
+`api_key_requirement_next_missing_provider_family`,
+`api_key_requirement_next_missing_provider`,
+`api_key_requirement_next_missing_required_env_keys`,
+`api_key_requirement_next_missing_required_env_key_count`,
+`api_key_requirement_next_missing_missing_env_keys`,
+`api_key_requirement_next_missing_missing_env_key_count`,
+`api_key_requirement_next_missing_preferred_env_key`,
+`api_key_requirement_next_missing_accepted_env_keys`,
+`api_key_requirement_next_missing_setup_status`,
+`api_key_requirement_next_missing_next_setup_action`,
+`api_key_requirement_next_missing_smoke_command_name`,
+`api_key_requirement_next_missing_network_call`,
+`api_key_requirement_next_missing_mutates_local_state`, and
+`api_key_requirement_next_missing_secret_values_returned`.
 It also mirrors per-family provider requirement hints as
 `api_key_provider_requirement_providers`,
 `api_key_provider_requirement_required_env_keys`,
