@@ -1040,6 +1040,67 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.869 API Key Setup Status Provider Route Family Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.868에서 integration status row는 family별 selected provider class, route data mode,
+live-data-required evidence를 직접 보여주게 됐다. 하지만 `setup_status_summary.v1`와
+top-level `api_key_setup_*` mirrors는 아직 selected provider classes list와 route status만
+갖고 있어, setup progress row만 읽는 compact client는 어떤 family가 어떤 live route로
+연결됐는지 확인하려면 provider selection 또는 integration status summary를 다시 봐야
+한다. 이번 slice는 같은 no-secret route-family evidence를 setup status summary와
+`api_key_setup_*` top-level mirrors로 올려, API 키만 채운 뒤 setup row 하나로 실제 live
+provider route를 검증할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - setup_status_summary mirrors selected provider class by family
+  - setup_status_summary mirrors provider route data_mode and live_data_required by family
+  - setup_status_summary mirrors all_selected_routes_live
+  - summary-only top-level api_key_setup_* mirrors expose the same route family evidence without nested parsing
+  - README and DevOps setup guide document setup status provider route family fields
+  - tests cover fake-key setup status route family mirrors without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key setup status route family pytest: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 96 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 824 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only print confirmed setup status selected provider class, route data_mode, live_data_required maps, all_selected_routes_live true, and secret_values_returned false
+```
+
 ## 3.868 API Key Integration Status Provider Route Family Fields Gate Record - 2026-05-17
 
 ### A. 목적

@@ -549,7 +549,11 @@ It mirrors provider-family readiness at top level with
 `api_key_setup_configured_provider_family_count`,
 `api_key_setup_required_provider_family_count`,
 `api_key_setup_ready_to_run_live_smoke`, and
-`api_key_setup_provider_route_status`.
+`api_key_setup_provider_route_status`. It also mirrors setup-status route family
+evidence as `api_key_setup_selected_provider_class_by_family`,
+`api_key_setup_provider_route_data_mode_by_family`,
+`api_key_setup_provider_route_live_data_required_by_family`, and
+`api_key_setup_all_selected_routes_live`.
 When provider recovery is required, the compact top-level payload also exposes
 top-level summary-only recovery command lists:
 `provider_recovery_smoke_command_names`, `provider_recovery_smoke_commands`,

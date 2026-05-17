@@ -414,6 +414,29 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_provider_route_status": setup_status_summary.get(
             "provider_route_status"
         ),
+        "api_key_setup_selected_provider_class_by_family": (
+            _optional_mapping(
+                setup_status_summary.get("selected_provider_class_by_family")
+            )
+            or {}
+        ),
+        "api_key_setup_provider_route_data_mode_by_family": (
+            _optional_mapping(
+                setup_status_summary.get("provider_route_data_mode_by_family")
+            )
+            or {}
+        ),
+        "api_key_setup_provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                setup_status_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_setup_all_selected_routes_live": (
+            setup_status_summary.get("all_selected_routes_live") is True
+        ),
         "api_key_required_env_keys": _string_list(
             api_key_requirements_summary.get("required_env_keys")
         ),

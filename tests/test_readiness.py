@@ -1226,6 +1226,16 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
         ],
         "provider_factory": "get_market_data_provider",
         "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "provider_route_summary": {
             "schema_version": "live_data_provider_route.v1",
             "status": "blocked",
@@ -5335,6 +5345,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "FredMacroDataProvider",
             "NewsApiDataProvider",
         ],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,
@@ -7292,6 +7312,36 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert payload["api_key_setup_provider_route_status"] == (
         payload["setup_status_summary"]["provider_route_status"]
     )
+    assert payload["setup_status_summary"]["selected_provider_class_by_family"] == (
+        payload["api_key_provider_selection_summary"]["selected_provider_class_by_family"]
+    )
+    assert payload["setup_status_summary"]["provider_route_data_mode_by_family"] == (
+        payload["api_key_provider_selection_summary"][
+            "provider_route_data_mode_by_family"
+        ]
+    )
+    assert payload["setup_status_summary"][
+        "provider_route_live_data_required_by_family"
+    ] == payload["api_key_provider_selection_summary"][
+        "provider_route_live_data_required_by_family"
+    ]
+    assert payload["setup_status_summary"]["all_selected_routes_live"] is (
+        payload["api_key_provider_selection_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_setup_selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_setup_provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert payload["api_key_setup_provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert payload["api_key_setup_all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
     assert payload["api_key_copy_dotenv_command"] == (
         payload["api_key_command_summary"]["copy_dotenv_command"]["command"]
     )
@@ -8482,6 +8532,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
         "next_provider_smoke": None,
         "next_provider_smoke_command_name": None,
         "selected_provider_classes": ["ReplayMarketDataProvider"],
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

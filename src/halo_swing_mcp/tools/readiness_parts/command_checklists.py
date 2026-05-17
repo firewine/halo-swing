@@ -151,6 +151,29 @@ def _api_key_pipeline_setup_status_summary(
         "selected_provider_classes": live_data_setup_summary.get(
             "selected_provider_classes"
         ),
+        "selected_provider_class_by_family": (
+            _optional_mapping(
+                live_data_setup_summary.get("selected_provider_class_by_family")
+            )
+            or {}
+        ),
+        "provider_route_data_mode_by_family": (
+            _optional_mapping(
+                live_data_setup_summary.get("provider_route_data_mode_by_family")
+            )
+            or {}
+        ),
+        "provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                live_data_setup_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "all_selected_routes_live": (
+            live_data_setup_summary.get("all_selected_routes_live") is True
+        ),
         "network_call": False,
         "mutates_local_state": False,
         "secret_values_returned": False,

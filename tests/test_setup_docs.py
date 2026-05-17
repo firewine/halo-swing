@@ -699,6 +699,10 @@ def test_setup_docs_keep_api_key_setup_progress_fields_in_sync() -> None:
         "api_key_setup_required_provider_family_count",
         "api_key_setup_ready_to_run_live_smoke",
         "api_key_setup_provider_route_status",
+        "api_key_setup_selected_provider_class_by_family",
+        "api_key_setup_provider_route_data_mode_by_family",
+        "api_key_setup_provider_route_live_data_required_by_family",
+        "api_key_setup_all_selected_routes_live",
     )
 
     for field_name in field_names:

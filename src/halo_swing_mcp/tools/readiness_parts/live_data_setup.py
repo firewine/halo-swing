@@ -20,6 +20,36 @@ def _live_data_setup_summary(
         if _optional_mapping(provider).get("configured") is True
     ]
     route_summary = _api_key_pipeline_provider_route_summary(provider_route)
+    raw_route_entries = provider_route.get("route")
+    route_entries = (
+        [entry for entry in raw_route_entries if isinstance(entry, dict)]
+        if isinstance(raw_route_entries, list)
+        else []
+    )
+    route_entries_by_family = {
+        entry.get("provider_family"): entry
+        for entry in route_entries
+        if isinstance(entry.get("provider_family"), str)
+    }
+    selected_provider_class_by_family = {
+        family: route_entries_by_family.get(family, {}).get("provider_class")
+        for family in providers
+    }
+    provider_route_data_mode_by_family = {
+        family: route_entries_by_family.get(family, {}).get("data_mode")
+        for family in providers
+    }
+    provider_route_live_data_required_by_family = {
+        family: (
+            route_entries_by_family.get(family, {}).get("live_data_required") is True
+        )
+        for family in providers
+    }
+    selected_route_data_modes = [
+        data_mode
+        for data_mode in provider_route_data_mode_by_family.values()
+        if data_mode is not None
+    ]
     missing = _ordered_unique_strings(
         [
             *(api_key_status.get("missing") or []),
@@ -62,6 +92,13 @@ def _live_data_setup_summary(
         "missing": missing,
         "provider_factory": route_summary.get("provider_factory"),
         "selected_provider_classes": route_summary.get("selected_provider_classes"),
+        "selected_provider_class_by_family": selected_provider_class_by_family,
+        "provider_route_data_mode_by_family": provider_route_data_mode_by_family,
+        "provider_route_live_data_required_by_family": (
+            provider_route_live_data_required_by_family
+        ),
+        "all_selected_routes_live": bool(selected_route_data_modes)
+        and all(data_mode == "live" for data_mode in selected_route_data_modes),
         "provider_route_summary": route_summary,
         "dotenv_template": _live_data_dotenv_template(),
         "dotenv_file_status": dotenv_file_status,
