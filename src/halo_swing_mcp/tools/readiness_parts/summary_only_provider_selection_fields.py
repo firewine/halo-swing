@@ -31,6 +31,30 @@ def _api_key_provider_selection_top_level_fields(
             api_key_provider_selection_summary.get("selected_provider_by_family")
         )
         or {},
+        "api_key_selected_provider_class_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "selected_provider_class_by_family"
+            )
+        )
+        or {},
+        "api_key_provider_route_data_mode_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "provider_route_data_mode_by_family"
+            )
+        )
+        or {},
+        "api_key_provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                api_key_provider_selection_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_provider_all_selected_routes_live": (
+            api_key_provider_selection_summary.get("all_selected_routes_live")
+            is True
+        ),
         "api_key_configured_env_keys_by_provider_family": _optional_mapping(
             api_key_provider_selection_summary.get(
                 "configured_env_keys_by_provider_family"

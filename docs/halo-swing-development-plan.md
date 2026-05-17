@@ -1040,6 +1040,66 @@ verification:
   - direct summary-only smoke confirmed api_key_pipeline_failure_summary next-action fields and secret_values_returned false
 ```
 
+## 3.867 API Key Provider Route Family Top-Level Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.866에서 API 키만 채우면 live provider가 자동 선택된다는 auto-live-mode
+metadata를 top-level에 올렸다. `get_live_data_provider_route`는 fake-key/current-env
+상태에서 family별 `provider_class`, `data_mode`, `live_data_required` route evidence를
+이미 제공한다. 하지만 API-key-only compact output만 읽는 client는 아직 family별 실제
+provider class와 live route mode를 확인하려면 nested route/provider selection summary를
+다시 봐야 한다. 이번 slice는 family별 route evidence를 no-secret top-level mirrors로
+올려, 사용자가 API 키만 넣은 뒤 어떤 live provider class가 어떤 family에 연결됐는지 한
+row에서 검증할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_selection_summary mirrors selected provider class by family
+  - api_key_provider_selection_summary mirrors route data_mode and live_data_required by family
+  - summary-only top-level api_key_provider_* mirrors expose provider route family evidence without nested parsing
+  - README and DevOps setup guide document the provider route family top-level fields
+  - tests cover fake-key provider route family mirrors without secret values
+  - fake live-smoke fixture route evidence now includes the same route entries as the real provider route path
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key provider route family pytest: 2 passed
+  - fake-key get_live_data_provider_route confirmed live provider classes/data modes/live_data_required by family without secret values
+  - fake-key run_api_key_pipeline_smoke --summary-only confirmed compact top-level route family mirrors and secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 824 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.866 API Key Provider Selection Auto-Live-Mode Top-Level Fields Gate Record - 2026-05-17
 
 ### A. 목적
@@ -1061,7 +1121,6 @@ implemented:
   - api_key_provider_selection_summary mirrors auto_selects_live_provider by family
   - api_key_provider_selection_summary mirrors optional live-mode env and live_mode_required by family
   - summary-only top-level api_key_provider_* mirrors expose those fields without nested parsing
-  - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
   - live_data_setup_summary provider setup actions preserve bounded auto/live-mode metadata so provider-selection fallback paths do not lose it
   - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
   - README and DevOps setup guide document the provider selection auto-live-mode top-level fields

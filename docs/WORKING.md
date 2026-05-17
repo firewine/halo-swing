@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_GATE
+status: API_KEY_PROVIDER_ROUTE_FAMILY_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_ROUTE_FAMILY_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider selection auto-live-mode fields at API-key top level
+next_atomic_step: mirror provider route family evidence at API-key top level
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -76,7 +76,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -84,17 +84,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_provider_selection_summary mirrors provider auto_selects_live_provider, optional live-mode env, and live_mode_required by family without secret values
-  - summary-only top-level api_key_provider_* mirrors expose provider auto-live-mode status without nested parsing
-  - README and DevOps setup guide document the provider selection auto-live-mode top-level fields
+  - api_key_provider_selection_summary mirrors selected provider class, route data_mode, and live_data_required by provider family without secret values
+  - summary-only top-level api_key_provider_* mirrors expose provider route family evidence without nested parsing
+  - README and DevOps setup guide document the provider route family top-level fields
   - setup docs guard keeps README and DevOps API-key provider selection field parity in sync
-  - fake-key offline verification proves API keys alone mark providers as auto-selected while live-mode env remains optional
+  - fake-key offline verification proves API keys select live family routes with expected provider classes and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider selection auto-live-mode fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider route family top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider selection auto-live-mode fields at API-key top level
 ```
 
 Previous completed directive:
@@ -3458,20 +3469,20 @@ cto_call: AUDIT_LOG_JSONL_AND_LOCAL_WEB_VIEWER_KEEP_RUNTIME_ARTIFACTS_IGNORED
 blockers: []
 implementation_ready: true
 
-next_state_after_success: commit this verified API-key provider selection auto-live-mode fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider route family top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Provider Selection Auto-Live-Mode Top-Level Fields Gate is
-verified. Provider-selection summary and summary-only top-level
-`api_key_provider_*` mirrors now expose provider auto-selection, optional
-live-mode env names, and live-mode-required flags without secrets. Focused
-readiness/docs coverage, fake-key harness checks, setup-docs coverage, full
+Summary: API Key Provider Route Family Top-Level Fields Gate is verified.
+Provider-selection summary and summary-only top-level `api_key_provider_*`
+mirrors now expose selected provider class, route data mode, and
+live-data-required state by provider family without secrets. Focused
+readiness/docs coverage, fake-key route checks, setup-docs coverage, full
 pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_provider_selection_auto_live_mode_top_level_fields_gate:
+api_key_provider_route_family_top_level_fields_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3480,19 +3491,15 @@ api_key_provider_selection_auto_live_mode_top_level_fields_gate:
     - docs/codex-task.json
     - docs/devops-setup-guide.md
     - docs/halo-swing-development-plan.md
-    - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
     - src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py
-    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
     - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_selection_fields.py
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - api_key_provider_selection_summary now mirrors provider_auto_selects_live_provider_by_family, provider_optional_live_mode_env_by_family, and provider_live_mode_required_by_family
-    - api_key_provider_selection_summary now reports all_configured_auto_select_live_provider and any_live_mode_required
-    - summary-only top-level api_key_provider_auto_selects_live_provider_by_family, api_key_provider_optional_live_mode_env_by_family, api_key_provider_live_mode_required_by_family, api_key_provider_all_configured_auto_select_live_provider, and api_key_provider_any_live_mode_required mirror the nested summary
-    - provider-selection top-level projection was split into summary_only_provider_selection_fields.py so summary_only_payload.py stays below the 900-line warning point
-    - live_data_setup_summary provider setup actions preserve bounded auto/live-mode metadata so provider-selection fallback paths do not lose it
-    - README and DevOps setup guide document provider selection auto-live-mode top-level fields
+    - api_key_provider_selection_summary now mirrors selected_provider_class_by_family, provider_route_data_mode_by_family, provider_route_live_data_required_by_family, and all_selected_routes_live
+    - summary-only top-level api_key_selected_provider_class_by_family, api_key_provider_route_data_mode_by_family, api_key_provider_route_live_data_required_by_family, and api_key_provider_all_selected_routes_live mirror the nested summary
+    - fake live-smoke fixture route evidence now includes the same route entries as the real provider route path
+    - README and DevOps setup guide document provider route family top-level fields
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3505,12 +3512,10 @@ api_key_provider_selection_auto_live_mode_top_level_fields_gate:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
       result: "2 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q
-      result: "5 passed"
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit
-      result: passed; providers reported auto_selects_live_provider true, optional live-mode env names, live_mode_required false, and secret_values_returned false
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit
+      result: passed; route entries reported PolygonMarketDataProvider/FredMacroDataProvider/NewsApiDataProvider, data_mode live, live_data_required true, and secret_values_returned false
     - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-      result: passed; fake-key provider recovery remains no-secret while compact top-level mirrors are present
+      result: passed; compact top-level route family mirrors returned without secret values
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
       result: "32 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -3519,8 +3524,8 @@ api_key_provider_selection_auto_live_mode_top_level_fields_gate:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_selection_summary"]; print(summary["all_configured_auto_select_live_provider"], summary["any_live_mode_required"], summary["provider_auto_selects_live_provider_by_family"], summary["provider_optional_live_mode_env_by_family"], payload["api_key_provider_all_configured_auto_select_live_provider"], payload["api_key_provider_any_live_mode_required"], payload["secret_values_returned"])'
-      result: "True False {'market': True, 'macro': True, 'news': True} {'market': 'HALO_SWING_MARKET_DATA_MODE', 'macro': 'HALO_SWING_MACRO_DATA_MODE', 'news': 'HALO_SWING_NEWS_DATA_MODE'} True False False"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["api_key_selected_provider_class_by_family"], payload["api_key_provider_route_data_mode_by_family"], payload["api_key_provider_route_live_data_required_by_family"], payload["api_key_provider_all_selected_routes_live"], payload["secret_values_returned"])'
+      result: "{'market': 'PolygonMarketDataProvider', 'macro': 'FredMacroDataProvider', 'news': 'NewsApiDataProvider'} {'market': 'live', 'macro': 'live', 'news': 'live'} {'market': True, 'macro': True, 'news': True} True False"
 ```
 
 Previous verification:

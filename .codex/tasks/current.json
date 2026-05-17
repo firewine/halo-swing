@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SELECTION_AUTO_LIVE_MODE_TOP_LEVEL_FIELDS_GATE",
+  "gate_id": "API_KEY_PROVIDER_ROUTE_FAMILY_TOP_LEVEL_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.866",
-  "next_atomic_step": "mirror provider selection auto-live-mode fields at API-key top level",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.867",
+  "next_atomic_step": "mirror provider route family evidence at API-key top level",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -19,7 +19,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.866",
+    "docs/halo-swing-development-plan.md#3.867",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness.py",
@@ -42,7 +42,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_selection_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary -q",
-    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_api_key_status --no-audit",
+    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_live_data_provider_route --no-audit",
     "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
@@ -60,15 +60,15 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_provider_selection_summary mirrors provider auto_selects_live_provider, optional live-mode env, and live_mode_required by family without secret values",
-    "summary-only top-level api_key_provider_* mirrors expose provider auto-live-mode status without nested parsing",
-    "README and DevOps setup guide document the provider selection auto-live-mode top-level fields",
+    "api_key_provider_selection_summary mirrors selected provider class, route data_mode, and live_data_required by provider family without secret values",
+    "summary-only top-level api_key_provider_* mirrors expose provider route family evidence without nested parsing",
+    "README and DevOps setup guide document the provider route family top-level fields",
     "setup docs guard keeps README and DevOps API-key provider selection field parity in sync",
-    "fake-key offline verification proves API keys alone mark providers as auto-selected while live-mode env remains optional",
+    "fake-key offline verification proves API keys select live family routes with expected provider classes and no secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key provider selection auto-live-mode fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key provider route family top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

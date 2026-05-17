@@ -284,6 +284,12 @@ def _api_key_provider_selection_summary(
         if isinstance(entry.get("provider_family"), str)
         and entry.get("provider_family") != "fixture"
     }
+    route_entries_by_family = {
+        str(entry["provider_family"]): entry
+        for entry in route_entries
+        if isinstance(entry.get("provider_family"), str)
+        and entry.get("provider_family") != "fixture"
+    }
     configured_provider_families = [
         family for family, row in provider_rows if row.get("configured") is True
     ]
@@ -351,6 +357,33 @@ def _api_key_provider_selection_summary(
         )
         for family, row in provider_rows
     }
+    selected_provider_class_by_family = {
+        family: (
+            route_entries_by_family.get(family, {}).get("provider_class")
+            or (
+                row.get("provider_class")
+                if selected_provider_by_family.get(family) is not None
+                else None
+            )
+        )
+        for family, row in provider_rows
+    }
+    provider_route_data_mode_by_family = {
+        family: route_entries_by_family.get(family, {}).get("data_mode")
+        for family, _row in provider_rows
+    }
+    provider_route_live_data_required_by_family = {
+        family: route_entries_by_family.get(family, {}).get(
+            "live_data_required"
+        )
+        is True
+        for family, _row in provider_rows
+    }
+    selected_route_data_modes = [
+        data_mode
+        for data_mode in provider_route_data_mode_by_family.values()
+        if isinstance(data_mode, str)
+    ]
     return {
         "schema_version": "api_key_provider_selection_summary.v1",
         "status": provider_route.get("status"),
@@ -380,6 +413,16 @@ def _api_key_provider_selection_summary(
             provider_live_mode_required_by_family.values()
         ),
         "selected_provider_by_family": selected_provider_by_family,
+        "selected_provider_class_by_family": selected_provider_class_by_family,
+        "provider_route_data_mode_by_family": (
+            provider_route_data_mode_by_family
+        ),
+        "provider_route_live_data_required_by_family": (
+            provider_route_live_data_required_by_family
+        ),
+        "all_selected_routes_live": bool(selected_route_data_modes) and all(
+            data_mode == "live" for data_mode in selected_route_data_modes
+        ),
         "ready_to_run_live_smoke": (
             provider_route.get("status") == "ready"
             and live_data_setup_summary.get("ready_to_run_live_smoke") is True

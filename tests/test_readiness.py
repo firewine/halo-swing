@@ -619,6 +619,63 @@ def expected_provider_auto_selects_live_provider_by_family(
     return {"market": configured, "macro": configured, "news": configured}
 
 
+def expected_selected_provider_class_by_family(
+    *, configured: bool
+) -> dict[str, str | None]:
+    if not configured:
+        return {"market": None, "macro": None, "news": None}
+    return {
+        "market": "PolygonMarketDataProvider",
+        "macro": "FredMacroDataProvider",
+        "news": "NewsApiDataProvider",
+    }
+
+
+def expected_provider_route_data_mode_by_family(
+    *, configured: bool
+) -> dict[str, str | None]:
+    data_mode = "live" if configured else None
+    return {"market": data_mode, "macro": data_mode, "news": data_mode}
+
+
+def expected_provider_route_live_data_required_by_family(
+    *, configured: bool
+) -> dict[str, bool]:
+    return {"market": configured, "macro": configured, "news": configured}
+
+
+def expected_live_provider_route_entries() -> list[dict[str, Any]]:
+    return [
+        {
+            "provider_family": "market",
+            "provider": "polygon",
+            "provider_class": "PolygonMarketDataProvider",
+            "data_mode": "live",
+            "live_data_required": True,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "provider_family": "macro",
+            "provider": "fred",
+            "provider_class": "FredMacroDataProvider",
+            "data_mode": "live",
+            "live_data_required": True,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+        {
+            "provider_family": "news",
+            "provider": "newsapi",
+            "provider_class": "NewsApiDataProvider",
+            "data_mode": "live",
+            "live_data_required": True,
+            "network_call": False,
+            "secret_values_returned": False,
+        },
+    ]
+
+
 def expected_provider_smoke_plan(
     *,
     market_configured_env_keys: list[str],
@@ -2741,6 +2798,16 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "macro": "fred",
             "news": "newsapi",
         },
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "ready_to_run_live_smoke": True,
         "network_call": False,
         "mutates_local_state": False,
@@ -3789,6 +3856,7 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
                 "schema_version": "live_data_provider_route.v1",
                 "status": "ready",
                 "provider_factory": "get_market_data_provider",
+                "route": expected_live_provider_route_entries(),
                 "selected_provider_classes": [
                     "PolygonMarketDataProvider",
                     "FredMacroDataProvider",
@@ -4757,6 +4825,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
                 "schema_version": "live_data_provider_route.v1",
                 "status": "ready",
                 "provider_factory": "get_market_data_provider",
+                "route": expected_live_provider_route_entries(),
                 "selected_provider_classes": [
                     "PolygonMarketDataProvider",
                     "FredMacroDataProvider",
@@ -5068,6 +5137,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "macro": "fred",
             "news": "newsapi",
         },
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "ready_to_run_live_smoke": True,
         "network_call": False,
         "mutates_local_state": False,
@@ -7680,6 +7759,31 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summar
     assert payload["api_key_selected_provider_by_family"] == (
         provider_selection_summary["selected_provider_by_family"]
     )
+    assert payload["api_key_selected_provider_class_by_family"] == (
+        provider_selection_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_provider_route_data_mode_by_family"] == (
+        provider_selection_summary["provider_route_data_mode_by_family"]
+    )
+    assert payload["api_key_provider_route_live_data_required_by_family"] == (
+        provider_selection_summary[
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert (
+        payload["api_key_provider_all_selected_routes_live"]
+        == provider_selection_summary["all_selected_routes_live"]
+    )
+    assert provider_selection_summary["selected_provider_class_by_family"] == (
+        expected_selected_provider_class_by_family(configured=True)
+    )
+    assert provider_selection_summary["provider_route_data_mode_by_family"] == (
+        expected_provider_route_data_mode_by_family(configured=True)
+    )
+    assert provider_selection_summary[
+        "provider_route_live_data_required_by_family"
+    ] == expected_provider_route_live_data_required_by_family(configured=True)
+    assert provider_selection_summary["all_selected_routes_live"] is True
     assert payload["api_key_configured_env_keys_by_provider_family"] == (
         provider_selection_summary["configured_env_keys_by_provider_family"]
     )
@@ -8555,6 +8659,16 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
             "macro": None,
             "news": None,
         },
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=False)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=False)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=False)
+        ),
+        "all_selected_routes_live": False,
         "ready_to_run_live_smoke": False,
         "network_call": False,
         "mutates_local_state": False,

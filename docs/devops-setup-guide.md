@@ -870,12 +870,20 @@ selection with `provider_factory`, `selected_provider_classes`,
 `provider_optional_live_mode_env_by_family`,
 `provider_live_mode_required_by_family`,
 `all_configured_auto_select_live_provider`, `any_live_mode_required`,
-`selected_provider_by_family`, and `ready_to_run_live_smoke`, so API-key
+`selected_provider_by_family`, `selected_provider_class_by_family`,
+`provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`,
+`all_selected_routes_live`, and `ready_to_run_live_smoke`, so API-key
 auto-selection, each provider family's `optional_live_mode_env`, and whether
-`live_mode_required` is false can be verified without secret values. The top-level
+`live_mode_required` is false can be verified together with the selected live
+provider class and route mode, without secret values. The top-level
 `api_key_provider_selection_status`, `api_key_provider_factory`,
 `api_key_selected_provider_classes`, `api_key_selected_provider_class_count`,
 `api_key_selected_provider_by_family`,
+`api_key_selected_provider_class_by_family`,
+`api_key_provider_route_data_mode_by_family`,
+`api_key_provider_route_live_data_required_by_family`,
+`api_key_provider_all_selected_routes_live`,
 `api_key_configured_env_keys_by_provider_family`, and
 `api_key_provider_env_key_hints_by_family`,
 `api_key_provider_auto_selects_live_provider_by_family`,
