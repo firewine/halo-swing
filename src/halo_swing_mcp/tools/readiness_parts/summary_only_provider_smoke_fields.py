@@ -246,6 +246,38 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         {},
     )
+    next_provider_smoke_accepted_env_keys = _string_list(
+        next_provider_smoke.get("accepted_env_keys")
+    )
+    next_provider_smoke_expected_live_checks = _string_list(
+        next_provider_smoke.get("expected_live_checks")
+    )
+    next_provider_smoke_has_command = bool(next_provider_smoke.get("command"))
+    next_provider_smoke_ready_to_run = (
+        next_provider_smoke.get("status") == "ready"
+        and next_provider_smoke_has_command
+    )
+    next_provider_smoke_requires_api_keys = (
+        next_provider_smoke.get("status") != "ready"
+        and bool(next_provider_smoke_accepted_env_keys)
+    )
+    next_blocked_provider_smoke_accepted_env_keys = _string_list(
+        next_blocked_provider_smoke.get("accepted_env_keys")
+    )
+    next_blocked_provider_smoke_expected_live_checks = _string_list(
+        next_blocked_provider_smoke.get("expected_live_checks")
+    )
+    next_blocked_provider_smoke_has_command = bool(
+        next_blocked_provider_smoke.get("command")
+    )
+    next_blocked_provider_smoke_ready_to_run = (
+        next_blocked_provider_smoke.get("status") == "ready"
+        and next_blocked_provider_smoke_has_command
+    )
+    next_blocked_provider_smoke_requires_api_keys = (
+        next_blocked_provider_smoke.get("status") != "ready"
+        and bool(next_blocked_provider_smoke_accepted_env_keys)
+    )
     ready_provider_smoke_count = setup_status_summary.get("ready_provider_smoke_count")
     blocked_provider_smoke_count = setup_status_summary.get(
         "blocked_provider_smoke_count"
@@ -839,14 +871,14 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_next_provider_smoke_expected_live_contract": (
             next_provider_smoke.get("expected_live_contract")
         ),
-        "api_key_next_provider_smoke_expected_live_checks": _string_list(
-            next_provider_smoke.get("expected_live_checks")
+        "api_key_next_provider_smoke_expected_live_checks": (
+            next_provider_smoke_expected_live_checks
         ),
         "api_key_next_provider_smoke_preferred_env_key": (
             next_provider_smoke.get("preferred_env_key")
         ),
-        "api_key_next_provider_smoke_accepted_env_keys": _string_list(
-            next_provider_smoke.get("accepted_env_keys")
+        "api_key_next_provider_smoke_accepted_env_keys": (
+            next_provider_smoke_accepted_env_keys
         ),
         "api_key_next_provider_smoke_mutates_local_state": (
             next_provider_smoke.get("mutates_local_state") is True
@@ -880,17 +912,32 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_next_ready_provider_smoke_command": next_provider_smoke.get(
             "command"
         ),
+        "api_key_next_ready_provider_smoke_has_command": (
+            next_provider_smoke_has_command
+        ),
+        "api_key_next_ready_provider_smoke_ready_to_run": (
+            next_provider_smoke_ready_to_run
+        ),
+        "api_key_next_ready_provider_smoke_requires_api_keys": (
+            next_provider_smoke_requires_api_keys
+        ),
         "api_key_next_ready_provider_smoke_expected_live_contract": (
             next_provider_smoke.get("expected_live_contract")
         ),
-        "api_key_next_ready_provider_smoke_expected_live_checks": _string_list(
-            next_provider_smoke.get("expected_live_checks")
+        "api_key_next_ready_provider_smoke_expected_live_checks": (
+            next_provider_smoke_expected_live_checks
+        ),
+        "api_key_next_ready_provider_smoke_expected_live_check_count": len(
+            next_provider_smoke_expected_live_checks
         ),
         "api_key_next_ready_provider_smoke_preferred_env_key": (
             next_provider_smoke.get("preferred_env_key")
         ),
-        "api_key_next_ready_provider_smoke_accepted_env_keys": _string_list(
-            next_provider_smoke.get("accepted_env_keys")
+        "api_key_next_ready_provider_smoke_accepted_env_keys": (
+            next_provider_smoke_accepted_env_keys
+        ),
+        "api_key_next_ready_provider_smoke_accepted_env_key_count": len(
+            next_provider_smoke_accepted_env_keys
         ),
         "api_key_next_ready_provider_smoke_next_setup_action": (
             next_provider_smoke.get("next_setup_action")
@@ -933,17 +980,32 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_next_blocked_provider_smoke_command": (
             next_blocked_provider_smoke.get("command")
         ),
+        "api_key_next_blocked_provider_smoke_has_command": (
+            next_blocked_provider_smoke_has_command
+        ),
+        "api_key_next_blocked_provider_smoke_ready_to_run": (
+            next_blocked_provider_smoke_ready_to_run
+        ),
+        "api_key_next_blocked_provider_smoke_requires_api_keys": (
+            next_blocked_provider_smoke_requires_api_keys
+        ),
         "api_key_next_blocked_provider_smoke_expected_live_contract": (
             next_blocked_provider_smoke.get("expected_live_contract")
         ),
-        "api_key_next_blocked_provider_smoke_expected_live_checks": _string_list(
-            next_blocked_provider_smoke.get("expected_live_checks")
+        "api_key_next_blocked_provider_smoke_expected_live_checks": (
+            next_blocked_provider_smoke_expected_live_checks
+        ),
+        "api_key_next_blocked_provider_smoke_expected_live_check_count": len(
+            next_blocked_provider_smoke_expected_live_checks
         ),
         "api_key_next_blocked_provider_smoke_preferred_env_key": (
             next_blocked_provider_smoke.get("preferred_env_key")
         ),
-        "api_key_next_blocked_provider_smoke_accepted_env_keys": _string_list(
-            next_blocked_provider_smoke.get("accepted_env_keys")
+        "api_key_next_blocked_provider_smoke_accepted_env_keys": (
+            next_blocked_provider_smoke_accepted_env_keys
+        ),
+        "api_key_next_blocked_provider_smoke_accepted_env_key_count": len(
+            next_blocked_provider_smoke_accepted_env_keys
         ),
         "api_key_next_blocked_provider_smoke_next_setup_action": (
             next_blocked_provider_smoke.get("next_setup_action")

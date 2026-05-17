@@ -789,6 +789,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.969 API Key Provider-Smoke Next Ready/Blocked Readiness Count Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.968은 quickstart immediate command-plan scalar에 count fields를 추가했다. 다음으로
+provider-smoke summary의 top-level next ready/blocked shortcut fields도 command row를
+직접 열지 않고 실행 가능 여부와 API key 입력 규모를 표시할 수 있어야 한다. 이번
+slice는 `api_key_next_ready_provider_smoke_*`와
+`api_key_next_blocked_provider_smoke_*`에 has-command, ready-to-run,
+requires-api-keys, expected live-check count, accepted env-key count fields를 추가한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+completed:
+  - summary-only output exposes provider-smoke next ready/blocked has-command, ready-to-run, and requires-api-keys fields
+  - summary-only output exposes provider-smoke next ready/blocked expected live-check count and accepted env-key count fields
+  - summary-only tests prove provider-smoke next ready/blocked readiness and count fields match their selected command rows
+  - README and DevOps guide document the top-level API-key provider-smoke next ready/blocked readiness and count fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.968 API Key Quickstart Next Command-Plan Count Fields Gate Record - 2026-05-18
 
 ### A. 목적

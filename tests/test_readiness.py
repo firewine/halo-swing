@@ -1950,6 +1950,17 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_next_ready_provider_smoke_command"] == (
         payload["api_key_next_provider_smoke_command"]
     ) == next_ready_provider_smoke.get("command")
+    assert payload["api_key_next_ready_provider_smoke_has_command"] is bool(
+        next_ready_provider_smoke.get("command")
+    )
+    assert payload["api_key_next_ready_provider_smoke_ready_to_run"] is (
+        next_ready_provider_smoke.get("status") == "ready"
+        and bool(next_ready_provider_smoke.get("command"))
+    )
+    assert payload["api_key_next_ready_provider_smoke_requires_api_keys"] is (
+        next_ready_provider_smoke.get("status") != "ready"
+        and bool(next_ready_provider_smoke.get("accepted_env_keys") or [])
+    )
     assert payload[
         "api_key_next_ready_provider_smoke_expected_live_contract"
     ] == payload["api_key_next_provider_smoke_expected_live_contract"]
@@ -1959,12 +1970,18 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_next_ready_provider_smoke_expected_live_checks"] == (
         payload["api_key_next_provider_smoke_expected_live_checks"]
     ) == (next_ready_provider_smoke.get("expected_live_checks") or [])
+    assert payload[
+        "api_key_next_ready_provider_smoke_expected_live_check_count"
+    ] == len(next_ready_provider_smoke.get("expected_live_checks") or [])
     assert payload["api_key_next_ready_provider_smoke_preferred_env_key"] == (
         payload["api_key_next_provider_smoke_preferred_env_key"]
     ) == next_ready_provider_smoke.get("preferred_env_key")
     assert payload["api_key_next_ready_provider_smoke_accepted_env_keys"] == (
         payload["api_key_next_provider_smoke_accepted_env_keys"]
     ) == (next_ready_provider_smoke.get("accepted_env_keys") or [])
+    assert payload[
+        "api_key_next_ready_provider_smoke_accepted_env_key_count"
+    ] == len(next_ready_provider_smoke.get("accepted_env_keys") or [])
     assert payload["api_key_next_ready_provider_smoke_next_setup_action"] == (
         payload["api_key_next_provider_smoke_next_setup_action"]
     ) == next_ready_provider_smoke.get("next_setup_action")
@@ -2014,18 +2031,35 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload["api_key_next_blocked_provider_smoke_command"] == (
         next_blocked_provider_smoke.get("command")
     )
+    assert payload["api_key_next_blocked_provider_smoke_has_command"] is bool(
+        next_blocked_provider_smoke.get("command")
+    )
+    assert payload["api_key_next_blocked_provider_smoke_ready_to_run"] is (
+        next_blocked_provider_smoke.get("status") == "ready"
+        and bool(next_blocked_provider_smoke.get("command"))
+    )
+    assert payload["api_key_next_blocked_provider_smoke_requires_api_keys"] is (
+        next_blocked_provider_smoke.get("status") != "ready"
+        and bool(next_blocked_provider_smoke.get("accepted_env_keys") or [])
+    )
     assert payload[
         "api_key_next_blocked_provider_smoke_expected_live_contract"
     ] == next_blocked_provider_smoke.get("expected_live_contract")
     assert payload["api_key_next_blocked_provider_smoke_expected_live_checks"] == (
         next_blocked_provider_smoke.get("expected_live_checks") or []
     )
+    assert payload[
+        "api_key_next_blocked_provider_smoke_expected_live_check_count"
+    ] == len(next_blocked_provider_smoke.get("expected_live_checks") or [])
     assert payload["api_key_next_blocked_provider_smoke_preferred_env_key"] == (
         next_blocked_provider_smoke.get("preferred_env_key")
     )
     assert payload["api_key_next_blocked_provider_smoke_accepted_env_keys"] == (
         next_blocked_provider_smoke.get("accepted_env_keys") or []
     )
+    assert payload[
+        "api_key_next_blocked_provider_smoke_accepted_env_key_count"
+    ] == len(next_blocked_provider_smoke.get("accepted_env_keys") or [])
     assert payload["api_key_next_blocked_provider_smoke_next_setup_action"] == (
         next_blocked_provider_smoke.get("next_setup_action")
     )
