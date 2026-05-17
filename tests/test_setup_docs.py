@@ -119,6 +119,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_provider_selection_summary.v1" in guide
     assert "selected_provider_classes" in guide
     assert "configured_env_keys_by_provider_family" in guide
+    assert "provider_env_key_hints_by_family" in guide
     assert "selected_provider_by_family" in guide
     assert "api_key_integration_status_summary" in guide
     assert "api_key_integration_status_summary.v1" in guide

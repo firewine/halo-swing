@@ -2704,13 +2704,14 @@ def _api_key_provider_selection_summary(
     provider_route: dict[str, Any],
     live_data_setup_summary: dict[str, Any],
 ) -> dict[str, Any]:
+    provider_setup_actions = (
+        _optional_mapping(live_data_setup_summary.get("provider_setup_actions"))
+        or {}
+    )
     providers = _optional_mapping(provider_route.get("providers")) or {}
     providers_from_route = bool(providers)
     if not providers:
-        providers = (
-            _optional_mapping(live_data_setup_summary.get("provider_setup_actions"))
-            or {}
-        )
+        providers = provider_setup_actions
     provider_rows: list[tuple[str, dict[str, Any]]] = []
     for family, provider in providers.items():
         row = _optional_mapping(provider)
@@ -2746,6 +2747,21 @@ def _api_key_provider_selection_summary(
         family: _string_list(row.get("configured_env_keys"))
         for family, row in provider_rows
     }
+    provider_env_key_hints_by_family = {
+        family: {
+            "preferred_env_key": row.get("preferred_env_key")
+            or (
+                _optional_mapping(provider_setup_actions.get(family)) or {}
+            ).get("preferred_env_key"),
+            "accepted_env_keys": _string_list(row.get("accepted_env_keys"))
+            or _string_list(
+                (
+                    _optional_mapping(provider_setup_actions.get(family)) or {}
+                ).get("accepted_env_keys")
+            ),
+        }
+        for family, row in provider_rows
+    }
     selected_provider_classes = _string_list(
         provider_route.get("selected_provider_classes")
     )
@@ -2775,6 +2791,7 @@ def _api_key_provider_selection_summary(
         "configured_env_keys_by_provider_family": (
             configured_env_keys_by_provider_family
         ),
+        "provider_env_key_hints_by_family": provider_env_key_hints_by_family,
         "selected_provider_by_family": selected_provider_by_family,
         "ready_to_run_live_smoke": (
             provider_route.get("status") == "ready"

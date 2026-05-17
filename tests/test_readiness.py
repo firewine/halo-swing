@@ -569,6 +569,21 @@ def expected_provider_setup_actions(
     }
 
 
+def expected_provider_env_key_hints_by_family() -> dict[str, dict[str, Any]]:
+    provider_setup_actions = expected_provider_setup_actions(
+        market_configured_env_keys=[],
+        macro_configured_env_keys=[],
+        news_configured_env_keys=[],
+    )
+    return {
+        family: {
+            "preferred_env_key": action["preferred_env_key"],
+            "accepted_env_keys": action["accepted_env_keys"],
+        }
+        for family, action in provider_setup_actions.items()
+    }
+
+
 def expected_provider_smoke_plan(
     *,
     market_configured_env_keys: list[str],
@@ -2512,6 +2527,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "macro": ["FRED_API_KEY"],
             "news": ["NEWS_API_KEY"],
         },
+        "provider_env_key_hints_by_family": (
+            expected_provider_env_key_hints_by_family()
+        ),
         "selected_provider_by_family": {
             "market": "polygon",
             "macro": "fred",
@@ -4127,6 +4145,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "macro": ["FRED_API_KEY"],
             "news": ["NEWS_API_KEY"],
         },
+        "provider_env_key_hints_by_family": (
+            expected_provider_env_key_hints_by_family()
+        ),
         "selected_provider_by_family": {
             "market": "polygon",
             "macro": "fred",
@@ -5206,6 +5227,45 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert "news-secret" not in serialized
 
 
+def test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    provider_selection_summary = payload["api_key_provider_selection_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert provider_selection_summary["schema_version"] == (
+        "api_key_provider_selection_summary.v1"
+    )
+    assert provider_selection_summary["status"] == "ready"
+    assert provider_selection_summary["configured_env_keys_by_provider_family"] == {
+        "market": ["POLYGON_API_KEY"],
+        "macro": ["FRED_API_KEY"],
+        "news": ["NEWS_API_KEY"],
+    }
+    assert provider_selection_summary["provider_env_key_hints_by_family"] == (
+        expected_provider_env_key_hints_by_family()
+    )
+    assert provider_selection_summary["provider_env_key_hints_by_family"]["market"][
+        "preferred_env_key"
+    ] == "POLYGON_API_KEY"
+    assert provider_selection_summary["provider_env_key_hints_by_family"]["market"][
+        "accepted_env_keys"
+    ] == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+    assert provider_selection_summary["secret_values_returned"] is False
+    assert "api_key_provider_selection_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
 def test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout(
     monkeypatch,
 ) -> None:
@@ -5488,6 +5548,9 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
             "macro": [],
             "news": [],
         },
+        "provider_env_key_hints_by_family": (
+            expected_provider_env_key_hints_by_family()
+        ),
         "selected_provider_by_family": {
             "market": None,
             "macro": None,

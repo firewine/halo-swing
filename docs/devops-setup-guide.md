@@ -582,9 +582,11 @@ precedence issues are visible without returning key values. The top-level
 (`api_key_provider_selection_summary.v1`) shows the actual provider factory
 selection with `provider_factory`, `selected_provider_classes`,
 `configured_provider_families`, `missing_provider_families`,
-`configured_env_keys_by_provider_family`, `selected_provider_by_family`, and
-`ready_to_run_live_smoke`, so API-key auto-selection can be verified without
-secret values. The top-level `api_key_integration_status_summary`
+`configured_env_keys_by_provider_family`, `provider_env_key_hints_by_family`,
+`selected_provider_by_family`, and `ready_to_run_live_smoke`, so API-key
+auto-selection and each provider family's `preferred_env_key` /
+`accepted_env_keys` can be verified without secret values. The top-level
+`api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
 provider selection, failure, and next-action evidence into one operator row with
 `status`, `api_keys_configured`, `dotenv_loading_enabled`,
