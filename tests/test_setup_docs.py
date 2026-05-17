@@ -849,6 +849,41 @@ def test_setup_docs_keep_api_key_provider_selection_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_readiness_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "readiness_summary",
+        "readiness_summary.next_operator_action",
+        "next_operator_action",
+        "next_operator_action_name",
+        "next_operator_action_command",
+        "next_operator_action_next_after_action",
+        "next_operator_action_dotenv_target_path",
+        "next_operator_action_source_path",
+        "next_operator_action_target_path",
+        "next_operator_action_provider_family",
+        "next_operator_action_provider",
+        "next_operator_action_smoke_command_name",
+        "next_operator_action_expected_live_contract",
+        "next_operator_action_expected_live_checks",
+        "next_operator_action_preferred_env_key",
+        "next_operator_action_accepted_env_keys",
+        "next_operator_action_required_env_keys",
+        "next_operator_action_dotenv_examples",
+        "next_operator_action_status",
+        "next_operator_action_network_call",
+        "next_operator_action_network_call_policy",
+        "next_operator_action_mutates_local_state",
+        "next_operator_action_secret_input_required",
+        "next_operator_action_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
