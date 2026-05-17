@@ -1483,6 +1483,9 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         "api_key_provider_smoke_next_action_primary_provider"
     ] == expected_next_action_primary_row.get("provider")
     assert payload[
+        "api_key_provider_smoke_next_action_primary_kind"
+    ] == expected_next_action_primary_row.get("kind")
+    assert payload[
         "api_key_provider_smoke_next_action_primary_command_name"
     ] == expected_next_action_primary_row.get("smoke_command_name")
     assert payload[

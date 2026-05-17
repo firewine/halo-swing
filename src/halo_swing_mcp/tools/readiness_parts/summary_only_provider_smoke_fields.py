@@ -520,6 +520,9 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_next_action_primary_provider": (
             provider_smoke_next_action_primary_row.get("provider")
         ),
+        "api_key_provider_smoke_next_action_primary_kind": (
+            provider_smoke_next_action_primary_row.get("kind")
+        ),
         "api_key_provider_smoke_next_action_primary_command_name": (
             provider_smoke_next_action_primary_row.get("smoke_command_name")
         ),

@@ -959,6 +959,7 @@ It also mirrors provider smoke progress as
 `api_key_provider_smoke_next_action_requires_api_keys`,
 `api_key_provider_smoke_next_action_primary_provider_family`,
 `api_key_provider_smoke_next_action_primary_provider`,
+`api_key_provider_smoke_next_action_primary_kind`,
 `api_key_provider_smoke_next_action_primary_command_name`,
 `api_key_provider_smoke_next_action_primary_command`,
 `api_key_provider_smoke_next_action_primary_status`,
