@@ -371,6 +371,61 @@ verification:
   - targeted payload print: command plan names ['copy_env_example_to_env', 'get_live_data_api_key_status', 'get_market_snapshot_live_smoke', 'get_macro_snapshot_live_smoke', 'get_news_bundle_live_smoke', 'run_api_key_pipeline_smoke'], command plan count 6, next item copy_dotenv cp .env.example .env, secret_values_returned false
 ```
 
+## 3.827 API Key Top-Level Next Command Scalars Gate Record - 2026-05-17
+
+### A. 목적
+
+3.826에서 summary-only top-level payload는 operator 순서의 command plan과 즉시 실행할
+command plan item object를 직접 보여주게 됐다. 하지만 compact client가 한 줄짜리
+상태 배지나 버튼을 만들려면 아직 nested item에서 name, kind, command, status,
+network/local mutation safety metadata를 다시 꺼내야 한다. 이번 slice는 이 no-secret
+next command metadata를 top-level scalar fields로 미러링해, 사용자가 API 키만 넣고
+연동할 때 첫 화면에서 즉시 실행할 명령과 안전 속성을 바로 표시할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_next_command_plan_name, kind, command, provider_family, and status mirror the immediate executable command item
+  - summary-only top-level api_key_setup_quickstart_next_command_plan_network_call, network_call_policy, mutates_local_state, and secret_values_returned mirror command safety metadata
+  - README and DevOps setup guide document top-level API-key next command scalar mirrors
+  - setup docs tests assert top-level next command scalar guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: next command scalar fields copy_env_example_to_env copy_dotenv cp .env.example .env required False True False
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

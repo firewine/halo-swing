@@ -5573,6 +5573,44 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         payload["api_key_setup_quickstart_next_command"]
         or payload["api_key_setup_quickstart_command_plan"][0]["command"]
     )
+    assert payload["api_key_setup_quickstart_next_command_plan_name"] == (
+        "copy_env_example_to_env"
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_kind"] == (
+        "copy_dotenv"
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_command"] == (
+        "cp .env.example .env"
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_provider_family"]
+        is None
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
+        "required"
+    )
+    assert (
+        payload["api_key_setup_quickstart_next_command_plan_network_call"]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_network_call_policy"
+        ]
+        is None
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_mutates_local_state"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_next_command_plan_secret_values_returned"
+        ]
+        is False
+    )
     assert payload["api_key_setup_quickstart_steps"][0] == {
         "name": "prepare_dotenv",
         "status": "pending",
@@ -7130,6 +7168,31 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_setup_quickstart_next_command_plan_item"] == (
         payload["api_key_setup_quickstart_command_plan"][0]
     )
+    assert payload["api_key_setup_quickstart_next_command_plan_name"] == (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["name"]
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_kind"] == (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["kind"]
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_command"] == (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["command"]
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_status"] == (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["status"]
+    )
+    assert payload["api_key_setup_quickstart_next_command_plan_network_call"] == (
+        payload["api_key_setup_quickstart_next_command_plan_item"]["network_call"]
+    )
+    assert payload[
+        "api_key_setup_quickstart_next_command_plan_mutates_local_state"
+    ] == payload["api_key_setup_quickstart_next_command_plan_item"][
+        "mutates_local_state"
+    ]
+    assert payload[
+        "api_key_setup_quickstart_next_command_plan_secret_values_returned"
+    ] == payload["api_key_setup_quickstart_next_command_plan_item"][
+        "secret_values_returned"
+    ]
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
         family: row["preferred_env_key"]
         for family, row in requirements["provider_requirements"].items()

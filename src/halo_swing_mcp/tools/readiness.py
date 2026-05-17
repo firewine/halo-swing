@@ -3200,6 +3200,7 @@ def _api_key_pipeline_summary_only_payload(
         ),
         quickstart_command_plan[0] if quickstart_command_plan else None,
     )
+    next_quickstart_command_plan_row = next_quickstart_command_plan_item or {}
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3328,6 +3329,33 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_setup_quickstart_next_command_plan_item": (
             next_quickstart_command_plan_item
+        ),
+        "api_key_setup_quickstart_next_command_plan_name": (
+            next_quickstart_command_plan_row.get("name")
+        ),
+        "api_key_setup_quickstart_next_command_plan_kind": (
+            next_quickstart_command_plan_row.get("kind")
+        ),
+        "api_key_setup_quickstart_next_command_plan_command": (
+            next_quickstart_command_plan_row.get("command")
+        ),
+        "api_key_setup_quickstart_next_command_plan_provider_family": (
+            next_quickstart_command_plan_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_next_command_plan_status": (
+            next_quickstart_command_plan_row.get("status")
+        ),
+        "api_key_setup_quickstart_next_command_plan_network_call": (
+            next_quickstart_command_plan_row.get("network_call") is True
+        ),
+        "api_key_setup_quickstart_next_command_plan_network_call_policy": (
+            next_quickstart_command_plan_row.get("network_call_policy")
+        ),
+        "api_key_setup_quickstart_next_command_plan_mutates_local_state": (
+            next_quickstart_command_plan_row.get("mutates_local_state") is True
+        ),
+        "api_key_setup_quickstart_next_command_plan_secret_values_returned": (
+            next_quickstart_command_plan_row.get("secret_values_returned") is True
         ),
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")

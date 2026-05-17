@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_TOP_LEVEL_QUICKSTART_COMMAND_PLAN_VERIFIED
-gate_id: API_KEY_TOP_LEVEL_QUICKSTART_COMMAND_PLAN_GATE
+status: API_KEY_TOP_LEVEL_NEXT_COMMAND_SCALARS_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_NEXT_COMMAND_SCALARS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key quickstart command plan in summary-only top-level fields
+next_atomic_step: mirror API-key quickstart next command plan item onto scalar top-level fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -81,17 +81,27 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level api_key_setup_quickstart_command_plan lists no-secret setup and smoke commands in operator order
-  - summary-only top-level api_key_setup_quickstart_command_plan_names and api_key_setup_quickstart_command_plan_count mirror command plan identity
-  - summary-only top-level api_key_setup_quickstart_next_command_plan_item mirrors the immediate executable command item
-  - README and DevOps setup guide document top-level API-key quickstart command plan
-  - setup docs tests assert the new top-level quickstart command plan guidance
+  - summary-only top-level api_key_setup_quickstart_next_command_plan_name, kind, command, provider_family, and status mirror the immediate executable command item
+  - summary-only top-level api_key_setup_quickstart_next_command_plan_network_call, network_call_policy, mutates_local_state, and secret_values_returned mirror command safety metadata
+  - README and DevOps setup guide document top-level API-key next command scalar mirrors
+  - setup docs tests assert the new top-level next command scalar guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified top-level quickstart command plan gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified top-level next command scalar gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_TOP_LEVEL_QUICKSTART_COMMAND_PLAN_VERIFIED
+gate_id: API_KEY_TOP_LEVEL_QUICKSTART_COMMAND_PLAN_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key quickstart command plan in summary-only top-level fields
 ```
 
 Previous completed directive:
@@ -3033,14 +3043,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Top-Level Quickstart Command Plan Gate is verified.
-Summary-only top-level payload now exposes the no-secret copy/status/provider
-smoke/one-shot command plan, command plan names/count, and immediate command
-plan item. Focused tests, direct summary-only smoke, targeted payload print,
-full pytest, ruff, and health_check passed.
+Summary: API Key Top-Level Next Command Scalars Gate is verified. Summary-only
+top-level payload now mirrors the immediate quickstart command plan item as
+scalar name/kind/command/provider/status and safety metadata fields. Focused
+tests, direct summary-only smoke, targeted payload print, full pytest, ruff,
+and health_check passed.
 
 ```yaml
-api_key_top_level_quickstart_command_plan_gate:
+api_key_top_level_next_command_scalars_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -3053,11 +3063,10 @@ api_key_top_level_quickstart_command_plan_gate:
     - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - summary-only top-level api_key_setup_quickstart_command_plan lists no-secret setup and smoke commands in operator order
-    - summary-only top-level api_key_setup_quickstart_command_plan_names and api_key_setup_quickstart_command_plan_count mirror command plan identity
-    - summary-only top-level api_key_setup_quickstart_next_command_plan_item mirrors the immediate executable command item
-    - README and DevOps setup guide document top-level API-key quickstart command plan
-    - setup docs tests assert top-level quickstart command plan guidance
+    - summary-only top-level api_key_setup_quickstart_next_command_plan_name, kind, command, provider_family, and status mirror the immediate executable command item
+    - summary-only top-level api_key_setup_quickstart_next_command_plan_network_call, network_call_policy, mutates_local_state, and secret_values_returned mirror command safety metadata
+    - README and DevOps setup guide document top-level API-key next command scalar mirrors
+    - setup docs tests assert top-level next command scalar guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -3078,8 +3087,21 @@ api_key_top_level_quickstart_command_plan_gate:
       result: passed
     - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_setup_quickstart_command_plan_names"], p["api_key_setup_quickstart_command_plan_count"], p["api_key_setup_quickstart_next_command_plan_item"]["kind"], p["api_key_setup_quickstart_next_command_plan_item"]["command"], p["secret_values_returned"])'
-      result: "['copy_env_example_to_env', 'get_live_data_api_key_status', 'get_market_snapshot_live_smoke', 'get_macro_snapshot_live_smoke', 'get_news_bundle_live_smoke', 'run_api_key_pipeline_smoke'] 6 copy_dotenv cp .env.example .env False"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; p=run_api_key_pipeline_smoke(summary_only=True); print(p["api_key_setup_quickstart_next_command_plan_name"], p["api_key_setup_quickstart_next_command_plan_kind"], p["api_key_setup_quickstart_next_command_plan_command"], p["api_key_setup_quickstart_next_command_plan_status"], p["api_key_setup_quickstart_next_command_plan_network_call"], p["api_key_setup_quickstart_next_command_plan_mutates_local_state"], p["api_key_setup_quickstart_next_command_plan_secret_values_returned"])'
+      result: "copy_env_example_to_env copy_dotenv cp .env.example .env required False True False"
+```
+
+Previous verification:
+
+Summary: API Key Top-Level Quickstart Command Plan Gate is verified.
+Summary-only top-level payload now exposes the no-secret copy/status/provider
+smoke/one-shot command plan, command plan names/count, and immediate command
+plan item. Focused tests, direct summary-only smoke, targeted payload print,
+full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_top_level_quickstart_command_plan_gate:
+  status: verified
 ```
 
 Previous verification:
