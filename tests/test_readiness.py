@@ -1679,6 +1679,96 @@ def assert_api_key_requirements_summary_top_level_fields(
     )
 
 
+def assert_api_key_operator_checklist_top_level_fields(
+    payload: dict[str, Any],
+) -> None:
+    checklist_summary = payload["api_key_operator_checklist_summary"]
+    assert payload["api_key_operator_checklist_schema_version"] == (
+        checklist_summary["schema_version"]
+    )
+    assert payload["api_key_setup_status"] == checklist_summary["status"]
+    assert payload["api_key_setup_current_step"] == (
+        checklist_summary["current_step"]
+    )
+    assert payload["api_key_setup_ready"] is checklist_summary["ready"]
+    assert payload["api_key_setup_step_count"] == checklist_summary["step_count"]
+    assert payload["api_key_setup_ready_step_names"] == (
+        checklist_summary["ready_step_names"]
+    )
+    assert payload["api_key_setup_ready_step_count"] == (
+        checklist_summary["ready_step_count"]
+    )
+    assert payload["api_key_setup_blocking_step_names"] == (
+        checklist_summary["blocking_step_names"]
+    )
+    assert payload["api_key_setup_blocking_step_count"] == (
+        checklist_summary["blocking_step_count"]
+    )
+    assert payload["api_key_setup_next_blocking_step"] == (
+        checklist_summary["next_blocking_step"]
+    )
+    assert payload["api_key_setup_next_blocking_action_name"] == (
+        checklist_summary["next_blocking_action_name"]
+    )
+    assert payload["api_key_setup_next_blocking_action_status"] == (
+        checklist_summary.get("next_blocking_action_status")
+    )
+    assert payload["api_key_setup_next_blocking_action_command"] == (
+        checklist_summary.get("next_blocking_action_command")
+    )
+    assert payload["api_key_setup_next_blocking_action_network_call"] is (
+        checklist_summary.get("next_blocking_action_network_call") is True
+    )
+    assert payload["api_key_setup_next_blocking_action_network_call_policy"] == (
+        checklist_summary.get("next_blocking_action_network_call_policy")
+    )
+    assert payload["api_key_setup_next_blocking_action_mutates_local_state"] is (
+        checklist_summary.get("next_blocking_action_mutates_local_state") is True
+    )
+    assert payload["api_key_setup_next_blocking_action_secret_values_returned"] is (
+        checklist_summary.get("next_blocking_action_secret_values_returned") is True
+    )
+    assert payload["api_key_setup_next_blocking_action_provider_family"] == (
+        checklist_summary.get("next_blocking_action_provider_family")
+    )
+    assert payload["api_key_setup_next_blocking_action_provider"] == (
+        checklist_summary.get("next_blocking_action_provider")
+    )
+    assert payload["api_key_setup_next_blocking_action_smoke_command_name"] == (
+        checklist_summary.get("next_blocking_action_smoke_command_name")
+    )
+    assert payload["api_key_setup_next_blocking_action_preferred_env_key"] == (
+        checklist_summary.get("next_blocking_action_preferred_env_key")
+    )
+    assert payload["api_key_setup_next_blocking_action_accepted_env_keys"] == (
+        checklist_summary.get("next_blocking_action_accepted_env_keys") or []
+    )
+    assert payload[
+        "api_key_operator_checklist_selected_provider_class_by_family"
+    ] == checklist_summary["selected_provider_class_by_family"]
+    assert payload[
+        "api_key_operator_checklist_provider_route_data_mode_by_family"
+    ] == checklist_summary["provider_route_data_mode_by_family"]
+    assert (
+        payload[
+            "api_key_operator_checklist_provider_route_live_data_required_by_family"
+        ]
+        == checklist_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_operator_checklist_all_selected_routes_live"] is (
+        checklist_summary["all_selected_routes_live"]
+    )
+    assert payload["api_key_operator_checklist_network_call"] is (
+        checklist_summary["network_call"]
+    )
+    assert payload["api_key_operator_checklist_mutates_local_state"] is (
+        checklist_summary["mutates_local_state"]
+    )
+    assert payload["api_key_operator_checklist_secret_values_returned"] is (
+        checklist_summary["secret_values_returned"]
+    )
+
+
 @pytest.fixture(autouse=True)
 def clear_settings_cache_after_readiness_env_tests() -> None:
     get_settings.cache_clear()
@@ -6749,6 +6839,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert_pipeline_failure_summary_top_level_fields(payload)
     assert_api_key_command_summary_top_level_fields(payload)
     assert_api_key_requirements_summary_top_level_fields(payload)
+    assert_api_key_operator_checklist_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -9318,24 +9409,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     )
     assert checklist_summary["status"] == "conflict"
     assert checklist_summary["current_step"] == "recover_failed_providers"
-    assert payload["api_key_setup_current_step"] == checklist_summary["current_step"]
-    assert payload["api_key_setup_ready"] == checklist_summary["ready"]
-    assert payload["api_key_setup_step_count"] == checklist_summary["step_count"]
-    assert payload["api_key_setup_ready_step_names"] == (
-        checklist_summary["ready_step_names"]
-    )
-    assert payload["api_key_setup_ready_step_count"] == (
-        checklist_summary["ready_step_count"]
-    )
-    assert payload["api_key_setup_blocking_step_names"] == (
-        checklist_summary["blocking_step_names"]
-    )
-    assert payload["api_key_setup_blocking_step_count"] == (
-        checklist_summary["blocking_step_count"]
-    )
-    assert payload["api_key_setup_next_blocking_step"] == (
-        checklist_summary["next_blocking_step"]
-    )
+    assert_api_key_operator_checklist_top_level_fields(payload)
     assert payload["api_key_setup_configured_provider_families"] == (
         payload["setup_status_summary"]["configured_provider_families"]
     )

@@ -705,11 +705,32 @@ compact response still shows the next local setup or recovery action and the
 `KEY=placeholder` lines to fill without
 returning the full checklist payload.
 For compact clients that read only top-level fields, summary-only output also
-mirrors checklist route-family evidence as
+mirrors checklist action fields as
+`api_key_operator_checklist_schema_version`, `api_key_setup_status`,
+`api_key_setup_current_step`, `api_key_setup_ready`,
+`api_key_setup_step_count`, `api_key_setup_ready_step_names`,
+`api_key_setup_ready_step_count`, `api_key_setup_blocking_step_names`,
+`api_key_setup_blocking_step_count`, `api_key_setup_next_blocking_step`,
+`api_key_setup_next_blocking_action_name`,
+`api_key_setup_next_blocking_action_status`,
+`api_key_setup_next_blocking_action_command`,
+`api_key_setup_next_blocking_action_network_call`,
+`api_key_setup_next_blocking_action_network_call_policy`,
+`api_key_setup_next_blocking_action_mutates_local_state`,
+`api_key_setup_next_blocking_action_secret_values_returned`,
+`api_key_setup_next_blocking_action_provider_family`,
+`api_key_setup_next_blocking_action_provider`,
+`api_key_setup_next_blocking_action_smoke_command_name`,
+`api_key_setup_next_blocking_action_preferred_env_key`, and
+`api_key_setup_next_blocking_action_accepted_env_keys`.
+It also mirrors checklist route-family evidence as
 `api_key_operator_checklist_selected_provider_class_by_family`,
 `api_key_operator_checklist_provider_route_data_mode_by_family`,
-`api_key_operator_checklist_provider_route_live_data_required_by_family`, and
-`api_key_operator_checklist_all_selected_routes_live`.
+`api_key_operator_checklist_provider_route_live_data_required_by_family`,
+`api_key_operator_checklist_all_selected_routes_live`,
+`api_key_operator_checklist_network_call`,
+`api_key_operator_checklist_mutates_local_state`, and
+`api_key_operator_checklist_secret_values_returned`.
 It also
 mirrors the no-secret setup sequence as `api_key_setup_quickstart_steps`,
 `api_key_setup_quickstart_step_names`,

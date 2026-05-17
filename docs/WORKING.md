@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_REQUIREMENTS_TOP_LEVEL_STATUS_FIELDS_VERIFIED
-gate_id: API_KEY_REQUIREMENTS_TOP_LEVEL_STATUS_FIELDS_GATE
+status: API_KEY_OPERATOR_CHECKLIST_TOP_LEVEL_ACTION_FIELDS_VERIFIED
+gate_id: API_KEY_OPERATOR_CHECKLIST_TOP_LEVEL_ACTION_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key requirements status, counts, and safety fields as top-level scalars
+next_atomic_step: surface summary-only API-key operator checklist next blocking action fields as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,8 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_operator_checklist_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_requirement_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,28 +83,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output mirrors API-key requirements status, provider family counts, provider/configured key maps, and safety fields without secret values
-  - blocked default and partial-key summary-only tests prove top-level requirement fields match api_key_requirements_summary
-  - README and DevOps guide document top-level api_key_requirement_* status and safety fields
+  - summary-only output mirrors operator checklist status, current step, next blocking action, provider recovery context, env-key hints, and safety fields without secret values
+  - blocked default and ready fake-key summary-only tests prove top-level operator checklist fields match api_key_operator_checklist_summary
+  - README and DevOps guide document top-level api_key_setup_* next blocking action fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key requirements top-level status fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key operator checklist top-level action fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_REQUIREMENTS_TOP_LEVEL_STATUS_FIELDS_GATE
+gate_id: API_KEY_OPERATOR_CHECKLIST_TOP_LEVEL_ACTION_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_requirement_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_operator_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
@@ -117,14 +117,25 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_operator_checklist_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_requirement_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key requirements top-level status fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key operator checklist top-level action fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes top-level API-key requirement status, provider family counts, configured key maps, and no-secret safety maps
-  - summary_only_payload.py is 551 lines after moving requirement projection to summary_only_requirement_fields.py
+  - summary-only payload now exposes operator checklist status, next blocking action, provider recovery context, env-key hints, and no-secret safety fields
+  - summary_only_payload.py is 505 lines after moving operator checklist projection to summary_only_operator_checklist_fields.py
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_REQUIREMENTS_TOP_LEVEL_STATUS_FIELDS_VERIFIED
+gate_id: API_KEY_REQUIREMENTS_TOP_LEVEL_STATUS_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key requirements status, counts, and safety fields as top-level scalars
 ```
 
 Previous completed directive:

@@ -49,6 +49,9 @@ from .summary_only_command_fields import (
 from .summary_only_requirement_fields import (
     _api_key_requirements_top_level_fields,
 )
+from .summary_only_operator_checklist_fields import (
+    _api_key_operator_checklist_top_level_fields,
+)
 
 
 __all__ = ('_api_key_pipeline_summary_only_payload',)
@@ -246,55 +249,8 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_next_action_all_selected_routes_live": (
             api_key_next_action_summary.get("all_selected_routes_live") is True
         ),
-        "api_key_setup_current_step": api_key_operator_checklist_summary.get(
-            "current_step"
-        ),
-        "api_key_setup_ready": api_key_operator_checklist_summary.get("ready") is True,
-        "api_key_setup_step_count": api_key_operator_checklist_summary.get(
-            "step_count"
-        ),
-        "api_key_setup_ready_step_names": _string_list(
-            api_key_operator_checklist_summary.get("ready_step_names")
-        ),
-        "api_key_setup_ready_step_count": api_key_operator_checklist_summary.get(
-            "ready_step_count"
-        ),
-        "api_key_setup_blocking_step_names": _string_list(
-            api_key_operator_checklist_summary.get("blocking_step_names")
-        ),
-        "api_key_setup_blocking_step_count": api_key_operator_checklist_summary.get(
-            "blocking_step_count"
-        ),
-        "api_key_setup_next_blocking_step": api_key_operator_checklist_summary.get(
-            "next_blocking_step"
-        ),
-        "api_key_operator_checklist_selected_provider_class_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "selected_provider_class_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "provider_route_data_mode_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                api_key_operator_checklist_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_operator_checklist_all_selected_routes_live": (
-            api_key_operator_checklist_summary.get("all_selected_routes_live")
-            is True
+        **_api_key_operator_checklist_top_level_fields(
+            api_key_operator_checklist_summary
         ),
         **_api_key_setup_quickstart_top_level_fields(
             setup_quickstart_rows=setup_quickstart_rows,
