@@ -77,6 +77,9 @@ def _api_key_pipeline_summary_only_payload(
     api_key_pipeline_check_summary = _optional_mapping(
         payload.get("api_key_pipeline_check_summary")
     ) or {}
+    api_key_dotenv_loading_summary = (
+        _optional_mapping(payload.get("api_key_dotenv_loading_summary")) or {}
+    )
     api_key_provider_recovery_checklist = _optional_mapping(
         payload.get("api_key_provider_recovery_checklist")
     ) or {}
@@ -290,6 +293,51 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
             "target_path"
         ),
+        "api_key_dotenv_supported": (
+            api_key_dotenv_loading_summary.get("dotenv_supported") is True
+        ),
+        "api_key_dotenv_loading_enabled": (
+            api_key_dotenv_loading_summary.get("dotenv_loading_enabled") is True
+        ),
+        "api_key_dotenv_disabled": (
+            api_key_dotenv_loading_summary.get("disabled") is True
+        ),
+        "api_key_dotenv_disabled_env_key": api_key_dotenv_loading_summary.get(
+            "disabled_env_key"
+        ),
+        "api_key_dotenv_configuration_precedence": _string_list(
+            api_key_dotenv_loading_summary.get("configuration_precedence")
+        ),
+        "api_key_dotenv_source_path": api_key_dotenv_loading_summary.get(
+            "source_path"
+        ),
+        "api_key_dotenv_target_path": api_key_dotenv_loading_summary.get(
+            "target_path"
+        ),
+        "api_key_dotenv_source_exists": (
+            api_key_dotenv_loading_summary.get("source_exists") is True
+        ),
+        "api_key_dotenv_target_exists": (
+            api_key_dotenv_loading_summary.get("target_exists") is True
+        ),
+        "api_key_dotenv_copy_required": (
+            api_key_dotenv_loading_summary.get("copy_required") is True
+        ),
+        "api_key_dotenv_next_setup_step": api_key_dotenv_loading_summary.get(
+            "next_setup_step"
+        ),
+        "api_key_dotenv_ready_to_run_live_smoke": (
+            api_key_dotenv_loading_summary.get("ready_to_run_live_smoke") is True
+        ),
+        "api_key_dotenv_network_call": (
+            api_key_dotenv_loading_summary.get("network_call") is True
+        ),
+        "api_key_dotenv_mutates_local_state": (
+            api_key_dotenv_loading_summary.get("mutates_local_state") is True
+        ),
+        "api_key_dotenv_secret_values_returned": (
+            api_key_dotenv_loading_summary.get("secret_values_returned") is True
+        ),
         **_api_key_provider_selection_top_level_fields(
             api_key_provider_selection_summary
         ),
@@ -437,10 +485,7 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_requirements_summary": api_key_requirements_summary,
         "api_key_command_summary": api_key_command_summary,
         "api_key_setup_file_summary": api_key_setup_file_summary,
-        "api_key_dotenv_loading_summary": _optional_mapping(
-            payload.get("api_key_dotenv_loading_summary")
-        )
-        or {},
+        "api_key_dotenv_loading_summary": api_key_dotenv_loading_summary,
         "api_key_pipeline_failure_summary": _optional_mapping(
             payload.get("api_key_pipeline_failure_summary")
         )

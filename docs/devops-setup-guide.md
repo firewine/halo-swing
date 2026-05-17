@@ -1056,6 +1056,15 @@ values or mutating files. The top-level `api_key_dotenv_loading_summary`
 `configuration_precedence`, `.env.example`/`.env` file status,
 `next_setup_step`, and `ready_to_run_live_smoke`, so disabled dotenv loading or
 precedence issues are visible without returning key values. The top-level
+one-line dotenv fields mirror the same state as `api_key_dotenv_supported`,
+`api_key_dotenv_loading_enabled`, `api_key_dotenv_disabled`,
+`api_key_dotenv_disabled_env_key`, `api_key_dotenv_configuration_precedence`,
+`api_key_dotenv_source_path`, `api_key_dotenv_target_path`,
+`api_key_dotenv_source_exists`, `api_key_dotenv_target_exists`,
+`api_key_dotenv_copy_required`, `api_key_dotenv_next_setup_step`,
+`api_key_dotenv_ready_to_run_live_smoke`, `api_key_dotenv_network_call`,
+`api_key_dotenv_mutates_local_state`, and
+`api_key_dotenv_secret_values_returned`. The top-level
 `api_key_provider_selection_summary`
 (`api_key_provider_selection_summary.v1`) shows the actual provider factory
 selection with `provider_factory`, `selected_provider_classes`,

@@ -6093,6 +6093,46 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "topic": "macro",
         "summary_only": True,
     }
+    dotenv_summary = payload["api_key_dotenv_loading_summary"]
+    assert payload["api_key_dotenv_supported"] is (
+        dotenv_summary["dotenv_supported"]
+    )
+    assert payload["api_key_dotenv_loading_enabled"] is (
+        dotenv_summary["dotenv_loading_enabled"]
+    )
+    assert payload["api_key_dotenv_disabled"] is dotenv_summary["disabled"]
+    assert payload["api_key_dotenv_disabled_env_key"] == (
+        dotenv_summary["disabled_env_key"]
+    )
+    assert payload["api_key_dotenv_configuration_precedence"] == (
+        dotenv_summary["configuration_precedence"]
+    )
+    assert payload["api_key_dotenv_source_path"] == dotenv_summary["source_path"]
+    assert payload["api_key_dotenv_target_path"] == dotenv_summary["target_path"]
+    assert payload["api_key_dotenv_source_exists"] is (
+        dotenv_summary["source_exists"]
+    )
+    assert payload["api_key_dotenv_target_exists"] is (
+        dotenv_summary["target_exists"]
+    )
+    assert payload["api_key_dotenv_copy_required"] is (
+        dotenv_summary["copy_required"]
+    )
+    assert payload["api_key_dotenv_next_setup_step"] == (
+        dotenv_summary["next_setup_step"]
+    )
+    assert payload["api_key_dotenv_ready_to_run_live_smoke"] is (
+        dotenv_summary["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_dotenv_network_call"] is (
+        dotenv_summary["network_call"]
+    )
+    assert payload["api_key_dotenv_mutates_local_state"] is (
+        dotenv_summary["mutates_local_state"]
+    )
+    assert payload["api_key_dotenv_secret_values_returned"] is (
+        dotenv_summary["secret_values_returned"]
+    )
     assert payload["provider_smoke_success_count"] == 0
     assert payload["provider_smoke_first_success_provider_family"] is None
     assert payload["provider_smoke_first_success_provider"] is None
@@ -6106,6 +6146,46 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["provider_smoke_first_success_network_call_policy"] is None
     assert payload["provider_smoke_first_success_mutates_local_state"] is False
     assert payload["provider_smoke_first_success_secret_values_returned"] is False
+    dotenv_summary = payload["api_key_dotenv_loading_summary"]
+    assert payload["api_key_dotenv_supported"] is (
+        dotenv_summary["dotenv_supported"]
+    )
+    assert payload["api_key_dotenv_loading_enabled"] is (
+        dotenv_summary["dotenv_loading_enabled"]
+    )
+    assert payload["api_key_dotenv_disabled"] is dotenv_summary["disabled"]
+    assert payload["api_key_dotenv_disabled_env_key"] == (
+        dotenv_summary["disabled_env_key"]
+    )
+    assert payload["api_key_dotenv_configuration_precedence"] == (
+        dotenv_summary["configuration_precedence"]
+    )
+    assert payload["api_key_dotenv_source_path"] == dotenv_summary["source_path"]
+    assert payload["api_key_dotenv_target_path"] == dotenv_summary["target_path"]
+    assert payload["api_key_dotenv_source_exists"] is (
+        dotenv_summary["source_exists"]
+    )
+    assert payload["api_key_dotenv_target_exists"] is (
+        dotenv_summary["target_exists"]
+    )
+    assert payload["api_key_dotenv_copy_required"] is (
+        dotenv_summary["copy_required"]
+    )
+    assert payload["api_key_dotenv_next_setup_step"] == (
+        dotenv_summary["next_setup_step"]
+    )
+    assert payload["api_key_dotenv_ready_to_run_live_smoke"] is (
+        dotenv_summary["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_dotenv_network_call"] is (
+        dotenv_summary["network_call"]
+    )
+    assert payload["api_key_dotenv_mutates_local_state"] is (
+        dotenv_summary["mutates_local_state"]
+    )
+    assert payload["api_key_dotenv_secret_values_returned"] is (
+        dotenv_summary["secret_values_returned"]
+    )
     assert payload["api_key_integration_status_summary"] == {
         "schema_version": "api_key_integration_status_summary.v1",
         "status": "blocked",
@@ -8742,6 +8822,45 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    assert payload["api_key_dotenv_supported"] is (
+        dotenv_summary["dotenv_supported"]
+    )
+    assert payload["api_key_dotenv_loading_enabled"] is (
+        dotenv_summary["dotenv_loading_enabled"]
+    )
+    assert payload["api_key_dotenv_disabled"] is dotenv_summary["disabled"]
+    assert payload["api_key_dotenv_disabled_env_key"] == (
+        dotenv_summary["disabled_env_key"]
+    )
+    assert payload["api_key_dotenv_configuration_precedence"] == (
+        dotenv_summary["configuration_precedence"]
+    )
+    assert payload["api_key_dotenv_source_path"] == dotenv_summary["source_path"]
+    assert payload["api_key_dotenv_target_path"] == dotenv_summary["target_path"]
+    assert payload["api_key_dotenv_source_exists"] is (
+        dotenv_summary["source_exists"]
+    )
+    assert payload["api_key_dotenv_target_exists"] is (
+        dotenv_summary["target_exists"]
+    )
+    assert payload["api_key_dotenv_copy_required"] is (
+        dotenv_summary["copy_required"]
+    )
+    assert payload["api_key_dotenv_next_setup_step"] == (
+        dotenv_summary["next_setup_step"]
+    )
+    assert payload["api_key_dotenv_ready_to_run_live_smoke"] is (
+        dotenv_summary["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_dotenv_network_call"] is (
+        dotenv_summary["network_call"]
+    )
+    assert payload["api_key_dotenv_mutates_local_state"] is (
+        dotenv_summary["mutates_local_state"]
+    )
+    assert payload["api_key_dotenv_secret_values_returned"] is (
+        dotenv_summary["secret_values_returned"]
+    )
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
 
 

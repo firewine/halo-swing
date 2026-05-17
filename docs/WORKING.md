@@ -42,18 +42,22 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_CLI_EXPORTED_ENV_SUMMARY_VERIFIED
-gate_id: API_KEY_PIPELINE_CLI_EXPORTED_ENV_SUMMARY_GATE
+status: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: add CLI regression coverage proving summary-only API-key pipeline reads exported API keys without local dotenv secrets
+next_atomic_step: surface summary-only API-key dotenv loading status as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -70,49 +74,67 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - a subprocess harness invocation of run_api_key_pipeline_smoke --summary-only reads POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY from exported environment variables without a launch-directory .env
-  - the subprocess summary-only payload reports all three provider families configured, no missing provider families, dotenv loading disabled for isolation, and provider routes selected as live
-  - the subprocess summary-only payload exposes the next ready provider-smoke command and context without returning secret values
-  - the subprocess working directory remains without a generated .env file and the serialized subprocess output does not contain the fake secret values
+  - summary-only top-level output mirrors dotenv supported, enabled, disabled, disabled env key, and precedence fields without secret values
+  - summary-only top-level output mirrors dotenv source/target paths, existence booleans, copy-required state, next setup step, and ready-to-run-live-smoke state
+  - summary-only top-level dotenv safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
+  - blocked default and disabled-dotenv summary-only tests prove the top-level fields match api_key_dotenv_loading_summary without secret values
+  - README and DevOps guide document the top-level dotenv loading scalar fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI exported-env API-key pipeline summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key dotenv loading top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PIPELINE_CLI_EXPORTED_ENV_SUMMARY_GATE
+gate_id: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 833 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
-next_state: commit this verified CLI exported-env API-key pipeline summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+  - tests/test_setup_docs.py
+next_state: commit this verified API-key dotenv loading top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - subprocess CLI coverage proves summary-only API-key pipeline reads exported API keys with dotenv loading disabled and without returning secret values
+  - compact clients can now read dotenv/source readiness without opening nested api_key_dotenv_loading_summary
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_CLI_EXPORTED_ENV_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_CLI_EXPORTED_ENV_SUMMARY_GATE
+review_tier: S1_small
+
+next_atomic_step: add CLI regression coverage proving summary-only API-key pipeline reads exported API keys without local dotenv secrets
 ```
 
 Previous completed directive:

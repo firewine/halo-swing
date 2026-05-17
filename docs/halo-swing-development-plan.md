@@ -197,6 +197,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.905 API Key Dotenv Loading Top-Level Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.904까지 CLI harness는 launch-directory `.env`와 exported environment variable
+양쪽에서 API 키를 읽는 실제 프로세스 경계를 회귀 테스트로 고정했다. 하지만 compact
+client가 API 키 source/readiness를 한 줄로 표시하려면 아직
+`api_key_dotenv_loading_summary` nested object를 열어야 한다. 이번 slice는 dotenv
+loading/source/copy/ready/safety 상태를 summary-only top-level scalar로 올려, API 키만
+채운 뒤 현재 경로가 `.env` 기반인지 isolated exported-env 기반인지 바로 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only top-level output mirrors dotenv supported, enabled, disabled, disabled env key, and precedence fields without secret values
+  - summary-only top-level output mirrors dotenv source/target paths, existence booleans, copy-required state, next setup step, and ready-to-run-live-smoke state
+  - summary-only top-level dotenv safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
+  - blocked default and disabled-dotenv summary-only tests prove the top-level fields match api_key_dotenv_loading_summary without secret values
+  - README and DevOps setup guide document the top-level dotenv loading scalar fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 833 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.901 API Key Quickstart Command Plan Next Ready/Blocked Context Gate Record - 2026-05-18
 
 ### A. 목적

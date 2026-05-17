@@ -1093,6 +1093,21 @@ def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
         "copy_required",
         "next_setup_step",
         "ready_to_run_live_smoke",
+        "api_key_dotenv_supported",
+        "api_key_dotenv_loading_enabled",
+        "api_key_dotenv_disabled",
+        "api_key_dotenv_disabled_env_key",
+        "api_key_dotenv_configuration_precedence",
+        "api_key_dotenv_source_path",
+        "api_key_dotenv_target_path",
+        "api_key_dotenv_source_exists",
+        "api_key_dotenv_target_exists",
+        "api_key_dotenv_copy_required",
+        "api_key_dotenv_next_setup_step",
+        "api_key_dotenv_ready_to_run_live_smoke",
+        "api_key_dotenv_network_call",
+        "api_key_dotenv_mutates_local_state",
+        "api_key_dotenv_secret_values_returned",
     )
 
     for field_name in field_names:
