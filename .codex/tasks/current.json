@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_TOP_LEVEL_REQUIREMENTS_MIRRORS_GATE",
+  "gate_id": "API_KEY_TOP_LEVEL_PROVIDER_REQUIREMENT_HINTS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.822",
-  "next_atomic_step": "mirror API-key requirements summary onto summary-only top-level fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.823",
+  "next_atomic_step": "mirror API-key provider requirement hints onto summary-only top-level fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.822",
+    "docs/halo-swing-development-plan.md#3.823",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -56,16 +56,16 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level api_key_required_env_keys and api_key_required_env_key_count mirror required API-key names",
-    "summary-only top-level api_key_configured_env_keys and api_key_configured_env_key_count mirror configured API-key names without values",
-    "summary-only top-level api_key_requirement_configured_provider_families and api_key_requirement_missing_provider_families mirror requirements provider-family state",
-    "summary-only top-level api_key_provider_requirement_families and api_key_provider_requirement_count mirror provider requirement coverage",
-    "README and DevOps setup guide document top-level API-key requirement mirrors",
-    "setup docs tests assert the new top-level requirement mirror guidance",
+    "summary-only top-level api_key_provider_requirement_preferred_env_keys mirrors provider-family preferred env-key names",
+    "summary-only top-level api_key_provider_requirement_accepted_env_keys mirrors provider-family accepted env-key aliases",
+    "summary-only top-level api_key_provider_requirement_setup_statuses and api_key_provider_requirement_configured mirror provider-family setup state",
+    "summary-only top-level api_key_provider_requirement_next_setup_actions and api_key_provider_requirement_smoke_command_names mirror provider-family next actions",
+    "README and DevOps setup guide document top-level API-key provider requirement hint mirrors",
+    "setup docs tests assert the new top-level provider requirement hint guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified top-level requirements mirrors gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified top-level provider requirement hints gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

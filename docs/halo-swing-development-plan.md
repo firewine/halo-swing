@@ -141,6 +141,64 @@ verification:
   - targeted payload print: required keys ['POLYGON_API_KEY', 'FRED_API_KEY', 'NEWS_API_KEY'], required count 3, configured keys [], provider requirement families ['market', 'macro', 'news'], secret_values_returned false
 ```
 
+## 3.823 API Key Top-Level Provider Requirement Hints Gate Record - 2026-05-17
+
+### A. 목적
+
+3.822에서 summary-only top-level payload는 전체 required/configured API-key 이름을
+직접 보여주게 됐다. 하지만 compact row만 읽는 operator는 provider family별
+preferred env key, accepted alias, setup status, 다음 setup action, smoke command
+name을 아직 nested `api_key_requirements_summary.provider_requirements`에서 확인해야
+한다. 이번 slice는 이 no-secret provider requirement hints를 top-level map으로 올려,
+사용자가 market/macro/news별로 어떤 key alias를 채울지 compact response 첫 레벨에서
+확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_provider_requirement_preferred_env_keys mirrors provider-family preferred env-key names
+  - summary-only top-level api_key_provider_requirement_accepted_env_keys mirrors provider-family accepted env-key aliases
+  - summary-only top-level api_key_provider_requirement_setup_statuses and api_key_provider_requirement_configured mirror provider-family setup state
+  - summary-only top-level api_key_provider_requirement_next_setup_actions and api_key_provider_requirement_smoke_command_names mirror provider-family next actions
+  - README and DevOps setup guide document top-level API-key provider requirement hint mirrors
+  - setup docs tests assert top-level provider requirement hint guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: preferred env-key map, accepted env-key map, setup status map, configured map present, secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

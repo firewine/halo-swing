@@ -602,6 +602,13 @@ mirrors requirement metadata as `api_key_required_env_keys`,
 `api_key_requirement_missing_provider_families`,
 `api_key_provider_requirement_families`, and
 `api_key_provider_requirement_count`.
+It also mirrors per-family provider requirement hints as
+`api_key_provider_requirement_preferred_env_keys`,
+`api_key_provider_requirement_accepted_env_keys`,
+`api_key_provider_requirement_setup_statuses`,
+`api_key_provider_requirement_configured`,
+`api_key_provider_requirement_next_setup_actions`, and
+`api_key_provider_requirement_smoke_command_names`.
 It keeps `api_key_operator_checklist_summary`
 (`api_key_operator_checklist_summary.v1`) with `current_step`, `ready`,
 ready/blocking step names and counts, `next_blocking_action_name`,

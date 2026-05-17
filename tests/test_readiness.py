@@ -5545,6 +5545,40 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "news",
     ]
     assert payload["api_key_provider_requirement_count"] == 3
+    assert payload["api_key_provider_requirement_preferred_env_keys"] == {
+        "market": "POLYGON_API_KEY",
+        "macro": "FRED_API_KEY",
+        "news": "NEWS_API_KEY",
+    }
+    assert payload["api_key_provider_requirement_accepted_env_keys"] == {
+        "market": ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
+        "macro": [
+            "HALO_SWING_MACRO_API_KEY",
+            "HALO_SWING_FRED_API_KEY",
+            "FRED_API_KEY",
+        ],
+        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+    }
+    assert payload["api_key_provider_requirement_setup_statuses"] == {
+        "market": "pending",
+        "macro": "pending",
+        "news": "pending",
+    }
+    assert payload["api_key_provider_requirement_configured"] == {
+        "market": False,
+        "macro": False,
+        "news": False,
+    }
+    assert payload["api_key_provider_requirement_next_setup_actions"] == {
+        "market": "fill_preferred_env_key",
+        "macro": "fill_preferred_env_key",
+        "news": "fill_preferred_env_key",
+    }
+    assert payload["api_key_provider_requirement_smoke_command_names"] == {
+        "market": "get_market_snapshot_live_smoke",
+        "macro": "get_macro_snapshot_live_smoke",
+        "news": "get_news_bundle_live_smoke",
+    }
     assert payload["api_key_copy_dotenv_command"] == "cp .env.example .env"
     assert payload["api_key_copy_dotenv_required"] is True
     assert payload["api_key_next_smoke_command_name"] == (
@@ -6898,6 +6932,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "news",
     ]
     assert payload["api_key_provider_requirement_count"] == 3
+    assert payload["api_key_provider_requirement_preferred_env_keys"] == {
+        family: row["preferred_env_key"]
+        for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_accepted_env_keys"] == {
+        family: row["accepted_env_keys"]
+        for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_setup_statuses"] == {
+        family: row["setup_status"]
+        for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_configured"] == {
+        family: row["configured"]
+        for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_next_setup_actions"] == {
+        family: row["next_setup_action"]
+        for family, row in requirements["provider_requirements"].items()
+    }
+    assert payload["api_key_provider_requirement_smoke_command_names"] == {
+        family: row["smoke_command_name"]
+        for family, row in requirements["provider_requirements"].items()
+    }
     assert requirements["provider_requirements"]["market"]["configured"] is True
     assert requirements["provider_requirements"]["macro"]["preferred_env_key"] == (
         "FRED_API_KEY"

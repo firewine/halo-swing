@@ -3030,6 +3030,10 @@ def _api_key_pipeline_summary_only_payload(
     provider_requirement_families = _ordered_unique_strings(
         provider_requirements.keys()
     )
+    provider_requirement_rows = {
+        family: _optional_mapping(provider_requirements.get(family)) or {}
+        for family in provider_requirement_families
+    }
     api_key_command_summary = _optional_mapping(
         payload.get("api_key_command_summary")
     ) or {}
@@ -3206,6 +3210,30 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "api_key_provider_requirement_families": provider_requirement_families,
         "api_key_provider_requirement_count": len(provider_requirement_families),
+        "api_key_provider_requirement_preferred_env_keys": {
+            family: row.get("preferred_env_key")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_accepted_env_keys": {
+            family: _string_list(row.get("accepted_env_keys"))
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_setup_statuses": {
+            family: row.get("setup_status")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_configured": {
+            family: row.get("configured") is True
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_next_setup_actions": {
+            family: row.get("next_setup_action")
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_smoke_command_names": {
+            family: row.get("smoke_command_name")
+            for family, row in provider_requirement_rows.items()
+        },
         "api_key_copy_dotenv_command": copy_dotenv_command.get("command"),
         "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
         "api_key_next_smoke_command": next_smoke_command.get("command"),
