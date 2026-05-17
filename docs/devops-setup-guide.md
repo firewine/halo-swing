@@ -699,7 +699,10 @@ provider selection, failure, and next-action evidence into one operator row with
 `selected_provider_classes`, `failure_category`, `has_failures`,
 `next_action_name`, `next_action_provider_family`, `next_action_provider`,
 `next_action_smoke_command_name`, `next_action_is_recovery`, and
-`next_action_network_call`. When the next action summary carries provider smoke
+`next_action_network_call`, plus `provider_recovery_action_status`,
+`provider_recovery_retry_ready`, `provider_recovery_all_retryable`,
+`provider_recovery_has_pending`, and `provider_recovery_has_blocked`. When the
+next action summary carries provider smoke
 or recovery metadata, it also includes `preferred_env_key` and
 `accepted_env_keys`, so key-only live setup status is visible with provider
 identity and env-key aliases without reading every nested summary or returning

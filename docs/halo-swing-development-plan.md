@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.786 API Key Integration Status Recovery Action Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 provider recovery action 상태를 보여주지만,
+상위 `api_key_integration_status_summary`만 확인하는 operator는 recovery가 즉시
+재시도 가능한지 확인하려면 nested recovery summary를 다시 열어야 했다. 이번 slice는
+no-secret `provider_recovery_action_status`, `provider_recovery_retry_ready`,
+`provider_recovery_all_retryable`, `provider_recovery_has_pending`,
+`provider_recovery_has_blocked`를 integration status summary로 올려, API key 입력 후
+summary-only payload의 상위 상태 줄만으로 복구 재시도 가능 여부를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_integration_status_summary includes provider_recovery_action_status copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes provider_recovery_retry_ready and provider_recovery_all_retryable aggregate booleans
+  - api_key_integration_status_summary includes provider_recovery_has_pending and provider_recovery_has_blocked aggregate booleans
+  - fake-key API-key pipeline summary-only CLI returns integration status provider_recovery_action_status=ready_to_retry without secret values
+  - blocked setup summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+  - ready fake-live summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+  - focused tests cover integration status recovery action fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document integration status recovery action fields
+  - tests/test_setup_docs.py asserts integration status recovery action field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; summary-only integration status recovery action fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["provider_recovery_action_status"], summary["provider_recovery_retry_ready"], summary["provider_recovery_all_retryable"], summary["provider_recovery_has_pending"], summary["provider_recovery_has_blocked"], summary["secret_values_returned"])': ready_to_retry True True True False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 795 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.785 API Key Provider Recovery Summary Action Status Gate Record - 2026-05-17
 
 ### A. 목적

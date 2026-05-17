@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_SUMMARY_ACTION_STATUS_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_SUMMARY_ACTION_STATUS_GATE
+status: API_KEY_INTEGRATION_STATUS_RECOVERY_ACTION_VERIFIED
+gate_id: API_KEY_INTEGRATION_STATUS_RECOVERY_ACTION_GATE
 review_tier: S1_small
 
-next_atomic_step: add aggregate recovery action status fields to API-key provider recovery summary
+next_atomic_step: carry provider recovery action status into API-key integration status summary
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,30 +74,40 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_and_blocked tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; print(summary["provider_recovery_action_status"], summary["provider_recovery_has_pending"], summary["provider_recovery_has_blocked"], summary["provider_recovery_retry_ready"], summary["provider_recovery_all_retryable"], summary["secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["provider_recovery_action_status"], summary["provider_recovery_retry_ready"], summary["provider_recovery_all_retryable"], summary["provider_recovery_has_pending"], summary["provider_recovery_has_blocked"], summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_provider_recovery_summary includes provider_recovery_has_pending and provider_recovery_has_blocked aggregate booleans
-  - api_key_provider_recovery_summary includes provider_recovery_retry_ready and provider_recovery_all_retryable aggregate booleans
-  - api_key_provider_recovery_summary includes provider_recovery_action_status with no_recovery_required, ready_to_retry, partially_retryable, and blocked states
-  - provider_recovery_action_status returns ready_to_retry for all-pending fake-key provider recovery summaries
-  - provider_recovery_action_status returns partially_retryable when pending and blocked recovery items are mixed
-  - provider_recovery_action_status returns no_recovery_required when no recovery item exists
-  - focused tests cover action status fields in summary_only API-key provider recovery summary
-  - fake-key API-key pipeline summary-only CLI returns action status fields without secret values
-  - README and DevOps setup guide document action status fields
-  - setup docs tests assert action status field guidance
+  - api_key_integration_status_summary includes provider_recovery_action_status copied from API-key provider recovery summary
+  - api_key_integration_status_summary includes provider_recovery_retry_ready and provider_recovery_all_retryable aggregate booleans
+  - api_key_integration_status_summary includes provider_recovery_has_pending and provider_recovery_has_blocked aggregate booleans
+  - fake-key API-key pipeline summary-only CLI returns integration status provider_recovery_action_status=ready_to_retry without secret values
+  - blocked setup summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+  - ready fake-live summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+  - focused tests cover integration status recovery action fields in summary_only API-key pipeline output
+  - README and DevOps setup guide document integration status recovery action fields
+  - setup docs tests assert integration status recovery action field guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key provider recovery summary action-status gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key integration status recovery-action gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_SUMMARY_ACTION_STATUS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_SUMMARY_ACTION_STATUS_GATE
+review_tier: S1_small
+
+next_atomic_step: add aggregate recovery action status fields to API-key provider recovery summary
 ```
 
 Previous completed directive:
@@ -2587,6 +2597,65 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Integration Status Recovery Action Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes
+`provider_recovery_action_status`, `provider_recovery_retry_ready`,
+`provider_recovery_all_retryable`, `provider_recovery_has_pending`, and
+`provider_recovery_has_blocked` in the top-level
+`api_key_integration_status_summary`, so the operator-facing integration row
+shows provider recovery retry readiness without opening the nested recovery
+summary. Focused tests, fake-key CLI, full pytest, ruff, and health_check
+passed.
+
+```yaml
+api_key_integration_status_recovery_action_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_integration_status_summary includes provider_recovery_action_status copied from API-key provider recovery summary
+    - api_key_integration_status_summary includes provider_recovery_retry_ready and provider_recovery_all_retryable aggregate booleans
+    - api_key_integration_status_summary includes provider_recovery_has_pending and provider_recovery_has_blocked aggregate booleans
+    - fake-key API-key pipeline summary-only CLI returns integration status provider_recovery_action_status=ready_to_retry without secret values
+    - blocked setup summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+    - ready fake-live summary returns integration status provider_recovery_action_status=no_recovery_required without secret values
+    - focused tests cover integration status recovery action fields in summary_only API-key pipeline output
+    - README and DevOps setup guide document integration status recovery action fields
+    - tests/test_setup_docs.py asserts integration status recovery action field guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "3 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only integration status recovery action fields returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_integration_status_summary"]; print(summary["provider_recovery_action_status"], summary["provider_recovery_retry_ready"], summary["provider_recovery_all_retryable"], summary["provider_recovery_has_pending"], summary["provider_recovery_has_blocked"], summary["secret_values_returned"])'
+      result: "ready_to_retry True True True False False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "795 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Provider Recovery Summary Action Status Gate is verified.
 `run_api_key_pipeline_smoke(summary_only=true)` now exposes

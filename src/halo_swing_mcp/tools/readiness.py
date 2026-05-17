@@ -875,6 +875,9 @@ def run_api_key_pipeline_smoke(
     api_key_provider_recovery_checklist = _api_key_provider_recovery_checklist(
         live_data_smoke_summary
     )
+    api_key_provider_recovery_summary = _api_key_provider_recovery_summary(
+        api_key_provider_recovery_checklist
+    )
     api_key_operator_checklist = _api_key_pipeline_operator_checklist(
         setup_status_summary=setup_status_summary,
         api_key_requirements_summary=api_key_requirements_summary,
@@ -923,6 +926,7 @@ def run_api_key_pipeline_smoke(
         api_key_setup_file_summary=api_key_setup_file_summary,
         api_key_dotenv_loading_summary=api_key_dotenv_loading_summary,
         api_key_provider_selection_summary=api_key_provider_selection_summary,
+        api_key_provider_recovery_summary=api_key_provider_recovery_summary,
     )
     api_key_live_http_timeout_summary = _api_key_live_http_timeout_summary()
 
@@ -956,6 +960,7 @@ def run_api_key_pipeline_smoke(
         "api_key_command_summary": api_key_command_summary,
         "api_key_operator_checklist": api_key_operator_checklist,
         "api_key_provider_recovery_checklist": api_key_provider_recovery_checklist,
+        "api_key_provider_recovery_summary": api_key_provider_recovery_summary,
         "api_key_setup_file_summary": api_key_setup_file_summary,
         "api_key_dotenv_loading_summary": api_key_dotenv_loading_summary,
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
@@ -3346,6 +3351,7 @@ def _api_key_integration_status_summary(
     api_key_setup_file_summary: dict[str, Any],
     api_key_dotenv_loading_summary: dict[str, Any],
     api_key_provider_selection_summary: dict[str, Any],
+    api_key_provider_recovery_summary: dict[str, Any],
 ) -> dict[str, Any]:
     configured_provider_families = _string_list(
         setup_status_summary.get("configured_provider_families")
@@ -3408,6 +3414,29 @@ def _api_key_integration_status_summary(
         ),
         "next_action_network_call": (
             api_key_next_action_summary.get("next_action_network_call") is True
+        ),
+        "provider_recovery_action_status": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_action_status"
+            )
+        ),
+        "provider_recovery_retry_ready": (
+            api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
+            is True
+        ),
+        "provider_recovery_all_retryable": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_all_retryable"
+            )
+            is True
+        ),
+        "provider_recovery_has_pending": (
+            api_key_provider_recovery_summary.get("provider_recovery_has_pending")
+            is True
+        ),
+        "provider_recovery_has_blocked": (
+            api_key_provider_recovery_summary.get("provider_recovery_has_blocked")
+            is True
         ),
         "network_call": False,
         "mutates_local_state": False,
