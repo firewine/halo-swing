@@ -2660,6 +2660,14 @@ def _api_key_provider_recovery_summary(
     recovery_blocked_count = sum(
         1 for item in compact_items if item.get("recovery_status") == "blocked"
     )
+    first_pending_item = next(
+        (
+            item
+            for item in compact_items
+            if item.get("recovery_status") == "pending"
+        ),
+        None,
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2799,6 +2807,56 @@ def _api_key_provider_recovery_summary(
             if accepted_env_keys
         ],
         "item_count": len(compact_items),
+        "next_pending_recovery_smoke_command_name": (
+            first_pending_item.get("smoke_command_name")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_smoke_command": (
+            first_pending_item.get("recovery_smoke_command")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_provider_family": (
+            first_pending_item.get("provider_family")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_provider": (
+            first_pending_item.get("provider") if first_pending_item else None
+        ),
+        "next_pending_recovery_next_setup_action": (
+            first_pending_item.get("next_setup_action")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_preferred_env_key": (
+            first_pending_item.get("preferred_env_key")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_accepted_env_keys": (
+            _string_list(first_pending_item.get("accepted_env_keys"))
+            if first_pending_item
+            else []
+        ),
+        "next_pending_recovery_network_call_policy": (
+            first_pending_item.get("network_call_policy")
+            if first_pending_item
+            else None
+        ),
+        "next_pending_recovery_smoke_available": first_pending_item is not None,
+        "next_pending_recovery_network_call": (
+            isinstance(first_pending_item.get("recovery_smoke_command"), str)
+            if first_pending_item
+            else False
+        ),
+        "next_pending_recovery_mutates_local_state": (
+            first_pending_item.get("mutates_local_state") is True
+            if first_pending_item
+            else False
+        ),
+        "next_pending_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": (
             first_item.get("smoke_command_name") if first_item else None
         ),

@@ -177,6 +177,18 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_recovery_preferred_env_keys" in guide
     assert "provider_recovery_accepted_env_keys" in guide
     assert "provider_recovery_accepted_env_key_groups" in guide
+    assert "next_pending_recovery_smoke_command_name" in guide
+    assert "next_pending_recovery_smoke_command" in guide
+    assert "next_pending_recovery_provider_family" in guide
+    assert "next_pending_recovery_provider" in guide
+    assert "next_pending_recovery_next_setup_action" in guide
+    assert "next_pending_recovery_preferred_env_key" in guide
+    assert "next_pending_recovery_accepted_env_keys" in guide
+    assert "next_pending_recovery_network_call_policy" in guide
+    assert "next_pending_recovery_smoke_available" in guide
+    assert "next_pending_recovery_network_call" in guide
+    assert "next_pending_recovery_mutates_local_state" in guide
+    assert "next_pending_recovery_secret_values_returned" in guide
     assert "next_recovery_provider_family" in guide
     assert "next_recovery_provider" in guide
     assert "next_recovery_smoke_available" in guide

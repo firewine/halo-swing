@@ -14,6 +14,7 @@ from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.risk_settings import update_btc_risk_settings
 from halo_swing_mcp.secret_store import save_binance_credentials
 from halo_swing_mcp.tools.readiness import (
+    _api_key_provider_recovery_summary,
     get_integration_readiness,
     get_integration_setup_checklist,
     get_live_data_api_key_status,
@@ -2789,6 +2790,29 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             ],
         ],
         "item_count": 3,
+        "next_pending_recovery_smoke_command_name": (
+            "get_market_snapshot_live_smoke"
+        ),
+        "next_pending_recovery_smoke_command": (
+            payload["provider_recovery_smokes"][0]["command"]
+        ),
+        "next_pending_recovery_provider_family": "market",
+        "next_pending_recovery_provider": "polygon",
+        "next_pending_recovery_next_setup_action": (
+            "verify_provider_credentials_or_network"
+        ),
+        "next_pending_recovery_preferred_env_key": "POLYGON_API_KEY",
+        "next_pending_recovery_accepted_env_keys": [
+            "HALO_SWING_MARKET_DATA_API_KEY",
+            "POLYGON_API_KEY",
+        ],
+        "next_pending_recovery_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
+        "next_pending_recovery_smoke_available": True,
+        "next_pending_recovery_network_call": True,
+        "next_pending_recovery_mutates_local_state": False,
+        "next_pending_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_recovery_smoke_command": payload["provider_recovery_smokes"][0][
             "command"
@@ -4999,6 +5023,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "provider_recovery_accepted_env_keys": [],
         "provider_recovery_accepted_env_key_groups": [],
         "item_count": 0,
+        "next_pending_recovery_smoke_command_name": None,
+        "next_pending_recovery_smoke_command": None,
+        "next_pending_recovery_provider_family": None,
+        "next_pending_recovery_provider": None,
+        "next_pending_recovery_next_setup_action": None,
+        "next_pending_recovery_preferred_env_key": None,
+        "next_pending_recovery_accepted_env_keys": [],
+        "next_pending_recovery_network_call_policy": None,
+        "next_pending_recovery_smoke_available": False,
+        "next_pending_recovery_network_call": False,
+        "next_pending_recovery_mutates_local_state": False,
+        "next_pending_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": None,
         "next_recovery_smoke_command": None,
         "items": [],
@@ -5018,6 +5054,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "api_key_command_summary" not in payload["omitted_sections"]
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "api_key_dotenv_loading_summary" not in payload["omitted_sections"]
+
     assert "api_key_pipeline_stage_summary" not in payload["omitted_sections"]
     assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
     assert "live_data_setup_summary" not in payload["omitted_sections"]
@@ -5037,6 +5074,78 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
+
+
+def test_api_key_provider_recovery_summary_next_pending_skips_blocked_item() -> None:
+    summary = _api_key_provider_recovery_summary(
+        {
+            "status": "conflict",
+            "provider_error_count": 2,
+            "provider_recovery_smoke_count": 1,
+            "items": [
+                {
+                    "provider_family": "market",
+                    "provider": "polygon",
+                    "smoke_command_name": "get_market_snapshot_live_smoke",
+                    "recovery_smoke_command": None,
+                    "recovery_smoke_available": False,
+                    "next_setup_action": "fill_provider_key",
+                    "preferred_env_key": "POLYGON_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_MARKET_DATA_API_KEY",
+                        "POLYGON_API_KEY",
+                    ],
+                },
+                {
+                    "provider_family": "macro",
+                    "provider": "fred",
+                    "smoke_command_name": "get_macro_snapshot_live_smoke",
+                    "recovery_smoke_command": "run fred smoke",
+                    "recovery_smoke_available": True,
+                    "recovery_smoke": {
+                        "network_call_policy": (
+                            "only_when_matching_api_key_selects_live_provider"
+                        ),
+                        "mutates_local_state": False,
+                    },
+                    "next_setup_action": "verify_provider_credentials_or_network",
+                    "preferred_env_key": "FRED_API_KEY",
+                    "accepted_env_keys": [
+                        "HALO_SWING_MACRO_API_KEY",
+                        "HALO_SWING_FRED_API_KEY",
+                        "FRED_API_KEY",
+                    ],
+                },
+            ],
+        }
+    )
+
+    assert summary["next_recovery_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert summary["next_recovery_smoke_available"] is False
+    assert summary["next_pending_recovery_smoke_command_name"] == (
+        "get_macro_snapshot_live_smoke"
+    )
+    assert summary["next_pending_recovery_smoke_command"] == "run fred smoke"
+    assert summary["next_pending_recovery_provider_family"] == "macro"
+    assert summary["next_pending_recovery_provider"] == "fred"
+    assert summary["next_pending_recovery_next_setup_action"] == (
+        "verify_provider_credentials_or_network"
+    )
+    assert summary["next_pending_recovery_preferred_env_key"] == "FRED_API_KEY"
+    assert summary["next_pending_recovery_accepted_env_keys"] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
+    assert summary["next_pending_recovery_network_call_policy"] == (
+        "only_when_matching_api_key_selects_live_provider"
+    )
+    assert summary["next_pending_recovery_smoke_available"] is True
+    assert summary["next_pending_recovery_network_call"] is True
+    assert summary["next_pending_recovery_mutates_local_state"] is False
+    assert summary["next_pending_recovery_secret_values_returned"] is False
 
 
 def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
