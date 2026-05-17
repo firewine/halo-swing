@@ -258,6 +258,8 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "top-level summary-only recovery diagnostic and safety\naggregates"
         in guide
     )
+    assert "top-level summary-only recovery required status" in guide
+    assert "provider_recovery_summary_status" in guide
     assert "next_operator_action_provider_family" in guide
     assert "next_operator_action_provider" in guide
     assert "next_operator_action_smoke_command_name" in guide

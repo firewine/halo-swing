@@ -2731,6 +2731,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["live_data_smoke_summary"]["provider_recovery_smokes"]
     )
     assert payload["provider_recovery_smoke_count"] == 3
+    assert payload["provider_recovery_required"] is True
+    assert payload["provider_recovery_summary_status"] == "conflict"
     assert payload["provider_recovery_action_status"] == "ready_to_retry"
     assert payload["provider_recovery_item_count"] == 3
     assert payload["provider_recovery_pending_count"] == 3
@@ -2916,6 +2918,8 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     provider_recovery_summary = summary_payload[
         "api_key_provider_recovery_summary"
     ]
+    assert summary_payload["provider_recovery_required"] is True
+    assert summary_payload["provider_recovery_summary_status"] == "conflict"
     assert summary_payload["provider_recovery_action_status"] == "ready_to_retry"
     assert summary_payload["provider_recovery_item_count"] == 3
     assert summary_payload["provider_recovery_pending_count"] == 3
@@ -5552,6 +5556,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["failed_provider_families"] == []
     assert payload["failed_provider_count"] == 0
     assert payload["provider_recovery_smoke_count"] == 0
+    assert payload["provider_recovery_required"] is False
+    assert payload["provider_recovery_summary_status"] == "ok"
     assert payload["provider_recovery_action_status"] == "no_recovery_required"
     assert payload["provider_recovery_item_count"] == 0
     assert payload["provider_recovery_pending_count"] == 0

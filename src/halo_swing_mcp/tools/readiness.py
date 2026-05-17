@@ -997,6 +997,13 @@ def run_api_key_pipeline_smoke(
         "provider_recovery_smoke_count": live_data_smoke_summary[
             "provider_recovery_smoke_count"
         ],
+        "provider_recovery_required": (
+            api_key_provider_recovery_summary.get("provider_recovery_required")
+            is True
+        ),
+        "provider_recovery_summary_status": api_key_provider_recovery_summary.get(
+            "status"
+        ),
         "provider_recovery_action_status": api_key_provider_recovery_summary.get(
             "provider_recovery_action_status"
         ),
@@ -2979,6 +2986,12 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_recovery_smoke_count": payload.get(
             "provider_recovery_smoke_count"
+        ),
+        "provider_recovery_required": (
+            payload.get("provider_recovery_required") is True
+        ),
+        "provider_recovery_summary_status": payload.get(
+            "provider_recovery_summary_status"
         ),
         "provider_recovery_action_status": payload.get(
             "provider_recovery_action_status"

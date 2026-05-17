@@ -524,6 +524,8 @@ aggregates, including smoke availability, network-call counts, mutation/secret
 safety counters, next setup actions, exception types, recovery statuses, and
 URL/exception-message returned flags, without returning URLs, exception
 messages, or secret values.
+It also exposes top-level summary-only recovery required status through
+`provider_recovery_required` and `provider_recovery_summary_status`.
 It also exposes top-level summary-only next recovery fields:
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,
