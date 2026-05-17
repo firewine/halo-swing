@@ -518,10 +518,15 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_preferred_env_key_by_family`,
 `api_key_setup_quickstart_command_plan_accepted_env_keys_by_family`,
 `api_key_setup_quickstart_command_plan_next_setup_actions_by_family`,
+`api_key_setup_quickstart_command_plan_statuses_by_family`,
+`api_key_setup_quickstart_command_plan_network_calls_by_family`,
+`api_key_setup_quickstart_command_plan_network_call_policies_by_family`,
+`api_key_setup_quickstart_command_plan_mutates_local_state_by_family`,
+`api_key_setup_quickstart_command_plan_secret_values_returned_by_family`,
 and `api_key_setup_quickstart_next_command_plan_item`, so compact clients can
 show the copy/status/provider-smoke/one-shot commands in operator order with
-provider route evidence, expected live checks, env-key hints, and next setup
-actions on provider-smoke rows.
+provider route evidence, expected live checks, env-key hints, next setup
+actions, and safety/status maps on provider-smoke rows.
 It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,

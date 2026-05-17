@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.892 API Key Quickstart Command Plan Safety Maps Gate Record - 2026-05-18
+
+### A. 목적
+
+3.891에서 quickstart command plan provider-smoke row의 `next_setup_action`은 top-level
+family map과 next command scalar까지 이어졌다. 하지만 quickstart plan만 읽는 compact
+client는 provider-family별 provider smoke status, network call 여부, network policy,
+local mutation 여부, secret redaction 여부를 보려면 여전히 command plan row를 파싱해야
+한다. 이번 slice는 API 키만 넣은 뒤 quickstart command plan family maps만 읽어도 각
+provider smoke 명령을 안전하게 실행할 수 있는지 판단하게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level quickstart command plan exposes provider-family status maps for provider-smoke rows
+  - summary-only top-level quickstart command plan exposes provider-family network_call and network_call_policy maps for provider-smoke rows
+  - summary-only top-level quickstart command plan exposes provider-family mutates_local_state and secret_values_returned maps for provider-smoke rows
+  - README and DevOps setup guide document quickstart command plan safety/status maps
+  - fake-key offline verification confirmed ready provider-smoke statuses, network_call=true, live-provider network policy, mutates_local_state=false, secret_values_returned=false, and top-level secret_values_returned=false
+  - blocked no-key test coverage keeps safety/status maps tied to provider smoke command rows without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan safety maps pytest: 2 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key assertion confirmed ready status maps, network maps, safety maps, and no secret values
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.891 API Key Quickstart Next Command Plan Next Setup Action Gate Record - 2026-05-18
 
 ### A. 목적

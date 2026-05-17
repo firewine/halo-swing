@@ -6408,6 +6408,44 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_quickstart_command_plan"][2][
         "provider_family"
     ] == "market"
+    assert payload["api_key_setup_quickstart_command_plan_statuses_by_family"] == {
+        row["provider_family"]: row["status"]
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+    }
+    assert (
+        payload["api_key_setup_quickstart_command_plan_network_calls_by_family"]
+        == {
+            row["provider_family"]: row["network_call"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_network_call_policies_by_family"
+        ]
+        == {
+            row["provider_family"]: row["network_call_policy"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_mutates_local_state_by_family"
+        ]
+        == {
+            row["provider_family"]: row["mutates_local_state"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_secret_values_returned_by_family"
+        ]
+        == {
+            row["provider_family"]: row["secret_values_returned"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
     assert payload["api_key_setup_quickstart_command_plan"][-1]["kind"] == (
         "pipeline_smoke"
     )
@@ -8511,6 +8549,47 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         ]
         == {
             row["provider_family"]: row["next_setup_action"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_statuses_by_family"]
+        == {
+            row["provider_family"]: row["status"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_network_calls_by_family"]
+        == {
+            row["provider_family"]: row["network_call"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_network_call_policies_by_family"
+        ]
+        == {
+            row["provider_family"]: row["network_call_policy"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_mutates_local_state_by_family"
+        ]
+        == {
+            row["provider_family"]: row["mutates_local_state"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        }
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_secret_values_returned_by_family"
+        ]
+        == {
+            row["provider_family"]: row["secret_values_returned"]
             for row in payload["api_key_command_summary"]["provider_smoke_commands"]
         }
     )

@@ -96,6 +96,26 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             row["provider_family"]: row.get("next_setup_action")
             for row in provider_rows
         },
+        "api_key_setup_quickstart_command_plan_statuses_by_family": {
+            row["provider_family"]: row.get("status")
+            for row in provider_rows
+        },
+        "api_key_setup_quickstart_command_plan_network_calls_by_family": {
+            row["provider_family"]: row.get("network_call") is True
+            for row in provider_rows
+        },
+        "api_key_setup_quickstart_command_plan_network_call_policies_by_family": {
+            row["provider_family"]: row.get("network_call_policy")
+            for row in provider_rows
+        },
+        "api_key_setup_quickstart_command_plan_mutates_local_state_by_family": {
+            row["provider_family"]: row.get("mutates_local_state") is True
+            for row in provider_rows
+        },
+        "api_key_setup_quickstart_command_plan_secret_values_returned_by_family": {
+            row["provider_family"]: row.get("secret_values_returned") is True
+            for row in provider_rows
+        },
     }
 
 
