@@ -6093,6 +6093,70 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "topic": "macro",
         "summary_only": True,
     }
+    setup_file_summary = payload["api_key_setup_file_summary"]
+    assert payload["api_key_setup_dotenv_source_path"] == (
+        setup_file_summary["source_path"]
+    )
+    assert payload["api_key_setup_dotenv_target_path"] == (
+        setup_file_summary["target_path"]
+    )
+    assert payload["api_key_setup_dotenv_source_exists"] is (
+        setup_file_summary["source_exists"]
+    )
+    assert payload["api_key_setup_dotenv_target_exists"] is (
+        setup_file_summary["target_exists"]
+    )
+    assert payload["api_key_setup_dotenv_copy_required"] is (
+        setup_file_summary["copy_required"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command"] == (
+        setup_file_summary["copy_command"]["command"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_name"] == (
+        setup_file_summary["copy_command"]["name"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_network_call"] is (
+        setup_file_summary["copy_command"]["network_call"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_mutates_local_state"] is (
+        setup_file_summary["copy_command"]["mutates_local_state"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_secret_values_returned"] is (
+        setup_file_summary["copy_command"]["secret_values_returned"]
+    )
+    assert payload["api_key_setup_dotenv_preferred_env_keys"] == (
+        setup_file_summary["preferred_env_keys"]
+    )
+    assert payload["api_key_setup_dotenv_preferred_env_key_count"] == (
+        setup_file_summary["preferred_env_key_count"]
+    )
+    assert payload["api_key_setup_dotenv_configured_provider_families"] == (
+        setup_file_summary["configured_provider_families"]
+    )
+    assert payload["api_key_setup_dotenv_missing_provider_families"] == (
+        setup_file_summary["missing_provider_families"]
+    )
+    assert payload["api_key_setup_dotenv_configured_provider_family_count"] == (
+        setup_file_summary["configured_provider_family_count"]
+    )
+    assert payload["api_key_setup_dotenv_required_provider_family_count"] == (
+        setup_file_summary["required_provider_family_count"]
+    )
+    assert payload["api_key_setup_dotenv_next_setup_step"] == (
+        setup_file_summary["next_setup_step"]
+    )
+    assert payload["api_key_setup_dotenv_ready_to_run_live_smoke"] is (
+        setup_file_summary["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_setup_dotenv_network_call"] is (
+        setup_file_summary["network_call"]
+    )
+    assert payload["api_key_setup_dotenv_mutates_local_state"] is (
+        setup_file_summary["mutates_local_state"]
+    )
+    assert payload["api_key_setup_dotenv_secret_values_returned"] is (
+        setup_file_summary["secret_values_returned"]
+    )
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -8243,14 +8307,71 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
     assert payload["api_key_setup_dotenv_target_path"] == (
         setup_file_summary["target_path"]
     )
+    assert payload["api_key_setup_dotenv_source_exists"] is (
+        setup_file_summary["source_exists"]
+    )
+    assert payload["api_key_setup_dotenv_target_exists"] is (
+        setup_file_summary["target_exists"]
+    )
+    assert payload["api_key_setup_dotenv_copy_required"] is (
+        setup_file_summary["copy_required"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command"] == (
+        setup_file_summary["copy_command"]["command"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_name"] == (
+        setup_file_summary["copy_command"]["name"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_network_call"] is (
+        setup_file_summary["copy_command"]["network_call"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_mutates_local_state"] is (
+        setup_file_summary["copy_command"]["mutates_local_state"]
+    )
+    assert payload["api_key_setup_dotenv_copy_command_secret_values_returned"] is (
+        setup_file_summary["copy_command"]["secret_values_returned"]
+    )
+    assert payload["api_key_setup_dotenv_preferred_env_keys"] == (
+        setup_file_summary["preferred_env_keys"]
+    )
+    assert payload["api_key_setup_dotenv_preferred_env_key_count"] == (
+        setup_file_summary["preferred_env_key_count"]
+    )
     assert setup_file_summary["configured_provider_families"] == [
         "market",
         "macro",
         "news",
     ]
     assert setup_file_summary["missing_provider_families"] == []
+    assert payload["api_key_setup_dotenv_configured_provider_families"] == (
+        setup_file_summary["configured_provider_families"]
+    )
+    assert payload["api_key_setup_dotenv_missing_provider_families"] == (
+        setup_file_summary["missing_provider_families"]
+    )
+    assert payload["api_key_setup_dotenv_configured_provider_family_count"] == (
+        setup_file_summary["configured_provider_family_count"]
+    )
+    assert payload["api_key_setup_dotenv_required_provider_family_count"] == (
+        setup_file_summary["required_provider_family_count"]
+    )
+    assert payload["api_key_setup_dotenv_next_setup_step"] == (
+        setup_file_summary["next_setup_step"]
+    )
     assert setup_file_summary["ready_to_run_live_smoke"] is True
+    assert payload["api_key_setup_dotenv_ready_to_run_live_smoke"] is (
+        setup_file_summary["ready_to_run_live_smoke"]
+    )
+    assert payload["api_key_setup_dotenv_network_call"] is (
+        setup_file_summary["network_call"]
+    )
+    assert payload["api_key_setup_dotenv_mutates_local_state"] is (
+        setup_file_summary["mutates_local_state"]
+    )
     assert setup_file_summary["secret_values_returned"] is False
+    assert payload["api_key_setup_dotenv_secret_values_returned"] is (
+        setup_file_summary["secret_values_returned"]
+    )
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized

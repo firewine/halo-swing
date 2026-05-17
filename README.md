@@ -620,7 +620,23 @@ It also mirrors the no-secret `.env` lines to fill as
 `api_key_setup_dotenv_example_lines`,
 `api_key_setup_dotenv_example_line_count`,
 `api_key_setup_dotenv_example_env_keys`, `api_key_setup_dotenv_source_path`,
-and `api_key_setup_dotenv_target_path`.
+`api_key_setup_dotenv_target_path`, `api_key_setup_dotenv_source_exists`,
+`api_key_setup_dotenv_target_exists`, `api_key_setup_dotenv_copy_required`,
+`api_key_setup_dotenv_copy_command`, `api_key_setup_dotenv_copy_command_name`,
+`api_key_setup_dotenv_copy_command_network_call`,
+`api_key_setup_dotenv_copy_command_mutates_local_state`,
+`api_key_setup_dotenv_copy_command_secret_values_returned`,
+`api_key_setup_dotenv_preferred_env_keys`,
+`api_key_setup_dotenv_preferred_env_key_count`,
+`api_key_setup_dotenv_configured_provider_families`,
+`api_key_setup_dotenv_missing_provider_families`,
+`api_key_setup_dotenv_configured_provider_family_count`,
+`api_key_setup_dotenv_required_provider_family_count`,
+`api_key_setup_dotenv_next_setup_step`,
+`api_key_setup_dotenv_ready_to_run_live_smoke`,
+`api_key_setup_dotenv_network_call`,
+`api_key_setup_dotenv_mutates_local_state`, and
+`api_key_setup_dotenv_secret_values_returned`.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.

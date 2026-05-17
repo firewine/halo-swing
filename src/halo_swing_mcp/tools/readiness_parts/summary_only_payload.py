@@ -28,6 +28,9 @@ from .summary_only_provider_smoke_fields import (
 from .summary_only_quickstart_fields import (
     _api_key_setup_quickstart_top_level_fields,
 )
+from .summary_only_setup_file_fields import (
+    _api_key_setup_file_top_level_fields,
+)
 
 
 __all__ = ('_api_key_pipeline_summary_only_payload',)
@@ -278,21 +281,7 @@ def _api_key_pipeline_summary_only_payload(
             ),
             next_quickstart_command_plan_row=next_quickstart_command_plan_row,
         ),
-        "api_key_setup_dotenv_example_lines": _string_list(
-            api_key_setup_file_summary.get("dotenv_examples")
-        ),
-        "api_key_setup_dotenv_example_line_count": len(
-            _string_list(api_key_setup_file_summary.get("dotenv_examples"))
-        ),
-        "api_key_setup_dotenv_example_env_keys": _string_list(
-            api_key_setup_file_summary.get("preferred_env_keys")
-        ),
-        "api_key_setup_dotenv_source_path": api_key_setup_file_summary.get(
-            "source_path"
-        ),
-        "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
-            "target_path"
-        ),
+        **_api_key_setup_file_top_level_fields(api_key_setup_file_summary),
         "api_key_dotenv_supported": (
             api_key_dotenv_loading_summary.get("dotenv_supported") is True
         ),

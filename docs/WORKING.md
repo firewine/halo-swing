@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_VERIFIED
-gate_id: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_GATE
+status: API_KEY_SETUP_FILE_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_SETUP_FILE_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key dotenv loading status as top-level scalars
+next_atomic_step: surface summary-only API-key setup file status as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -56,6 +56,7 @@ allowed_edit_paths:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_setup_file_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -74,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_file_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,30 +83,31 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level output mirrors dotenv supported, enabled, disabled, disabled env key, and precedence fields without secret values
-  - summary-only top-level output mirrors dotenv source/target paths, existence booleans, copy-required state, next setup step, and ready-to-run-live-smoke state
-  - summary-only top-level dotenv safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
-  - blocked default and disabled-dotenv summary-only tests prove the top-level fields match api_key_dotenv_loading_summary without secret values
-  - README and DevOps guide document the top-level dotenv loading scalar fields
+  - summary-only top-level output mirrors setup file source/target paths, source/target existence, copy-required state, and copy command without secret values
+  - summary-only top-level output mirrors setup file preferred env keys, dotenv examples, configured/missing provider families, next setup step, and ready-to-run-live-smoke state
+  - summary-only top-level setup file safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
+  - blocked default and ready setup-file summary-only tests prove the top-level fields match api_key_setup_file_summary without secret values
+  - README and DevOps guide document the top-level api_key_setup_dotenv_* setup-file fields
+  - summary-only payload assembly remains below the 900-line warning threshold by delegating setup-file projection to a focused module
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key dotenv loading top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key setup file top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_GATE
+gate_id: API_KEY_SETUP_FILE_TOP_LEVEL_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_dotenv_loading_status tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_file_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 833 passed
@@ -119,11 +121,23 @@ files_changed:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_setup_file_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key dotenv loading top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key setup file top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - compact clients can now read dotenv/source readiness without opening nested api_key_dotenv_loading_summary
+  - compact clients can now read setup-file readiness without opening nested api_key_setup_file_summary
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_DOTENV_LOADING_TOP_LEVEL_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key dotenv loading status as top-level scalars
 ```
 
 Previous completed directive:
