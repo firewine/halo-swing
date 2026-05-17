@@ -602,6 +602,7 @@ def expected_provider_smoke_plan(
             "provider": action["provider"],
             "status": "ready" if action["configured"] else "blocked",
             "preferred_env_key": action["preferred_env_key"],
+            "accepted_env_keys": action["accepted_env_keys"],
             "next_setup_action": action["next_setup_action"],
             "smoke_command_name": action["smoke_command"]["name"],
             "command": action["smoke_command"]["command"],
@@ -1312,6 +1313,9 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
         news_configured_env_keys=[],
         ready_to_run_live_smoke=False,
     )
+    assert payload["provider_smoke_plan"]["provider_smokes"][0][
+        "accepted_env_keys"
+    ] == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False
@@ -1533,6 +1537,9 @@ def test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_f
     assert payload["next_operator_action"]["name"] == "run_provider_smokes"
     assert payload["next_operator_action"]["status"] == "ready"
     assert payload["next_operator_action"]["provider_smoke_count"] == 3
+    assert payload["next_operator_action"]["provider_smokes"][0][
+        "accepted_env_keys"
+    ] == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
     assert (
         payload["next_operator_action"]["next_provider_smoke_command_name"]
         == "get_market_snapshot_live_smoke"
@@ -4897,6 +4904,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary(
     ] == []
     assert setup_summary["provider_smoke_plan"]["provider_smoke_count"] == 3
     assert setup_summary["provider_smoke_plan"]["ready_provider_smoke_count"] == 3
+    assert setup_summary["provider_smoke_plan"]["provider_smokes"][0][
+        "accepted_env_keys"
+    ] == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
     assert setup_summary["live_data_setup_steps"]["next_step"] == (
         "run_provider_smokes"
     )

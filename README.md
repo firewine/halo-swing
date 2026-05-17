@@ -322,9 +322,11 @@ response still shows the next local setup or recovery action without returning
 the full checklist payload.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
-template/file status, setup steps, and no-secret next operator action, so the
-compact response shows the same local setup readiness evidence as the full
-one-shot pipeline response without returning secret values.
+template/file status, setup steps, and no-secret next operator action.
+Provider smoke plan rows include `preferred_env_key` and `accepted_env_keys`,
+so the compact response shows the same local setup readiness and key-alias
+evidence as the full one-shot pipeline response without returning secret
+values.
 It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,

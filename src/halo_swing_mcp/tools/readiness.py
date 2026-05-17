@@ -3542,6 +3542,7 @@ def _live_data_provider_smoke_plan(
                 "provider": action.get("provider"),
                 "status": "ready" if configured else "blocked",
                 "preferred_env_key": action.get("preferred_env_key"),
+                "accepted_env_keys": _string_list(action.get("accepted_env_keys")),
                 "next_setup_action": action.get("next_setup_action"),
                 "smoke_command_name": smoke_command.get("name"),
                 "command": smoke_command.get("command"),

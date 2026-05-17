@@ -389,7 +389,8 @@ summary includes `ready_to_run_live_smoke`, `next_smoke_command`, and a no-secre
 `provider_family_summary` with configured/missing live data provider families,
 `provider_setup_actions` with provider-level preferred keys, next setup actions,
 and no-secret `smoke_command` objects, `provider_smoke_plan` with per-provider
-smoke readiness and final pipeline smoke status, and a no-secret
+smoke readiness, `preferred_env_key`, `accepted_env_keys`, and final pipeline
+smoke status, and a no-secret
 `dotenv_template` with repo-root `.env` entries for Polygon, FRED, and NewsAPI
 so the setup payload itself shows what to fill before running smoke commands.
 It also includes `dotenv_file_status` so the payload shows
@@ -494,9 +495,11 @@ response still shows the next local setup or recovery action without returning
 the full checklist payload.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
-template/file status, setup steps, and no-secret next operator action, so the
-compact response shows the same local setup readiness evidence as the full
-one-shot pipeline response without returning secret values.
+template/file status, setup steps, and no-secret next operator action.
+Provider smoke plan rows include `preferred_env_key` and `accepted_env_keys`,
+so the compact response shows the same local setup readiness and key-alias
+evidence as the full one-shot pipeline response without returning secret
+values.
 It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,

@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_PROVIDER_SELECTION_ENV_HINT_GATE",
+  "gate_id": "API_KEY_PROVIDER_SMOKE_PLAN_ENV_HINT_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.753",
-  "next_atomic_step": "add provider env-key hints to API-key provider selection summary",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.754",
+  "next_atomic_step": "add accepted env-key hints to API-key provider smoke plan rows",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.752",
+    "docs/halo-swing-development-plan.md#3.753",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -39,9 +39,9 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_live_data_setup_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\",\"symbols\":[\"QQQ\"],\"topic\":\"macro\",\"summary_only\":true}' --no-audit",
-    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); hint=payload[\"api_key_provider_selection_summary\"][\"provider_env_key_hints_by_family\"][\"market\"]; print(hint[\"preferred_env_key\"], hint[\"accepted_env_keys\"], payload[\"api_key_provider_selection_summary\"][\"secret_values_returned\"])'",
+    "POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); smoke=payload[\"live_data_setup_summary\"][\"provider_smoke_plan\"][\"provider_smokes\"][0]; print(smoke[\"preferred_env_key\"], smoke[\"accepted_env_keys\"], payload[\"live_data_setup_summary\"][\"secret_values_returned\"])'",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -57,16 +57,16 @@
     "read_only": true
   },
   "done_means": [
-    "api_key_provider_selection_summary includes provider_env_key_hints_by_family with preferred_env_key and accepted_env_keys for each provider family",
-    "provider selection env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values",
-    "focused tests cover provider selection env-key hints in full and summary_only API-key pipeline output",
-    "fake-key API-key pipeline summary-only CLI returns provider selection env-key names without secret values",
-    "README and DevOps setup guide document provider selection env-key hints",
-    "setup docs tests assert provider selection env-key hint guidance",
+    "live_data_setup_summary provider_smoke_plan provider_smokes include accepted_env_keys alongside preferred_env_key for each provider smoke row",
+    "provider smoke plan env-key hints expose only env-key names and no exception messages, URLs, API key values, or secret values",
+    "focused tests cover provider smoke plan accepted env-key hints in live data setup and summary_only API-key pipeline output",
+    "fake-key API-key pipeline summary-only CLI returns provider smoke plan accepted env-key names without secret values",
+    "README and DevOps setup guide document provider smoke plan accepted env-key hints",
+    "setup docs tests assert provider smoke plan accepted env-key hint guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified API-key provider selection env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified API-key provider smoke plan env hint gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -42,6 +42,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "setup_status" in guide
     assert "provider_setup_actions" in guide
     assert "provider_smoke_plan" in guide
+    assert (
+        "Provider smoke plan rows include `preferred_env_key` "
+        "and `accepted_env_keys`"
+    ) in guide
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
     assert "blocked_provider_smoke_count" in guide
