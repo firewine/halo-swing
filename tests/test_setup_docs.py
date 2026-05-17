@@ -47,6 +47,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     ) in guide
     assert "--summary-only" in guide
     assert "without editing" in guide
+    assert "Returned one-shot command summaries use `--summary-only --no-audit`" in guide
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
     assert "blocked_provider_smoke_count" in guide

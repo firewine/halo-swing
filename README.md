@@ -438,6 +438,9 @@ It also keeps `api_key_command_summary`
 the compact response still shows the exact local smoke commands, expected live
 contract/checks, live-call policy, and accepted API-key aliases to use after
 API keys are configured.
+Returned one-shot command summaries use `--summary-only --no-audit` for
+`run_api_key_pipeline_smoke`, so the displayed post-setup command opens the same
+compact response without requiring input JSON edits.
 It keeps `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) with `.env.example`/`.env` source and target
 status, `copy_required`, `copy_command`, `preferred_env_keys`,
@@ -682,7 +685,7 @@ to `recover_failed_providers` so every summary exposes the same next recovery
 command:
 
 ```bash
-PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --no-audit
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
 ```
 
 The checklist is offline and non-mutating. It does not write `.env`, create

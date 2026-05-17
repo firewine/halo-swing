@@ -203,7 +203,7 @@ def expected_pipeline_smoke_command() -> dict[str, Any]:
             "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
             "run_api_key_pipeline_smoke --input-json "
             "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-            "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+            "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --summary-only --no-audit"
         ),
         "network_call": True,
         "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -3655,7 +3655,8 @@ def test_run_integration_smoke_combines_readiness_and_live_data_smoke(
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
                     "--input-json "
                     "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
+                    "--summary-only --no-audit"
                 ),
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -3885,7 +3886,8 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
                     "--input-json "
                     "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
+                    "--summary-only --no-audit"
                 ),
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -4100,7 +4102,8 @@ def test_run_live_recording_smoke_executes_with_fake_live_metadata(
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
                     "--input-json "
                     "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
+                    "--summary-only --no-audit"
                 ),
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -4624,7 +4627,8 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
                     "--input-json "
                     "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
+                    "--summary-only --no-audit"
                 ),
                 "network_call": True,
                 "network_call_policy": "only_when_matching_api_key_selects_live_provider",
@@ -5526,7 +5530,8 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
                     "halo_swing_mcp.harness run_api_key_pipeline_smoke "
                     "--input-json "
                     "'{\"asset\":\"TQQQ\",\"timeframe\":\"swing_3d_10d\","
-                    "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' --no-audit"
+                        "\"symbols\":[\"QQQ\"],\"topic\":\"macro\"}' "
+                        "--summary-only --no-audit"
                 ),
                 "required_env_keys": [],
                 "configured_env_keys": [],
@@ -6752,6 +6757,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     ]
     assert command_summary["one_shot_pipeline_smoke"]["name"] == (
         "run_api_key_pipeline_smoke"
+    )
+    assert command_summary["one_shot_pipeline_smoke"]["command"].endswith(
+        "--summary-only --no-audit"
+    )
+    assert setup_summary["one_shot_smoke_command"]["command"].endswith(
+        "--summary-only --no-audit"
+    )
+    assert setup_summary["provider_smoke_plan"]["one_shot_pipeline_smoke"][
+        "command"
+    ].endswith("--summary-only --no-audit")
+    assert setup_summary["live_data_setup_steps"]["steps"][3]["command"].endswith(
+        "--summary-only --no-audit"
     )
     assert command_summary["secret_values_returned"] is False
     assert "api_key_command_summary" not in payload["omitted_sections"]

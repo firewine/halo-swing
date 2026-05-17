@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.812 API Key Pipeline Summary-Only Command Summary Gate Record - 2026-05-17
+
+### A. 목적
+
+`--summary-only` harness flag가 추가됐지만, API-key setup payload의
+`one_shot_smoke_command`, `provider_smoke_plan.one_shot_pipeline_smoke`,
+`live_data_setup_steps`, `api_key_command_summary.one_shot_pipeline_smoke`는
+아직 full payload 명령을 안내한다. 실제 API 키 입력 후 사용자가 payload에 표시된 명령을
+그대로 실행하면 compact response를 받도록, 이번 slice는 returned one-shot command
+summaries를 no-secret `--summary-only --no-audit` 명령으로 맞춘다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - get_live_data_api_key_status one_shot_smoke_command now includes --summary-only --no-audit
+  - live_data_setup_summary provider smoke plan and setup steps preserve the compact one-shot command
+  - api_key_command_summary.one_shot_pipeline_smoke exposes the compact one-shot command in summary-only payloads
+  - README and DevOps setup guide document returned one-shot command summaries as compact commands
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -c command-summary compact smoke -> True True False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 798 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 3.811 API Key Pipeline Summary-Only CLI Flag Gate Record - 2026-05-17
 
 ### A. 목적

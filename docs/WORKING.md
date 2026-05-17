@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PIPELINE_SUMMARY_ONLY_CLI_FLAG_VERIFIED
-gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_CLI_FLAG_GATE
+status: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_COMMAND_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: add a no-secret harness --summary-only flag for run_api_key_pipeline_smoke
+next_atomic_step: make API-key one-shot command summaries point at the compact --summary-only harness command
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,8 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/harness.py
-  - tests/test_harness.py
+  - src/halo_swing_mcp/tools/readiness.py
+  - tests/test_readiness.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -74,24 +74,35 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_maps_api_key_pipeline tests/test_harness.py::test_harness_summary_only_flag_rejects_other_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status, run_api_key_pipeline_smoke; status=get_live_data_api_key_status(); summary=run_api_key_pipeline_smoke(summary_only=True); print(status["one_shot_smoke_command"]["command"].endswith("--summary-only --no-audit"), summary["api_key_command_summary"]["one_shot_pipeline_smoke"]["command"].endswith("--summary-only --no-audit"), summary["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - harness accepts --summary-only for run_api_key_pipeline_smoke and injects summary_only=true without requiring the user to edit input JSON
-  - harness rejects --summary-only for other commands before tool execution
-  - focused tests prove --summary-only returns api_key_pipeline_smoke_summary_only.v1 without secret values or nested full smoke sections
-  - README and DevOps setup guide document --summary-only as the API-key-only compact smoke command path
-  - setup docs tests assert the --summary-only guidance
+  - get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke with --summary-only --no-audit
+  - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the compact one-shot command
+  - summary-only API-key pipeline payload exposes the compact one_shot_pipeline_smoke command without secrets
+  - README and DevOps setup guide document returned one-shot command summaries as compact --summary-only commands
+  - setup docs tests assert compact one-shot command summary guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified summary-only CLI flag gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified summary-only command summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PIPELINE_SUMMARY_ONLY_CLI_FLAG_VERIFIED
+gate_id: API_KEY_PIPELINE_SUMMARY_ONLY_CLI_FLAG_GATE
+review_tier: S1_small
+
+next_atomic_step: add a no-secret harness --summary-only flag for run_api_key_pipeline_smoke
 ```
 
 Previous completed directive:
@@ -2868,14 +2879,14 @@ post_implementation_review:
 
 ## 5. LATEST_VERIFICATION
 
-Summary: API Key Pipeline Summary-Only CLI Flag Gate is verified.
-`halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only` now injects
-`summary_only=true` for the API-key pipeline smoke without requiring users to
-edit input JSON. Focused harness/docs tests, direct CLI smoke, full pytest,
-ruff, and health_check passed.
+Summary: API Key Pipeline Summary-Only Command Summary Gate is verified.
+API-key setup and pipeline summaries now return `run_api_key_pipeline_smoke`
+one-shot commands with `--summary-only --no-audit`, so the displayed post-setup
+command opens the compact no-secret response. Focused readiness/docs tests,
+direct command-summary smoke, full pytest, ruff, and health_check passed.
 
 ```yaml
-api_key_pipeline_summary_only_cli_flag_gate:
+api_key_pipeline_summary_only_command_summary_gate:
   status: verified
   changed_files:
     - .codex/tasks/current.json
@@ -2884,15 +2895,15 @@ api_key_pipeline_summary_only_cli_flag_gate:
     - docs/halo-swing-development-plan.md
     - README.md
     - docs/devops-setup-guide.md
-    - src/halo_swing_mcp/harness.py
-    - tests/test_harness.py
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
     - tests/test_setup_docs.py
   implementation:
-    - harness accepts --summary-only for run_api_key_pipeline_smoke and injects summary_only=true
-    - harness rejects --summary-only for other commands before tool execution
-    - focused tests prove the flag returns api_key_pipeline_smoke_summary_only.v1 without secret values or nested full smoke sections
-    - README and DevOps setup guide document --summary-only and preserve summary_only=true MCP payload guidance
-    - tests/test_setup_docs.py asserts --summary-only guidance
+    - get_live_data_api_key_status one_shot_smoke_command points at run_api_key_pipeline_smoke with --summary-only --no-audit
+    - live_data_setup_summary provider smoke plan, setup steps, and API-key command summary preserve the compact one-shot command
+    - summary-only API-key pipeline payload exposes the compact one_shot_pipeline_smoke command without secrets
+    - README and DevOps setup guide document returned one-shot command summaries as compact --summary-only commands
+    - tests/test_setup_docs.py asserts compact one-shot command summary guidance
     - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
   verification:
     - command: diff -u .codex/tasks/current.json docs/codex-task.json
@@ -2903,10 +2914,10 @@ api_key_pipeline_summary_only_cli_flag_gate:
       result: passed
     - command: git diff --check
       result: passed
-    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_harness.py::test_harness_summary_only_flag_maps_api_key_pipeline tests/test_harness.py::test_harness_summary_only_flag_rejects_other_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-      result: "3 passed"
-    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro"}' --summary-only --no-audit
-      result: "passed; schema_version api_key_pipeline_smoke_summary_only.v1, summary_only true, secret_values_returned false"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import get_live_data_api_key_status, run_api_key_pipeline_smoke; status=get_live_data_api_key_status(); summary=run_api_key_pipeline_smoke(summary_only=True); print(status["one_shot_smoke_command"]["command"].endswith("--summary-only --no-audit"), summary["api_key_command_summary"]["one_shot_pipeline_smoke"]["command"].endswith("--summary-only --no-audit"), summary["secret_values_returned"])'
+      result: "True True False"
     - command: PYTHONPATH=src ./.venv/bin/python -m pytest
       result: "798 passed"
     - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
