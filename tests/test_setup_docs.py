@@ -377,6 +377,13 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_setup_dotenv_example_env_keys" in guide
     assert "api_key_setup_dotenv_source_path" in guide
     assert "api_key_setup_dotenv_target_path" in guide
+    assert "api_key_provider_selection_status" in guide
+    assert "api_key_provider_factory" in guide
+    assert "api_key_selected_provider_classes" in guide
+    assert "api_key_selected_provider_class_count" in guide
+    assert "api_key_selected_provider_by_family" in guide
+    assert "api_key_configured_env_keys_by_provider_family" in guide
+    assert "api_key_provider_env_key_hints_by_family" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

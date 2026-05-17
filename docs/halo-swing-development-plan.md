@@ -482,6 +482,62 @@ verification:
   - targeted payload print: dotenv example lines ['POLYGON_API_KEY=your_polygon_key', 'FRED_API_KEY=your_fred_key', 'NEWS_API_KEY=your_newsapi_key'], line count 3, env keys ['POLYGON_API_KEY', 'FRED_API_KEY', 'NEWS_API_KEY'], source .env.example, target .env, secret_values_returned false
 ```
 
+## 3.829 API Key Top-Level Provider Selection Mirrors Gate Record - 2026-05-17
+
+### A. 목적
+
+3.828에서 summary-only top-level payload는 `.env`에 채울 no-secret API-key example
+lines를 직접 보여주게 됐다. 하지만 사용자가 키를 채운 뒤 실제 live provider가 어떤
+class로 선택됐는지, provider family별 어떤 env key alias가 configured로 인식됐는지,
+그리고 provider-family별 env-key hint를 확인하려면 아직 nested
+`api_key_provider_selection_summary`를 읽어야 한다. 이번 slice는 이 no-secret provider
+selection metadata를 top-level로 미러링해, API 키만 넣은 뒤 compact response에서 실제
+연동 route와 key alias 인식 상태를 바로 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_provider_selection_status, api_key_provider_factory, api_key_selected_provider_classes, and api_key_selected_provider_class_count mirror actual provider selection
+  - summary-only top-level api_key_selected_provider_by_family, api_key_configured_env_keys_by_provider_family, and api_key_provider_env_key_hints_by_family mirror provider-family setup state
+  - README and DevOps setup guide document top-level API-key provider selection mirrors
+  - setup docs tests assert top-level provider selection guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: provider selection blocked get_market_data_provider ['ReplayMarketDataProvider'] 1 {'market': None, 'macro': None, 'news': None} {'market': [], 'macro': [], 'news': []} secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

@@ -3059,6 +3059,9 @@ def _api_key_pipeline_summary_only_payload(
     api_key_setup_file_summary = _optional_mapping(
         payload.get("api_key_setup_file_summary")
     ) or {}
+    api_key_provider_selection_summary = _optional_mapping(
+        payload.get("api_key_provider_selection_summary")
+    ) or {}
     api_key_requirements_summary = _optional_mapping(
         payload.get("api_key_requirements_summary")
     ) or {}
@@ -3375,6 +3378,34 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_setup_dotenv_target_path": api_key_setup_file_summary.get(
             "target_path"
         ),
+        "api_key_provider_selection_status": (
+            api_key_provider_selection_summary.get("status")
+        ),
+        "api_key_provider_factory": (
+            api_key_provider_selection_summary.get("provider_factory")
+        ),
+        "api_key_selected_provider_classes": _string_list(
+            api_key_provider_selection_summary.get("selected_provider_classes")
+        ),
+        "api_key_selected_provider_class_count": (
+            api_key_provider_selection_summary.get("selected_provider_class_count")
+        ),
+        "api_key_selected_provider_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get("selected_provider_by_family")
+        )
+        or {},
+        "api_key_configured_env_keys_by_provider_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "configured_env_keys_by_provider_family"
+            )
+        )
+        or {},
+        "api_key_provider_env_key_hints_by_family": _optional_mapping(
+            api_key_provider_selection_summary.get(
+                "provider_env_key_hints_by_family"
+            )
+        )
+        or {},
         "api_key_setup_configured_provider_families": _string_list(
             setup_status_summary.get("configured_provider_families")
         ),
@@ -3504,10 +3535,7 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_pipeline_check_summary")
         )
         or {},
-        "api_key_provider_selection_summary": _optional_mapping(
-            payload.get("api_key_provider_selection_summary")
-        )
-        or {},
+        "api_key_provider_selection_summary": api_key_provider_selection_summary,
         "api_key_live_http_timeout_summary": _optional_mapping(
             payload.get("api_key_live_http_timeout_summary")
         )

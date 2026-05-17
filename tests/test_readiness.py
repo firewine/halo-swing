@@ -5513,6 +5513,25 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     ]
     assert payload["api_key_setup_dotenv_source_path"] == ".env.example"
     assert payload["api_key_setup_dotenv_target_path"] == ".env"
+    assert payload["api_key_provider_selection_status"] == "blocked"
+    assert payload["api_key_provider_factory"] == "get_market_data_provider"
+    assert payload["api_key_selected_provider_classes"] == [
+        "ReplayMarketDataProvider"
+    ]
+    assert payload["api_key_selected_provider_class_count"] == 1
+    assert payload["api_key_selected_provider_by_family"] == {
+        "market": None,
+        "macro": None,
+        "news": None,
+    }
+    assert payload["api_key_configured_env_keys_by_provider_family"] == {
+        "market": [],
+        "macro": [],
+        "news": [],
+    }
+    assert payload["api_key_provider_env_key_hints_by_family"] == (
+        expected_provider_env_key_hints_by_family()
+    )
     assert payload["api_key_setup_current_step"] == "prepare_dotenv"
     assert payload["api_key_setup_ready"] is False
     assert payload["api_key_setup_step_count"] == 4
@@ -7390,6 +7409,27 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summar
         "macro": ["FRED_API_KEY"],
         "news": ["NEWS_API_KEY"],
     }
+    assert payload["api_key_provider_selection_status"] == (
+        provider_selection_summary["status"]
+    )
+    assert payload["api_key_provider_factory"] == (
+        provider_selection_summary["provider_factory"]
+    )
+    assert payload["api_key_selected_provider_classes"] == (
+        provider_selection_summary["selected_provider_classes"]
+    )
+    assert payload["api_key_selected_provider_class_count"] == (
+        provider_selection_summary["selected_provider_class_count"]
+    )
+    assert payload["api_key_selected_provider_by_family"] == (
+        provider_selection_summary["selected_provider_by_family"]
+    )
+    assert payload["api_key_configured_env_keys_by_provider_family"] == (
+        provider_selection_summary["configured_env_keys_by_provider_family"]
+    )
+    assert payload["api_key_provider_env_key_hints_by_family"] == (
+        provider_selection_summary["provider_env_key_hints_by_family"]
+    )
     assert provider_selection_summary["provider_env_key_hints_by_family"] == (
         expected_provider_env_key_hints_by_family()
     )
