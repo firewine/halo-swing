@@ -552,8 +552,9 @@ auto-selection and each provider family's `preferred_env_key` /
 `accepted_env_keys` can be verified without secret values.
 The top-level `readiness_summary` mirrors the selected `next_operator_action`
 and, when that action carries provider smoke or recovery env-key hints, also
-includes `preferred_env_key` and `accepted_env_keys` without returning key
-values.
+includes `preferred_env_key`, `accepted_env_keys`,
+`next_operator_action_expected_live_contract`, and
+`next_operator_action_expected_live_checks` without returning key values.
 The top-level `api_key_integration_status_summary`
 (`api_key_integration_status_summary.v1`) combines setup file, dotenv,
 provider selection, failure, and next-action evidence into one operator row with

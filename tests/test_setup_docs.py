@@ -268,6 +268,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_operator_action_smoke_command_name" in guide
     assert "next_operator_action_expected_live_contract" in guide
     assert "next_operator_action_expected_live_checks" in guide
+    assert (
+        "readiness_summary` mirrors provider smoke or recovery "
+        "`preferred_env_key`"
+    ) in guide
     assert "next_operator_action_preferred_env_key" in guide
     assert "next_operator_action_accepted_env_keys" in guide
     assert "next_operator_action_status" in guide

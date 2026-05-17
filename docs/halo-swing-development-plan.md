@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.802 API Key Readiness Summary Expected Contract Gate Record - 2026-05-17
+
+### A. 목적
+
+summary-only 최상위 next operator one-line fields와 `api_key_next_action_summary`는
+다음 provider smoke 또는 recovery smoke의 expected live contract/check를 보여주지만,
+`readiness_summary`는 여전히 next action 이름, object, env-key hint까지만 보여준다.
+operator가 compact response의 readiness row만 스캔할 때도 API key 입력 후 다음 실행
+명령의 성공 판정 기준을 확인할 수 있도록, 이번 slice는 no-secret
+`readiness_summary.next_operator_action_expected_live_contract`와
+`readiness_summary.next_operator_action_expected_live_checks`를 추가한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key readiness summary exposes next_operator_action_expected_live_contract and next_operator_action_expected_live_checks
+  - readiness summary expected fields match summary-only top-level next operator expected fields
+  - focused tests lock provider smoke and provider recovery readiness summary expected fields without returning secret values
+  - README and DevOps setup guide document readiness summary expected contract/check fields
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; readiness summary expected live contract/check fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); readiness=payload["readiness_summary"]; print(readiness["next_operator_action_expected_live_contract"], ",".join(readiness["next_operator_action_expected_live_checks"]), payload["next_operator_action_expected_live_contract"], payload["secret_values_returned"])': market_snapshot_contract live_data_boundary_declared market_snapshot_contract False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.801 API Key Next Action Expected Contract Gate Record - 2026-05-17
 
 ### A. 목적

@@ -3409,6 +3409,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         payload["readiness_summary"]["next_operator_action_name"]
         == "recover_failed_providers"
     )
+    assert payload["readiness_summary"][
+        "next_operator_action_expected_live_contract"
+    ] == payload["api_key_next_action_summary"]["next_action_expected_live_contract"]
+    assert payload["readiness_summary"][
+        "next_operator_action_expected_live_checks"
+    ] == payload["api_key_next_action_summary"]["next_action_expected_live_checks"]
     assert payload["api_key_next_action_summary"] == {
         "schema_version": "api_key_next_action_summary.v1",
         "status": "conflict",
@@ -6807,6 +6813,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     ]
     assert next_operator_action["secret_values_returned"] is False
     assert readiness_summary["next_operator_action_name"] == "run_provider_smokes"
+    assert readiness_summary["next_operator_action_expected_live_contract"] == (
+        payload["next_operator_action_expected_live_contract"]
+    )
+    assert readiness_summary["next_operator_action_expected_live_checks"] == (
+        payload["next_operator_action_expected_live_checks"]
+    )
     assert readiness_summary["preferred_env_key"] == "POLYGON_API_KEY"
     assert readiness_summary["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
