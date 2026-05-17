@@ -1778,6 +1778,13 @@ def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secr
         EXPECTED_DOTENV_EXAMPLES
     )
     assert summary_payload["next_operator_action_dotenv_example_count"] == 3
+    assert summary_payload["next_operator_action_next_after_action"] == (
+        "run_provider_smokes"
+    )
+    assert summary_payload["next_operator_action_dotenv_target_path"] == ".env"
+    assert summary_payload["next_operator_action_source_path"] is None
+    assert summary_payload["next_operator_action_target_path"] is None
+    assert summary_payload["next_operator_action_secret_input_required"] is True
     assert summary_payload["secret_values_returned"] is False
     assert payload["api_key_dotenv_loading_summary"]["secret_values_returned"] is False
     for value in secret_env.values():
@@ -5488,6 +5495,13 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_next_action_summary"]["next_action_name"] == (
         "prepare_dotenv"
     )
+    assert payload["next_operator_action_next_after_action"] == (
+        "fill_live_data_api_keys"
+    )
+    assert payload["next_operator_action_dotenv_target_path"] == ".env"
+    assert payload["next_operator_action_source_path"] == ".env.example"
+    assert payload["next_operator_action_target_path"] == ".env"
+    assert payload["next_operator_action_secret_input_required"] is False
     assert "preferred_env_key" not in payload["api_key_integration_status_summary"]
     assert "accepted_env_keys" not in payload["api_key_integration_status_summary"]
     assert payload["api_key_operator_checklist_summary"] == {

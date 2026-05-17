@@ -3040,6 +3040,14 @@ def _api_key_pipeline_summary_only_payload(
         "next_operator_action_command": api_key_next_action_summary.get(
             "next_action_command"
         ),
+        "next_operator_action_next_after_action": next_operator_action.get(
+            "next_after_action"
+        ),
+        "next_operator_action_dotenv_target_path": next_operator_action.get(
+            "dotenv_target_path"
+        ),
+        "next_operator_action_source_path": next_operator_action.get("source_path"),
+        "next_operator_action_target_path": next_operator_action.get("target_path"),
         "next_operator_action_provider_family": (
             next_operator_action.get("provider_family")
             or next_provider_recovery_action.get("provider_family")
@@ -3072,6 +3080,9 @@ def _api_key_pipeline_summary_only_payload(
         "next_operator_action_mutates_local_state": (
             api_key_next_action_summary.get("next_action_mutates_local_state")
             is True
+        ),
+        "next_operator_action_secret_input_required": (
+            next_operator_action.get("secret_input_required") is True
         ),
         "next_operator_action_preferred_env_key": api_key_next_action_summary.get(
             "preferred_env_key"

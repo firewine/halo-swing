@@ -313,6 +313,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "readiness_summary` mirrors provider smoke or recovery "
         "`preferred_env_key`"
     ) in guide
+    assert "next_operator_action_next_after_action" in guide
+    assert "next_operator_action_dotenv_target_path" in guide
+    assert "next_operator_action_source_path" in guide
+    assert "next_operator_action_target_path" in guide
     assert "next_operator_action_preferred_env_key" in guide
     assert "next_operator_action_accepted_env_keys" in guide
     assert "next_operator_action_required_env_keys" in guide
@@ -321,6 +325,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "next_operator_action_network_call" in guide
     assert "next_operator_action_network_call_policy" in guide
     assert "next_operator_action_mutates_local_state" in guide
+    assert "next_operator_action_secret_input_required" in guide
     assert "next_operator_action_secret_values_returned" in guide
     assert "top-level summary-only recovery command lists" in guide
     assert "top-level summary-only recovery status and identity fields" in guide
