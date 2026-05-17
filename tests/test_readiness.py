@@ -6415,6 +6415,48 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_quickstart_command_plan_provider_family_count"] == (
         payload["api_key_command_summary"]["provider_smoke_command_count"]
     )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
+        == sum(
+            row["status"] == "ready"
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_blocked_provider_smoke_count"]
+        == sum(
+            row["status"] != "ready"
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_all_provider_smokes_ready"]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_all_provider_smokes_network_calls"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_all_provider_smokes_live_required"
+        ]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_any_provider_smoke_mutates_local_state"
+        ]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_any_provider_smoke_secret_values_returned"
+        ]
+        is False
+    )
     assert payload["api_key_setup_quickstart_command_plan_kinds_by_family"] == {
         row["provider_family"]: "provider_smoke"
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
@@ -8490,6 +8532,63 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     ]
     assert payload["api_key_setup_quickstart_command_plan_provider_family_count"] == (
         payload["api_key_command_summary"]["provider_smoke_command_count"]
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
+        == sum(
+            row["status"] == "ready"
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_blocked_provider_smoke_count"]
+        == sum(
+            row["status"] != "ready"
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload["api_key_setup_quickstart_command_plan_all_provider_smokes_ready"]
+        == all(
+            row["status"] == "ready"
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_all_provider_smokes_network_calls"
+        ]
+        == all(
+            row["network_call"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_all_provider_smokes_live_required"
+        ]
+        == all(
+            row["provider_route_live_data_required"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_any_provider_smoke_mutates_local_state"
+        ]
+        == any(
+            row["mutates_local_state"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_any_provider_smoke_secret_values_returned"
+        ]
+        == any(
+            row["secret_values_returned"]
+            for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        )
     )
     assert payload["api_key_setup_quickstart_command_plan_kinds_by_family"] == {
         row["provider_family"]: "provider_smoke"

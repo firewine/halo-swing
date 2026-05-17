@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.895 API Key Quickstart Command Plan Aggregate Flags Gate Record - 2026-05-18
+
+### A. 목적
+
+3.894에서 quickstart command plan provider-smoke row의 provider family 목록과 kind는
+top-level index로 올라왔다. 하지만 compact client가 API 키만 넣은 뒤 provider-smoke
+묶음 전체가 실행 가능한지, live route가 요구되는지, 로컬 상태 변경이나 secret 반환 위험이
+있는지 판단하려면 여전히 family map들을 순회해야 한다. 이번 slice는 quickstart command
+plan만 읽어도 provider-smoke 묶음의 ready/safety 상태를 한 번에 판정할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_ready_provider_smoke_count mirrors provider-smoke ready rows
+  - summary-only top-level api_key_setup_quickstart_command_plan_blocked_provider_smoke_count mirrors provider-smoke non-ready rows
+  - summary-only top-level api_key_setup_quickstart_command_plan_all_provider_smokes_ready reports whether all provider-smoke rows are ready
+  - summary-only top-level api_key_setup_quickstart_command_plan_all_provider_smokes_network_calls reports provider-smoke network-call intent
+  - summary-only top-level api_key_setup_quickstart_command_plan_all_provider_smokes_live_required reports whether every provider-smoke row is on a live-required route
+  - summary-only top-level api_key_setup_quickstart_command_plan_any_provider_smoke_mutates_local_state and any_provider_smoke_secret_values_returned expose aggregate safety state
+  - README and DevOps setup guide document the quickstart command plan aggregate readiness/safety fields
+  - setup docs tests assert the documented aggregate field list stays in sync
+  - fake-key offline verification confirmed ready count 3, blocked count 0, all ready/network/live true, mutation false, secret false
+  - partial-key and no-key test coverage keeps aggregate flags tied to provider smoke command rows without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan aggregate flags pytest: 3 passed
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - direct fake-key aggregate assertion: ready count 3, blocked count 0, all ready/network/live true, mutation false, secret false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.894 API Key Quickstart Command Plan Family Index Gate Record - 2026-05-18
 
 ### A. 목적

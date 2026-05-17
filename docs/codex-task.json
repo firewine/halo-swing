@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_FAMILY_INDEX_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.894",
-  "next_atomic_step": "surface API-key quickstart provider-smoke provider-family index fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.895",
+  "next_atomic_step": "surface API-key quickstart provider-smoke aggregate readiness and safety flags",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.894",
+    "docs/halo-swing-development-plan.md#3.895",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
@@ -57,14 +57,14 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level quickstart command plan exposes provider-smoke provider family list and count",
-    "summary-only top-level quickstart command plan exposes provider-smoke kind by provider family",
-    "fake-key offline verification proves quickstart family index reports market, macro, and news without secret values",
-    "blocked no-key verification proves quickstart family index stays tied to provider smoke command rows without secret values",
+    "summary-only top-level quickstart command plan exposes provider-smoke ready and blocked counts",
+    "summary-only top-level quickstart command plan exposes aggregate ready, network, live-required, mutation, and secret-return flags for provider-smoke rows",
+    "fake-key offline verification proves provider-smoke aggregate flags report ready/live/safe state for market, macro, and news without secret values",
+    "blocked no-key verification proves aggregate flags stay tied to provider smoke command rows without secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan family index gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan aggregate flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

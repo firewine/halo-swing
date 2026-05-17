@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_FAMILY_INDEX_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_FAMILY_INDEX_GATE
+status: API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key quickstart provider-smoke provider-family index fields
+next_atomic_step: surface API-key quickstart provider-smoke aggregate readiness and safety flags
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,31 +82,31 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level quickstart command plan exposes provider-smoke provider family list and count
-  - summary-only top-level quickstart command plan exposes provider-smoke kind by provider family
-  - fake-key offline verification proves quickstart family index reports market, macro, and news without secret values
-  - blocked no-key verification proves quickstart family index stays tied to provider smoke command rows without secret values
+  - summary-only top-level quickstart command plan exposes provider-smoke ready and blocked counts
+  - summary-only top-level quickstart command plan exposes aggregate ready, network, live-required, mutation, and secret-return flags for provider-smoke rows
+  - fake-key offline verification proves provider-smoke aggregate flags report ready/live/safe state for market, macro, and news without secret values
+  - blocked no-key verification proves aggregate flags stay tied to provider smoke command rows without secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan family index gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart command plan aggregate flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_FAMILY_INDEX_GATE
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart family-index pytest: 3 passed
+  - focused API-key quickstart aggregate flags pytest: 3 passed
   - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - direct fake-key family-index assertion: market, macro, news; count 3; secret_values_returned false
+  - direct fake-key aggregate assertion: ready count 3, blocked count 0, all ready/network/live true, mutation/secret false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
@@ -121,9 +121,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart command plan family index gate
+next_state: commit this verified API-key quickstart command plan aggregate flags gate
 notes:
-  - quickstart command plan family-index fields are top-level and tied to provider-smoke rows without returning secret values
+  - quickstart command plan aggregate flags are top-level and tied to provider-smoke rows without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_AGGREGATE_FLAGS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key quickstart provider-smoke aggregate readiness and safety flags
 ```
 
 Previous completed directive:

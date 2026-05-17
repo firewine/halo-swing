@@ -60,12 +60,44 @@ def _api_key_setup_quickstart_command_plan_family_fields(
     provider_families = _ordered_unique_strings(
         [row.get("provider_family") for row in provider_rows]
     )
+    provider_smoke_count = len(provider_rows)
+    ready_provider_smoke_count = sum(
+        row.get("status") == "ready" for row in provider_rows
+    )
+    has_provider_smokes = provider_smoke_count > 0
     return {
         "api_key_setup_quickstart_command_plan_provider_families": (
             provider_families
         ),
         "api_key_setup_quickstart_command_plan_provider_family_count": len(
             provider_families
+        ),
+        "api_key_setup_quickstart_command_plan_ready_provider_smoke_count": (
+            ready_provider_smoke_count
+        ),
+        "api_key_setup_quickstart_command_plan_blocked_provider_smoke_count": (
+            provider_smoke_count - ready_provider_smoke_count
+        ),
+        "api_key_setup_quickstart_command_plan_all_provider_smokes_ready": (
+            has_provider_smokes
+            and ready_provider_smoke_count == provider_smoke_count
+        ),
+        "api_key_setup_quickstart_command_plan_all_provider_smokes_network_calls": (
+            has_provider_smokes
+            and all(row.get("network_call") is True for row in provider_rows)
+        ),
+        "api_key_setup_quickstart_command_plan_all_provider_smokes_live_required": (
+            has_provider_smokes
+            and all(
+                row.get("provider_route_live_data_required") is True
+                for row in provider_rows
+            )
+        ),
+        "api_key_setup_quickstart_command_plan_any_provider_smoke_mutates_local_state": (
+            any(row.get("mutates_local_state") is True for row in provider_rows)
+        ),
+        "api_key_setup_quickstart_command_plan_any_provider_smoke_secret_values_returned": (
+            any(row.get("secret_values_returned") is True for row in provider_rows)
         ),
         "api_key_setup_quickstart_command_plan_kinds_by_family": {
             row["provider_family"]: row.get("kind")
