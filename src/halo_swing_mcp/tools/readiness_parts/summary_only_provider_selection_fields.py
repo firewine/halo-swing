@@ -6,6 +6,9 @@ from typing import Any
 
 from .contract_checks import _optional_mapping
 from .live_data_setup import _string_list
+from .summary_only_provider_route_fields import (
+    _api_key_provider_selection_route_count_top_level_fields,
+)
 
 
 __all__ = ("_api_key_provider_selection_top_level_fields",)
@@ -54,6 +57,9 @@ def _api_key_provider_selection_top_level_fields(
         "api_key_provider_all_selected_routes_live": (
             api_key_provider_selection_summary.get("all_selected_routes_live")
             is True
+        ),
+        **_api_key_provider_selection_route_count_top_level_fields(
+            api_key_provider_selection_summary
         ),
         "api_key_configured_env_keys_by_provider_family": _optional_mapping(
             api_key_provider_selection_summary.get(

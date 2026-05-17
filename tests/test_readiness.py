@@ -7054,6 +7054,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         prefix="api_key_readiness",
         source_summary=payload["readiness_summary"],
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider",
+        source_summary=payload["api_key_provider_selection_summary"],
+    )
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -11045,6 +11050,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summar
     assert (
         payload["api_key_provider_all_selected_routes_live"]
         == provider_selection_summary["all_selected_routes_live"]
+    )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider",
+        source_summary=provider_selection_summary,
     )
     assert provider_selection_summary["selected_provider_class_by_family"] == (
         expected_selected_provider_class_by_family(configured=True)

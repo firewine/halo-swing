@@ -10,6 +10,7 @@ from .contract_checks import _optional_mapping
 __all__ = (
     "_api_key_failure_route_top_level_fields",
     "_api_key_next_action_route_top_level_fields",
+    "_api_key_provider_selection_route_count_top_level_fields",
     "_api_key_provider_recovery_checklist_route_top_level_fields",
     "_api_key_provider_recovery_route_top_level_fields",
     "_api_key_readiness_route_top_level_fields",
@@ -34,6 +35,15 @@ def _api_key_next_action_route_top_level_fields(
     return _route_family_summary_top_level_fields(
         prefix="api_key_next_action",
         source_summary=api_key_next_action_summary,
+    )
+
+
+def _api_key_provider_selection_route_count_top_level_fields(
+    api_key_provider_selection_summary: dict[str, Any],
+) -> dict[str, Any]:
+    return _route_family_count_top_level_fields(
+        prefix="api_key_provider",
+        source_summary=api_key_provider_selection_summary,
     )
 
 
