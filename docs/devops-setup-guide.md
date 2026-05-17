@@ -956,8 +956,14 @@ It also mirrors provider smoke progress as
 `api_key_provider_smoke_action_status`,
 `api_key_provider_smoke_next_action`,
 `api_key_provider_smoke_next_action_command_count`,
-`api_key_provider_smoke_next_action_command_names`, and
+`api_key_provider_smoke_next_action_command_names`,
 `api_key_provider_smoke_next_action_commands`,
+`api_key_provider_smoke_next_action_preferred_env_keys`,
+`api_key_provider_smoke_next_action_preferred_env_key_count`,
+`api_key_provider_smoke_next_action_accepted_env_keys`,
+`api_key_provider_smoke_next_action_accepted_env_key_count`,
+`api_key_provider_smoke_next_action_accepted_env_key_groups`, and
+`api_key_provider_smoke_next_action_accepted_env_key_group_count`,
 plus ready setup hints
 `api_key_provider_smoke_ready_preferred_env_keys`,
 `api_key_provider_smoke_ready_preferred_env_key_count`,

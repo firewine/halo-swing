@@ -257,6 +257,27 @@ def _api_key_provider_smoke_top_level_fields(
         if provider_smoke_next_action == "run_ready_provider_smokes"
         else []
     )
+    provider_smoke_next_action_preferred_env_keys = (
+        provider_smoke_ready_preferred_env_keys
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else provider_smoke_blocked_preferred_env_keys
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else []
+    )
+    provider_smoke_next_action_accepted_env_key_groups = (
+        provider_smoke_ready_accepted_env_key_groups
+        if provider_smoke_next_action == "run_ready_provider_smokes"
+        else provider_smoke_blocked_accepted_env_key_groups
+        if provider_smoke_next_action == "fill_live_data_api_keys"
+        else []
+    )
+    provider_smoke_next_action_accepted_env_keys = _ordered_unique_strings(
+        [
+            env_key
+            for group in provider_smoke_next_action_accepted_env_key_groups
+            for env_key in group
+        ]
+    )
     return {
         "api_key_provider_smoke_total_count": setup_status_summary.get(
             "provider_smoke_count"
@@ -281,6 +302,24 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_commands": (
             provider_smoke_next_action_commands
+        ),
+        "api_key_provider_smoke_next_action_preferred_env_keys": (
+            provider_smoke_next_action_preferred_env_keys
+        ),
+        "api_key_provider_smoke_next_action_preferred_env_key_count": len(
+            provider_smoke_next_action_preferred_env_keys
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_keys": (
+            provider_smoke_next_action_accepted_env_keys
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_key_count": len(
+            provider_smoke_next_action_accepted_env_keys
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_key_groups": (
+            provider_smoke_next_action_accepted_env_key_groups
+        ),
+        "api_key_provider_smoke_next_action_accepted_env_key_group_count": len(
+            provider_smoke_next_action_accepted_env_key_groups
         ),
         "api_key_provider_smoke_ready_preferred_env_keys": (
             provider_smoke_ready_preferred_env_keys
