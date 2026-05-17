@@ -1255,17 +1255,37 @@ def assert_provider_smoke_safety_count_fields(payload: dict[str, Any]) -> None:
     secret_values_returned_by_family = payload[
         "api_key_provider_smoke_secret_values_returned_by_family"
     ]
+    all_network_calls = bool(network_calls_by_family) and all(
+        network_call is True for network_call in network_calls_by_family.values()
+    )
+    any_mutates_local_state = any(
+        mutates_local_state is True
+        for mutates_local_state in mutates_local_state_by_family.values()
+    )
+    any_secret_values_returned = any(
+        secret_values_returned is True
+        for secret_values_returned in secret_values_returned_by_family.values()
+    )
     assert payload["api_key_provider_smoke_network_call_count"] == sum(
         network_call is True
         for network_call in network_calls_by_family.values()
     )
+    assert payload["api_key_provider_smoke_all_network_calls"] is all_network_calls
     assert payload["api_key_provider_smoke_mutates_local_state_count"] == sum(
         mutates_local_state is True
         for mutates_local_state in mutates_local_state_by_family.values()
     )
+    assert (
+        payload["api_key_provider_smoke_any_mutates_local_state"]
+        is any_mutates_local_state
+    )
     assert payload["api_key_provider_smoke_secret_values_returned_count"] == sum(
         secret_values_returned is True
         for secret_values_returned in secret_values_returned_by_family.values()
+    )
+    assert (
+        payload["api_key_provider_smoke_any_secret_values_returned"]
+        is any_secret_values_returned
     )
 
 

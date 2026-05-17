@@ -413,6 +413,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.935 API Key Provider Smoke Safety Flag Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.934는 provider-smoke safety evidence를 by-family map과 count로 올렸다. 하지만
+compact client가 "모든 provider smoke가 network call을 선언했는지", "어떤 provider
+smoke라도 local state mutation이나 secret value 반환 위험을 갖는지"를 확인하려면
+아직 map/count를 직접 비교해야 한다. 이번 slice는 기존 safety map에서 계산되는
+aggregate boolean flags를 top-level로 제공한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - summary-only output mirrors api_key_provider_smoke_all_network_calls
+  - summary-only output mirrors api_key_provider_smoke_any_mutates_local_state
+  - summary-only output mirrors api_key_provider_smoke_any_secret_values_returned
+  - summary-only tests prove provider smoke safety flag fields match their by-family safety maps
+  - README and DevOps guide document the top-level API-key provider smoke safety flag fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.934 API Key Provider Smoke Safety Count Fields Gate Record - 2026-05-18
 
 ### A. 목적

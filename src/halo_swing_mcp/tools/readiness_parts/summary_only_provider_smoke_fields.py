@@ -189,16 +189,26 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_network_call_count": sum(
             provider_smoke_network_calls_by_family.values()
         ),
+        "api_key_provider_smoke_all_network_calls": (
+            provider_smoke_command_count > 0
+            and all(provider_smoke_network_calls_by_family.values())
+        ),
         "api_key_provider_smoke_mutates_local_state_by_family": (
             provider_smoke_mutates_local_state_by_family
         ),
         "api_key_provider_smoke_mutates_local_state_count": sum(
             provider_smoke_mutates_local_state_by_family.values()
         ),
+        "api_key_provider_smoke_any_mutates_local_state": any(
+            provider_smoke_mutates_local_state_by_family.values()
+        ),
         "api_key_provider_smoke_secret_values_returned_by_family": (
             provider_smoke_secret_values_returned_by_family
         ),
         "api_key_provider_smoke_secret_values_returned_count": sum(
+            provider_smoke_secret_values_returned_by_family.values()
+        ),
+        "api_key_provider_smoke_any_secret_values_returned": any(
             provider_smoke_secret_values_returned_by_family.values()
         ),
         "api_key_provider_smoke_expected_live_contracts_by_family": {
