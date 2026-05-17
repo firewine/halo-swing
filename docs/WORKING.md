@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_READINESS_FLAGS_VERIFIED
-gate_id: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_READINESS_FLAGS_GATE
+status: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_READINESS_FLAGS_VERIFIED
+gate_id: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_READINESS_FLAGS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key quickstart next-command-plan readiness flags
+next_atomic_step: surface summary-only API-key quickstart next provider-smoke readiness flags
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,22 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key quickstart next command-plan has-command, ready-to-run, and requires-api-keys flags
-  - summary-only tests prove quickstart next command-plan readiness flags match the selected next command-plan row
-  - README and DevOps guide document the top-level API-key quickstart next command-plan readiness flags
+  - summary-only output exposes API-key quickstart next ready and blocked provider-smoke has-command, ready-to-run, and requires-api-keys flags
+  - summary-only tests prove quickstart next ready and blocked provider-smoke readiness flags match their selected command rows
+  - README and DevOps guide document the top-level API-key quickstart next provider-smoke readiness flags
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart next command-plan readiness flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key quickstart next provider-smoke readiness flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_READINESS_FLAGS_GATE
+gate_id: API_KEY_QUICKSTART_NEXT_PROVIDER_SMOKE_READINESS_FLAGS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -119,9 +119,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart next command-plan readiness flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key quickstart next provider-smoke readiness flags gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes quickstart next command-plan has-command, ready-to-run, and requires-api-keys flags without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes quickstart next ready and blocked provider-smoke has-command, ready-to-run, and requires-api-keys flags without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_READINESS_FLAGS_VERIFIED
+gate_id: API_KEY_QUICKSTART_NEXT_COMMAND_PLAN_READINESS_FLAGS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key quickstart next-command-plan readiness flags
 ```
 
 Previous completed directive:

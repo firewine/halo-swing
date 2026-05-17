@@ -8620,6 +8620,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_has_command"
+        ]
+        == bool(first_ready_command_row.get("command"))
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_ready_to_run"
+        ]
+        == (
+            first_ready_command_row.get("status") == "ready"
+            and bool(first_ready_command_row.get("command"))
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_requires_api_keys"
+        ]
+        == (
+            first_ready_command_row.get("status") != "ready"
+            and bool(first_ready_command_row.get("accepted_env_keys", []))
+        )
+    )
+    assert (
+        payload[
             "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract"
         ]
         == first_ready_command_row.get("expected_live_contract")
@@ -8722,6 +8746,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
         ]
         == first_blocked_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_has_command"
+        ]
+        == bool(first_blocked_command_row.get("command"))
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_ready_to_run"
+        ]
+        == (
+            first_blocked_command_row.get("status") == "ready"
+            and bool(first_blocked_command_row.get("command"))
+        )
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_requires_api_keys"
+        ]
+        == (
+            first_blocked_command_row.get("status") != "ready"
+            and bool(first_blocked_command_row.get("accepted_env_keys", []))
+        )
     )
     assert (
         payload[

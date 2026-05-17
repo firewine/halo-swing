@@ -161,6 +161,10 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command": (
             next_ready_row.get("command")
         ),
+        **_provider_smoke_readiness_fields(
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke",
+            next_ready_row,
+        ),
         "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract": (
             next_ready_row.get("expected_live_contract")
         ),
@@ -211,6 +215,10 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command": (
             next_blocked_row.get("command")
+        ),
+        **_provider_smoke_readiness_fields(
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke",
+            next_blocked_row,
         ),
         "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_expected_live_contract": (
             next_blocked_row.get("expected_live_contract")
@@ -349,6 +357,21 @@ def _api_key_setup_quickstart_command_plan_family_fields(
             row["provider_family"]: row.get("secret_values_returned") is True
             for row in provider_rows
         },
+    }
+
+
+def _provider_smoke_readiness_fields(
+    prefix: str,
+    row: dict[str, Any],
+) -> dict[str, Any]:
+    has_command = bool(row.get("command"))
+    accepted_env_keys = _string_list(row.get("accepted_env_keys"))
+    return {
+        f"{prefix}_has_command": has_command,
+        f"{prefix}_ready_to_run": row.get("status") == "ready" and has_command,
+        f"{prefix}_requires_api_keys": (
+            row.get("status") != "ready" and bool(accepted_env_keys)
+        ),
     }
 
 
