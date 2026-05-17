@@ -557,18 +557,19 @@ checklist payload.
 It keeps `live_data_setup_summary` (`live_data_setup_summary.v1`) with
 API-key setup status, provider family summary, provider smoke plan, dotenv
 template/file status, setup steps, and no-secret next operator action.
-Provider smoke plan rows include `preferred_env_key` and `accepted_env_keys`,
-so the compact response shows the same local setup readiness and key-alias
-evidence as the full one-shot pipeline response without returning secret
-values.
+Provider smoke plan rows include `network_call`, `network_call_policy`,
+`preferred_env_key`, and `accepted_env_keys`, so the compact response shows the
+same local setup readiness, live-call policy, and key-alias evidence as the full
+one-shot pipeline response without returning secret values.
 It also keeps `api_key_command_summary`
 (`api_key_pipeline_api_key_command_summary.v1`) with `copy_dotenv_command`,
 `next_smoke_command`, `one_shot_pipeline_smoke`,
 `provider_smoke_commands`, `provider_smoke_command_count`, and
-`next_provider_smoke_command_name`. Provider smoke rows include
-`preferred_env_key` and `accepted_env_keys` without returning key values, so the
-compact response still shows accepted API-key aliases and the exact local smoke
-commands to use after API keys are configured.
+`next_provider_smoke_command_name`. Provider smoke rows include `network_call`,
+`network_call_policy`, `preferred_env_key`, and `accepted_env_keys` without
+returning key values, so the compact response still shows accepted API-key
+aliases, live-call policy, and the exact local smoke commands to use after API
+keys are configured.
 It keeps `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) with `.env.example`/`.env` source and target
 status, `copy_required`, `copy_command`, `preferred_env_keys`,

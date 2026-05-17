@@ -608,6 +608,7 @@ def expected_provider_smoke_plan(
             "next_setup_action": action["next_setup_action"],
             "smoke_command_name": action["smoke_command"]["name"],
             "command": action["smoke_command"]["command"],
+            "network_call": True,
             "expected_live_contract": action["smoke_command"][
                 "expected_live_contract"
             ],
@@ -714,6 +715,7 @@ def expected_api_key_command_summary(
             "status": provider_smoke["status"],
             "smoke_command_name": provider_smoke["smoke_command_name"],
             "command": provider_smoke["command"],
+            "network_call": True,
             "network_call_policy": provider_smoke["network_call_policy"],
             "preferred_env_key": provider_smoke["preferred_env_key"],
             "accepted_env_keys": provider_setup_actions[
@@ -6391,6 +6393,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
 
     payload = run_api_key_pipeline_smoke(summary_only=True)
     command_summary = payload["api_key_command_summary"]
+    setup_summary = payload["live_data_setup_summary"]
     serialized = json.dumps(payload, sort_keys=True)
 
     assert command_summary == expected_api_key_command_summary(
@@ -6408,10 +6411,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     assert command_summary["next_provider_smoke"]["preferred_env_key"] == (
         "POLYGON_API_KEY"
     )
+    assert command_summary["next_provider_smoke"]["network_call"] is True
     assert command_summary["next_provider_smoke"]["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert command_summary["provider_smoke_commands"][0]["network_call"] is True
+    assert setup_summary["provider_smoke_plan"]["provider_smokes"][0][
+        "network_call"
+    ] is True
+    assert setup_summary["live_data_setup_steps"]["steps"][2][
+        "next_provider_smoke"
+    ]["network_call"] is True
     assert command_summary["provider_smoke_commands"][1]["preferred_env_key"] == (
         "FRED_API_KEY"
     )

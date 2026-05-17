@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.799 API Key Provider Smoke Command Network Flag Gate Record - 2026-05-17
+
+### A. 목적
+
+API-key-only setup 경로는 `run_provider_smokes` step이 실제 live provider 네트워크
+호출이라는 점을 상위 step과 `network_call_policy`로 보여준다. 하지만 operator가
+`api_key_command_summary.provider_smoke_commands` 또는
+`live_data_setup_summary.provider_smoke_plan.provider_smokes` row만 보고 첫 provider
+smoke를 실행할 때는 row 자체에 `network_call` boolean이 없어, 개별 명령의 실행 성격을
+확인하려면 상위 step을 다시 봐야 했다. 이번 slice는 provider smoke command row와
+`next_provider_smoke` row에 no-secret `network_call=true`를 추가해, API key 입력 후
+실제 연동 확인 명령이 네트워크 호출임을 같은 row에서 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - API-key command summary provider_smoke_commands rows expose network_call=true beside network_call_policy
+  - API-key command summary next_provider_smoke exposes network_call=true when provider smokes are ready
+  - live_data_setup_summary provider_smoke_plan provider_smokes rows expose network_call=true beside network_call_policy
+  - live_data_setup_steps run_provider_smokes next_provider_smoke exposes network_call=true when provider smokes are ready
+  - README and DevOps setup guide document the per-provider smoke command network_call flag
+  - tests lock the no-secret network_call flags in ready summary_only output
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit: exit 0; provider smoke command rows returned network_call=true beside network_call_policy without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); command_summary=payload["api_key_command_summary"]; setup_summary=payload["live_data_setup_summary"]; print(command_summary["next_provider_smoke"]["network_call"], command_summary["provider_smoke_commands"][0]["network_call"], setup_summary["provider_smoke_plan"]["provider_smokes"][0]["network_call"], setup_summary["live_data_setup_steps"]["steps"][2]["next_provider_smoke"]["network_call"], payload["secret_values_returned"])': True True True True False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 796 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.798 API Key Summary-Only Failure One-Line Gate Record - 2026-05-17
 
 ### A. 목적

@@ -4588,6 +4588,7 @@ def _api_key_command_provider_smoke_row(
         "status": provider_smoke.get("status"),
         "smoke_command_name": provider_smoke.get("smoke_command_name"),
         "command": provider_smoke.get("command"),
+        "network_call": True,
         "network_call_policy": provider_smoke.get("network_call_policy"),
         "preferred_env_key": env_hint.get("preferred_env_key"),
         "accepted_env_keys": env_hint.get("accepted_env_keys", []),
@@ -4962,6 +4963,7 @@ def _live_data_provider_smoke_plan(
                 "next_setup_action": action.get("next_setup_action"),
                 "smoke_command_name": smoke_command.get("name"),
                 "command": smoke_command.get("command"),
+                "network_call": True,
                 "expected_live_contract": smoke_command.get(
                     "expected_live_contract"
                 ),

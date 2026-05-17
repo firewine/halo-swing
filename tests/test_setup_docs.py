@@ -43,8 +43,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "provider_setup_actions" in guide
     assert "provider_smoke_plan" in guide
     assert (
-        "Provider smoke plan rows include `preferred_env_key` "
-        "and `accepted_env_keys`"
+        "Provider smoke plan rows include `network_call`, `network_call_policy`,"
     ) in guide
     assert "provider_smoke_count" in guide
     assert "ready_provider_smoke_count" in guide
@@ -287,6 +286,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide
+    assert "Provider smoke plan rows include `network_call`" in guide
     assert "keeps `api_key_requirements_summary`" in guide
     assert "api_key_pipeline_api_key_requirements_summary.v1" in guide
     assert "required_env_keys" in guide
@@ -295,6 +295,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "keeps `api_key_command_summary`" in guide
     assert "api_key_pipeline_api_key_command_summary.v1" in guide
     assert "provider_smoke_commands" in guide
+    assert "Provider smoke rows include `network_call`" in guide
     assert "one_shot_pipeline_smoke" in guide
     assert "next_provider_smoke_command_name" in guide
     assert "accepted API-key aliases" in guide
