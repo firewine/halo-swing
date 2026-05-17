@@ -1016,6 +1016,94 @@ def run_api_key_pipeline_smoke(
             "provider_error_count",
             0,
         ),
+        "provider_recovery_smoke_available_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_smoke_available_count"
+            )
+        ),
+        "provider_recovery_smoke_unavailable_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_smoke_unavailable_count"
+            )
+        ),
+        "provider_recovery_all_smokes_available": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_all_smokes_available"
+            )
+            is True
+        ),
+        "provider_recovery_network_call_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_network_call_count"
+            )
+        ),
+        "provider_recovery_all_network_calls": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_all_network_calls"
+            )
+            is True
+        ),
+        "provider_recovery_mutates_local_state_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_mutates_local_state_count"
+            )
+        ),
+        "provider_recovery_any_mutates_local_state": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_any_mutates_local_state"
+            )
+            is True
+        ),
+        "provider_recovery_secret_values_returned_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_secret_values_returned_count"
+            )
+        ),
+        "provider_recovery_any_secret_values_returned": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_any_secret_values_returned"
+            )
+            is True
+        ),
+        "provider_recovery_next_setup_actions": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_next_setup_actions"
+            )
+        ),
+        "provider_recovery_exception_types": _string_list(
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_exception_types"
+            )
+        ),
+        "provider_recovery_exception_message_returned_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_exception_message_returned_count"
+            )
+        ),
+        "provider_recovery_any_exception_messages_returned": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_any_exception_messages_returned"
+            )
+            is True
+        ),
+        "provider_recovery_url_returned_count": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_url_returned_count"
+            )
+        ),
+        "provider_recovery_any_urls_returned": (
+            api_key_provider_recovery_summary.get(
+                "provider_recovery_any_urls_returned"
+            )
+            is True
+        ),
+        "provider_recovery_statuses": _string_list(
+            api_key_provider_recovery_summary.get("provider_recovery_statuses")
+        ),
+        "provider_recovery_all_pending": (
+            api_key_provider_recovery_summary.get("provider_recovery_all_pending")
+            is True
+        ),
         "provider_recovery_retry_ready": (
             api_key_provider_recovery_summary.get("provider_recovery_retry_ready")
             is True
@@ -2905,6 +2993,57 @@ def _api_key_pipeline_summary_only_payload(
             "provider_recovery_blocked_count"
         ),
         "provider_error_count": payload.get("provider_error_count"),
+        "provider_recovery_smoke_available_count": payload.get(
+            "provider_recovery_smoke_available_count"
+        ),
+        "provider_recovery_smoke_unavailable_count": payload.get(
+            "provider_recovery_smoke_unavailable_count"
+        ),
+        "provider_recovery_all_smokes_available": (
+            payload.get("provider_recovery_all_smokes_available") is True
+        ),
+        "provider_recovery_network_call_count": payload.get(
+            "provider_recovery_network_call_count"
+        ),
+        "provider_recovery_all_network_calls": (
+            payload.get("provider_recovery_all_network_calls") is True
+        ),
+        "provider_recovery_mutates_local_state_count": payload.get(
+            "provider_recovery_mutates_local_state_count"
+        ),
+        "provider_recovery_any_mutates_local_state": (
+            payload.get("provider_recovery_any_mutates_local_state") is True
+        ),
+        "provider_recovery_secret_values_returned_count": payload.get(
+            "provider_recovery_secret_values_returned_count"
+        ),
+        "provider_recovery_any_secret_values_returned": (
+            payload.get("provider_recovery_any_secret_values_returned") is True
+        ),
+        "provider_recovery_next_setup_actions": _string_list(
+            payload.get("provider_recovery_next_setup_actions")
+        ),
+        "provider_recovery_exception_types": _string_list(
+            payload.get("provider_recovery_exception_types")
+        ),
+        "provider_recovery_exception_message_returned_count": payload.get(
+            "provider_recovery_exception_message_returned_count"
+        ),
+        "provider_recovery_any_exception_messages_returned": (
+            payload.get("provider_recovery_any_exception_messages_returned") is True
+        ),
+        "provider_recovery_url_returned_count": payload.get(
+            "provider_recovery_url_returned_count"
+        ),
+        "provider_recovery_any_urls_returned": (
+            payload.get("provider_recovery_any_urls_returned") is True
+        ),
+        "provider_recovery_statuses": _string_list(
+            payload.get("provider_recovery_statuses")
+        ),
+        "provider_recovery_all_pending": (
+            payload.get("provider_recovery_all_pending") is True
+        ),
         "provider_recovery_retry_ready": (
             payload.get("provider_recovery_retry_ready") is True
         ),

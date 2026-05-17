@@ -254,6 +254,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "matches\n`readiness_summary.next_operator_action`" in guide
     assert "next_operator_action_command" in guide
     assert "top-level summary-only recovery env hints and network policies" in guide
+    assert (
+        "top-level summary-only recovery diagnostic and safety\naggregates"
+        in guide
+    )
     assert "next_operator_action_provider_family" in guide
     assert "next_operator_action_provider" in guide
     assert "next_operator_action_smoke_command_name" in guide

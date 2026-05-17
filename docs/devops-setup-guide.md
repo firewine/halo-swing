@@ -519,6 +519,11 @@ It also exposes top-level summary-only recovery env hints and network policies:
 `provider_recovery_preferred_env_keys`, `provider_recovery_accepted_env_keys`,
 `provider_recovery_accepted_env_key_groups`, and
 `provider_recovery_network_call_policies`.
+It also exposes top-level summary-only recovery diagnostic and safety
+aggregates, including smoke availability, network-call counts, mutation/secret
+safety counters, next setup actions, exception types, recovery statuses, and
+URL/exception-message returned flags, without returning URLs, exception
+messages, or secret values.
 It also exposes top-level summary-only next recovery fields:
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,

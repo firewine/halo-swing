@@ -2736,6 +2736,25 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert payload["provider_recovery_pending_count"] == 3
     assert payload["provider_recovery_blocked_count"] == 0
     assert payload["provider_error_count"] == 3
+    assert payload["provider_recovery_smoke_available_count"] == 3
+    assert payload["provider_recovery_smoke_unavailable_count"] == 0
+    assert payload["provider_recovery_all_smokes_available"] is True
+    assert payload["provider_recovery_network_call_count"] == 3
+    assert payload["provider_recovery_all_network_calls"] is True
+    assert payload["provider_recovery_mutates_local_state_count"] == 0
+    assert payload["provider_recovery_any_mutates_local_state"] is False
+    assert payload["provider_recovery_secret_values_returned_count"] == 0
+    assert payload["provider_recovery_any_secret_values_returned"] is False
+    assert payload["provider_recovery_next_setup_actions"] == [
+        "verify_provider_credentials_or_network"
+    ]
+    assert payload["provider_recovery_exception_types"] == ["RuntimeError"]
+    assert payload["provider_recovery_exception_message_returned_count"] == 0
+    assert payload["provider_recovery_any_exception_messages_returned"] is False
+    assert payload["provider_recovery_url_returned_count"] == 0
+    assert payload["provider_recovery_any_urls_returned"] is False
+    assert payload["provider_recovery_statuses"] == ["pending"]
+    assert payload["provider_recovery_all_pending"] is True
     assert payload["provider_recovery_retry_ready"] is True
     assert payload["provider_recovery_all_retryable"] is True
     assert payload["provider_recovery_has_pending"] is True
@@ -2902,6 +2921,29 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert summary_payload["provider_recovery_pending_count"] == 3
     assert summary_payload["provider_recovery_blocked_count"] == 0
     assert summary_payload["provider_error_count"] == 3
+    assert summary_payload["provider_recovery_smoke_available_count"] == 3
+    assert summary_payload["provider_recovery_smoke_unavailable_count"] == 0
+    assert summary_payload["provider_recovery_all_smokes_available"] is True
+    assert summary_payload["provider_recovery_network_call_count"] == 3
+    assert summary_payload["provider_recovery_all_network_calls"] is True
+    assert summary_payload["provider_recovery_mutates_local_state_count"] == 0
+    assert summary_payload["provider_recovery_any_mutates_local_state"] is False
+    assert summary_payload["provider_recovery_secret_values_returned_count"] == 0
+    assert summary_payload["provider_recovery_any_secret_values_returned"] is False
+    assert summary_payload["provider_recovery_next_setup_actions"] == [
+        "verify_provider_credentials_or_network"
+    ]
+    assert summary_payload["provider_recovery_exception_types"] == ["RuntimeError"]
+    assert (
+        summary_payload["provider_recovery_exception_message_returned_count"] == 0
+    )
+    assert (
+        summary_payload["provider_recovery_any_exception_messages_returned"] is False
+    )
+    assert summary_payload["provider_recovery_url_returned_count"] == 0
+    assert summary_payload["provider_recovery_any_urls_returned"] is False
+    assert summary_payload["provider_recovery_statuses"] == ["pending"]
+    assert summary_payload["provider_recovery_all_pending"] is True
     assert summary_payload["provider_recovery_retry_ready"] is True
     assert summary_payload["provider_recovery_all_retryable"] is True
     assert summary_payload["provider_recovery_has_pending"] is True
@@ -5515,6 +5557,23 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["provider_recovery_pending_count"] == 0
     assert payload["provider_recovery_blocked_count"] == 0
     assert payload["provider_error_count"] == 0
+    assert payload["provider_recovery_smoke_available_count"] == 0
+    assert payload["provider_recovery_smoke_unavailable_count"] == 0
+    assert payload["provider_recovery_all_smokes_available"] is False
+    assert payload["provider_recovery_network_call_count"] == 0
+    assert payload["provider_recovery_all_network_calls"] is False
+    assert payload["provider_recovery_mutates_local_state_count"] == 0
+    assert payload["provider_recovery_any_mutates_local_state"] is False
+    assert payload["provider_recovery_secret_values_returned_count"] == 0
+    assert payload["provider_recovery_any_secret_values_returned"] is False
+    assert payload["provider_recovery_next_setup_actions"] == []
+    assert payload["provider_recovery_exception_types"] == []
+    assert payload["provider_recovery_exception_message_returned_count"] == 0
+    assert payload["provider_recovery_any_exception_messages_returned"] is False
+    assert payload["provider_recovery_url_returned_count"] == 0
+    assert payload["provider_recovery_any_urls_returned"] is False
+    assert payload["provider_recovery_statuses"] == []
+    assert payload["provider_recovery_all_pending"] is False
     assert payload["provider_recovery_retry_ready"] is False
     assert payload["provider_recovery_all_retryable"] is False
     assert payload["provider_recovery_has_pending"] is False
