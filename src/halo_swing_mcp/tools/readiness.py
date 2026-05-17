@@ -2727,6 +2727,20 @@ def _api_key_provider_recovery_summary(
                 if item.get("recovery_status") == "blocked"
             ]
         ),
+        "provider_recovery_pending_providers": _ordered_unique_strings(
+            [
+                item.get("provider")
+                for item in compact_items
+                if item.get("recovery_status") == "pending"
+            ]
+        ),
+        "provider_recovery_blocked_providers": _ordered_unique_strings(
+            [
+                item.get("provider")
+                for item in compact_items
+                if item.get("recovery_status") == "blocked"
+            ]
+        ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
         ),
