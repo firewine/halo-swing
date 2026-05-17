@@ -1094,7 +1094,7 @@ verification:
   - focused API-key pipeline check summary route family pytest: 5 passed
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 33 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 97 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 96 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 825 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
