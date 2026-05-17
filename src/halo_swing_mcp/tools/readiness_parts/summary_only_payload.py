@@ -16,6 +16,9 @@ from .summary_only_pipeline_route_fields import (
 from .summary_only_pipeline_check_fields import (
     _api_key_pipeline_check_top_level_fields,
 )
+from .api_key_pipeline_payload_mirrors import (
+    _api_key_failure_top_level_fields,
+)
 from .provider_recovery_checklist_summary import (
     _api_key_provider_recovery_checklist_summary,
 )
@@ -88,6 +91,9 @@ def _api_key_pipeline_summary_only_payload(
     ) or {}
     api_key_pipeline_check_summary = _optional_mapping(
         payload.get("api_key_pipeline_check_summary")
+    ) or {}
+    api_key_pipeline_failure_summary = _optional_mapping(
+        payload.get("api_key_pipeline_failure_summary")
     ) or {}
     provider_route_summary = (
         _optional_mapping(payload.get("provider_route_summary")) or {}
@@ -493,10 +499,7 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_command_summary": api_key_command_summary,
         "api_key_setup_file_summary": api_key_setup_file_summary,
         "api_key_dotenv_loading_summary": api_key_dotenv_loading_summary,
-        "api_key_pipeline_failure_summary": _optional_mapping(
-            payload.get("api_key_pipeline_failure_summary")
-        )
-        or {},
+        "api_key_pipeline_failure_summary": api_key_pipeline_failure_summary,
         "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
         "api_key_pipeline_check_summary": api_key_pipeline_check_summary,
         **_api_key_pipeline_check_top_level_fields(
@@ -539,46 +542,7 @@ def _api_key_pipeline_summary_only_payload(
                 provider_smoke_success_accepted_env_key_groups
             ),
         ),
-        "api_key_failure_category": payload.get("api_key_failure_category"),
-        "api_key_has_failures": payload.get("api_key_has_failures") is True,
-        "api_key_failed_stage_names": _string_list(
-            payload.get("api_key_failed_stage_names")
-        ),
-        "api_key_failed_check_keys": _string_list(
-            payload.get("api_key_failed_check_keys")
-        ),
-        "api_key_tools_with_failures": _string_list(
-            payload.get("api_key_tools_with_failures")
-        ),
-        "api_key_first_failed_stage_name": payload.get(
-            "api_key_first_failed_stage_name"
-        ),
-        "api_key_first_failed_check_key": payload.get(
-            "api_key_first_failed_check_key"
-        ),
-        "api_key_failure_selected_provider_class_by_family": (
-            _optional_mapping(
-                payload.get("api_key_failure_selected_provider_class_by_family")
-            )
-            or {}
-        ),
-        "api_key_failure_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                payload.get("api_key_failure_provider_route_data_mode_by_family")
-            )
-            or {}
-        ),
-        "api_key_failure_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                payload.get(
-                    "api_key_failure_provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_failure_all_selected_routes_live": (
-            payload.get("api_key_failure_all_selected_routes_live") is True
-        ),
+        **_api_key_failure_top_level_fields(api_key_pipeline_failure_summary),
         "provider_route_summary": provider_route_summary,
         **_api_key_provider_route_summary_top_level_fields(
             provider_route_summary

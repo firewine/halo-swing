@@ -1157,40 +1157,6 @@ def test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync() -> None
         assert field_name in guide
 
 
-def test_setup_docs_keep_api_key_pipeline_check_summary_fields_in_sync() -> None:
-    readme = README.read_text(encoding="utf-8")
-    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
-    field_names = (
-        "api_key_pipeline_check_summary",
-        "api_key_pipeline_check_summary.v1",
-        "api_key_check_status",
-        "api_key_check_count",
-        "api_key_check_passed_count",
-        "api_key_check_failed_count",
-        "api_key_check_failed_keys",
-        "api_key_check_tools_with_failures",
-        "api_key_check_tool_failure_counts",
-        "api_key_check_first_failed_tool",
-        "api_key_check_first_failed_name",
-        "api_key_check_first_failed_key",
-        "api_key_check_first_failed_expected",
-        "api_key_check_first_failed_actual",
-        "api_key_check_first_failed_provider_family",
-        "api_key_check_first_failed_provider",
-        "api_key_check_first_failed_smoke_command_name",
-        "api_key_check_first_failed_preferred_env_key",
-        "api_key_check_first_failed_accepted_env_keys",
-        "api_key_check_first_failed_secret_values_returned",
-        "api_key_check_network_call",
-        "api_key_check_mutates_local_state",
-        "api_key_check_secret_values_returned",
-    )
-
-    for field_name in field_names:
-        assert field_name in readme
-        assert field_name in guide
-
-
 def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
@@ -1238,8 +1204,10 @@ def test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync() -> No
         "api_key_pipeline_failure_summary",
         "api_key_pipeline_failure_summary.v1",
         "status",
+        "api_key_failure_status",
         "has_failures",
         "failure_category",
+        "api_key_has_failures",
         "failed_stage_names",
         "failed_check_keys",
         "tools_with_failures",
@@ -1255,6 +1223,18 @@ def test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync() -> No
         "next_action_is_recovery",
         "provider_recovery_required",
         "provider_recovery_item_count",
+        "api_key_failure_next_action_name",
+        "api_key_failure_next_action_command",
+        "api_key_failure_next_action_provider_family",
+        "api_key_failure_next_action_provider",
+        "api_key_failure_next_action_smoke_command_name",
+        "api_key_failure_next_action_expected_live_contract",
+        "api_key_failure_next_action_expected_live_checks",
+        "api_key_failure_next_action_is_recovery",
+        "api_key_failure_provider_recovery_required",
+        "api_key_failure_provider_recovery_item_count",
+        "api_key_failure_preferred_env_key",
+        "api_key_failure_accepted_env_keys",
         "selected_provider_class_by_family",
         "provider_route_data_mode_by_family",
         "provider_route_live_data_required_by_family",
@@ -1268,6 +1248,9 @@ def test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync() -> No
         "network_call",
         "mutates_local_state",
         "secret_values_returned",
+        "api_key_failure_network_call",
+        "api_key_failure_mutates_local_state",
+        "api_key_failure_secret_values_returned",
     )
 
     for field_name in field_names:

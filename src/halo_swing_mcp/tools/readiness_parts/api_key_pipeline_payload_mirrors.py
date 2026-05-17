@@ -18,6 +18,9 @@ def _api_key_failure_top_level_fields(
     api_key_pipeline_failure_summary: dict[str, Any],
 ) -> dict[str, Any]:
     return {
+        "api_key_failure_status": api_key_pipeline_failure_summary.get(
+            "status"
+        ),
         "api_key_failure_category": api_key_pipeline_failure_summary.get(
             "failure_category"
         ),
@@ -38,6 +41,50 @@ def _api_key_failure_top_level_fields(
         ),
         "api_key_first_failed_check_key": api_key_pipeline_failure_summary.get(
             "first_failed_check_key"
+        ),
+        "api_key_failure_next_action_name": (
+            api_key_pipeline_failure_summary.get("next_action_name")
+        ),
+        "api_key_failure_next_action_command": (
+            api_key_pipeline_failure_summary.get("next_action_command")
+        ),
+        "api_key_failure_next_action_provider_family": (
+            api_key_pipeline_failure_summary.get("next_action_provider_family")
+        ),
+        "api_key_failure_next_action_provider": (
+            api_key_pipeline_failure_summary.get("next_action_provider")
+        ),
+        "api_key_failure_next_action_smoke_command_name": (
+            api_key_pipeline_failure_summary.get(
+                "next_action_smoke_command_name"
+            )
+        ),
+        "api_key_failure_next_action_expected_live_contract": (
+            api_key_pipeline_failure_summary.get(
+                "next_action_expected_live_contract"
+            )
+        ),
+        "api_key_failure_next_action_expected_live_checks": _string_list(
+            api_key_pipeline_failure_summary.get(
+                "next_action_expected_live_checks"
+            )
+        ),
+        "api_key_failure_next_action_is_recovery": (
+            api_key_pipeline_failure_summary.get("next_action_is_recovery")
+            is True
+        ),
+        "api_key_failure_provider_recovery_required": (
+            api_key_pipeline_failure_summary.get("provider_recovery_required")
+            is True
+        ),
+        "api_key_failure_provider_recovery_item_count": (
+            api_key_pipeline_failure_summary.get("provider_recovery_item_count")
+        ),
+        "api_key_failure_preferred_env_key": (
+            api_key_pipeline_failure_summary.get("preferred_env_key")
+        ),
+        "api_key_failure_accepted_env_keys": _string_list(
+            api_key_pipeline_failure_summary.get("accepted_env_keys")
         ),
         "api_key_failure_selected_provider_class_by_family": (
             _optional_mapping(
@@ -65,6 +112,16 @@ def _api_key_failure_top_level_fields(
         ),
         "api_key_failure_all_selected_routes_live": (
             api_key_pipeline_failure_summary.get("all_selected_routes_live")
+            is True
+        ),
+        "api_key_failure_network_call": (
+            api_key_pipeline_failure_summary.get("network_call") is True
+        ),
+        "api_key_failure_mutates_local_state": (
+            api_key_pipeline_failure_summary.get("mutates_local_state") is True
+        ),
+        "api_key_failure_secret_values_returned": (
+            api_key_pipeline_failure_summary.get("secret_values_returned")
             is True
         ),
     }

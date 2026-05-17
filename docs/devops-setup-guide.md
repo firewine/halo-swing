@@ -1107,10 +1107,23 @@ failure category is provider recovery, it also includes `preferred_env_key` and
 expected live checks, route-family evidence, and safety flags are visible in
 compact output. The
 compact top-level payload also mirrors API-key failure one-line fields:
-`api_key_failure_category`, `api_key_has_failures`,
+`api_key_failure_status`, `api_key_failure_category`, `api_key_has_failures`,
 `api_key_failed_stage_names`, `api_key_failed_check_keys`,
 `api_key_tools_with_failures`, `api_key_first_failed_stage_name`, and
-`api_key_first_failed_check_key`, plus route-family mirrors
+`api_key_first_failed_check_key`,
+`api_key_failure_next_action_name`, `api_key_failure_next_action_command`,
+`api_key_failure_next_action_provider_family`,
+`api_key_failure_next_action_provider`,
+`api_key_failure_next_action_smoke_command_name`,
+`api_key_failure_next_action_expected_live_contract`,
+`api_key_failure_next_action_expected_live_checks`,
+`api_key_failure_next_action_is_recovery`,
+`api_key_failure_provider_recovery_required`,
+`api_key_failure_provider_recovery_item_count`,
+`api_key_failure_preferred_env_key`,
+`api_key_failure_accepted_env_keys`, `api_key_failure_network_call`,
+`api_key_failure_mutates_local_state`, and
+`api_key_failure_secret_values_returned`, plus route-family mirrors
 `api_key_failure_selected_provider_class_by_family`,
 `api_key_failure_provider_route_data_mode_by_family`,
 `api_key_failure_provider_route_live_data_required_by_family`, and

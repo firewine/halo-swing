@@ -1214,6 +1214,92 @@ def assert_pipeline_check_summary_top_level_fields(payload: dict[str, Any]) -> N
     )
 
 
+def assert_pipeline_failure_summary_top_level_fields(
+    payload: dict[str, Any],
+) -> None:
+    failure_summary = payload["api_key_pipeline_failure_summary"]
+    assert payload["api_key_failure_status"] == failure_summary["status"]
+    assert payload["api_key_failure_category"] == (
+        failure_summary["failure_category"]
+    )
+    assert payload["api_key_has_failures"] is (
+        failure_summary["has_failures"]
+    )
+    assert payload["api_key_failed_stage_names"] == (
+        failure_summary["failed_stage_names"]
+    )
+    assert payload["api_key_failed_check_keys"] == (
+        failure_summary["failed_check_keys"]
+    )
+    assert payload["api_key_tools_with_failures"] == (
+        failure_summary["tools_with_failures"]
+    )
+    assert payload["api_key_first_failed_stage_name"] == (
+        failure_summary["first_failed_stage_name"]
+    )
+    assert payload["api_key_first_failed_check_key"] == (
+        failure_summary["first_failed_check_key"]
+    )
+    assert payload["api_key_failure_next_action_name"] == (
+        failure_summary["next_action_name"]
+    )
+    assert payload["api_key_failure_next_action_command"] == (
+        failure_summary["next_action_command"]
+    )
+    assert payload["api_key_failure_next_action_provider_family"] == (
+        failure_summary.get("next_action_provider_family")
+    )
+    assert payload["api_key_failure_next_action_provider"] == (
+        failure_summary.get("next_action_provider")
+    )
+    assert payload["api_key_failure_next_action_smoke_command_name"] == (
+        failure_summary.get("next_action_smoke_command_name")
+    )
+    assert payload["api_key_failure_next_action_expected_live_contract"] == (
+        failure_summary.get("next_action_expected_live_contract")
+    )
+    assert payload["api_key_failure_next_action_expected_live_checks"] == (
+        failure_summary.get("next_action_expected_live_checks") or []
+    )
+    assert payload["api_key_failure_next_action_is_recovery"] is (
+        failure_summary["next_action_is_recovery"]
+    )
+    assert payload["api_key_failure_provider_recovery_required"] is (
+        failure_summary["provider_recovery_required"]
+    )
+    assert payload["api_key_failure_provider_recovery_item_count"] == (
+        failure_summary["provider_recovery_item_count"]
+    )
+    assert payload["api_key_failure_preferred_env_key"] == (
+        failure_summary.get("preferred_env_key")
+    )
+    assert payload["api_key_failure_accepted_env_keys"] == (
+        failure_summary.get("accepted_env_keys") or []
+    )
+    assert payload["api_key_failure_selected_provider_class_by_family"] == (
+        failure_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_failure_provider_route_data_mode_by_family"] == (
+        failure_summary["provider_route_data_mode_by_family"]
+    )
+    assert (
+        payload["api_key_failure_provider_route_live_data_required_by_family"]
+        == failure_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_failure_all_selected_routes_live"] is (
+        failure_summary["all_selected_routes_live"]
+    )
+    assert payload["api_key_failure_network_call"] is (
+        failure_summary["network_call"]
+    )
+    assert payload["api_key_failure_mutates_local_state"] is (
+        failure_summary["mutates_local_state"]
+    )
+    assert payload["api_key_failure_secret_values_returned"] is (
+        failure_summary["secret_values_returned"]
+    )
+
+
 @pytest.fixture(autouse=True)
 def clear_settings_cache_after_readiness_env_tests() -> None:
     get_settings.cache_clear()
@@ -6280,6 +6366,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert_provider_route_summary_top_level_fields(payload)
     assert_pipeline_check_summary_top_level_fields(payload)
+    assert_pipeline_failure_summary_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -8767,6 +8854,63 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_check_summary(
     )
     assert check_summary["secret_values_returned"] is False
     assert "api_key_pipeline_check_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_failure_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    failure_summary = payload["api_key_pipeline_failure_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert failure_summary["schema_version"] == (
+        "api_key_pipeline_failure_summary.v1"
+    )
+    assert failure_summary["status"] == "conflict"
+    assert failure_summary["failure_category"] == "provider_recovery"
+    assert failure_summary["next_action_name"] == "recover_failed_providers"
+    assert failure_summary["next_action_is_recovery"] is True
+    assert failure_summary["next_action_provider_family"] == "market"
+    assert failure_summary["next_action_provider"] == "polygon"
+    assert failure_summary["next_action_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
+    assert failure_summary["next_action_expected_live_contract"] == (
+        "market_snapshot_contract"
+    )
+    assert failure_summary["next_action_expected_live_checks"] == [
+        "live_data_boundary_declared",
+    ]
+    assert failure_summary["provider_recovery_required"] is True
+    assert failure_summary["provider_recovery_item_count"] == 3
+    assert failure_summary["preferred_env_key"] == "POLYGON_API_KEY"
+    assert failure_summary["accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert_pipeline_failure_summary_top_level_fields(payload)
+    assert payload["api_key_failure_next_action_name"] == (
+        failure_summary["next_action_name"]
+    )
+    assert payload["api_key_failure_next_action_provider_family"] == "market"
+    assert payload["api_key_failure_next_action_provider"] == "polygon"
+    assert payload["api_key_failure_preferred_env_key"] == "POLYGON_API_KEY"
+    assert payload["api_key_failure_accepted_env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+    ]
+    assert payload["api_key_failure_secret_values_returned"] is False
+    assert "api_key_pipeline_failure_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
