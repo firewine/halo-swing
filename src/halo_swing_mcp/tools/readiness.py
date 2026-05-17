@@ -2639,6 +2639,15 @@ def _api_key_provider_recovery_summary(
     smoke_available_count = sum(
         1 for item in compact_items if item.get("recovery_smoke_available") is True
     )
+    network_call_count = sum(
+        1 for item in compact_items if item.get("network_call") is True
+    )
+    mutates_local_state_count = sum(
+        1 for item in compact_items if item.get("mutates_local_state") is True
+    )
+    secret_values_returned_count = sum(
+        1 for item in compact_items if item.get("secret_values_returned") is True
+    )
     summary = {
         "schema_version": "api_key_provider_recovery_summary.v1",
         "status": recovery_checklist.get("status", "ok"),
@@ -2654,6 +2663,18 @@ def _api_key_provider_recovery_summary(
         ),
         "provider_recovery_all_smokes_available": (
             bool(compact_items) and smoke_available_count == len(compact_items)
+        ),
+        "provider_recovery_network_call_count": network_call_count,
+        "provider_recovery_all_network_calls": (
+            bool(compact_items) and network_call_count == len(compact_items)
+        ),
+        "provider_recovery_mutates_local_state_count": mutates_local_state_count,
+        "provider_recovery_any_mutates_local_state": mutates_local_state_count > 0,
+        "provider_recovery_secret_values_returned_count": (
+            secret_values_returned_count
+        ),
+        "provider_recovery_any_secret_values_returned": (
+            secret_values_returned_count > 0
         ),
         "provider_recovery_provider_families": _ordered_unique_strings(
             [item.get("provider_family") for item in compact_items]
