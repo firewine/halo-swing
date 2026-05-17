@@ -506,20 +506,31 @@ including `preferred_env_key` and `accepted_env_keys`, plus
 so the compact response still shows which API-key names to fill and how those
 keys map to live provider routes without returning secret values.
 For compact clients that read only top-level fields, summary-only output also
-mirrors requirement metadata as `api_key_required_env_keys`,
+mirrors requirement metadata as `api_key_requirement_schema_version`,
+`api_key_requirement_status`, `api_key_required_env_keys`,
 `api_key_required_env_key_count`, `api_key_configured_env_keys`,
 `api_key_configured_env_key_count`,
 `api_key_requirement_configured_provider_families`,
+`api_key_requirement_configured_provider_family_count`,
 `api_key_requirement_missing_provider_families`,
+`api_key_requirement_missing_provider_family_count`,
 `api_key_provider_requirement_families`, and
 `api_key_provider_requirement_count`.
 It also mirrors per-family provider requirement hints as
+`api_key_provider_requirement_providers`,
+`api_key_provider_requirement_configured_env_keys`,
 `api_key_provider_requirement_preferred_env_keys`,
 `api_key_provider_requirement_accepted_env_keys`,
 `api_key_provider_requirement_setup_statuses`,
 `api_key_provider_requirement_configured`,
 `api_key_provider_requirement_next_setup_actions`, and
-`api_key_provider_requirement_smoke_command_names`. Route-family evidence is
+`api_key_provider_requirement_smoke_command_names`. It mirrors no-secret safety
+state as `api_key_provider_requirement_network_calls`,
+`api_key_provider_requirement_mutates_local_state`,
+`api_key_provider_requirement_secret_values_returned`,
+`api_key_requirement_network_call`,
+`api_key_requirement_mutates_local_state`, and
+`api_key_requirement_secret_values_returned`. Route-family evidence is
 mirrored as `api_key_requirement_selected_provider_class_by_family`,
 `api_key_requirement_provider_route_data_mode_by_family`,
 `api_key_requirement_provider_route_live_data_required_by_family`, and

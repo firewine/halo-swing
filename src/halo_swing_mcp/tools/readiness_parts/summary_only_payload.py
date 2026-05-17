@@ -46,6 +46,9 @@ from .summary_only_setup_file_fields import (
 from .summary_only_command_fields import (
     _api_key_command_top_level_fields,
 )
+from .summary_only_requirement_fields import (
+    _api_key_requirements_top_level_fields,
+)
 
 
 __all__ = ('_api_key_pipeline_summary_only_payload',)
@@ -76,7 +79,6 @@ def _api_key_pipeline_summary_only_payload(
     api_key_setup_file_summary = _summary_context['api_key_setup_file_summary']
     api_key_provider_selection_summary = _summary_context['api_key_provider_selection_summary']
     api_key_requirements_summary = _summary_context['api_key_requirements_summary']
-    provider_requirement_families = _summary_context['provider_requirement_families']
     provider_requirement_rows = _summary_context['provider_requirement_rows']
     api_key_command_summary = _summary_context['api_key_command_summary']
     copy_dotenv_command = _summary_context['copy_dotenv_command']
@@ -427,50 +429,10 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_readiness_all_selected_routes_live": (
             readiness_summary.get("all_selected_routes_live") is True
         ),
-        "api_key_required_env_keys": _string_list(
-            api_key_requirements_summary.get("required_env_keys")
+        **_api_key_requirements_top_level_fields(
+            api_key_requirements_summary=api_key_requirements_summary,
+            provider_requirement_rows=provider_requirement_rows,
         ),
-        "api_key_required_env_key_count": len(
-            _string_list(api_key_requirements_summary.get("required_env_keys"))
-        ),
-        "api_key_configured_env_keys": _string_list(
-            api_key_requirements_summary.get("configured_env_keys")
-        ),
-        "api_key_configured_env_key_count": len(
-            _string_list(api_key_requirements_summary.get("configured_env_keys"))
-        ),
-        "api_key_requirement_configured_provider_families": _string_list(
-            api_key_requirements_summary.get("configured_provider_families")
-        ),
-        "api_key_requirement_missing_provider_families": _string_list(
-            api_key_requirements_summary.get("missing_provider_families")
-        ),
-        "api_key_provider_requirement_families": provider_requirement_families,
-        "api_key_provider_requirement_count": len(provider_requirement_families),
-        "api_key_provider_requirement_preferred_env_keys": {
-            family: row.get("preferred_env_key")
-            for family, row in provider_requirement_rows.items()
-        },
-        "api_key_provider_requirement_accepted_env_keys": {
-            family: _string_list(row.get("accepted_env_keys"))
-            for family, row in provider_requirement_rows.items()
-        },
-        "api_key_provider_requirement_setup_statuses": {
-            family: row.get("setup_status")
-            for family, row in provider_requirement_rows.items()
-        },
-        "api_key_provider_requirement_configured": {
-            family: row.get("configured") is True
-            for family, row in provider_requirement_rows.items()
-        },
-        "api_key_provider_requirement_next_setup_actions": {
-            family: row.get("next_setup_action")
-            for family, row in provider_requirement_rows.items()
-        },
-        "api_key_provider_requirement_smoke_command_names": {
-            family: row.get("smoke_command_name")
-            for family, row in provider_requirement_rows.items()
-        },
         **_api_key_requirement_route_top_level_fields(
             api_key_requirements_summary
         ),

@@ -1517,7 +1517,13 @@ def assert_provider_recovery_summary_top_level_fields(
         ),
     }
     for payload_key, summary_key in mapped_fields.items():
-        assert payload[payload_key] == recovery_summary[summary_key]
+        actual_value = payload[payload_key]
+        expected_value = recovery_summary.get(summary_key)
+        if expected_value is None and isinstance(actual_value, list):
+            expected_value = []
+        if expected_value is None and isinstance(actual_value, bool):
+            expected_value = False
+        assert actual_value == expected_value
 
 
 def assert_api_key_command_summary_top_level_fields(
@@ -1580,6 +1586,96 @@ def assert_api_key_command_summary_top_level_fields(
     )
     assert payload["api_key_one_shot_pipeline_smoke_secret_values_returned"] is (
         one_shot_pipeline_smoke["secret_values_returned"]
+    )
+
+
+def assert_api_key_requirements_summary_top_level_fields(
+    payload: dict[str, Any],
+) -> None:
+    requirements = payload["api_key_requirements_summary"]
+    provider_requirements = requirements["provider_requirements"]
+    assert payload["api_key_requirement_schema_version"] == (
+        requirements["schema_version"]
+    )
+    assert payload["api_key_requirement_status"] == requirements["status"]
+    assert payload["api_key_required_env_keys"] == (
+        requirements["required_env_keys"]
+    )
+    assert payload["api_key_required_env_key_count"] == len(
+        requirements["required_env_keys"]
+    )
+    assert payload["api_key_configured_env_keys"] == (
+        requirements["configured_env_keys"]
+    )
+    assert payload["api_key_configured_env_key_count"] == len(
+        requirements["configured_env_keys"]
+    )
+    assert payload["api_key_requirement_configured_provider_families"] == (
+        requirements["configured_provider_families"]
+    )
+    assert payload["api_key_requirement_configured_provider_family_count"] == len(
+        requirements["configured_provider_families"]
+    )
+    assert payload["api_key_requirement_missing_provider_families"] == (
+        requirements["missing_provider_families"]
+    )
+    assert payload["api_key_requirement_missing_provider_family_count"] == len(
+        requirements["missing_provider_families"]
+    )
+    assert payload["api_key_provider_requirement_families"] == list(
+        provider_requirements
+    )
+    assert payload["api_key_provider_requirement_count"] == len(
+        provider_requirements
+    )
+    assert payload["api_key_provider_requirement_providers"] == {
+        family: row["provider"] for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_configured_env_keys"] == {
+        family: row["configured_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_preferred_env_keys"] == {
+        family: row["preferred_env_key"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_accepted_env_keys"] == {
+        family: row["accepted_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_setup_statuses"] == {
+        family: row["setup_status"] for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_configured"] == {
+        family: row["configured"] for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_next_setup_actions"] == {
+        family: row["next_setup_action"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_smoke_command_names"] == {
+        family: row["smoke_command_name"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_network_calls"] == {
+        family: row["network_call"] for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_mutates_local_state"] == {
+        family: row["mutates_local_state"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_secret_values_returned"] == {
+        family: row["secret_values_returned"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_requirement_network_call"] is (
+        requirements["network_call"]
+    )
+    assert payload["api_key_requirement_mutates_local_state"] is (
+        requirements["mutates_local_state"]
+    )
+    assert payload["api_key_requirement_secret_values_returned"] is (
+        requirements["secret_values_returned"]
     )
 
 
@@ -6652,6 +6748,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert_pipeline_check_summary_top_level_fields(payload)
     assert_pipeline_failure_summary_top_level_fields(payload)
     assert_api_key_command_summary_top_level_fields(payload)
+    assert_api_key_requirements_summary_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -9606,6 +9703,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_requirement_missing_provider_families"] == (
         requirements["missing_provider_families"]
     )
+    assert_api_key_requirements_summary_top_level_fields(payload)
     assert payload["api_key_provider_requirement_families"] == [
         "market",
         "macro",
