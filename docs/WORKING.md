@@ -42,22 +42,18 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_CONTEXT_VERIFIED
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_CONTEXT_GATE
+status: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: surface API-key quickstart next ready and next blocked provider-smoke execution context scalars
+next_atomic_step: add CLI regression coverage proving summary-only API-key pipeline reads API keys from a local .env without exported secrets
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -74,59 +70,60 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_setup_quickstart_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements -q
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_dotenv_without_exported_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level quickstart command plan exposes next ready provider-smoke expected live contract, expected checks, preferred env key, accepted env keys, next setup action, and status scalars
-  - summary-only top-level quickstart command plan exposes next blocked provider-smoke expected live contract, expected checks, preferred env key, accepted env keys, next setup action, and status scalars
-  - fake-key offline verification proves next ready context points at the first ready provider smoke and next blocked context is absent/empty without secret values
-  - blocked no-key verification proves next blocked context points at the first blocked provider smoke and next ready context is absent/empty without secret values
-  - partial-key verification proves next ready and next blocked context scalars stay tied to provider smoke command row status without secret values
+  - a subprocess harness invocation of run_api_key_pipeline_smoke --summary-only reads POLYGON_API_KEY, FRED_API_KEY, and NEWS_API_KEY from a launch-directory .env without those keys exported
+  - the subprocess summary-only payload reports all three provider families configured, no missing provider families, dotenv loading enabled, and provider routes selected as live
+  - the subprocess summary-only payload exposes the next ready provider-smoke command and context without returning secret values
+  - the serialized subprocess output does not contain the fake secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key quickstart command plan next ready/blocked execution context gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI dotenv-only API-key pipeline summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_CONTEXT_GATE
+gate_id: API_KEY_PIPELINE_CLI_DOTENV_ONLY_SUMMARY_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - focused API-key quickstart next ready/blocked execution context pytest: 3 passed
-  - direct fake-key next ready/blocked execution context assertion: next ready market contract/checks/env/action/status, next blocked empty, secret_values_returned false
-  - direct no-key next ready/blocked execution context assertion: next ready empty, next blocked market contract/checks/env/action/status, secret_values_returned false
-  - direct partial-key next ready/blocked execution context assertion: next ready market context, next blocked macro context, secret_values_returned false
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_dotenv_without_exported_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 98 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 832 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
-next_state: commit this verified API-key quickstart command plan next ready/blocked execution context gate
+next_state: commit this verified CLI dotenv-only API-key pipeline summary gate
 notes:
-  - quickstart command plan next ready/blocked execution context scalars are top-level and tied to provider-smoke row status without returning secret values
+  - subprocess CLI coverage proves summary-only API-key pipeline reads launch-directory .env API keys without exported secrets and without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_CONTEXT_VERIFIED
+gate_id: API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_CONTEXT_GATE
+review_tier: S1_small
+
+next_atomic_step: surface API-key quickstart next ready and next blocked provider-smoke execution context scalars
 ```
 
 Previous completed directive:

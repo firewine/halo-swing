@@ -12769,6 +12769,131 @@ def test_integration_readiness_repo_root_env_clears_integration_gates_without_ga
     assert '"token":' not in serialized
 
 
+def test_api_key_pipeline_summary_cli_reads_launch_directory_dotenv_without_exported_secrets(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-cli-dotenv-secret",
+        "FRED_API_KEY": "fred-cli-dotenv-secret",
+        "NEWS_API_KEY": "news-cli-dotenv-secret",
+    }
+    (tmp_path / ".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWS_API_KEY=\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".env").write_text(
+        "\n".join(
+            [
+                "HALO_SWING_DISABLE_DOTENV=false",
+                "HALO_SWING_BINANCE_TESTNET=true",
+                "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true",
+                "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=false",
+                "HALO_SWING_BINANCE_CREDENTIALS_PATH=state/binance_credentials.enc.json",
+                "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=",
+                "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=",
+                "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=",
+                "HALO_SWING_HERMES_CONFIG_PATH=missing-hermes.yaml",
+                "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=",
+                "HALO_SWING_TELEGRAM_BOT_TOKEN=",
+                "TELEGRAM_BOT_TOKEN=",
+                "HALO_SWING_TELEGRAM_GATEWAY=",
+                "HALO_SWING_TELEGRAM_GATEWAY_URL=",
+                "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=0.001",
+                *(f"{key}={value}" for key, value in secret_env.items()),
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    env = os.environ.copy()
+    for key in READINESS_ENV_KEYS:
+        env.pop(key, None)
+    env["PYTHONPATH"] = str(ROOT / "src")
+    for key in secret_env:
+        assert key not in env
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "run_api_key_pipeline_smoke",
+            "--summary-only",
+            "--no-audit",
+        ],
+        cwd=tmp_path,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=20,
+    )
+    payload = json.loads(completed.stdout)
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_summary_only.v1"
+    assert payload["summary_only"] is True
+    assert payload["api_key_setup_configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_missing_provider_families"] == []
+    assert payload["api_key_setup_ready_to_run_live_smoke"] is True
+    assert payload["api_key_dotenv_loading_summary"]["dotenv_loading_enabled"] is True
+    assert payload["api_key_dotenv_loading_summary"][
+        "ready_to_run_live_smoke"
+    ] is True
+    assert payload["api_key_selected_provider_class_by_family"] == {
+        "market": "PolygonMarketDataProvider",
+        "macro": "FredMacroDataProvider",
+        "news": "NewsApiDataProvider",
+    }
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family"
+        ]
+        == "market"
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name"
+        ]
+        == "get_market_snapshot_live_smoke"
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_expected_live_contract"
+        ]
+        == "market_snapshot_contract"
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_preferred_env_key"
+        ]
+        == "POLYGON_API_KEY"
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_status"
+        ]
+        == "ready"
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_secret_values_returned"
+        ]
+        is False
+    )
+    assert payload["secret_values_returned"] is False
+    for value in secret_env.values():
+        assert value not in completed.stdout
+        assert value not in serialized
+    assert completed.stderr == ""
+
+
 def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
     tmp_path: Path,
     monkeypatch,
