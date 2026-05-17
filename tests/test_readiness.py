@@ -2565,6 +2565,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "failure_category": "provider_recovery",
         "has_failures": True,
         "next_action_name": "recover_failed_providers",
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_is_recovery": True,
         "next_action_network_call": True,
         "preferred_env_key": "POLYGON_API_KEY",
@@ -2830,6 +2833,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_action_name": "recover_failed_providers",
         "next_action_status": "pending",
         "next_action_command": payload["provider_recovery_smokes"][0]["command"],
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "next_action_is_recovery": True,
         "next_action_network_call": True,
         "next_action_mutates_local_state": False,
@@ -4189,6 +4195,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "failure_category": "none",
         "has_failures": False,
         "next_action_name": "run_provider_smokes",
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -4210,6 +4219,9 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "next_action_command": fake_next_operator_action["next_provider_smoke"][
             "command"
         ],
+        "next_action_provider_family": "market",
+        "next_action_provider": "polygon",
+        "next_action_smoke_command_name": "get_market_snapshot_live_smoke",
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -5357,6 +5369,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smok
 
     assert next_action_summary["next_action_name"] == "run_provider_smokes"
     assert next_action_summary["next_action_is_recovery"] is False
+    assert next_action_summary["next_action_provider_family"] == "market"
+    assert next_action_summary["next_action_provider"] == "polygon"
+    assert next_action_summary["next_action_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert next_action_summary["preferred_env_key"] == "POLYGON_API_KEY"
     assert next_action_summary["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -5434,6 +5451,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provid
 
     assert integration_status["next_action_name"] == "run_provider_smokes"
     assert integration_status["next_action_is_recovery"] is False
+    assert integration_status["next_action_provider_family"] == "market"
+    assert integration_status["next_action_provider"] == "polygon"
+    assert integration_status["next_action_smoke_command_name"] == (
+        "get_market_snapshot_live_smoke"
+    )
     assert integration_status["preferred_env_key"] == "POLYGON_API_KEY"
     assert integration_status["accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",

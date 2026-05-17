@@ -560,11 +560,13 @@ top-level `api_key_next_action_summary`
 (`api_key_next_action_summary.v1`) mirrors the checklist `status`,
 `current_step`, `ready`, blocking counts, provider recovery counts, and compact
 `next_action_name`, `next_action_command`, `next_action_is_recovery`,
-`next_action_network_call`, and `next_action_mutates_local_state` fields. When
-the next action points at a provider smoke or provider recovery command, it also
-includes `preferred_env_key` and `accepted_env_keys`, so the single next setup
-or recovery command and its accepted API-key aliases are visible without
-reading nested payloads. It keeps `api_key_pipeline_stage_summary`
+`next_action_network_call`, `next_action_mutates_local_state`,
+`next_action_provider_family`, `next_action_provider`, and
+`next_action_smoke_command_name` fields. When the next action points at a
+provider smoke or provider recovery command, it also includes
+`preferred_env_key` and `accepted_env_keys`, so the single next setup or
+recovery command, provider identity, and accepted API-key aliases are visible
+without reading nested payloads. It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in
 execution order with `status`, `stage_count`, `failed_stage_count`,
@@ -620,11 +622,13 @@ provider selection, failure, and next-action evidence into one operator row with
 `dotenv_target_exists`, `live_providers_selected`, `ready_to_run_live_smoke`,
 `configured_provider_families`, `missing_provider_families`,
 `selected_provider_classes`, `failure_category`, `has_failures`,
-`next_action_name`, `next_action_is_recovery`, and
+`next_action_name`, `next_action_provider_family`, `next_action_provider`,
+`next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`. When the next action summary carries provider smoke
-or recovery env-key hints, it also includes `preferred_env_key` and
-`accepted_env_keys`, so key-only live setup status is visible without reading
-every nested summary or returning secret values. The
+or recovery metadata, it also includes `preferred_env_key` and
+`accepted_env_keys`, so key-only live setup status is visible with provider
+identity and env-key aliases without reading every nested summary or returning
+secret values. The
 top-level command summary and checklist also expose `next_provider_smoke` and
 `next_provider_smoke_command_name` once at least one provider smoke command is
 ready, and `setup_status_summary` mirrors the no-secret `next_provider_smoke`

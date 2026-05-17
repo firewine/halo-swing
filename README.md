@@ -283,8 +283,10 @@ ready/blocking fields, progress counts, the no-secret `next_blocking_action`,
 the compact `api_key_next_action_summary.v1` with `next_action_name`,
 `next_action_command`, `next_action_is_recovery`,
 `next_action_network_call`, `next_action_mutates_local_state`,
-`preferred_env_key`, and `accepted_env_keys` when the next action points at a
-provider smoke command or provider recovery, provider
+`next_action_provider_family`, `next_action_provider`,
+`next_action_smoke_command_name`, `preferred_env_key`, and
+`accepted_env_keys` when the next action points at a provider smoke command or
+provider recovery, provider
 family counts, API-key setup status inside `readiness_summary`, the next local
 action mirrored inside `readiness_summary`, readiness summary
 `preferred_env_key` and `accepted_env_keys` when that action points at a
@@ -439,11 +441,13 @@ provider selection, failure, and next-action evidence into one operator row with
 `dotenv_target_exists`, `live_providers_selected`, `ready_to_run_live_smoke`,
 `configured_provider_families`, `missing_provider_families`,
 `selected_provider_classes`, `failure_category`, `has_failures`,
-`next_action_name`, `next_action_is_recovery`, and
+`next_action_name`, `next_action_provider_family`, `next_action_provider`,
+`next_action_smoke_command_name`, `next_action_is_recovery`, and
 `next_action_network_call`. When the next action summary carries provider smoke
-or recovery env-key hints, it also includes `preferred_env_key` and
-`accepted_env_keys`, so a key-only live setup can be checked without reading
-every nested summary or returning secret values.
+or recovery metadata, it also includes `preferred_env_key` and
+`accepted_env_keys`, so a key-only live setup can be checked with provider
+identity and env-key aliases without reading every nested summary or returning
+secret values.
 Each sub-smoke summary also includes stage-level setup fields such as
 `live_data_setup_summary_status`, `ready_to_run_live_smoke`,
 `provider_route_status`, `provider_family_summary`,

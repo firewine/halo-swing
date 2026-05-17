@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_SUMMARY_ONLY_NEXT_OPERATOR_ACTION_PROVIDER_FIELDS_VERIFIED
-gate_id: API_KEY_SUMMARY_ONLY_NEXT_OPERATOR_ACTION_PROVIDER_FIELDS_GATE
+status: API_KEY_NEXT_ACTION_SUMMARY_PROVIDER_FIELDS_VERIFIED
+gate_id: API_KEY_NEXT_ACTION_SUMMARY_PROVIDER_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: add next operator action provider identity fields to API-key summary-only output
+next_atomic_step: add provider identity fields to API-key next-action and integration-status summaries
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -74,26 +74,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
-  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); print(payload["next_operator_action_name"], payload["next_operator_action_provider_family"], payload["next_operator_action_provider"], payload["next_operator_action_smoke_command_name"], payload["next_operator_action_secret_values_returned"])'
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload["api_key_next_action_summary"]; status=payload["api_key_integration_status_summary"]; print(action["next_action_provider_family"], action["next_action_provider"], action["next_action_smoke_command_name"], status["next_action_provider_family"], status["next_action_provider"], status["next_action_smoke_command_name"], action["secret_values_returned"], status["secret_values_returned"])'
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary_only API-key pipeline output includes top-level next_operator_action_provider_family, next_operator_action_provider, and next_operator_action_smoke_command_name
-  - summary_only next operator action provider identity mirrors next_operator_action provider smoke or recovery action without secret values
-  - focused tests cover one-line next operator action provider identity in summary_only API-key pipeline output
-  - fake-key API-key pipeline summary-only CLI returns next operator action provider identity without secret values
-  - README and DevOps setup guide document summary_only next operator action provider identity
-  - setup docs tests assert summary_only next operator action provider identity guidance
+  - api_key_next_action_summary includes next_action_provider_family, next_action_provider, and next_action_smoke_command_name
+  - api_key_integration_status_summary mirrors next-action provider identity without secret values
+  - focused tests cover provider identity fields in summary_only API-key next-action and integration-status summaries
+  - fake-key API-key pipeline summary-only CLI returns next-action summary provider identity without secret values
+  - README and DevOps setup guide document next-action and integration-status provider identity
+  - setup docs tests assert next-action and integration-status provider identity guidance
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified API-key summary-only next operator action provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified API-key next-action summary provider fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_SUMMARY_ONLY_NEXT_OPERATOR_ACTION_PROVIDER_FIELDS_VERIFIED
+gate_id: API_KEY_SUMMARY_ONLY_NEXT_OPERATOR_ACTION_PROVIDER_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: add next operator action provider identity fields to API-key summary-only output
 ```
 
 Previous completed directive:
@@ -2330,6 +2341,59 @@ post_implementation_review:
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Next Action Summary Provider Fields Gate is verified.
+`run_api_key_pipeline_smoke(summary_only=true)` now exposes provider identity in
+`api_key_next_action_summary` and `api_key_integration_status_summary`, so the
+compact next-action and integration-status rows identify the provider family,
+provider, and smoke command without returning secret values. Focused tests,
+fake-key CLI, full pytest, ruff, and health_check passed.
+
+```yaml
+api_key_next_action_summary_provider_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/halo-swing-development-plan.md
+    - README.md
+    - docs/devops-setup-guide.md
+    - src/halo_swing_mcp/tools/readiness.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_next_action_summary includes next_action_provider_family, next_action_provider, and next_action_smoke_command_name when the next action targets provider smoke or recovery
+    - api_key_integration_status_summary mirrors next-action provider identity without secret values
+    - focused tests cover provider identity fields in summary_only API-key next-action and integration-status summaries
+    - fake-key API-key pipeline summary-only CLI returns next-action summary provider identity without secret values
+    - README and DevOps setup guide document next-action and integration-status provider identity
+    - tests/test_setup_docs.py asserts next-action and integration-status provider identity guidance
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_action_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_provider_smoke_env_hints tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
+      result: "5 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit
+      result: "exit 0; summary-only next-action and integration-status provider identity returned without secret values"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); action=payload["api_key_next_action_summary"]; status=payload["api_key_integration_status_summary"]; print(action["next_action_provider_family"], action["next_action_provider"], action["next_action_smoke_command_name"], status["next_action_provider_family"], status["next_action_provider"], status["next_action_smoke_command_name"], action["secret_values_returned"], status["secret_values_returned"])'
+      result: "market polygon get_market_snapshot_live_smoke market polygon get_market_snapshot_live_smoke False False"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "792 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
+
+Previous verification:
 
 Summary: API Key Summary-Only Next Operator Action Provider Fields Gate is
 verified. `run_api_key_pipeline_smoke(summary_only=true)` now exposes top-level

@@ -1860,6 +1860,9 @@ def _api_key_pipeline_next_action_summary(
     next_provider_smoke = _optional_mapping(
         next_operator_action.get("next_provider_smoke")
     ) or {}
+    next_provider_recovery_action = _optional_mapping(
+        next_operator_action.get("next_provider_recovery_action")
+    ) or {}
     next_action_command = (
         next_operator_action.get("recovery_smoke_command")
         or next_operator_action.get("command")
@@ -1900,6 +1903,29 @@ def _api_key_pipeline_next_action_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    next_action_provider_family = (
+        next_operator_action.get("provider_family")
+        or next_provider_recovery_action.get("provider_family")
+        or next_provider_smoke.get("provider_family")
+    )
+    next_action_provider = (
+        next_operator_action.get("provider")
+        or next_provider_recovery_action.get("provider")
+        or next_provider_smoke.get("provider")
+    )
+    next_action_smoke_command_name = (
+        next_operator_action.get("smoke_command_name")
+        or next_operator_action.get("next_provider_smoke_command_name")
+        or next_operator_action.get("next_provider_recovery_smoke_command_name")
+        or next_provider_recovery_action.get("smoke_command_name")
+        or next_provider_smoke.get("smoke_command_name")
+    )
+    if isinstance(next_action_provider_family, str):
+        summary["next_action_provider_family"] = next_action_provider_family
+    if isinstance(next_action_provider, str):
+        summary["next_action_provider"] = next_action_provider
+    if isinstance(next_action_smoke_command_name, str):
+        summary["next_action_smoke_command_name"] = next_action_smoke_command_name
     preferred_env_key = next_operator_action.get(
         "preferred_env_key"
     ) or next_provider_smoke.get("preferred_env_key")
@@ -2963,6 +2989,19 @@ def _api_key_integration_status_summary(
     accepted_env_keys = _string_list(
         api_key_next_action_summary.get("accepted_env_keys")
     )
+    next_action_provider_family = api_key_next_action_summary.get(
+        "next_action_provider_family"
+    )
+    next_action_provider = api_key_next_action_summary.get("next_action_provider")
+    next_action_smoke_command_name = api_key_next_action_summary.get(
+        "next_action_smoke_command_name"
+    )
+    if isinstance(next_action_provider_family, str):
+        summary["next_action_provider_family"] = next_action_provider_family
+    if isinstance(next_action_provider, str):
+        summary["next_action_provider"] = next_action_provider
+    if isinstance(next_action_smoke_command_name, str):
+        summary["next_action_smoke_command_name"] = next_action_smoke_command_name
     if isinstance(preferred_env_key, str):
         summary["preferred_env_key"] = preferred_env_key
     if accepted_env_keys:

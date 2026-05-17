@@ -133,6 +133,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "dotenv_target_exists" in guide
     assert "failure_category" in guide
     assert "next action summary carries provider smoke" in guide
+    assert "next_action_provider_family" in guide
+    assert "next_action_provider" in guide
+    assert "next_action_smoke_command_name" in guide
     assert "api_key_live_http_timeout_summary" in guide
     assert "api_key_live_http_timeout_summary.v1" in guide
     assert "timeout_seconds" in guide
