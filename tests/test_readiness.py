@@ -2721,8 +2721,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "next_recovery_network_call_policy": (
             "only_when_matching_api_key_selects_live_provider"
         ),
+        "next_recovery_smoke_available": True,
         "next_recovery_network_call": True,
         "next_recovery_mutates_local_state": False,
+        "next_recovery_exception_type": "RuntimeError",
+        "next_recovery_exception_message_returned": False,
+        "next_recovery_url_returned": False,
         "next_recovery_secret_values_returned": False,
         "items": [
             {

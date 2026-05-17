@@ -2669,6 +2669,9 @@ def _api_key_provider_recovery_summary(
             summary["next_recovery_provider_family"] = provider_family
         if isinstance(provider, str):
             summary["next_recovery_provider"] = provider
+        summary["next_recovery_smoke_available"] = (
+            first_item.get("recovery_smoke_available") is True
+        )
         if isinstance(next_setup_action, str):
             summary["next_recovery_next_setup_action"] = next_setup_action
         if isinstance(preferred_env_key, str):
@@ -2684,6 +2687,13 @@ def _api_key_provider_recovery_summary(
         summary["next_recovery_mutates_local_state"] = (
             first_item.get("mutates_local_state") is True
         )
+        exception_type = first_item.get("exception_type")
+        if isinstance(exception_type, str):
+            summary["next_recovery_exception_type"] = exception_type
+        summary["next_recovery_exception_message_returned"] = (
+            first_item.get("exception_message_returned") is True
+        )
+        summary["next_recovery_url_returned"] = first_item.get("url_returned") is True
         summary["next_recovery_secret_values_returned"] = False
     return summary
 

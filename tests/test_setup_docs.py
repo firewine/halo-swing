@@ -144,12 +144,16 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "applies_to" in guide
     assert "next_recovery_provider_family" in guide
     assert "next_recovery_provider" in guide
+    assert "next_recovery_smoke_available" in guide
     assert "next_recovery_next_setup_action" in guide
     assert "next_recovery_preferred_env_key" in guide
     assert "next_recovery_accepted_env_keys" in guide
     assert "next_recovery_network_call_policy" in guide
     assert "next_recovery_network_call" in guide
     assert "next_recovery_mutates_local_state" in guide
+    assert "next_recovery_exception_type" in guide
+    assert "next_recovery_exception_message_returned" in guide
+    assert "next_recovery_url_returned" in guide
     assert "next_recovery_secret_values_returned" in guide
     assert "network_call_policy" in guide
     assert "mutates_local_state" in guide

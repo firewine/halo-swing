@@ -552,10 +552,13 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `provider_recovery_smoke_count`, `item_count`,
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,
+`next_recovery_smoke_available`,
 `next_recovery_next_setup_action`,
 `next_recovery_preferred_env_key`, `next_recovery_accepted_env_keys`,
 `next_recovery_network_call_policy`, `next_recovery_network_call`,
 `next_recovery_mutates_local_state`,
+`next_recovery_exception_type`,
+`next_recovery_exception_message_returned`, `next_recovery_url_returned`,
 `next_recovery_secret_values_returned`, and compact provider-family recovery
 items with `provider_family`, `provider`,
 `smoke_command_name`, `recovery_smoke_command`, `recovery_smoke_available`,

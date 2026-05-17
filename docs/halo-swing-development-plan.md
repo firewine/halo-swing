@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.771 API Key Provider Recovery Summary Diagnostic Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+`api_key_provider_recovery_summary`는 다음 provider recovery command와 setup
+action을 top-level에 보여주지만, 그 command가 실제로 제공되는지와 첫 provider 실패의
+예외 계열, exception message/URL 반환 여부는 item row를 열어야 확인할 수 있었다. 이번
+slice는 no-secret `next_recovery_smoke_available`,
+`next_recovery_exception_type`, `next_recovery_exception_message_returned`,
+`next_recovery_url_returned`를 top-level에 추가해, API key 입력 후 live provider 복구가
+필요한 상황에서 compact summary 한 줄만으로 재시도 가능 여부와 민감 출력 안전성을
+확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary includes next_recovery_smoke_available for the first recovery item
+  - api_key_provider_recovery_summary includes next_recovery_exception_type, next_recovery_exception_message_returned, and next_recovery_url_returned for the first recovery item
+  - api_key_provider_recovery_summary diagnostic and safety fields mirror item fields without secret values
+  - focused tests cover top-level diagnostic and safety fields in summary_only API-key provider recovery summary
+  - fake-key API-key pipeline summary-only CLI returns provider recovery diagnostic and safety fields without secret values
+  - README and DevOps setup guide document provider recovery diagnostic and safety fields
+  - tests/test_setup_docs.py asserts provider recovery diagnostic and safety field guidance
+```
+
+### C. 경계 조건
+
+```text
+not_added:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 감사 검증
+
+```text
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json -> passed
+  - git diff --check -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q -> 3 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --input-json '{"asset":"TQQQ","timeframe":"swing_3d_10d","symbols":["QQQ"],"topic":"macro","summary_only":true}' --no-audit -> exit 0; summary-only provider recovery diagnostic and safety fields returned without secret values
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -c 'from halo_swing_mcp.tools.readiness import run_api_key_pipeline_smoke; payload=run_api_key_pipeline_smoke(summary_only=True); summary=payload["api_key_provider_recovery_summary"]; item=summary["items"][0]; print(summary["next_recovery_smoke_available"], item["recovery_smoke_available"], summary["next_recovery_exception_type"], summary["next_recovery_exception_message_returned"], summary["next_recovery_url_returned"], summary["secret_values_returned"], item["secret_values_returned"])' -> True True URLError False False False False
+  - PYTHONPATH=src ./.venv/bin/python -m pytest -> 792 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check . -> passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check -> passed
+```
+
 ## 3.770 API Key Provider Recovery Summary Next Setup Action Gate Record - 2026-05-17
 
 ### A. 목적
