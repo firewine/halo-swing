@@ -797,8 +797,13 @@ mirrors the no-secret command metadata as `api_key_copy_dotenv_command`,
 `api_key_provider_smoke_provider_family_count`,
 `api_key_provider_smoke_ready_provider_families`,
 `api_key_provider_smoke_blocked_provider_families`,
-`api_key_provider_smoke_ready_command_names`, and
-`api_key_provider_smoke_blocked_command_names`.
+`api_key_provider_smoke_ready_command_names`,
+`api_key_provider_smoke_ready_commands`,
+`api_key_provider_smoke_blocked_command_names`, and
+`api_key_provider_smoke_blocked_commands`.
+The flat `api_key_provider_smoke_commands` list mirrors every provider smoke
+command string in command-plan order, so compact clients can run the ready list
+or display blocked commands without opening the command rows.
 It also mirrors provider smoke progress as
 `api_key_provider_smoke_total_count`, `api_key_provider_smoke_ready_count`,
 `api_key_provider_smoke_blocked_count`,

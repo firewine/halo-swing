@@ -1244,10 +1244,19 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
         for row in provider_smoke_rows
         if row["status"] == "ready"
     ]
+    assert payload["api_key_provider_smoke_ready_commands"] == [
+        row["command"] for row in provider_smoke_rows if row["status"] == "ready"
+    ]
     assert payload["api_key_provider_smoke_blocked_command_names"] == [
         row["smoke_command_name"]
         for row in provider_smoke_rows
         if row["status"] != "ready"
+    ]
+    assert payload["api_key_provider_smoke_commands"] == [
+        row["command"] for row in provider_smoke_rows
+    ]
+    assert payload["api_key_provider_smoke_blocked_commands"] == [
+        row["command"] for row in provider_smoke_rows if row["status"] != "ready"
     ]
     assert payload["api_key_provider_smoke_kinds_by_family"] == {
         row["provider_family"]: row.get("kind") for row in provider_smoke_rows

@@ -111,9 +111,26 @@ def _api_key_provider_smoke_top_level_fields(
             if row.get("status") == "ready"
         ]
     )
+    provider_smoke_ready_commands = _string_list(
+        [
+            row.get("command")
+            for row in provider_smoke_command_rows
+            if row.get("status") == "ready"
+        ]
+    )
     provider_smoke_blocked_command_names = _ordered_unique_strings(
         [
             row.get("smoke_command_name")
+            for row in provider_smoke_command_rows
+            if row.get("status") != "ready"
+        ]
+    )
+    provider_smoke_commands = _string_list(
+        [row.get("command") for row in provider_smoke_command_rows]
+    )
+    provider_smoke_blocked_commands = _string_list(
+        [
+            row.get("command")
             for row in provider_smoke_command_rows
             if row.get("status") != "ready"
         ]
@@ -203,8 +220,12 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_provider_smoke_ready_command_names": (
             provider_smoke_ready_command_names
         ),
+        "api_key_provider_smoke_ready_commands": provider_smoke_ready_commands,
         "api_key_provider_smoke_blocked_command_names": (
             provider_smoke_blocked_command_names
+        ),
+        "api_key_provider_smoke_blocked_commands": (
+            provider_smoke_blocked_commands
         ),
         "api_key_provider_smoke_command_names": _ordered_unique_strings(
             [
@@ -212,6 +233,7 @@ def _api_key_provider_smoke_top_level_fields(
                 for row in provider_smoke_command_rows
             ]
         ),
+        "api_key_provider_smoke_commands": provider_smoke_commands,
         "api_key_provider_smoke_kinds_by_family": {
             family: row.get("kind")
             for family, row in provider_smoke_command_rows_by_family.items()
