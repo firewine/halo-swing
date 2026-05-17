@@ -1821,6 +1821,10 @@ def test_setup_docs_keep_api_key_provider_recovery_checklist_summary_fields_in_s
         "api_key_provider_recovery_checklist_provider_route_data_mode_by_family",
         "api_key_provider_recovery_checklist_provider_route_live_data_required_by_family",
         "api_key_provider_recovery_checklist_all_selected_routes_live",
+        "api_key_provider_recovery_checklist_provider_route_family_count",
+        "api_key_provider_recovery_checklist_selected_provider_family_count",
+        "api_key_provider_recovery_checklist_provider_route_live_data_required_family_count",
+        "api_key_provider_recovery_checklist_provider_route_data_mode_counts",
     )
 
     for field_name in field_names:
@@ -1843,6 +1847,10 @@ def test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync() -> N
         "api_key_provider_recovery_provider_route_data_mode_by_family",
         "api_key_provider_recovery_provider_route_live_data_required_by_family",
         "api_key_provider_recovery_all_selected_routes_live",
+        "api_key_provider_recovery_provider_route_family_count",
+        "api_key_provider_recovery_selected_provider_family_count",
+        "api_key_provider_recovery_provider_route_live_data_required_family_count",
+        "api_key_provider_recovery_provider_route_data_mode_counts",
         "provider_recovery_smoke_available_count",
         "provider_recovery_smoke_unavailable_count",
         "provider_recovery_all_smokes_available",

@@ -65,19 +65,31 @@ def _api_key_readiness_route_top_level_fields(
 def _api_key_provider_recovery_route_top_level_fields(
     api_key_provider_recovery_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return _route_family_top_level_fields(
-        prefix="api_key_provider_recovery",
-        source_summary=api_key_provider_recovery_summary,
-    )
+    return {
+        **_route_family_top_level_fields(
+            prefix="api_key_provider_recovery",
+            source_summary=api_key_provider_recovery_summary,
+        ),
+        **_route_family_count_top_level_fields(
+            prefix="api_key_provider_recovery",
+            source_summary=api_key_provider_recovery_summary,
+        ),
+    }
 
 
 def _api_key_provider_recovery_checklist_route_top_level_fields(
     api_key_provider_recovery_checklist_summary: dict[str, Any],
 ) -> dict[str, Any]:
-    return _route_family_top_level_fields(
-        prefix="api_key_provider_recovery_checklist",
-        source_summary=api_key_provider_recovery_checklist_summary,
-    )
+    return {
+        **_route_family_top_level_fields(
+            prefix="api_key_provider_recovery_checklist",
+            source_summary=api_key_provider_recovery_checklist_summary,
+        ),
+        **_route_family_count_top_level_fields(
+            prefix="api_key_provider_recovery_checklist",
+            source_summary=api_key_provider_recovery_checklist_summary,
+        ),
+    }
 
 
 def _route_family_top_level_fields(

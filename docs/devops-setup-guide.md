@@ -1072,7 +1072,11 @@ The compact top-level payload mirrors provider recovery route-family evidence as
 `api_key_provider_recovery_selected_provider_class_by_family`,
 `api_key_provider_recovery_provider_route_data_mode_by_family`,
 `api_key_provider_recovery_provider_route_live_data_required_by_family`, and
-`api_key_provider_recovery_all_selected_routes_live`.
+`api_key_provider_recovery_all_selected_routes_live`, plus route count
+aggregates `api_key_provider_recovery_provider_route_family_count`,
+`api_key_provider_recovery_selected_provider_family_count`,
+`api_key_provider_recovery_provider_route_live_data_required_family_count`, and
+`api_key_provider_recovery_provider_route_data_mode_counts`.
 It also keeps `api_key_provider_recovery_checklist_summary`
 (`api_key_provider_recovery_checklist_summary.v1`) with checklist status,
 provider error and recovery smoke counts, next recovery provider/smoke fields,
@@ -1084,7 +1088,12 @@ route evidence from
 `api_key_provider_recovery_checklist_selected_provider_class_by_family`,
 `api_key_provider_recovery_checklist_provider_route_data_mode_by_family`,
 `api_key_provider_recovery_checklist_provider_route_live_data_required_by_family`,
-and `api_key_provider_recovery_checklist_all_selected_routes_live`.
+and `api_key_provider_recovery_checklist_all_selected_routes_live`, plus route
+count aggregates
+`api_key_provider_recovery_checklist_provider_route_family_count`,
+`api_key_provider_recovery_checklist_selected_provider_family_count`,
+`api_key_provider_recovery_checklist_provider_route_live_data_required_family_count`,
+and `api_key_provider_recovery_checklist_provider_route_data_mode_counts`.
 The checklist includes `ready`,
 `ready_step_names`, `ready_step_count`, `blocking_step_names`,
 `blocking_step_count`, `next_blocking_step`, and the no-secret

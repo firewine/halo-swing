@@ -1576,6 +1576,11 @@ def assert_provider_recovery_summary_top_level_fields(
         if expected_value is None and isinstance(actual_value, bool):
             expected_value = False
         assert actual_value == expected_value
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider_recovery",
+        source_summary=recovery_summary,
+    )
 
 
 def assert_api_key_command_summary_top_level_fields(
@@ -4282,6 +4287,13 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         provider_recovery_summary["all_selected_routes_live"]
     )
     assert_provider_recovery_summary_top_level_fields(summary_payload)
+    assert_route_count_top_level_fields(
+        summary_payload,
+        prefix="api_key_provider_recovery_checklist",
+        source_summary=summary_payload[
+            "api_key_provider_recovery_checklist_summary"
+        ],
+    )
     assert summary_payload["provider_recovery_action_status"] == "ready_to_retry"
     assert summary_payload["provider_recovery_item_count"] == 3
     assert summary_payload["provider_recovery_pending_count"] == 3
@@ -8719,6 +8731,11 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload[
         "api_key_provider_recovery_checklist_all_selected_routes_live"
     ] is recovery_checklist_summary["all_selected_routes_live"]
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider_recovery_checklist",
+        source_summary=recovery_checklist_summary,
+    )
     assert payload["provider_recovery_summary_status"] == "ok"
     assert payload["provider_recovery_action_status"] == "no_recovery_required"
     assert payload["provider_recovery_item_count"] == 0
@@ -9727,6 +9744,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summar
     assert payload[
         "api_key_provider_recovery_checklist_all_selected_routes_live"
     ] is recovery_checklist_summary["all_selected_routes_live"]
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_provider_recovery_checklist",
+        source_summary=recovery_checklist_summary,
+    )
     assert payload["api_key_copy_dotenv_command"] == (
         payload["api_key_command_summary"]["copy_dotenv_command"]["command"]
     )
