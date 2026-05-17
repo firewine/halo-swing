@@ -2715,6 +2715,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "HALO_SWING_MARKET_DATA_API_KEY",
             "POLYGON_API_KEY",
         ],
+        "next_recovery_network_call_policy": (
+            "only_when_matching_api_key_selects_live_provider"
+        ),
         "items": [
             {
                 "provider_family": "market",
@@ -2730,6 +2733,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                     "HALO_SWING_MARKET_DATA_API_KEY",
                     "POLYGON_API_KEY",
                 ],
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2750,6 +2756,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                     "HALO_SWING_FRED_API_KEY",
                     "FRED_API_KEY",
                 ],
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,
@@ -2769,6 +2778,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
                 ],
+                "network_call_policy": (
+                    "only_when_matching_api_key_selects_live_provider"
+                ),
                 "exception_type": "RuntimeError",
                 "exception_message_returned": False,
                 "url_returned": False,

@@ -2662,6 +2662,7 @@ def _api_key_provider_recovery_summary(
         provider = first_item.get("provider")
         preferred_env_key = first_item.get("preferred_env_key")
         accepted_env_keys = _string_list(first_item.get("accepted_env_keys"))
+        network_call_policy = first_item.get("network_call_policy")
         if isinstance(provider_family, str):
             summary["next_recovery_provider_family"] = provider_family
         if isinstance(provider, str):
@@ -2670,13 +2671,16 @@ def _api_key_provider_recovery_summary(
             summary["next_recovery_preferred_env_key"] = preferred_env_key
         if accepted_env_keys:
             summary["next_recovery_accepted_env_keys"] = accepted_env_keys
+        if isinstance(network_call_policy, str):
+            summary["next_recovery_network_call_policy"] = network_call_policy
     return summary
 
 
 def _api_key_provider_recovery_summary_item(
     item: dict[str, Any],
 ) -> dict[str, Any]:
-    return {
+    recovery_smoke = _optional_mapping(item.get("recovery_smoke")) or {}
+    summary = {
         "provider_family": item.get("provider_family"),
         "provider": item.get("provider"),
         "smoke_command_name": item.get("smoke_command_name"),
@@ -2690,6 +2694,10 @@ def _api_key_provider_recovery_summary_item(
         "url_returned": item.get("url_returned") is True,
         "secret_values_returned": False,
     }
+    network_call_policy = recovery_smoke.get("network_call_policy")
+    if isinstance(network_call_policy, str):
+        summary["network_call_policy"] = network_call_policy
+    return summary
 
 
 def _api_key_pipeline_summary_only_checks(raw_checks: Any) -> list[dict[str, Any]]:

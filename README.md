@@ -382,10 +382,12 @@ timeout without returning secret values. `api_key_provider_recovery_summary`
 `provider_recovery_smoke_count`, `item_count`,
 `next_recovery_smoke_command_name`, `next_recovery_smoke_command`,
 `next_recovery_provider_family`, `next_recovery_provider`,
-`next_recovery_preferred_env_key`, `next_recovery_accepted_env_keys`, and
-compact provider-family recovery items with `provider_family`, `provider`,
+`next_recovery_preferred_env_key`, `next_recovery_accepted_env_keys`,
+`next_recovery_network_call_policy`, and compact provider-family recovery items
+with `provider_family`, `provider`,
 `smoke_command_name`, `recovery_smoke_command`, `recovery_smoke_available`,
 `next_setup_action`, `preferred_env_key`, `accepted_env_keys`,
+`network_call_policy`,
 `exception_type`, `exception_message_returned`, and `url_returned`.
 It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
