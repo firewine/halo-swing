@@ -306,6 +306,29 @@ def _api_key_provider_smoke_top_level_fields(
         if provider_smoke_next_action_rows_by_family
         else {}
     )
+    provider_smoke_next_action_primary_provider_family = (
+        provider_smoke_next_action_primary_row.get("provider_family")
+    )
+    provider_smoke_next_action_primary_selected_provider_class = (
+        provider_smoke_next_action_primary_row.get("selected_provider_class")
+        or selected_provider_class_by_family.get(
+            provider_smoke_next_action_primary_provider_family
+        )
+    )
+    provider_smoke_next_action_primary_provider_route_data_mode = (
+        provider_smoke_next_action_primary_row.get("provider_route_data_mode")
+        or provider_route_data_mode_by_family.get(
+            provider_smoke_next_action_primary_provider_family
+        )
+    )
+    provider_smoke_next_action_primary_provider_route_live_data_required = (
+        provider_smoke_next_action_primary_row.get("provider_route_live_data_required")
+        is True
+        or provider_route_live_data_required_by_family.get(
+            provider_smoke_next_action_primary_provider_family
+        )
+        is True
+    )
     provider_smoke_next_action_primary_accepted_env_keys = _string_list(
         provider_smoke_next_action_primary_row.get("accepted_env_keys")
     )
@@ -492,7 +515,7 @@ def _api_key_provider_smoke_top_level_fields(
             and bool(provider_smoke_next_action_provider_families)
         ),
         "api_key_provider_smoke_next_action_primary_provider_family": (
-            provider_smoke_next_action_primary_row.get("provider_family")
+            provider_smoke_next_action_primary_provider_family
         ),
         "api_key_provider_smoke_next_action_primary_provider": (
             provider_smoke_next_action_primary_row.get("provider")
@@ -508,6 +531,15 @@ def _api_key_provider_smoke_top_level_fields(
         ),
         "api_key_provider_smoke_next_action_primary_setup_action": (
             provider_smoke_next_action_primary_row.get("next_setup_action")
+        ),
+        "api_key_provider_smoke_next_action_primary_selected_provider_class": (
+            provider_smoke_next_action_primary_selected_provider_class
+        ),
+        "api_key_provider_smoke_next_action_primary_provider_route_data_mode": (
+            provider_smoke_next_action_primary_provider_route_data_mode
+        ),
+        "api_key_provider_smoke_next_action_primary_provider_route_live_data_required": (
+            provider_smoke_next_action_primary_provider_route_live_data_required
         ),
         "api_key_provider_smoke_next_action_primary_network_call": (
             provider_smoke_next_action_primary_row.get("network_call") is True

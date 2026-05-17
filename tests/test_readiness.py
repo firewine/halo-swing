@@ -1494,6 +1494,35 @@ def assert_provider_smoke_family_metadata_fields(payload: dict[str, Any]) -> Non
     assert payload[
         "api_key_provider_smoke_next_action_primary_setup_action"
     ] == expected_next_action_primary_row.get("next_setup_action")
+    expected_next_action_primary_provider_family = (
+        expected_next_action_primary_row.get("provider_family")
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_selected_provider_class"
+    ] == (
+        expected_next_action_primary_row.get("selected_provider_class")
+        or payload["api_key_provider_smoke_selected_provider_class_by_family"].get(
+            expected_next_action_primary_provider_family
+        )
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_provider_route_data_mode"
+    ] == (
+        expected_next_action_primary_row.get("provider_route_data_mode")
+        or payload["api_key_provider_smoke_provider_route_data_mode_by_family"].get(
+            expected_next_action_primary_provider_family
+        )
+    )
+    assert payload[
+        "api_key_provider_smoke_next_action_primary_provider_route_live_data_required"
+    ] is (
+        expected_next_action_primary_row.get("provider_route_live_data_required")
+        is True
+        or payload[
+            "api_key_provider_smoke_provider_route_live_data_required_by_family"
+        ].get(expected_next_action_primary_provider_family)
+        is True
+    )
     assert payload[
         "api_key_provider_smoke_next_action_primary_network_call"
     ] is (expected_next_action_primary_row.get("network_call") is True)
