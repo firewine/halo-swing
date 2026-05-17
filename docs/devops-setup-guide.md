@@ -1378,6 +1378,11 @@ POLYGON_API_KEY=your_polygon_key
 `HALO_SWING_MARKET_DATA_API_KEY` is accepted as the project-specific alias for
 the same key. Without either key, market data remains fixture-backed and
 offline.
+The summary-only pipeline CLI reads the same project-specific aliases from a
+launch-directory `.env`. A local `.env` containing only
+`HALO_SWING_MARKET_DATA_API_KEY`, `HALO_SWING_MACRO_API_KEY`, and
+`HALO_SWING_NEWS_API_KEY` is enough to select the live Polygon, FRED, and
+NewsAPI providers without exported API-key environment variables.
 When one of these keys selects the live Polygon provider, market snapshot
 payloads explicitly declare `live_data_required=true` and `network_call=true`
 in `market_snapshot_contract`, and the guard reports

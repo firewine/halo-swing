@@ -253,6 +253,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.909 API Key Pipeline CLI Project-Alias Dotenv Summary Gate Record - 2026-05-18
+
+### A. 목적
+
+3.908은 provider route summary를 summary-only top-level scalar로 올렸다. 하지만 실제
+사용자는 preferred keys뿐 아니라 project-specific aliases
+(`HALO_SWING_MARKET_DATA_API_KEY`, `HALO_SWING_MACRO_API_KEY`,
+`HALO_SWING_NEWS_API_KEY`)만 `.env`에 채울 수도 있다. 이번 slice는 launch-directory
+`.env`에 project-specific aliases만 넣어도 `run_api_key_pipeline_smoke --summary-only
+--no-audit`가 exported API-key env 없이 live provider route를 선택하고 secret 값을
+반환하지 않음을 CLI 회귀 테스트로 증명한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+planned:
+  - launch-directory .env with HALO_SWING_MARKET_DATA_API_KEY, HALO_SWING_MACRO_API_KEY, and HALO_SWING_NEWS_API_KEY configures all live-data provider families without exported API-key env vars
+  - summary-only CLI output reports ready API-key setup, live selected provider classes, live provider route modes, and no missing provider route keys
+  - summary-only CLI output does not return project-specific alias secret values
+  - README and DevOps guide document project-specific alias .env keys work with summary-only pipeline CLI
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_document_project_alias_dotenv_cli_summary tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_project_alias_dotenv_without_exported_secrets -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 101 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 838 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.908 API Key Provider Route Summary Top-Level Fields Gate Record - 2026-05-18
 
 ### A. 목적

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_GATE
+status: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_VERIFIED
+gate_id: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider route summary as top-level scalars
+next_atomic_step: prove summary-only API-key pipeline reads project-specific live-data aliases from launch-directory dotenv
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,6 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_summary_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -75,7 +73,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_mirrors_provider_route_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_document_project_alias_dotenv_cli_summary tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_project_alias_dotenv_without_exported_secrets -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,33 +81,32 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level output mirrors provider route schema version, status, provider factory, selected provider classes, missing keys, selected class count, and missing count without secret values
-  - summary-only top-level provider route safety fields expose network_call and secret_values_returned booleans
-  - blocked default and ready fake-key summary-only tests prove the top-level fields match provider_route_summary without secret values
-  - README and DevOps guide document the top-level api_key_provider_route_summary_* fields
-  - summary-only payload assembly remains below the 900-line warning threshold by delegating provider route summary projection to a focused module
+  - launch-directory .env with HALO_SWING_MARKET_DATA_API_KEY, HALO_SWING_MACRO_API_KEY, and HALO_SWING_NEWS_API_KEY configures all live-data provider families without exported API-key env vars
+  - summary-only CLI output reports ready API-key setup, live selected provider classes, live provider route modes, and no missing provider route keys
+  - summary-only CLI output does not return project-specific alias secret values
+  - README and DevOps guide document project-specific alias .env keys work with summary-only pipeline CLI
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider route summary top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key project-alias dotenv CLI summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_GATE
+gate_id: API_KEY_PIPELINE_CLI_PROJECT_ALIAS_DOTENV_SUMMARY_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_mirrors_provider_route_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 40 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 100 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 836 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_document_project_alias_dotenv_cli_summary tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_launch_directory_project_alias_dotenv_without_exported_secrets -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 101 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 838 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -119,13 +116,22 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_summary_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider route summary top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key project-alias dotenv CLI summary gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - compact clients can now read provider route status and missing route keys without opening nested provider_route_summary
+  - project-specific API-key aliases in launch-directory .env are enough for summary-only CLI live-provider selection
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider route summary as top-level scalars
 ```
 
 Previous completed directive:

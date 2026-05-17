@@ -631,6 +631,23 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "export NEWS_API_KEY" not in guide
 
 
+def test_setup_docs_document_project_alias_dotenv_cli_summary() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    expected = (
+        "summary-only pipeline CLI reads the same",
+        "launch-directory `.env`",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "without exported API-key environment variables",
+    )
+
+    for text in expected:
+        assert text in readme
+        assert text in guide
+
+
 def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() -> None:
     readme = README.read_text(encoding="utf-8")
 
