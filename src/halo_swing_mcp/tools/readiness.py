@@ -2976,6 +2976,13 @@ def _api_key_pipeline_summary_only_payload(
         if row.get("passed") is True or row.get("status") == "ok"
     ]
     provider_smoke_success_count = len(provider_smoke_success_rows)
+    provider_smoke_success_expected_live_checks = _ordered_unique_strings(
+        [
+            check
+            for row in provider_smoke_success_rows
+            for check in _string_list(row.get("expected_live_checks"))
+        ]
+    )
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -3122,6 +3129,18 @@ def _api_key_pipeline_summary_only_payload(
         ),
         "provider_smoke_success_smoke_command_names": _ordered_unique_strings(
             [row.get("smoke_command_name") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_expected_live_contracts": _ordered_unique_strings(
+            [
+                row.get("expected_live_contract")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_expected_live_checks": (
+            provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_check_count": len(
+            provider_smoke_success_expected_live_checks
         ),
         "api_key_failure_category": payload.get("api_key_failure_category"),
         "api_key_has_failures": payload.get("api_key_has_failures") is True,

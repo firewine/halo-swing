@@ -5258,6 +5258,17 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "get_macro_snapshot_live_smoke",
         "get_news_bundle_live_smoke",
     ]
+    assert summary_payload["provider_smoke_success_expected_live_contracts"] == [
+        "market_snapshot_contract",
+        "macro_filter_contract",
+        "news_source_policy_contract",
+    ]
+    assert summary_payload["provider_smoke_success_expected_live_checks"] == [
+        "live_data_boundary_declared",
+        "network_call_declared",
+        "secret_values_not_returned",
+    ]
+    assert summary_payload["provider_smoke_success_check_count"] == 3
     assert (
         summary_payload["provider_smoke_summaries"][0]["provider_family"]
         == "market"

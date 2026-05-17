@@ -332,6 +332,10 @@ The summary-only provider smoke status aggregate also exposes
 `provider_smoke_success_providers`, and
 `provider_smoke_success_smoke_command_names` so compact output shows which live
 provider smokes succeeded without scanning nested sections.
+It also keeps summary-only provider smoke contract/check aggregates:
+`provider_smoke_success_expected_live_contracts`,
+`provider_smoke_success_expected_live_checks`, and
+`provider_smoke_success_check_count`.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command
