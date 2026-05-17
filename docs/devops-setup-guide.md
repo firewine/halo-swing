@@ -489,6 +489,18 @@ top-level `next_operator_action`, `readiness_summary`,
 `api_key_provider_selection_summary`, `api_key_provider_recovery_summary`,
 `api_key_live_http_timeout_summary`, `provider_route_summary`, `checks`, and
 safety flags while omitting nested full smoke sections.
+It mirrors the same no-secret provider route status as top-level
+`api_key_provider_route_summary_schema_version`,
+`api_key_provider_route_summary_status`,
+`api_key_provider_route_summary_provider_factory`,
+`api_key_provider_route_summary_selected_provider_classes`,
+`api_key_provider_route_summary_selected_provider_class_count`,
+`api_key_provider_route_summary_missing_keys`,
+`api_key_provider_route_summary_missing_key_count`,
+`api_key_provider_route_summary_network_call`, and
+`api_key_provider_route_summary_secret_values_returned`, so compact clients can
+show selected live/replay provider state and missing route keys without opening
+the nested summary.
 The summary-only top-level provider smoke aggregates keep
 `provider_smoke_summaries` and `provider_smoke_summary_count` copied from the
 omitted `live_data_smoke_summary`, so compact output still shows provider

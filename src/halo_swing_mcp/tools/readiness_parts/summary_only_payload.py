@@ -21,6 +21,9 @@ from .summary_only_provider_route_fields import (
     _api_key_provider_recovery_route_top_level_fields,
     _api_key_requirement_route_top_level_fields,
 )
+from .summary_only_provider_route_summary_fields import (
+    _api_key_provider_route_summary_top_level_fields,
+)
 from .summary_only_provider_selection_fields import (
     _api_key_provider_selection_top_level_fields,
 )
@@ -83,6 +86,9 @@ def _api_key_pipeline_summary_only_payload(
     api_key_pipeline_check_summary = _optional_mapping(
         payload.get("api_key_pipeline_check_summary")
     ) or {}
+    provider_route_summary = (
+        _optional_mapping(payload.get("provider_route_summary")) or {}
+    )
     api_key_dotenv_loading_summary = (
         _optional_mapping(payload.get("api_key_dotenv_loading_summary")) or {}
     )
@@ -567,10 +573,10 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_failure_all_selected_routes_live": (
             payload.get("api_key_failure_all_selected_routes_live") is True
         ),
-        "provider_route_summary": _optional_mapping(
-            payload.get("provider_route_summary")
-        )
-        or {},
+        "provider_route_summary": provider_route_summary,
+        **_api_key_provider_route_summary_top_level_fields(
+            provider_route_summary
+        ),
         "checks": _api_key_pipeline_summary_only_checks(payload.get("checks")),
         "failed_provider_families": _string_list(
             payload.get("failed_provider_families")

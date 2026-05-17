@@ -1119,6 +1119,27 @@ def test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "provider_route_summary",
+        "api_key_provider_route_summary_schema_version",
+        "api_key_provider_route_summary_status",
+        "api_key_provider_route_summary_provider_factory",
+        "api_key_provider_route_summary_selected_provider_classes",
+        "api_key_provider_route_summary_selected_provider_class_count",
+        "api_key_provider_route_summary_missing_keys",
+        "api_key_provider_route_summary_missing_key_count",
+        "api_key_provider_route_summary_network_call",
+        "api_key_provider_route_summary_secret_values_returned",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_keep_api_key_dotenv_loading_fields_in_sync() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

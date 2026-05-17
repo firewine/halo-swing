@@ -1118,6 +1118,38 @@ def clear_readiness_env(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def assert_provider_route_summary_top_level_fields(payload: dict[str, Any]) -> None:
+    provider_route_summary = payload["provider_route_summary"]
+    assert payload["api_key_provider_route_summary_schema_version"] == (
+        provider_route_summary["schema_version"]
+    )
+    assert payload["api_key_provider_route_summary_status"] == (
+        provider_route_summary["status"]
+    )
+    assert payload["api_key_provider_route_summary_provider_factory"] == (
+        provider_route_summary["provider_factory"]
+    )
+    assert payload["api_key_provider_route_summary_selected_provider_classes"] == (
+        provider_route_summary["selected_provider_classes"]
+    )
+    assert (
+        payload["api_key_provider_route_summary_selected_provider_class_count"]
+        == len(provider_route_summary["selected_provider_classes"])
+    )
+    assert payload["api_key_provider_route_summary_missing_keys"] == (
+        provider_route_summary["missing"]
+    )
+    assert payload["api_key_provider_route_summary_missing_key_count"] == len(
+        provider_route_summary["missing"]
+    )
+    assert payload["api_key_provider_route_summary_network_call"] is (
+        provider_route_summary["network_call"]
+    )
+    assert payload["api_key_provider_route_summary_secret_values_returned"] is (
+        provider_route_summary["secret_values_returned"]
+    )
+
+
 @pytest.fixture(autouse=True)
 def clear_settings_cache_after_readiness_env_tests() -> None:
     get_settings.cache_clear()
@@ -6182,6 +6214,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_live_http_timeout_secret_values_returned"] is (
         live_http_timeout_summary["secret_values_returned"]
     )
+    assert_provider_route_summary_top_level_fields(payload)
     dotenv_summary = payload["api_key_dotenv_loading_summary"]
     assert payload["api_key_dotenv_supported"] is (
         dotenv_summary["dotenv_supported"]
@@ -8398,6 +8431,38 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
         setup_file_summary["secret_values_returned"]
     )
     assert "api_key_setup_file_summary" not in payload["omitted_sections"]
+    assert "polygon-secret" not in serialized
+    assert "fred-secret" not in serialized
+    assert "news-secret" not in serialized
+
+
+def test_run_api_key_pipeline_smoke_summary_only_mirrors_provider_route_summary(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    monkeypatch.setenv("POLYGON_API_KEY", "polygon-secret")
+    monkeypatch.setenv("FRED_API_KEY", "fred-secret")
+    monkeypatch.setenv("NEWS_API_KEY", "news-secret")
+    get_settings.cache_clear()
+    clear_local_env_cache()
+
+    payload = run_api_key_pipeline_smoke(summary_only=True)
+    provider_route_summary = payload["provider_route_summary"]
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert provider_route_summary["schema_version"] == "live_data_provider_route.v1"
+    assert provider_route_summary["status"] == "ready"
+    assert provider_route_summary["provider_factory"] == "get_market_data_provider"
+    assert provider_route_summary["selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert provider_route_summary["missing"] == []
+    assert provider_route_summary["network_call"] is False
+    assert provider_route_summary["secret_values_returned"] is False
+    assert_provider_route_summary_top_level_fields(payload)
+    assert "provider_route_summary" not in payload["omitted_sections"]
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized

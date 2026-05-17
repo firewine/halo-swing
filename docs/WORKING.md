@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_VERIFIED
-gate_id: API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_GATE
+status: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key live HTTP timeout policy as top-level scalars
+next_atomic_step: surface summary-only API-key provider route summary as top-level scalars
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,8 +55,8 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_live_http_timeout_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_summary_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_mirrors_provider_route_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,33 +83,33 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only top-level output mirrors live HTTP timeout seconds, env key, default seconds, provider-class applies-to list, and applies-to count without secret values
-  - summary-only top-level live HTTP timeout safety fields expose network_call, mutates_local_state, and secret_values_returned booleans
-  - blocked default and configured-timeout summary-only tests prove the top-level fields match api_key_live_http_timeout_summary without secret values
-  - README and DevOps guide document the top-level api_key_live_http_timeout_* fields
-  - summary-only payload assembly remains below the 900-line warning threshold by delegating live HTTP timeout projection to a focused module
+  - summary-only top-level output mirrors provider route schema version, status, provider factory, selected provider classes, missing keys, selected class count, and missing count without secret values
+  - summary-only top-level provider route safety fields expose network_call and secret_values_returned booleans
+  - blocked default and ready fake-key summary-only tests prove the top-level fields match provider_route_summary without secret values
+  - README and DevOps guide document the top-level api_key_provider_route_summary_* fields
+  - summary-only payload assembly remains below the 900-line warning threshold by delegating provider route summary projection to a focused module
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key live HTTP timeout top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key provider route summary top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_GATE
+gate_id: API_KEY_PROVIDER_ROUTE_SUMMARY_TOP_LEVEL_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_live_http_timeout_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_reports_configured_live_http_timeout tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 39 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 99 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 834 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_route_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_mirrors_provider_route_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 40 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 100 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 836 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -119,13 +119,24 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/summary_only_live_http_timeout_fields.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_summary_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key live HTTP timeout top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key provider route summary top-level fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - compact clients can now read live HTTP timeout policy without opening nested api_key_live_http_timeout_summary
+  - compact clients can now read provider route status and missing route keys without opening nested provider_route_summary
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_VERIFIED
+gate_id: API_KEY_LIVE_HTTP_TIMEOUT_TOP_LEVEL_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key live HTTP timeout policy as top-level scalars
 ```
 
 Previous completed directive:
