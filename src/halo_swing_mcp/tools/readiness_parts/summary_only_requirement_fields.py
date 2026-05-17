@@ -70,6 +70,10 @@ def _api_key_requirements_top_level_fields(
             family: _string_list(row.get("required_env_keys"))
             for family, row in provider_requirement_rows.items()
         },
+        "api_key_provider_requirement_required_env_key_counts": {
+            family: len(_string_list(row.get("required_env_keys")))
+            for family, row in provider_requirement_rows.items()
+        },
         "api_key_provider_requirement_preferred_env_keys": {
             family: row.get("preferred_env_key")
             for family, row in provider_requirement_rows.items()
@@ -84,6 +88,10 @@ def _api_key_requirements_top_level_fields(
         },
         "api_key_provider_requirement_missing_env_keys": {
             family: _string_list(row.get("missing_env_keys"))
+            for family, row in provider_requirement_rows.items()
+        },
+        "api_key_provider_requirement_missing_env_key_counts": {
+            family: len(_string_list(row.get("missing_env_keys")))
             for family, row in provider_requirement_rows.items()
         },
         "api_key_provider_requirement_setup_statuses": {

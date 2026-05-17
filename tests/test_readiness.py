@@ -1642,8 +1642,16 @@ def assert_api_key_requirements_summary_top_level_fields(
         family: row["required_env_keys"]
         for family, row in provider_requirements.items()
     }
+    assert payload["api_key_provider_requirement_required_env_key_counts"] == {
+        family: len(row["required_env_keys"])
+        for family, row in provider_requirements.items()
+    }
     assert payload["api_key_provider_requirement_missing_env_keys"] == {
         family: row["missing_env_keys"]
+        for family, row in provider_requirements.items()
+    }
+    assert payload["api_key_provider_requirement_missing_env_key_counts"] == {
+        family: len(row["missing_env_keys"])
         for family, row in provider_requirements.items()
     }
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
@@ -10429,10 +10437,20 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         "macro": ["FRED_API_KEY"],
         "news": ["NEWS_API_KEY"],
     }
+    assert payload["api_key_provider_requirement_required_env_key_counts"] == {
+        "market": 1,
+        "macro": 1,
+        "news": 1,
+    }
     assert payload["api_key_provider_requirement_missing_env_keys"] == {
         "market": [],
         "macro": ["FRED_API_KEY"],
         "news": ["NEWS_API_KEY"],
+    }
+    assert payload["api_key_provider_requirement_missing_env_key_counts"] == {
+        "market": 0,
+        "macro": 1,
+        "news": 1,
     }
     assert payload["api_key_provider_requirement_setup_statuses"] == {
         family: row["setup_status"]

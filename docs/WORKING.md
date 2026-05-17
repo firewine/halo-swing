@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_REQUIREMENTS_ENV_KEY_MAP_FIELDS_VERIFIED
-gate_id: API_KEY_REQUIREMENTS_ENV_KEY_MAP_FIELDS_GATE
+status: API_KEY_REQUIREMENTS_ENV_KEY_COUNT_MAP_FIELDS_VERIFIED
+gate_id: API_KEY_REQUIREMENTS_ENV_KEY_COUNT_MAP_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider requirement required and missing env-key maps
+next_atomic_step: surface summary-only API-key provider requirement required and missing env-key count maps
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,7 +55,6 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/command_checklists.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_requirement_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
@@ -83,23 +82,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_requirements_summary provider_requirements include per-family required_env_keys and missing_env_keys without secret values
-  - summary-only output mirrors per-family required and missing API-key env-key maps as top-level fields
-  - blocked default and partial-key summary-only tests prove top-level provider requirement env-key maps match api_key_requirements_summary
-  - README and DevOps guide document the top-level provider requirement required/missing env-key maps
+  - summary-only output mirrors per-family required and missing API-key env-key counts as top-level fields
+  - blocked default and partial-key summary-only tests prove top-level provider requirement env-key count maps match api_key_requirements_summary
+  - README and DevOps guide document the top-level provider requirement required/missing env-key count maps
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key requirements env-key map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key requirements env-key count map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_REQUIREMENTS_ENV_KEY_MAP_FIELDS_GATE
+gate_id: API_KEY_REQUIREMENTS_ENV_KEY_COUNT_MAP_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -118,14 +116,23 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/command_checklists.py
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_requirement_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key requirements env-key map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key requirements env-key count map fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - requirements summary now exposes per-family required_env_keys and missing_env_keys without secret values
-  - summary-only top-level output now mirrors required and missing provider requirement env-key maps
+  - summary-only top-level output now mirrors required and missing provider requirement env-key count maps
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_REQUIREMENTS_ENV_KEY_MAP_FIELDS_VERIFIED
+gate_id: API_KEY_REQUIREMENTS_ENV_KEY_MAP_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider requirement required and missing env-key maps
 ```
 
 Previous completed directive:
