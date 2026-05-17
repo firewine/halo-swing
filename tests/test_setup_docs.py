@@ -384,6 +384,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_selected_provider_by_family" in guide
     assert "api_key_configured_env_keys_by_provider_family" in guide
     assert "api_key_provider_env_key_hints_by_family" in guide
+    assert "api_key_provider_smoke_total_count" in guide
+    assert "api_key_provider_smoke_ready_count" in guide
+    assert "api_key_provider_smoke_blocked_count" in guide
+    assert "api_key_next_provider_smoke_command_name" in guide
+    assert "api_key_next_provider_smoke_provider_family" in guide
+    assert "api_key_next_provider_smoke_provider" in guide
+    assert "api_key_next_provider_smoke_command" in guide
+    assert "api_key_next_provider_smoke_status" in guide
     assert "keeps `live_data_setup_summary`" in guide
     assert "live_data_setup_summary.v1" in guide
     assert "provider smoke plan" in guide

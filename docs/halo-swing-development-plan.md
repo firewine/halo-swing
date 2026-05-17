@@ -538,6 +538,62 @@ verification:
   - targeted payload print: provider selection blocked get_market_data_provider ['ReplayMarketDataProvider'] 1 {'market': None, 'macro': None, 'news': None} {'market': [], 'macro': [], 'news': []} secret_values_returned false
 ```
 
+## 3.830 API Key Top-Level Provider Smoke Progress Gate Record - 2026-05-17
+
+### A. 목적
+
+3.829에서 summary-only top-level payload는 API-key 기반 provider selection state를
+직접 보여주게 됐다. 하지만 사용자가 키를 채운 뒤 provider smoke를 어느 정도 실행할
+준비가 됐는지, 몇 개가 ready/blocked인지, 즉시 실행할 provider smoke가 무엇인지
+확인하려면 아직 nested `setup_status_summary` 또는 `api_key_command_summary`를 읽어야
+한다. 이번 slice는 no-secret provider smoke progress metadata를 top-level로 미러링해,
+API 키만 넣은 뒤 compact response에서 provider smoke 실행 진행상태와 다음 smoke
+명령을 바로 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_provider_smoke_total_count, api_key_provider_smoke_ready_count, and api_key_provider_smoke_blocked_count mirror provider smoke progress
+  - summary-only top-level api_key_next_provider_smoke_command_name, provider_family, provider, command, and status mirror the next ready provider smoke when available
+  - README and DevOps setup guide document top-level API-key provider smoke progress mirrors
+  - setup docs tests assert top-level provider smoke progress guidance
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for readiness/setup docs: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 800 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - targeted payload print: provider smoke progress 3 0 3 None None None None None secret_values_returned false
+```
+
 ## 3.820 API Key Top-Level Provider Family Mirrors Gate Record - 2026-05-17
 
 ### A. 목적

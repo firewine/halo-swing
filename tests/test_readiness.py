@@ -5754,6 +5754,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
         "get_live_data_api_key_status --no-audit"
     )
+    assert payload["api_key_provider_smoke_total_count"] == 3
+    assert payload["api_key_provider_smoke_ready_count"] == 0
+    assert payload["api_key_provider_smoke_blocked_count"] == 3
+    assert payload["api_key_next_provider_smoke_command_name"] is None
+    assert payload["api_key_next_provider_smoke_provider_family"] is None
+    assert payload["api_key_next_provider_smoke_provider"] is None
+    assert payload["api_key_next_provider_smoke_command"] is None
+    assert payload["api_key_next_provider_smoke_status"] is None
     assert payload["api_key_one_shot_pipeline_smoke_command"] == (
         "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
         "run_api_key_pipeline_smoke --summary-only --no-audit"
@@ -7321,6 +7329,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands(
     }
     assert command_summary["next_provider_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
+    )
+    assert payload["api_key_provider_smoke_total_count"] == (
+        payload["setup_status_summary"]["provider_smoke_count"]
+    )
+    assert payload["api_key_provider_smoke_ready_count"] == (
+        payload["setup_status_summary"]["ready_provider_smoke_count"]
+    )
+    assert payload["api_key_provider_smoke_blocked_count"] == (
+        payload["setup_status_summary"]["blocked_provider_smoke_count"]
+    )
+    assert payload["api_key_next_provider_smoke_command_name"] == (
+        command_summary["next_provider_smoke_command_name"]
+    )
+    assert payload["api_key_next_provider_smoke_provider_family"] == (
+        command_summary["next_provider_smoke"]["provider_family"]
+    )
+    assert payload["api_key_next_provider_smoke_provider"] == (
+        command_summary["next_provider_smoke"]["provider"]
+    )
+    assert payload["api_key_next_provider_smoke_command"] == (
+        command_summary["next_provider_smoke"]["command"]
+    )
+    assert payload["api_key_next_provider_smoke_status"] == (
+        command_summary["next_provider_smoke"]["status"]
     )
     assert command_summary["next_provider_smoke"]["preferred_env_key"] == (
         "POLYGON_API_KEY"

@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_TOP_LEVEL_PROVIDER_SELECTION_MIRRORS_GATE",
+  "gate_id": "API_KEY_TOP_LEVEL_PROVIDER_SMOKE_PROGRESS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.829",
-  "next_atomic_step": "mirror API-key provider selection state onto summary-only top-level fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.830",
+  "next_atomic_step": "mirror API-key provider smoke progress onto summary-only top-level fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.829",
+    "docs/halo-swing-development-plan.md#3.830",
     "src/halo_swing_mcp/tools/readiness.py",
     "tests/test_readiness.py",
     "README.md",
@@ -39,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_provider_selection_summary tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -56,14 +56,14 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level api_key_provider_selection_status, api_key_provider_factory, api_key_selected_provider_classes, and api_key_selected_provider_class_count mirror actual provider selection",
-    "summary-only top-level api_key_selected_provider_by_family, api_key_configured_env_keys_by_provider_family, and api_key_provider_env_key_hints_by_family mirror provider-family setup state",
-    "README and DevOps setup guide document top-level API-key provider selection mirrors",
-    "setup docs tests assert the new top-level provider selection guidance",
+    "summary-only top-level api_key_provider_smoke_total_count, api_key_provider_smoke_ready_count, and api_key_provider_smoke_blocked_count mirror provider smoke progress",
+    "summary-only top-level api_key_next_provider_smoke_command_name, provider_family, provider, command, and status mirror the next ready provider smoke when available",
+    "README and DevOps setup guide document top-level API-key provider smoke progress mirrors",
+    "setup docs tests assert the new top-level provider smoke progress guidance",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified top-level provider selection mirror gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified top-level provider smoke progress gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

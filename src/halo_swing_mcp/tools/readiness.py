@@ -3084,6 +3084,9 @@ def _api_key_pipeline_summary_only_payload(
     next_smoke_command = _optional_mapping(
         api_key_command_summary.get("next_smoke_command")
     ) or {}
+    next_provider_smoke = _optional_mapping(
+        api_key_command_summary.get("next_provider_smoke")
+    ) or {}
     one_shot_pipeline_smoke = _optional_mapping(
         api_key_command_summary.get("one_shot_pipeline_smoke")
     ) or {}
@@ -3472,6 +3475,29 @@ def _api_key_pipeline_summary_only_payload(
         "api_key_copy_dotenv_required": copy_dotenv_command.get("required") is True,
         "api_key_next_smoke_command": next_smoke_command.get("command"),
         "api_key_next_smoke_command_name": next_smoke_command.get("name"),
+        "api_key_provider_smoke_total_count": setup_status_summary.get(
+            "provider_smoke_count"
+        ),
+        "api_key_provider_smoke_ready_count": setup_status_summary.get(
+            "ready_provider_smoke_count"
+        ),
+        "api_key_provider_smoke_blocked_count": setup_status_summary.get(
+            "blocked_provider_smoke_count"
+        ),
+        "api_key_next_provider_smoke_command_name": (
+            setup_status_summary.get("next_provider_smoke_command_name")
+            or next_provider_smoke.get("smoke_command_name")
+        ),
+        "api_key_next_provider_smoke_provider_family": (
+            next_provider_smoke.get("provider_family")
+        ),
+        "api_key_next_provider_smoke_provider": next_provider_smoke.get(
+            "provider"
+        ),
+        "api_key_next_provider_smoke_command": next_provider_smoke.get(
+            "command"
+        ),
+        "api_key_next_provider_smoke_status": next_provider_smoke.get("status"),
         "api_key_one_shot_pipeline_smoke_command": one_shot_pipeline_smoke.get(
             "command"
         ),
