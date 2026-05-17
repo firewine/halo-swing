@@ -3199,6 +3199,11 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     )
     assert payload["next_recovery_provider_family"] == "market"
     assert payload["next_recovery_provider"] == "polygon"
+    assert payload["next_recovery_selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert payload["next_recovery_provider_route_data_mode"] == "live"
+    assert payload["next_recovery_provider_route_live_data_required"] is True
     assert payload["next_recovery_next_setup_action"] == (
         "verify_provider_credentials_or_network"
     )
@@ -3470,6 +3475,26 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     )
     assert summary_payload["next_recovery_provider_family"] == "market"
     assert summary_payload["next_recovery_provider"] == "polygon"
+    assert summary_payload["next_recovery_selected_provider_class"] == (
+        "PolygonMarketDataProvider"
+    )
+    assert summary_payload["next_recovery_provider_route_data_mode"] == "live"
+    assert (
+        summary_payload["next_recovery_provider_route_live_data_required"]
+        is True
+    )
+    assert provider_recovery_summary["next_recovery_selected_provider_class"] == (
+        summary_payload["next_recovery_selected_provider_class"]
+    )
+    assert provider_recovery_summary["next_recovery_provider_route_data_mode"] == (
+        summary_payload["next_recovery_provider_route_data_mode"]
+    )
+    assert (
+        provider_recovery_summary[
+            "next_recovery_provider_route_live_data_required"
+        ]
+        is summary_payload["next_recovery_provider_route_live_data_required"]
+    )
     assert summary_payload["next_recovery_next_setup_action"] == (
         "verify_provider_credentials_or_network"
     )
@@ -3673,6 +3698,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         ],
         "next_recovery_provider_family": "market",
         "next_recovery_provider": "polygon",
+        "next_recovery_selected_provider_class": "PolygonMarketDataProvider",
+        "next_recovery_provider_route_data_mode": "live",
+        "next_recovery_provider_route_live_data_required": True,
         "next_recovery_next_setup_action": (
             "verify_provider_credentials_or_network"
         ),
@@ -3696,6 +3724,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "provider_family": "market",
                 "provider": "polygon",
                 "smoke_command_name": "get_market_snapshot_live_smoke",
+                "selected_provider_class": "PolygonMarketDataProvider",
+                "provider_route_data_mode": "live",
+                "provider_route_live_data_required": True,
                 "recovery_smoke_command": payload["provider_recovery_smokes"][0][
                     "command"
                 ],
@@ -3721,6 +3752,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "provider_family": "macro",
                 "provider": "fred",
                 "smoke_command_name": "get_macro_snapshot_live_smoke",
+                "selected_provider_class": "FredMacroDataProvider",
+                "provider_route_data_mode": "live",
+                "provider_route_live_data_required": True,
                 "recovery_smoke_command": payload["provider_recovery_smokes"][1][
                     "command"
                 ],
@@ -3747,6 +3781,9 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "provider_family": "news",
                 "provider": "newsapi",
                 "smoke_command_name": "get_news_bundle_live_smoke",
+                "selected_provider_class": "NewsApiDataProvider",
+                "provider_route_data_mode": "live",
+                "provider_route_live_data_required": True,
                 "recovery_smoke_command": payload["provider_recovery_smokes"][2][
                     "command"
                 ],
@@ -6844,6 +6881,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "next_blocked_recovery_mutates_local_state": False,
         "next_blocked_recovery_secret_values_returned": False,
         "next_recovery_smoke_command_name": None,
+        "next_recovery_selected_provider_class": None,
+        "next_recovery_provider_route_data_mode": None,
+        "next_recovery_provider_route_live_data_required": False,
         "next_recovery_smoke_command": None,
         "items": [],
         "network_call": False,
@@ -6970,6 +7010,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["next_recovery_smoke_command"] is None
     assert payload["next_recovery_provider_family"] is None
     assert payload["next_recovery_provider"] is None
+    assert payload["next_recovery_selected_provider_class"] is None
+    assert payload["next_recovery_provider_route_data_mode"] is None
+    assert payload["next_recovery_provider_route_live_data_required"] is False
     assert payload["next_recovery_next_setup_action"] is None
     assert payload["next_recovery_preferred_env_key"] is None
     assert payload["next_recovery_accepted_env_keys"] == []

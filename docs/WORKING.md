@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ITEM_ROUTE_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ITEM_ROUTE_FIELDS_GATE
+status: API_KEY_NEXT_RECOVERY_ROUTE_FIELDS_VERIFIED
+gate_id: API_KEY_NEXT_RECOVERY_ROUTE_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: mirror provider route evidence into API-key provider recovery checklist items
+next_atomic_step: mirror provider route evidence into API-key next recovery fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,7 +55,9 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/
+  - src/halo_swing_mcp/tools/readiness_parts/provider_recovery.py
+  - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -74,7 +76,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,18 +84,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - api_key_provider_recovery_checklist items mirror selected provider class, route data_mode, and live_data_required evidence for their provider family without secret values
-  - api_key_operator_checklist provider_recovery_checklist mirror carries the same item-level route evidence without recomputing from setup summaries
-  - summary-only output exposes api_key_provider_recovery_checklist_summary and compact checklist route-family mirrors without returning the full checklist
-  - README and DevOps setup guide document the provider recovery checklist item route fields
-  - setup docs guard keeps README and DevOps API-key provider recovery checklist field parity in sync
-  - fake-key offline verification proves provider recovery checklist items carry live route evidence with expected provider classes and no secret values
+  - api_key_provider_recovery_summary mirrors selected provider class, route data_mode, and live_data_required evidence for the next recovery item without secret values
+  - full and summary-only top-level next_recovery_* fields expose the same next recovery route evidence without nested parsing
+  - README and DevOps setup guide document the next recovery route fields
+  - setup docs guard keeps README and DevOps API-key provider recovery summary field parity in sync
+  - fake-key offline verification proves next recovery fields carry live route evidence with expected provider class and no secret values
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider recovery checklist item route fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key next recovery route fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ITEM_ROUTE_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_CHECKLIST_ITEM_ROUTE_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: mirror provider route evidence into API-key provider recovery checklist items
 ```
 
 Previous completed directive:
@@ -3604,6 +3616,59 @@ next_state_after_success: commit this verified API-key provider route family top
 ```
 
 ## 5. LATEST_VERIFICATION
+
+Summary: API Key Next Recovery Route Fields Gate is verified. The provider
+recovery summary, full payload mirrors, and summary-only top-level
+`next_recovery_*` fields now carry no-secret selected provider class, route
+data mode, and live-data-required evidence for the next recovery item. Focused
+coverage, fake-key smoke, setup-docs coverage, full pytest, ruff, and
+health_check passed.
+
+```yaml
+api_key_next_recovery_route_fields_gate:
+  status: verified
+  changed_files:
+    - .codex/tasks/current.json
+    - README.md
+    - docs/WORKING.md
+    - docs/codex-task.json
+    - docs/devops-setup-guide.md
+    - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_payload_mirrors.py
+    - src/halo_swing_mcp/tools/readiness_parts/provider_recovery.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
+    - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_smoke_fields.py
+    - tests/test_readiness.py
+    - tests/test_setup_docs.py
+  implementation:
+    - api_key_provider_recovery_summary items now include selected_provider_class, provider_route_data_mode, and provider_route_live_data_required
+    - api_key_provider_recovery_summary next_recovery fields now mirror selected provider class, route data mode, and live-data-required state for the next recovery item
+    - full and summary-only top-level next_recovery_* mirrors expose the same no-secret route evidence without nested parsing
+    - summary-only provider smoke success aggregate projection moved into the focused provider smoke field module so summary_only_payload.py stays below the 900-line warning point
+    - README and DevOps setup guide document next recovery route fields
+    - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+  verification:
+    - command: diff -u .codex/tasks/current.json docs/codex-task.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+      result: passed
+    - command: git diff --check
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_combines_fake_live_smokes tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
+      result: "4 passed"
+    - command: POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit
+      result: passed; next_recovery route fields present; no secret values returned
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+      result: "35 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m pytest
+      result: "827 passed"
+    - command: PYTHONPATH=src ./.venv/bin/python -m ruff check .
+      result: passed
+    - command: PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+      result: passed
+```
 
 Summary: API Key Provider Recovery Checklist Item Route Fields Gate is
 verified. Each `api_key_provider_recovery_checklist.items[]` row now carries

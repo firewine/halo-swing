@@ -438,6 +438,22 @@ def _api_key_provider_recovery_top_level_fields(
         "next_recovery_provider": api_key_provider_recovery_summary.get(
             "next_recovery_provider"
         ),
+        "next_recovery_selected_provider_class": (
+            api_key_provider_recovery_summary.get(
+                "next_recovery_selected_provider_class"
+            )
+        ),
+        "next_recovery_provider_route_data_mode": (
+            api_key_provider_recovery_summary.get(
+                "next_recovery_provider_route_data_mode"
+            )
+        ),
+        "next_recovery_provider_route_live_data_required": (
+            api_key_provider_recovery_summary.get(
+                "next_recovery_provider_route_live_data_required"
+            )
+            is True
+        ),
         "next_recovery_next_setup_action": api_key_provider_recovery_summary.get(
             "next_recovery_next_setup_action"
         ),

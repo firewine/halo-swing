@@ -7,7 +7,10 @@ from typing import Any
 from .live_data_setup import _ordered_unique_strings, _string_list
 
 
-__all__ = ("_api_key_provider_smoke_top_level_fields",)
+__all__ = (
+    "_api_key_provider_smoke_top_level_fields",
+    "_api_key_provider_smoke_success_top_level_fields",
+)
 
 
 def _api_key_provider_smoke_top_level_fields(
@@ -88,4 +91,84 @@ def _api_key_provider_smoke_top_level_fields(
             family: _string_list(row.get("expected_live_checks"))
             for family, row in provider_smoke_command_rows_by_family.items()
         },
+    }
+
+
+def _api_key_provider_smoke_success_top_level_fields(
+    *,
+    provider_smoke_summary_count: int,
+    provider_smoke_success_rows: list[dict[str, Any]],
+    provider_smoke_success_count: int,
+    provider_smoke_success_expected_live_checks: list[str],
+    provider_smoke_success_network_call_count: int,
+    provider_smoke_success_mutates_local_state_count: int,
+    provider_smoke_success_secret_values_returned_count: int,
+    provider_smoke_success_accepted_env_key_groups: list[list[str]],
+) -> dict[str, Any]:
+    return {
+        "provider_smoke_success_count": provider_smoke_success_count,
+        "provider_smoke_all_successful": (
+            provider_smoke_summary_count > 0
+            and provider_smoke_success_count == provider_smoke_summary_count
+        ),
+        "provider_smoke_success_provider_families": _ordered_unique_strings(
+            [row.get("provider_family") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_providers": _ordered_unique_strings(
+            [row.get("provider") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_smoke_command_names": _ordered_unique_strings(
+            [row.get("smoke_command_name") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_expected_live_contracts": _ordered_unique_strings(
+            [
+                row.get("expected_live_contract")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_expected_live_checks": (
+            provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_check_count": len(
+            provider_smoke_success_expected_live_checks
+        ),
+        "provider_smoke_success_network_call_count": (
+            provider_smoke_success_network_call_count
+        ),
+        "provider_smoke_success_all_network_calls": (
+            provider_smoke_success_count > 0
+            and provider_smoke_success_network_call_count
+            == provider_smoke_success_count
+        ),
+        "provider_smoke_success_network_call_policies": _ordered_unique_strings(
+            [
+                row.get("network_call_policy")
+                for row in provider_smoke_success_rows
+            ]
+        ),
+        "provider_smoke_success_mutates_local_state_count": (
+            provider_smoke_success_mutates_local_state_count
+        ),
+        "provider_smoke_success_any_mutates_local_state": (
+            provider_smoke_success_mutates_local_state_count > 0
+        ),
+        "provider_smoke_success_secret_values_returned_count": (
+            provider_smoke_success_secret_values_returned_count
+        ),
+        "provider_smoke_success_any_secret_values_returned": (
+            provider_smoke_success_secret_values_returned_count > 0
+        ),
+        "provider_smoke_success_preferred_env_keys": _ordered_unique_strings(
+            [row.get("preferred_env_key") for row in provider_smoke_success_rows]
+        ),
+        "provider_smoke_success_accepted_env_keys": _ordered_unique_strings(
+            [
+                env_key
+                for group in provider_smoke_success_accepted_env_key_groups
+                for env_key in group
+            ]
+        ),
+        "provider_smoke_success_accepted_env_key_groups": (
+            provider_smoke_success_accepted_env_key_groups
+        ),
     }

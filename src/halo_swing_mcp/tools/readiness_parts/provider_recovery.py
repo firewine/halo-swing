@@ -322,6 +322,17 @@ def _api_key_provider_recovery_summary(
         "next_recovery_smoke_command_name": (
             first_item.get("smoke_command_name") if first_item else None
         ),
+        "next_recovery_selected_provider_class": (
+            first_item.get("selected_provider_class") if first_item else None
+        ),
+        "next_recovery_provider_route_data_mode": (
+            first_item.get("provider_route_data_mode") if first_item else None
+        ),
+        "next_recovery_provider_route_live_data_required": (
+            first_item.get("provider_route_live_data_required") is True
+            if first_item
+            else False
+        ),
         "next_recovery_smoke_command": (
             first_item.get("recovery_smoke_command") if first_item else None
         ),
@@ -339,10 +350,23 @@ def _api_key_provider_recovery_summary(
         network_call_policy = first_item.get("network_call_policy")
         next_recovery_command = first_item.get("recovery_smoke_command")
         next_setup_action = first_item.get("next_setup_action")
+        selected_provider_class = first_item.get("selected_provider_class")
+        provider_route_data_mode = first_item.get("provider_route_data_mode")
         if isinstance(provider_family, str):
             summary["next_recovery_provider_family"] = provider_family
         if isinstance(provider, str):
             summary["next_recovery_provider"] = provider
+        if isinstance(selected_provider_class, str):
+            summary["next_recovery_selected_provider_class"] = (
+                selected_provider_class
+            )
+        if isinstance(provider_route_data_mode, str):
+            summary["next_recovery_provider_route_data_mode"] = (
+                provider_route_data_mode
+            )
+        summary["next_recovery_provider_route_live_data_required"] = (
+            first_item.get("provider_route_live_data_required") is True
+        )
         summary["next_recovery_smoke_available"] = (
             first_item.get("recovery_smoke_available") is True
         )
@@ -381,6 +405,11 @@ def _api_key_provider_recovery_summary_item(
         "provider_family": item.get("provider_family"),
         "provider": item.get("provider"),
         "smoke_command_name": item.get("smoke_command_name"),
+        "selected_provider_class": item.get("selected_provider_class"),
+        "provider_route_data_mode": item.get("provider_route_data_mode"),
+        "provider_route_live_data_required": (
+            item.get("provider_route_live_data_required") is True
+        ),
         "recovery_smoke_command": item.get("recovery_smoke_command"),
         "recovery_smoke_available": recovery_smoke_available,
         "recovery_status": "pending" if recovery_smoke_available else "blocked",

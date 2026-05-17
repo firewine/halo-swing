@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.880 API Key Next Recovery Route Fields Gate Record - 2026-05-17
+
+### A. 목적
+
+3.879에서 provider recovery checklist item과 compact checklist summary가 recovery
+item의 no-secret route evidence를 갖게 됐다. 하지만 compact/full top-level
+`next_recovery_*` fields만 읽는 client는 첫 recovery action의 selected provider class,
+route data mode, live-data-required evidence를 다시 nested recovery summary나 checklist
+item에서 찾아야 한다. 이번 slice는 `next_recovery_selected_provider_class`,
+`next_recovery_provider_route_data_mode`, `next_recovery_provider_route_live_data_required`를
+provider recovery summary와 top-level payload에 직접 올려, API 키만 넣고 실패한 첫
+provider retry row만 보아도 실제 live provider route를 확인할 수 있게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - api_key_provider_recovery_summary items include selected_provider_class for each provider family
+  - api_key_provider_recovery_summary items include provider_route_data_mode and provider_route_live_data_required
+  - api_key_provider_recovery_summary next_recovery fields mirror selected provider class, route data mode, and live-data-required state for the next recovery item
+  - full and summary-only top-level next_recovery_* mirrors expose the same no-secret route evidence without nested parsing
+  - summary-only provider smoke success aggregate projection moved into summary_only_provider_smoke_fields.py so summary_only_payload.py stays below the 900-line warning point
+  - README and DevOps setup guide document next recovery route fields
+  - tests cover fake-key next recovery route fields without secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key next recovery route fields pytest: 4 passed
+  - POLYGON_API_KEY=fake FRED_API_KEY=fake NEWS_API_KEY=fake PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness run_api_key_pipeline_smoke --summary-only --no-audit: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 35 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 827 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - direct fake-key summary-only output confirmed next_recovery_selected_provider_class, next_recovery_provider_route_data_mode, and next_recovery_provider_route_live_data_required without secret values
+```
+
 ## 3.821 API Key Top-Level Command Summary Mirrors Gate Record - 2026-05-17
 
 ### A. 목적
