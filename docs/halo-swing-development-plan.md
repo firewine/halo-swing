@@ -49,7 +49,7 @@ implemented:
   - setup docs tests assert the documented ready/blocked field list stays in sync
   - fake-key offline verification confirmed ready families market, macro, news and blocked families empty without secret values
   - no-key offline verification confirmed ready families empty and blocked families market, macro, news without secret values
-  - partial-key test coverage keeps ready and blocked families tied to provider smoke command row status
+  - partial-key offline verification confirmed ready family market and blocked families macro, news without secret values
   - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
 ```
 
@@ -78,8 +78,10 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - focused API-key quickstart command plan ready/blocked family pytest: 3 passed
+  - fake-key run_api_key_pipeline_smoke --summary-only --no-audit: passed
   - direct fake-key ready/blocked family assertion: ready market, macro, news; blocked empty; secret_values_returned false
   - direct no-key ready/blocked family assertion: ready empty; blocked market, macro, news; secret_values_returned false
+  - direct partial-key ready/blocked family assertion: ready market; blocked macro, news; secret_values_returned false
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
