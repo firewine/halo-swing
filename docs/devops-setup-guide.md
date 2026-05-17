@@ -1122,7 +1122,11 @@ Summary-only top-level mirrors expose the same next-action route evidence as
 `api_key_next_action_selected_provider_class_by_family`,
 `api_key_next_action_provider_route_data_mode_by_family`,
 `api_key_next_action_provider_route_live_data_required_by_family`, and
-`api_key_next_action_all_selected_routes_live`.
+`api_key_next_action_all_selected_routes_live`, plus route count aggregates
+`api_key_next_action_provider_route_family_count`,
+`api_key_next_action_selected_provider_family_count`,
+`api_key_next_action_provider_route_live_data_required_family_count`, and
+`api_key_next_action_provider_route_data_mode_counts`.
 When the next action is `fill_live_data_api_keys`, it also includes
 `required_env_keys`, `next_after_action`, `dotenv_target_path`, `source_path`,
 `target_path`, `secret_input_required`, and no-secret `dotenv_examples` /

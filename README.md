@@ -410,8 +410,12 @@ Summary-only next-action route evidence is mirrored at top level as
 `api_key_next_action_selected_provider_class_by_family`,
 `api_key_next_action_provider_route_data_mode_by_family`,
 `api_key_next_action_provider_route_live_data_required_by_family`, and
-`api_key_next_action_all_selected_routes_live`, so compact clients can verify
-the full provider-family route map beside the single next command.
+`api_key_next_action_all_selected_routes_live`, plus route count aggregates
+`api_key_next_action_provider_route_family_count`,
+`api_key_next_action_selected_provider_family_count`,
+`api_key_next_action_provider_route_live_data_required_family_count`, and
+`api_key_next_action_provider_route_data_mode_counts`, so compact clients can
+verify the full provider-family route map beside the single next command.
 The kept top-level `next_operator_action` matches
 `readiness_summary.next_operator_action`, including provider smoke or recovery
 env-key hints, so the compact response still shows the next local command

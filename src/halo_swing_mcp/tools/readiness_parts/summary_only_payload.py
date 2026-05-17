@@ -24,6 +24,7 @@ from .provider_recovery_checklist_summary import (
     _api_key_provider_recovery_checklist_summary,
 )
 from .summary_only_provider_route_fields import (
+    _api_key_next_action_route_top_level_fields,
     _api_key_provider_recovery_checklist_route_top_level_fields,
     _api_key_readiness_route_top_level_fields,
     _api_key_requirement_route_top_level_fields,
@@ -224,32 +225,8 @@ def _api_key_pipeline_summary_only_payload(
             next_operator_action.get("secret_values_returned") is True
             or api_key_next_action_summary.get("secret_values_returned") is True
         ),
-        "api_key_next_action_selected_provider_class_by_family": (
-            _optional_mapping(
-                api_key_next_action_summary.get(
-                    "selected_provider_class_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_next_action_provider_route_data_mode_by_family": (
-            _optional_mapping(
-                api_key_next_action_summary.get(
-                    "provider_route_data_mode_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_next_action_provider_route_live_data_required_by_family": (
-            _optional_mapping(
-                api_key_next_action_summary.get(
-                    "provider_route_live_data_required_by_family"
-                )
-            )
-            or {}
-        ),
-        "api_key_next_action_all_selected_routes_live": (
-            api_key_next_action_summary.get("all_selected_routes_live") is True
+        **_api_key_next_action_route_top_level_fields(
+            api_key_next_action_summary
         ),
         **_api_key_operator_checklist_top_level_fields(
             api_key_operator_checklist_summary

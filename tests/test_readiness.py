@@ -12017,6 +12017,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_next_operator_action(
     assert payload["api_key_next_action_all_selected_routes_live"] is (
         next_action_summary["all_selected_routes_live"]
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_next_action",
+        source_summary=next_action_summary,
+    )
     assert payload["next_operator_action_provider_family"] == "market"
     assert payload["next_operator_action_provider"] == "polygon"
     assert payload["next_operator_action_selected_provider_class"] == (
