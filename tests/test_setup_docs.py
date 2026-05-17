@@ -627,6 +627,39 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         assert field_name in guide
 
 
+def test_setup_docs_keep_api_key_integration_next_action_fields_in_sync() -> None:
+    readme = README.read_text(encoding="utf-8")
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    field_names = (
+        "api_key_integration_next_action_provider_family",
+        "api_key_integration_next_action_provider",
+        "api_key_integration_next_action_smoke_command_name",
+        "api_key_integration_next_action_is_recovery",
+        "api_key_integration_next_action_network_call",
+        "api_key_integration_next_action_status",
+        "api_key_integration_next_action_command",
+        "api_key_integration_next_action_mutates_local_state",
+        "api_key_integration_next_action_secret_values_returned",
+        "api_key_integration_next_action_preferred_env_key",
+        "api_key_integration_next_action_accepted_env_keys",
+        "api_key_integration_next_action_required_env_keys",
+        "api_key_integration_next_action_network_call_policy",
+        "api_key_integration_next_action_expected_live_contract",
+        "api_key_integration_next_action_expected_live_checks",
+        "api_key_integration_next_action_next_after_action",
+        "api_key_integration_next_action_dotenv_target_path",
+        "api_key_integration_next_action_source_path",
+        "api_key_integration_next_action_target_path",
+        "api_key_integration_next_action_secret_input_required",
+        "api_key_integration_next_action_dotenv_examples",
+        "api_key_integration_next_action_dotenv_example_count",
+    )
+
+    for field_name in field_names:
+        assert field_name in readme
+        assert field_name in guide
+
+
 def test_setup_docs_describe_hermes_registration_env_flag() -> None:
     text = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
