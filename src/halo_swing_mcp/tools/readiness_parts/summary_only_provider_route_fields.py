@@ -8,12 +8,28 @@ from .contract_checks import _optional_mapping
 
 
 __all__ = (
+    "_api_key_failure_route_top_level_fields",
     "_api_key_provider_recovery_checklist_route_top_level_fields",
     "_api_key_provider_recovery_route_top_level_fields",
     "_api_key_readiness_route_top_level_fields",
     "_api_key_requirement_route_top_level_fields",
     "_api_key_setup_route_top_level_fields",
 )
+
+
+def _api_key_failure_route_top_level_fields(
+    api_key_pipeline_failure_summary: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        **_route_family_top_level_fields(
+            prefix="api_key_failure",
+            source_summary=api_key_pipeline_failure_summary,
+        ),
+        **_route_family_count_top_level_fields(
+            prefix="api_key_failure",
+            source_summary=api_key_pipeline_failure_summary,
+        ),
+    }
 
 
 def _api_key_requirement_route_top_level_fields(

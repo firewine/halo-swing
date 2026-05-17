@@ -1037,7 +1037,11 @@ The compact top-level payload also mirrors API-key failure one-line fields:
 `api_key_failure_selected_provider_class_by_family`,
 `api_key_failure_provider_route_data_mode_by_family`,
 `api_key_failure_provider_route_live_data_required_by_family`, and
-`api_key_failure_all_selected_routes_live`.
+`api_key_failure_all_selected_routes_live`, plus route count aggregates
+`api_key_failure_provider_route_family_count`,
+`api_key_failure_selected_provider_family_count`,
+`api_key_failure_provider_route_live_data_required_family_count`, and
+`api_key_failure_provider_route_data_mode_counts`.
 The top-level `api_key_setup_file_summary`
 (`api_key_setup_file_summary.v1`) keeps the `.env.example` and `.env` setup
 state visible with `source_path`, `target_path`, `source_exists`,

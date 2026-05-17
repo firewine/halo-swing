@@ -1341,6 +1341,11 @@ def assert_pipeline_failure_summary_top_level_fields(
     assert payload["api_key_failure_all_selected_routes_live"] is (
         failure_summary["all_selected_routes_live"]
     )
+    assert_route_count_top_level_fields(
+        payload,
+        prefix="api_key_failure",
+        source_summary=failure_summary,
+    )
     assert payload["api_key_failure_network_call"] is (
         failure_summary["network_call"]
     )

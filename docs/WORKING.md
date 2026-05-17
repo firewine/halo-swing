@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_PROVIDER_RECOVERY_ROUTE_COUNT_FIELDS_VERIFIED
-gate_id: API_KEY_PROVIDER_RECOVERY_ROUTE_COUNT_FIELDS_GATE
+status: API_KEY_FAILURE_ROUTE_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_FAILURE_ROUTE_COUNT_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key provider recovery route count fields
+next_atomic_step: surface summary-only API-key pipeline failure route count fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -75,7 +75,7 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_failure_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -83,28 +83,28 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output mirrors API-key provider recovery and recovery checklist route family, selected provider, live-required, and data-mode count fields
-  - blocked default and provider-recovery summary-only tests prove recovery route count fields match their route maps
-  - README and DevOps guide document the top-level API-key provider recovery route count fields
+  - summary-only output mirrors API-key pipeline failure route family, selected provider, live-required, and data-mode count fields
+  - blocked default and provider-recovery failure summary-only tests prove failure route count fields match their route maps
+  - README and DevOps guide document the top-level API-key pipeline failure route count fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key provider recovery route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key pipeline failure route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_PROVIDER_RECOVERY_ROUTE_COUNT_FIELDS_GATE
+gate_id: API_KEY_FAILURE_ROUTE_COUNT_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_summary_fields_in_sync tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_recovery_checklist_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_operator_checklist_summary -q: 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_pipeline_failure_summary_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_failure_summary tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 4 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
@@ -121,9 +121,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_provider_route_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key provider recovery route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key pipeline failure route count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only top-level output now mirrors API-key provider recovery and recovery checklist route count fields
+  - summary-only top-level output now mirrors API-key pipeline failure route count fields
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_PROVIDER_RECOVERY_ROUTE_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_PROVIDER_RECOVERY_ROUTE_COUNT_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key provider recovery route count fields
 ```
 
 Previous completed directive:
