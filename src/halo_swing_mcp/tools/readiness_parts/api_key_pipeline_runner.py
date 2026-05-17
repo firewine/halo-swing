@@ -110,6 +110,7 @@ def run_api_key_pipeline_smoke(
         next_operator_action=next_operator_action,
     )
     api_key_pipeline_stage_summary = _api_key_pipeline_stage_summary(
+        live_data_setup_summary=live_data_setup_summary,
         live_data_smoke_summary=live_data_smoke_summary,
         signal_workflow_smoke_summary=signal_workflow_smoke_summary,
         recording_smoke_summary=recording_smoke_summary,

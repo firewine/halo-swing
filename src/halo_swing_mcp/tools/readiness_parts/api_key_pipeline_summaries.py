@@ -383,6 +383,7 @@ def _api_key_operator_checklist_step_summary(
 
 def _api_key_pipeline_stage_summary(
     *,
+    live_data_setup_summary: dict[str, Any],
     live_data_smoke_summary: dict[str, Any],
     signal_workflow_smoke_summary: dict[str, Any],
     recording_smoke_summary: dict[str, Any],
@@ -402,7 +403,7 @@ def _api_key_pipeline_stage_summary(
         ),
     ]
     failed_stages = [stage for stage in stages if stage["failed"]]
-    return {
+    summary = {
         "schema_version": "api_key_pipeline_stage_summary.v1",
         "status": "conflict" if failed_stages else "ok",
         "stage_count": len(stages),
@@ -416,6 +417,8 @@ def _api_key_pipeline_stage_summary(
         "mutates_local_state": False,
         "secret_values_returned": False,
     }
+    summary.update(_api_key_route_family_fields(live_data_setup_summary))
+    return summary
 
 
 def _api_key_pipeline_stage_row(

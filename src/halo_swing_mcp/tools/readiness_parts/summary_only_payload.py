@@ -56,6 +56,9 @@ def _api_key_pipeline_summary_only_payload(
     next_quickstart_command_plan_item = _summary_context['next_quickstart_command_plan_item']
     next_quickstart_command_plan_row = _summary_context['next_quickstart_command_plan_row']
     readiness_summary = _optional_mapping(payload.get("readiness_summary")) or {}
+    api_key_pipeline_stage_summary = _optional_mapping(
+        payload.get("api_key_pipeline_stage_summary")
+    ) or {}
     return {
         "schema_version": "api_key_pipeline_smoke_summary_only.v1",
         "status": payload.get("status"),
@@ -434,10 +437,35 @@ def _api_key_pipeline_summary_only_payload(
             payload.get("api_key_pipeline_failure_summary")
         )
         or {},
-        "api_key_pipeline_stage_summary": _optional_mapping(
-            payload.get("api_key_pipeline_stage_summary")
-        )
-        or {},
+        "api_key_pipeline_stage_summary": api_key_pipeline_stage_summary,
+        "api_key_stage_selected_provider_class_by_family": (
+            _optional_mapping(
+                api_key_pipeline_stage_summary.get(
+                    "selected_provider_class_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_stage_provider_route_data_mode_by_family": (
+            _optional_mapping(
+                api_key_pipeline_stage_summary.get(
+                    "provider_route_data_mode_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_stage_provider_route_live_data_required_by_family": (
+            _optional_mapping(
+                api_key_pipeline_stage_summary.get(
+                    "provider_route_live_data_required_by_family"
+                )
+            )
+            or {}
+        ),
+        "api_key_stage_all_selected_routes_live": (
+            api_key_pipeline_stage_summary.get("all_selected_routes_live")
+            is True
+        ),
         "api_key_pipeline_check_summary": _optional_mapping(
             payload.get("api_key_pipeline_check_summary")
         )

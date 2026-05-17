@@ -835,7 +835,10 @@ without reading nested payloads. It keeps `api_key_pipeline_stage_summary`
 (`api_key_pipeline_stage_summary.v1`) with the `run_live_data_smoke`,
 `run_live_signal_workflow_smoke`, and `run_live_recording_smoke` stages in
 execution order with `status`, `stage_count`, `failed_stage_count`,
-`failed_stage_names`, `first_failed_stage`, and per-stage `stage_name`,
+`failed_stage_names`, `first_failed_stage`,
+`selected_provider_class_by_family`, `provider_route_data_mode_by_family`,
+`provider_route_live_data_required_by_family`, `all_selected_routes_live`, and
+per-stage `stage_name`,
 `failed`, `error_summary`, `provider_error_summary_count`,
 `provider_recovery_smoke_count`, `provider_family`, `provider`,
 `smoke_command_name`, `preferred_env_key`, `accepted_env_keys`, `network_call`,
@@ -843,6 +846,11 @@ execution order with `status`, `stage_count`, `failed_stage_count`,
 When provider recovery smoke metadata exists, it includes stage recovery
 provider identity and env-key hints without returning key values, so the failed
 pipeline stage is visible without reading every nested smoke summary.
+The compact top-level payload mirrors stage route-family evidence as
+`api_key_stage_selected_provider_class_by_family`,
+`api_key_stage_provider_route_data_mode_by_family`,
+`api_key_stage_provider_route_live_data_required_by_family`, and
+`api_key_stage_all_selected_routes_live`.
 It keeps `api_key_pipeline_check_summary`
 (`api_key_pipeline_check_summary.v1`) summarizing the pipeline `checks` array
 with `check_count`, `passed_check_count`, `failed_check_count`,

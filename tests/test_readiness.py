@@ -5014,6 +5014,16 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "failed_stage_count": 0,
         "failed_stage_names": [],
         "first_failed_stage": None,
+        "selected_provider_class_by_family": (
+            expected_selected_provider_class_by_family(configured=True)
+        ),
+        "provider_route_data_mode_by_family": (
+            expected_provider_route_data_mode_by_family(configured=True)
+        ),
+        "provider_route_live_data_required_by_family": (
+            expected_provider_route_live_data_required_by_family(configured=True)
+        ),
+        "all_selected_routes_live": True,
         "stages": [
             {
                 "stage_name": "run_live_data_smoke",
@@ -7244,6 +7254,32 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_pipeline_stage_summary(
         "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
     ]
+    assert stage_summary["selected_provider_class_by_family"] == (
+        payload["setup_status_summary"]["selected_provider_class_by_family"]
+    )
+    assert stage_summary["provider_route_data_mode_by_family"] == (
+        payload["setup_status_summary"]["provider_route_data_mode_by_family"]
+    )
+    assert stage_summary["provider_route_live_data_required_by_family"] == (
+        payload["setup_status_summary"][
+            "provider_route_live_data_required_by_family"
+        ]
+    )
+    assert stage_summary["all_selected_routes_live"] is (
+        payload["setup_status_summary"]["all_selected_routes_live"]
+    )
+    assert payload["api_key_stage_selected_provider_class_by_family"] == (
+        stage_summary["selected_provider_class_by_family"]
+    )
+    assert payload["api_key_stage_provider_route_data_mode_by_family"] == (
+        stage_summary["provider_route_data_mode_by_family"]
+    )
+    assert payload["api_key_stage_provider_route_live_data_required_by_family"] == (
+        stage_summary["provider_route_live_data_required_by_family"]
+    )
+    assert payload["api_key_stage_all_selected_routes_live"] is (
+        stage_summary["all_selected_routes_live"]
+    )
     assert stage_summary["stages"][0]["preferred_env_key"] == "POLYGON_API_KEY"
     assert stage_summary["stages"][0]["provider_family"] == "market"
     assert stage_summary["stages"][0]["provider"] == "polygon"
