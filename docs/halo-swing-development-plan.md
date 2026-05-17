@@ -28,6 +28,70 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.898 API Key Quickstart Command Plan Next Ready/Blocked Command Gate Record - 2026-05-18
+
+### A. 목적
+
+3.897에서 quickstart command plan provider-smoke rows의 ready/blocked command names와
+commands는 top-level lists로 올라왔다. 하지만 compact client가 API 키만 넣은 뒤 다음에
+바로 실행할 provider smoke와 첫 blocked provider smoke를 표시하려면 아직 list의 첫 row를
+직접 골라야 한다. 이번 slice는 next ready/blocked provider-smoke provider family, command
+name, command를 top-level scalar로 올려 all-key, partial-key, no-key 상태의 다음 실행/차단
+명령을 바로 보여주게 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family mirrors the first ready provider-smoke row provider family
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name mirrors the first ready provider-smoke row command name
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command mirrors the first ready provider-smoke row command
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family mirrors the first blocked provider-smoke row provider family
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name mirrors the first blocked provider-smoke row command name
+  - summary-only top-level api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command mirrors the first blocked provider-smoke row command
+  - README and DevOps setup guide document the quickstart command plan next ready/blocked command scalar fields
+  - setup docs tests assert the documented next ready/blocked field list stays in sync
+  - fake-key offline verification confirmed next ready market smoke command, next blocked empty, and no secret values
+  - no-key offline verification confirmed next ready empty, next blocked market smoke command, and no secret values
+  - partial-key offline verification confirmed next ready market smoke command, next blocked macro smoke command, and no secret values
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 결과
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused API-key quickstart command plan next ready/blocked command pytest: 3 passed
+  - direct fake-key next ready/blocked command assertion: next ready market smoke command, next blocked empty, secret_values_returned false
+  - direct no-key next ready/blocked command assertion: next ready empty, next blocked market smoke command, secret_values_returned false
+  - direct partial-key next ready/blocked command assertion: next ready market smoke command, next blocked macro smoke command, secret_values_returned false
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 38 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 831 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.897 API Key Quickstart Command Plan Ready/Blocked Commands Gate Record - 2026-05-18
 
 ### A. 목적

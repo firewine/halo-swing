@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_READY_BLOCKED_COMMANDS_GATE",
+  "gate_id": "API_KEY_QUICKSTART_COMMAND_PLAN_NEXT_READY_BLOCKED_COMMAND_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.897",
-  "next_atomic_step": "surface API-key quickstart provider-smoke ready and blocked command lists",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.898",
+  "next_atomic_step": "surface API-key quickstart next ready and next blocked provider-smoke command scalars",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.897",
+    "docs/halo-swing-development-plan.md#3.898",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_quickstart_fields.py",
@@ -57,15 +57,15 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only top-level quickstart command plan exposes ready provider-smoke command names and commands",
-    "summary-only top-level quickstart command plan exposes blocked provider-smoke command names and commands",
-    "fake-key offline verification proves ready command lists include market, macro, and news provider smokes while blocked command lists are empty without secret values",
-    "blocked no-key verification proves ready command lists are empty and blocked command lists include market, macro, and news provider smokes without secret values",
-    "partial-key verification proves ready and blocked command lists stay tied to provider smoke command row status",
+    "summary-only top-level quickstart command plan exposes next ready provider-smoke provider family, command name, and command",
+    "summary-only top-level quickstart command plan exposes next blocked provider-smoke provider family, command name, and command",
+    "fake-key offline verification proves next ready command is market provider smoke and next blocked command is empty without secret values",
+    "blocked no-key verification proves next ready command is empty and next blocked command is market provider smoke without secret values",
+    "partial-key verification proves next ready command is market provider smoke and next blocked command is macro provider smoke without secret values",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key quickstart command plan ready/blocked commands gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key quickstart command plan next ready/blocked command gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

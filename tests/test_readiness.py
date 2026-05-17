@@ -6448,6 +6448,56 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
         if row["status"] != "ready"
     ]
+    ready_command_rows = [
+        row
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    blocked_command_rows = [
+        row
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
+    first_ready_command_row = ready_command_rows[0] if ready_command_rows else {}
+    first_blocked_command_row = (
+        blocked_command_rows[0] if blocked_command_rows else {}
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family"
+        ]
+        == first_ready_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name"
+        ]
+        == first_ready_command_row.get("smoke_command_name")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command"
+        ]
+        == first_ready_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
+        ]
+        == first_blocked_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name"
+        ]
+        == first_blocked_command_row.get("smoke_command_name")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
+        ]
+        == first_blocked_command_row.get("command")
+    )
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
         == sum(
@@ -8599,6 +8649,56 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
         for row in payload["api_key_command_summary"]["provider_smoke_commands"]
         if row["status"] != "ready"
     ]
+    ready_command_rows = [
+        row
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] == "ready"
+    ]
+    blocked_command_rows = [
+        row
+        for row in payload["api_key_command_summary"]["provider_smoke_commands"]
+        if row["status"] != "ready"
+    ]
+    first_ready_command_row = ready_command_rows[0] if ready_command_rows else {}
+    first_blocked_command_row = (
+        blocked_command_rows[0] if blocked_command_rows else {}
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family"
+        ]
+        == first_ready_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name"
+        ]
+        == first_ready_command_row.get("smoke_command_name")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command"
+        ]
+        == first_ready_command_row.get("command")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family"
+        ]
+        == first_blocked_command_row.get("provider_family")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name"
+        ]
+        == first_blocked_command_row.get("smoke_command_name")
+    )
+    assert (
+        payload[
+            "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command"
+        ]
+        == first_blocked_command_row.get("command")
+    )
     assert (
         payload["api_key_setup_quickstart_command_plan_ready_provider_smoke_count"]
         == sum(

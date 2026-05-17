@@ -517,6 +517,12 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 `api_key_setup_quickstart_command_plan_ready_commands`,
 `api_key_setup_quickstart_command_plan_blocked_command_names`,
 `api_key_setup_quickstart_command_plan_blocked_commands`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name`,
+`api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name`,
+`api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command`,
 `api_key_setup_quickstart_command_plan_ready_provider_smoke_count`,
 `api_key_setup_quickstart_command_plan_blocked_provider_smoke_count`,
 `api_key_setup_quickstart_command_plan_all_provider_smokes_ready`,
@@ -544,9 +550,9 @@ It also exposes `api_key_setup_quickstart_command_plan`,
 and `api_key_setup_quickstart_next_command_plan_item`, so compact clients can
 show the copy/status/provider-smoke/one-shot commands in operator order with
 provider route evidence, expected live checks, env-key hints, next setup
-actions, ready/blocked provider-family lists, ready/blocked command lists,
-aggregate provider-smoke readiness/safety flags, and safety/status maps on
-provider-smoke rows.
+actions, ready/blocked provider-family lists, ready/blocked command lists, first
+ready/blocked provider-smoke commands, aggregate provider-smoke
+readiness/safety flags, and safety/status maps on provider-smoke rows.
 It mirrors the immediate command item as scalar
 `api_key_setup_quickstart_next_command_plan_name`,
 `api_key_setup_quickstart_next_command_plan_kind`,

@@ -76,6 +76,8 @@ def _api_key_setup_quickstart_command_plan_family_fields(
     )
     ready_rows = [row for row in provider_rows if row.get("status") == "ready"]
     blocked_rows = [row for row in provider_rows if row.get("status") != "ready"]
+    next_ready_row = ready_rows[0] if ready_rows else {}
+    next_blocked_row = blocked_rows[0] if blocked_rows else {}
     provider_smoke_count = len(provider_rows)
     ready_provider_smoke_count = sum(
         row.get("status") == "ready" for row in provider_rows
@@ -105,6 +107,24 @@ def _api_key_setup_quickstart_command_plan_family_fields(
         ),
         "api_key_setup_quickstart_command_plan_blocked_commands": (
             _string_list([row.get("command") for row in blocked_rows])
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_provider_family": (
+            next_ready_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command_name": (
+            next_ready_row.get("name")
+        ),
+        "api_key_setup_quickstart_command_plan_next_ready_provider_smoke_command": (
+            next_ready_row.get("command")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_provider_family": (
+            next_blocked_row.get("provider_family")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command_name": (
+            next_blocked_row.get("name")
+        ),
+        "api_key_setup_quickstart_command_plan_next_blocked_provider_smoke_command": (
+            next_blocked_row.get("command")
         ),
         "api_key_setup_quickstart_command_plan_ready_provider_smoke_count": (
             ready_provider_smoke_count
