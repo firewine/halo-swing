@@ -136,6 +136,9 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys: list[
         str
     ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples: list[
+        str
+    ] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
         False
     )
@@ -378,6 +381,9 @@ def _api_key_integration_status_top_level_fields(
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys = (
                     one_shot_pipeline_smoke_unblock_followup_required_env_keys
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples = (
+                    one_shot_pipeline_smoke_unblock_followup_dotenv_examples
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_network_call
@@ -623,6 +629,14 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_key_count": (
             len(
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys
+            )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_example_count": (
+            len(
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
             )
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call": (

@@ -1128,6 +1128,8 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_key_count",
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples",
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_example_count",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state",

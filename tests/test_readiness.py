@@ -8643,6 +8643,22 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_examples"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_example_count"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_example_count"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call"
         ]
         is payload[
@@ -13167,6 +13183,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys: list[
         str
     ] = []
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples: list[
+        str
+    ] = []
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = False
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy = None
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state = False
@@ -13357,6 +13376,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys = (
                 expected_one_shot_unblock_followup_required_env_keys
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples = (
+                expected_one_shot_unblock_followup_dotenv_examples
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
                 expected_one_shot_unblock_followup_smoke_network_call
@@ -13638,6 +13660,20 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         ]
         == len(
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys
+        )
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_example_count"
+        ]
+        == len(
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
         )
     )
     assert (
