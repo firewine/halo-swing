@@ -42,24 +42,18 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_REJECTION_VERIFIED
-gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_REJECTION_GATE
+status: API_KEY_INTEGRATION_CLI_DOTENV_PLACEHOLDER_REJECTION_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_PLACEHOLDER_REJECTION_GATE
 review_tier: S1_small
 
-next_atomic_step: reject documented API-key placeholder values as live provider credentials
+next_atomic_step: prove summary-only API-key pipeline CLI rejects launch-directory dotenv placeholder credentials
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
-  - tests/test_providers.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -76,59 +70,59 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_setup_docs.py::test_setup_docs_warn_placeholder_api_key_values_are_not_configured -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - provider factory and readiness API-key checks do not treat documented placeholder values such as your_polygon_key, your_fred_key, or your_newsapi_key as configured live credentials
-  - placeholder API-key values keep live data readiness blocked and do not auto-select Polygon, FRED, or NewsAPI providers
-  - tests cover provider route and live data API-key status placeholder rejection without returning secret values
-  - README and DevOps guide warn that placeholder examples are not configured credentials
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+  - summary-only API-key pipeline CLI launched from a directory containing .env placeholder examples keeps API-key setup blocked
+  - CLI regression proves placeholder values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready
+  - test does not require live network, provider URLs, API key values, local state mutation, or committed runtime artifacts
+  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI dotenv placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_REJECTION_GATE
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_PLACEHOLDER_REJECTION_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_setup_docs.py::test_setup_docs_warn_placeholder_api_key_values_are_not_configured -q: 3 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 32 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 103 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 842 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 104 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 843 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
-  - tests/test_providers.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
-next_state: commit this verified API-key placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified CLI dotenv placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - provider factory and readiness API-key checks now keep documented placeholder API-key examples blocked instead of treating them as live credentials
+  - summary-only API-key pipeline CLI now has regression coverage proving launch-directory .env placeholder examples keep setup blocked instead of selecting live providers
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_REJECTION_VERIFIED
+gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_REJECTION_GATE
+review_tier: S1_small
+
+next_atomic_step: reject documented API-key placeholder values as live provider credentials
 ```
 
 Previous completed directive:

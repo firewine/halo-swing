@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.011 API Key Integration CLI Dotenv Placeholder Rejection Gate Record - 2026-05-18
+
+### A. 목적
+
+4.010은 provider factory와 readiness API-key checks가 documented placeholder values를
+configured credential로 인정하지 않도록 막았다. 남은 실사용 경로는 operator가
+launch-directory `.env`에 예시 값을 그대로 둔 상태에서
+`run_api_key_pipeline_smoke --summary-only --no-audit`를 실행하는 경우다. 이번 slice는
+CLI harness와 dotenv loading 경로까지 같은 rejection rule이 적용되는지 고정해,
+API-key-only setup이 실제 키 없이 ready로 오인되지 않게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression using launch-directory .env placeholder examples
+  - prove placeholder .env values leave configured provider families empty and selected live routes unset
+  - prove one-shot pipeline smoke remains not ready without real API-key credentials
+  - keep the test offline, no-audit, no URL/API-key output, and no committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 104 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 843 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.010 API Key Integration Placeholder Secret Rejection Gate Record - 2026-05-18
 
 ### A. 목적
