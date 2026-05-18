@@ -8427,6 +8427,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy"
+        ]
+        == "only_when_matching_api_key_selects_live_provider"
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state"
         ]
         is False
@@ -12861,6 +12867,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_requires_api_keys = False
     expected_one_shot_unblock_followup_smoke_ready_after_env_keys = False
     expected_one_shot_unblock_followup_smoke_network_call = False
+    expected_one_shot_unblock_followup_smoke_network_call_policy = None
     expected_one_shot_unblock_followup_smoke_mutates_local_state = False
     expected_one_shot_unblock_followup_smoke_secret_values_returned = False
     if expected_one_shot_unblock_next_after_action == "fill_live_data_api_keys":
@@ -12878,6 +12885,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         )
         expected_one_shot_unblock_followup_smoke_network_call = (
             one_shot_pipeline_smoke["network_call"]
+        )
+        expected_one_shot_unblock_followup_smoke_network_call_policy = (
+            one_shot_pipeline_smoke["network_call_policy"]
         )
         expected_one_shot_unblock_followup_smoke_mutates_local_state = (
             one_shot_pipeline_smoke["mutates_local_state"]
@@ -13004,6 +13014,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
         ]
         is expected_one_shot_unblock_followup_smoke_network_call
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy"
+        ]
+        == expected_one_shot_unblock_followup_smoke_network_call_policy
     )
     assert (
         payload[

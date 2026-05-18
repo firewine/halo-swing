@@ -80,6 +80,7 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_requires_api_keys = False
     one_shot_pipeline_smoke_unblock_followup_smoke_ready_after_env_keys = False
     one_shot_pipeline_smoke_unblock_followup_smoke_network_call = False
+    one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy = None
     one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state = False
     one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned = False
     one_shot_pipeline_smoke_unblock_network_call = False
@@ -120,6 +121,9 @@ def _api_key_integration_status_top_level_fields(
             )
             one_shot_pipeline_smoke_unblock_followup_smoke_network_call = (
                 one_shot_pipeline_smoke_network_call
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy = (
+                one_shot_pipeline_smoke.get("network_call_policy")
             )
             one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state = (
                 one_shot_pipeline_smoke.get("mutates_local_state") is True
@@ -289,6 +293,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call": (
             one_shot_pipeline_smoke_unblock_followup_smoke_network_call
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state": (
             one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state
