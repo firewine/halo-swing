@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.037 API Key Integration CLI Disable Dotenv Ignores Launch Dotenv Gate Record - 2026-05-18
+
+### A. 목적
+
+4.036은 malformed exported project alias values가 있어도 launch-directory `.env`의 실제
+canonical credentials가 API-key setup을 ready로 유지함을 고정했다. API 키만 넣으면 연동되는
+경로가 쉬워지는 만큼, 명시적 안전 스위치도 CLI 경로에서 강하게 존중돼야 한다. 이번 slice는
+exported `HALO_SWING_DISABLE_DOTENV=true`가 설정되면 launch-directory `.env`에 실제 API keys가
+있어도 dotenv를 읽지 않고, exported real credentials가 없으면 setup이 blocked로 남는지
+고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with exported HALO_SWING_DISABLE_DOTENV=true plus launch-directory dotenv real credentials
+  - prove dotenv loading is disabled and real dotenv credentials do not select live providers
+  - prove CLI remains blocked until exported real credentials are provided
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_exported_disable_dotenv_with_launch_directory_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 129 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 869 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.036 API Key Integration CLI Exported Alias Malformed With Dotenv Canonical Gate Record - 2026-05-18
 
 ### A. 목적

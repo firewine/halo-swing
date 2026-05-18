@@ -1,22 +1,20 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_MALFORMED_WITH_DOTENV_CANONICAL_GATE",
+  "gate_id": "API_KEY_INTEGRATION_CLI_DISABLE_DOTENV_IGNORES_LAUNCH_DOTENV_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.036",
-  "next_atomic_step": "prove summary-only API-key pipeline CLI accepts launch-directory dotenv real canonical credentials when exported project alias malformed values remain",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.037",
+  "next_atomic_step": "prove summary-only API-key pipeline CLI respects exported dotenv-disable switch even when launch-directory dotenv contains real credentials",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/providers.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.036",
-    "src/halo_swing_mcp/providers.py",
+    "docs/halo-swing-development-plan.md#4.037",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -33,7 +31,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_malformed_values_without_secret_output -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_exported_disable_dotenv_with_launch_directory_dotenv_secrets -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -50,14 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only API-key pipeline CLI launched with exported project alias malformed values and launch-directory dotenv real canonical credentials keeps API-key setup ready",
-    "provider API-key resolvers skip placeholder, blank, and malformed earlier candidates before selecting later real credentials",
-    "CLI regression proves exported project alias malformed values do not block real dotenv canonical credentials, live routes, or one-shot smoke readiness",
+    "summary-only API-key pipeline CLI launched with exported HALO_SWING_DISABLE_DOTENV=true ignores launch-directory dotenv real credentials",
+    "CLI regression proves disabled dotenv loading keeps API-key setup blocked until exported real credentials are provided",
     "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified CLI exported-alias-malformed with dotenv canonical API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified CLI dotenv-disable API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
