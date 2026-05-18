@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEXT_PROVIDER_SMOKE_READINESS_COUNT_FIELDS_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEXT_PROVIDER_SMOKE_READINESS_COUNT_FIELDS_GATE
+status: API_KEY_INTEGRATION_NEXT_ACTION_READINESS_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEXT_ACTION_READINESS_COUNT_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key integration next provider-smoke readiness and count fields
+next_atomic_step: surface summary-only API-key integration next-action readiness and count fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -82,23 +82,23 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key integration next provider-smoke has-command, ready-to-run, and requires-api-keys fields
-  - summary-only output exposes API-key integration next provider-smoke expected live-check count and accepted env-key count fields
-  - summary-only tests prove integration next provider-smoke readiness/count fields match the selected next provider-smoke row
-  - README and DevOps guide document the top-level API-key integration next provider-smoke readiness and count fields
+  - summary-only output exposes API-key integration next-action has-command, ready-to-run, and requires-api-keys fields
+  - summary-only output exposes API-key integration next-action expected live-check count and accepted env-key count fields
+  - summary-only tests prove integration next-action readiness/count fields match the selected next action summary
+  - README and DevOps guide document the top-level API-key integration next-action readiness and count fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key integration next provider-smoke readiness and count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key integration next-action readiness and count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEXT_PROVIDER_SMOKE_READINESS_COUNT_FIELDS_GATE
+gate_id: API_KEY_INTEGRATION_NEXT_ACTION_READINESS_COUNT_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -120,9 +120,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key integration next provider-smoke readiness and count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key integration next-action readiness and count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes integration next provider-smoke readiness and count fields without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes integration next-action readiness and count fields without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEXT_PROVIDER_SMOKE_READINESS_COUNT_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEXT_PROVIDER_SMOKE_READINESS_COUNT_FIELDS_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key integration next provider-smoke readiness and count fields
 ```
 
 Previous completed directive:

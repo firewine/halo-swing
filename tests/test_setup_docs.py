@@ -457,14 +457,19 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_network_call" in guide
     assert "api_key_integration_next_action_status" in guide
     assert "api_key_integration_next_action_command" in guide
+    assert "api_key_integration_next_action_has_command" in guide
+    assert "api_key_integration_next_action_ready_to_run" in guide
+    assert "api_key_integration_next_action_requires_api_keys" in guide
     assert "api_key_integration_next_action_mutates_local_state" in guide
     assert "api_key_integration_next_action_secret_values_returned" in guide
     assert "api_key_integration_next_action_preferred_env_key" in guide
     assert "api_key_integration_next_action_accepted_env_keys" in guide
+    assert "api_key_integration_next_action_accepted_env_key_count" in guide
     assert "api_key_integration_next_action_required_env_keys" in guide
     assert "api_key_integration_next_action_network_call_policy" in guide
     assert "api_key_integration_next_action_expected_live_contract" in guide
     assert "api_key_integration_next_action_expected_live_checks" in guide
+    assert "api_key_integration_next_action_expected_live_check_count" in guide
     assert "api_key_integration_next_action_next_after_action" in guide
     assert "api_key_integration_next_action_dotenv_target_path" in guide
     assert "api_key_integration_next_action_source_path" in guide
@@ -1109,14 +1114,19 @@ def test_setup_docs_keep_api_key_integration_next_action_fields_in_sync() -> Non
         "api_key_integration_next_action_network_call",
         "api_key_integration_next_action_status",
         "api_key_integration_next_action_command",
+        "api_key_integration_next_action_has_command",
+        "api_key_integration_next_action_ready_to_run",
+        "api_key_integration_next_action_requires_api_keys",
         "api_key_integration_next_action_mutates_local_state",
         "api_key_integration_next_action_secret_values_returned",
         "api_key_integration_next_action_preferred_env_key",
         "api_key_integration_next_action_accepted_env_keys",
+        "api_key_integration_next_action_accepted_env_key_count",
         "api_key_integration_next_action_required_env_keys",
         "api_key_integration_next_action_network_call_policy",
         "api_key_integration_next_action_expected_live_contract",
         "api_key_integration_next_action_expected_live_checks",
+        "api_key_integration_next_action_expected_live_check_count",
         "api_key_integration_next_action_next_after_action",
         "api_key_integration_next_action_dotenv_target_path",
         "api_key_integration_next_action_source_path",

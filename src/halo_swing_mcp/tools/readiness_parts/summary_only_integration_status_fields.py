@@ -68,6 +68,21 @@ def _api_key_integration_status_top_level_fields(
         next_provider_smoke_status != "ready"
         and bool(next_provider_smoke_accepted_env_keys)
     )
+    next_action_status = api_key_next_action_summary.get("next_action_status")
+    next_action_command = api_key_next_action_summary.get("next_action_command")
+    next_action_expected_live_checks = _string_list(
+        api_key_next_action_summary.get("next_action_expected_live_checks")
+    )
+    next_action_accepted_env_keys = _string_list(
+        api_key_next_action_summary.get("accepted_env_keys")
+    )
+    next_action_has_command = bool(next_action_command)
+    next_action_ready_to_run = (
+        next_action_status == "ready" and next_action_has_command
+    )
+    next_action_requires_api_keys = (
+        next_action_status != "ready" and bool(next_action_accepted_env_keys)
+    )
     return {
         "api_key_integration_status": (
             api_key_integration_status_summary.get("status")
@@ -144,11 +159,12 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_name": (
             api_key_integration_status_summary.get("next_action_name")
         ),
-        "api_key_integration_next_action_status": (
-            api_key_next_action_summary.get("next_action_status")
-        ),
-        "api_key_integration_next_action_command": (
-            api_key_next_action_summary.get("next_action_command")
+        "api_key_integration_next_action_status": next_action_status,
+        "api_key_integration_next_action_command": next_action_command,
+        "api_key_integration_next_action_has_command": next_action_has_command,
+        "api_key_integration_next_action_ready_to_run": next_action_ready_to_run,
+        "api_key_integration_next_action_requires_api_keys": (
+            next_action_requires_api_keys
         ),
         "api_key_integration_next_action_next_after_action": (
             next_operator_action.get("next_after_action")
@@ -205,8 +221,11 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_preferred_env_key": (
             api_key_next_action_summary.get("preferred_env_key")
         ),
-        "api_key_integration_next_action_accepted_env_keys": _string_list(
-            api_key_next_action_summary.get("accepted_env_keys")
+        "api_key_integration_next_action_accepted_env_keys": (
+            next_action_accepted_env_keys
+        ),
+        "api_key_integration_next_action_accepted_env_key_count": len(
+            next_action_accepted_env_keys
         ),
         "api_key_integration_next_action_required_env_keys": _string_list(
             api_key_next_action_summary.get("required_env_keys")
@@ -214,8 +233,11 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_expected_live_contract": (
             api_key_next_action_summary.get("next_action_expected_live_contract")
         ),
-        "api_key_integration_next_action_expected_live_checks": _string_list(
-            api_key_next_action_summary.get("next_action_expected_live_checks")
+        "api_key_integration_next_action_expected_live_checks": (
+            next_action_expected_live_checks
+        ),
+        "api_key_integration_next_action_expected_live_check_count": len(
+            next_action_expected_live_checks
         ),
         "api_key_integration_next_action_mutates_local_state": (
             api_key_next_action_summary.get("next_action_mutates_local_state")

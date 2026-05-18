@@ -8342,6 +8342,9 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_command"] == (
         "cp .env.example .env"
     )
+    assert payload["api_key_integration_next_action_has_command"] is True
+    assert payload["api_key_integration_next_action_ready_to_run"] is False
+    assert payload["api_key_integration_next_action_requires_api_keys"] is False
     assert payload["api_key_integration_next_action_next_after_action"] == (
         "fill_live_data_api_keys"
     )
@@ -8368,9 +8371,13 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_network_call_policy"] is None
     assert payload["api_key_integration_next_action_preferred_env_key"] is None
     assert payload["api_key_integration_next_action_accepted_env_keys"] == []
+    assert payload["api_key_integration_next_action_accepted_env_key_count"] == 0
     assert payload["api_key_integration_next_action_required_env_keys"] == []
     assert payload["api_key_integration_next_action_expected_live_contract"] is None
     assert payload["api_key_integration_next_action_expected_live_checks"] == []
+    assert (
+        payload["api_key_integration_next_action_expected_live_check_count"] == 0
+    )
     assert payload["api_key_integration_next_action_mutates_local_state"] is True
     assert (
         payload["api_key_integration_next_action_secret_values_returned"] is False
@@ -12726,6 +12733,17 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert payload["api_key_integration_next_action_command"] == (
         payload["api_key_next_action_summary"]["next_action_command"]
     )
+    assert payload["api_key_integration_next_action_has_command"] is bool(
+        payload["api_key_next_action_summary"]["next_action_command"]
+    )
+    assert payload["api_key_integration_next_action_ready_to_run"] is (
+        payload["api_key_next_action_summary"]["next_action_status"] == "ready"
+        and bool(payload["api_key_next_action_summary"]["next_action_command"])
+    )
+    assert payload["api_key_integration_next_action_requires_api_keys"] is (
+        payload["api_key_next_action_summary"]["next_action_status"] != "ready"
+        and bool(payload["api_key_next_action_summary"]["accepted_env_keys"])
+    )
     assert payload["api_key_integration_next_action_next_after_action"] == (
         payload["next_operator_action_next_after_action"]
     )
@@ -12774,6 +12792,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert payload["api_key_integration_next_action_accepted_env_keys"] == (
         payload["next_operator_action_accepted_env_keys"]
     )
+    assert payload[
+        "api_key_integration_next_action_accepted_env_key_count"
+    ] == len(payload["next_operator_action_accepted_env_keys"])
     assert payload["api_key_integration_next_action_required_env_keys"] == (
         payload["next_operator_action_required_env_keys"]
     )
@@ -12783,6 +12804,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert payload["api_key_integration_next_action_expected_live_checks"] == (
         payload["next_operator_action_expected_live_checks"]
     )
+    assert payload[
+        "api_key_integration_next_action_expected_live_check_count"
+    ] == len(payload["next_operator_action_expected_live_checks"])
     assert (
         payload["api_key_integration_next_action_mutates_local_state"]
         is payload["api_key_next_action_summary"]["next_action_mutates_local_state"]
