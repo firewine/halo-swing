@@ -37,6 +37,7 @@ def _api_key_integration_status_top_level_fields(
         _optional_mapping(api_key_command_summary.get("one_shot_pipeline_smoke"))
         or {}
     )
+    next_action_command = api_key_next_action_summary.get("next_action_command")
     one_shot_pipeline_smoke_command = one_shot_pipeline_smoke.get("command")
     one_shot_pipeline_smoke_has_command = bool(one_shot_pipeline_smoke_command)
     integration_ready_to_run_live_smoke = (
@@ -64,11 +65,13 @@ def _api_key_integration_status_top_level_fields(
     elif one_shot_pipeline_smoke_status == "blocked":
         one_shot_pipeline_smoke_blocked_reason = "live_smoke_not_ready"
     one_shot_pipeline_smoke_unblock_action_name = None
+    one_shot_pipeline_smoke_unblock_command = None
     if one_shot_pipeline_smoke_blocked_reason == "api_key_setup_not_ready":
         one_shot_pipeline_smoke_unblock_action_name = (
             api_key_integration_status_summary.get("next_action_name")
             or api_key_next_action_summary.get("next_action_name")
         )
+        one_shot_pipeline_smoke_unblock_command = next_action_command
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -106,7 +109,6 @@ def _api_key_integration_status_top_level_fields(
         and bool(next_provider_smoke_accepted_env_keys)
     )
     next_action_status = api_key_next_action_summary.get("next_action_status")
-    next_action_command = api_key_next_action_summary.get("next_action_command")
     next_action_expected_live_checks = _string_list(
         api_key_next_action_summary.get("next_action_expected_live_checks")
     )
@@ -158,6 +160,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_action_name": (
             one_shot_pipeline_smoke_unblock_action_name
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_command": (
+            one_shot_pipeline_smoke_unblock_command
         ),
         "api_key_integration_one_shot_pipeline_smoke_has_command": (
             one_shot_pipeline_smoke_has_command
