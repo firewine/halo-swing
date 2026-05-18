@@ -547,6 +547,31 @@ def test_market_data_provider_auto_uses_newsapi_key_alias(monkeypatch) -> None:
     get_settings.cache_clear()
 
 
+def test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling(
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("HALO_SWING_NEWS_DATA_MODE", raising=False)
+    monkeypatch.setenv("NEWS_API_KEY", "your_newsapi_key")
+    monkeypatch.setenv("NEWSAPI_KEY", "newsapi-alias-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+    payload = describe_market_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert payload["providers"]["news"]["configured"] is True
+    assert payload["providers"]["news"]["configured_env_keys"] == ["NEWSAPI_KEY"]
+    assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
+    ]
+    assert "newsapi-alias-secret" not in serialized
+
+    get_settings.cache_clear()
+
+
 def test_market_data_provider_auto_uses_local_env_api_key_aliases(
     tmp_path,
     monkeypatch,
@@ -935,7 +960,7 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
         "provider_family": "news",
         "provider": "newsapi",
         "smoke_command_name": "get_news_bundle_live_smoke",
-        "preferred_env_key": "NEWS_API_KEY",
+        "preferred_env_key": "NEWSAPI_KEY",
         "accepted_env_keys": [
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
@@ -1214,7 +1239,7 @@ def test_news_bundle_live_provider_exception_returns_recovery_metadata(
         "provider_family": "news",
         "provider": "newsapi",
         "smoke_command_name": "get_news_bundle_live_smoke",
-        "preferred_env_key": "NEWS_API_KEY",
+        "preferred_env_key": "NEWSAPI_KEY",
         "accepted_env_keys": [
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",

@@ -42,23 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_GATE
+status: API_KEY_INTEGRATION_NEWSAPI_PROVIDER_SMOKE_PREFERRED_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_PROVIDER_SMOKE_PREFERRED_GATE
 review_tier: S1_small
 
-next_atomic_step: promote NEWSAPI_KEY to the preferred NewsAPI setup example across readiness surfaces and operator docs
+next_atomic_step: align NewsAPI provider smoke metadata with NEWSAPI_KEY as the preferred setup key
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
-  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
-  - README.md
-  - tests/test_env_template.py
-  - tests/test_readiness.py
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -75,42 +71,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - readiness dotenv template and API-key status use NEWSAPI_KEY=your_newsapi_key as the preferred NewsAPI copy/paste example
+  - NewsAPI provider smoke success metadata reports NEWSAPI_KEY as preferred_env_key
+  - NewsAPI provider smoke recovery/error metadata reports NEWSAPI_KEY as preferred_env_key
   - accepted NewsAPI env keys still include HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
-  - README and DevOps setup guide document NEWSAPI_KEY as a supported NewsAPI alias
-  - summary-only setup file fields expose NEWSAPI_KEY as the news example env key without returning secret values
+  - provider selection still accepts NEWSAPI_KEY when legacy NEWS_API_KEY contains a documented placeholder sibling
   - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified NEWSAPI_KEY preferred example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified NewsAPI provider smoke preferred-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_GATE
+gate_id: API_KEY_INTEGRATION_NEWSAPI_PROVIDER_SMOKE_PREFERRED_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -118,29 +109,33 @@ results:
   - task contract and portable mirror match
   - JSON task contract parsing passed for current contract and portable mirror
   - git diff --check passed
-  - focused dotenv template preferred example test passed: 1 passed
-  - focused readiness setup tests passed: 2 passed
-  - env template tests passed: 11 passed
-  - readiness tests passed: 132 passed
-  - setup docs tests passed: 42 passed
-  - full pytest passed: 875 passed
+  - focused NewsAPI provider smoke preferred-key tests passed: 3 passed
+  - provider tests passed: 37 passed
+  - full pytest passed: 876 passed
   - ruff passed
   - harness health_check passed
 files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
-  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
-  - README.md
-  - tests/test_env_template.py
-  - tests/test_readiness.py
-next_state: commit and push this verified NEWSAPI_KEY preferred example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+  - src/halo_swing_mcp/tools/market.py
+  - tests/test_providers.py
+next_state: commit and push this verified NewsAPI provider smoke preferred-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - NEWSAPI_KEY is now the preferred NewsAPI copy/paste example in readiness and summary-only setup fields
-  - accepted NewsAPI aliases still include HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
+  - direct live NewsAPI provider smoke metadata now reports NEWSAPI_KEY as preferred_env_key
+  - legacy NEWS_API_KEY placeholder siblings do not block NEWSAPI_KEY real credentials
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_GATE
+review_tier: S1_small
+
+next_atomic_step: promote NEWSAPI_KEY to the preferred NewsAPI setup example across readiness surfaces and operator docs
 ```
 
 Previous completed directive:

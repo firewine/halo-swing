@@ -84,6 +84,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.042 API Key Integration NewsAPI Provider Smoke Preferred-Key Gate Record - 2026-05-18
+
+### A. 목적
+
+4.041은 readiness/API-key setup 표면에서 `NEWSAPI_KEY`를 preferred NewsAPI 예시로
+승격했다. 하지만 직접 `get_news_bundle` live smoke를 실행했을 때 반환되는
+`provider_smoke_summary`와 provider recovery metadata는 아직 `NEWS_API_KEY`를
+preferred key로 보여줄 수 있다. 이번 slice는 실제 provider smoke 결과도
+`NEWSAPI_KEY`를 preferred setup key로 보고하게 맞춘다. 또한 legacy `NEWS_API_KEY`
+placeholder가 sibling으로 남아 있어도 실제 `NEWSAPI_KEY` credential이 provider selection을
+유지하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - updated NewsAPI provider smoke hints to report NEWSAPI_KEY as preferred_env_key
+  - kept accepted NewsAPI env keys as HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
+  - proved provider smoke success and recovery/error metadata expose NEWSAPI_KEY without secret output
+  - proved NEWSAPI_KEY real credentials are selected when legacy NEWS_API_KEY contains a documented placeholder sibling
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.040 API Key Integration NEWSAPI_KEY Alias Gate Record - 2026-05-18
 
 ### A. 목적
