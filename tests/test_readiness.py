@@ -8334,6 +8334,10 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "run_api_key_pipeline_smoke --summary-only --no-audit"
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == "blocked"
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_blocked_reason"]
+        == "api_key_setup_not_ready"
+    )
     assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is True
     assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is False
     assert (
@@ -12689,6 +12693,20 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         expected_one_shot_status = "blocked"
     assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == (
         expected_one_shot_status
+    )
+    expected_one_shot_blocked_reason = None
+    if expected_one_shot_status == "unavailable":
+        expected_one_shot_blocked_reason = "command_unavailable"
+    elif (
+        expected_one_shot_status == "blocked"
+        and one_shot_pipeline_smoke["network_call"]
+    ):
+        expected_one_shot_blocked_reason = "api_key_setup_not_ready"
+    elif expected_one_shot_status == "blocked":
+        expected_one_shot_blocked_reason = "live_smoke_not_ready"
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_blocked_reason"]
+        == expected_one_shot_blocked_reason
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is bool(
         one_shot_pipeline_smoke["command"]
