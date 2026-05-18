@@ -8366,6 +8366,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == ".env"
     )
     assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_required_env_keys"
+        ]
+        == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_required_env_key_count"
+        ]
+        == 3
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_examples"
+        ]
+        == EXPECTED_DOTENV_EXAMPLES
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_example_count"
+        ]
+        == len(EXPECTED_DOTENV_EXAMPLES)
+    )
+    assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]
         is True
     )
@@ -12781,6 +12805,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         expected_one_shot_unblock_dotenv_target_path = payload[
             "api_key_next_action_summary"
         ].get("dotenv_target_path")
+    expected_one_shot_unblock_followup_required_env_keys: list[str] = []
+    expected_one_shot_unblock_followup_dotenv_examples: list[str] = []
+    if expected_one_shot_unblock_next_after_action == "fill_live_data_api_keys":
+        expected_one_shot_unblock_followup_required_env_keys = payload[
+            "api_key_requirements_summary"
+        ].get("required_env_keys", [])
+        expected_one_shot_unblock_followup_dotenv_examples = payload[
+            "api_key_setup_file_summary"
+        ].get("dotenv_examples", [])
     expected_one_shot_unblock_network_call = False
     expected_one_shot_unblock_mutates_local_state = False
     expected_one_shot_unblock_secret_values_returned = False
@@ -12826,6 +12859,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_dotenv_target_path"
         ]
         == expected_one_shot_unblock_dotenv_target_path
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_required_env_keys"
+        ]
+        == expected_one_shot_unblock_followup_required_env_keys
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_required_env_key_count"
+        ]
+        == len(expected_one_shot_unblock_followup_required_env_keys)
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_examples"
+        ]
+        == expected_one_shot_unblock_followup_dotenv_examples
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_example_count"
+        ]
+        == len(expected_one_shot_unblock_followup_dotenv_examples)
     )
     assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]
