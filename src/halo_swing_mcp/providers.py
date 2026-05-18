@@ -385,7 +385,7 @@ MACRO_API_KEY_ENV_KEYS = (
     "HALO_SWING_FRED_API_KEY",
     "FRED_API_KEY",
 )
-NEWS_API_KEY_ENV_KEYS = ("HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY")
+NEWS_API_KEY_ENV_KEYS = ("HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY")
 
 
 def get_market_data_provider() -> MarketDataProvider:
@@ -551,12 +551,13 @@ def _resolve_news_api_key() -> str:
         settings.news_api_key,
         get_config_value("HALO_SWING_NEWS_API_KEY"),
         get_config_value("NEWS_API_KEY"),
+        get_config_value("NEWSAPI_KEY"),
     )
     for candidate in candidates:
         if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "news API key")
     raise ValueError(
-        "live news data requires HALO_SWING_NEWS_API_KEY or NEWS_API_KEY"
+        "live news data requires HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, or NEWSAPI_KEY"
     )
 
 
@@ -565,6 +566,7 @@ def _news_api_key_configured(settings: Any) -> bool:
         _secret_candidate_configured(settings.news_api_key)
         or _secret_candidate_configured(get_config_value("HALO_SWING_NEWS_API_KEY"))
         or _secret_candidate_configured(get_config_value("NEWS_API_KEY"))
+        or _secret_candidate_configured(get_config_value("NEWSAPI_KEY"))
     )
 
 

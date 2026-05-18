@@ -45,6 +45,7 @@ READINESS_ENV_KEYS = (
     "TELEGRAM_BOT_TOKEN",
     "FRED_API_KEY",
     "NEWS_API_KEY",
+    "NEWSAPI_KEY",
     "HALO_SWING_MACRO_API_KEY",
     "HALO_SWING_FRED_API_KEY",
     "HALO_SWING_NEWS_API_KEY",
@@ -485,7 +486,9 @@ def expected_provider_smoke_command(name: str) -> dict[str, Any]:
         "get_news_bundle_live_smoke": {
             "name": "get_news_bundle_live_smoke",
             "provider": "newsapi",
-            "required_env_key_groups": [["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]],
+            "required_env_key_groups": [
+                ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"]
+            ],
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
                 "get_news_bundle --input-json '{\"topic\":\"macro\"}' --no-audit"
@@ -541,7 +544,7 @@ def expected_provider_setup_actions(
             "newsapi",
             news_configured_env_keys,
             "NEWS_API_KEY",
-            ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
             "NEWS_API_KEY=your_newsapi_key",
             "get_news_bundle_live_smoke",
         ),
@@ -3294,6 +3297,7 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
+                        "NEWSAPI_KEY",
                     ],
                     "example": "NEWS_API_KEY=your_newsapi_key",
                     "secret": True,
@@ -3483,6 +3487,7 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["providers"]["news"]["accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     expected_provider_setup = {
         "market": ("POLYGON_API_KEY", "POLYGON_API_KEY=your_polygon_key"),
@@ -5244,11 +5249,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "FRED_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["provider_recovery_accepted_env_key_groups"] == [
         ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
         ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
-        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     ]
     assert payload["next_recovery_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
@@ -5539,11 +5545,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "FRED_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["provider_recovery_accepted_env_key_groups"] == [
         ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
         ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
-        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     ]
     assert summary_payload["next_recovery_smoke_command_name"] == (
         "get_market_snapshot_live_smoke"
@@ -5758,6 +5765,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "FRED_API_KEY",
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "provider_recovery_accepted_env_key_groups": [
             [
@@ -5772,6 +5780,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             [
                 "HALO_SWING_NEWS_API_KEY",
                 "NEWS_API_KEY",
+                "NEWSAPI_KEY",
             ],
         ],
         "item_count": 3,
@@ -5919,6 +5928,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 "accepted_env_keys": [
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
+                    "NEWSAPI_KEY",
                 ],
                 "network_call_policy": (
                     "only_when_matching_api_key_selects_live_provider"
@@ -7100,7 +7110,11 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "provider": "newsapi",
             "smoke_command_name": "get_news_bundle_live_smoke",
             "preferred_env_key": "NEWS_API_KEY",
-            "accepted_env_keys": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            "accepted_env_keys": [
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+                "NEWSAPI_KEY",
+            ],
             "expected_live_contract": "news_source_policy_contract",
             "expected_live_checks": [
                 "live_data_boundary_declared",
@@ -8031,11 +8045,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
         "FRED_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["provider_smoke_success_accepted_env_key_groups"] == [
         ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
         ["HALO_SWING_MACRO_API_KEY", "HALO_SWING_FRED_API_KEY", "FRED_API_KEY"],
-        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     ]
     assert (
         summary_payload["provider_smoke_summaries"][0]["provider_family"]
@@ -8538,6 +8553,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "news": [
                 "HALO_SWING_NEWS_API_KEY",
                 "NEWS_API_KEY",
+                "NEWSAPI_KEY",
             ],
         }
     )
@@ -10027,7 +10043,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
             "HALO_SWING_FRED_API_KEY",
             "FRED_API_KEY",
         ],
-        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     }
     assert payload["api_key_provider_requirement_setup_statuses"] == {
         "market": "pending",
@@ -10997,6 +11013,7 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
+                        "NEWSAPI_KEY",
                     ],
                 },
             ],
@@ -11023,6 +11040,7 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
     assert summary["next_blocked_recovery_accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary["next_blocked_recovery_network_call_policy"] is None
     assert summary["next_blocked_recovery_smoke_available"] is False
@@ -11071,6 +11089,7 @@ def test_api_key_integration_status_summary_carries_next_blocked_recovery_fields
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
+                        "NEWSAPI_KEY",
                     ],
                 },
             ],
@@ -11124,6 +11143,7 @@ def test_api_key_integration_status_summary_carries_next_blocked_recovery_fields
     assert summary["next_blocked_recovery_accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary["next_blocked_recovery_network_call_policy"] is None
     assert summary["next_blocked_recovery_smoke_available"] is False
@@ -11170,6 +11190,7 @@ def test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_a
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
+                        "NEWSAPI_KEY",
                     ],
                 },
             ],
@@ -12713,7 +12734,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_provider_requirement_accepted_env_key_counts"] == {
         "market": 2,
         "macro": 3,
-        "news": 2,
+        "news": 3,
     }
     assert payload["api_key_provider_requirement_required_env_keys"] == {
         "market": ["POLYGON_API_KEY"],
@@ -12849,6 +12870,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert requirements["provider_requirements"]["news"]["accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert requirements["secret_values_returned"] is False
     assert "api_key_requirements_summary" not in payload["omitted_sections"]
@@ -18687,6 +18709,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_withou
         "FRED_API_KEY": "macro-cli-dotenv-duplicate-canonical",
         "HALO_SWING_NEWS_API_KEY": "news-cli-dotenv-duplicate-primary",
         "NEWS_API_KEY": "news-cli-dotenv-duplicate-canonical",
+        "NEWSAPI_KEY": "news-cli-dotenv-duplicate-alias",
     }
     (tmp_path / ".env.example").write_text(
         (
@@ -18697,6 +18720,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_withou
             "FRED_API_KEY=\n"
             "HALO_SWING_NEWS_API_KEY=\n"
             "NEWS_API_KEY=\n"
+            "NEWSAPI_KEY=\n"
         ),
         encoding="utf-8",
     )
@@ -18765,7 +18789,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_withou
             "HALO_SWING_FRED_API_KEY",
             "FRED_API_KEY",
         ],
-        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     }
     assert payload["api_key_selected_provider_class_by_family"] == {
         "market": "PolygonMarketDataProvider",
@@ -20572,6 +20596,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_exported_aliases_with
         "FRED_API_KEY": "macro-cli-duplicate-canonical-secret",
         "HALO_SWING_NEWS_API_KEY": "news-cli-duplicate-primary-secret",
         "NEWS_API_KEY": "news-cli-duplicate-canonical-secret",
+        "NEWSAPI_KEY": "news-cli-duplicate-alias-secret",
     }
     (tmp_path / ".env.example").write_text(
         (
@@ -20582,6 +20607,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_exported_aliases_with
             "FRED_API_KEY=\n"
             "HALO_SWING_NEWS_API_KEY=\n"
             "NEWS_API_KEY=\n"
+            "NEWSAPI_KEY=\n"
         ),
         encoding="utf-8",
     )
@@ -20645,7 +20671,7 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_exported_aliases_with
             "HALO_SWING_FRED_API_KEY",
             "FRED_API_KEY",
         ],
-        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+        "news": ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
     }
     assert payload["api_key_selected_provider_class_by_family"] == {
         "market": "PolygonMarketDataProvider",
@@ -20879,6 +20905,105 @@ def test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_wi
         assert value not in serialized
         assert value.strip() not in serialized
     for value in unquoted_values:
+        assert value not in completed.stdout
+        assert value not in serialized
+    assert completed.stderr == ""
+
+
+def test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "POLYGON_API_KEY": "polygon-cli-newsapi-alias-secret",
+        "FRED_API_KEY": "fred-cli-newsapi-alias-secret",
+        "NEWSAPI_KEY": "newsapi-cli-alias-secret",
+    }
+    (tmp_path / ".env.example").write_text(
+        "POLYGON_API_KEY=\nFRED_API_KEY=\nNEWSAPI_KEY=\n",
+        encoding="utf-8",
+    )
+
+    env = os.environ.copy()
+    for key in READINESS_ENV_KEYS:
+        env.pop(key, None)
+    env.update(
+        {
+            "PYTHONPATH": str(ROOT / "src"),
+            "HALO_SWING_DISABLE_DOTENV": "true",
+            "HALO_SWING_BINANCE_TESTNET": "true",
+            "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION": "true",
+            "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING": "false",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH": (
+                "state/binance_credentials.enc.json"
+            ),
+            "HALO_SWING_HERMES_CONFIG_PATH": "missing-hermes.yaml",
+            "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS": "0.001",
+            **secret_env,
+        }
+    )
+    assert not (tmp_path / ".env").exists()
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "run_api_key_pipeline_smoke",
+            "--summary-only",
+            "--no-audit",
+        ],
+        cwd=tmp_path,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=20,
+    )
+    payload = json.loads(completed.stdout)
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_summary_only.v1"
+    assert payload["summary_only"] is True
+    assert payload["api_key_setup_configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_missing_provider_families"] == []
+    assert payload["api_key_setup_ready_to_run_live_smoke"] is True
+    assert payload["api_key_dotenv_loading_summary"]["disabled"] is True
+    assert (
+        payload["api_key_dotenv_loading_summary"]["dotenv_loading_enabled"] is False
+    )
+    assert payload["api_key_configured_env_keys_by_provider_family"] == {
+        "market": ["POLYGON_API_KEY"],
+        "macro": ["FRED_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
+    }
+    assert payload["api_key_selected_provider_class_by_family"] == {
+        "market": "PolygonMarketDataProvider",
+        "macro": "FredMacroDataProvider",
+        "news": "NewsApiDataProvider",
+    }
+    assert payload["api_key_provider_route_data_mode_by_family"] == {
+        "market": "live",
+        "macro": "live",
+        "news": "live",
+    }
+    assert payload["api_key_provider_route_summary_status"] == "ready"
+    assert payload["api_key_provider_route_summary_missing_keys"] == []
+    assert payload["api_key_provider_route_summary_selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is True
+    assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == "ready"
+    assert payload["secret_values_returned"] is False
+    assert not (tmp_path / ".env").exists()
+    for value in secret_env.values():
         assert value not in completed.stdout
         assert value not in serialized
     assert completed.stderr == ""

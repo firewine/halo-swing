@@ -351,6 +351,7 @@ def _macro_api_key_env_configured() -> bool:
 def _news_api_key_env_configured() -> bool:
     return _env_value_configured(
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
         "HALO_SWING_NEWS_API_KEY",
     )
 

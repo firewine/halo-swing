@@ -68,6 +68,7 @@ def clear_live_data_provider_env(monkeypatch) -> None:
         "HALO_SWING_NEWS_SOURCE",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
+        "NEWSAPI_KEY",
         "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS",
     ):
         monkeypatch.delenv(key, raising=False)
@@ -483,6 +484,7 @@ def test_live_news_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.setenv("HALO_SWING_NEWS_DATA_MODE", "live")
     monkeypatch.delenv("HALO_SWING_NEWS_API_KEY", raising=False)
     monkeypatch.delenv("NEWS_API_KEY", raising=False)
+    monkeypatch.delenv("NEWSAPI_KEY", raising=False)
     get_settings.cache_clear()
 
     with pytest.raises(ValueError, match="live news data requires"):
@@ -515,6 +517,32 @@ def test_market_data_provider_auto_uses_newsapi_key(monkeypatch) -> None:
     assert isinstance(provider, NewsApiDataProvider)
     assert provider.data_mode == "fixture"
     assert provider.live_data_required is False
+
+    get_settings.cache_clear()
+
+
+def test_market_data_provider_auto_uses_newsapi_key_alias(monkeypatch) -> None:
+    monkeypatch.delenv("HALO_SWING_NEWS_DATA_MODE", raising=False)
+    monkeypatch.setenv("NEWSAPI_KEY", "newsapi-alias-secret")
+    get_settings.cache_clear()
+
+    provider = get_market_data_provider()
+    payload = describe_market_data_provider_route()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert isinstance(provider, NewsApiDataProvider)
+    assert payload["providers"]["news"]["configured"] is True
+    assert payload["providers"]["news"]["configured_env_keys"] == ["NEWSAPI_KEY"]
+    assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
+    ]
+    assert payload["selected_provider_classes"] == [
+        "ReplayMarketDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert "newsapi-alias-secret" not in serialized
 
     get_settings.cache_clear()
 
@@ -911,6 +939,7 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
         "accepted_env_keys": [
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "expected_live_contract": "news_source_policy_contract",
         "expected_live_checks": [
@@ -1189,6 +1218,7 @@ def test_news_bundle_live_provider_exception_returns_recovery_metadata(
         "accepted_env_keys": [
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "next_setup_action": "verify_provider_credentials_or_network",
         "expected_live_contract": "news_source_policy_contract",

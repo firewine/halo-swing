@@ -378,6 +378,7 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                 "accepted_env_keys": [
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
+                    "NEWSAPI_KEY",
                 ],
                 "example": "NEWS_API_KEY=your_newsapi_key",
                 "secret": True,

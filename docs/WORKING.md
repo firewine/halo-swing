@@ -42,19 +42,25 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_VERIFIED
-gate_id: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE
+status: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_GATE
 review_tier: S1_small
 
-next_atomic_step: prove exported API keys with accidental surrounding quotes are normalized before live provider selection and request construction
+next_atomic_step: accept NEWSAPI_KEY as a NewsAPI credential alias across provider selection, dotenv template, and summary-only API-key pipeline CLI
 
 allowed_edit_paths:
+  - .env.example
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/secret_values.py
+  - src/halo_swing_mcp/tools/market.py
+  - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
+  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
+  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
+  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
+  - tests/test_env_template.py
   - tests/test_providers.py
   - tests/test_readiness.py
 
@@ -73,8 +79,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -82,51 +89,78 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - exported API keys with accidental surrounding quotes configure market, macro, and news provider families
-  - provider request construction strips accidental surrounding quotes before API-key query parameters are sent
-  - quoted documented placeholders remain unconfigured and do not select live providers
+  - NEWSAPI_KEY selects the NewsAPI provider when market and macro provider keys are also configured
+  - NEWSAPI_KEY appears in accepted news env-key surfaces, dotenv template, and .env.example as a blank supported key
+  - summary-only API-key pipeline CLI reports news configured via NEWSAPI_KEY without returning secret values
   - test output does not return secret values, URLs with secrets, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified quoted exported API-key normalization gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified NEWSAPI_KEY alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_GATE
 commands:
-  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
-  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
-  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
-  - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q: 3 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_project_alias_control_character_keys_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_control_character_exported_keys_without_secret_output -q: 2 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 35 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 131 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 873 passed
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task contract and portable mirror match
+  - JSON task contract parsing passed for current contract and portable mirror
+  - git diff --check passed
+  - focused NEWSAPI_KEY provider/template tests passed: 3 passed
+  - focused summary-only NEWSAPI_KEY CLI test passed: 1 passed
+  - env template tests passed: 11 passed
+  - provider tests passed: 36 passed
+  - readiness tests passed: 132 passed
+  - full pytest passed: 875 passed
+  - ruff passed
+  - harness health_check passed
 files_changed:
+  - .env.example
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/secret_values.py
+  - src/halo_swing_mcp/tools/market.py
+  - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
+  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
+  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
+  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
+  - tests/test_env_template.py
   - tests/test_providers.py
   - tests/test_readiness.py
-next_state: commit and push this verified quoted exported API-key normalization gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified NEWSAPI_KEY alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - added shared secret normalization for accidental surrounding single or double quotes
-  - quoted exported API keys configure live provider families without returning secret values
-  - provider request query parameters receive unquoted API keys under fake HTTP calls
-  - quoted placeholders remain blocked, and control-character values remain rejected
+  - NEWSAPI_KEY now selects the NewsAPI provider and appears in accepted news env-key surfaces
+  - summary-only API-key pipeline CLI reports NEWSAPI_KEY as configured without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_VERIFIED
+gate_id: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE
+review_tier: S1_small
+
+next_atomic_step: prove exported API keys with accidental surrounding quotes are normalized before live provider selection and request construction
 ```
 
 Previous completed directive:

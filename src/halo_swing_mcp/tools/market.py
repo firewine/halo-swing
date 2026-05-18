@@ -72,6 +72,7 @@ PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
         "accepted_env_keys": [
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "expected_live_contract": "news_source_policy_contract",
         "expected_live_checks": [

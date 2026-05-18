@@ -71,7 +71,9 @@ def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:
         {
             "name": "get_news_bundle_live_smoke",
             "provider": "newsapi",
-            "required_env_key_groups": [["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]],
+            "required_env_key_groups": [
+                ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"]
+            ],
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
                 "get_news_bundle --input-json '{\"topic\":\"macro\"}' --no-audit"

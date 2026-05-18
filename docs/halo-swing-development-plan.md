@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.040 API Key Integration NEWSAPI_KEY Alias Gate Record - 2026-05-18
+
+### A. 목적
+
+4.039는 실수로 surrounding quotes가 들어간 exported API key 값을 실제 provider 요청 전에
+정규화하도록 고정했다. 이번 slice는 NewsAPI 사용자가 흔히 쓰는 `NEWSAPI_KEY` 환경변수도
+공식 news credential alias로 인정한다. 목표는 사용자가 `NEWSAPI_KEY`만 알고 있어도
+`HALO_SWING_NEWS_API_KEY`나 `NEWS_API_KEY`로 다시 이름을 바꾸지 않고 API-key-only setup을
+ready로 만들 수 있게 하는 것이다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - added NEWSAPI_KEY to the NewsAPI accepted env-key tuple
+  - exposed NEWSAPI_KEY in .env.example and readiness dotenv template as a blank supported alias
+  - proved provider auto-selection and summary-only API-key pipeline CLI accept NEWSAPI_KEY without returning secret values
+  - kept placeholder/control-character/no-secret behavior unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q: 11 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 36 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 875 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.039 API Key Integration Quoted Exported Keys Normalization Gate Record - 2026-05-18
 
 ### A. 목적

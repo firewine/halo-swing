@@ -221,7 +221,11 @@ def get_live_data_api_key_status() -> dict[str, Any]:
             provider_family="news",
             provider="newsapi",
             preferred_env_key="NEWS_API_KEY",
-            accepted_env_keys=["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"],
+            accepted_env_keys=[
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+                "NEWSAPI_KEY",
+            ],
             missing_name="news_api_key",
             smoke_command_name="get_news_bundle_live_smoke",
             optional_live_mode_env="HALO_SWING_NEWS_DATA_MODE",
