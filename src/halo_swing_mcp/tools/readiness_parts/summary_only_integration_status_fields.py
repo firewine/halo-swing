@@ -74,6 +74,11 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_dotenv_target_path = None
     one_shot_pipeline_smoke_unblock_followup_required_env_keys: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_dotenv_examples: list[str] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_name = None
+    one_shot_pipeline_smoke_unblock_followup_smoke_command = None
+    one_shot_pipeline_smoke_unblock_followup_smoke_network_call = False
+    one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state = False
+    one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned = False
     one_shot_pipeline_smoke_unblock_network_call = False
     one_shot_pipeline_smoke_unblock_mutates_local_state = False
     one_shot_pipeline_smoke_unblock_secret_values_returned = False
@@ -103,6 +108,21 @@ def _api_key_integration_status_top_level_fields(
             )
             one_shot_pipeline_smoke_unblock_followup_dotenv_examples = (
                 _string_list(api_key_setup_file_summary.get("dotenv_examples"))
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_name = (
+                one_shot_pipeline_smoke.get("name")
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_command = (
+                one_shot_pipeline_smoke_command
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_network_call = (
+                one_shot_pipeline_smoke_network_call
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state = (
+                one_shot_pipeline_smoke.get("mutates_local_state") is True
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned = (
+                one_shot_pipeline_smoke.get("secret_values_returned") is True
             )
         one_shot_pipeline_smoke_unblock_network_call = (
             api_key_next_action_summary.get("next_action_network_call") is True
@@ -234,6 +254,21 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_example_count": (
             len(one_shot_pipeline_smoke_unblock_followup_dotenv_examples)
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_name": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_name
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_network_call
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run": (
             one_shot_pipeline_smoke_unblock_ready_to_run

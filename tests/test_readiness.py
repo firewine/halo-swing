@@ -8390,6 +8390,36 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == len(EXPECTED_DOTENV_EXAMPLES)
     )
     assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_name"
+        ]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command"
+        ]
+        == payload["api_key_integration_one_shot_pipeline_smoke_command"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state"
+        ]
+        is False
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned"
+        ]
+        is False
+    )
+    assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]
         is True
     )
@@ -12807,6 +12837,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         ].get("dotenv_target_path")
     expected_one_shot_unblock_followup_required_env_keys: list[str] = []
     expected_one_shot_unblock_followup_dotenv_examples: list[str] = []
+    expected_one_shot_unblock_followup_smoke_name = None
+    expected_one_shot_unblock_followup_smoke_command = None
+    expected_one_shot_unblock_followup_smoke_network_call = False
+    expected_one_shot_unblock_followup_smoke_mutates_local_state = False
+    expected_one_shot_unblock_followup_smoke_secret_values_returned = False
     if expected_one_shot_unblock_next_after_action == "fill_live_data_api_keys":
         expected_one_shot_unblock_followup_required_env_keys = payload[
             "api_key_requirements_summary"
@@ -12814,6 +12849,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         expected_one_shot_unblock_followup_dotenv_examples = payload[
             "api_key_setup_file_summary"
         ].get("dotenv_examples", [])
+        expected_one_shot_unblock_followup_smoke_name = one_shot_pipeline_smoke[
+            "name"
+        ]
+        expected_one_shot_unblock_followup_smoke_command = (
+            one_shot_pipeline_smoke["command"]
+        )
+        expected_one_shot_unblock_followup_smoke_network_call = (
+            one_shot_pipeline_smoke["network_call"]
+        )
+        expected_one_shot_unblock_followup_smoke_mutates_local_state = (
+            one_shot_pipeline_smoke["mutates_local_state"]
+        )
+        expected_one_shot_unblock_followup_smoke_secret_values_returned = (
+            one_shot_pipeline_smoke["secret_values_returned"]
+        )
     expected_one_shot_unblock_network_call = False
     expected_one_shot_unblock_mutates_local_state = False
     expected_one_shot_unblock_secret_values_returned = False
@@ -12883,6 +12933,36 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_dotenv_example_count"
         ]
         == len(expected_one_shot_unblock_followup_dotenv_examples)
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_name"
+        ]
+        == expected_one_shot_unblock_followup_smoke_name
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command"
+        ]
+        == expected_one_shot_unblock_followup_smoke_command
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
+        ]
+        is expected_one_shot_unblock_followup_smoke_network_call
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state"
+        ]
+        is expected_one_shot_unblock_followup_smoke_mutates_local_state
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned"
+        ]
+        is expected_one_shot_unblock_followup_smoke_secret_values_returned
     )
     assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]
