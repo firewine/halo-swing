@@ -8409,6 +8409,46 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family"
+        ]
+        == {
+            "market": "polygon",
+            "macro": "fred",
+            "news": "newsapi",
+        }
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family"
+        ]
+        == {
+            "market": "POLYGON_API_KEY",
+            "macro": "FRED_API_KEY",
+            "news": "NEWS_API_KEY",
+        }
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family"
+        ]
+        == {
+            "market": [
+                "HALO_SWING_MARKET_DATA_API_KEY",
+                "POLYGON_API_KEY",
+            ],
+            "macro": [
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+                "FRED_API_KEY",
+            ],
+            "news": [
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+            ],
+        }
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command"
         ]
         == payload["api_key_integration_one_shot_pipeline_smoke_command"]
@@ -12874,6 +12914,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_required_env_keys: list[str] = []
     expected_one_shot_unblock_followup_dotenv_examples: list[str] = []
     expected_one_shot_unblock_followup_smoke_provider_families: list[str] = []
+    expected_one_shot_unblock_followup_smoke_provider_by_family: dict[str, object] = {}
+    expected_one_shot_unblock_followup_smoke_preferred_env_key_by_family: dict[
+        str, object
+    ] = {}
+    expected_one_shot_unblock_followup_smoke_accepted_env_keys_by_family: dict[
+        str, list[str]
+    ] = {}
     expected_one_shot_unblock_followup_smoke_name = None
     expected_one_shot_unblock_followup_smoke_command = None
     expected_one_shot_unblock_followup_smoke_status = "unavailable"
@@ -12898,6 +12945,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             for family in provider_requirements
             if isinstance(family, str)
         ]
+        provider_requirement_rows = {
+            family: provider_requirements.get(family, {})
+            for family in expected_one_shot_unblock_followup_smoke_provider_families
+        }
+        expected_one_shot_unblock_followup_smoke_provider_by_family = {
+            family: row.get("provider")
+            for family, row in provider_requirement_rows.items()
+        }
+        expected_one_shot_unblock_followup_smoke_preferred_env_key_by_family = {
+            family: row.get("preferred_env_key")
+            for family, row in provider_requirement_rows.items()
+        }
+        expected_one_shot_unblock_followup_smoke_accepted_env_keys_by_family = {
+            family: row.get("accepted_env_keys", [])
+            for family, row in provider_requirement_rows.items()
+        }
         expected_one_shot_unblock_followup_smoke_name = one_shot_pipeline_smoke[
             "name"
         ]
@@ -13017,6 +13080,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_family_count"
         ]
         == len(expected_one_shot_unblock_followup_smoke_provider_families)
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_provider_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_preferred_env_key_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_accepted_env_keys_by_family
     )
     assert (
         payload[

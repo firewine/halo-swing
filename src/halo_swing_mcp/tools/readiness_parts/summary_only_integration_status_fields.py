@@ -75,6 +75,15 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_required_env_keys: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_dotenv_examples: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_provider_families: list[str] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family: dict[
+        str, list[str]
+    ] = {}
     one_shot_pipeline_smoke_unblock_followup_smoke_name = None
     one_shot_pipeline_smoke_unblock_followup_smoke_command = None
     one_shot_pipeline_smoke_unblock_followup_smoke_status = "unavailable"
@@ -125,6 +134,24 @@ def _api_key_integration_status_top_level_fields(
                 for family in provider_requirements
                 if isinstance(family, str)
             ]
+            provider_requirement_rows = {
+                family: _optional_mapping(provider_requirements.get(family)) or {}
+                for family in (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                )
+            }
+            one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family = {
+                family: row.get("provider")
+                for family, row in provider_requirement_rows.items()
+            }
+            one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family = {
+                family: row.get("preferred_env_key")
+                for family, row in provider_requirement_rows.items()
+            }
+            one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family = {
+                family: _string_list(row.get("accepted_env_keys"))
+                for family, row in provider_requirement_rows.items()
+            }
             one_shot_pipeline_smoke_unblock_followup_smoke_name = (
                 one_shot_pipeline_smoke.get("name")
             )
@@ -298,6 +325,15 @@ def _api_key_integration_status_top_level_fields(
             len(
                 one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
             )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command": (
             one_shot_pipeline_smoke_unblock_followup_smoke_command

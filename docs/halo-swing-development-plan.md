@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 3.989 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke Provider Env-Hint Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.988까지 summary-only 출력은 API-key integration one-shot pipeline smoke의 후속
+실행 대상 provider family 목록과 개수를 top-level로 노출한다. 하지만 사용자가 실제
+API 키를 넣을 때 compact client가 family별 provider와 허용 env-key alias를 표시하려면
+아직 nested provider requirement map을 직접 열어야 한다. 이번 slice는 후속 smoke에
+필요한 provider/env-key hint를 top-level map으로 올려 API 키만 넣으면 실제 live
+provider smoke로 이어지는 경로를 더 명확하게 만든다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family mirrors provider names from API-key provider requirements
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family mirrors preferred env-key names from API-key provider requirements
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family mirrors accepted env-key aliases without values
+  - summary-only tests prove follow-up smoke provider/env-key hint fields mirror provider_requirements without exposing secret values
+  - README and DevOps setup guide document the follow-up smoke provider/env-key hint fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.988 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke Provider-Family Fields Gate Record - 2026-05-18
 
 ### A. 목적
