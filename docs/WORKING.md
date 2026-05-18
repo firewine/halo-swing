@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_PLACEHOLDER_WITH_DOTENV_CANONICAL_VERIFIED
-gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_PLACEHOLDER_WITH_DOTENV_CANONICAL_GATE
+status: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_BLANK_WITH_DOTENV_CANONICAL_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_BLANK_WITH_DOTENV_CANONICAL_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline CLI accepts launch-directory dotenv real canonical credentials when exported project alias placeholders remain
+next_atomic_step: prove summary-only API-key pipeline CLI accepts launch-directory dotenv real canonical credentials when exported project alias blanks remain
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -71,38 +71,39 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_blanks_without_secret_output -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only API-key pipeline CLI launched with exported project alias placeholders and launch-directory dotenv real canonical credentials keeps API-key setup ready
+  - summary-only API-key pipeline CLI launched with exported project alias blanks and launch-directory dotenv real canonical credentials keeps API-key setup ready
   - provider API-key resolvers skip placeholder, blank, and malformed earlier candidates before selecting later real credentials
-  - CLI regression proves exported project alias placeholders do not block real dotenv canonical credentials, live routes, or one-shot smoke readiness
+  - CLI regression proves exported project alias blanks do not block real dotenv canonical credentials, live routes, or one-shot smoke readiness
   - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI exported-alias-placeholder with dotenv canonical API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI exported-alias-blank with dotenv canonical API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_PLACEHOLDER_WITH_DOTENV_CANONICAL_GATE
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_BLANK_WITH_DOTENV_CANONICAL_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 126 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 866 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_blanks_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 127 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 867 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -112,11 +113,21 @@ files_changed:
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/providers.py
   - tests/test_readiness.py
-next_state: commit and push this verified CLI exported-alias-placeholder with dotenv canonical API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified CLI exported-alias-blank with dotenv canonical API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - fixed provider API-key resolvers to skip placeholder, blank, and malformed earlier candidates before selecting later real credentials
-  - added regression proving exported project alias placeholders do not block launch-directory dotenv canonical credentials
+  - added regression proving exported project alias blanks do not block launch-directory dotenv canonical credentials
   - CLI output keeps live routes selected, configured env-key surface names only for real canonical keys, one-shot smoke ready, and secret values absent
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_PLACEHOLDER_WITH_DOTENV_CANONICAL_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_PLACEHOLDER_WITH_DOTENV_CANONICAL_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline CLI accepts launch-directory dotenv real canonical credentials when exported project alias placeholders remain
 ```
 
 Previous completed directive:
