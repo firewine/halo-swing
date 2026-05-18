@@ -149,6 +149,15 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families: list[
         str
     ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_provider_family_count = (
+        0
+    )
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_family_count = (
+        0
+    )
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured = (
+        False
+    )
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family: dict[
         str, Any
     ] = {}
@@ -448,6 +457,15 @@ def _api_key_integration_status_top_level_fields(
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_families
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_provider_family_count = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_family_count = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family
@@ -751,6 +769,15 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_provider_family_count": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_provider_family_count
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_family_count": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_family_count
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family
