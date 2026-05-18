@@ -8739,6 +8739,38 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live"
+        ]
+        is payload["api_key_integration_all_selected_routes_live"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count"
+        ]
+        == payload["api_key_integration_provider_route_family_count"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count"
+        ]
+        == payload["api_key_integration_selected_provider_family_count"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count"
+        ]
+        == payload[
+            "api_key_integration_provider_route_live_data_required_family_count"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts"
+        ]
+        == payload["api_key_integration_provider_route_data_mode_counts"]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family"
         ]
         == payload[
@@ -13451,6 +13483,21 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family: dict[
         str, object
     ] = {}
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live = (
+        False
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count = (
+        0
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count = (
+        0
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count = (
+        0
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts: dict[
+        str, int
+    ] = {}
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family: dict[
         str, object
     ] = {}
@@ -13720,6 +13767,41 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family = (
                 integration_status["provider_route_live_data_required_by_family"]
             )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live = (
+                integration_status["all_selected_routes_live"]
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count = len(
+                set(
+                    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family
+                )
+                | set(
+                    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family
+                )
+                | set(
+                    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family
+                )
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count = sum(
+                1
+                for selected_provider_class in expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family.values()
+                if isinstance(selected_provider_class, str)
+                and bool(selected_provider_class)
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count = sum(
+                1
+                for live_data_required in expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family.values()
+                if live_data_required is True
+            )
+            for data_mode in expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family.values():
+                if isinstance(data_mode, str) and data_mode:
+                    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts[
+                        data_mode
+                    ] = (
+                        expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts.get(
+                            data_mode, 0
+                        )
+                        + 1
+                    )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family = (
                 expected_one_shot_unblock_followup_smoke_provider_by_family
             )
@@ -14123,6 +14205,36 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family"
         ]
         == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts
     )
     assert (
         payload[

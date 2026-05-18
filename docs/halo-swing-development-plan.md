@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.008 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Provider Route Aggregate Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+4.007까지 summary-only 출력은 API-key-only next command block에 selected provider
+class와 family별 data mode/live-data requirement를 top-level로 노출한다. 하지만 compact
+client가 같은 command card에서 모든 selected route가 live인지, route family 수와 live-data
+required family 수가 몇 개인지 표시하려면 상위 API-key integration route aggregate fields를
+다시 조합해야 한다. 이번 slice는 API-key-only next command provider route aggregate fields를
+조건부 top-level로 올려, API 키 입력 후 실제 live provider route로 이어지는 준비 상태를 한
+블록에서 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_selected_routes_live mirrors API-key integration all-selected-routes-live only when API-key-only setup is ready after env keys
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_family_count mirrors API-key integration provider route family count for the next command block
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_family_count mirrors selected provider family count for the next command block
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_family_count mirrors live-data-required family count for the next command block
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_counts mirrors provider route data mode counts for the next command block
+  - summary-only tests prove API-key-only next command provider route aggregate fields derive from API-key integration provider route aggregate state and API-key-only readiness
+  - README and DevOps setup guide document the follow-up smoke API-key-only next command provider route aggregate fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.007 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Provider Route Fields Gate Record - 2026-05-18
 
 ### A. 목적
