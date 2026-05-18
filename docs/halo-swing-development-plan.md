@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.039 API Key Integration Quoted Exported Keys Normalization Gate Record - 2026-05-18
+
+### A. 목적
+
+4.038은 `.env` 파일 자체의 disable 스위치가 같은 파일의 실제 키를 활성화하지 않도록
+고정했다. 이번 slice는 사용자가 shell/export 경로에서 API key 값에 실수로 surrounding quotes를
+포함해 넣어도 provider selection과 실제 provider request construction이 quote 없는 키로
+정규화되는지 고정한다. 이 작업은 "API 키만 넣으면 연동"되는 경로에서 흔한 입력 실수를
+막되, documented placeholder 값은 quote가 붙어도 live provider를 선택하지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - normalize accidental surrounding single or double quotes from configured secret values
+  - keep quoted documented placeholders unconfigured
+  - prove quoted exported keys make summary-only API-key pipeline ready without secret output
+  - prove Polygon, FRED, and NewsAPI request query parameters receive unquoted API keys with offline fake HTTP calls
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_project_alias_control_character_keys_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_control_character_exported_keys_without_secret_output -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 35 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 131 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 873 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.038 API Key Integration CLI Dotenv Self Disable Ignores Dotenv Keys Gate Record - 2026-05-18
 
 ### A. 목적

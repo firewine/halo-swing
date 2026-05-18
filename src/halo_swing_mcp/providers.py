@@ -10,7 +10,10 @@ from typing import Any, Protocol
 from halo_swing_mcp import fixtures
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import get_config_value
-from halo_swing_mcp.secret_values import is_placeholder_secret_value
+from halo_swing_mcp.secret_values import (
+    is_placeholder_secret_value,
+    normalize_secret_value,
+)
 
 
 class MarketDataProvider(Protocol):
@@ -659,11 +662,13 @@ def _provider_route_entry(
 
 
 def _secret_candidate_configured(value: str | None) -> bool:
+    normalized = normalize_secret_value(value) if isinstance(value, str) else ""
     return bool(
-        isinstance(value, str)
-        and value.strip()
+        normalized
+        and isinstance(value, str)
         and _has_no_control_characters(value)
-        and not is_placeholder_secret_value(value)
+        and _has_no_control_characters(normalized)
+        and not is_placeholder_secret_value(normalized)
     )
 
 
@@ -768,9 +773,11 @@ def _normalize_secret(value: str, field_name: str) -> str:
         raise ValueError(f"{field_name} must be a nonempty string")
     if not _has_no_control_characters(value):
         raise ValueError(f"{field_name} must not contain control characters")
-    normalized = value.strip()
+    normalized = normalize_secret_value(value)
     if not normalized:
         raise ValueError(f"{field_name} must be a nonempty string")
+    if not _has_no_control_characters(normalized):
+        raise ValueError(f"{field_name} must not contain control characters")
     if is_placeholder_secret_value(normalized):
         raise ValueError(f"{field_name} must be a real credential, not a placeholder")
     return normalized

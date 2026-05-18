@@ -42,18 +42,20 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_VERIFIED
-gate_id: API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_GATE
+status: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_VERIFIED
+gate_id: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline CLI respects launch-directory dotenv disable flag even when the same dotenv contains real credentials
+next_atomic_step: prove exported API keys with accidental surrounding quotes are normalized before live provider selection and request construction
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/secret_values.py
+  - tests/test_providers.py
   - tests/test_readiness.py
 
 blocked_path_prefixes:
@@ -71,38 +73,43 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_launch_directory_dotenv_disable_flag_with_same_file_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only API-key pipeline CLI launched with launch-directory dotenv HALO_SWING_DISABLE_DOTENV=true ignores real credentials in that same dotenv
-  - CLI regression proves dotenv-resident disable switch keeps API-key setup blocked until exported real credentials are provided
-  - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
+  - exported API keys with accidental surrounding quotes configure market, macro, and news provider families
+  - provider request construction strips accidental surrounding quotes before API-key query parameters are sent
+  - quoted documented placeholders remain unconfigured and do not select live providers
+  - test output does not return secret values, URLs with secrets, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI dotenv self-disable API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified quoted exported API-key normalization gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_GATE
+gate_id: API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_launch_directory_dotenv_disable_flag_with_same_file_secrets -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_exported_disable_dotenv_with_launch_directory_dotenv_secrets -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 130 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 870 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_project_alias_control_character_keys_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_control_character_exported_keys_without_secret_output -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 35 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 131 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 873 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -110,13 +117,27 @@ files_changed:
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
+  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/secret_values.py
+  - tests/test_providers.py
   - tests/test_readiness.py
-next_state: commit and push this verified CLI dotenv self-disable API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified quoted exported API-key normalization gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - added regression proving launch-directory dotenv HALO_SWING_DISABLE_DOTENV=true ignores real credentials in the same dotenv file
-  - live data API key status now reports disabled dotenv from the resolved disable switch so summary-only CLI output is accurate
-  - CLI output stays blocked without exported real credentials and does not return dotenv secret values
+  - added shared secret normalization for accidental surrounding single or double quotes
+  - quoted exported API keys configure live provider families without returning secret values
+  - provider request query parameters receive unquoted API keys under fake HTTP calls
+  - quoted placeholders remain blocked, and control-character values remain rejected
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline CLI respects launch-directory dotenv disable flag even when the same dotenv contains real credentials
 ```
 
 Previous completed directive:

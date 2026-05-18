@@ -1,22 +1,26 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_CLI_DOTENV_SELF_DISABLE_IGNORES_DOTENV_KEYS_GATE",
+  "gate_id": "API_KEY_INTEGRATION_QUOTED_EXPORTED_KEYS_NORMALIZATION_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.038",
-  "next_atomic_step": "prove summary-only API-key pipeline CLI respects launch-directory dotenv disable flag even when the same dotenv contains real credentials",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.039",
+  "next_atomic_step": "prove exported API keys with accidental surrounding quotes are normalized before live provider selection and request construction",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/tools/readiness_parts/public_tools.py",
+    "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/secret_values.py",
+    "tests/test_providers.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.038",
-    "src/halo_swing_mcp/tools/readiness_parts/public_tools.py",
+    "docs/halo-swing-development-plan.md#4.039",
+    "src/halo_swing_mcp/providers.py",
+    "src/halo_swing_mcp/secret_values.py",
+    "tests/test_providers.py",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -33,7 +37,9 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_launch_directory_dotenv_disable_flag_with_same_file_secrets -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_accidentally_quoted_exported_keys_without_secret_output -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -50,13 +56,14 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only API-key pipeline CLI launched with launch-directory dotenv HALO_SWING_DISABLE_DOTENV=true ignores real credentials in that same dotenv",
-    "CLI regression proves dotenv-resident disable switch keeps API-key setup blocked until exported real credentials are provided",
-    "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
+    "exported API keys with accidental surrounding quotes configure market, macro, and news provider families",
+    "provider request construction strips accidental surrounding quotes before API-key query parameters are sent",
+    "quoted documented placeholders remain unconfigured and do not select live providers",
+    "test output does not return secret values, URLs with secrets, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified CLI dotenv self-disable API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified quoted exported API-key normalization gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

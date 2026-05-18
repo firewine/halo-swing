@@ -207,12 +207,15 @@ def test_placeholder_secret_predicate_covers_documented_examples() -> None:
         "your_newsapi_key",
         "your_provider_key",
         "<api_key>",
+        '"<api_key>"',
+        "'your_polygon_key'",
         "placeholder",
         "CHANGE_ME",
     ]
 
     assert all(is_placeholder_secret_value(value) for value in placeholders)
     assert not is_placeholder_secret_value("polygon-realistic-test-secret")
+    assert not is_placeholder_secret_value('"polygon-realistic-test-secret"')
 
 
 def test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys(
@@ -259,6 +262,42 @@ def test_describe_market_data_provider_route_ignores_documented_placeholder_api_
     assert payload["secret_values_returned"] is False
     for value in placeholder_env.values():
         assert value not in serialized
+
+
+def test_describe_market_data_provider_route_ignores_quoted_placeholder_api_keys(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    placeholder_env = {
+        "POLYGON_API_KEY": '"your_polygon_key"',
+        "FRED_API_KEY": "'your_fred_key'",
+        "NEWS_API_KEY": '"your_newsapi_key"',
+    }
+    for key, value in placeholder_env.items():
+        monkeypatch.setenv(key, value)
+    get_settings.cache_clear()
+
+    payload = describe_market_data_provider_route()
+    provider = get_market_data_provider()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert isinstance(provider, ReplayMarketDataProvider)
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["selected_provider_classes"] == ["ReplayMarketDataProvider"]
+    for family in ("market", "macro", "news"):
+        assert payload["providers"][family]["configured"] is False
+        assert payload["providers"][family]["configured_env_keys"] == []
+        assert payload["providers"][family]["selected"] is False
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+    for value in placeholder_env.values():
+        assert value not in serialized
+        assert value.strip("\"'") not in serialized
 
 
 def test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key(
@@ -598,6 +637,89 @@ def test_polygon_market_data_provider_fetches_ohlcv_without_returning_secret() -
     assert bars[-1]["close"] == 102.5
     assert query["apiKey"] == ["polygon-secret"]
     assert "polygon-secret" not in serialized_bars
+
+
+def test_provider_api_keys_strip_accidental_surrounding_quotes_before_requests() -> None:
+    requested_urls: list[str] = []
+
+    def fake_http_get(url: str) -> dict[str, Any]:
+        requested_urls.append(url)
+        if "polygon.io" in url:
+            return {
+                "results": [
+                    {
+                        "t": 1_700_000_000_000,
+                        "o": 100.0,
+                        "h": 102.0,
+                        "l": 99.5,
+                        "c": 101.0,
+                        "v": 1000,
+                    },
+                    {
+                        "t": 1_700_086_400_000,
+                        "o": 101.0,
+                        "h": 103.0,
+                        "l": 100.5,
+                        "c": 102.5,
+                        "v": 1100,
+                    },
+                ]
+            }
+        if "stlouisfed.org" in url:
+            return {
+                "observations": [
+                    {"value": "20.0"},
+                    {"value": "19.5"},
+                    {"value": "19.0"},
+                    {"value": "18.5"},
+                    {"value": "18.0"},
+                    {"value": "17.5"},
+                ]
+            }
+        return {
+            "articles": [
+                {
+                    "title": "Market headline",
+                    "description": "Policy context changed.",
+                    "publishedAt": "2026-05-16T13:00:00Z",
+                    "url": "https://example.invalid/news/policy",
+                    "source": {"name": "Example Policy"},
+                }
+            ]
+        }
+
+    market_provider = PolygonMarketDataProvider(
+        api_key='"polygon-quoted-secret"',
+        http_get=fake_http_get,
+    )
+    macro_provider = FredMacroDataProvider(
+        ReplayMarketDataProvider(),
+        api_key="'fred-quoted-secret'",
+        http_get=fake_http_get,
+    )
+    news_provider = NewsApiDataProvider(
+        ReplayMarketDataProvider(),
+        api_key='  "news-quoted-secret"  ',
+        http_get=fake_http_get,
+    )
+
+    market_provider.ohlcv("QQQ", periods=2)
+    macro_provider.macro_snapshot()
+    news_provider.news_cards("macro")
+
+    polygon_query = parse.parse_qs(parse.urlparse(requested_urls[0]).query)
+    fred_query = parse.parse_qs(parse.urlparse(requested_urls[1]).query)
+    news_query = parse.parse_qs(parse.urlparse(requested_urls[-1]).query)
+    serialized_urls = repr(requested_urls)
+
+    assert polygon_query["apiKey"] == ["polygon-quoted-secret"]
+    assert fred_query["api_key"] == ["fred-quoted-secret"]
+    assert news_query["apiKey"] == ["news-quoted-secret"]
+    assert "%22" not in serialized_urls
+    assert "%27" not in serialized_urls
+    assert '"polygon-quoted-secret"' not in serialized_urls
+    assert "'fred-quoted-secret'" not in serialized_urls
+    assert '"news-quoted-secret"' not in serialized_urls
 
 
 def test_fred_macro_provider_fetches_macro_snapshot_without_returning_secret() -> None:
