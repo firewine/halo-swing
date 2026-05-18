@@ -76,6 +76,9 @@ def _api_key_integration_status_top_level_fields(
     next_action_accepted_env_keys = _string_list(
         api_key_next_action_summary.get("accepted_env_keys")
     )
+    next_action_required_env_keys = _string_list(
+        api_key_next_action_summary.get("required_env_keys")
+    )
     next_action_has_command = bool(next_action_command)
     next_action_ready_to_run = (
         next_action_status == "ready" and next_action_has_command
@@ -227,8 +230,11 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_next_action_accepted_env_key_count": len(
             next_action_accepted_env_keys
         ),
-        "api_key_integration_next_action_required_env_keys": _string_list(
-            api_key_next_action_summary.get("required_env_keys")
+        "api_key_integration_next_action_required_env_keys": (
+            next_action_required_env_keys
+        ),
+        "api_key_integration_next_action_required_env_key_count": len(
+            next_action_required_env_keys
         ),
         "api_key_integration_next_action_expected_live_contract": (
             api_key_next_action_summary.get("next_action_expected_live_contract")

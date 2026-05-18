@@ -466,6 +466,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "api_key_integration_next_action_accepted_env_keys" in guide
     assert "api_key_integration_next_action_accepted_env_key_count" in guide
     assert "api_key_integration_next_action_required_env_keys" in guide
+    assert "api_key_integration_next_action_required_env_key_count" in guide
     assert "api_key_integration_next_action_network_call_policy" in guide
     assert "api_key_integration_next_action_expected_live_contract" in guide
     assert "api_key_integration_next_action_expected_live_checks" in guide
@@ -1123,6 +1124,7 @@ def test_setup_docs_keep_api_key_integration_next_action_fields_in_sync() -> Non
         "api_key_integration_next_action_accepted_env_keys",
         "api_key_integration_next_action_accepted_env_key_count",
         "api_key_integration_next_action_required_env_keys",
+        "api_key_integration_next_action_required_env_key_count",
         "api_key_integration_next_action_network_call_policy",
         "api_key_integration_next_action_expected_live_contract",
         "api_key_integration_next_action_expected_live_checks",

@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_NEXT_ACTION_READINESS_COUNT_FIELDS_GATE",
+  "gate_id": "API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.972",
-  "next_atomic_step": "surface summary-only API-key integration next-action readiness and count fields",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.973",
+  "next_atomic_step": "surface summary-only API-key integration next-action required env-key count field",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -18,7 +18,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.972",
+    "docs/halo-swing-development-plan.md#3.973",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
@@ -57,14 +57,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output exposes API-key integration next-action has-command, ready-to-run, and requires-api-keys fields",
-    "summary-only output exposes API-key integration next-action expected live-check count and accepted env-key count fields",
-    "summary-only tests prove integration next-action readiness/count fields match the selected next action summary",
-    "README and DevOps guide document the top-level API-key integration next-action readiness and count fields",
+    "summary-only output exposes API-key integration next-action required env-key count field",
+    "summary-only tests prove integration next-action required env-key count matches the selected next action summary",
+    "README and DevOps guide document the top-level API-key integration next-action required env-key count field",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key integration next-action readiness and count fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key integration next-action required env-key count field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

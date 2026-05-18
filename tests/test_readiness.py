@@ -8373,6 +8373,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_next_action_accepted_env_keys"] == []
     assert payload["api_key_integration_next_action_accepted_env_key_count"] == 0
     assert payload["api_key_integration_next_action_required_env_keys"] == []
+    assert payload["api_key_integration_next_action_required_env_key_count"] == 0
     assert payload["api_key_integration_next_action_expected_live_contract"] is None
     assert payload["api_key_integration_next_action_expected_live_checks"] == []
     assert (
@@ -12798,6 +12799,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert payload["api_key_integration_next_action_required_env_keys"] == (
         payload["next_operator_action_required_env_keys"]
     )
+    assert payload[
+        "api_key_integration_next_action_required_env_key_count"
+    ] == len(payload["next_operator_action_required_env_keys"])
     assert payload["api_key_integration_next_action_expected_live_contract"] == (
         payload["next_operator_action_expected_live_contract"]
     )

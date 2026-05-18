@@ -1610,6 +1610,7 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_accepted_env_keys`,
 `api_key_integration_next_action_accepted_env_key_count`,
 `api_key_integration_next_action_required_env_keys`,
+`api_key_integration_next_action_required_env_key_count`,
 `api_key_integration_next_action_network_call_policy`,
 `api_key_integration_next_action_expected_live_contract`, and
 `api_key_integration_next_action_expected_live_checks`,
