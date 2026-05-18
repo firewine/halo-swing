@@ -27,11 +27,16 @@ def _bool_from_status_or_provider(
 
 def _api_key_integration_status_top_level_fields(
     *,
+    api_key_command_summary: dict[str, Any],
     api_key_integration_status_summary: dict[str, Any],
     api_key_next_action_summary: dict[str, Any],
     next_operator_action: dict[str, Any],
     next_provider_smoke: dict[str, Any],
 ) -> dict[str, Any]:
+    one_shot_pipeline_smoke = (
+        _optional_mapping(api_key_command_summary.get("one_shot_pipeline_smoke"))
+        or {}
+    )
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -107,6 +112,24 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_ready_to_run_live_smoke": (
             api_key_integration_status_summary.get("ready_to_run_live_smoke")
             is True
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_name": (
+            one_shot_pipeline_smoke.get("name")
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_command": (
+            one_shot_pipeline_smoke.get("command")
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_network_call": (
+            one_shot_pipeline_smoke.get("network_call") is True
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_network_call_policy": (
+            one_shot_pipeline_smoke.get("network_call_policy")
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_mutates_local_state": (
+            one_shot_pipeline_smoke.get("mutates_local_state") is True
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_secret_values_returned": (
+            one_shot_pipeline_smoke.get("secret_values_returned") is True
         ),
         "api_key_integration_provider_smoke_count": (
             api_key_integration_status_summary.get("provider_smoke_count")

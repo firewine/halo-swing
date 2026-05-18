@@ -8325,6 +8325,27 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_integration_dotenv_target_exists"] is False
     assert payload["api_key_integration_live_providers_selected"] is False
     assert payload["api_key_integration_ready_to_run_live_smoke"] is False
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_name"]
+        == "run_api_key_pipeline_smoke"
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_command"] == (
+        "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
+        "run_api_key_pipeline_smoke --summary-only --no-audit"
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_network_call"] is True
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_network_call_policy"]
+        == "only_when_matching_api_key_selects_live_provider"
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_mutates_local_state"]
+        is False
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_secret_values_returned"]
+        is False
+    )
     assert payload["api_key_integration_provider_smoke_count"] == 3
     assert payload["api_key_integration_ready_provider_smoke_count"] == 0
     assert payload["api_key_integration_blocked_provider_smoke_count"] == 3
@@ -12641,6 +12662,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert (
         payload["api_key_integration_ready_to_run_live_smoke"]
         is integration_status["ready_to_run_live_smoke"]
+    )
+    one_shot_pipeline_smoke = payload["api_key_command_summary"][
+        "one_shot_pipeline_smoke"
+    ]
+    assert payload["api_key_integration_one_shot_pipeline_smoke_name"] == (
+        one_shot_pipeline_smoke["name"]
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_command"] == (
+        one_shot_pipeline_smoke["command"]
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_network_call"] is (
+        one_shot_pipeline_smoke["network_call"]
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_network_call_policy"]
+        == one_shot_pipeline_smoke["network_call_policy"]
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_mutates_local_state"]
+        is one_shot_pipeline_smoke["mutates_local_state"]
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_secret_values_returned"]
+        is one_shot_pipeline_smoke["secret_values_returned"]
     )
     assert integration_status["provider_smoke_count"] == (
         payload["setup_status_summary"]["provider_smoke_count"]

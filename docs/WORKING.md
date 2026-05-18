@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_GATE
+status: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_COMMAND_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_COMMAND_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key integration next-action required env-key count field
+next_atomic_step: surface summary-only API-key integration one-shot pipeline smoke command fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -56,6 +56,7 @@ allowed_edit_paths:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
 
@@ -82,22 +83,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key integration next-action required env-key count field
-  - summary-only tests prove integration next-action required env-key count matches the selected next action summary
-  - README and DevOps guide document the top-level API-key integration next-action required env-key count field
+  - summary-only output exposes API-key integration one-shot pipeline smoke command fields
+  - summary-only tests prove integration one-shot pipeline smoke fields mirror the command summary without secret values
+  - README and DevOps guide document the top-level API-key integration one-shot pipeline smoke command fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key integration next-action required env-key count field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key integration one-shot pipeline smoke command fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_GATE
+gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_COMMAND_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -117,11 +118,23 @@ files_changed:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py
+  - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key integration next-action required env-key count field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key integration one-shot pipeline smoke command fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes integration next-action required env-key count without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes integration one-shot pipeline smoke command fields without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEXT_ACTION_REQUIRED_ENV_KEY_COUNT_FIELD_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key integration next-action required env-key count field
 ```
 
 Previous completed directive:

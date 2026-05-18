@@ -295,6 +295,7 @@ def _api_key_pipeline_summary_only_payload(
             api_key_provider_selection_summary
         ),
         **_api_key_integration_status_top_level_fields(
+            api_key_command_summary=api_key_command_summary,
             api_key_integration_status_summary=api_key_integration_status_summary,
             api_key_next_action_summary=api_key_next_action_summary,
             next_operator_action=next_operator_action,
