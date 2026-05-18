@@ -63,6 +63,12 @@ def _api_key_integration_status_top_level_fields(
         one_shot_pipeline_smoke_blocked_reason = "api_key_setup_not_ready"
     elif one_shot_pipeline_smoke_status == "blocked":
         one_shot_pipeline_smoke_blocked_reason = "live_smoke_not_ready"
+    one_shot_pipeline_smoke_unblock_action_name = None
+    if one_shot_pipeline_smoke_blocked_reason == "api_key_setup_not_ready":
+        one_shot_pipeline_smoke_unblock_action_name = (
+            api_key_integration_status_summary.get("next_action_name")
+            or api_key_next_action_summary.get("next_action_name")
+        )
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -149,6 +155,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_blocked_reason": (
             one_shot_pipeline_smoke_blocked_reason
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_action_name": (
+            one_shot_pipeline_smoke_unblock_action_name
         ),
         "api_key_integration_one_shot_pipeline_smoke_has_command": (
             one_shot_pipeline_smoke_has_command

@@ -1085,6 +1085,7 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         "api_key_integration_one_shot_pipeline_smoke_command",
         "api_key_integration_one_shot_pipeline_smoke_status",
         "api_key_integration_one_shot_pipeline_smoke_blocked_reason",
+        "api_key_integration_one_shot_pipeline_smoke_unblock_action_name",
         "api_key_integration_one_shot_pipeline_smoke_has_command",
         "api_key_integration_one_shot_pipeline_smoke_ready_to_run",
         "api_key_integration_one_shot_pipeline_smoke_requires_api_keys",
