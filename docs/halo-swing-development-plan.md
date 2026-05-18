@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.015 API Key Integration CLI Exported Alias Value Gate Record - 2026-05-18
+
+### A. 목적
+
+4.013은 launch-directory `.env` project alias key가 summary-only API-key pipeline CLI에서
+live-ready로 잡히는지 고정했고, 4.014는 exported placeholder values가 ready로 오인되지
+않음을 고정했다. 실제 운영자는 `.env` 대신 shell/exported env로 `HALO_SWING_*` alias key만
+넣고 CLI를 실행할 수 있다. 이번 slice는 exported project alias API-key values만으로도
+market/macro/news provider families가 configured가 되고 Polygon/FRED/NewsAPI live routes가
+선택되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression using exported project alias API-key values
+  - prove exported alias values configure market, macro, and news provider families
+  - prove selected provider route classes are PolygonMarketDataProvider, FredMacroDataProvider, and NewsApiDataProvider
+  - keep output no-secret, no-audit, no local .env mutation, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_project_alias_env_without_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 107 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 847 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.014 API Key Integration CLI Exported Placeholder Rejection Gate Record - 2026-05-18
 
 ### A. 목적

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_CLI_EXPORTED_PLACEHOLDER_REJECTION_VERIFIED
-gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_PLACEHOLDER_REJECTION_GATE
+status: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_VALUE_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_VALUE_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline CLI rejects exported placeholder credentials
+next_atomic_step: prove summary-only API-key pipeline CLI accepts exported project alias credentials
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,37 +70,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_placeholder_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_project_alias_env_without_dotenv_secrets -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only API-key pipeline CLI launched with exported placeholder API-key values keeps API-key setup blocked
-  - CLI regression proves exported placeholder values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready
+  - summary-only API-key pipeline CLI launched with exported project alias API-key values treats those values as configured credentials
+  - CLI regression proves exported project alias values configure market, macro, and news provider families and select Polygon/FRED/NewsAPI live routes
   - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI exported placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI exported alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_PLACEHOLDER_REJECTION_GATE
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_VALUE_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_placeholder_values -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 106 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 846 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_exported_project_alias_env_without_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 107 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 847 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -109,11 +109,22 @@ files_changed:
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - tests/test_readiness.py
-next_state: commit this verified CLI exported placeholder rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified CLI exported alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only API-key pipeline CLI launched with exported placeholder API-key values keeps API-key setup blocked
-  - exported placeholder values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready
+  - summary-only API-key pipeline CLI launched with exported project alias API-key values configures market, macro, and news provider families
+  - exported project alias values select Polygon/FRED/NewsAPI live routes while keeping output no-secret and avoiding local .env mutation
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes were added
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_CLI_EXPORTED_PLACEHOLDER_REJECTION_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_EXPORTED_PLACEHOLDER_REJECTION_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline CLI rejects exported placeholder credentials
 ```
 
 Previous completed directive:

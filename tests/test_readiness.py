@@ -18102,6 +18102,109 @@ def test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets(
     assert completed.stderr == ""
 
 
+def test_api_key_pipeline_summary_cli_reads_exported_project_alias_env_without_dotenv_secrets(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-cli-exported-alias-secret",
+        "HALO_SWING_MACRO_API_KEY": "macro-cli-exported-alias-secret",
+        "HALO_SWING_NEWS_API_KEY": "news-cli-exported-alias-secret",
+    }
+    (tmp_path / ".env.example").write_text(
+        (
+            "HALO_SWING_MARKET_DATA_API_KEY=\n"
+            "HALO_SWING_MACRO_API_KEY=\n"
+            "HALO_SWING_NEWS_API_KEY=\n"
+        ),
+        encoding="utf-8",
+    )
+
+    env = os.environ.copy()
+    for key in READINESS_ENV_KEYS:
+        env.pop(key, None)
+    env.update(
+        {
+            "PYTHONPATH": str(ROOT / "src"),
+            "HALO_SWING_DISABLE_DOTENV": "true",
+            "HALO_SWING_BINANCE_TESTNET": "true",
+            "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION": "true",
+            "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING": "false",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH": (
+                "state/binance_credentials.enc.json"
+            ),
+            "HALO_SWING_HERMES_CONFIG_PATH": "missing-hermes.yaml",
+            "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS": "0.001",
+            **secret_env,
+        }
+    )
+    assert not (tmp_path / ".env").exists()
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "run_api_key_pipeline_smoke",
+            "--summary-only",
+            "--no-audit",
+        ],
+        cwd=tmp_path,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=20,
+    )
+    payload = json.loads(completed.stdout)
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_summary_only.v1"
+    assert payload["summary_only"] is True
+    assert payload["api_key_setup_configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_missing_provider_families"] == []
+    assert payload["api_key_setup_ready_to_run_live_smoke"] is True
+    assert payload["api_key_dotenv_loading_summary"]["disabled"] is True
+    assert (
+        payload["api_key_dotenv_loading_summary"]["dotenv_loading_enabled"] is False
+    )
+    assert payload["api_key_configured_env_keys_by_provider_family"] == {
+        "market": ["HALO_SWING_MARKET_DATA_API_KEY"],
+        "macro": ["HALO_SWING_MACRO_API_KEY"],
+        "news": ["HALO_SWING_NEWS_API_KEY"],
+    }
+    assert payload["api_key_selected_provider_class_by_family"] == {
+        "market": "PolygonMarketDataProvider",
+        "macro": "FredMacroDataProvider",
+        "news": "NewsApiDataProvider",
+    }
+    assert payload["api_key_provider_route_data_mode_by_family"] == {
+        "market": "live",
+        "macro": "live",
+        "news": "live",
+    }
+    assert payload["api_key_provider_route_summary_status"] == "ready"
+    assert payload["api_key_provider_route_summary_missing_keys"] == []
+    assert payload["api_key_provider_route_summary_selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is True
+    assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == "ready"
+    assert payload["secret_values_returned"] is False
+    assert not (tmp_path / ".env").exists()
+    for value in secret_env.values():
+        assert value not in completed.stdout
+        assert value not in serialized
+    assert completed.stderr == ""
+
+
 def test_api_key_pipeline_summary_cli_rejects_exported_placeholder_values(
     tmp_path: Path,
     monkeypatch,
