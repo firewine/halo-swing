@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.022 API Key Integration CLI Dotenv Control Character Key Rejection Gate Record - 2026-05-18
+
+### A. 목적
+
+4.021은 exported API-key values에 control character가 섞인 경우 summary-only API-key
+pipeline CLI가 live-ready로 오인하지 않음을 고정했다. 실제 운영자는 shell export 대신
+launch-directory `.env`에 API keys를 넣는 경로도 사용한다. 이번 slice는 `.env`에
+control-character API-key values가 들어가도 setup이 blocked로 남고 live route를 선택하지
+않는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with launch-directory dotenv control-character API-key values
+  - prove malformed dotenv values leave market, macro, and news provider families unconfigured
+  - prove selected live routes stay unset and one-shot pipeline smoke remains blocked
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_control_character_keys -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 114 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 854 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.021 API Key Integration CLI Control Character Key Rejection Gate Record - 2026-05-18
 
 ### A. 목적
