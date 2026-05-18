@@ -3623,6 +3623,60 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
         assert value not in serialized
 
 
+def test_live_data_api_key_status_ignores_documented_placeholder_api_keys(
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    placeholder_env = {
+        "POLYGON_API_KEY": "your_polygon_key",
+        "FRED_API_KEY": "your_fred_key",
+        "NEWS_API_KEY": "your_newsapi_key",
+    }
+    for key, value in placeholder_env.items():
+        monkeypatch.setenv(key, value)
+    clear_local_env_cache()
+    get_settings.cache_clear()
+
+    payload = get_live_data_api_key_status()
+
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["provider_family_summary"] == {
+        "required_provider_families": ["market", "macro", "news"],
+        "configured_provider_families": [],
+        "missing_provider_families": ["market", "macro", "news"],
+        "configured_count": 0,
+        "required_count": 3,
+        "ready_to_run_live_smoke": False,
+        "network_call": False,
+        "mutates_local_state": False,
+        "secret_values_returned": False,
+    }
+    assert payload["provider_smoke_plan"] == expected_provider_smoke_plan(
+        market_configured_env_keys=[],
+        macro_configured_env_keys=[],
+        news_configured_env_keys=[],
+        ready_to_run_live_smoke=False,
+    )
+    assert payload["next_operator_action"]["name"] == "prepare_dotenv"
+    assert payload["next_operator_action"]["status"] == "pending"
+    for family in ("market", "macro", "news"):
+        assert payload["providers"][family]["configured"] is False
+        assert payload["providers"][family]["configured_env_keys"] == []
+        assert payload["providers"][family]["setup_status"] == "pending"
+        assert (
+            payload["providers"][family]["next_setup_action"]
+            == "fill_preferred_env_key"
+        )
+        assert payload["providers"][family]["auto_selects_live_provider"] is False
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+
+
 def test_live_data_api_key_status_treats_exported_keys_as_ready_without_dotenv_file(
     tmp_path: Path,
     monkeypatch,

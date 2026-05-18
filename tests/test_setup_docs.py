@@ -680,6 +680,17 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "export NEWS_API_KEY" not in guide
 
 
+def test_setup_docs_warn_placeholder_api_key_values_are_not_configured() -> None:
+    text = _normalized_text(README)
+    guide = _normalized_text(DEVOPS_GUIDE)
+
+    for document in (text, guide):
+        assert "your_polygon_key" in document
+        assert "your_fred_key" in document
+        assert "your_newsapi_key" in document
+        assert "not treated as configured live-data credentials" in document
+
+
 def test_setup_docs_document_project_alias_dotenv_cli_summary() -> None:
     readme = README.read_text(encoding="utf-8")
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")

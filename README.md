@@ -593,6 +593,9 @@ compact setup step rows including
 compact response still shows the next local setup or recovery action and the
 `KEY=placeholder` lines to fill without
 returning the full checklist payload.
+Placeholder examples such as `your_polygon_key`, `your_fred_key`, and
+`your_newsapi_key` are documentation examples only; they are not treated as
+configured live-data credentials.
 For compact clients that read only top-level fields, summary-only output also
 mirrors checklist action fields as
 `api_key_operator_checklist_schema_version`, `api_key_setup_status`,

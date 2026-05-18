@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.010 API Key Integration Placeholder Secret Rejection Gate Record - 2026-05-18
+
+### A. 목적
+
+API-key-only live provider auto-select 경로는 `.env` 또는 exported env에 지원되는 key
+alias가 있으면 Polygon/FRED/NewsAPI provider를 선택한다. 하지만 operator-facing docs와
+summary payload에는 `POLYGON_API_KEY=your_polygon_key`, `FRED_API_KEY=your_fred_key`,
+`NEWS_API_KEY=your_newsapi_key` 같은 no-secret 예시가 반복 노출된다. 사용자가 이 예시
+값을 그대로 `.env`에 넣으면 실제 credential이 아닌데도 live provider route가 ready로 보일
+수 있다. 이번 slice는 documented placeholder API-key values를 configured credential로
+인정하지 않게 해, "API 키만 넣으면 연동" 경로가 진짜 키 입력을 요구하도록 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - provider factory API-key configured checks reject documented placeholder values such as your_polygon_key, your_fred_key, and your_newsapi_key
+  - readiness live-data API-key configured checks use the same placeholder rejection so setup status stays blocked for example values
+  - provider route and live-data API-key status tests prove placeholder examples do not auto-select live providers and do not return secret values
+  - README and DevOps setup guide warn that placeholder examples are not configured credentials
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_setup_docs.py::test_setup_docs_warn_placeholder_api_key_values_are_not_configured -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 32 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 103 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 842 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.009 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Expected Live Check Fields Gate Record - 2026-05-18
 
 ### A. 목적

@@ -199,6 +199,52 @@ def test_describe_market_data_provider_route_reports_full_api_key_route(
         assert value not in serialized
 
 
+def test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys(
+    monkeypatch,
+) -> None:
+    clear_live_data_provider_env(monkeypatch)
+    placeholder_env = {
+        "POLYGON_API_KEY": "your_polygon_key",
+        "FRED_API_KEY": "your_fred_key",
+        "NEWS_API_KEY": "your_newsapi_key",
+    }
+    for key, value in placeholder_env.items():
+        monkeypatch.setenv(key, value)
+    get_settings.cache_clear()
+
+    payload = describe_market_data_provider_route()
+    provider = get_market_data_provider()
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert isinstance(provider, ReplayMarketDataProvider)
+    assert payload["status"] == "blocked"
+    assert payload["missing"] == [
+        "market_ohlcv_api_key",
+        "macro_api_key",
+        "news_api_key",
+    ]
+    assert payload["selected_provider_classes"] == ["ReplayMarketDataProvider"]
+    assert payload["route"] == [
+        {
+            "provider_family": "fixture",
+            "provider": "fixture",
+            "provider_class": "ReplayMarketDataProvider",
+            "data_mode": "fixture",
+            "live_data_required": False,
+            "network_call": False,
+            "secret_values_returned": False,
+        }
+    ]
+    for family in ("market", "macro", "news"):
+        assert payload["providers"][family]["configured"] is False
+        assert payload["providers"][family]["configured_env_keys"] == []
+        assert payload["providers"][family]["selected"] is False
+    assert payload["network_call"] is False
+    assert payload["secret_values_returned"] is False
+    for value in placeholder_env.values():
+        assert value not in serialized
+
+
 def test_describe_market_data_provider_route_marks_fred_entry_live_without_market_key(
     monkeypatch,
 ) -> None:
