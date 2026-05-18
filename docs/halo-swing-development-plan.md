@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.020 API Key Integration CLI Whitespace-Wrapped Real Key Gate Record - 2026-05-18
+
+### A. 목적
+
+4.019는 같은 provider family에 duplicate real aliases가 있어도 ready와 no-secret output이
+유지되는지 고정했다. 실제 운영자는 shell export나 비밀관리 도구에서 값을 복사하면서 앞뒤
+공백이 붙은 API-key value를 넣을 수 있다. provider 생성 경로는 secret value를 trim하여
+정규화하므로, 이번 slice는 summary-only API-key pipeline CLI도 whitespace-wrapped real
+exported values를 configured credential로 판단하고 live route를 선택하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with whitespace-wrapped real exported API-key values
+  - prove whitespace-wrapped values configure market, macro, and news provider families
+  - prove raw and trimmed secret values are not returned in CLI output
+  - keep output no-secret, no-audit, no local .env mutation, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_whitespace_wrapped_exported_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 112 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 852 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.019 API Key Integration CLI Duplicate Real Alias Gate Record - 2026-05-18
 
 ### A. 목적
