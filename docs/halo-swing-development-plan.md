@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.012 API Key Integration Placeholder Secret Predicate SSOT Gate Record - 2026-05-18
+
+### A. 목적
+
+4.010과 4.011은 documented placeholder API-key examples를 실제 credential로 오인하지
+않도록 provider factory, readiness status, CLI dotenv path를 고정했다. 하지만 placeholder
+value predicate가 provider factory와 readiness gate에 중복되어 있어 이후 한쪽만 변경되면
+API-key-only setup 판단이 다시 drift될 수 있다. 이번 slice는 placeholder secret detection을
+repo-local 공통 predicate로 모아, live provider route와 readiness가 같은 기준으로 credential
+configured 여부를 판단하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add a shared secret-value placeholder predicate for documented API-key examples and generic placeholder forms
+  - update provider factory secret configured checks to use the shared predicate
+  - update readiness API-key configured checks to use the same shared predicate
+  - keep existing provider/readiness/CLI placeholder rejection behavior covered by tests
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 104 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 844 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.011 API Key Integration CLI Dotenv Placeholder Rejection Gate Record - 2026-05-18
 
 ### A. 목적

@@ -10,6 +10,7 @@ from typing import Any, Protocol
 from halo_swing_mcp import fixtures
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.env import get_config_value
+from halo_swing_mcp.secret_values import is_placeholder_secret_value
 
 
 class MarketDataProvider(Protocol):
@@ -382,17 +383,6 @@ MACRO_API_KEY_ENV_KEYS = (
     "FRED_API_KEY",
 )
 NEWS_API_KEY_ENV_KEYS = ("HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY")
-PLACEHOLDER_SECRET_VALUES = {
-    "your_polygon_key",
-    "your_fred_key",
-    "your_newsapi_key",
-    "your_news_key",
-    "your_api_key",
-    "placeholder",
-    "changeme",
-    "change_me",
-    "replace_me",
-}
 
 
 def get_market_data_provider() -> MarketDataProvider:
@@ -673,7 +663,7 @@ def _secret_candidate_configured(value: str | None) -> bool:
         isinstance(value, str)
         and value.strip()
         and _has_no_control_characters(value)
-        and not _is_placeholder_secret_value(value)
+        and not is_placeholder_secret_value(value)
     )
 
 
@@ -781,18 +771,9 @@ def _normalize_secret(value: str, field_name: str) -> str:
     normalized = value.strip()
     if not normalized:
         raise ValueError(f"{field_name} must be a nonempty string")
-    if _is_placeholder_secret_value(normalized):
+    if is_placeholder_secret_value(normalized):
         raise ValueError(f"{field_name} must be a real credential, not a placeholder")
     return normalized
-
-
-def _is_placeholder_secret_value(value: str) -> bool:
-    normalized = value.strip().lower()
-    return (
-        normalized in PLACEHOLDER_SECRET_VALUES
-        or (normalized.startswith("your_") and normalized.endswith("_key"))
-        or (normalized.startswith("<") and normalized.endswith(">"))
-    )
 
 
 def _normalize_symbol(value: str) -> str:

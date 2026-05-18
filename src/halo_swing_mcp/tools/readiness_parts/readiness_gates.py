@@ -3,23 +3,12 @@
 
 from __future__ import annotations
 
+from halo_swing_mcp.secret_values import is_placeholder_secret_value
+
 from .context import *
 
 
 __all__ = ('_local_command', '_truthy_config_value', '_hermes_readiness', '_resolve_hermes_config_path', '_resolve_hermes_mcp_config_registered', '_resolve_binance_passphrase_confirmed', '_resolve_binance_trade_only_permission_attested', '_resolve_binance_live_order_approved', '_telegram_readiness', '_migration_readiness', '_repository_readiness', '_binance_readiness', '_live_order_submission_readiness', '_live_data_readiness', '_market_data_api_key_env_configured', '_macro_api_key_env_configured', '_news_api_key_env_configured', '_env_value_configured', '_is_env_value_configured', '_normalize_boolean', '_normalize_env_boolean', '_normalize_optional_boolean', '_normalize_optional_path', '_normalize_path', '_has_no_control_characters', '_next_actions')
-
-PLACEHOLDER_SECRET_VALUES = {
-    "your_polygon_key",
-    "your_fred_key",
-    "your_newsapi_key",
-    "your_news_key",
-    "your_api_key",
-    "placeholder",
-    "changeme",
-    "change_me",
-    "replace_me",
-}
-
 
 def _local_command(name: str) -> dict[str, Any]:
     for command in _setup_local_commands():
@@ -375,16 +364,7 @@ def _is_env_value_configured(value: str | None) -> bool:
         isinstance(value, str)
         and value.strip()
         and _has_no_control_characters(value)
-        and not _is_placeholder_secret_value(value)
-    )
-
-
-def _is_placeholder_secret_value(value: str) -> bool:
-    normalized = value.strip().lower()
-    return (
-        normalized in PLACEHOLDER_SECRET_VALUES
-        or (normalized.startswith("your_") and normalized.endswith("_key"))
-        or (normalized.startswith("<") and normalized.endswith(">"))
+        and not is_placeholder_secret_value(value)
     )
 
 

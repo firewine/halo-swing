@@ -17,6 +17,7 @@ from halo_swing_mcp.providers import (
     describe_market_data_provider_route,
     get_market_data_provider,
 )
+from halo_swing_mcp.secret_values import is_placeholder_secret_value
 from halo_swing_mcp.tools.market import (
     calculate_indicators,
     get_event_calendar,
@@ -197,6 +198,21 @@ def test_describe_market_data_provider_route_reports_full_api_key_route(
     for key, value in secret_env.items():
         assert key in serialized
         assert value not in serialized
+
+
+def test_placeholder_secret_predicate_covers_documented_examples() -> None:
+    placeholders = [
+        "your_polygon_key",
+        "your_fred_key",
+        "your_newsapi_key",
+        "your_provider_key",
+        "<api_key>",
+        "placeholder",
+        "CHANGE_ME",
+    ]
+
+    assert all(is_placeholder_secret_value(value) for value in placeholders)
+    assert not is_placeholder_secret_value("polygon-realistic-test-secret")
 
 
 def test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys(
