@@ -84,6 +84,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.044 API Key Integration NewsAPI Smoke Required-Key Order Gate Record - 2026-05-18
+
+### A. 목적
+
+4.043까지 `NEWSAPI_KEY`는 preferred example과 provider smoke metadata의 preferred key로
+정렬됐다. 하지만 provider smoke command metadata의 `required_env_key_groups`는 아직
+NewsAPI group 안에서 `NEWSAPI_KEY`를 마지막에 둔다. 이 slice는 operator-facing smoke
+metadata에서 preferred key가 첫 번째로 보이도록 `NEWSAPI_KEY`를 group 첫 항목으로 올린다.
+Provider resolver priority, accepted env-key tuple, 실제 credential selection 순서는 변경하지
+않는다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - put NEWSAPI_KEY first in get_news_bundle_live_smoke required_env_key_groups
+  - keep HALO_SWING_NEWS_API_KEY and NEWS_API_KEY accepted in the same group
+  - prove provider status and smoke plan expose the preferred-first group without secret values
+  - keep provider resolver priority unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted NewsAPI env-key removal
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

@@ -487,7 +487,7 @@ def expected_provider_smoke_command(name: str) -> dict[str, Any]:
             "name": "get_news_bundle_live_smoke",
             "provider": "newsapi",
             "required_env_key_groups": [
-                ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"]
+                ["NEWSAPI_KEY", "HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]
             ],
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
@@ -3385,9 +3385,9 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     assert "FRED_API_KEY" in live_smoke_commands[
         "get_macro_snapshot_live_smoke"
     ]["required_env_key_groups"][0]
-    assert "NEWS_API_KEY" in live_smoke_commands[
-        "get_news_bundle_live_smoke"
-    ]["required_env_key_groups"][0]
+    assert live_smoke_commands["get_news_bundle_live_smoke"][
+        "required_env_key_groups"
+    ][0] == ["NEWSAPI_KEY", "HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]
     assert payload["durable_gate_requirements"] == [
         {
             "gate": "migration",

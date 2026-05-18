@@ -42,20 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEWSAPI_KEY_DOCS_AND_FIXTURE_CLEANUP_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_DOCS_AND_FIXTURE_CLEANUP_GATE
+status: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: remove stale or invalid NewsAPI setup examples from operator docs and API-key CLI fixtures
+next_atomic_step: put NEWSAPI_KEY first in NewsAPI provider smoke required env-key groups without changing resolver priority
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -72,41 +71,38 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -c 'from pathlib import Path; paths=[Path("docs/devops-setup-guide.md"),Path("tests/test_readiness.py"),Path("tests/test_setup_docs.py")]; bad=[str(path) for path in paths if "HALO_SWING_NEWSAPI_KEY" in path.read_text(encoding="utf-8")]; assert not bad, bad'
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - operator docs keep NEWSAPI_KEY as the preferred NewsAPI copy/paste example
-  - operator docs describe NEWS_API_KEY as an accepted alias without presenting it as the preferred value-bearing example
-  - API-key CLI dotenv fixture uses the valid HALO_SWING_NEWS_API_KEY project alias and not invalid HALO_SWING_NEWSAPI_KEY
+  - NewsAPI provider smoke required_env_key_groups list NEWSAPI_KEY first for operator-facing smoke metadata
   - accepted NewsAPI env keys remain HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
+  - provider resolver priority and NEWS_API_KEY/HALO_SWING_NEWS_API_KEY acceptance remain unchanged
   - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified NewsAPI docs and fixture cleanup gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified NewsAPI smoke required-key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_DOCS_AND_FIXTURE_CLEANUP_GATE
+gate_id: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -c 'from pathlib import Path; paths=[Path("docs/devops-setup-guide.md"),Path("tests/test_readiness.py"),Path("tests/test_setup_docs.py")]; bad=[str(path) for path in paths if "HALO_SWING_NEWSAPI_KEY" in path.read_text(encoding="utf-8")]; assert not bad, bad'
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -114,10 +110,9 @@ results:
   - task contract and portable mirror match
   - JSON task contract parsing passed for current contract and portable mirror
   - git diff --check passed
-  - invalid HALO_SWING_NEWSAPI_KEY absence check passed for touched docs and fixture paths
-  - focused API-key CLI fixture regression passed: 1 passed
-  - focused DevOps guide preferred-key regression passed: 1 passed
-  - readiness and setup docs tests passed: 174 passed
+  - focused integration setup checklist smoke metadata regression passed: 1 passed
+  - focused live data API-key status regressions passed: 2 passed
+  - readiness tests passed: 132 passed
   - full pytest passed: 876 passed
   - ruff passed
   - harness health_check passed
@@ -125,14 +120,24 @@ files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
   - tests/test_readiness.py
-  - tests/test_setup_docs.py
-next_state: commit and push this verified NewsAPI docs and fixture cleanup gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified NewsAPI smoke required-key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - DevOps guide keeps NEWSAPI_KEY as the preferred value-bearing copy/paste key
-  - API-key CLI fixture now uses valid HALO_SWING_NEWS_API_KEY instead of invalid HALO_SWING_NEWSAPI_KEY
+  - NewsAPI provider smoke required_env_key_groups now exposes NEWSAPI_KEY first
+  - accepted_env_keys and provider resolver priority remain unchanged
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEWSAPI_KEY_DOCS_AND_FIXTURE_CLEANUP_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_DOCS_AND_FIXTURE_CLEANUP_GATE
+review_tier: S1_small
+
+next_atomic_step: remove stale or invalid NewsAPI setup examples from operator docs and API-key CLI fixtures
 ```
 
 Previous completed directive:
