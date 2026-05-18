@@ -131,6 +131,8 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys = (
         False
     )
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_name = None
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command = None
     one_shot_pipeline_smoke_unblock_followup_smoke_network_call = False
     one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy = None
     one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state = False
@@ -350,6 +352,15 @@ def _api_key_integration_status_top_level_fields(
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup
                 and one_shot_pipeline_smoke_unblock_followup_smoke_ready_after_env_keys
             )
+            if (
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys
+            ):
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_name = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_name
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_command
+                )
         one_shot_pipeline_smoke_unblock_network_call = (
             api_key_next_action_summary.get("next_action_network_call") is True
         )
@@ -569,6 +580,12 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_name": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_name
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call": (
             one_shot_pipeline_smoke_unblock_followup_smoke_network_call
