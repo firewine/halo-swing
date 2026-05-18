@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.030 API Key Integration CLI Dotenv Duplicate Real Alias Gate Record - 2026-05-18
+
+### A. 목적
+
+4.029는 launch-directory `.env`의 sibling blank values가 real project alias API-key setup을
+방해하지 않음을 고정했다. 실제 운영자는 같은 provider family의 canonical key와 project
+alias key를 모두 실제 값으로 채울 수도 있다. 이번 slice는 duplicate real dotenv aliases가
+있어도 setup ready, configured env-key surface, live route 선택, one-shot smoke readiness가
+안정적으로 유지되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with duplicate real launch-directory dotenv aliases per provider family
+  - prove duplicate real dotenv aliases keep market, macro, and news provider families configured
+  - prove configured env-key fields list alias names only and selected provider routes remain Polygon/FRED/NewsAPI
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 122 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 862 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.029 API Key Integration CLI Dotenv Real Over Blank Alias Gate Record - 2026-05-18
 
 ### A. 목적
