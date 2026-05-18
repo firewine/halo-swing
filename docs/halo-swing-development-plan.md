@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.026 API Key Integration CLI Alias Dotenv Whitespace-Wrapped Real Key Gate Record - 2026-05-18
+
+### A. 목적
+
+4.025는 shell/exported env의 whitespace-wrapped real project alias API-key values가
+summary-only API-key pipeline CLI에서 ready로 처리됨을 고정했다. 실제 운영자는 `.env`에
+`HALO_SWING_*` project alias key를 채우는 경로도 자주 사용하므로, `.env` 값에 앞뒤 공백이
+붙어도 provider 정규화 경로처럼 trim 기준으로 configured 처리되어야 한다. 이번 slice는
+whitespace-wrapped real launch-directory project alias dotenv values가 setup ready와 live
+route 선택을 유지하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with whitespace-wrapped real launch-directory project alias dotenv API-key values
+  - prove trimmed project alias dotenv values configure market, macro, and news provider families
+  - prove selected live routes stay Polygon/FRED/NewsAPI and one-shot pipeline smoke remains ready
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_whitespace_wrapped_project_alias_dotenv_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 118 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 858 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.025 API Key Integration CLI Exported Alias Whitespace-Wrapped Real Key Gate Record - 2026-05-18
 
 ### A. 목적
