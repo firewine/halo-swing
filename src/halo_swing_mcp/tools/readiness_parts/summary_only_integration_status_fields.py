@@ -85,6 +85,11 @@ def _api_key_integration_status_top_level_fields(
         one_shot_pipeline_smoke_unblock_secret_values_returned = (
             api_key_next_action_summary.get("secret_values_returned") is True
         )
+    one_shot_pipeline_smoke_unblock_ready_to_run = (
+        bool(one_shot_pipeline_smoke_unblock_command)
+        and not one_shot_pipeline_smoke_unblock_network_call
+        and not one_shot_pipeline_smoke_unblock_secret_values_returned
+    )
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -176,6 +181,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_command": (
             one_shot_pipeline_smoke_unblock_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run": (
+            one_shot_pipeline_smoke_unblock_ready_to_run
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_network_call": (
             one_shot_pipeline_smoke_unblock_network_call

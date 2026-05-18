@@ -789,6 +789,60 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.981 API Key Integration One-Shot Pipeline Smoke Unblock Readiness Field Gate Record - 2026-05-18
+
+### A. 목적
+
+3.980은 one-shot pipeline smoke unblock command의 safety metadata를 같은 row에
+노출했다. 하지만 compact client가 해당 unblock command를 지금 실행해도 되는지 판단하려면
+command 존재 여부와 safety flag를 다시 조합해야 한다. 이번 slice는
+`api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run`을 추가해, API-key setup을
+풀기 위한 다음 command의 실행 가능 여부를 바로 확인할 수 있게 한다.
+
+### B. 구현 계획
+
+```text
+status: completed
+target:
+  - summary-only output exposes integration one-shot pipeline smoke unblock-ready-to-run field
+  - unblock-ready-to-run is true when an unblock command exists, does not require network, and does not return secrets
+  - summary-only tests prove unblock-ready-to-run matches unblock command availability and safety fields
+  - README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock readiness field
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.980 API Key Integration One-Shot Pipeline Smoke Unblock-Command Safety Fields Gate Record - 2026-05-18
 
 ### A. 목적
