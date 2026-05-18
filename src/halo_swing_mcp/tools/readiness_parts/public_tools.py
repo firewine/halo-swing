@@ -220,7 +220,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         "news": _live_data_api_key_provider_status(
             provider_family="news",
             provider="newsapi",
-            preferred_env_key="NEWS_API_KEY",
+            preferred_env_key="NEWSAPI_KEY",
             accepted_env_keys=[
                 "HALO_SWING_NEWS_API_KEY",
                 "NEWS_API_KEY",

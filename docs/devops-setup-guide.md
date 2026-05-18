@@ -1898,8 +1898,8 @@ offline.
 The summary-only pipeline CLI reads the same project-specific aliases from a
 launch-directory `.env`. A local `.env` containing only
 `HALO_SWING_MARKET_DATA_API_KEY`, `HALO_SWING_MACRO_API_KEY`, and
-`HALO_SWING_NEWS_API_KEY` is enough to select the live Polygon, FRED, and
-NewsAPI providers without exported API-key environment variables.
+`NEWSAPI_KEY` is enough to select the live Polygon, FRED, and NewsAPI providers
+without exported API-key environment variables.
 When one of these keys selects the live Polygon provider, market snapshot
 payloads explicitly declare `live_data_required=true` and `network_call=true`
 in `market_snapshot_contract`, and the guard reports
@@ -1923,14 +1923,14 @@ keys, macro data remains fixture-backed with `no_live_data_required` and
 News live data is wired through NewsAPI:
 
 ```bash
-NEWS_API_KEY=your_newsapi_key
+NEWSAPI_KEY=your_newsapi_key
 ```
 
-`HALO_SWING_NEWS_API_KEY` is accepted as the project-specific alias. Without
-either key, news evidence remains fixture-backed. When one of these keys selects
-the live NewsAPI provider, `get_news_bundle` declares `live_data_required=true`,
-`network_call=true`, and `secret_values_returned=false`; the
-`news_source_policy_guard` reports `live_data_boundary_declared` and
+`HALO_SWING_NEWS_API_KEY` and `NEWS_API_KEY=your_newsapi_key` are accepted
+aliases. Without one of these keys, news evidence remains fixture-backed. When
+one of these keys selects the live NewsAPI provider, `get_news_bundle` declares
+`live_data_required=true`, `network_call=true`, and `secret_values_returned=false`;
+the `news_source_policy_guard` reports `live_data_boundary_declared` and
 `network_call_declared`.
 
 Direct live provider smoke success payloads for `get_market_snapshot`,

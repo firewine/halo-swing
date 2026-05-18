@@ -42,26 +42,22 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_GATE
+status: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_GATE
 review_tier: S1_small
 
-next_atomic_step: accept NEWSAPI_KEY as a NewsAPI credential alias across provider selection, dotenv template, and summary-only API-key pipeline CLI
+next_atomic_step: promote NEWSAPI_KEY to the preferred NewsAPI setup example across readiness surfaces and operator docs
 
 allowed_edit_paths:
-  - .env.example
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/market.py
   - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
-  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
   - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
+  - README.md
   - tests/test_env_template.py
-  - tests/test_providers.py
   - tests/test_readiness.py
 
 blocked_path_prefixes:
@@ -79,43 +75,42 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - NEWSAPI_KEY selects the NewsAPI provider when market and macro provider keys are also configured
-  - NEWSAPI_KEY appears in accepted news env-key surfaces, dotenv template, and .env.example as a blank supported key
-  - summary-only API-key pipeline CLI reports news configured via NEWSAPI_KEY without returning secret values
-  - test output does not return secret values, URLs with secrets, mutate local state, or require committed runtime artifacts
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+  - readiness dotenv template and API-key status use NEWSAPI_KEY=your_newsapi_key as the preferred NewsAPI copy/paste example
+  - accepted NewsAPI env keys still include HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
+  - README and DevOps setup guide document NEWSAPI_KEY as a supported NewsAPI alias
+  - summary-only setup file fields expose NEWSAPI_KEY as the news example env key without returning secret values
+  - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified NEWSAPI_KEY alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified NEWSAPI_KEY preferred example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_GATE
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_PREFERRED_EXAMPLE_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template tests/test_env_template.py::test_readiness_live_data_keys_match_provider_auto_select_keys -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_newsapi_key_alias_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -123,33 +118,40 @@ results:
   - task contract and portable mirror match
   - JSON task contract parsing passed for current contract and portable mirror
   - git diff --check passed
-  - focused NEWSAPI_KEY provider/template tests passed: 3 passed
-  - focused summary-only NEWSAPI_KEY CLI test passed: 1 passed
+  - focused dotenv template preferred example test passed: 1 passed
+  - focused readiness setup tests passed: 2 passed
   - env template tests passed: 11 passed
-  - provider tests passed: 36 passed
   - readiness tests passed: 132 passed
+  - setup docs tests passed: 42 passed
   - full pytest passed: 875 passed
   - ruff passed
   - harness health_check passed
 files_changed:
-  - .env.example
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/tools/market.py
   - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
-  - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
   - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
+  - README.md
   - tests/test_env_template.py
-  - tests/test_providers.py
   - tests/test_readiness.py
-next_state: commit and push this verified NEWSAPI_KEY alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified NEWSAPI_KEY preferred example gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - NEWSAPI_KEY now selects the NewsAPI provider and appears in accepted news env-key surfaces
-  - summary-only API-key pipeline CLI reports NEWSAPI_KEY as configured without returning secret values
+  - NEWSAPI_KEY is now the preferred NewsAPI copy/paste example in readiness and summary-only setup fields
+  - accepted NewsAPI aliases still include HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEWSAPI_KEY_ALIAS_GATE
+review_tier: S1_small
+
+next_atomic_step: accept NEWSAPI_KEY as a NewsAPI credential alias across provider selection, dotenv template, and summary-only API-key pipeline CLI
 ```
 
 Previous completed directive:

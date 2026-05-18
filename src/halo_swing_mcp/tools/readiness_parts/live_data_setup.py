@@ -374,13 +374,13 @@ def _live_data_dotenv_template() -> dict[str, Any]:
             {
                 "provider_family": "news",
                 "provider": "newsapi",
-                "preferred_env_key": "NEWS_API_KEY",
+                "preferred_env_key": "NEWSAPI_KEY",
                 "accepted_env_keys": [
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
                     "NEWSAPI_KEY",
                 ],
-                "example": "NEWS_API_KEY=your_newsapi_key",
+                "example": "NEWSAPI_KEY=your_newsapi_key",
                 "secret": True,
             },
         ],
@@ -433,7 +433,7 @@ def _live_data_dotenv_file_status() -> dict[str, Any]:
             "secret_values_returned": False,
         },
         "fill_keys_after_copy": {
-            "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+            "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
             "secret": True,
             "secret_values_returned": False,
         },
@@ -641,7 +641,7 @@ def _live_data_next_operator_action(
         **base,
         "name": "fill_live_data_api_keys",
         "status": "pending",
-        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
         "dotenv_examples": _string_list(fill_key_step.get("dotenv_examples")),
         "dotenv_example_count": fill_key_step.get("dotenv_example_count"),
         "configured_provider_families": provider_family_summary.get(

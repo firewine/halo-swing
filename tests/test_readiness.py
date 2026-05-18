@@ -153,7 +153,7 @@ EXPECTED_READINESS_EVIDENCE_KEYS_BY_GATE = {
 EXPECTED_DOTENV_EXAMPLES = [
     "POLYGON_API_KEY=your_polygon_key",
     "FRED_API_KEY=your_fred_key",
-    "NEWS_API_KEY=your_newsapi_key",
+    "NEWSAPI_KEY=your_newsapi_key",
 ]
 
 
@@ -188,7 +188,7 @@ def expected_dotenv_file_status(target_path: Path) -> dict[str, Any]:
             "secret_values_returned": False,
         },
         "fill_keys_after_copy": {
-            "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+            "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
             "secret": True,
             "secret_values_returned": False,
         },
@@ -301,7 +301,7 @@ def expected_live_data_setup_steps(
                 "missing_provider_families": missing_provider_families,
                 "configured_count": configured_count,
                 "required_count": required_count,
-                "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+                "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
                 "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
                 "dotenv_example_count": 3,
                 "network_call": False,
@@ -425,7 +425,7 @@ def expected_next_operator_action(
         **base,
         "name": "fill_live_data_api_keys",
         "status": "pending",
-        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
         "dotenv_examples": EXPECTED_DOTENV_EXAMPLES,
         "dotenv_example_count": 3,
         "configured_provider_families": configured_provider_families,
@@ -543,9 +543,9 @@ def expected_provider_setup_actions(
             "news",
             "newsapi",
             news_configured_env_keys,
-            "NEWS_API_KEY",
+            "NEWSAPI_KEY",
             ["HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY", "NEWSAPI_KEY"],
-            "NEWS_API_KEY=your_newsapi_key",
+            "NEWSAPI_KEY=your_newsapi_key",
             "get_news_bundle_live_smoke",
         ),
     ]
@@ -791,7 +791,7 @@ def expected_api_key_requirements_summary(
     return {
         "schema_version": "api_key_pipeline_api_key_requirements_summary.v1",
         "status": status,
-        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "required_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
         "configured_env_keys": configured_env_keys,
         "missing_provider_families": missing_provider_families,
         "configured_provider_families": configured_provider_families,
@@ -3293,13 +3293,13 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
                 {
                     "provider_family": "news",
                     "provider": "newsapi",
-                    "preferred_env_key": "NEWS_API_KEY",
+                    "preferred_env_key": "NEWSAPI_KEY",
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
                         "NEWSAPI_KEY",
                     ],
-                    "example": "NEWS_API_KEY=your_newsapi_key",
+                    "example": "NEWSAPI_KEY=your_newsapi_key",
                     "secret": True,
                 },
             ],
@@ -3492,7 +3492,7 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     expected_provider_setup = {
         "market": ("POLYGON_API_KEY", "POLYGON_API_KEY=your_polygon_key"),
         "macro": ("FRED_API_KEY", "FRED_API_KEY=your_fred_key"),
-        "news": ("NEWS_API_KEY", "NEWS_API_KEY=your_newsapi_key"),
+        "news": ("NEWSAPI_KEY", "NEWSAPI_KEY=your_newsapi_key"),
     }
     for provider_family, provider_status in payload["providers"].items():
         preferred_env_key, example = expected_provider_setup[provider_family]
@@ -3597,12 +3597,12 @@ def test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_val
     assert payload["providers"]["macro"]["dotenv_target_path"] == ".env"
     assert payload["providers"]["news"]["configured"] is True
     assert payload["providers"]["news"]["configured_env_keys"] == ["NEWS_API_KEY"]
-    assert payload["providers"]["news"]["preferred_env_key"] == "NEWS_API_KEY"
+    assert payload["providers"]["news"]["preferred_env_key"] == "NEWSAPI_KEY"
     assert payload["providers"]["news"]["setup_status"] == "ready"
     assert payload["providers"]["news"]["next_setup_action"] == "run_provider_smoke"
     assert payload["dotenv_template"]["target_path"] == ".env"
     assert payload["dotenv_template"]["entries"][2]["example"] == (
-        "NEWS_API_KEY=your_newsapi_key"
+        "NEWSAPI_KEY=your_newsapi_key"
     )
     assert payload["dotenv_template"]["secret_values_returned"] is False
     assert payload["dotenv_file_status"] == expected_dotenv_file_status(repo_env)
@@ -3921,11 +3921,11 @@ def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secr
     ] == EXPECTED_DOTENV_EXAMPLES
     assert summary_payload["api_key_operator_checklist_summary"][
         "next_blocking_action_required_env_keys"
-    ] == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+    ] == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"]
     assert summary_payload["api_key_next_action_summary"]["required_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["api_key_next_action_summary"]["dotenv_examples"] == (
         EXPECTED_DOTENV_EXAMPLES
@@ -3933,7 +3933,7 @@ def test_run_api_key_pipeline_smoke_reports_disabled_dotenv_loading_without_secr
     assert summary_payload["next_operator_action_required_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["next_operator_action_dotenv_examples"] == (
         EXPECTED_DOTENV_EXAMPLES
@@ -4208,7 +4208,7 @@ def test_run_live_data_smoke_executes_and_validates_with_fake_live_payloads(
                 "provider_family": "news",
                 "provider": "newsapi",
                 "smoke_command_name": "get_news_bundle_live_smoke",
-                "preferred_env_key": "NEWS_API_KEY",
+                "preferred_env_key": "NEWSAPI_KEY",
                 "accepted_env_keys": [
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
@@ -4818,12 +4818,12 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
             "mutates_local_state": True,
             "secret_values_returned": False,
         },
-        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
         "preferred_env_key_count": 3,
         "dotenv_examples": [
             "POLYGON_API_KEY=your_polygon_key",
             "FRED_API_KEY=your_fred_key",
-            "NEWS_API_KEY=your_newsapi_key",
+            "NEWSAPI_KEY=your_newsapi_key",
         ],
         "dotenv_example_count": 3,
         "configured_provider_families": ["market", "macro", "news"],
@@ -5239,7 +5239,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert payload["provider_recovery_preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["provider_recovery_accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -5535,7 +5535,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
     assert summary_payload["provider_recovery_preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["provider_recovery_accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -5755,7 +5755,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
         "provider_recovery_preferred_env_keys": [
             "POLYGON_API_KEY",
             "FRED_API_KEY",
-            "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "provider_recovery_accepted_env_keys": [
             "HALO_SWING_MARKET_DATA_API_KEY",
@@ -5924,7 +5924,7 @@ def test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries(
                 ],
                 "recovery_smoke_available": True,
                 "next_setup_action": "verify_provider_credentials_or_network",
-                "preferred_env_key": "NEWS_API_KEY",
+                "preferred_env_key": "NEWSAPI_KEY",
                 "accepted_env_keys": [
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
@@ -6550,7 +6550,7 @@ def test_run_live_signal_workflow_smoke_executes_with_fake_live_metadata(
     serialized = repr(payload).lower()
     assert "polygon_api_key=your_polygon_key" in serialized
     assert "fred_api_key=your_fred_key" in serialized
-    assert "news_api_key=your_newsapi_key" in serialized
+    assert "newsapi_key=your_newsapi_key" in serialized
     assert "polygon-secret" not in serialized
     assert "fred-secret" not in serialized
     assert "news-secret" not in serialized
@@ -6961,7 +6961,7 @@ def test_run_api_key_pipeline_smoke_returns_conflict_payload_for_sub_smoke_excep
     assert payload["api_key_setup_file_summary"]["preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["api_key_setup_file_summary"]["secret_values_returned"] is False
     assert payload["live_data_smoke_summary"]["ready_to_run_live_smoke"] is True
@@ -7109,7 +7109,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "provider_family": "news",
             "provider": "newsapi",
             "smoke_command_name": "get_news_bundle_live_smoke",
-            "preferred_env_key": "NEWS_API_KEY",
+            "preferred_env_key": "NEWSAPI_KEY",
             "accepted_env_keys": [
                 "HALO_SWING_NEWS_API_KEY",
                 "NEWS_API_KEY",
@@ -7451,12 +7451,12 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
             "mutates_local_state": True,
             "secret_values_returned": False,
         },
-        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"],
+        "preferred_env_keys": ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"],
         "preferred_env_key_count": 3,
         "dotenv_examples": [
             "POLYGON_API_KEY=your_polygon_key",
             "FRED_API_KEY=your_fred_key",
-            "NEWS_API_KEY=your_newsapi_key",
+            "NEWSAPI_KEY=your_newsapi_key",
         ],
         "dotenv_example_count": 3,
         "configured_provider_families": ["market", "macro", "news"],
@@ -8035,7 +8035,7 @@ def test_run_api_key_pipeline_smoke_combines_fake_live_smokes(
     assert summary_payload["provider_smoke_success_preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert summary_payload["provider_smoke_success_accepted_env_keys"] == [
         "HALO_SWING_MARKET_DATA_API_KEY",
@@ -8478,7 +8478,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_required_env_keys"
         ]
-        == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+        == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"]
     )
     assert (
         payload[
@@ -8533,7 +8533,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == {
             "market": "POLYGON_API_KEY",
             "macro": "FRED_API_KEY",
-            "news": "NEWS_API_KEY",
+            "news": "NEWSAPI_KEY",
         }
     )
     assert (
@@ -8564,7 +8564,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == {
             "market": ["POLYGON_API_KEY"],
             "macro": ["FRED_API_KEY"],
-            "news": ["NEWS_API_KEY"],
+            "news": ["NEWSAPI_KEY"],
         }
     )
     assert (
@@ -8574,14 +8574,14 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         == {
             "market": ["POLYGON_API_KEY"],
             "macro": ["FRED_API_KEY"],
-            "news": ["NEWS_API_KEY"],
+            "news": ["NEWSAPI_KEY"],
         }
     )
     assert (
         payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys"
         ]
-        == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWS_API_KEY"]
+        == ["POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"]
     )
     assert (
         payload[
@@ -9315,7 +9315,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_setup_dotenv_example_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["api_key_setup_dotenv_source_path"] == ".env.example"
     assert payload["api_key_setup_dotenv_target_path"] == ".env"
@@ -9984,7 +9984,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "required_env_keys": [
             "POLYGON_API_KEY",
             "FRED_API_KEY",
-            "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "configured_env_keys": [],
         "missing_provider_families": ["market", "macro", "news"],
@@ -10014,7 +10014,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_required_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["api_key_required_env_key_count"] == 3
     assert payload["api_key_configured_env_keys"] == []
@@ -10034,7 +10034,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     assert payload["api_key_provider_requirement_preferred_env_keys"] == {
         "market": "POLYGON_API_KEY",
         "macro": "FRED_API_KEY",
-        "news": "NEWS_API_KEY",
+        "news": "NEWSAPI_KEY",
     }
     assert payload["api_key_provider_requirement_accepted_env_keys"] == {
         "market": ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"],
@@ -10251,7 +10251,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
                 "required_env_keys": [
                     "POLYGON_API_KEY",
                     "FRED_API_KEY",
-                    "NEWS_API_KEY",
+                    "NEWSAPI_KEY",
                 ],
                 "configured_env_keys": [],
                 "missing_provider_families": ["market", "macro", "news"],
@@ -10388,13 +10388,13 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "preferred_env_keys": [
             "POLYGON_API_KEY",
             "FRED_API_KEY",
-            "NEWS_API_KEY",
+            "NEWSAPI_KEY",
         ],
         "preferred_env_key_count": 3,
         "dotenv_examples": [
             "POLYGON_API_KEY=your_polygon_key",
             "FRED_API_KEY=your_fred_key",
-            "NEWS_API_KEY=your_newsapi_key",
+            "NEWSAPI_KEY=your_newsapi_key",
         ],
         "dotenv_example_count": 3,
         "configured_provider_families": [],
@@ -11009,7 +11009,7 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
                     "recovery_smoke_command": None,
                     "recovery_smoke_available": False,
                     "next_setup_action": "fill_provider_key",
-                    "preferred_env_key": "NEWS_API_KEY",
+                    "preferred_env_key": "NEWSAPI_KEY",
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
@@ -11036,7 +11036,7 @@ def test_api_key_provider_recovery_summary_next_blocked_skips_pending_item() -> 
     assert summary["next_blocked_recovery_provider_route_data_mode"] == "live"
     assert summary["next_blocked_recovery_provider_route_live_data_required"] is True
     assert summary["next_blocked_recovery_next_setup_action"] == "fill_provider_key"
-    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWS_API_KEY"
+    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWSAPI_KEY"
     assert summary["next_blocked_recovery_accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
@@ -11085,7 +11085,7 @@ def test_api_key_integration_status_summary_carries_next_blocked_recovery_fields
                     "recovery_smoke_command": None,
                     "recovery_smoke_available": False,
                     "next_setup_action": "fill_provider_key",
-                    "preferred_env_key": "NEWS_API_KEY",
+                    "preferred_env_key": "NEWSAPI_KEY",
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
@@ -11139,7 +11139,7 @@ def test_api_key_integration_status_summary_carries_next_blocked_recovery_fields
     assert summary["next_blocked_recovery_provider_route_data_mode"] == "live"
     assert summary["next_blocked_recovery_provider_route_live_data_required"] is True
     assert summary["next_blocked_recovery_next_setup_action"] == "fill_provider_key"
-    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWS_API_KEY"
+    assert summary["next_blocked_recovery_preferred_env_key"] == "NEWSAPI_KEY"
     assert summary["next_blocked_recovery_accepted_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
@@ -11186,7 +11186,7 @@ def test_api_key_provider_recovery_summary_action_status_handles_mixed_pending_a
                     "recovery_smoke_command": None,
                     "recovery_smoke_available": False,
                     "next_setup_action": "fill_provider_key",
-                    "preferred_env_key": "NEWS_API_KEY",
+                    "preferred_env_key": "NEWSAPI_KEY",
                     "accepted_env_keys": [
                         "HALO_SWING_NEWS_API_KEY",
                         "NEWS_API_KEY",
@@ -11227,12 +11227,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_setup_file_summary(
     assert setup_file_summary["preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert setup_file_summary["dotenv_examples"] == [
         "POLYGON_API_KEY=your_polygon_key",
         "FRED_API_KEY=your_fred_key",
-        "NEWS_API_KEY=your_newsapi_key",
+        "NEWSAPI_KEY=your_newsapi_key",
     ]
     assert setup_file_summary["dotenv_example_count"] == 3
     assert payload["api_key_setup_dotenv_example_lines"] == (
@@ -12039,7 +12039,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert requirements["required_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert requirements["configured_env_keys"] == ["POLYGON_API_KEY"]
     assert requirements["configured_provider_families"] == ["market"]
@@ -12739,7 +12739,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_provider_requirement_required_env_keys"] == {
         "market": ["POLYGON_API_KEY"],
         "macro": ["FRED_API_KEY"],
-        "news": ["NEWS_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
     }
     assert payload["api_key_provider_requirement_required_env_key_counts"] == {
         "market": 1,
@@ -12754,7 +12754,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements(
     assert payload["api_key_provider_requirement_missing_env_keys"] == {
         "market": [],
         "macro": ["FRED_API_KEY"],
-        "news": ["NEWS_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
     }
     assert payload["api_key_provider_requirement_missing_env_key_counts"] == {
         "market": 0,
@@ -15849,12 +15849,12 @@ def test_run_api_key_pipeline_smoke_flags_fixture_defaults_without_keys(
     assert payload["api_key_setup_file_summary"]["preferred_env_keys"] == [
         "POLYGON_API_KEY",
         "FRED_API_KEY",
-        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
     ]
     assert payload["api_key_setup_file_summary"]["dotenv_examples"] == [
         "POLYGON_API_KEY=your_polygon_key",
         "FRED_API_KEY=your_fred_key",
-        "NEWS_API_KEY=your_newsapi_key",
+        "NEWSAPI_KEY=your_newsapi_key",
     ]
     assert payload["api_key_setup_file_summary"]["dotenv_example_count"] == 3
     assert payload["api_key_setup_file_summary"]["missing_provider_families"] == [
@@ -17920,7 +17920,7 @@ def test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholde
                 "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=0.001",
                 "POLYGON_API_KEY=your_polygon_key",
                 "FRED_API_KEY=your_fred_key",
-                "NEWS_API_KEY=your_newsapi_key",
+                "NEWSAPI_KEY=your_newsapi_key",
             ]
         ),
         encoding="utf-8",
@@ -18480,7 +18480,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_real_aliases_with_placeholder
             "HALO_SWING_FRED_API_KEY=\n"
             "FRED_API_KEY=your_fred_key\n"
             "HALO_SWING_NEWS_API_KEY=\n"
-            "NEWS_API_KEY=your_newsapi_key\n"
+            "NEWSAPI_KEY=your_newsapi_key\n"
         ),
         encoding="utf-8",
     )
@@ -18953,7 +18953,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_real_aliases_with_exported_pl
             "HALO_SWING_FRED_API_KEY=\n"
             "FRED_API_KEY=your_fred_key\n"
             "HALO_SWING_NEWS_API_KEY=\n"
-            "NEWS_API_KEY=your_newsapi_key\n"
+            "NEWSAPI_KEY=your_newsapi_key\n"
         ),
         encoding="utf-8",
     )
@@ -19194,7 +19194,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
             "POLYGON_API_KEY=\n"
             "HALO_SWING_MACRO_API_KEY=your_fred_key\n"
             "FRED_API_KEY=\n"
-            "HALO_SWING_NEWS_API_KEY=your_newsapi_key\n"
+            "HALO_SWING_NEWSAPI_KEY=your_newsapi_key\n"
             "NEWS_API_KEY=\n"
         ),
         encoding="utf-8",
@@ -20381,7 +20381,7 @@ def test_api_key_pipeline_summary_cli_reads_real_exported_aliases_with_placehold
             "HALO_SWING_FRED_API_KEY=\n"
             "FRED_API_KEY=your_fred_key\n"
             "HALO_SWING_NEWS_API_KEY=\n"
-            "NEWS_API_KEY=your_newsapi_key\n"
+            "NEWSAPI_KEY=your_newsapi_key\n"
         ),
         encoding="utf-8",
     )

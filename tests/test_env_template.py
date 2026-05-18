@@ -109,7 +109,7 @@ def test_readiness_dotenv_template_examples_are_copy_paste_key_value_lines() -> 
     assert examples == [
         "POLYGON_API_KEY=your_polygon_key",
         "FRED_API_KEY=your_fred_key",
-        "NEWS_API_KEY=your_newsapi_key",
+        "NEWSAPI_KEY=your_newsapi_key",
     ]
     assert all(" = " not in example for example in examples)
 
