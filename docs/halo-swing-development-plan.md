@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.014 API Key Integration CLI Exported Placeholder Rejection Gate Record - 2026-05-18
+
+### A. 목적
+
+4.011은 launch-directory `.env` placeholder examples가 summary-only API-key pipeline CLI에서
+live-ready로 오인되지 않음을 고정했다. 하지만 API-key-only setup은 exported env도 동일하게
+지원한다. 사용자가 shell에 문서 예시값을 그대로 export한 경우에도 provider families가
+configured로 표시되면 실제 연동 준비 상태를 잘못 판단하게 된다. 이번 slice는 exported
+placeholder API-key values가 CLI 경로에서도 setup blocked로 남는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression using exported placeholder API-key values
+  - prove exported placeholders leave configured provider families empty and selected live routes unset
+  - prove one-shot pipeline smoke remains blocked until real API-key credentials are supplied
+  - keep the test no-audit, no URL/API-key output, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_placeholder_values -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 106 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 846 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.013 API Key Integration CLI Dotenv Quoted Value Gate Record - 2026-05-18
 
 ### A. 목적
