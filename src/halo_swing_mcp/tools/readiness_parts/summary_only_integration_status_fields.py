@@ -66,12 +66,25 @@ def _api_key_integration_status_top_level_fields(
         one_shot_pipeline_smoke_blocked_reason = "live_smoke_not_ready"
     one_shot_pipeline_smoke_unblock_action_name = None
     one_shot_pipeline_smoke_unblock_command = None
+    one_shot_pipeline_smoke_unblock_network_call = False
+    one_shot_pipeline_smoke_unblock_mutates_local_state = False
+    one_shot_pipeline_smoke_unblock_secret_values_returned = False
     if one_shot_pipeline_smoke_blocked_reason == "api_key_setup_not_ready":
         one_shot_pipeline_smoke_unblock_action_name = (
             api_key_integration_status_summary.get("next_action_name")
             or api_key_next_action_summary.get("next_action_name")
         )
         one_shot_pipeline_smoke_unblock_command = next_action_command
+        one_shot_pipeline_smoke_unblock_network_call = (
+            api_key_next_action_summary.get("next_action_network_call") is True
+        )
+        one_shot_pipeline_smoke_unblock_mutates_local_state = (
+            api_key_next_action_summary.get("next_action_mutates_local_state")
+            is True
+        )
+        one_shot_pipeline_smoke_unblock_secret_values_returned = (
+            api_key_next_action_summary.get("secret_values_returned") is True
+        )
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -163,6 +176,15 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_command": (
             one_shot_pipeline_smoke_unblock_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_network_call": (
+            one_shot_pipeline_smoke_unblock_network_call
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_mutates_local_state": (
+            one_shot_pipeline_smoke_unblock_mutates_local_state
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_secret_values_returned": (
+            one_shot_pipeline_smoke_unblock_secret_values_returned
         ),
         "api_key_integration_one_shot_pipeline_smoke_has_command": (
             one_shot_pipeline_smoke_has_command

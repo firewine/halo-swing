@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_FIELD_VERIFIED
-gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_FIELD_GATE
+status: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_SAFETY_FIELDS_VERIFIED
+gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_SAFETY_FIELDS_GATE
 review_tier: S1_small
 
-next_atomic_step: surface summary-only API-key integration one-shot pipeline smoke unblock-command field
+next_atomic_step: surface summary-only API-key integration one-shot pipeline smoke unblock-command safety fields
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -83,22 +83,22 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only output exposes API-key integration one-shot pipeline smoke unblock-command field
-  - summary-only tests prove integration one-shot pipeline smoke unblock command matches the integration next-action command when API-key setup blocks the smoke
-  - README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock-command field
+  - summary-only output exposes API-key integration one-shot pipeline smoke unblock-command safety fields
+  - summary-only tests prove integration one-shot pipeline smoke unblock-command safety fields match the integration next-action safety fields
+  - README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock-command safety fields
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key integration one-shot pipeline smoke unblock-command field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified API-key integration one-shot pipeline smoke unblock-command safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_FIELD_GATE
+gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_SAFETY_FIELDS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
@@ -121,9 +121,20 @@ files_changed:
   - src/halo_swing_mcp/tools/readiness_parts/summary_only_payload.py
   - tests/test_readiness.py
   - tests/test_setup_docs.py
-next_state: commit this verified API-key integration one-shot pipeline smoke unblock-command field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified API-key integration one-shot pipeline smoke unblock-command safety fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only payload now exposes integration one-shot pipeline smoke unblock-command field without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+  - summary-only payload now exposes integration one-shot pipeline smoke unblock-command safety fields without live adapter, broker, persistence, scheduler, .env mutation, URL, API key value, or secret value output changes
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_FIELD_VERIFIED
+gate_id: API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_COMMAND_FIELD_GATE
+review_tier: S1_small
+
+next_atomic_step: surface summary-only API-key integration one-shot pipeline smoke unblock-command field
 ```
 
 Previous completed directive:
