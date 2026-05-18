@@ -8627,6 +8627,38 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call"
+        ]
+        is payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call_policy"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state"
+        ]
+        is payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_mutates_local_state"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_secret_values_returned"
+        ]
+        is payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_secret_values_returned"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
         ]
         is True
@@ -13116,6 +13148,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         None
     )
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command = None
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = False
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy = None
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state = False
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_secret_values_returned = False
     expected_one_shot_unblock_followup_smoke_network_call = False
     expected_one_shot_unblock_followup_smoke_network_call_policy = None
     expected_one_shot_unblock_followup_smoke_mutates_local_state = False
@@ -13299,6 +13335,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command = (
                 expected_one_shot_unblock_followup_smoke_command
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
+                expected_one_shot_unblock_followup_smoke_network_call
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy = (
+                expected_one_shot_unblock_followup_smoke_network_call_policy
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state = (
+                expected_one_shot_unblock_followup_smoke_mutates_local_state
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_secret_values_returned = (
+                expected_one_shot_unblock_followup_smoke_secret_values_returned
             )
     expected_one_shot_unblock_network_call = False
     expected_one_shot_unblock_mutates_local_state = False
@@ -13555,6 +13603,30 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command"
         ]
         == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_secret_values_returned"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_secret_values_returned
     )
     assert (
         payload[
