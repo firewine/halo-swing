@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.021 API Key Integration CLI Control Character Key Rejection Gate Record - 2026-05-18
+
+### A. 목적
+
+4.020은 앞뒤 공백이 붙은 real API-key values가 trim 기준으로 configured 처리되고 secret
+값은 출력되지 않음을 고정했다. 반면 newline, carriage return, tab 같은 control character가
+섞인 secret은 provider 정규화 경로에서 거부되는 malformed credential이다. 이번 slice는
+summary-only API-key pipeline CLI도 control-character exported API-key values를 live-ready로
+오인하지 않고 blocked 상태로 남기는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with control-character exported API-key values
+  - prove malformed values leave market, macro, and news provider families unconfigured
+  - prove selected live routes stay unset and one-shot pipeline smoke remains blocked
+  - keep output no-secret, no-audit, no local .env mutation, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_control_character_exported_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 113 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 853 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.020 API Key Integration CLI Whitespace-Wrapped Real Key Gate Record - 2026-05-18
 
 ### A. 목적
