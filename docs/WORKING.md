@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_CLI_DOTENV_DUPLICATE_REAL_ALIAS_VERIFIED
-gate_id: API_KEY_INTEGRATION_CLI_DOTENV_DUPLICATE_REAL_ALIAS_GATE
+status: API_KEY_INTEGRATION_CLI_DOTENV_MIXED_ENV_VALUE_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_MIXED_ENV_VALUE_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline CLI accepts duplicate real launch-directory dotenv aliases per provider family
+next_atomic_step: prove summary-only API-key pipeline CLI accepts mixed launch-directory dotenv canonical and project alias credentials
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,37 +70,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_without_secret_output -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_mixed_dotenv_env_aliases_without_secret_output -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only API-key pipeline CLI launched with duplicate real launch-directory dotenv aliases per provider family keeps API-key setup ready
-  - CLI regression proves duplicate real dotenv aliases keep provider family configuration, live routes, and one-shot smoke readiness stable
+  - summary-only API-key pipeline CLI launched with mixed launch-directory dotenv canonical and project alias credentials keeps API-key setup ready
+  - CLI regression proves mixed dotenv env-key names keep provider family configuration, live routes, and one-shot smoke readiness stable
   - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI duplicate real dotenv alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI mixed dotenv env-value API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_CLI_DOTENV_DUPLICATE_REAL_ALIAS_GATE
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_MIXED_ENV_VALUE_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_without_secret_output -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 122 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 862 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_mixed_dotenv_env_aliases_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 123 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 863 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -109,10 +109,21 @@ files_changed:
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - tests/test_readiness.py
-next_state: commit and push this verified CLI duplicate real dotenv alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified CLI mixed dotenv env-value API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - added regression proving duplicate real launch-directory dotenv aliases keep setup ready without secret output
+  - added regression proving mixed launch-directory dotenv canonical and project alias credentials keep setup ready without secret output
   - CLI output keeps live routes selected, configured env-key surface names only, one-shot smoke ready, and secret values absent
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_CLI_DOTENV_DUPLICATE_REAL_ALIAS_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_DUPLICATE_REAL_ALIAS_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline CLI accepts duplicate real launch-directory dotenv aliases per provider family
 ```
 
 Previous completed directive:
