@@ -789,6 +789,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 3.986 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke Readiness Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+3.985는 key 입력 다음에 실행할 one-shot smoke command와 safety metadata를 unblock
+follow-up row에 노출했다. 하지만 compact client가 그 command가 API-key 입력 후 실행할
+검증인지 표시하려면 command 존재 여부, required env-key 목록, safety flags를 다시 조합해야
+한다. 이번 slice는 follow-up smoke `status`, `requires_api_keys`, `ready_after_env_keys`
+field를 추가해, API-key-only setup 화면이 key 입력 뒤 실행할 검증 상태를 바로 표시할 수
+있게 한다.
+
+### B. 구현 계획
+
+```text
+status: completed
+target:
+  - summary-only output exposes integration one-shot pipeline smoke unblock follow-up smoke status field
+  - summary-only output exposes follow-up smoke requires-api-keys and ready-after-env-keys fields
+  - follow-up smoke readiness fields are populated only when the unblock follow-up smoke command exists
+  - summary-only tests prove readiness fields match follow-up command availability, required env-key presence, and safety flags
+  - README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock follow-up smoke readiness fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 3.985 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke Command Fields Gate Record - 2026-05-18
 
 ### A. 목적
