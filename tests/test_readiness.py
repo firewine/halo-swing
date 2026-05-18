@@ -8346,6 +8346,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "cp .env.example .env"
     )
     assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_next_after_action"
+        ]
+        == "fill_live_data_api_keys"
+    )
+    assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]
         is True
     )
@@ -12743,6 +12749,11 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         expected_one_shot_unblock_command = payload["api_key_next_action_summary"][
             "next_action_command"
         ]
+    expected_one_shot_unblock_next_after_action = None
+    if expected_one_shot_blocked_reason == "api_key_setup_not_ready":
+        expected_one_shot_unblock_next_after_action = payload[
+            "api_key_next_action_summary"
+        ].get("next_after_action")
     expected_one_shot_unblock_network_call = False
     expected_one_shot_unblock_mutates_local_state = False
     expected_one_shot_unblock_secret_values_returned = False
@@ -12768,6 +12779,12 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_command"]
         == expected_one_shot_unblock_command
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_next_after_action"
+        ]
+        == expected_one_shot_unblock_next_after_action
     )
     assert (
         payload["api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run"]

@@ -66,6 +66,7 @@ def _api_key_integration_status_top_level_fields(
         one_shot_pipeline_smoke_blocked_reason = "live_smoke_not_ready"
     one_shot_pipeline_smoke_unblock_action_name = None
     one_shot_pipeline_smoke_unblock_command = None
+    one_shot_pipeline_smoke_unblock_next_after_action = None
     one_shot_pipeline_smoke_unblock_network_call = False
     one_shot_pipeline_smoke_unblock_mutates_local_state = False
     one_shot_pipeline_smoke_unblock_secret_values_returned = False
@@ -75,6 +76,9 @@ def _api_key_integration_status_top_level_fields(
             or api_key_next_action_summary.get("next_action_name")
         )
         one_shot_pipeline_smoke_unblock_command = next_action_command
+        one_shot_pipeline_smoke_unblock_next_after_action = (
+            api_key_next_action_summary.get("next_after_action")
+        )
         one_shot_pipeline_smoke_unblock_network_call = (
             api_key_next_action_summary.get("next_action_network_call") is True
         )
@@ -181,6 +185,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_command": (
             one_shot_pipeline_smoke_unblock_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_next_after_action": (
+            one_shot_pipeline_smoke_unblock_next_after_action
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_ready_to_run": (
             one_shot_pipeline_smoke_unblock_ready_to_run
