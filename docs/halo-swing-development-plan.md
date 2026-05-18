@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.036 API Key Integration CLI Exported Alias Malformed With Dotenv Canonical Gate Record - 2026-05-18
+
+### A. 목적
+
+4.035는 shell에 `HALO_SWING_*` project alias blanks가 남아 있어도 launch-directory `.env`의
+실제 canonical API keys가 API-key setup을 ready로 유지함을 고정했다. 4.034의 resolver
+수정은 placeholder뿐 아니라 malformed earlier candidates도 건너뛰어야 한다. 이번 slice는
+exported project alias values에 제어문자가 있어도 real dotenv canonical credentials를 막지
+않고, setup ready, configured env-key surface, live route 선택, one-shot smoke readiness가
+안정적으로 유지되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with exported project alias malformed values plus launch-directory dotenv real canonical credentials
+  - prove exported project alias malformed values do not block real dotenv canonical credentials for market, macro, and news provider families
+  - prove malformed values are not returned while configured env-key fields list real dotenv canonical names only
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_malformed_values_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_project_alias_control_character_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_control_character_exported_keys_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 33 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 128 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 868 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.035 API Key Integration CLI Exported Alias Blank With Dotenv Canonical Gate Record - 2026-05-18
 
 ### A. 목적
