@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_CLI_DOTENV_WHITESPACE_WRAPPED_REAL_KEY_GATE",
+  "gate_id": "API_KEY_INTEGRATION_CLI_DOTENV_REAL_OVER_PLACEHOLDER_ALIAS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.027",
-  "next_atomic_step": "prove summary-only API-key pipeline CLI accepts whitespace-wrapped real launch-directory dotenv API-key values",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.028",
+  "next_atomic_step": "prove summary-only API-key pipeline CLI accepts launch-directory dotenv real project aliases when sibling placeholders remain",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.027",
+    "docs/halo-swing-development-plan.md#4.028",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -31,7 +31,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_whitespace_wrapped_launch_directory_dotenv_without_secret_output -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_real_aliases_with_placeholder_siblings_without_secret_output -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -48,13 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only API-key pipeline CLI launched with whitespace-wrapped real launch-directory dotenv API-key values keeps API-key setup ready",
-    "CLI regression proves whitespace-wrapped canonical dotenv values configure provider families, select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke ready",
+    "summary-only API-key pipeline CLI launched with launch-directory dotenv real project aliases plus sibling placeholders keeps API-key setup ready",
+    "CLI regression proves sibling placeholder dotenv values do not poison real alias configuration, live routes, or one-shot smoke readiness",
     "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified CLI whitespace-wrapped canonical dotenv API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified CLI dotenv real-over-placeholder alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

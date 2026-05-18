@@ -18436,6 +18436,125 @@ def test_api_key_pipeline_summary_cli_rejects_launch_directory_project_alias_dot
     assert completed.stderr == ""
 
 
+def test_api_key_pipeline_summary_cli_reads_dotenv_real_aliases_with_placeholder_siblings_without_secret_output(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    clear_readiness_env(monkeypatch)
+    secret_env = {
+        "HALO_SWING_MARKET_DATA_API_KEY": "market-cli-dotenv-real-over-placeholder",
+        "HALO_SWING_FRED_API_KEY": "fred-cli-dotenv-real-over-placeholder",
+        "HALO_SWING_NEWS_API_KEY": "news-cli-dotenv-real-over-placeholder",
+    }
+    placeholder_env = {
+        "POLYGON_API_KEY": "your_polygon_key",
+        "FRED_API_KEY": "your_fred_key",
+        "NEWS_API_KEY": "your_newsapi_key",
+    }
+    (tmp_path / ".env.example").write_text(
+        (
+            "HALO_SWING_MARKET_DATA_API_KEY=\n"
+            "POLYGON_API_KEY=your_polygon_key\n"
+            "HALO_SWING_FRED_API_KEY=\n"
+            "FRED_API_KEY=your_fred_key\n"
+            "HALO_SWING_NEWS_API_KEY=\n"
+            "NEWS_API_KEY=your_newsapi_key\n"
+        ),
+        encoding="utf-8",
+    )
+    dotenv_text = "\n".join(
+        [
+            "HALO_SWING_DISABLE_DOTENV=false",
+            "HALO_SWING_BINANCE_TESTNET=true",
+            "HALO_SWING_BINANCE_FORCE_TESTNET_EXECUTION=true",
+            "HALO_SWING_BINANCE_ENABLE_LIVE_TRADING=false",
+            "HALO_SWING_BINANCE_CREDENTIALS_PATH=state/binance_credentials.enc.json",
+            "HALO_SWING_BINANCE_LIVE_ORDER_APPROVED=",
+            "HALO_SWING_BINANCE_PASSPHRASE_CONFIRMED=",
+            "HALO_SWING_BINANCE_TRADE_ONLY_PERMISSION_ATTESTED=",
+            "HALO_SWING_HERMES_CONFIG_PATH=missing-hermes.yaml",
+            "HALO_SWING_HERMES_MCP_CONFIG_REGISTERED=",
+            "HALO_SWING_TELEGRAM_BOT_TOKEN=",
+            "TELEGRAM_BOT_TOKEN=",
+            "HALO_SWING_TELEGRAM_GATEWAY=",
+            "HALO_SWING_TELEGRAM_GATEWAY_URL=",
+            "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS=0.001",
+            *(f"{key}={value}" for key, value in placeholder_env.items()),
+            *(f"{key}={value}" for key, value in secret_env.items()),
+        ]
+    )
+    (tmp_path / ".env").write_text(dotenv_text, encoding="utf-8")
+
+    env = os.environ.copy()
+    for key in READINESS_ENV_KEYS:
+        env.pop(key, None)
+    env["PYTHONPATH"] = str(ROOT / "src")
+    for key in secret_env:
+        assert key not in env
+    for key in placeholder_env:
+        assert key not in env
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "run_api_key_pipeline_smoke",
+            "--summary-only",
+            "--no-audit",
+        ],
+        cwd=tmp_path,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=20,
+    )
+    payload = json.loads(completed.stdout)
+    serialized = json.dumps(payload, sort_keys=True)
+
+    assert payload["schema_version"] == "api_key_pipeline_smoke_summary_only.v1"
+    assert payload["summary_only"] is True
+    assert payload["api_key_setup_configured_provider_families"] == [
+        "market",
+        "macro",
+        "news",
+    ]
+    assert payload["api_key_setup_missing_provider_families"] == []
+    assert payload["api_key_setup_ready_to_run_live_smoke"] is True
+    assert payload["api_key_dotenv_loading_summary"]["dotenv_loading_enabled"] is True
+    assert payload["api_key_configured_env_keys_by_provider_family"] == {
+        "market": ["HALO_SWING_MARKET_DATA_API_KEY"],
+        "macro": ["HALO_SWING_FRED_API_KEY"],
+        "news": ["HALO_SWING_NEWS_API_KEY"],
+    }
+    assert payload["api_key_selected_provider_class_by_family"] == {
+        "market": "PolygonMarketDataProvider",
+        "macro": "FredMacroDataProvider",
+        "news": "NewsApiDataProvider",
+    }
+    assert payload["api_key_provider_route_data_mode_by_family"] == {
+        "market": "live",
+        "macro": "live",
+        "news": "live",
+    }
+    assert payload["api_key_provider_route_summary_status"] == "ready"
+    assert payload["api_key_provider_route_summary_missing_keys"] == []
+    assert payload["api_key_provider_route_summary_selected_provider_classes"] == [
+        "PolygonMarketDataProvider",
+        "FredMacroDataProvider",
+        "NewsApiDataProvider",
+    ]
+    assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is True
+    assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == "ready"
+    assert payload["secret_values_returned"] is False
+    assert (tmp_path / ".env").read_text(encoding="utf-8") == dotenv_text
+    for value in secret_env.values():
+        assert value not in completed.stdout
+        assert value not in serialized
+    assert completed.stderr == ""
+
+
 def test_api_key_pipeline_summary_cli_reads_exported_env_without_dotenv_secrets(
     tmp_path: Path,
     monkeypatch,
