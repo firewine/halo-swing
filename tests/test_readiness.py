@@ -8397,6 +8397,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_families"
+        ]
+        == ["market", "macro", "news"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_family_count"
+        ]
+        == 3
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command"
         ]
         == payload["api_key_integration_one_shot_pipeline_smoke_command"]
@@ -12861,6 +12873,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         ].get("dotenv_target_path")
     expected_one_shot_unblock_followup_required_env_keys: list[str] = []
     expected_one_shot_unblock_followup_dotenv_examples: list[str] = []
+    expected_one_shot_unblock_followup_smoke_provider_families: list[str] = []
     expected_one_shot_unblock_followup_smoke_name = None
     expected_one_shot_unblock_followup_smoke_command = None
     expected_one_shot_unblock_followup_smoke_status = "unavailable"
@@ -12877,6 +12890,14 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         expected_one_shot_unblock_followup_dotenv_examples = payload[
             "api_key_setup_file_summary"
         ].get("dotenv_examples", [])
+        provider_requirements = payload["api_key_requirements_summary"].get(
+            "provider_requirements", {}
+        )
+        expected_one_shot_unblock_followup_smoke_provider_families = [
+            family
+            for family in provider_requirements
+            if isinstance(family, str)
+        ]
         expected_one_shot_unblock_followup_smoke_name = one_shot_pipeline_smoke[
             "name"
         ]
@@ -12984,6 +13005,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_name"
         ]
         == expected_one_shot_unblock_followup_smoke_name
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_families"
+        ]
+        == expected_one_shot_unblock_followup_smoke_provider_families
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_family_count"
+        ]
+        == len(expected_one_shot_unblock_followup_smoke_provider_families)
     )
     assert (
         payload[

@@ -74,6 +74,7 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_dotenv_target_path = None
     one_shot_pipeline_smoke_unblock_followup_required_env_keys: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_dotenv_examples: list[str] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_name = None
     one_shot_pipeline_smoke_unblock_followup_smoke_command = None
     one_shot_pipeline_smoke_unblock_followup_smoke_status = "unavailable"
@@ -113,6 +114,17 @@ def _api_key_integration_status_top_level_fields(
             one_shot_pipeline_smoke_unblock_followup_dotenv_examples = (
                 _string_list(api_key_setup_file_summary.get("dotenv_examples"))
             )
+            provider_requirements = (
+                _optional_mapping(
+                    api_key_requirements_summary.get("provider_requirements")
+                )
+                or {}
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_provider_families = [
+                family
+                for family in provider_requirements
+                if isinstance(family, str)
+            ]
             one_shot_pipeline_smoke_unblock_followup_smoke_name = (
                 one_shot_pipeline_smoke.get("name")
             )
@@ -278,6 +290,14 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_name": (
             one_shot_pipeline_smoke_unblock_followup_smoke_name
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_families": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_provider_family_count": (
+            len(
+                one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+            )
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command": (
             one_shot_pipeline_smoke_unblock_followup_smoke_command
