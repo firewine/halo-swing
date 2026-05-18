@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_NEXT_AFTER_ACTION_FIELD_GATE",
+  "gate_id": "API_KEY_INTEGRATION_ONE_SHOT_PIPELINE_SMOKE_UNBLOCK_PATH_FIELDS_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#3.982",
-  "next_atomic_step": "surface summary-only API-key integration one-shot pipeline smoke unblock next-after-action field",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#3.983",
+  "next_atomic_step": "surface summary-only API-key integration one-shot pipeline smoke unblock path fields",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "README.md",
@@ -19,7 +19,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.982",
+    "docs/halo-swing-development-plan.md#3.983",
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/tools/readiness_parts/summary_only_integration_status_fields.py",
@@ -59,13 +59,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only output exposes API-key integration one-shot pipeline smoke unblock next-after-action field",
-    "summary-only tests prove integration one-shot pipeline smoke unblock next-after-action matches the API-key next action summary",
-    "README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock next-after-action field",
+    "summary-only output exposes API-key integration one-shot pipeline smoke unblock path fields",
+    "summary-only tests prove integration one-shot pipeline smoke unblock path fields match the API-key next action summary",
+    "README and DevOps guide document the top-level API-key integration one-shot pipeline smoke unblock path fields",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key integration one-shot pipeline smoke unblock next-after-action field gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified API-key integration one-shot pipeline smoke unblock path fields gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
