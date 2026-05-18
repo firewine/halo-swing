@@ -19194,7 +19194,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
             "POLYGON_API_KEY=\n"
             "HALO_SWING_MACRO_API_KEY=your_fred_key\n"
             "FRED_API_KEY=\n"
-            "HALO_SWING_NEWSAPI_KEY=your_newsapi_key\n"
+            "HALO_SWING_NEWS_API_KEY=your_newsapi_key\n"
             "NEWS_API_KEY=\n"
         ),
         encoding="utf-8",

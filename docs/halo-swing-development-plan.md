@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.043 API Key Integration NewsAPI Docs And Fixture Cleanup Gate Record - 2026-05-18
+
+### A. 목적
+
+4.040-4.042는 `NEWSAPI_KEY`를 accepted alias, preferred setup example, 직접 provider
+smoke metadata까지 정렬했다. 이번 slice는 남은 stale setup 표면을 정리한다. DevOps guide는
+`NEWSAPI_KEY=your_newsapi_key`를 preferred copy/paste 예시로 유지하고, legacy
+`NEWS_API_KEY`는 value-bearing preferred 예시가 아닌 accepted alias로 설명한다. API-key CLI
+fixture는 존재하지 않는 `HALO_SWING_NEWSAPI_KEY`가 아니라 유효한
+`HALO_SWING_NEWS_API_KEY` project alias를 사용하도록 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - keep NEWSAPI_KEY as the preferred NewsAPI operator copy/paste example
+  - describe NEWS_API_KEY as an accepted alias without presenting it as the preferred value-bearing example
+  - replace the invalid HALO_SWING_NEWSAPI_KEY fixture line with HALO_SWING_NEWS_API_KEY
+  - add focused regression coverage that the invalid alias is absent from the touched docs and fixture paths
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -c invalid HALO_SWING_NEWSAPI_KEY absence check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py tests/test_setup_docs.py -q: 174 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

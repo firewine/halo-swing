@@ -28,7 +28,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
 
     assert "POLYGON_API_KEY=your_polygon_key" in guide
     assert "FRED_API_KEY=your_fred_key" in guide
-    assert "NEWS_API_KEY=your_newsapi_key" in guide
+    assert "NEWSAPI_KEY=your_newsapi_key" in guide
+    assert "NEWS_API_KEY` are accepted aliases" in guide
+    invalid_news_key = "HALO_SWING_NEWS" + "API_KEY"
+    assert invalid_news_key not in guide
     assert "HALO_SWING_LIVE_HTTP_TIMEOUT_SECONDS" in guide
     assert "default of `10` seconds" in guide
     assert "live_data_setup_summary" in guide

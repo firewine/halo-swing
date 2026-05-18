@@ -1926,8 +1926,8 @@ News live data is wired through NewsAPI:
 NEWSAPI_KEY=your_newsapi_key
 ```
 
-`HALO_SWING_NEWS_API_KEY` and `NEWS_API_KEY=your_newsapi_key` are accepted
-aliases. Without one of these keys, news evidence remains fixture-backed. When
+`HALO_SWING_NEWS_API_KEY` and `NEWS_API_KEY` are accepted aliases; `NEWSAPI_KEY`
+is the preferred copy/paste setup key. Without one of these keys, news evidence remains fixture-backed. When
 one of these keys selects the live NewsAPI provider, `get_news_bundle` declares
 `live_data_required=true`, `network_call=true`, and `secret_values_returned=false`;
 the `news_source_policy_guard` reports `live_data_boundary_declared` and
