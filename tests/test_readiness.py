@@ -8599,6 +8599,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys"
+        ]
+        is True
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_network_call"
         ]
         is True
@@ -13080,6 +13092,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_status = "unavailable"
     expected_one_shot_unblock_followup_smoke_requires_api_keys = False
     expected_one_shot_unblock_followup_smoke_ready_after_env_keys = False
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup = False
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys = (
+        False
+    )
     expected_one_shot_unblock_followup_smoke_network_call = False
     expected_one_shot_unblock_followup_smoke_network_call_policy = None
     expected_one_shot_unblock_followup_smoke_mutates_local_state = False
@@ -13239,6 +13255,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             expected_one_shot_unblock_followup_smoke_status = (
                 "ready_after_env_keys"
             )
+        expected_one_shot_unblock_followup_smoke_api_key_only_setup = (
+            bool(expected_one_shot_unblock_followup_smoke_provider_families)
+            and expected_one_shot_unblock_followup_smoke_next_setup_actions
+            == ["fill_preferred_env_key"]
+            and expected_one_shot_unblock_followup_smoke_configured_provider_family_count
+            == 0
+            and expected_one_shot_unblock_followup_smoke_blocked_provider_family_count
+            == len(expected_one_shot_unblock_followup_smoke_provider_families)
+            and expected_one_shot_unblock_followup_smoke_requires_api_keys
+            and not expected_one_shot_unblock_followup_smoke_mutates_local_state
+            and not expected_one_shot_unblock_followup_smoke_secret_values_returned
+        )
+        expected_one_shot_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys = (
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup
+            and expected_one_shot_unblock_followup_smoke_ready_after_env_keys
+        )
     expected_one_shot_unblock_network_call = False
     expected_one_shot_unblock_mutates_local_state = False
     expected_one_shot_unblock_secret_values_returned = False
@@ -13470,6 +13502,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_ready_after_env_keys"
         ]
         is expected_one_shot_unblock_followup_smoke_ready_after_env_keys
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_ready_after_env_keys
     )
     assert (
         payload[
