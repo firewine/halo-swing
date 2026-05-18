@@ -8563,6 +8563,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions"
+        ]
+        == ["fill_preferred_env_key"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_count"
+        ]
+        == 1
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command"
         ]
         == payload["api_key_integration_one_shot_pipeline_smoke_command"]
@@ -13062,6 +13074,7 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_next_setup_action_by_family: dict[
         str, object
     ] = {}
+    expected_one_shot_unblock_followup_smoke_next_setup_actions: list[str] = []
     expected_one_shot_unblock_followup_smoke_name = None
     expected_one_shot_unblock_followup_smoke_command = None
     expected_one_shot_unblock_followup_smoke_status = "unavailable"
@@ -13176,6 +13189,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             family: row.get("next_setup_action")
             for family, row in provider_requirement_rows.items()
         }
+        expected_one_shot_unblock_followup_smoke_next_setup_actions = [
+            action
+            for action in (
+                expected_one_shot_unblock_followup_smoke_next_setup_action_by_family.get(
+                    family
+                )
+                for family in expected_one_shot_unblock_followup_smoke_provider_families
+            )
+            if isinstance(action, str)
+        ]
+        expected_one_shot_unblock_followup_smoke_next_setup_actions = [
+            action
+            for index, action in enumerate(
+                expected_one_shot_unblock_followup_smoke_next_setup_actions
+            )
+            if action
+            not in expected_one_shot_unblock_followup_smoke_next_setup_actions[:index]
+        ]
         expected_one_shot_unblock_followup_smoke_name = one_shot_pipeline_smoke[
             "name"
         ]
@@ -13403,6 +13434,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family"
         ]
         == expected_one_shot_unblock_followup_smoke_next_setup_action_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions"
+        ]
+        == expected_one_shot_unblock_followup_smoke_next_setup_actions
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_count"
+        ]
+        == len(expected_one_shot_unblock_followup_smoke_next_setup_actions)
     )
     assert (
         payload[

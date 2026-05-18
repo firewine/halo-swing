@@ -1116,6 +1116,8 @@ def test_setup_docs_keep_api_key_integration_status_fields_in_sync() -> None:
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_setup_status_by_family",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family",
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions",
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_count",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_status",
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_requires_api_keys",

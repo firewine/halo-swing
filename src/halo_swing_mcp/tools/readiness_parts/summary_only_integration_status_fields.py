@@ -119,6 +119,9 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family: dict[
         str, Any
     ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions: list[
+        str
+    ] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_name = None
     one_shot_pipeline_smoke_unblock_followup_smoke_command = None
     one_shot_pipeline_smoke_unblock_followup_smoke_status = "unavailable"
@@ -269,6 +272,28 @@ def _api_key_integration_status_top_level_fields(
                 family: row.get("next_setup_action")
                 for family, row in provider_requirement_rows.items()
             }
+            one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions = [
+                action
+                for action in (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family.get(
+                        family
+                    )
+                    for family in (
+                        one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                    )
+                )
+                if isinstance(action, str)
+            ]
+            one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions = [
+                action
+                for index, action in enumerate(
+                    one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions
+                )
+                if action
+                not in one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions[
+                    :index
+                ]
+            ]
             one_shot_pipeline_smoke_unblock_followup_smoke_name = (
                 one_shot_pipeline_smoke.get("name")
             )
@@ -496,6 +521,12 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_action_count": (
+            len(one_shot_pipeline_smoke_unblock_followup_smoke_next_setup_actions)
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_command": (
             one_shot_pipeline_smoke_unblock_followup_smoke_command
