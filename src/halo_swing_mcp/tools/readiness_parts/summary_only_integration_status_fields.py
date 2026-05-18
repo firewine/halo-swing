@@ -90,9 +90,13 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys_by_family: dict[
         str, list[str]
     ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys: list[str] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys_by_family: dict[
         str, list[str]
     ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys: list[
+        str
+    ] = []
     one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family: dict[
         str, bool
     ] = {}
@@ -195,6 +199,24 @@ def _api_key_integration_status_top_level_fields(
                 family: _string_list(row.get("configured_env_keys"))
                 for family, row in provider_requirement_rows.items()
             }
+            one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys = [
+                env_key
+                for family in (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                )
+                for env_key in one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys_by_family.get(
+                    family, []
+                )
+            ]
+            one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys = [
+                env_key
+                for family in (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                )
+                for env_key in one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys_by_family.get(
+                    family, []
+                )
+            ]
             one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family = {
                 family: row.get("configured") is True
                 for family, row in provider_requirement_rows.items()
@@ -436,8 +458,20 @@ def _api_key_integration_status_top_level_fields(
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys_by_family
         ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_key_count": (
+            len(one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys)
+        ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_key_count": (
+            len(one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys)
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family
