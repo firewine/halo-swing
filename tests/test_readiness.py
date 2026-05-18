@@ -8715,6 +8715,54 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys_by_family"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys_by_family"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_keys"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_key_count"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_missing_env_key_count"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys_by_family"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys_by_family"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_keys"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_key_count"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_env_key_count"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys"
         ]
         == payload[
@@ -13298,6 +13346,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family: dict[
         str, object
     ] = {}
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys_by_family: dict[
+        str, object
+    ] = {}
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys: list[
+        str
+    ] = []
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys_by_family: dict[
+        str, object
+    ] = {}
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys: list[
+        str
+    ] = []
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys: list[
         str
     ] = []
@@ -13521,6 +13581,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family = (
                 expected_one_shot_unblock_followup_smoke_required_env_keys_by_family
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys_by_family = (
+                expected_one_shot_unblock_followup_smoke_missing_env_keys_by_family
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys = (
+                expected_one_shot_unblock_followup_smoke_missing_env_keys
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys_by_family = (
+                expected_one_shot_unblock_followup_smoke_configured_env_keys_by_family
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys = (
+                expected_one_shot_unblock_followup_smoke_configured_env_keys
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys = (
                 expected_one_shot_unblock_followup_required_env_keys
@@ -13863,6 +13935,46 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family"
         ]
         == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_key_count"
+        ]
+        == len(
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_missing_env_keys
+        )
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_key_count"
+        ]
+        == len(
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_configured_env_keys
+        )
     )
     assert (
         payload[
