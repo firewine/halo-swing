@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.018 API Key Integration CLI Real Over Blank Alias Gate Record - 2026-05-18
+
+### A. 목적
+
+4.017은 같은 provider family에서 documented placeholder alias가 함께 export되어도 실제
+alias credential이 configured로 잡히는지 고정했다. 실제 설정에서는 `.env.example` 또는
+shell profile의 빈 export(`KEY=`)가 남아 있고, 같은 family의 다른 accepted alias에 실제
+키를 넣는 경우도 있다. 이번 slice는 sibling blank alias가 있어도 실제 exported alias
+credential이 provider family를 configured로 만들고 live route를 선택하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with real exported aliases plus sibling blank aliases
+  - prove sibling blank aliases do not poison real API-key alias configuration
+  - prove selected provider route classes remain PolygonMarketDataProvider, FredMacroDataProvider, and NewsApiDataProvider
+  - keep output no-secret, no-audit, no local .env mutation, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_real_exported_aliases_with_blank_siblings -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 110 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 850 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.017 API Key Integration CLI Real Over Placeholder Alias Gate Record - 2026-05-18
 
 ### A. 목적
