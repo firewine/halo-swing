@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_CONTROL_CHARACTER_KEY_REJECTION_GATE",
+  "gate_id": "API_KEY_INTEGRATION_CLI_EXPORTED_ALIAS_WHITESPACE_WRAPPED_REAL_KEY_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.024",
-  "next_atomic_step": "prove summary-only API-key pipeline CLI rejects exported project alias API-key values containing control characters",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.025",
+  "next_atomic_step": "prove summary-only API-key pipeline CLI accepts whitespace-wrapped real exported project alias API-key values",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.024",
+    "docs/halo-swing-development-plan.md#4.025",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -31,7 +31,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_exported_project_alias_control_character_keys_without_secret_output -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_whitespace_wrapped_exported_project_aliases_without_secret_output -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -48,13 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only API-key pipeline CLI launched with exported project alias API-key values containing control characters keeps API-key setup blocked",
-    "CLI regression proves exported project alias control-character values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready",
+    "summary-only API-key pipeline CLI launched with whitespace-wrapped real exported project alias API-key values keeps API-key setup ready",
+    "CLI regression proves whitespace-wrapped project alias values configure provider families, select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke ready",
     "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified CLI exported project alias control-character API-key rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified CLI whitespace-wrapped exported project alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
