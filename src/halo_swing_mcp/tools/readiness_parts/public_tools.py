@@ -290,7 +290,7 @@ def get_live_data_api_key_status() -> dict[str, Any]:
         ),
         "dotenv": {
             "supported": True,
-            "disabled": _truthy_config_value(get_config_value("HALO_SWING_DISABLE_DOTENV")),
+            "disabled": local_env.dotenv_loading_disabled(),
             "precedence": [
                 "exported environment variables",
                 "launch-directory .env",

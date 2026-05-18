@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.038 API Key Integration CLI Dotenv Self Disable Ignores Dotenv Keys Gate Record - 2026-05-18
+
+### A. 목적
+
+4.037은 exported `HALO_SWING_DISABLE_DOTENV=true`가 launch-directory `.env`의 실제 API keys를
+무시하고 setup을 blocked로 유지함을 고정했다. 이번 slice는 disable 플래그가 `.env` 파일
+자체에 들어 있을 때도 같은 파일의 실제 credentials가 로드되지 않는지 고정한다. 사용자가
+`.env`에서 dotenv loading을 끄면, 그 파일에 실수로 실제 키가 같이 남아 있어도 CLI가 그 키를
+사용하지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression with HALO_SWING_DISABLE_DOTENV=true and real credentials in the same launch-directory dotenv
+  - report dotenv loading as disabled from the resolved dotenv-disable switch instead of re-reading it through disabled dotenv config lookup
+  - prove dotenv loading is disabled before same-file real credentials select live providers
+  - prove CLI remains blocked until exported real credentials are provided
+  - keep output no-secret, no-audit, no local .env mutation beyond test fixture, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_launch_directory_dotenv_disable_flag_with_same_file_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_respects_exported_disable_dotenv_with_launch_directory_dotenv_secrets -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 130 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 870 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.037 API Key Integration CLI Disable Dotenv Ignores Launch Dotenv Gate Record - 2026-05-18
 
 ### A. 목적
