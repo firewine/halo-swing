@@ -48,6 +48,11 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_network_call = (
         one_shot_pipeline_smoke.get("network_call") is True
     )
+    one_shot_pipeline_smoke_status = "unavailable"
+    if one_shot_pipeline_smoke_ready_to_run:
+        one_shot_pipeline_smoke_status = "ready"
+    elif one_shot_pipeline_smoke_has_command:
+        one_shot_pipeline_smoke_status = "blocked"
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -128,6 +133,9 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_command": (
             one_shot_pipeline_smoke_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_status": (
+            one_shot_pipeline_smoke_status
         ),
         "api_key_integration_one_shot_pipeline_smoke_has_command": (
             one_shot_pipeline_smoke_has_command

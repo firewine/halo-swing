@@ -8333,6 +8333,7 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
         "run_api_key_pipeline_smoke --summary-only --no-audit"
     )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == "blocked"
     assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is True
     assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is False
     assert (
@@ -12677,6 +12678,17 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_command"] == (
         one_shot_pipeline_smoke["command"]
+    )
+    expected_one_shot_status = "unavailable"
+    if (
+        integration_status["ready_to_run_live_smoke"]
+        and one_shot_pipeline_smoke["command"]
+    ):
+        expected_one_shot_status = "ready"
+    elif one_shot_pipeline_smoke["command"]:
+        expected_one_shot_status = "blocked"
+    assert payload["api_key_integration_one_shot_pipeline_smoke_status"] == (
+        expected_one_shot_status
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is bool(
         one_shot_pipeline_smoke["command"]
