@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_CLI_MIXED_EXPORTED_ENV_VALUE_VERIFIED
-gate_id: API_KEY_INTEGRATION_CLI_MIXED_EXPORTED_ENV_VALUE_GATE
+status: API_KEY_INTEGRATION_CLI_REAL_OVER_PLACEHOLDER_ALIAS_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_REAL_OVER_PLACEHOLDER_ALIAS_GATE
 review_tier: S1_small
 
-next_atomic_step: prove summary-only API-key pipeline CLI accepts mixed exported canonical and project alias credentials
+next_atomic_step: prove summary-only API-key pipeline CLI accepts real exported aliases when sibling placeholder aliases are also present
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -70,37 +70,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_mixed_exported_env_aliases_without_dotenv_secrets -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_real_exported_aliases_with_placeholder_siblings -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - summary-only API-key pipeline CLI launched with mixed exported canonical and project alias API-key values treats those values as configured credentials
-  - CLI regression proves mixed exported env aliases configure market, macro, and news provider families and select Polygon/FRED/NewsAPI live routes
+  - summary-only API-key pipeline CLI launched with real exported alias API-key values and sibling placeholder aliases treats the real values as configured credentials
+  - CLI regression proves sibling placeholder aliases do not prevent market, macro, and news provider families from configuring or selecting Polygon/FRED/NewsAPI live routes
   - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified CLI mixed exported env API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI real-over-placeholder alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_CLI_MIXED_EXPORTED_ENV_VALUE_GATE
+gate_id: API_KEY_INTEGRATION_CLI_REAL_OVER_PLACEHOLDER_ALIAS_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_mixed_exported_env_aliases_without_dotenv_secrets -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 108 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 848 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_real_exported_aliases_with_placeholder_siblings -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 109 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 849 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -109,11 +109,22 @@ files_changed:
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - tests/test_readiness.py
-next_state: commit this verified CLI mixed exported env API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified CLI real-over-placeholder alias API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - summary-only API-key pipeline CLI launched with mixed exported canonical/project alias API-key values configures market, macro, and news provider families
-  - mixed exported env aliases select Polygon/FRED/NewsAPI live routes while keeping output no-secret and avoiding local .env mutation
+  - summary-only API-key pipeline CLI launched with real exported aliases remains configured when sibling documented placeholder aliases are also exported
+  - sibling placeholder aliases do not prevent market, macro, and news provider families from selecting Polygon/FRED/NewsAPI live routes
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes were added
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_CLI_MIXED_EXPORTED_ENV_VALUE_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_MIXED_EXPORTED_ENV_VALUE_GATE
+review_tier: S1_small
+
+next_atomic_step: prove summary-only API-key pipeline CLI accepts mixed exported canonical and project alias credentials
 ```
 
 Previous completed directive:
