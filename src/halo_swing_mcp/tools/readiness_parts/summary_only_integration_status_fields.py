@@ -158,6 +158,18 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured = (
         False
     )
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_classes: list[
+        str
+    ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family: dict[
+        str, Any
+    ] = {}
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family: dict[
         str, Any
     ] = {}
@@ -466,6 +478,35 @@ def _api_key_integration_status_top_level_fields(
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_classes = _string_list(
+                    api_key_integration_status_summary.get(
+                        "selected_provider_classes"
+                    )
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family = (
+                    _optional_mapping(
+                        api_key_integration_status_summary.get(
+                            "selected_provider_class_by_family"
+                        )
+                    )
+                    or {}
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family = (
+                    _optional_mapping(
+                        api_key_integration_status_summary.get(
+                            "provider_route_data_mode_by_family"
+                        )
+                    )
+                    or {}
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family = (
+                    _optional_mapping(
+                        api_key_integration_status_summary.get(
+                            "provider_route_live_data_required_by_family"
+                        )
+                    )
+                    or {}
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family
@@ -778,6 +819,23 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_all_provider_families_configured
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_classes": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_classes
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_count": (
+            len(
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_classes
+            )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_selected_provider_class_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_data_mode_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_route_live_data_required_by_family
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family
