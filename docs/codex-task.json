@@ -1,27 +1,20 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_GATE",
+  "gate_id": "API_KEY_INTEGRATION_CLI_DOTENV_QUOTED_VALUE_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.012",
-  "next_atomic_step": "centralize API-key placeholder secret detection for provider factory and readiness checks",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.013",
+  "next_atomic_step": "prove summary-only API-key pipeline CLI accepts quoted launch-directory dotenv credentials with comments",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/secret_values.py",
-    "src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py",
-    "tests/test_providers.py",
     "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.012",
-    "src/halo_swing_mcp/providers.py",
-    "src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py",
-    "tests/test_providers.py",
+    "docs/halo-swing-development-plan.md#4.013",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -38,8 +31,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_quoted_launch_directory_dotenv_values -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -56,13 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "provider factory and readiness API-key checks share one local predicate for documented placeholder secret values",
-    "placeholder examples and generic placeholder forms are rejected without duplicating the value list in providers and readiness gates",
-    "tests prove documented placeholder examples are covered and existing provider/readiness/CLI rejection behavior remains intact",
+    "summary-only API-key pipeline CLI launched from a directory containing quoted .env API-key values treats those values as configured credentials",
+    "CLI regression proves quoted/commented .env values configure market, macro, and news provider families and select Polygon/FRED/NewsAPI live routes",
+    "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified API-key placeholder predicate SSOT gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified CLI quoted dotenv API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

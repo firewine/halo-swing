@@ -42,21 +42,17 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_VERIFIED
-gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_GATE
+status: API_KEY_INTEGRATION_CLI_DOTENV_QUOTED_VALUE_VERIFIED
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_QUOTED_VALUE_GATE
 review_tier: S1_small
 
-next_atomic_step: centralize API-key placeholder secret detection for provider factory and readiness checks
+next_atomic_step: prove summary-only API-key pipeline CLI accepts quoted launch-directory dotenv credentials with comments
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/secret_values.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
-  - tests/test_providers.py
   - tests/test_readiness.py
 
 blocked_path_prefixes:
@@ -74,39 +70,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_quoted_launch_directory_dotenv_values -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - provider factory and readiness API-key checks share one local predicate for documented placeholder secret values
-  - placeholder examples and generic placeholder forms are rejected without duplicating the value list in providers and readiness gates
-  - tests prove documented placeholder examples are covered and existing provider/readiness/CLI rejection behavior remains intact
+  - summary-only API-key pipeline CLI launched from a directory containing quoted .env API-key values treats those values as configured credentials
+  - CLI regression proves quoted/commented .env values configure market, macro, and news provider families and select Polygon/FRED/NewsAPI live routes
+  - test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit this verified API-key placeholder predicate SSOT gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit this verified CLI quoted dotenv API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_GATE
+gate_id: API_KEY_INTEGRATION_CLI_DOTENV_QUOTED_VALUE_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_placeholder_secret_predicate_covers_documented_examples tests/test_providers.py::test_describe_market_data_provider_route_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_live_data_api_key_status_ignores_documented_placeholder_api_keys tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_placeholders -q: 4 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 33 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 104 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 844 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_quoted_launch_directory_dotenv_values -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 105 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 845 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -114,14 +108,21 @@ files_changed:
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
-  - src/halo_swing_mcp/secret_values.py
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
-  - tests/test_providers.py
   - tests/test_readiness.py
-next_state: commit this verified API-key placeholder predicate SSOT gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit this verified CLI quoted dotenv API-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 notes:
-  - provider factory and readiness API-key checks now share one placeholder secret predicate while preserving provider/readiness/CLI rejection behavior
+  - summary-only API-key pipeline CLI now has regression coverage proving quoted/commented launch-directory .env API-key values configure live provider routes without returning secret values
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_VERIFIED
+gate_id: API_KEY_INTEGRATION_PLACEHOLDER_SECRET_PREDICATE_SSOT_GATE
+review_tier: S1_small
+
+next_atomic_step: centralize API-key placeholder secret detection for provider factory and readiness checks
 ```
 
 Previous completed directive:

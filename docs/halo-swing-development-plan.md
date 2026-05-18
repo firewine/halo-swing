@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.013 API Key Integration CLI Dotenv Quoted Value Gate Record - 2026-05-18
+
+### A. 목적
+
+API-key-only setup은 사용자가 `.env`에 실제 provider key를 넣고
+`run_api_key_pipeline_smoke --summary-only --no-audit`로 확인하는 경로를 중심으로 한다.
+실제 `.env` 작성에서는 key 값을 따옴표로 감싸거나 inline comment를 붙이는 일이 흔하다.
+이번 slice는 launch-directory `.env`에 quoted API-key values와 comments가 있어도 summary-only
+CLI가 market/macro/news provider families를 configured로 보고 Polygon/FRED/NewsAPI live
+routes를 선택하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add summary-only pipeline CLI regression using quoted launch-directory .env API-key values
+  - prove quoted/commented values configure market, macro, and news provider families
+  - prove selected provider route classes are PolygonMarketDataProvider, FredMacroDataProvider, and NewsApiDataProvider
+  - keep output no-secret, no-audit, offline except for provider smoke metadata, and free of committed runtime artifacts
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_quoted_launch_directory_dotenv_values -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 105 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 845 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.012 API Key Integration Placeholder Secret Predicate SSOT Gate Record - 2026-05-18
 
 ### A. 목적
