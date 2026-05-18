@@ -499,7 +499,7 @@ def _resolve_polygon_api_key() -> str:
         get_config_value("POLYGON_API_KEY"),
     )
     for candidate in candidates:
-        if isinstance(candidate, str) and candidate.strip():
+        if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "market data API key")
     raise ValueError(
         "live market data requires HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY"
@@ -525,7 +525,7 @@ def _resolve_fred_api_key() -> str:
         get_config_value("FRED_API_KEY"),
     )
     for candidate in candidates:
-        if isinstance(candidate, str) and candidate.strip():
+        if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "macro API key")
     raise ValueError(
         "live macro data requires HALO_SWING_MACRO_API_KEY, "
@@ -550,7 +550,7 @@ def _resolve_news_api_key() -> str:
         get_config_value("NEWS_API_KEY"),
     )
     for candidate in candidates:
-        if isinstance(candidate, str) and candidate.strip():
+        if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "news API key")
     raise ValueError(
         "live news data requires HALO_SWING_NEWS_API_KEY or NEWS_API_KEY"
