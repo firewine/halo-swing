@@ -96,6 +96,13 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family: dict[
         str, bool
     ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count = (
+        0
+    )
+    one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count = 0
+    one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured = (
+        False
+    )
     one_shot_pipeline_smoke_unblock_followup_smoke_setup_status_by_family: dict[
         str, Any
     ] = {}
@@ -186,6 +193,26 @@ def _api_key_integration_status_top_level_fields(
                 family: row.get("configured") is True
                 for family, row in provider_requirement_rows.items()
             }
+            one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count = sum(
+                1
+                for configured in (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family.values()
+                )
+                if configured
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count = (
+                len(
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                )
+                - one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count
+            )
+            one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured = (
+                bool(
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_families
+                )
+                and one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count
+                == 0
+            )
             one_shot_pipeline_smoke_unblock_followup_smoke_setup_status_by_family = {
                 family: row.get("setup_status")
                 for family, row in provider_requirement_rows.items()
@@ -388,6 +415,15 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_family_count
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_all_provider_families_configured
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_setup_status_by_family": (
             one_shot_pipeline_smoke_unblock_followup_smoke_setup_status_by_family
