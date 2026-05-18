@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.001 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Status Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+4.000까지 summary-only 출력은 API-key-only next command block에 command, env-key,
+dotenv example, network/safety metadata를 top-level로 노출한다. 하지만 compact client가
+그 command card의 상태를 렌더링하려면 follow-up smoke status와 requires/ready flags를
+다시 조합해야 한다. 이번 slice는 API-key-only next command status fields를 조건부
+top-level로 올려, 키 입력 전후 실행 가능 상태를 같은 command block에서 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_status mirrors follow-up smoke status only when API-key-only setup is ready after env keys
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys mirrors follow-up smoke API-key requirement only when API-key-only setup is ready after env keys
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys mirrors follow-up smoke ready-after-env-keys state only when API-key-only setup is ready after env keys
+  - summary-only tests prove API-key-only next command status fields derive from follow-up smoke status and API-key-only readiness
+  - README and DevOps setup guide document the follow-up smoke API-key-only next command status fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.000 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Dotenv Example Fields Gate Record - 2026-05-18
 
 ### A. 목적

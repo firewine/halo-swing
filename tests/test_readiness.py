@@ -8627,6 +8627,30 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_status"
+        ]
+        == payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_status"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys"
+        ]
+        is payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_requires_api_keys"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys"
+        ]
+        is payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_ready_after_env_keys"
+        ]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys"
         ]
         == payload[
@@ -13180,6 +13204,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         None
     )
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command = None
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_status = (
+        None
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys = (
+        False
+    )
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys = (
+        False
+    )
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys: list[
         str
     ] = []
@@ -13373,6 +13406,15 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command = (
                 expected_one_shot_unblock_followup_smoke_command
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_status = (
+                expected_one_shot_unblock_followup_smoke_status
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys = (
+                expected_one_shot_unblock_followup_smoke_requires_api_keys
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys = (
+                expected_one_shot_unblock_followup_smoke_ready_after_env_keys
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys = (
                 expected_one_shot_unblock_followup_required_env_keys
@@ -13647,6 +13689,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command"
         ]
         == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_status"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_status
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_requires_api_keys
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys"
+        ]
+        is expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_ready_after_env_keys
     )
     assert (
         payload[
