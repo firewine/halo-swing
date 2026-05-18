@@ -1417,6 +1417,9 @@ readiness values as top-level scalars/lists:
 `api_key_integration_next_action_name`. It also mirrors the one-shot pipeline
 smoke command as `api_key_integration_one_shot_pipeline_smoke_name`,
 `api_key_integration_one_shot_pipeline_smoke_command`,
+`api_key_integration_one_shot_pipeline_smoke_has_command`,
+`api_key_integration_one_shot_pipeline_smoke_ready_to_run`,
+`api_key_integration_one_shot_pipeline_smoke_requires_api_keys`,
 `api_key_integration_one_shot_pipeline_smoke_network_call`,
 `api_key_integration_one_shot_pipeline_smoke_network_call_policy`,
 `api_key_integration_one_shot_pipeline_smoke_mutates_local_state`, and

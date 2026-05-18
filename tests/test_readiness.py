@@ -8333,6 +8333,12 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
         "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
         "run_api_key_pipeline_smoke --summary-only --no-audit"
     )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is True
+    assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is False
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_requires_api_keys"]
+        is True
+    )
     assert payload["api_key_integration_one_shot_pipeline_smoke_network_call"] is True
     assert (
         payload["api_key_integration_one_shot_pipeline_smoke_network_call_policy"]
@@ -12671,6 +12677,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_command"] == (
         one_shot_pipeline_smoke["command"]
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_has_command"] is bool(
+        one_shot_pipeline_smoke["command"]
+    )
+    assert payload["api_key_integration_one_shot_pipeline_smoke_ready_to_run"] is (
+        integration_status["ready_to_run_live_smoke"]
+        and bool(one_shot_pipeline_smoke["command"])
+    )
+    assert (
+        payload["api_key_integration_one_shot_pipeline_smoke_requires_api_keys"]
+        is (
+            one_shot_pipeline_smoke["network_call"]
+            and not payload[
+                "api_key_integration_one_shot_pipeline_smoke_ready_to_run"
+            ]
+        )
     )
     assert payload["api_key_integration_one_shot_pipeline_smoke_network_call"] is (
         one_shot_pipeline_smoke["network_call"]

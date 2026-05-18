@@ -37,6 +37,17 @@ def _api_key_integration_status_top_level_fields(
         _optional_mapping(api_key_command_summary.get("one_shot_pipeline_smoke"))
         or {}
     )
+    one_shot_pipeline_smoke_command = one_shot_pipeline_smoke.get("command")
+    one_shot_pipeline_smoke_has_command = bool(one_shot_pipeline_smoke_command)
+    integration_ready_to_run_live_smoke = (
+        api_key_integration_status_summary.get("ready_to_run_live_smoke") is True
+    )
+    one_shot_pipeline_smoke_ready_to_run = (
+        integration_ready_to_run_live_smoke and one_shot_pipeline_smoke_has_command
+    )
+    one_shot_pipeline_smoke_network_call = (
+        one_shot_pipeline_smoke.get("network_call") is True
+    )
     next_provider_smoke_command = (
         api_key_integration_status_summary.get(
             "next_action_next_provider_smoke_command"
@@ -110,17 +121,26 @@ def _api_key_integration_status_top_level_fields(
             is True
         ),
         "api_key_integration_ready_to_run_live_smoke": (
-            api_key_integration_status_summary.get("ready_to_run_live_smoke")
-            is True
+            integration_ready_to_run_live_smoke
         ),
         "api_key_integration_one_shot_pipeline_smoke_name": (
             one_shot_pipeline_smoke.get("name")
         ),
         "api_key_integration_one_shot_pipeline_smoke_command": (
-            one_shot_pipeline_smoke.get("command")
+            one_shot_pipeline_smoke_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_has_command": (
+            one_shot_pipeline_smoke_has_command
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_ready_to_run": (
+            one_shot_pipeline_smoke_ready_to_run
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_requires_api_keys": (
+            one_shot_pipeline_smoke_network_call
+            and not one_shot_pipeline_smoke_ready_to_run
         ),
         "api_key_integration_one_shot_pipeline_smoke_network_call": (
-            one_shot_pipeline_smoke.get("network_call") is True
+            one_shot_pipeline_smoke_network_call
         ),
         "api_key_integration_one_shot_pipeline_smoke_network_call_policy": (
             one_shot_pipeline_smoke.get("network_call_policy")
