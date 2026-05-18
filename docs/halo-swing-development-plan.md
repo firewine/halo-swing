@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.003 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Provider Env-Hint Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+4.002까지 summary-only 출력은 API-key-only next command block에 대상 provider family
+목록과 configured/blocked family 상태를 top-level로 노출한다. 하지만 사용자가 실제로 API
+키를 채우려면 family마다 어떤 provider와 preferred/accepted env key를 써야 하는지 같은
+command block 안에서 확인할 수 있어야 한다. 이번 slice는 API-key-only next command
+provider env-hint fields를 조건부 top-level로 올려, API 키 입력 화면이나 compact client가
+follow-up smoke maps를 다시 조합하지 않고 바로 env 입력 힌트를 렌더링하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family mirrors follow-up smoke provider map only when API-key-only setup is ready after env keys
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_preferred_env_key_by_family mirrors preferred env-key map for the next command block
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_accepted_env_keys_by_family mirrors accepted env-key map for the next command block
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family mirrors required env-key map for the next command block
+  - summary-only tests prove API-key-only next command provider env-hint fields derive from follow-up smoke provider requirements and API-key-only readiness
+  - README and DevOps setup guide document the follow-up smoke API-key-only next command provider env-hint fields
+  - no live_adapters, broker/order code, Telegram send, Hermes runtime call, migration, repository persistence, scheduler, committed runtime artifact, automatic .env mutation, exception message, URL, API key value, or secret value output changes added
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.002 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Provider-Family Fields Gate Record - 2026-05-18
 
 ### A. 목적

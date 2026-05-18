@@ -149,6 +149,18 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families: list[
         str
     ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_preferred_env_key_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_accepted_env_keys_by_family: dict[
+        str, list[str]
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family: dict[
+        str, list[str]
+    ] = {}
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys: list[
         str
     ] = []
@@ -412,6 +424,18 @@ def _api_key_integration_status_top_level_fields(
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_families
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_provider_by_family
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_preferred_env_key_by_family = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_preferred_env_key_by_family
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_accepted_env_keys_by_family = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_accepted_env_keys_by_family
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family = (
+                    one_shot_pipeline_smoke_unblock_followup_smoke_required_env_keys_by_family
                 )
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys = (
                     one_shot_pipeline_smoke_unblock_followup_required_env_keys
@@ -679,6 +703,18 @@ def _api_key_integration_status_top_level_fields(
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_blocked_provider_families
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_provider_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_preferred_env_key_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_preferred_env_key_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_accepted_env_keys_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_accepted_env_keys_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys_by_family
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_required_env_keys
