@@ -1079,14 +1079,19 @@ plus blocked setup hints
 `api_key_next_provider_smoke_provider_route_data_mode`,
 `api_key_next_provider_smoke_provider_route_live_data_required`,
 `api_key_next_provider_smoke_command`,
+`api_key_next_provider_smoke_has_command`,
+`api_key_next_provider_smoke_ready_to_run`,
+`api_key_next_provider_smoke_requires_api_keys`,
 `api_key_next_provider_smoke_next_setup_action`,
 `api_key_next_provider_smoke_status`,
 `api_key_next_provider_smoke_network_call`,
 `api_key_next_provider_smoke_network_call_policy`,
 `api_key_next_provider_smoke_expected_live_contract`,
 `api_key_next_provider_smoke_expected_live_checks`,
+`api_key_next_provider_smoke_expected_live_check_count`,
 `api_key_next_provider_smoke_preferred_env_key`,
 `api_key_next_provider_smoke_accepted_env_keys`,
+`api_key_next_provider_smoke_accepted_env_key_count`,
 `api_key_next_provider_smoke_mutates_local_state`, and
 `api_key_next_provider_smoke_secret_values_returned`.
 The same first ready provider smoke is also exposed with explicit ready-field

@@ -857,6 +857,15 @@ def _api_key_provider_smoke_top_level_fields(
             is True
         ),
         "api_key_next_provider_smoke_command": next_provider_smoke.get("command"),
+        "api_key_next_provider_smoke_has_command": (
+            next_provider_smoke_has_command
+        ),
+        "api_key_next_provider_smoke_ready_to_run": (
+            next_provider_smoke_ready_to_run
+        ),
+        "api_key_next_provider_smoke_requires_api_keys": (
+            next_provider_smoke_requires_api_keys
+        ),
         "api_key_next_provider_smoke_next_setup_action": (
             next_provider_smoke.get("next_setup_action")
             or setup_next_provider_smoke.get("next_setup_action")
@@ -874,10 +883,16 @@ def _api_key_provider_smoke_top_level_fields(
         "api_key_next_provider_smoke_expected_live_checks": (
             next_provider_smoke_expected_live_checks
         ),
+        "api_key_next_provider_smoke_expected_live_check_count": len(
+            next_provider_smoke_expected_live_checks
+        ),
         "api_key_next_provider_smoke_preferred_env_key": (
             next_provider_smoke.get("preferred_env_key")
         ),
         "api_key_next_provider_smoke_accepted_env_keys": (
+            next_provider_smoke_accepted_env_keys
+        ),
+        "api_key_next_provider_smoke_accepted_env_key_count": len(
             next_provider_smoke_accepted_env_keys
         ),
         "api_key_next_provider_smoke_mutates_local_state": (
