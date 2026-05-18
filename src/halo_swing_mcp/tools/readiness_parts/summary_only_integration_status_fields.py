@@ -32,6 +32,42 @@ def _api_key_integration_status_top_level_fields(
     next_operator_action: dict[str, Any],
     next_provider_smoke: dict[str, Any],
 ) -> dict[str, Any]:
+    next_provider_smoke_command = (
+        api_key_integration_status_summary.get(
+            "next_action_next_provider_smoke_command"
+        )
+        or next_provider_smoke.get("command")
+    )
+    next_provider_smoke_status = (
+        api_key_integration_status_summary.get(
+            "next_action_next_provider_smoke_status"
+        )
+        or next_provider_smoke.get("status")
+    )
+    next_provider_smoke_expected_live_checks = (
+        _string_list(
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_expected_live_checks"
+            )
+        )
+        or _string_list(next_provider_smoke.get("expected_live_checks"))
+    )
+    next_provider_smoke_accepted_env_keys = (
+        _string_list(
+            api_key_integration_status_summary.get(
+                "next_action_next_provider_smoke_accepted_env_keys"
+            )
+        )
+        or _string_list(next_provider_smoke.get("accepted_env_keys"))
+    )
+    next_provider_smoke_has_command = bool(next_provider_smoke_command)
+    next_provider_smoke_ready_to_run = (
+        next_provider_smoke_status == "ready" and next_provider_smoke_has_command
+    )
+    next_provider_smoke_requires_api_keys = (
+        next_provider_smoke_status != "ready"
+        and bool(next_provider_smoke_accepted_env_keys)
+    )
     return {
         "api_key_integration_status": (
             api_key_integration_status_summary.get("status")
@@ -214,10 +250,16 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("smoke_command_name")
         ),
         "api_key_integration_next_action_next_provider_smoke_command": (
-            api_key_integration_status_summary.get(
-                "next_action_next_provider_smoke_command"
-            )
-            or next_provider_smoke.get("command")
+            next_provider_smoke_command
+        ),
+        "api_key_integration_next_action_next_provider_smoke_has_command": (
+            next_provider_smoke_has_command
+        ),
+        "api_key_integration_next_action_next_provider_smoke_ready_to_run": (
+            next_provider_smoke_ready_to_run
+        ),
+        "api_key_integration_next_action_next_provider_smoke_requires_api_keys": (
+            next_provider_smoke_requires_api_keys
         ),
         "api_key_integration_next_action_next_provider_smoke_next_setup_action": (
             api_key_integration_status_summary.get(
@@ -257,10 +299,7 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("provider_route_live_data_required") is True
         ),
         "api_key_integration_next_action_next_provider_smoke_status": (
-            api_key_integration_status_summary.get(
-                "next_action_next_provider_smoke_status"
-            )
-            or next_provider_smoke.get("status")
+            next_provider_smoke_status
         ),
         "api_key_integration_next_action_next_provider_smoke_network_call": (
             _bool_from_status_or_provider(
@@ -283,12 +322,10 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("expected_live_contract")
         ),
         "api_key_integration_next_action_next_provider_smoke_expected_live_checks": (
-            _string_list(
-                api_key_integration_status_summary.get(
-                    "next_action_next_provider_smoke_expected_live_checks"
-                )
-            )
-            or _string_list(next_provider_smoke.get("expected_live_checks"))
+            next_provider_smoke_expected_live_checks
+        ),
+        "api_key_integration_next_action_next_provider_smoke_expected_live_check_count": (
+            len(next_provider_smoke_expected_live_checks)
         ),
         "api_key_integration_next_action_next_provider_smoke_preferred_env_key": (
             api_key_integration_status_summary.get(
@@ -297,12 +334,10 @@ def _api_key_integration_status_top_level_fields(
             or next_provider_smoke.get("preferred_env_key")
         ),
         "api_key_integration_next_action_next_provider_smoke_accepted_env_keys": (
-            _string_list(
-                api_key_integration_status_summary.get(
-                    "next_action_next_provider_smoke_accepted_env_keys"
-                )
-            )
-            or _string_list(next_provider_smoke.get("accepted_env_keys"))
+            next_provider_smoke_accepted_env_keys
+        ),
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count": (
+            len(next_provider_smoke_accepted_env_keys)
         ),
         "api_key_integration_next_action_next_provider_smoke_mutates_local_state": (
             api_key_integration_status_summary.get(

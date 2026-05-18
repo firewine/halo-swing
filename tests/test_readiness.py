@@ -12826,6 +12826,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_has_command"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_ready_to_run"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_requires_api_keys"
+        ]
+        is False
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_next_setup_action"
         ]
         == integration_status["next_action_next_provider_smoke_next_setup_action"]
@@ -12929,6 +12947,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "expected_live_checks"
         ]
     )
+    assert payload[
+        "api_key_integration_next_action_next_provider_smoke_expected_live_check_count"
+    ] == len(payload["next_operator_action"]["next_provider_smoke"]["expected_live_checks"])
     assert (
         payload[
             "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
@@ -12951,6 +12972,9 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "accepted_env_keys"
         ]
     )
+    assert payload[
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count"
+    ] == len(payload["next_operator_action"]["next_provider_smoke"]["accepted_env_keys"])
     assert (
         payload[
             "api_key_integration_next_action_next_provider_smoke_mutates_local_state"
@@ -13006,6 +13030,24 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
         payload["api_key_integration_next_action_next_provider_smoke_command"]
         == integration_status["next_action_next_provider_smoke_command"]
         == next_provider_smoke["command"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_has_command"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_ready_to_run"
+        ]
+        is True
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_requires_api_keys"
+        ]
+        is False
     )
     assert (
         payload[
@@ -13109,6 +13151,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
     )
     assert (
         payload[
+            "api_key_integration_next_action_next_provider_smoke_expected_live_check_count"
+        ]
+        == len(next_provider_smoke["expected_live_checks"])
+        == 1
+    )
+    assert (
+        payload[
             "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
         ]
         == integration_status["next_action_next_provider_smoke_preferred_env_key"]
@@ -13122,6 +13171,13 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_next_provider
         == integration_status["next_action_next_provider_smoke_accepted_env_keys"]
         == next_provider_smoke["accepted_env_keys"]
         == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+    )
+    assert (
+        payload[
+            "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count"
+        ]
+        == len(next_provider_smoke["accepted_env_keys"])
+        == 2
     )
     assert (
         payload[

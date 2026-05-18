@@ -482,6 +482,15 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         "api_key_integration_next_action_next_provider_smoke_command_name" in guide
     )
     assert "api_key_integration_next_action_next_provider_smoke_command" in guide
+    assert "api_key_integration_next_action_next_provider_smoke_has_command" in guide
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_ready_to_run"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_requires_api_keys"
+        in guide
+    )
     assert (
         "api_key_integration_next_action_next_provider_smoke_next_setup_action"
         in guide
@@ -506,11 +515,19 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
         in guide
     )
     assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_check_count"
+        in guide
+    )
+    assert (
         "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
         in guide
     )
     assert (
         "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        in guide
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count"
         in guide
     )
     assert (
@@ -688,6 +705,15 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
         in readme
     )
     assert "api_key_integration_next_action_next_provider_smoke_command" in readme
+    assert "api_key_integration_next_action_next_provider_smoke_has_command" in readme
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_ready_to_run"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_requires_api_keys"
+        in readme
+    )
     assert (
         "api_key_integration_next_action_next_provider_smoke_next_setup_action"
         in readme
@@ -724,11 +750,19 @@ def test_readme_shows_api_key_integration_next_action_provider_smoke_progress() 
         in readme
     )
     assert (
+        "api_key_integration_next_action_next_provider_smoke_expected_live_check_count"
+        in readme
+    )
+    assert (
         "api_key_integration_next_action_next_provider_smoke_preferred_env_key"
         in readme
     )
     assert (
         "api_key_integration_next_action_next_provider_smoke_accepted_env_keys"
+        in readme
+    )
+    assert (
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count"
         in readme
     )
     assert (
@@ -755,6 +789,9 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_blocked_provider_smoke_count",
         "api_key_integration_next_action_next_provider_smoke_command_name",
         "api_key_integration_next_action_next_provider_smoke_command",
+        "api_key_integration_next_action_next_provider_smoke_has_command",
+        "api_key_integration_next_action_next_provider_smoke_ready_to_run",
+        "api_key_integration_next_action_next_provider_smoke_requires_api_keys",
         "api_key_integration_next_action_next_provider_smoke_next_setup_action",
         "api_key_integration_next_action_next_provider_smoke_provider_family",
         "api_key_integration_next_action_next_provider_smoke_provider",
@@ -766,8 +803,10 @@ def test_setup_docs_keep_api_key_integration_provider_smoke_progress_fields_in_s
         "api_key_integration_next_action_next_provider_smoke_network_call_policy",
         "api_key_integration_next_action_next_provider_smoke_expected_live_contract",
         "api_key_integration_next_action_next_provider_smoke_expected_live_checks",
+        "api_key_integration_next_action_next_provider_smoke_expected_live_check_count",
         "api_key_integration_next_action_next_provider_smoke_preferred_env_key",
         "api_key_integration_next_action_next_provider_smoke_accepted_env_keys",
+        "api_key_integration_next_action_next_provider_smoke_accepted_env_key_count",
         "api_key_integration_next_action_next_provider_smoke_mutates_local_state",
         "api_key_integration_next_action_next_provider_smoke_secret_values_returned",
     )
