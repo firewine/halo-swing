@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_CLI_DOTENV_CONTROL_CHARACTER_KEY_REJECTION_GATE",
+  "gate_id": "API_KEY_INTEGRATION_CLI_ALIAS_DOTENV_CONTROL_CHARACTER_KEY_REJECTION_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.022",
-  "next_atomic_step": "prove summary-only API-key pipeline CLI rejects launch-directory dotenv API-key values containing control characters",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.023",
+  "next_atomic_step": "prove summary-only API-key pipeline CLI rejects launch-directory project alias dotenv API-key values containing control characters",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -14,7 +14,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.022",
+    "docs/halo-swing-development-plan.md#4.023",
     "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
@@ -31,7 +31,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_dotenv_control_character_keys -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_rejects_launch_directory_project_alias_dotenv_control_character_keys -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
@@ -48,13 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "summary-only API-key pipeline CLI launched with launch-directory dotenv API-key values containing control characters keeps API-key setup blocked",
-    "CLI regression proves dotenv control-character values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready",
+    "summary-only API-key pipeline CLI launched with launch-directory project alias dotenv API-key values containing control characters keeps API-key setup blocked",
+    "CLI regression proves project alias dotenv control-character values do not configure provider families, do not select Polygon/FRED/NewsAPI live routes, and keep one-shot smoke not ready",
     "test output does not return secret values, URLs, mutate local state, or require committed runtime artifacts",
     "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, exception message, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit this verified CLI dotenv control-character API-key rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit this verified CLI project alias dotenv control-character API-key rejection gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }
