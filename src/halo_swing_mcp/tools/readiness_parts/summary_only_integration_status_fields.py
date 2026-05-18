@@ -227,6 +227,18 @@ def _api_key_integration_status_top_level_fields(
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples: list[
         str
     ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts: list[
+        str
+    ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family: dict[
+        str, Any
+    ] = {}
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks: list[
+        str
+    ] = []
+    one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family: dict[
+        str, list[str]
+    ] = {}
     one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
         False
     )
@@ -603,6 +615,34 @@ def _api_key_integration_status_top_level_fields(
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples = (
                     one_shot_pipeline_smoke_unblock_followup_dotenv_examples
                 )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts = _string_list(
+                    one_shot_pipeline_smoke.get("expected_live_contracts")
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family = (
+                    _optional_mapping(
+                        one_shot_pipeline_smoke.get(
+                            "expected_live_contracts_by_family"
+                        )
+                    )
+                    or {}
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks = _string_list(
+                    one_shot_pipeline_smoke.get("expected_live_checks")
+                )
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family = {
+                    family: _string_list(checks)
+                    for family, checks in (
+                        (
+                            _optional_mapping(
+                                one_shot_pipeline_smoke.get(
+                                    "expected_live_checks_by_family"
+                                )
+                            )
+                            or {}
+                        ).items()
+                    )
+                    if isinstance(family, str)
+                }
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
                     one_shot_pipeline_smoke_unblock_followup_smoke_network_call
                 )
@@ -971,6 +1011,28 @@ def _api_key_integration_status_top_level_fields(
             len(
                 one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
             )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contract_count": (
+            len(
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts
+            )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_check_count": (
+            len(
+                one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks
+            )
+        ),
+        "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family": (
+            one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family
         ),
         "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call": (
             one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call

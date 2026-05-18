@@ -28,6 +28,62 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.009 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Expected Live Check Fields Gate Record - 2026-05-18
+
+### A. 목적
+
+4.008까지 summary-only 출력은 API-key-only next command block에 selected provider
+route와 route aggregate를 top-level로 노출한다. 하지만 사용자가 API 키 입력 후
+`run_api_key_pipeline_smoke`를 실행할 때 어떤 live boundary contract/check가 검증될지 같은
+command card에서 확인하려면 provider smoke metadata를 다시 찾아야 한다. 이번 slice는
+one-shot pipeline smoke command summary에 provider별 expected live contract/check metadata를
+집계하고, API-key-only next command expected live check fields로 조건부 top-level 노출해,
+API 키만 넣으면 이어지는 실제 연동 smoke의 검증 기준을 한 블록에서 확인하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - api_key_command_summary.one_shot_pipeline_smoke includes expected_live_contracts, expected_live_contracts_by_family, expected_live_checks, and expected_live_checks_by_family derived from provider smoke commands
+  - summary-only top-level api_key_one_shot_pipeline_smoke_expected_live_contracts/checks expose the same no-secret one-shot validation metadata
+  - summary-only top-level api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts/checks mirrors one-shot live-check metadata only when API-key-only setup is ready after env keys
+  - summary-only tests prove API-key-only next command expected live check fields derive from one-shot pipeline smoke provider live-check metadata and API-key-only readiness
+  - README and DevOps setup guide document the follow-up smoke API-key-only next command expected live check fields
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - exception message, URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: verified
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_setup_docs_keep_api_key_provider_smoke_route_fields_in_sync tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_commands tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 41 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 102 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 839 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.008 API Key Integration One-Shot Pipeline Smoke Unblock Follow-Up Smoke API-Key-Only Next Command Provider Route Aggregate Fields Gate Record - 2026-05-18
 
 ### A. 목적

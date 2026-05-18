@@ -870,6 +870,22 @@ def expected_api_key_command_summary(
         ),
         None,
     )
+    expected_live_contracts_by_family = {
+        row["provider_family"]: row["expected_live_contract"]
+        for row in provider_smoke_commands
+    }
+    expected_live_checks_by_family = {
+        row["provider_family"]: row["expected_live_checks"]
+        for row in provider_smoke_commands
+    }
+    expected_live_contracts = list(dict.fromkeys(expected_live_contracts_by_family.values()))
+    expected_live_checks = list(
+        dict.fromkeys(
+            check
+            for checks in expected_live_checks_by_family.values()
+            for check in checks
+        )
+    )
     return {
         "schema_version": "api_key_pipeline_api_key_command_summary.v1",
         "status": status,
@@ -888,6 +904,10 @@ def expected_api_key_command_summary(
             "network_call_policy": "only_when_matching_api_key_selects_live_provider",
             "mutates_local_state": False,
             "secret_values_returned": False,
+            "expected_live_contracts": expected_live_contracts,
+            "expected_live_contracts_by_family": expected_live_contracts_by_family,
+            "expected_live_checks": expected_live_checks,
+            "expected_live_checks_by_family": expected_live_checks_by_family,
         },
         "next_provider_smoke": next_provider_smoke,
         "next_provider_smoke_command_name": (
@@ -2697,6 +2717,26 @@ def assert_api_key_command_summary_top_level_fields(
     )
     assert payload["api_key_one_shot_pipeline_smoke_secret_values_returned"] is (
         one_shot_pipeline_smoke["secret_values_returned"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_expected_live_contracts"] == (
+        one_shot_pipeline_smoke["expected_live_contracts"]
+    )
+    assert payload[
+        "api_key_one_shot_pipeline_smoke_expected_live_contract_count"
+    ] == len(one_shot_pipeline_smoke["expected_live_contracts"])
+    assert (
+        payload["api_key_one_shot_pipeline_smoke_expected_live_contracts_by_family"]
+        == one_shot_pipeline_smoke["expected_live_contracts_by_family"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_expected_live_checks"] == (
+        one_shot_pipeline_smoke["expected_live_checks"]
+    )
+    assert payload["api_key_one_shot_pipeline_smoke_expected_live_check_count"] == (
+        len(one_shot_pipeline_smoke["expected_live_checks"])
+    )
+    assert (
+        payload["api_key_one_shot_pipeline_smoke_expected_live_checks_by_family"]
+        == one_shot_pipeline_smoke["expected_live_checks_by_family"]
     )
 
 
@@ -8923,6 +8963,44 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts"
+        ]
+        == payload["api_key_one_shot_pipeline_smoke_expected_live_contracts"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contract_count"
+        ]
+        == payload["api_key_one_shot_pipeline_smoke_expected_live_contract_count"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family"
+        ]
+        == payload[
+            "api_key_one_shot_pipeline_smoke_expected_live_contracts_by_family"
+        ]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks"
+        ]
+        == payload["api_key_one_shot_pipeline_smoke_expected_live_checks"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_check_count"
+        ]
+        == payload["api_key_one_shot_pipeline_smoke_expected_live_check_count"]
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family"
+        ]
+        == payload["api_key_one_shot_pipeline_smoke_expected_live_checks_by_family"]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_network_call"
         ]
         is payload[
@@ -13540,6 +13618,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples: list[
         str
     ] = []
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts: list[
+        str
+    ] = []
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family: dict[
+        str, object
+    ] = {}
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks: list[
+        str
+    ] = []
+    expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family: dict[
+        str, object
+    ] = {}
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = False
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call_policy = None
     expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_mutates_local_state = False
@@ -13843,6 +13933,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples = (
                 expected_one_shot_unblock_followup_dotenv_examples
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts = (
+                one_shot_pipeline_smoke["expected_live_contracts"]
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family = (
+                one_shot_pipeline_smoke["expected_live_contracts_by_family"]
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks = (
+                one_shot_pipeline_smoke["expected_live_checks"]
+            )
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family = (
+                one_shot_pipeline_smoke["expected_live_checks_by_family"]
             )
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_network_call = (
                 expected_one_shot_unblock_followup_smoke_network_call
@@ -14359,6 +14461,46 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
         == len(
             expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_dotenv_examples
         )
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contract_count"
+        ]
+        == len(
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts
+        )
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_contracts_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_check_count"
+        ]
+        == len(
+            expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks
+        )
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family"
+        ]
+        == expected_one_shot_unblock_followup_smoke_api_key_only_setup_next_command_expected_live_checks_by_family
     )
     assert (
         payload[

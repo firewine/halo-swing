@@ -300,6 +300,31 @@ def _api_key_pipeline_api_key_command_summary(
         if isinstance(provider_smoke, dict)
     ]
     next_provider_smoke = _next_ready_provider_smoke(provider_smokes)
+    expected_live_contracts_by_family = {
+        provider_smoke["provider_family"]: provider_smoke.get(
+            "expected_live_contract"
+        )
+        for provider_smoke in provider_smokes
+        if isinstance(provider_smoke.get("provider_family"), str)
+        and isinstance(provider_smoke.get("expected_live_contract"), str)
+    }
+    expected_live_checks_by_family = {
+        provider_smoke["provider_family"]: _string_list(
+            provider_smoke.get("expected_live_checks")
+        )
+        for provider_smoke in provider_smokes
+        if isinstance(provider_smoke.get("provider_family"), str)
+    }
+    expected_live_contracts = _ordered_unique_strings(
+        list(expected_live_contracts_by_family.values())
+    )
+    expected_live_checks = _ordered_unique_strings(
+        [
+            check
+            for checks in expected_live_checks_by_family.values()
+            for check in checks
+        ]
+    )
     next_smoke_command = _optional_mapping(
         live_data_setup_summary.get("next_smoke_command")
     ) or {}
@@ -324,6 +349,10 @@ def _api_key_pipeline_api_key_command_summary(
             "secret_values_returned": one_shot_smoke_command.get(
                 "secret_values_returned"
             ),
+            "expected_live_contracts": expected_live_contracts,
+            "expected_live_contracts_by_family": expected_live_contracts_by_family,
+            "expected_live_checks": expected_live_checks,
+            "expected_live_checks_by_family": expected_live_checks_by_family,
         },
         "next_provider_smoke": next_provider_smoke,
         "next_provider_smoke_command_name": next_provider_smoke.get(

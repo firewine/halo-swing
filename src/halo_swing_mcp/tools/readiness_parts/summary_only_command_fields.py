@@ -8,6 +8,32 @@ from typing import Any
 __all__ = ("_api_key_command_top_level_fields",)
 
 
+def _string_list(values: Any) -> list[str]:
+    if not isinstance(values, list):
+        return []
+    return [value for value in values if isinstance(value, str)]
+
+
+def _string_mapping(values: Any) -> dict[str, str]:
+    if not isinstance(values, dict):
+        return {}
+    return {
+        key: value
+        for key, value in values.items()
+        if isinstance(key, str) and isinstance(value, str)
+    }
+
+
+def _string_list_mapping(values: Any) -> dict[str, list[str]]:
+    if not isinstance(values, dict):
+        return {}
+    return {
+        key: _string_list(value)
+        for key, value in values.items()
+        if isinstance(key, str)
+    }
+
+
 def _api_key_command_top_level_fields(
     *,
     copy_dotenv_command: dict[str, Any],
@@ -60,5 +86,27 @@ def _api_key_command_top_level_fields(
         ),
         "api_key_one_shot_pipeline_smoke_secret_values_returned": (
             one_shot_pipeline_smoke.get("secret_values_returned") is True
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_contracts": (
+            _string_list(one_shot_pipeline_smoke.get("expected_live_contracts"))
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_contract_count": (
+            len(_string_list(one_shot_pipeline_smoke.get("expected_live_contracts")))
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_contracts_by_family": (
+            _string_mapping(
+                one_shot_pipeline_smoke.get("expected_live_contracts_by_family")
+            )
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_checks": (
+            _string_list(one_shot_pipeline_smoke.get("expected_live_checks"))
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_check_count": (
+            len(_string_list(one_shot_pipeline_smoke.get("expected_live_checks")))
+        ),
+        "api_key_one_shot_pipeline_smoke_expected_live_checks_by_family": (
+            _string_list_mapping(
+                one_shot_pipeline_smoke.get("expected_live_checks_by_family")
+            )
         ),
     }
