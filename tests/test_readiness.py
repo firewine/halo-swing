@@ -8489,6 +8489,18 @@ def test_run_api_key_pipeline_smoke_summary_only_returns_compact_status_payload(
     )
     assert (
         payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_families"
+        ]
+        == []
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_families"
+        ]
+        == ["market", "macro", "news"]
+    )
+    assert (
+        payload[
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_family_count"
         ]
         == 0
@@ -13011,6 +13023,10 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
     expected_one_shot_unblock_followup_smoke_configured_by_family: dict[
         str, bool
     ] = {}
+    expected_one_shot_unblock_followup_smoke_configured_provider_families: list[
+        str
+    ] = []
+    expected_one_shot_unblock_followup_smoke_blocked_provider_families: list[str] = []
     expected_one_shot_unblock_followup_smoke_configured_provider_family_count = 0
     expected_one_shot_unblock_followup_smoke_blocked_provider_family_count = 0
     expected_one_shot_unblock_followup_smoke_all_provider_families_configured = False
@@ -13076,6 +13092,22 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             family: row.get("configured") is True
             for family, row in provider_requirement_rows.items()
         }
+        expected_one_shot_unblock_followup_smoke_configured_provider_families = [
+            family
+            for family in expected_one_shot_unblock_followup_smoke_provider_families
+            if expected_one_shot_unblock_followup_smoke_configured_by_family.get(
+                family
+            )
+            is True
+        ]
+        expected_one_shot_unblock_followup_smoke_blocked_provider_families = [
+            family
+            for family in expected_one_shot_unblock_followup_smoke_provider_families
+            if expected_one_shot_unblock_followup_smoke_configured_by_family.get(
+                family
+            )
+            is not True
+        ]
         expected_one_shot_unblock_followup_smoke_configured_provider_family_count = sum(
             1
             for configured in (
@@ -13261,6 +13293,18 @@ def test_run_api_key_pipeline_smoke_summary_only_keeps_integration_status_summar
             "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_by_family"
         ]
         == expected_one_shot_unblock_followup_smoke_configured_by_family
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_configured_provider_families"
+        ]
+        == expected_one_shot_unblock_followup_smoke_configured_provider_families
+    )
+    assert (
+        payload[
+            "api_key_integration_one_shot_pipeline_smoke_unblock_followup_smoke_blocked_provider_families"
+        ]
+        == expected_one_shot_unblock_followup_smoke_blocked_provider_families
     )
     assert (
         payload[
