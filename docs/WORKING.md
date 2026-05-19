@@ -42,18 +42,18 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEXT_ACTION_PREFERRED_KEYS_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEXT_ACTION_PREFERRED_KEYS_GATE
+status: API_KEY_INTEGRATION_SETUP_CHECKLIST_NEWSAPI_ALIAS_VERIFIED
+gate_id: API_KEY_INTEGRATION_SETUP_CHECKLIST_NEWSAPI_ALIAS_GATE
 review_tier: S1_small
 
-next_atomic_step: make integration readiness next_actions show preferred live-data API key names POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY without changing gate missing codes or accepted aliases
+next_atomic_step: add NEWSAPI_KEY to integration setup checklist live_data env_requirements without changing resolver priority or accepted aliases
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/readiness_gates.py
+  - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_runner.py
   - tests/test_readiness.py
 
 blocked_path_prefixes:
@@ -71,27 +71,74 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults tests/test_readiness.py::test_integration_readiness_requires_api_keys_with_live_modes tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - integration readiness next_actions show POLYGON_API_KEY for missing market live-data credentials
-  - integration readiness next_actions show FRED_API_KEY for missing macro live-data credentials
-  - integration readiness next_actions show NEWSAPI_KEY for missing news live-data credentials
-  - live_data gate missing codes remain market_ohlcv_api_key, macro_api_key, and news_api_key
-  - accepted alias support remains intact
+  - integration setup checklist live_data env_requirements include NEWSAPI_KEY
+  - integration setup checklist live_data env_requirements still include existing accepted live-data aliases
+  - live_data setup summary preferred key fields remain POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
   - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified next-actions preferred-key gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified setup checklist NEWSAPI alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: API_KEY_INTEGRATION_SETUP_CHECKLIST_NEWSAPI_ALIAS_GATE
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_runner.py
+  - tests/test_readiness.py
+next_state: commit and push this verified setup checklist NEWSAPI alias gate
+notes:
+  - get_integration_setup_checklist live_data env_requirements still list NEWS_API_KEY but omit NEWSAPI_KEY
+  - setup checklist env key listing now includes the already-supported NEWSAPI_KEY alias and matches existing preferred setup surfaces
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_NEXT_ACTION_PREFERRED_KEYS_VERIFIED
+gate_id: API_KEY_INTEGRATION_NEXT_ACTION_PREFERRED_KEYS_GATE
+review_tier: S1_small
+
+next_atomic_step: make integration readiness next_actions show preferred live-data API key names POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY without changing gate missing codes or accepted aliases
+```
+
+Previous verification result:
 
 ```text
 status: passed

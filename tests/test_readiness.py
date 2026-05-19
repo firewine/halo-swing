@@ -3194,6 +3194,16 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     ]
     assert env_requirements["telegram"]["secret"] is True
     assert env_requirements["live_data"]["secret"] is True
+    assert env_requirements["live_data"]["env_keys"] == [
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "POLYGON_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+        "NEWSAPI_KEY",
+    ]
     assert env_requirements["binance_credentials"]["configured"] is False
     assert env_requirements["binance_credentials"]["missing"] == [
         "encrypted_binance_credentials"
@@ -21364,6 +21374,7 @@ def test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure(
     assert env_requirements["hermes"]["configured"] is True
     assert env_requirements["telegram"]["configured"] is True
     assert env_requirements["live_data"]["configured"] is True
+    assert "NEWSAPI_KEY" in env_requirements["live_data"]["env_keys"]
     assert env_requirements["binance_credentials"]["configured"] is True
     assert env_requirements["binance_read_only_smoke"]["configured"] is True
     assert env_requirements["binance_live_order_readiness"]["configured"] is True

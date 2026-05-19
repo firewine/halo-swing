@@ -285,6 +285,7 @@ def _setup_env_requirements(gates: dict[str, Any]) -> list[dict[str, Any]]:
                 "FRED_API_KEY",
                 "HALO_SWING_NEWS_API_KEY",
                 "NEWS_API_KEY",
+                "NEWSAPI_KEY",
             ],
             "configured": gates["live_data"]["ready"],
             "secret": True,
