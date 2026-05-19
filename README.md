@@ -154,9 +154,9 @@ run/config traceability, an idempotency key, and no-network/no-DB guards.
 calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
 macro, and news API-key readiness. Live data providers auto-select when their
 supported API-key aliases are present: Polygon uses
-`HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`; FRED uses
-`HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, or `FRED_API_KEY`; and
-NewsAPI uses `HALO_SWING_NEWS_API_KEY`, `NEWS_API_KEY`, or `NEWSAPI_KEY`.
+`POLYGON_API_KEY` or `HALO_SWING_MARKET_DATA_API_KEY`; FRED uses
+`FRED_API_KEY`, `HALO_SWING_MACRO_API_KEY`, or `HALO_SWING_FRED_API_KEY`; and
+NewsAPI uses `NEWSAPI_KEY`, `HALO_SWING_NEWS_API_KEY`, or `NEWS_API_KEY`.
 Exported environment variables satisfy setup even if repo-root `.env` has not
 been copied, so the next setup action moves directly to provider smokes.
 Without those keys, runs remain fixture-backed and offline. The summary-only pipeline CLI reads the same aliases from a launch-directory `.env`, so a local

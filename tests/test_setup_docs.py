@@ -28,6 +28,23 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
     guide_text = _normalized_text(DEVOPS_GUIDE)
 
+    assert (
+        "Polygon uses `POLYGON_API_KEY` or `HALO_SWING_MARKET_DATA_API_KEY`; "
+        "FRED uses `FRED_API_KEY`, `HALO_SWING_MACRO_API_KEY`, or "
+        "`HALO_SWING_FRED_API_KEY`; and NewsAPI uses `NEWSAPI_KEY`, "
+        "`HALO_SWING_NEWS_API_KEY`, or `NEWS_API_KEY`."
+    ) in readme_text
+    assert (
+        "Polygon uses `HALO_SWING_MARKET_DATA_API_KEY` or `POLYGON_API_KEY`"
+    ) not in readme_text
+    assert (
+        "FRED uses `HALO_SWING_MACRO_API_KEY`, `HALO_SWING_FRED_API_KEY`, "
+        "or `FRED_API_KEY`"
+    ) not in readme_text
+    assert (
+        "NewsAPI uses `HALO_SWING_NEWS_API_KEY`, `NEWS_API_KEY`, or "
+        "`NEWSAPI_KEY`"
+    ) not in readme_text
     assert "POLYGON_API_KEY=your_polygon_key" in guide
     assert "FRED_API_KEY=your_fred_key" in guide
     assert "NEWSAPI_KEY=your_newsapi_key" in guide
