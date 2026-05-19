@@ -160,11 +160,10 @@ NewsAPI uses `HALO_SWING_NEWS_API_KEY`, `NEWS_API_KEY`, or `NEWSAPI_KEY`.
 Exported environment variables satisfy setup even if repo-root `.env` has not
 been copied, so the next setup action moves directly to provider smokes.
 Without those keys, runs remain fixture-backed and offline. The summary-only pipeline CLI reads the same aliases from a launch-directory `.env`, so a local
-`.env` containing only `HALO_SWING_MARKET_DATA_API_KEY`,
-`HALO_SWING_MACRO_API_KEY`, and `HALO_SWING_NEWS_API_KEY` is enough to select
-the live Polygon, FRED, and NewsAPI providers without exported API-key environment variables;
-`NEWSAPI_KEY` is the preferred NewsAPI copy/paste example and `NEWS_API_KEY`
-remains accepted.
+`.env` containing only `POLYGON_API_KEY`, `FRED_API_KEY`, and `NEWSAPI_KEY` is
+enough to select the live Polygon, FRED, and NewsAPI providers without exported
+API-key environment variables. Project-specific aliases remain accepted for all
+three providers.
 When a NewsAPI key selects live news,
 `get_news_bundle` declares `live_data_required=true`, `network_call=true`, and
 `secret_values_returned=false`, with guard checks for the live data boundary and

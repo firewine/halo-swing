@@ -197,6 +197,62 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.046 API Key Integration Preferred Dotenv Bundle Docs Gate Record - 2026-05-20
+
+### A. 목적
+
+4.045까지 API-key setup status와 provider smoke metadata는 market/macro/news 모두
+preferred copy/paste key를 먼저 보여준다. 하지만 README와 DevOps guide의 local `.env`
+bundle 예시는 아직 market/macro에 project-specific alias를 대표 예시처럼 보여준다. 이번
+slice는 operator-facing bundle 예시를 `POLYGON_API_KEY`, `FRED_API_KEY`, `NEWSAPI_KEY`로
+정렬하고, project-specific aliases는 accepted alias 설명으로만 유지한다. Provider selection,
+accepted aliases, resolver priority는 변경하지 않는다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - update README local dotenv bundle example to POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
+  - update DevOps guide local dotenv bundle example to POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
+  - keep docs stating HALO_SWING_MARKET_DATA_API_KEY, HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, HALO_SWING_NEWS_API_KEY, and NEWS_API_KEY remain accepted aliases
+  - add setup docs regression assertions for preferred bundle examples and stale bundle rejection
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key removal
+  - provider smoke metadata change
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

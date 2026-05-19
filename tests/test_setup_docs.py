@@ -24,11 +24,27 @@ def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:
 
 
 def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
+    readme_text = _normalized_text(README)
     guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    guide_text = _normalized_text(DEVOPS_GUIDE)
 
     assert "POLYGON_API_KEY=your_polygon_key" in guide
     assert "FRED_API_KEY=your_fred_key" in guide
     assert "NEWSAPI_KEY=your_newsapi_key" in guide
+    for document in (readme_text, guide_text):
+        assert (
+            "`.env` containing only `POLYGON_API_KEY`, `FRED_API_KEY`, and "
+            "`NEWSAPI_KEY`"
+        ) in document
+        assert (
+            "`HALO_SWING_MARKET_DATA_API_KEY`, `HALO_SWING_MACRO_API_KEY`, "
+            "and `NEWSAPI_KEY`"
+        ) not in document
+        assert "Project-specific aliases remain accepted for all three providers" in document
+        assert "HALO_SWING_MARKET_DATA_API_KEY" in document
+        assert "HALO_SWING_MACRO_API_KEY" in document
+        assert "HALO_SWING_FRED_API_KEY" in document
+        assert "NEWS_API_KEY" in document
     assert "NEWS_API_KEY` are accepted aliases" in guide
     invalid_news_key = "HALO_SWING_NEWS" + "API_KEY"
     assert invalid_news_key not in guide
@@ -695,11 +711,15 @@ def test_setup_docs_warn_placeholder_api_key_values_are_not_configured() -> None
 
 
 def test_setup_docs_document_project_alias_dotenv_cli_summary() -> None:
-    readme = README.read_text(encoding="utf-8")
-    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    readme = _normalized_text(README)
+    guide = _normalized_text(DEVOPS_GUIDE)
     expected = (
         "summary-only pipeline CLI reads the same",
         "launch-directory `.env`",
+        "POLYGON_API_KEY",
+        "FRED_API_KEY",
+        "NEWSAPI_KEY",
+        "Project-specific aliases remain accepted for all three providers",
         "HALO_SWING_MARKET_DATA_API_KEY",
         "HALO_SWING_MACRO_API_KEY",
         "HALO_SWING_NEWS_API_KEY",
