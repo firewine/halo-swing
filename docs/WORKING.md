@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_VERIFIED
-gate_id: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_GATE
+status: API_KEY_INTEGRATION_PROVIDER_SMOKE_REQUIRED_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_PROVIDER_SMOKE_REQUIRED_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: put NEWSAPI_KEY first in NewsAPI provider smoke required env-key groups without changing resolver priority
+next_atomic_step: put POLYGON_API_KEY and FRED_API_KEY first in market and macro provider smoke required env-key groups without changing resolver priority or accepted env-key lists
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,50 +72,52 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - NewsAPI provider smoke required_env_key_groups list NEWSAPI_KEY first for operator-facing smoke metadata
-  - accepted NewsAPI env keys remain HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, and NEWSAPI_KEY
-  - provider resolver priority and NEWS_API_KEY/HALO_SWING_NEWS_API_KEY acceptance remain unchanged
+  - Market provider smoke required_env_key_groups lists POLYGON_API_KEY first
+  - Macro provider smoke required_env_key_groups lists FRED_API_KEY first
+  - market and macro accepted_env_keys remain unchanged
+  - provider resolver priority remains unchanged
   - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified NewsAPI smoke required-key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider smoke required-key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_NEWSAPI_SMOKE_REQUIRED_KEY_ORDER_GATE
+gate_id: API_KEY_INTEGRATION_PROVIDER_SMOKE_REQUIRED_KEY_ORDER_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_live_data_api_key_status_accepts_repo_dotenv_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 results:
-  - task contract and portable mirror match
-  - JSON task contract parsing passed for current contract and portable mirror
-  - git diff --check passed
-  - focused integration setup checklist smoke metadata regression passed: 1 passed
-  - focused live data API-key status regressions passed: 2 passed
-  - readiness tests passed: 132 passed
-  - full pytest passed: 876 passed
-  - ruff passed
-  - harness health_check passed
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
@@ -123,9 +125,9 @@ files_changed:
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/readiness_parts/provider_commands.py
   - tests/test_readiness.py
-next_state: commit and push this verified NewsAPI smoke required-key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state: commit and push this verified provider smoke required-key ordering gate
 notes:
-  - NewsAPI provider smoke required_env_key_groups now exposes NEWSAPI_KEY first
+  - market and macro provider smoke required_env_key_groups expose preferred simple keys first
   - accepted_env_keys and provider resolver priority remain unchanged
 ```
 

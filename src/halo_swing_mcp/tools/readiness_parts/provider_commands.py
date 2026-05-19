@@ -27,7 +27,7 @@ def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:
             "name": "get_market_snapshot_live_smoke",
             "provider": "polygon",
             "required_env_key_groups": [
-                ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+                ["POLYGON_API_KEY", "HALO_SWING_MARKET_DATA_API_KEY"]
             ],
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
@@ -47,9 +47,9 @@ def _setup_live_data_smoke_commands() -> list[dict[str, Any]]:
             "provider": "fred",
             "required_env_key_groups": [
                 [
+                    "FRED_API_KEY",
                     "HALO_SWING_MACRO_API_KEY",
                     "HALO_SWING_FRED_API_KEY",
-                    "FRED_API_KEY",
                 ]
             ],
             "command": (

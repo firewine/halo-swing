@@ -441,7 +441,7 @@ def expected_provider_smoke_command(name: str) -> dict[str, Any]:
             "name": "get_market_snapshot_live_smoke",
             "provider": "polygon",
             "required_env_key_groups": [
-                ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+                ["POLYGON_API_KEY", "HALO_SWING_MARKET_DATA_API_KEY"]
             ],
             "command": (
                 "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness "
@@ -462,9 +462,9 @@ def expected_provider_smoke_command(name: str) -> dict[str, Any]:
             "provider": "fred",
             "required_env_key_groups": [
                 [
+                    "FRED_API_KEY",
                     "HALO_SWING_MACRO_API_KEY",
                     "HALO_SWING_FRED_API_KEY",
-                    "FRED_API_KEY",
                 ]
             ],
             "command": (
@@ -3379,12 +3379,16 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     assert live_smoke_commands["get_news_bundle_live_smoke"][
         "expected_live_contract"
     ] == "news_source_policy_contract"
-    assert "POLYGON_API_KEY" in live_smoke_commands[
-        "get_market_snapshot_live_smoke"
-    ]["required_env_key_groups"][0]
-    assert "FRED_API_KEY" in live_smoke_commands[
-        "get_macro_snapshot_live_smoke"
-    ]["required_env_key_groups"][0]
+    assert live_smoke_commands["get_market_snapshot_live_smoke"][
+        "required_env_key_groups"
+    ][0] == ["POLYGON_API_KEY", "HALO_SWING_MARKET_DATA_API_KEY"]
+    assert live_smoke_commands["get_macro_snapshot_live_smoke"][
+        "required_env_key_groups"
+    ][0] == [
+        "FRED_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+    ]
     assert live_smoke_commands["get_news_bundle_live_smoke"][
         "required_env_key_groups"
     ][0] == ["NEWSAPI_KEY", "HALO_SWING_NEWS_API_KEY", "NEWS_API_KEY"]
@@ -3438,6 +3442,35 @@ def test_live_data_api_key_status_reports_blocked_defaults(monkeypatch) -> None:
     assert payload["provider_smoke_plan"]["provider_smokes"][0][
         "accepted_env_keys"
     ] == ["HALO_SWING_MARKET_DATA_API_KEY", "POLYGON_API_KEY"]
+    assert payload["provider_smoke_plan"]["provider_smokes"][0][
+        "accepted_env_keys"
+    ] == payload["providers"]["market"]["accepted_env_keys"]
+    assert payload["provider_smoke_plan"]["provider_smokes"][0][
+        "preferred_env_key"
+    ] == "POLYGON_API_KEY"
+    assert payload["providers"]["market"]["smoke_command"][
+        "required_env_key_groups"
+    ][0] == ["POLYGON_API_KEY", "HALO_SWING_MARKET_DATA_API_KEY"]
+    assert payload["provider_smoke_plan"]["provider_smokes"][1][
+        "accepted_env_keys"
+    ] == [
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "FRED_API_KEY",
+    ]
+    assert payload["provider_smoke_plan"]["provider_smokes"][1][
+        "accepted_env_keys"
+    ] == payload["providers"]["macro"]["accepted_env_keys"]
+    assert payload["provider_smoke_plan"]["provider_smokes"][1][
+        "preferred_env_key"
+    ] == "FRED_API_KEY"
+    assert payload["providers"]["macro"]["smoke_command"][
+        "required_env_key_groups"
+    ][0] == [
+        "FRED_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+    ]
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
     assert payload["secret_values_returned"] is False

@@ -140,6 +140,63 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.045 API Key Integration Provider Smoke Required-Key Order Gate Record - 2026-05-20
+
+### A. 목적
+
+4.044는 NewsAPI smoke metadata에서 preferred key를 첫 번째로 표시하도록 정렬했다. 같은
+operator-facing provider smoke 표면에서 market과 macro도 preferred simple key가 먼저 보이도록
+정렬한다. `POLYGON_API_KEY`와 `FRED_API_KEY`는 setup guide와 API-key status의 preferred
+copy/paste key이므로 direct provider smoke의 `required_env_key_groups`에서도 첫 번째여야 한다.
+Provider resolver priority와 `accepted_env_keys` 목록은 변경하지 않는다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - put POLYGON_API_KEY first in get_market_snapshot_live_smoke required_env_key_groups
+  - put FRED_API_KEY first in get_macro_snapshot_live_smoke required_env_key_groups
+  - keep market accepted_env_keys as HALO_SWING_MARKET_DATA_API_KEY and POLYGON_API_KEY
+  - keep macro accepted_env_keys as HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY, and FRED_API_KEY
+  - prove provider status and smoke metadata expose preferred-first required groups without secret values
+  - keep provider resolver priority unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted market or macro env-key removal
+  - new live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적
