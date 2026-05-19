@@ -482,6 +482,63 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.051 API Key Integration Next-Actions Preferred Keys Gate Record - 2026-05-20
+
+### A. 목적
+
+`get_live_data_api_key_status` and API-key summary-only setup fields already
+show `POLYGON_API_KEY`, `FRED_API_KEY`, and `NEWSAPI_KEY` as the preferred
+operator copy/paste keys. The top-level integration readiness `next_actions`
+still reports the live-data gap as internal missing codes:
+`market_ohlcv_api_key`, `macro_api_key`, and `news_api_key`. This slice keeps
+those missing codes inside the gate contract, but makes the user-facing
+`next_actions` line point operators to the preferred env keys.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - map live_data next_actions missing codes to POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
+  - keep gates.live_data.missing unchanged for existing machine-readable contracts
+  - update readiness tests for default, full live-data missing, and partial market missing cases
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key tuple change
+  - operator docs or .env.example change
+  - automatic .env mutation
+  - secret value insertion
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_readiness_reports_blocked_defaults tests/test_readiness.py::test_integration_readiness_requires_api_keys_with_live_modes tests/test_readiness.py::test_integration_readiness_ignores_unimplemented_market_api_key_aliases -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

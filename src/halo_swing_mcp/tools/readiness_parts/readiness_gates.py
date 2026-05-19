@@ -419,6 +419,17 @@ def _next_actions(gates: dict[str, dict[str, Any]]) -> list[str]:
     actions: list[str] = []
     for name, gate in gates.items():
         if not gate["ready"]:
-            missing = ", ".join(gate["missing"])
+            missing = ", ".join(_next_action_missing_items(name, gate["missing"]))
             actions.append(f"{name}: provide {missing}")
     return actions
+
+
+def _next_action_missing_items(gate_name: str, missing: list[str]) -> list[str]:
+    if gate_name != "live_data":
+        return missing
+    preferred_live_data_keys = {
+        "market_ohlcv_api_key": "POLYGON_API_KEY",
+        "macro_api_key": "FRED_API_KEY",
+        "news_api_key": "NEWSAPI_KEY",
+    }
+    return [preferred_live_data_keys.get(item, item) for item in missing]

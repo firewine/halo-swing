@@ -3088,10 +3088,7 @@ def test_integration_readiness_reports_blocked_defaults(monkeypatch) -> None:
             "manual_credential_passphrase_at_order_time, "
             "binance_console_trade_only_no_withdraw_attestation"
         ),
-        (
-            "live_data: provide market_ohlcv_api_key, "
-            "macro_api_key, news_api_key"
-        ),
+        "live_data: provide POLYGON_API_KEY, FRED_API_KEY, NEWSAPI_KEY",
     ]
     assert payload["gates"]["hermes"]["missing"] == [
         "hermes_config_path",
@@ -21413,9 +21410,9 @@ def test_integration_readiness_requires_api_keys_with_live_modes(
     assert live_data_gate["evidence"]["news_source_configured"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert (
-        "live_data: provide market_ohlcv_api_key, "
-        "macro_api_key, news_api_key"
-    ) in payload["next_actions"]
+        "live_data: provide POLYGON_API_KEY, FRED_API_KEY, NEWSAPI_KEY"
+        in payload["next_actions"]
+    )
     for key in live_mode_env:
         assert key not in serialized
 
@@ -21451,7 +21448,7 @@ def test_integration_readiness_ignores_unimplemented_market_api_key_aliases(
     assert live_data_gate["evidence"]["macro_source_configured"] is True
     assert live_data_gate["evidence"]["news_source_configured"] is True
     assert live_data_gate["evidence"]["secret_values_returned"] is False
-    assert "live_data: provide market_ohlcv_api_key" in payload[
+    assert "live_data: provide POLYGON_API_KEY" in payload[
         "next_actions"
     ]
     for key, value in secret_env.items():
@@ -21497,7 +21494,8 @@ def test_integration_readiness_ignores_invalid_env_secret_values_without_exposur
     assert live_data_gate["evidence"]["news_source_configured"] is False
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     for key, value in secret_env.items():
-        assert key not in serialized
+        if key not in {"POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"}:
+            assert key not in serialized
         if value.strip():
             assert value not in serialized
 
@@ -21587,7 +21585,8 @@ def test_integration_readiness_ignores_invalid_live_data_source_env_values(
     assert live_data_gate["evidence"]["secret_values_returned"] is False
     assert "live_data: provide" in payload["next_actions"][-1]
     for key, value in source_env.items():
-        assert key not in serialized
+        if key not in {"POLYGON_API_KEY", "FRED_API_KEY", "NEWSAPI_KEY"}:
+            assert key not in serialized
         if value.strip():
             assert value not in serialized
 
