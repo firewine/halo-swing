@@ -59,11 +59,43 @@ def _env_assignments() -> dict[str, str]:
     return assignments
 
 
+def _assignment_key_order() -> list[str]:
+    keys: list[str] = []
+    for line in _env_template_lines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, _value = stripped.split("=", 1)
+        keys.append(key)
+    return keys
+
+
 def test_env_example_live_data_api_keys_are_blank_placeholders() -> None:
     assignments = _env_assignments()
 
     for key in LIVE_DATA_KEY_NAMES:
         assert key in assignments
+        assert assignments[key] == ""
+
+
+def test_env_example_live_data_key_block_prefers_copy_paste_keys_first() -> None:
+    key_order = _assignment_key_order()
+
+    live_key_order = [key for key in key_order if key in LIVE_DATA_KEY_NAMES]
+    assert live_key_order == [
+        "POLYGON_API_KEY",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "FRED_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+        "NEWSAPI_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+
+    assignments = _env_assignments()
+    assert set(live_key_order) == LIVE_DATA_KEY_NAMES
+    for key in live_key_order:
         assert assignments[key] == ""
 
 
