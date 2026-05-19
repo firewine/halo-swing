@@ -1,23 +1,21 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_ENV_EXAMPLE_KEY_ORDER_GATE",
+  "gate_id": "API_KEY_INTEGRATION_READINESS_PREFERRED_KEY_FIXTURES_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.049",
-  "next_atomic_step": "make .env.example live data key block list POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing accepted keys or resolver priority",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.050",
+  "next_atomic_step": "make API-key readiness CLI fixtures use preferred POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY terminology for the preferred-key path without changing accepted aliases or resolver priority",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    ".env.example",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "tests/test_env_template.py"
+    "tests/test_readiness.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.049",
-    ".env.example",
-    "tests/test_env_template.py"
+    "docs/halo-swing-development-plan.md#4.050",
+    "tests/test_readiness.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -33,8 +31,8 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_env_example_live_data_key_block_prefers_copy_paste_keys_first tests/test_env_template.py::test_env_example_live_data_keys_match_readiness_dotenv_template -q",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_placeholders_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_blanks_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_malformed_values_without_secret_output -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -50,15 +48,14 @@
     "read_only": true
   },
   "done_means": [
-    ".env.example live data key block lists POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY",
-    ".env.example live data key block lists FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY",
-    ".env.example live data key block lists NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY",
-    ".env.example still includes every accepted live data API-key alias as blank placeholders",
-    "env template regression prevents the live data key block from reverting to project-specific-first order",
+    "preferred-key readiness CLI fixture names use preferred-key terminology instead of canonical for the API-key path",
+    "preferred-key readiness CLI fixture secret values use NEWSAPI_KEY for the NewsAPI preferred-key path",
+    "preferred-key readiness CLI fixture .env.example snippets list POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases",
+    "explicit alias coverage for HALO_SWING_NEWS_API_KEY and NEWS_API_KEY remains intact",
     "no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified env example key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified readiness preferred-key fixture gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

@@ -18736,13 +18736,13 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_dotenv_aliases_withou
     clear_readiness_env(monkeypatch)
     secret_env = {
         "HALO_SWING_MARKET_DATA_API_KEY": "market-cli-dotenv-duplicate-primary",
-        "POLYGON_API_KEY": "market-cli-dotenv-duplicate-canonical",
+        "POLYGON_API_KEY": "market-cli-dotenv-duplicate-preferred",
         "HALO_SWING_MACRO_API_KEY": "macro-cli-dotenv-duplicate-primary",
         "HALO_SWING_FRED_API_KEY": "macro-cli-dotenv-duplicate-alias",
-        "FRED_API_KEY": "macro-cli-dotenv-duplicate-canonical",
+        "FRED_API_KEY": "macro-cli-dotenv-duplicate-preferred",
         "HALO_SWING_NEWS_API_KEY": "news-cli-dotenv-duplicate-primary",
-        "NEWS_API_KEY": "news-cli-dotenv-duplicate-canonical",
-        "NEWSAPI_KEY": "news-cli-dotenv-duplicate-alias",
+        "NEWS_API_KEY": "news-cli-dotenv-duplicate-alias",
+        "NEWSAPI_KEY": "news-cli-dotenv-duplicate-preferred",
     }
     (tmp_path / ".env.example").write_text(
         (
@@ -19206,15 +19206,15 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_real_aliases_with_exported_bl
     assert completed.stderr == ""
 
 
-def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_placeholders_without_secret_output(
+def test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_placeholders_without_secret_output(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
     secret_env = {
-        "POLYGON_API_KEY": "polygon-cli-dotenv-canonical-exported-placeholder",
-        "FRED_API_KEY": "fred-cli-dotenv-canonical-exported-placeholder",
-        "NEWS_API_KEY": "news-cli-dotenv-canonical-exported-placeholder",
+        "POLYGON_API_KEY": "polygon-cli-dotenv-preferred-exported-placeholder",
+        "FRED_API_KEY": "fred-cli-dotenv-preferred-exported-placeholder",
+        "NEWSAPI_KEY": "news-cli-dotenv-preferred-exported-placeholder",
     }
     placeholder_env = {
         "HALO_SWING_MARKET_DATA_API_KEY": "your_polygon_key",
@@ -19223,10 +19223,12 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     }
     (tmp_path / ".env.example").write_text(
         (
-            "HALO_SWING_MARKET_DATA_API_KEY=your_polygon_key\n"
             "POLYGON_API_KEY=\n"
-            "HALO_SWING_MACRO_API_KEY=your_fred_key\n"
+            "HALO_SWING_MARKET_DATA_API_KEY=your_polygon_key\n"
             "FRED_API_KEY=\n"
+            "HALO_SWING_MACRO_API_KEY=your_fred_key\n"
+            "HALO_SWING_FRED_API_KEY=\n"
+            "NEWSAPI_KEY=\n"
             "HALO_SWING_NEWS_API_KEY=your_newsapi_key\n"
             "NEWS_API_KEY=\n"
         ),
@@ -19293,7 +19295,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     assert payload["api_key_configured_env_keys_by_provider_family"] == {
         "market": ["POLYGON_API_KEY"],
         "macro": ["FRED_API_KEY"],
-        "news": ["NEWS_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
     }
     assert payload["api_key_selected_provider_class_by_family"] == {
         "market": "PolygonMarketDataProvider",
@@ -19327,15 +19329,15 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     assert completed.stderr == ""
 
 
-def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_blanks_without_secret_output(
+def test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_blanks_without_secret_output(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
     secret_env = {
-        "POLYGON_API_KEY": "polygon-cli-dotenv-canonical-exported-blank",
-        "FRED_API_KEY": "fred-cli-dotenv-canonical-exported-blank",
-        "NEWS_API_KEY": "news-cli-dotenv-canonical-exported-blank",
+        "POLYGON_API_KEY": "polygon-cli-dotenv-preferred-exported-blank",
+        "FRED_API_KEY": "fred-cli-dotenv-preferred-exported-blank",
+        "NEWSAPI_KEY": "news-cli-dotenv-preferred-exported-blank",
     }
     blank_env = {
         "HALO_SWING_MARKET_DATA_API_KEY": "",
@@ -19344,10 +19346,12 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     }
     (tmp_path / ".env.example").write_text(
         (
-            "HALO_SWING_MARKET_DATA_API_KEY=\n"
             "POLYGON_API_KEY=\n"
-            "HALO_SWING_MACRO_API_KEY=\n"
+            "HALO_SWING_MARKET_DATA_API_KEY=\n"
             "FRED_API_KEY=\n"
+            "HALO_SWING_MACRO_API_KEY=\n"
+            "HALO_SWING_FRED_API_KEY=\n"
+            "NEWSAPI_KEY=\n"
             "HALO_SWING_NEWS_API_KEY=\n"
             "NEWS_API_KEY=\n"
         ),
@@ -19414,7 +19418,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     assert payload["api_key_configured_env_keys_by_provider_family"] == {
         "market": ["POLYGON_API_KEY"],
         "macro": ["FRED_API_KEY"],
-        "news": ["NEWS_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
     }
     assert payload["api_key_selected_provider_class_by_family"] == {
         "market": "PolygonMarketDataProvider",
@@ -19448,15 +19452,15 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     assert completed.stderr == ""
 
 
-def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_alias_malformed_values_without_secret_output(
+def test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_malformed_values_without_secret_output(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     clear_readiness_env(monkeypatch)
     secret_env = {
-        "POLYGON_API_KEY": "polygon-cli-dotenv-canonical-exported-malformed",
-        "FRED_API_KEY": "fred-cli-dotenv-canonical-exported-malformed",
-        "NEWS_API_KEY": "news-cli-dotenv-canonical-exported-malformed",
+        "POLYGON_API_KEY": "polygon-cli-dotenv-preferred-exported-malformed",
+        "FRED_API_KEY": "fred-cli-dotenv-preferred-exported-malformed",
+        "NEWSAPI_KEY": "news-cli-dotenv-preferred-exported-malformed",
     }
     malformed_env = {
         "HALO_SWING_MARKET_DATA_API_KEY": "market-exported-alias-control\tsecret",
@@ -19465,10 +19469,12 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     }
     (tmp_path / ".env.example").write_text(
         (
-            "HALO_SWING_MARKET_DATA_API_KEY=\n"
             "POLYGON_API_KEY=\n"
-            "HALO_SWING_MACRO_API_KEY=\n"
+            "HALO_SWING_MARKET_DATA_API_KEY=\n"
             "FRED_API_KEY=\n"
+            "HALO_SWING_MACRO_API_KEY=\n"
+            "HALO_SWING_FRED_API_KEY=\n"
+            "NEWSAPI_KEY=\n"
             "HALO_SWING_NEWS_API_KEY=\n"
             "NEWS_API_KEY=\n"
         ),
@@ -19535,7 +19541,7 @@ def test_api_key_pipeline_summary_cli_reads_dotenv_canonical_keys_with_exported_
     assert payload["api_key_configured_env_keys_by_provider_family"] == {
         "market": ["POLYGON_API_KEY"],
         "macro": ["FRED_API_KEY"],
-        "news": ["NEWS_API_KEY"],
+        "news": ["NEWSAPI_KEY"],
     }
     assert payload["api_key_selected_provider_class_by_family"] == {
         "market": "PolygonMarketDataProvider",
@@ -20623,13 +20629,13 @@ def test_api_key_pipeline_summary_cli_reads_duplicate_real_exported_aliases_with
     clear_readiness_env(monkeypatch)
     secret_env = {
         "HALO_SWING_MARKET_DATA_API_KEY": "market-cli-duplicate-primary-secret",
-        "POLYGON_API_KEY": "market-cli-duplicate-canonical-secret",
+        "POLYGON_API_KEY": "market-cli-duplicate-preferred-secret",
         "HALO_SWING_MACRO_API_KEY": "macro-cli-duplicate-primary-secret",
         "HALO_SWING_FRED_API_KEY": "macro-cli-duplicate-alias-secret",
-        "FRED_API_KEY": "macro-cli-duplicate-canonical-secret",
+        "FRED_API_KEY": "macro-cli-duplicate-preferred-secret",
         "HALO_SWING_NEWS_API_KEY": "news-cli-duplicate-primary-secret",
-        "NEWS_API_KEY": "news-cli-duplicate-canonical-secret",
-        "NEWSAPI_KEY": "news-cli-duplicate-alias-secret",
+        "NEWS_API_KEY": "news-cli-duplicate-alias-secret",
+        "NEWSAPI_KEY": "news-cli-duplicate-preferred-secret",
     }
     (tmp_path / ".env.example").write_text(
         (

@@ -424,6 +424,64 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.050 API Key Integration Readiness Preferred-Key Fixtures Gate Record - 2026-05-20
+
+### A. 목적
+
+API-key status and summary-only readiness outputs now present `POLYGON_API_KEY`,
+`FRED_API_KEY`, and `NEWSAPI_KEY` as the preferred copy/paste keys while
+retaining the existing accepted aliases. A few readiness CLI fixtures still call
+the preferred-key path "canonical" and use `NEWS_API_KEY` as the representative
+NewsAPI key. This slice aligns fixture terminology and preferred-key snippets
+with the current operator-facing contract without changing resolver priority,
+accepted aliases, or runtime behavior.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - rename the preferred-key readiness CLI fixture tests from canonical-key wording to preferred-key wording
+  - make those preferred-key fixtures use NEWSAPI_KEY as the NewsAPI secret key
+  - order the test-local .env.example snippets as POLYGON_API_KEY, FRED_API_KEY, NEWSAPI_KEY before accepted aliases
+  - keep explicit HALO_SWING_NEWS_API_KEY and NEWS_API_KEY alias coverage intact
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key tuple change
+  - operator docs or .env.example change
+  - automatic .env mutation
+  - secret value insertion
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_placeholders_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_blanks_without_secret_output tests/test_readiness.py::test_api_key_pipeline_summary_cli_reads_dotenv_preferred_keys_with_exported_alias_malformed_values_without_secret_output -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적
