@@ -42,20 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_PREFERRED_DOTENV_BUNDLE_DOCS_VERIFIED
-gate_id: API_KEY_INTEGRATION_PREFERRED_DOTENV_BUNDLE_DOCS_GATE
+status: API_KEY_INTEGRATION_PROVIDER_ERROR_MESSAGE_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_PROVIDER_ERROR_MESSAGE_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: promote POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY in README and DevOps local dotenv bundle examples without changing accepted aliases or provider selection
+next_atomic_step: make missing live provider API-key error messages list POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY first without changing resolver priority or accepted aliases
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - docs/devops-setup-guide.md
-  - tests/test_setup_docs.py
+  - src/halo_swing_mcp/providers.py
+  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -72,37 +71,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_live_market_data_provider_requires_api_key tests/test_providers.py::test_live_macro_provider_requires_api_key tests/test_providers.py::test_live_news_provider_requires_api_key -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README local dotenv bundle example uses POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
-  - DevOps guide local dotenv bundle example uses POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
-  - docs still state project-specific market, macro, and news aliases remain accepted
-  - setup docs regression test prevents stale project-specific bundle examples from returning
+  - missing live market API-key error message lists POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
+  - missing live macro API-key error message lists FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
+  - missing live news API-key error message lists NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
+  - provider resolver priority and accepted alias tuples remain unchanged
   - no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified preferred dotenv bundle docs gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider error-message key ordering gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_PREFERRED_DOTENV_BUNDLE_DOCS_GATE
+gate_id: API_KEY_INTEGRATION_PROVIDER_ERROR_MESSAGE_KEY_ORDER_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_live_market_data_provider_requires_api_key tests/test_providers.py::test_live_macro_provider_requires_api_key tests/test_providers.py::test_live_news_provider_requires_api_key -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -111,23 +110,33 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py::test_devops_guide_shows_dotenv_key_only_live_data_setup -q: 1 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_live_market_data_provider_requires_api_key tests/test_providers.py::test_live_macro_provider_requires_api_key tests/test_providers.py::test_live_news_provider_requires_api_key -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - docs/devops-setup-guide.md
-  - tests/test_setup_docs.py
-next_state: commit and push this verified preferred dotenv bundle docs gate
+  - src/halo_swing_mcp/providers.py
+  - tests/test_providers.py
+next_state: commit and push this verified provider error-message key ordering gate
 notes:
-  - 4.045 made provider smoke required env-key groups preferred-first
-  - local dotenv bundle examples now match preferred copy/paste keys while preserving accepted alias documentation
+  - 4.045 and 4.046 aligned smoke metadata and docs with preferred copy/paste keys
+  - missing live provider API-key errors now follow the same preferred-first operator-facing order
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_PREFERRED_DOTENV_BUNDLE_DOCS_VERIFIED
+gate_id: API_KEY_INTEGRATION_PREFERRED_DOTENV_BUNDLE_DOCS_GATE
+review_tier: S1_small
+
+next_atomic_step: promote POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY in README and DevOps local dotenv bundle examples without changing accepted aliases or provider selection
 ```
 
 Previous completed directive:

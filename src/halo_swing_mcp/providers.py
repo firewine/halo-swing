@@ -505,7 +505,7 @@ def _resolve_polygon_api_key() -> str:
         if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "market data API key")
     raise ValueError(
-        "live market data requires HALO_SWING_MARKET_DATA_API_KEY or POLYGON_API_KEY"
+        "live market data requires POLYGON_API_KEY or HALO_SWING_MARKET_DATA_API_KEY"
     )
 
 
@@ -531,8 +531,8 @@ def _resolve_fred_api_key() -> str:
         if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "macro API key")
     raise ValueError(
-        "live macro data requires HALO_SWING_MACRO_API_KEY, "
-        "HALO_SWING_FRED_API_KEY, or FRED_API_KEY"
+        "live macro data requires FRED_API_KEY, "
+        "HALO_SWING_MACRO_API_KEY, or HALO_SWING_FRED_API_KEY"
     )
 
 
@@ -557,7 +557,7 @@ def _resolve_news_api_key() -> str:
         if _secret_candidate_configured(candidate):
             return _normalize_secret(candidate, "news API key")
     raise ValueError(
-        "live news data requires HALO_SWING_NEWS_API_KEY, NEWS_API_KEY, or NEWSAPI_KEY"
+        "live news data requires NEWSAPI_KEY, HALO_SWING_NEWS_API_KEY, or NEWS_API_KEY"
     )
 
 

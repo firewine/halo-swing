@@ -253,6 +253,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.047 API Key Integration Provider Error Message Key Order Gate Record - 2026-05-20
+
+### A. 목적
+
+4.045와 4.046은 provider smoke metadata와 operator docs를 preferred copy/paste key
+순서로 정렬했다. 하지만 live provider가 API key 없이 강제 실행될 때 발생하는 resolver
+`ValueError` 문구는 아직 project-specific alias를 먼저 보여준다. 이번 slice는 missing
+API-key error message만 `POLYGON_API_KEY`, `FRED_API_KEY`, `NEWSAPI_KEY` 우선 순서로
+정렬한다. Provider resolver priority와 accepted aliases는 변경하지 않는다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - update missing market live API-key error message to list POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
+  - update missing macro live API-key error message to list FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
+  - update missing news live API-key error message to list NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
+  - add provider tests that assert exact preferred-first error messages while leaving resolver candidate order untouched
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key tuple change
+  - provider smoke metadata change
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - automatic .env mutation
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_live_market_data_provider_requires_api_key tests/test_providers.py::test_live_macro_provider_requires_api_key tests/test_providers.py::test_live_news_provider_requires_api_key -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 876 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

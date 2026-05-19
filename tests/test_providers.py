@@ -389,8 +389,13 @@ def test_live_market_data_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.delenv("POLYGON_API_KEY", raising=False)
     get_settings.cache_clear()
 
-    with pytest.raises(ValueError, match="live market data requires"):
+    with pytest.raises(ValueError) as exc_info:
         get_market_data_provider()
+
+    assert str(exc_info.value) == (
+        "live market data requires POLYGON_API_KEY or "
+        "HALO_SWING_MARKET_DATA_API_KEY"
+    )
 
     get_settings.cache_clear()
 
@@ -446,8 +451,13 @@ def test_live_macro_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.delenv("FRED_API_KEY", raising=False)
     get_settings.cache_clear()
 
-    with pytest.raises(ValueError, match="live macro data requires"):
+    with pytest.raises(ValueError) as exc_info:
         get_market_data_provider()
+
+    assert str(exc_info.value) == (
+        "live macro data requires FRED_API_KEY, HALO_SWING_MACRO_API_KEY, "
+        "or HALO_SWING_FRED_API_KEY"
+    )
 
     get_settings.cache_clear()
 
@@ -487,8 +497,13 @@ def test_live_news_provider_requires_api_key(monkeypatch) -> None:
     monkeypatch.delenv("NEWSAPI_KEY", raising=False)
     get_settings.cache_clear()
 
-    with pytest.raises(ValueError, match="live news data requires"):
+    with pytest.raises(ValueError) as exc_info:
         get_market_data_provider()
+
+    assert str(exc_info.value) == (
+        "live news data requires NEWSAPI_KEY, HALO_SWING_NEWS_API_KEY, "
+        "or NEWS_API_KEY"
+    )
 
     get_settings.cache_clear()
 
