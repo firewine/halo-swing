@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: CONTEXT_TELEGRAM_PREVIEW_BOUNDARY_ALIGNMENT_VERIFIED
-gate_id: CONTEXT_TELEGRAM_PREVIEW_BOUNDARY_ALIGNMENT_GATE
+status: CONTEXT_ORDER_CHECKLIST_ALIGNMENT_VERIFIED
+gate_id: CONTEXT_ORDER_CHECKLIST_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified CONTEXT Telegram preview-boundary alignment; continue with the next explicit SSOT slice
+next_atomic_step: no open code step remains after verified CONTEXT order checklist alignment; continue with the next explicit SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - docs/CONTEXT.md describes Telegram-facing work as offline delivery_preview/report payloads rather than actual Telegram send
-  - docs/CONTEXT.md states report tools create Hermes/Telegram preview payloads with no credentials and no send call
-  - docs/CONTEXT.md keeps Telegram send, Hermes runtime start, scheduler, live adapter expansion, and broker/order expansion out of scope until later gates
-  - setup docs tests cover CONTEXT.md Telegram delivery preview boundary wording
+  - docs/CONTEXT.md quick checklist no longer asks only whether automatic orders invaded MVP scope
+  - docs/CONTEXT.md quick checklist asks whether BTC COIN-M execution remains inside the confirmation-gated boundary
+  - docs/CONTEXT.md quick checklist keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime, and scheduler automation outside later gates
+  - setup docs tests cover CONTEXT.md quick-checklist order boundary wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes
 
@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: CONTEXT_TELEGRAM_PREVIEW_BOUNDARY_ALIGNMENT_GATE
-scope: docs/CONTEXT.md Telegram/report wording alignment with current offline delivery_preview boundary
+gate_id: CONTEXT_ORDER_CHECKLIST_ALIGNMENT_GATE
+scope: docs/CONTEXT.md quick checklist order-boundary alignment with current BTC COIN-M guarded execution wording
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -205,8 +205,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 49 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 892 passed in 37.92s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 50 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 893 passed in 37.55s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -218,10 +218,9 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - docs/CONTEXT.md now describes Telegram-facing work as Hermes/Telegram delivery preview reports
-  - docs/CONTEXT.md states report tools create Telegram message chunks and Hermes payload metadata without credentials or send calls
-  - docs/CONTEXT.md clarifies Hermes Agent owns actual Telegram transmission while Halo Swing MCP owns preview payload generation
-  - setup docs tests cover the CONTEXT Telegram delivery-preview boundary wording
+  - docs/CONTEXT.md Quick Checklist now checks BTC COIN-M execution against the confirmation-gated boundary
+  - docs/CONTEXT.md Quick Checklist keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime start, and scheduler automation outside later gates
+  - setup docs tests cover the CONTEXT quick-checklist order-boundary wording
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

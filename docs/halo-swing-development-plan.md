@@ -776,6 +776,42 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.073 CONTEXT Order Checklist Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+`docs/CONTEXT.md`의 Quick Checklist가 여전히 "자동 주문이 MVP 범위를 침범하지
+않았는가?"라는 과거의 단순 금지 문구를 사용하고 있었다. 현재 상태는 BTC
+COIN-M confirmation-gated execution만 guarded surface로 존재하고, ETF 주문,
+범용 broker 확장, Telegram send, Hermes runtime start, scheduler 자동 실행은
+이후 gate 전까지 밖에 둔다. Quick Checklist도 이 경계를 확인하도록 정리한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md Quick Checklist now checks BTC COIN-M execution against the confirmation-gated boundary
+  - docs/CONTEXT.md Quick Checklist keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime start, and scheduler automation outside later gates
+  - tests/test_setup_docs.py covers the CONTEXT quick-checklist order-boundary wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 50 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 893 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.072 CONTEXT Telegram Preview Boundary Alignment Gate Record - 2026-05-20
 
 ### A. 목적

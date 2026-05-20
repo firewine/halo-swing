@@ -84,6 +84,15 @@ def test_context_describes_current_btc_order_boundary() -> None:
     assert "자동 주문은 MVP 범위가 아니다" not in text
 
 
+def test_context_quick_checklist_uses_current_order_boundary() -> None:
+    text = _normalized_text(CONTEXT)
+
+    assert "BTC COIN-M 실행은 confirmation-gated boundary 안에 있고" in text
+    assert "ETF 주문, 범용 broker 확장, Telegram send, Hermes runtime start" in text
+    assert "scheduler 자동 실행은 이후 gate 전까지 밖에 있는가" in text
+    assert "자동 주문이 MVP 범위를 침범하지 않았는가" not in text
+
+
 def test_context_describes_telegram_delivery_preview_boundary() -> None:
     text = _normalized_text(CONTEXT)
 

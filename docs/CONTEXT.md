@@ -202,4 +202,6 @@ BLOCK
 - 가중치/임계값 설정의 version/hash가 신호와 연결되는가?
 - 장기 실행 시 checkpoint와 watchdog 기준이 있는가?
 - 레버리지 ETF의 일일 리셋/변동성 drag를 고려했는가?
-- 자동 주문이 MVP 범위를 침범하지 않았는가?
+- BTC COIN-M 실행은 confirmation-gated boundary 안에 있고,
+  ETF 주문, 범용 broker 확장, Telegram send, Hermes runtime start,
+  scheduler 자동 실행은 이후 gate 전까지 밖에 있는가?
