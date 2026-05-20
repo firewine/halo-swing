@@ -406,6 +406,18 @@ def get_signal_replay_bundle(
 
 
 @mcp.tool()
+def get_storage_health(database_path: str) -> dict[str, Any]:
+    """Return SQLite storage health for an explicit database path."""
+
+    payload = {"database_path": database_path}
+    return _audited_tool_call(
+        "get_storage_health",
+        payload,
+        call_tool("get_storage_health", payload),
+    )
+
+
+@mcp.tool()
 def suggest_weight_update() -> dict[str, Any]:
     """Return a challenger config proposal without promotion."""
 

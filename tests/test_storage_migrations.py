@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -11,6 +14,7 @@ from halo_swing_mcp.storage_migrations import (
     apply_migrations,
     get_storage_health,
 )
+from halo_swing_mcp.tool_registry import call_tool
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +54,53 @@ def test_storage_health_reports_applied_migration_and_domain_tables(
     assert health["latest_migration"] == "202605100001_initial_replay_schema"
     assert health["domain_tables_present"] == list(DOMAIN_TABLES)
     assert health["live_data_required"] is False
+
+
+def test_storage_health_tool_reports_missing_database_without_creating_artifact(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "nested" / "halo_swing.sqlite"
+
+    health = call_tool("get_storage_health", {"database_path": f" {database_path} "})
+
+    assert StorageHealth.model_validate(health).model_dump(mode="json") == health
+    assert health["status"] == "ok"
+    assert health["migration_count"] == 0
+    assert health["latest_migration"] is None
+    assert health["domain_tables_present"] == []
+    assert health["live_data_required"] is False
+    assert not database_path.exists()
+    assert list((ROOT / "data").glob("*.sqlite")) == []
+    assert list((ROOT / "state").glob("*.sqlite")) == []
+
+
+def test_storage_health_harness_reports_migrated_database(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    apply_migrations(database_path)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "get_storage_health",
+            "--input-json",
+            json.dumps({"database_path": str(database_path)}),
+            "--no-audit",
+        ],
+        check=True,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    health = json.loads(result.stdout)
+
+    assert StorageHealth.model_validate(health).model_dump(mode="json") == health
+    assert health["migration_count"] == 1
+    assert health["latest_migration"] == "202605100001_initial_replay_schema"
+    assert health["domain_tables_present"] == list(DOMAIN_TABLES)
 
 
 def test_initial_replay_schema_contains_required_indexes_and_foreign_keys(

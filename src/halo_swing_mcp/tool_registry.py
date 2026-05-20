@@ -65,6 +65,7 @@ from halo_swing_mcp.tools.scoring import (
     score_leverage_swing,
     suggest_weight_update,
 )
+from halo_swing_mcp.tools.storage import get_storage_health
 
 ToolCallable = Callable[..., dict[str, Any]]
 
@@ -175,6 +176,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_signal_replay_bundle",
         get_signal_replay_bundle,
         "Return one recorded signal replay bundle.",
+    ),
+    ToolSpec(
+        "get_storage_health",
+        get_storage_health,
+        "Return SQLite storage health for an explicit database path.",
     ),
     ToolSpec(
         "suggest_weight_update",

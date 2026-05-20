@@ -42,19 +42,27 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: CONTEXT_PRODUCT_SHAPE_ORDER_BOUNDARY_VERIFIED
-gate_id: CONTEXT_PRODUCT_SHAPE_ORDER_BOUNDARY_GATE
+status: P1_REPOSITORY_STORAGE_HEALTH_TOOL_VERIFIED
+gate_id: P1_REPOSITORY_STORAGE_HEALTH_TOOL_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified CONTEXT product-shape order-boundary alignment; continue with the next explicit SSOT slice
+next_atomic_step: no open code step remains after verified explicit database_path storage health tool; continue with next explicit repository or storage slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - docs/CONTEXT.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
+  - README.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/tools/storage.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
+  - tests/test_storage_migrations.py
   - tests/test_setup_docs.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,21 +79,21 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - docs/CONTEXT.md Current Product Shape no longer broadly says automatic order or broker/order submission is outside product scope after listing BTC guarded tools
-  - docs/CONTEXT.md Current Product Shape says BTC COIN-M execution stays limited to confirmation-gated tooling
-  - docs/CONTEXT.md Current Product Shape keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime start, scheduler automation, live adapter expansion, and env DB activation outside later gates
-  - setup docs tests cover CONTEXT.md product-shape order boundary wording
-  - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
+  - get_storage_health is callable through the shared registry, CLI harness, and MCP server wrapper with explicit database_path input
+  - get_storage_health returns the existing StorageHealth DTO shape and reports missing database paths without creating repo DB artifacts
+  - health_check, README, DevOps guide, and MVP tool contract fixtures include get_storage_health in deterministic tool order
+  - storage health tests cover unmigrated, migrated, harness, and server/registry wrapper paths
+  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
 approval_source: "user objective: 개발문서 목표확인해서 계속 개발진행해"
-next_state_after_success: continue with the next explicit SSOT slice
+next_state_after_success: continue with next explicit repository or storage slice
 ```
 
 Previous repository verification result:
@@ -187,15 +195,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: CONTEXT_PRODUCT_SHAPE_ORDER_BOUNDARY_GATE
-scope: docs/CONTEXT.md Current Product Shape order-boundary alignment with current BTC COIN-M guarded execution wording
+gate_id: P1_REPOSITORY_STORAGE_HEALTH_TOOL_GATE
+scope: explicit database_path SQLite storage health MCP/CLI tool
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -204,24 +212,31 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 50 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 893 passed in 37.20s
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 13 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 895 passed in 37.79s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
   - .codex/tasks/current.json
-  - docs/CONTEXT.md
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - tests/test_setup_docs.py
-next_state: continue with the next explicit SSOT slice
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/tools/storage.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
+  - tests/test_storage_migrations.py
+next_state: continue with next explicit repository or storage slice
 notes:
-  - docs/CONTEXT.md Current Product Shape now limits BTC COIN-M execution to confirmation-gated tooling
-  - docs/CONTEXT.md Current Product Shape keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime start, scheduler automation, live adapter expansion, and env DB activation outside later gates
-  - setup docs tests cover the CONTEXT product-shape order-boundary wording
-  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
+  - get_storage_health is now callable through the shared registry, CLI harness, and MCP server wrapper
+  - the tool requires explicit database_path and returns the existing StorageHealth DTO shape
+  - missing database paths report zero migrations/domain tables without creating repository DB artifacts
+  - health_check, README, DevOps guide, and MVP contract fixtures include get_storage_health in deterministic tool order
+  - no live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 
 Previous completed directive:

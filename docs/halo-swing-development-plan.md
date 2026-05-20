@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.075 P1 Repository Storage Health Tool Gate Record - 2026-05-20
+
+### A. 목적
+
+`storage_health` DTO와 SQLite migration health helper는 존재하지만, 아직
+Hermes 없이 CLI harness/MCP tool surface에서 직접 호출할 수 있는 공개 도구가
+없다. `REPOSITORY_GO` 이후 storage 상태를 명시적 `database_path` 입력으로만
+확인하는 deterministic tool을 노출한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - expose get_storage_health through the shared tool registry
+  - add an MCP server wrapper with explicit database_path input
+  - keep SQLite activation explicit; no env-based DB activation
+  - update health_check, README, DevOps guide, and MVP contract fixtures in deterministic tool order
+  - add tests for unmigrated, migrated, harness, registry, and server wrapper paths
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 13 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 895 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or storage slice
+```
+
 ## 4.043 API Key Integration NewsAPI Docs And Fixture Cleanup Gate Record - 2026-05-18
 
 ### A. 목적
