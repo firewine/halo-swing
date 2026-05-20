@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.092 P1 Repository Latest Report Context Summary Intent Fallback Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed latest report의 source/label summaries는 `Reasons`에 표시된다.
+하지만 `intraday_risk_watch`처럼 `Reasons`가 없는 report intent에서는 해당
+provenance와 label context가 Telegram/report text에서 사라진다. 이번 slice는 intent
+섹션 순서를 그대로 지키면서, `Reasons`가 없는 repository-backed report에서는
+`Cautions`에 path-free source/label summaries를 fallback으로 포함한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - preserve source and label summaries in Cautions when the intent omits Reasons
+  - keep intraday_risk_watch section order exactly aligned with the report_intent contract
+  - keep fallback summaries path-free and free of ledger/database local path values
+  - keep default no-repository golden snapshot unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused context summary intent fallback tests: 3 passed
+  - full pytest: 917 passed in 44.49s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.091 P1 Repository Latest Report Label Summary Text Gate Record - 2026-05-20
 
 ### A. 목적

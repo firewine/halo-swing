@@ -913,6 +913,65 @@ def test_latest_signal_report_repository_label_summary_appears_in_sections_and_t
     )
 
 
+def test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_intraday_context_jsonl",
+        "run_id": "run_report_intraday_context_jsonl",
+        "created_at": "2026-05-20T14:08:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        ledger_path=str(ledger_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="SSO",
+        ledger_path=str(ledger_path),
+        report_intent="intraday_risk_watch",
+    )
+    section_titles = [section["title"] for section in payload["sections"]]
+    cautions = next(
+        section for section in payload["sections"] if section["title"] == "Cautions"
+    )
+    source_summary = (
+        "Repository source: jsonl_signal_ledger_record; "
+        "db_required=false; "
+        "filters asset=SSO underlying=<any> timeframe=swing_3d_10d"
+    )
+    label_summary = (
+        f"Stored label: outcome={label['outcome']}; "
+        f"realized_r={label['realized_r']}; "
+        f"first_barrier_hit={label['first_barrier_hit']}; "
+        "time_barrier_days=2"
+    )
+
+    assert section_titles == ["Target", "Decision", "Stop", "Cautions"]
+    assert "Reasons:" not in payload["text"]
+    assert source_summary in cautions["items"]
+    assert label_summary in cautions["items"]
+    assert f"- {source_summary}" in payload["text"]
+    assert f"- {label_summary}" in payload["text"]
+    assert payload["report_contract_guard"]["status"] == "ok"
+    assert str(ledger_path) not in iter_nested_strings(cautions)
+    assert str(ledger_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(cautions)
+    )
+
+
 def test_latest_signal_report_repository_source_evidence_guard_validates_label_status(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

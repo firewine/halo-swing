@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_LABEL_SUMMARY_TEXT_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_LABEL_SUMMARY_TEXT_GATE
+status: P1_REPOSITORY_LATEST_REPORT_CONTEXT_SUMMARY_INTENT_FALLBACK_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_CONTEXT_SUMMARY_INTENT_FALLBACK_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest report label summary text; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified repository-backed latest report context summary intent fallback; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,16 +72,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report includes a path-free stored label outcome summary in report sections when a label exists
-  - repository-backed report text includes the same stored label outcome summary
+  - repository-backed report_intents without Reasons preserve path-free source and label summaries in Cautions
+  - intraday_risk_watch sections remain ordered exactly by the report_intent contract
+  - intraday_risk_watch report text includes the source and label summaries without adding a Reasons section
   - default no-repository sections, text, and golden snapshot remain unchanged
-  - label summary does not expose ledger_path, database_path, SQLite filenames, or absolute local paths
+  - fallback summaries do not expose ledger_path, database_path, SQLite filenames, or absolute local paths
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -185,6 +186,46 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_REPORT_CONTEXT_SUMMARY_INTENT_FALLBACK_GATE
+scope: repository source and label summaries survive report_intents without Reasons
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 917 passed in 44.49s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - repository-backed intraday_risk_watch keeps section order Target, Decision, Stop, Cautions
+  - when Reasons is omitted, source and label summaries fall back into Cautions and report text
+  - fallback text contains no ledger_path, database_path, SQLite filename, or absolute local path
+  - default no-repository golden snapshot remains unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
 
 ```text
 status: passed

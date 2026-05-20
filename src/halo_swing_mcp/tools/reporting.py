@@ -848,12 +848,21 @@ def _report_sections(
         cautions.extend(report["data_warnings"])
     if not cautions:
         cautions.append(report["risk_summary"])
+    required = set(
+        intent_contract["required_sections"]
+        if intent_contract is not None
+        else REQUIRED_REPORT_SECTIONS
+    )
     reason_items = [report["reason_summary"], report["evidence_summary"]]
+    context_summaries: list[str] = []
     if source_repository_ref is not None:
-        reason_items.append(_source_repository_summary(source_repository_ref))
+        context_summaries.append(_source_repository_summary(source_repository_ref))
     label_status = report.get("label_status")
     if isinstance(label_status, dict):
-        reason_items.append(_label_status_summary(label_status))
+        context_summaries.append(_label_status_summary(label_status))
+    reason_items.extend(context_summaries)
+    if "Reasons" not in required:
+        cautions.extend(context_summaries)
 
     sections = [
         {
@@ -892,7 +901,6 @@ def _report_sections(
     if intent_contract is None:
         return sections
 
-    required = set(intent_contract["required_sections"])
     return [section for section in sections if section["title"] in required]
 
 
