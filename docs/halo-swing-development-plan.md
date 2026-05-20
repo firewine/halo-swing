@@ -776,6 +776,40 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.060 P1 Docs DevOps Storage Gate Status Guide Record - 2026-05-20
+
+### A. 목적
+
+DevOps guide의 all-env readiness 문단에 남아 있던 `MIGRATION_GO` /
+`REPOSITORY_GO` blocked 문구를 durable approval 이후 상태에 맞게 정리했다.
+스토리지 게이트는 승인되었지만, DB repository 사용은 여전히 명시적
+`database_path` 도구 입력으로만 활성화된다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md no longer says MIGRATION_GO and REPOSITORY_GO are blocked
+  - docs/devops-setup-guide.md points env-readiness users to explicit database_path repository inputs
+  - tests/test_setup_docs.py covers the updated storage approval wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+```
+
 ## 4.059 P1 Docs DevOps SQLite Repository Guide Record - 2026-05-20
 
 ### A. 목적

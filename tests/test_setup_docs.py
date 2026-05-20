@@ -154,6 +154,9 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "`HALO_SWING_DATABASE_URL`\nremains blank by default" in guide
     assert "env-based repository selection is not wired in this slice" in guide_text
     assert "do not commit SQLite files" in guide
+    assert "MIGRATION_GO` and `REPOSITORY_GO` still stay\nblocked" not in guide
+    assert "durable\nstorage approvals recorded in the SSOT" in guide
+    assert "explicit `database_path` tool inputs" in guide
     assert "api_key_pipeline_check_summary" in guide
     assert "api_key_pipeline_check_summary.v1" in guide
     assert "check_count" in guide

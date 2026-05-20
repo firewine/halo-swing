@@ -2023,10 +2023,11 @@ Hermes config/registration, Telegram token or gateway, live data API keys,
 Binance encrypted credential path, live trading, passphrase confirmation,
 trade-only/no-withdraw attestation, and live-order approval. With those values,
 `get_integration_readiness` can mark the integration evidence gates ready
-without public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` still stay
-blocked until their durable gates are approved. This all-env readiness smoke is
-offline only: no network call, no Hermes runtime start, no Telegram send, no
-order submission, and no secret values returned.
+without public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` are durable
+storage approvals recorded in the SSOT; database repository use still requires
+explicit `database_path` tool inputs rather than automatic `.env` activation.
+This all-env readiness smoke is offline only: no network call, no Hermes runtime
+start, no Telegram send, no order submission, and no secret values returned.
 Use `get_integration_setup_checklist` when you want the missing `.env` keys,
 durable gate approvals, and local harness command templates in one structured
 payload. The checklist itself is non-mutating: it does not write `.env`, create

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_DOCS_DEVOPS_SQLITE_REPOSITORY_GUIDE_GATE",
+  "gate_id": "P1_DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_GATE",
   "mode": "implement",
-  "status": "DOCS_DEVOPS_SQLITE_REPOSITORY_GUIDE_VERIFIED",
+  "status": "DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified SQLite repository DevOps guide update; continue with next explicit repository/docs_devops slice from SSOT",
+  "next_atomic_step": "no open code step remains after verified storage gate status guide update; continue with next explicit repository/docs_devops slice from SSOT",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     ".env.example",
@@ -37,7 +37,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py tests/test_env_template.py::test_env_example_database_url_stays_blank_after_storage_gates -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
   ],
@@ -54,10 +54,9 @@
     "read_only": true
   },
   "done_means": [
-    "DevOps guide no longer says SQLite/schema commands are absent",
-    "DevOps guide documents explicit database_path record, label, replay, and evaluate commands",
-    ".env.example keeps HALO_SWING_DATABASE_URL blank by default without claiming storage gates are unapproved",
-    "setup docs tests cover the updated SQLite repository docs text",
+    "DevOps guide no longer says MIGRATION_GO and REPOSITORY_GO are blocked after durable approval",
+    "DevOps guide points operators to explicit database_path repository commands instead of env-based DB activation",
+    "setup docs tests cover the updated durable storage gate status text",
     "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
     "verification passes"
   ],
