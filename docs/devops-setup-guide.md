@@ -221,6 +221,12 @@ required_evidence:
 If any item is missing, keep P1 storage/docs_devops open and continue with the
 next explicit SSOT slice instead of treating the phase as closed.
 
+Current P1 storage/docs_devops close readiness is verified by the SSOT storage
+records from 4.057 through 4.063 plus the mirrored task contract. This closes
+only the P1 storage/docs_devops checklist evidence; it does not approve
+live_adapters, broker/order submission, Hermes runtime start, Telegram send,
+scheduler execution, env-based DB activation, or committed SQLite artifacts.
+
 Indicator timeframe smoke:
 
 ```bash

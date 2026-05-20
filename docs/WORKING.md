@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_VERIFIED
-gate_id: P1_DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_GATE
+status: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_VERIFIED
+gate_id: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified P1 storage close checklist guide update; continue with next explicit repository/docs_devops slice from SSOT
+next_atomic_step: P1 storage/docs_devops close readiness evidence is verified; continue with the next explicit non-storage SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,16 +77,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - DevOps guide documents a P1 storage/docs_devops close checklist
-  - close checklist requires durable MIGRATION_GO and REPOSITORY_GO SSOT evidence
-  - close checklist requires verified migration, repository, SQLite command guide, backup/retention note, and final verification guide records
-  - close checklist requires task mirror, full pytest, ruff, health_check, explicit database_path use, blank database URL default, and no blocked runtime/broker/live artifacts
-  - setup docs tests cover the close checklist wording
-  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added
+  - DevOps guide records current P1 storage/docs_devops close readiness as verified by SSOT storage records and task mirror evidence
+  - DevOps guide states the close readiness record does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts
+  - SSOT records the P1 storage/docs_devops close readiness evidence and points next work to the next explicit non-storage SSOT slice
+  - setup docs tests cover the close readiness wording and blocked boundary
+  - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes, including full pytest
 
 approval_source: "user message: REPOSITORY_GO 승인"
-next_state_after_success: continue with next explicit repository/docs_devops slice from SSOT
+next_state_after_success: continue with the next explicit non-storage SSOT slice
 ```
 
 Previous repository verification result:
@@ -188,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_GATE
-scope: DevOps guide P1 storage/docs_devops close checklist after REPOSITORY_GO
+gate_id: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD
+scope: P1 storage/docs_devops close readiness evidence record after REPOSITORY_GO
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -217,12 +216,11 @@ files_changed:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
-next_state: continue with next explicit repository/docs_devops slice from SSOT
+next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - DevOps guide documents P1 storage/docs_devops close checklist evidence
-  - checklist requires MIGRATION_GO and REPOSITORY_GO SSOT records, verified storage records, task mirror, full pytest, ruff, and health_check
-  - checklist preserves explicit database_path use, blank HALO_SWING_DATABASE_URL default, and blocked runtime/live/broker artifact boundaries
-  - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
+  - P1 storage/docs_devops close readiness is recorded as verified for storage/docs_devops evidence only
+  - this does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts
+  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 
 Previous completed directive:

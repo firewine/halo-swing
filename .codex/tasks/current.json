@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_GATE",
+  "gate_id": "P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD",
   "mode": "implement",
-  "status": "DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_VERIFIED",
+  "status": "P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified P1 storage close checklist guide update; continue with next explicit repository/docs_devops slice from SSOT",
+  "next_atomic_step": "P1 storage/docs_devops close readiness evidence is verified; continue with the next explicit non-storage SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -17,7 +17,7 @@
     "AGENTS.md",
     "docs/WORKING.md",
     "docs/halo-swing-development-plan.md#3.5",
-    "docs/halo-swing-development-plan.md#4.062",
+    "docs/halo-swing-development-plan.md#4.063",
     "docs/devops-setup-guide.md"
   ],
   "blocked_path_prefixes": [
@@ -49,12 +49,11 @@
     "read_only": true
   },
   "done_means": [
-    "DevOps guide documents a P1 storage/docs_devops close checklist",
-    "close checklist requires durable MIGRATION_GO and REPOSITORY_GO SSOT evidence",
-    "close checklist requires verified migration, repository, SQLite command guide, backup/retention note, and final verification guide records",
-    "close checklist requires task mirror, full pytest, ruff, health_check, explicit database_path use, blank database URL default, and no blocked runtime/broker/live artifacts",
-    "setup docs tests cover the close checklist wording",
-    "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added",
+    "DevOps guide records current P1 storage/docs_devops close readiness as verified by SSOT storage records and task mirror evidence",
+    "DevOps guide states the close readiness record does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts",
+    "SSOT records the P1 storage/docs_devops close readiness evidence and points next work to the next explicit non-storage SSOT slice",
+    "setup docs tests cover the close readiness wording and blocked boundary",
+    "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes, including full pytest"
   ],
   "approval_source": "user message: REPOSITORY_GO 승인",
@@ -65,7 +64,8 @@
     "backup_retention_policy": "manual_local_operator_responsibility_until_tooling_exists",
     "final_verification_policy": "local_offline_fixture_tmp_path_only",
     "close_checklist_policy": "evidence_required_before_p1_storage_docs_devops_close",
+    "close_readiness": "verified_for_p1_storage_docs_devops_only",
     "test_database_policy": "tmp_path_only"
   },
-  "next_state_after_success": "continue with next explicit repository/docs_devops slice from SSOT"
+  "next_state_after_success": "continue with the next explicit non-storage SSOT slice"
 }

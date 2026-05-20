@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.064 P1 Storage Docs DevOps Close Readiness Record - 2026-05-20
+
+### A. 목적
+
+P1 storage/docs_devops close checklist의 현재 증거를 기준으로 close
+readiness를 기록했다. 이 기록은 storage/docs_devops evidence에 한정되며,
+live adapter, broker/order submission, Hermes runtime, Telegram send,
+scheduler, env-based DB activation, committed SQLite artifact를 승인하지
+않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md records current P1 storage/docs_devops close readiness
+  - docs/devops-setup-guide.md keeps blocked runtime/live/broker/env-DB/artifact boundaries explicit
+  - tests/test_setup_docs.py covers the close readiness wording and blocked boundary
+  - next work is no longer another repository/docs_devops slice unless new evidence appears
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit non-storage SSOT slice
+```
+
 ## 4.063 P1 Docs DevOps Storage Close Checklist Guide Record - 2026-05-20
 
 ### A. 목적

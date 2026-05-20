@@ -171,6 +171,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "full pytest, ruff, and health_check pass from a clean worktree" in guide
     assert "`HALO_SWING_DATABASE_URL` remains blank" in guide
     assert "keep P1 storage/docs_devops open" in guide
+    assert "Current P1 storage/docs_devops close readiness is verified" in guide
+    assert "records from 4.057 through 4.063" in guide
+    assert "does not approve\nlive_adapters" in guide
+    assert "env-based DB activation" in guide
     assert "MIGRATION_GO` and `REPOSITORY_GO` still stay\nblocked" not in guide
     assert "durable\nstorage approvals recorded in the SSOT" in guide
     assert "explicit `database_path` tool inputs" in guide
