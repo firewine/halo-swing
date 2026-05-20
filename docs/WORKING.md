@@ -42,27 +42,22 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_VERIFIED
-gate_id: P1_REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_GATE
-review_tier: S2_medium
+status: DOCS_DEVOPS_SQLITE_REPOSITORY_GUIDE_VERIFIED
+gate_id: P1_DOCS_DEVOPS_SQLITE_REPOSITORY_GUIDE_GATE
+review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified SQLite signal repository and replay query; continue with the next explicit repository or docs_devops slice from SSOT
+next_atomic_step: no open code step remains after verified SQLite repository DevOps guide update; continue with next explicit repository/docs_devops slice from SSOT
 
 allowed_edit_paths:
   - .codex/tasks/current.json
+  - .env.example
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/signal_repository.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/recording.py
-  - tests/golden/mvp_tool_contracts.json
-  - tests/golden/health_check.json
-  - tests/test_mvp_tools.py
-  - tests/test_signal_repository.py
-  - tests/test_tool_registry.py
+  - tests/test_env_template.py
+  - tests/test_setup_docs.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -79,28 +74,23 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py tests/test_env_template.py::test_env_example_database_url_stays_blank_after_storage_gates -q
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - REPOSITORY_GO approval is recorded in SSOT, gate packet, and WORKING.md
-  - record_signal supports explicit database_path SQLite persistence and remains idempotent
-  - label_signal_outcome writes repository-backed label_store rows when database_path is provided
-  - evaluate_score_performance reads repository-backed signal and label rows when database_path is provided
-  - get_signal_replay_bundle returns signal_ledger, feature_store, evidence_card, strategy_config, run_journal, latest label, and structured missing links
-  - default JSONL ledger behavior remains unchanged when database_path is omitted
-  - SQLite repository tests create databases only under tmp_path and no repo data/state SQLite artifacts are created
-  - default import guard allows sqlite3 only in the migration runner and signal repository introduced by storage gates
+  - DevOps guide no longer says SQLite/schema commands are absent
+  - DevOps guide documents explicit database_path record, label, replay, and evaluate commands
+  - .env.example keeps HALO_SWING_DATABASE_URL blank by default without claiming storage gates are unapproved
+  - setup docs tests cover the updated SQLite repository docs text
   - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - verification passes
 
 approval_source: "user message: REPOSITORY_GO 승인"
-next_state_after_success: continue with next explicit repository slice after verified SQLite signal repository path
+next_state_after_success: continue with next explicit repository/docs_devops slice from SSOT
 ```
 
-Latest verification result:
+Previous repository verification result:
 
 ```text
 status: passed
@@ -152,6 +142,47 @@ notes:
   - default JSONL behavior remains unchanged without database_path
   - tests create SQLite DBs only under tmp_path and no repo data/state DB artifacts are added
   - tests/test_tool_registry.py keeps live/default sqlite3 import blocked except for src/halo_swing_mcp/storage_migrations.py and src/halo_swing_mcp/signal_repository.py
+```
+
+Latest verification result:
+
+```text
+status: passed
+gate_id: P1_DOCS_DEVOPS_SQLITE_REPOSITORY_GUIDE_GATE
+scope: DevOps guide and env template update for REPOSITORY_GO SQLite repository usage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py tests/test_env_template.py::test_env_example_database_url_stays_blank_after_storage_gates -q
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py tests/test_env_template.py::test_env_example_database_url_stays_blank_after_storage_gates -q: 43 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+files_changed:
+  - .codex/tasks/current.json
+  - .env.example
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/devops-setup-guide.md
+  - docs/halo-swing-development-plan.md
+  - tests/test_env_template.py
+  - tests/test_setup_docs.py
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+notes:
+  - DevOps guide now documents explicit database_path SQLite repository smoke commands
+  - stale SQLite/schema absent wording was removed
+  - HALO_SWING_DATABASE_URL remains blank by default because env-based DB selection is not wired in this slice
+  - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 
 Previous completed directive:

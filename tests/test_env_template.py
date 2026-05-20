@@ -201,8 +201,12 @@ def test_env_example_does_not_include_secret_placeholder_values() -> None:
             assert fragment not in normalized
 
 
-def test_env_example_database_url_stays_blank_until_storage_gates() -> None:
+def test_env_example_database_url_stays_blank_after_storage_gates() -> None:
     assignments = _env_assignments()
+    template = ENV_TEMPLATE.read_text(encoding="utf-8")
 
     assert assignments["HALO_SWING_DATABASE_URL"] == ""
-    assert "data/halo_swing" not in ENV_TEMPLATE.read_text(encoding="utf-8")
+    assert "data/halo_swing" not in template
+    assert "Persistence gates are not approved yet" not in template
+    assert "database_path" in template
+    assert "env-based DB use" in template

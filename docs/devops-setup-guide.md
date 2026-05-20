@@ -13,7 +13,7 @@ dependencies: requirements.txt
 mcp_stack: official MCP Python SDK / FastMCP
 server_status: offline_mvp_tools_implemented
 harness_status: parameterized_cli_harness_implemented
-storage_schema_status: jsonl_signal_repository_contract
+storage_schema_status: sqlite_migration_and_explicit_repository_path_verified
 audit_log_status: runtime_jsonl_with_local_web_viewer
 runtime_guard_status: jsonl_retention_and_failure_watchdog
 runtime_checkpoint_status: append_only_jsonl_checkpoint_tool
@@ -133,8 +133,9 @@ WAIT/TRIM/EXIT/STOP decision is numeric-authoritative and does not submit orders
 
 `get_market_snapshot` should include `market_snapshot_contract.schema_version`
 `market_snapshot.v1`, core fixture assets QQQ/SPY/SMH/SOXX/BTC, and a guard
-showing feature-store persistence is not active before `MIGRATION_GO` and
-`REPOSITORY_GO`.
+showing fixture market snapshots do not implicitly persist feature-store rows.
+SQLite feature persistence is only active through explicit repository commands
+that pass `database_path`.
 
 `get_event_calendar` should include `event_policy_contract.schema_version`
 `event_policy.v1`, with CPI/FOMC/NFP/EARNINGS coverage and per-event danger
@@ -154,8 +155,8 @@ the label metrics.
 with schema `deflated_sharpe_proxy.v1`. This is an offline conservative proxy,
 not an exact Deflated Sharpe Ratio, and it must not enable automatic promotion.
 
-`record_signal` writes a local JSONL runtime ledger. Use an ignored or temporary
-path during development:
+`record_signal` defaults to a local JSONL runtime ledger. Use an ignored or
+temporary path during development:
 
 ```bash
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
@@ -163,9 +164,24 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"ledger_path":"state/signal_ledger.jsonl"}'
 ```
 
-SQLite/schema commands remain absent from the offline MVP. The current ledger is
-a reusable JSONL runtime adapter; migrations and repository persistence can be a
-later implementation behind the same tool contracts.
+After `MIGRATION_GO` and `REPOSITORY_GO`, the same recording tools also support
+an explicit SQLite repository path. Keep the file under ignored local state or a
+temporary directory; do not commit SQLite files. `HALO_SWING_DATABASE_URL`
+remains blank by default because env-based repository selection is not wired in
+this slice.
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --input-json '{"database_path":"state/halo_swing.sqlite"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"database_path":"state/halo_swing.sqlite"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_signal_replay_bundle --input-json '{"signal_id":"sig_fixture_20260511_tqqq","database_path":"state/halo_swing.sqlite"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"database_path":"state/halo_swing.sqlite"}'
+```
+
+The SQLite path applies migrations idempotently, stores `run_journal`,
+`strategy_config`, `feature_store`, `evidence_card`, `artifact_ref`,
+`signal_ledger`, and `label_store` rows, and lets `get_signal_replay_bundle`
+return replay sections plus structured missing-link errors. The default JSONL
+path remains available for lightweight local smoke runs.
 
 Indicator timeframe smoke:
 

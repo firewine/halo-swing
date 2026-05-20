@@ -776,6 +776,40 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.059 P1 Docs DevOps SQLite Repository Guide Record - 2026-05-20
+
+### A. 목적
+
+`REPOSITORY_GO` 이후 DevOps guide와 `.env.example`의 stale storage-gate
+문구를 현재 구현 상태에 맞췄다. 기본 동작은 여전히 JSONL/blank env이고,
+SQLite repository는 명시적 `database_path` 입력으로만 활성화된다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md documents explicit database_path SQLite record, label, replay, and evaluate commands
+  - .env.example keeps HALO_SWING_DATABASE_URL blank without saying storage gates are unapproved
+  - tests/test_setup_docs.py covers the updated SQLite repository guide text
+  - tests/test_env_template.py covers blank database URL after storage gates
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py tests/test_env_template.py::test_env_example_database_url_stays_blank_after_storage_gates -q: 43 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+```
+
 ## 4.058 P1 Repository GO SQLite Signal Repository Gate Record - 2026-05-20
 
 ### A. 승인 기록

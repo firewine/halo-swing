@@ -146,6 +146,14 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "stage_name" in guide
     assert "run_live_signal_workflow_smoke" in guide
     assert "run_live_recording_smoke" in guide
+    assert "SQLite/schema commands remain absent" not in guide
+    assert "sqlite_migration_and_explicit_repository_path_verified" in guide
+    assert "database_path" in guide
+    assert "state/halo_swing.sqlite" in guide
+    assert "get_signal_replay_bundle" in guide
+    assert "`HALO_SWING_DATABASE_URL`\nremains blank by default" in guide
+    assert "env-based repository selection is not wired in this slice" in guide_text
+    assert "do not commit SQLite files" in guide
     assert "api_key_pipeline_check_summary" in guide
     assert "api_key_pipeline_check_summary.v1" in guide
     assert "check_count" in guide
