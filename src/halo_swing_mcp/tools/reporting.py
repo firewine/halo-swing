@@ -151,6 +151,7 @@ def generate_latest_signal_report(
         signal,
         report,
         source_repository_ref=source_repository_ref,
+        latest_record_guard=latest_record_guard,
     )
     payload_live_data_required = bool(signal.get("live_data_required"))
     payload = {
@@ -1028,6 +1029,7 @@ def _evidence_context(
     signal: dict[str, Any],
     report: dict[str, Any],
     source_repository_ref: dict[str, Any] | None = None,
+    latest_record_guard: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     components = dict(signal.get("component_scores") or {})
     scored_components = {
@@ -1059,6 +1061,8 @@ def _evidence_context(
     }
     if source_repository_ref is not None:
         context["source_repository_ref"] = dict(source_repository_ref)
+    if latest_record_guard is not None:
+        context["latest_record_guard"] = dict(latest_record_guard)
     label_status = report.get("label_status")
     if isinstance(label_status, dict):
         context["label_status"] = dict(label_status)
@@ -5626,6 +5630,14 @@ def _evidence_guard(
                 "evidence_source_repository_ref_is_path_free",
             ]
         )
+    latest_record_guard = evidence_context.get("latest_record_guard")
+    if latest_record_guard is not None:
+        expected_guard_check_names.extend(
+            [
+                "evidence_latest_record_guard_keys_match_expected_schema",
+                "evidence_latest_record_guard_status_is_ok",
+            ]
+        )
     if isinstance(report.get("label_status"), dict):
         expected_guard_check_names.append(
             "label_status_reflected_in_evidence_context"
@@ -5778,6 +5790,34 @@ def _evidence_guard(
                                 source_repository_ref
                             ).__name__
                         }
+                    ),
+                },
+            ]
+        )
+    if latest_record_guard is not None:
+        latest_record_guard_is_dict = isinstance(latest_record_guard, dict)
+        checks.extend(
+            [
+                {
+                    "name": "evidence_latest_record_guard_keys_match_expected_schema",
+                    "passed": latest_record_guard_is_dict
+                    and list(latest_record_guard) == ["status", "checks"],
+                    "expected": ["status", "checks"],
+                    "actual": (
+                        list(latest_record_guard)
+                        if latest_record_guard_is_dict
+                        else type(latest_record_guard).__name__
+                    ),
+                },
+                {
+                    "name": "evidence_latest_record_guard_status_is_ok",
+                    "passed": latest_record_guard_is_dict
+                    and latest_record_guard.get("status") == "ok",
+                    "expected": "ok",
+                    "actual": (
+                        latest_record_guard.get("status")
+                        if latest_record_guard_is_dict
+                        else type(latest_record_guard).__name__
                     ),
                 },
             ]

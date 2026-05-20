@@ -723,6 +723,62 @@ def test_latest_signal_report_reuses_latest_record_guard(
     assert payload["report_payload_guard"]["status"] == "ok"
 
 
+def test_latest_signal_report_reuses_latest_record_guard_in_evidence_context(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_repo_record_guard_evidence",
+        "run_id": "run_report_repo_record_guard_evidence",
+        "created_at": "2026-05-20T13:50:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="sso", ledger_path=f" {ledger_path} ")
+    evidence_guard_checks = {
+        check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+
+    assert payload["evidence_context"]["latest_record_guard"] == payload[
+        "latest_record_guard"
+    ]
+    assert payload["evidence_context"]["latest_record_guard"]["status"] == "ok"
+    assert str(ledger_path) not in iter_nested_strings(
+        payload["evidence_context"]["latest_record_guard"]
+    )
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_keys_match_expected_schema"
+    ] == {
+        "name": "evidence_latest_record_guard_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["status", "checks"],
+        "actual": ["status", "checks"],
+    }
+    assert evidence_guard_checks["evidence_latest_record_guard_status_is_ok"] == {
+        "name": "evidence_latest_record_guard_status_is_ok",
+        "passed": True,
+        "expected": "ok",
+        "actual": "ok",
+    }
+    assert "evidence_latest_record_guard_keys_match_expected_schema" in (
+        evidence_guard_checks["evidence_guard_check_names_match_expected_schema"][
+            "actual"
+        ]
+    )
+    assert "evidence_latest_record_guard_status_is_ok" in (
+        evidence_guard_checks["evidence_guard_check_names_match_expected_schema"][
+            "actual"
+        ]
+    )
+    assert payload["evidence_guard"]["status"] == "ok"
+
+
 def test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

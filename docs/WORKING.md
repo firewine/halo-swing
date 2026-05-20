@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_RECORD_GUARD_PROPAGATION_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_RECORD_GUARD_PROPAGATION_GATE
+status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_RECORD_GUARD_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_RECORD_GUARD_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified latest report record guard propagation; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified latest report evidence record guard propagation; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,16 +72,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report preserves latest_record_guard from get_latest_signal_record
-  - report_payload_guard nested guard status checks include latest_record_guard when repository source metadata is present
+  - repository-backed generate_latest_signal_report mirrors latest_record_guard into evidence_context
+  - evidence_guard validates latest_record_guard key schema and status when present
   - default no-repository latest report payload and golden snapshot remain unchanged
-  - existing repository source_repository_ref propagation remains unchanged
+  - existing repository source_repository_ref and top-level latest_record_guard propagation remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -185,6 +185,48 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_RECORD_GUARD_GATE
+scope: mirror latest_record_guard into repository-backed latest report evidence context
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 927 passed in 44.16s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - repository-backed generate_latest_signal_report now mirrors latest_record_guard into evidence_context
+  - evidence_guard validates latest_record_guard key schema and ok status when present
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - existing source_repository_ref and top-level latest_record_guard propagation remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed
