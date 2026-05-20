@@ -84,6 +84,16 @@ def test_context_describes_current_btc_order_boundary() -> None:
     assert "자동 주문은 MVP 범위가 아니다" not in text
 
 
+def test_context_describes_telegram_delivery_preview_boundary() -> None:
+    text = _normalized_text(CONTEXT)
+
+    assert "Hermes/Telegram용 delivery preview 리포트" in text
+    assert "Telegram message chunk와 Hermes payload metadata" in text
+    assert "Telegram credential을 요구하거나 send call을 실행하지 않는다" in text
+    assert "Hermes/Telegram delivery preview payload 생성" in text
+    assert "텔레그램 리포트, 신호 기록" not in text
+
+
 def test_readme_capability_list_matches_health_check_golden() -> None:
     golden = json.loads(HEALTH_CHECK_GOLDEN.read_text(encoding="utf-8"))
     text = _normalized_text(README)

@@ -1,10 +1,10 @@
 {
-  "gate_id": "CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_GATE",
+  "gate_id": "CONTEXT_TELEGRAM_PREVIEW_BOUNDARY_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_VERIFIED",
+  "status": "CONTEXT_TELEGRAM_PREVIEW_BOUNDARY_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.071",
-  "next_atomic_step": "no open code step remains after verified CONTEXT BTC order-boundary alignment; continue with the next explicit SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.072",
+  "next_atomic_step": "no open code step remains after verified CONTEXT Telegram preview-boundary alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/CONTEXT.md",
@@ -17,8 +17,8 @@
     "AGENTS.md",
     "docs/CONTEXT.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.070",
-    "README.md#btc-coin-m-trading-admin"
+    "docs/halo-swing-development-plan.md#4.071",
+    "README.md#report-delivery-preview"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "docs/CONTEXT.md no longer says automatic order execution is simply outside MVP without the current BTC exception boundary",
-    "docs/CONTEXT.md states only BTC COIN-M order execution is exposed and only through explicit confirmation, live-trading flag, encrypted credentials, manual passphrase, and passing risk checks",
-    "docs/CONTEXT.md keeps leveraged ETF orders, broker/order expansion, Hermes runtime start, Telegram send, scheduler, and live adapter expansion out of scope until later gates",
-    "setup docs tests cover CONTEXT.md BTC order boundary wording",
+    "docs/CONTEXT.md describes Telegram-facing work as offline delivery_preview/report payloads rather than actual Telegram send",
+    "docs/CONTEXT.md states report tools create Hermes/Telegram preview payloads with no credentials and no send call",
+    "docs/CONTEXT.md keeps Telegram send, Hermes runtime start, scheduler, live adapter expansion, and broker/order expansion out of scope until later gates",
+    "setup docs tests cover CONTEXT.md Telegram delivery preview boundary wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes"
   ],

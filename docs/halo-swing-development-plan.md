@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.072 CONTEXT Telegram Preview Boundary Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+`docs/CONTEXT.md`의 초기 목표와 system definition이 "텔레그램 리포트"를
+실제 Telegram send까지 구현된 것처럼 읽힐 수 있게 남아 있었다. 현재 구현은
+report tool의 offline `delivery_preview` payload와 Telegram message chunk를
+제공하지만 credential을 요구하거나 send call을 실행하지 않는다. 이 경계를 새
+대화용 컨텍스트에 맞춘다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md describes the report goal as Hermes/Telegram delivery preview reports
+  - docs/CONTEXT.md states report tools create Telegram message chunks and Hermes payload metadata without credentials or send calls
+  - docs/CONTEXT.md clarifies Hermes Agent owns actual Telegram transmission while Halo Swing MCP owns delivery preview payload generation
+  - tests/test_setup_docs.py covers CONTEXT.md Telegram delivery-preview boundary wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 49 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 892 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.071 CONTEXT BTC Order Boundary Alignment Gate Record - 2026-05-20
 
 ### A. 목적
