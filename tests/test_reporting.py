@@ -1292,10 +1292,60 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         timeframe=" swing_3d_10d ",
         database_path=f" {database_path} ",
     )
+    reasons = next(
+        section for section in payload["sections"] if section["title"] == "Reasons"
+    )
+    report_payload_guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+    source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=TQQQ underlying=<any> timeframe=swing_3d_10d"
+    )
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
     assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
+    assert payload["source_repository_ref"] == {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "TQQQ",
+            "underlying": None,
+            "timeframe": "swing_3d_10d",
+        },
+    }
+    assert source_summary in reasons["items"]
+    assert f"- {source_summary}" in payload["text"]
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["actual"] == ["storage", "db_required", "filters"]
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
+    assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
+    assert str(database_path) not in iter_nested_strings(reasons)
+    assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(payload["source_repository_ref"])
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(report_payload_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(reasons)
+    )
 
 
 def test_latest_signal_report_repository_source_filters_by_underlying(
@@ -1328,6 +1378,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         underlying=" qqq ",
         database_path=str(database_path),
     )
+    reasons = next(
+        section for section in payload["sections"] if section["title"] == "Reasons"
+    )
+    report_payload_guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+    source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=TQQQ underlying=QQQ timeframe=swing_3d_10d"
+    )
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -1337,7 +1398,36 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "underlying": "QQQ",
         "timeframe": "swing_3d_10d",
     }
+    assert source_summary in reasons["items"]
+    assert f"- {source_summary}" in payload["text"]
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["actual"] == ["storage", "db_required", "filters"]
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
     assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
+    assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
+    assert str(database_path) not in iter_nested_strings(reasons)
+    assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(payload["source_repository_ref"])
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(report_payload_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(reasons)
+    )
 
 
 def test_latest_signal_report_repository_source_includes_jsonl_label_status(

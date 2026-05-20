@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.113 P1 Repository SQLite Latest Report Filter Provenance Guard Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+SQLite repository-backed latest report는 `database_path`와 `timeframe` 또는 `underlying`
+filter를 받아 최신 record를 선택한다. 기존 테스트는 선택된 record identity를 확인하지만,
+선택 provenance가 `source_repository_ref.filters`, report text summary,
+`report_payload_guard` source ref checks에 path-free로 남는지는 직접 coverage가 약하다.
+이번 slice는 명시적 `database_path` SQLite filtered report에서 filter provenance가 report
+read model과 guard payload에 안정적으로 반영됨을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extended SQLite repository-backed latest report timeframe filter provenance coverage
+  - extended SQLite repository-backed latest report underlying filter provenance coverage
+  - asserted filtered source_repository_ref summaries appear in sections/text
+  - asserted filtered source_repository_ref report_payload_guard checks remain ok and path-free
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task mirror diff passed
+  - task JSON validation passed
+  - git diff --check passed
+  - focused latest report filter provenance coverage tests: 3 passed
+  - full pytest: 935 passed in 64.73s
+  - ruff check passed
+  - health_check status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.112 P1 Repository SQLite Latest Report Source Signal Ref Payload Guard Coverage Gate Record - 2026-05-20
 
 ### A. 목적
