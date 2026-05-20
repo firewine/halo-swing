@@ -652,6 +652,69 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.054 API Key Integration Provider Status Accepted-Key Order Gate Record - 2026-05-20
+
+### A. 목적
+
+4.053까지 setup checklist, smoke command required key groups, dotenv examples,
+README/DevOps setup docs, and readiness next actions all show `POLYGON_API_KEY`,
+`FRED_API_KEY`, and `NEWSAPI_KEY` as the preferred copy/paste keys. The remaining
+API-key status/provider setup metadata, dotenv template metadata, and provider
+selection hints still expose `accepted_env_keys` with project-specific aliases
+first. This slice aligns that display order so provider status, dotenv template
+metadata, provider selection hints, provider setup actions, and provider smoke
+plan present the preferred keys first while preserving every accepted alias and
+the provider resolver priority in `src/halo_swing_mcp/providers.py`.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - order market accepted_env_keys as POLYGON_API_KEY, HALO_SWING_MARKET_DATA_API_KEY in live-data API-key status
+  - order macro accepted_env_keys as FRED_API_KEY, HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY in live-data API-key status
+  - order news accepted_env_keys as NEWSAPI_KEY, HALO_SWING_NEWS_API_KEY, NEWS_API_KEY in live-data API-key status
+  - prove dotenv template metadata, provider selection hints, live_data_setup_summary, provider_setup_actions, provider_smoke_plan, and summary-only flattened accepted-key fields preserve all aliases with preferred-first display order
+  - update env template coverage to prove alias-set parity with provider auto-select keys without requiring resolver-order display
+  - keep provider resolver constants and credential selection priority unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key removal
+  - operator docs or .env.example change
+  - automatic .env mutation
+  - secret value insertion
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_live_data_keys_preserve_provider_auto_select_aliases -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적

@@ -353,8 +353,8 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                 "provider": "polygon",
                 "preferred_env_key": "POLYGON_API_KEY",
                 "accepted_env_keys": [
-                    "HALO_SWING_MARKET_DATA_API_KEY",
                     "POLYGON_API_KEY",
+                    "HALO_SWING_MARKET_DATA_API_KEY",
                 ],
                 "example": "POLYGON_API_KEY=your_polygon_key",
                 "secret": True,
@@ -364,9 +364,9 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                 "provider": "fred",
                 "preferred_env_key": "FRED_API_KEY",
                 "accepted_env_keys": [
+                    "FRED_API_KEY",
                     "HALO_SWING_MACRO_API_KEY",
                     "HALO_SWING_FRED_API_KEY",
-                    "FRED_API_KEY",
                 ],
                 "example": "FRED_API_KEY=your_fred_key",
                 "secret": True,
@@ -376,9 +376,9 @@ def _live_data_dotenv_template() -> dict[str, Any]:
                 "provider": "newsapi",
                 "preferred_env_key": "NEWSAPI_KEY",
                 "accepted_env_keys": [
+                    "NEWSAPI_KEY",
                     "HALO_SWING_NEWS_API_KEY",
                     "NEWS_API_KEY",
-                    "NEWSAPI_KEY",
                 ],
                 "example": "NEWSAPI_KEY=your_newsapi_key",
                 "secret": True,

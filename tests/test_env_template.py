@@ -115,19 +115,22 @@ def test_env_example_live_data_keys_match_readiness_dotenv_template() -> None:
         assert assignments[key] == ""
 
 
-def test_readiness_live_data_keys_match_provider_auto_select_keys() -> None:
+def test_readiness_live_data_keys_preserve_provider_auto_select_aliases() -> None:
     payload = get_live_data_api_key_status()
     template_by_family = {
         entry["provider_family"]: entry for entry in payload["dotenv_template"]["entries"]
     }
 
-    assert template_by_family["market"]["accepted_env_keys"] == list(
+    assert template_by_family["market"]["accepted_env_keys"][0] == "POLYGON_API_KEY"
+    assert set(template_by_family["market"]["accepted_env_keys"]) == set(
         MARKET_API_KEY_ENV_KEYS
     )
-    assert template_by_family["macro"]["accepted_env_keys"] == list(
+    assert template_by_family["macro"]["accepted_env_keys"][0] == "FRED_API_KEY"
+    assert set(template_by_family["macro"]["accepted_env_keys"]) == set(
         MACRO_API_KEY_ENV_KEYS
     )
-    assert template_by_family["news"]["accepted_env_keys"] == list(
+    assert template_by_family["news"]["accepted_env_keys"][0] == "NEWSAPI_KEY"
+    assert set(template_by_family["news"]["accepted_env_keys"]) == set(
         NEWS_API_KEY_ENV_KEYS
     )
 

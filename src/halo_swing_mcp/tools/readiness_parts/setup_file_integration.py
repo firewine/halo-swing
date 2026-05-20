@@ -312,12 +312,12 @@ def _api_key_provider_selection_summary(
             or (
                 _optional_mapping(provider_setup_actions.get(family)) or {}
             ).get("preferred_env_key"),
-            "accepted_env_keys": _string_list(row.get("accepted_env_keys"))
-            or _string_list(
+            "accepted_env_keys": _string_list(
                 (
                     _optional_mapping(provider_setup_actions.get(family)) or {}
                 ).get("accepted_env_keys")
-            ),
+            )
+            or _string_list(row.get("accepted_env_keys")),
         }
         for family, row in provider_rows
     }
