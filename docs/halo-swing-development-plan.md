@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.104 P1 Repository SQLite Latest Report Intraday Context Summary Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.103에서 SQLite repository-backed latest report의 stored label summary가 기본
+pre-market report의 `Reasons` 섹션과 text에 path-free로 표시됨을 고정했다. JSONL 경로는
+`intraday_risk_watch`처럼 `Reasons` 섹션이 없는 intent에서도 repository source summary와
+stored label summary가 fallback 섹션에 남는지 직접 검증하지만, SQLite 경로에는 같은
+coverage가 아직 없다. 이번 slice는 명시적 `database_path` SQLite latest report에서도
+intraday report가 repository context summary를 `Cautions` 섹션과 text에 유지함을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add SQLite repository-backed intraday_risk_watch context summary coverage
+  - assert repository source summary appears in Cautions and report text
+  - assert stored label summary appears in Cautions and report text
+  - assert intraday section contract remains Target, Decision, Stop, Cautions with no Reasons section
+  - assert SQLite context summaries omit database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite intraday context summary coverage tests: 3 passed
+  - full pytest: 932 passed in 57.45s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.103 P1 Repository SQLite Latest Report Label Summary Text Coverage Gate Record - 2026-05-20
 
 ### A. 목적
