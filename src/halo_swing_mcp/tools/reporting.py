@@ -130,7 +130,12 @@ def generate_latest_signal_report(
         else None
     )
     report = _latest_signal_report_from_signal(signal, chart_payload)
-    sections = _report_sections(signal, report, intent_contract)
+    sections = _report_sections(
+        signal,
+        report,
+        intent_contract,
+        source_repository_ref=source_repository_ref,
+    )
     text = _format_report_text(report, sections)
     prompt_contract = _prompt_contract(intent_contract["required_sections"])
     delivery_contract = _delivery_contract(
@@ -836,12 +841,16 @@ def _report_sections(
     signal: dict[str, Any],
     report: dict[str, Any],
     intent_contract: dict[str, Any] | None = None,
+    source_repository_ref: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     cautions = list(signal.get("risk_warnings") or [])
     if report["data_warnings"]:
         cautions.extend(report["data_warnings"])
     if not cautions:
         cautions.append(report["risk_summary"])
+    reason_items = [report["reason_summary"], report["evidence_summary"]]
+    if source_repository_ref is not None:
+        reason_items.append(_source_repository_summary(source_repository_ref))
 
     sections = [
         {
@@ -858,7 +867,7 @@ def _report_sections(
         },
         {
             "title": "Reasons",
-            "items": [report["reason_summary"], report["evidence_summary"]],
+            "items": reason_items,
         },
         {
             "title": "Entry",
@@ -882,6 +891,20 @@ def _report_sections(
 
     required = set(intent_contract["required_sections"])
     return [section for section in sections if section["title"] in required]
+
+
+def _source_repository_summary(source_repository_ref: dict[str, Any]) -> str:
+    filters = source_repository_ref.get("filters")
+    normalized_filters = filters if isinstance(filters, dict) else {}
+    asset = normalized_filters.get("asset") or "<any>"
+    underlying = normalized_filters.get("underlying") or "<any>"
+    timeframe = normalized_filters.get("timeframe") or "<any>"
+    db_required = str(bool(source_repository_ref.get("db_required"))).lower()
+    return (
+        f"Repository source: {source_repository_ref.get('storage')}; "
+        f"db_required={db_required}; "
+        f"filters asset={asset} underlying={underlying} timeframe={timeframe}"
+    )
 
 
 def _format_report_text(
