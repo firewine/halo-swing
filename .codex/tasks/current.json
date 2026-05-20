@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_REPORT_UNDERLYING_FILTER_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_REPORT_MISSING_SOURCE_FILTER_ERROR_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_REPORT_UNDERLYING_FILTER_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_REPORT_MISSING_SOURCE_FILTER_ERROR_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.084",
-  "next_atomic_step": "no open code step remains after verified repository-backed latest report underlying filter; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.085",
+  "next_atomic_step": "no open code step remains after verified repository-backed latest report missing-source filter errors; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -12,10 +12,8 @@
     "docs/halo-swing-development-plan.md",
     "README.md",
     "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/server.py",
     "src/halo_swing_mcp/tools/reporting.py",
-    "tests/test_reporting.py",
-    "tests/test_tool_registry.py"
+    "tests/test_reporting.py"
   ],
   "read_only_context": [
     "AGENTS.md",
@@ -40,7 +38,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_missing_repository_source_error_includes_path_free_filters tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -55,11 +53,10 @@
     "read_only": true
   },
   "done_means": [
-    "generate_latest_signal_report accepts optional underlying input and passes it to repository-backed latest signal source selection",
-    "repository-backed reports select the latest signal matching asset, underlying, and timeframe when underlying is provided",
-    "source_repository_ref filters include the normalized underlying filter when provided",
+    "repository-backed generate_latest_signal_report missing-source errors include normalized asset, underlying, and timeframe filter evidence",
+    "missing-source errors do not include ledger_path, database_path, SQLite filenames, or absolute local paths",
     "default no-repository report behavior and golden snapshot remain unchanged",
-    "server MCP wrapper parameters stay aligned with the registered reporting function",
+    "existing missing-repository source rejection behavior remains a ValueError",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],

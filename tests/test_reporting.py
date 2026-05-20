@@ -765,6 +765,36 @@ def test_latest_signal_report_rejects_missing_repository_source(
     assert not ledger_path.exists()
 
 
+def test_latest_signal_report_missing_repository_source_error_includes_path_free_filters(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("TQQQ"),
+        "signal_id": "sig_report_missing_filter_source",
+        "run_id": "run_report_missing_filter_source",
+        "created_at": "2026-05-20T16:00:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    with pytest.raises(ValueError) as exc_info:
+        generate_latest_signal_report(
+            asset=" tqqq ",
+            underlying=" soxx ",
+            timeframe=" swing_3d_10d ",
+            database_path=str(database_path),
+        )
+
+    message = str(exc_info.value)
+    assert "latest signal report source was not found" in message
+    assert "filters asset=TQQQ underlying=SOXX timeframe=swing_3d_10d" in message
+    assert "database_path" not in message
+    assert "ledger_path" not in message
+    assert str(database_path) not in message
+    assert ".sqlite" not in message.lower()
+    assert "/Users/" not in message
+
+
 def test_latest_signal_report_contains_required_report_sections() -> None:
     payload = generate_latest_signal_report("TQQQ")
     sections = {section["title"]: section["items"] for section in payload["sections"]}

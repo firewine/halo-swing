@@ -708,7 +708,8 @@ def _latest_report_source_signal(
     )
     if latest_record["status"] != "found":
         raise ValueError(
-            "latest signal report source was not found in the selected repository"
+            "latest signal report source was not found in the selected repository "
+            f"for {_format_latest_report_source_filters(latest_record)}"
         )
     record = latest_record.get("record")
     if not isinstance(record, dict) or not isinstance(record.get("signal"), dict):
@@ -721,6 +722,16 @@ def _latest_report_source_signal(
         latest_record
     )
     return signal
+
+
+def _format_latest_report_source_filters(latest_record: dict[str, Any]) -> str:
+    filters = latest_record.get("filters")
+    normalized_filters = filters if isinstance(filters, dict) else {}
+    return (
+        f"filters asset={normalized_filters.get('asset') or '<any>'} "
+        f"underlying={normalized_filters.get('underlying') or '<any>'} "
+        f"timeframe={normalized_filters.get('timeframe') or '<any>'}"
+    )
 
 
 def _source_repository_ref_from_latest_record(

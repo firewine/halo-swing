@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.085 P1 Repository Latest Report Missing Source Filter Error Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed `generate_latest_signal_report`는 explicit repository path가
+있지만 matching signal이 없으면 `ValueError`로 중단한다. Asset/underlying/timeframe
+source filter가 모두 지원되면서, missing-source 오류도 어떤 normalized filter가
+실패했는지 알려줘야 한다. 이번 slice는 local path나 SQLite 파일명을 노출하지 않고
+필터 증거만 오류 메시지에 포함한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - keep missing repository source behavior as ValueError
+  - include normalized asset, underlying, and timeframe filters in the error message
+  - omit ledger_ref, ledger_path, database_path, SQLite filenames, and absolute paths
+  - keep default no-repository report snapshot unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_missing_repository_source_error_includes_path_free_filters tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused missing-source filter error tests: 3 passed
+  - full pytest: 910 passed in 43.86s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.083 P1 Repository Latest Report Source Metadata Gate Record - 2026-05-20
 
 ### A. 목적
