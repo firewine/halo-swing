@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.098 P1 Repository Latest Report Record Guard Propagation Gate Record - 2026-05-20
+
+### A. 목적
+
+4.097에서 `get_latest_signal_record`는 `source_repository_ref` provenance를
+검증하는 `latest_record_guard`를 갖게 됐다. 하지만 repository-backed
+`generate_latest_signal_report`는 source ref만 보존하고 latest record guard는
+report payload에서 잃는다. 이번 slice는 latest report read-model이 해당 guard를
+top-level payload로 보존하고, `report_payload_guard`가 repository-backed nested guard
+status에 포함해 Hermes가 provenance guard 상태를 같이 확인할 수 있게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - propagate latest_record_guard from get_latest_signal_record into repository-backed latest signal reports
+  - include latest_record_guard status in report_payload_guard nested guard status checks when repository source metadata exists
+  - keep default no-repository latest report payload and golden snapshot unchanged
+  - keep source_repository_ref propagation behavior unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused latest report record guard propagation tests: 3 passed
+  - full pytest: 926 passed in 43.70s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.097 P1 Repository Latest Signal Record Guard Gate Record - 2026-05-20
 
 ### A. 목적

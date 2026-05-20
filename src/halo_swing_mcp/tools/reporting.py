@@ -120,6 +120,7 @@ def generate_latest_signal_report(
         database_path=normalized_database_path,
     )
     source_repository_ref = signal.pop("_source_repository_ref", None)
+    latest_record_guard = signal.pop("_latest_record_guard", None)
     chart_payload = (
         render_chart(
             symbol=signal["underlying"],
@@ -192,6 +193,8 @@ def generate_latest_signal_report(
     }
     if source_repository_ref is not None:
         payload["source_repository_ref"] = source_repository_ref
+    if latest_record_guard is not None:
+        payload["latest_record_guard"] = latest_record_guard
     payload["live_data_required"] = payload_live_data_required
     if chart_payload is not None:
         payload["chart_code_guard"] = _chart_code_guard(signal, chart_payload)
@@ -234,6 +237,11 @@ def generate_latest_signal_report(
         "evidence_guard": payload["evidence_guard"]["status"],
         "report_contract_guard": payload["report_contract_guard"]["status"],
     }
+    if latest_record_guard is not None:
+        expected_payload_nested_guard_statuses["latest_record_guard"] = "ok"
+        actual_payload_nested_guard_statuses["latest_record_guard"] = payload[
+            "latest_record_guard"
+        ]["status"]
     expected_optional_context_statuses = {}
     actual_optional_context_statuses = {}
     expected_optional_context_guard_statuses = {}
@@ -411,6 +419,7 @@ def generate_latest_signal_report(
             include_multimodal=chart_payload is not None
             or bool(normalized_extra_evidence_cards),
             include_source_repository=source_repository_ref is not None,
+            include_latest_record_guard=latest_record_guard is not None,
         ),
         schema_check_name="report_payload_schema_version_matches_expected",
         live_data_check_name="report_payload_live_data_required_matches_expected",
@@ -731,6 +740,9 @@ def _latest_report_source_signal(
     signal["_source_repository_ref"] = _source_repository_ref_from_latest_record(
         latest_record
     )
+    latest_record_guard = latest_record.get("latest_record_guard")
+    if isinstance(latest_record_guard, dict):
+        signal["_latest_record_guard"] = dict(latest_record_guard)
     return signal
 
 
@@ -3567,6 +3579,7 @@ def _expected_report_payload_keys(
     include_chart: bool,
     include_multimodal: bool,
     include_source_repository: bool = False,
+    include_latest_record_guard: bool = False,
 ) -> list[str]:
     keys = [
         "schema_version",
@@ -3592,6 +3605,8 @@ def _expected_report_payload_keys(
     ]
     if include_source_repository:
         keys.append("source_repository_ref")
+    if include_latest_record_guard:
+        keys.append("latest_record_guard")
     keys.append("live_data_required")
     if include_chart:
         keys.append("chart_code_guard")
