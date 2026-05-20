@@ -485,7 +485,16 @@ def test_latest_signal_report_can_use_sqlite_repository_source(
 
     assert payload["latest_signal_report"]["signal_id"] == stored_signal["signal_id"]
     assert payload["latest_signal_report"]["asset"] == "QLD"
-    assert payload["source_signal_ref"]["run_id"] == stored_signal["run_id"]
+    assert payload["source_signal_ref"] == {
+        "signal_id": stored_signal["signal_id"],
+        "run_id": stored_signal["run_id"],
+        "config_hash": stored_signal["config_hash"],
+    }
+    assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(payload["source_signal_ref"])
+    )
     assert payload["report_payload_guard"]["status"] == "ok"
     assert payload["live_data_required"] is False
 
