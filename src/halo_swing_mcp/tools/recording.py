@@ -390,6 +390,10 @@ def get_latest_signal_record(
         "underlying": normalized_underlying,
         "timeframe": normalized_timeframe,
     }
+    source_repository_ref = _source_repository_ref(
+        repository=repository,
+        filters=filters,
+    )
 
     if record is None:
         return {
@@ -399,6 +403,7 @@ def get_latest_signal_record(
             "storage": repository.storage_name,
             "db_required": repository.db_required,
             "filters": filters,
+            "source_repository_ref": source_repository_ref,
             "record": {},
             "label_outcome": None,
             "missing_links": [
@@ -427,6 +432,7 @@ def get_latest_signal_record(
         "storage": repository.storage_name,
         "db_required": repository.db_required,
         "filters": filters,
+        "source_repository_ref": source_repository_ref,
         "record": record,
         "label_outcome": labels[-1] if labels else None,
         "missing_links": [],
@@ -602,6 +608,18 @@ def _latest_signal_missing_ref_id(
     if timeframe is not None:
         filters.append(f"timeframe={timeframe}")
     return "latest" if not filters else f"latest:{','.join(filters)}"
+
+
+def _source_repository_ref(
+    *,
+    repository: Any,
+    filters: dict[str, str | None],
+) -> dict[str, Any]:
+    return {
+        "storage": repository.storage_name,
+        "db_required": repository.db_required,
+        "filters": dict(filters),
+    }
 
 
 def _run_journal(

@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.096 P1 Repository Latest Signal Source Ref Propagation Gate Record - 2026-05-20
+
+### A. 목적
+
+`get_latest_signal_record`는 repository source를 `ledger_ref`로 드러내지만,
+report read-model이 쓰는 path-free `source_repository_ref`는
+`generate_latest_signal_report`에서 다시 구성한다. 이번 slice는 latest signal
+read-model 자체가 storage/db_required/normalized filters만 담은 path-free
+`source_repository_ref`를 제공하게 하고, latest report가 그 값을 우선 소비하게
+해 repository/report source metadata 계약을 한 경로로 맞춘다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add path-free source_repository_ref to get_latest_signal_record found/not_found payloads
+  - omit ledger_ref, ledger_path, database_path, SQLite filenames, and absolute paths from source_repository_ref
+  - make generate_latest_signal_report consume latest_record.source_repository_ref when present
+  - keep existing report source metadata and missing-source behavior unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused latest signal source ref propagation tests: 3 passed
+  - full pytest: 924 passed in 48.24s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.095 P1 Repository Latest Signal Boundary Cleanup Gate Record - 2026-05-20
 
 ### A. 목적

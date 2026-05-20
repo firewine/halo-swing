@@ -1125,6 +1125,71 @@ def test_get_latest_signal_record_filters_by_timeframe(tmp_path: Path) -> None:
         )
 
 
+def test_get_latest_signal_record_exposes_path_free_source_repository_ref(
+    tmp_path: Path,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    database_path = tmp_path / "halo_swing.sqlite"
+    signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_latest_source_ref",
+        "run_id": "run_latest_source_ref",
+        "created_at": "2026-05-20T10:00:00Z",
+    }
+
+    for repository_payload, expected_storage, expected_db_required, blocked_text in (
+        (
+            {"ledger_path": f" {ledger_path} "},
+            "jsonl_signal_ledger_record",
+            False,
+            str(ledger_path),
+        ),
+        (
+            {"database_path": f" {database_path} "},
+            "sqlite_signal_repository",
+            True,
+            str(database_path),
+        ),
+    ):
+        record_signal(signal=signal, **repository_payload)
+        latest = get_latest_signal_record(
+            asset=" tqqq ",
+            timeframe=" swing_3d_10d ",
+            **repository_payload,
+        )
+        missing = get_latest_signal_record(
+            asset="SOXL",
+            **repository_payload,
+        )
+        source_repository_ref = latest["source_repository_ref"]
+
+        assert source_repository_ref == {
+            "storage": expected_storage,
+            "db_required": expected_db_required,
+            "filters": {
+                "asset": "TQQQ",
+                "underlying": None,
+                "timeframe": "swing_3d_10d",
+            },
+        }
+        assert missing["source_repository_ref"] == {
+            "storage": expected_storage,
+            "db_required": expected_db_required,
+            "filters": {
+                "asset": "SOXL",
+                "underlying": None,
+                "timeframe": None,
+            },
+        }
+        serialized_source_ref = json.dumps(source_repository_ref, sort_keys=True)
+        assert "ledger_ref" not in source_repository_ref
+        assert "ledger_path" not in source_repository_ref
+        assert "database_path" not in source_repository_ref
+        assert blocked_text not in serialized_source_ref
+        assert ".sqlite" not in serialized_source_ref.lower()
+        assert "/users/" not in serialized_source_ref.lower()
+
+
 def test_get_latest_signal_record_delegates_matching_to_repository_boundary(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1210,6 +1275,15 @@ def test_get_latest_signal_record_delegates_matching_to_repository_boundary(
         "asset": "TQQQ",
         "underlying": "QQQ",
         "timeframe": "swing_3d_10d",
+    }
+    assert latest["source_repository_ref"] == {
+        "storage": "fake_signal_repository",
+        "db_required": False,
+        "filters": {
+            "asset": "TQQQ",
+            "underlying": "QQQ",
+            "timeframe": "swing_3d_10d",
+        },
     }
     assert latest["label_outcome"] == {
         "signal_id": "sig_fake_latest",

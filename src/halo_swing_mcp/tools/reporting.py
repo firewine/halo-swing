@@ -747,6 +747,9 @@ def _format_latest_report_source_filters(latest_record: dict[str, Any]) -> str:
 def _source_repository_ref_from_latest_record(
     latest_record: dict[str, Any],
 ) -> dict[str, Any]:
+    source_repository_ref = latest_record.get("source_repository_ref")
+    if isinstance(source_repository_ref, dict):
+        return dict(source_repository_ref)
     filters = latest_record.get("filters")
     normalized_filters = filters if isinstance(filters, dict) else {}
     return {

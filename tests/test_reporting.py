@@ -535,6 +535,69 @@ def test_latest_signal_report_repository_source_includes_jsonl_source_metadata(
     ]["passed"] is True
 
 
+def test_latest_signal_report_reuses_latest_record_source_repository_ref(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_repo_source_ref_reuse",
+        "run_id": "run_report_repo_source_ref_reuse",
+        "created_at": "2026-05-20T13:40:00Z",
+    }
+    source_repository_ref = {
+        "storage": "latest_signal_record_boundary",
+        "db_required": False,
+        "filters": {
+            "asset": "SSO",
+            "underlying": None,
+            "timeframe": "swing_3d_10d",
+        },
+    }
+
+    def fake_get_latest_signal_record(**kwargs: object) -> dict[str, object]:
+        assert kwargs == {
+            "ledger_path": str(ledger_path),
+            "database_path": None,
+            "asset": "SSO",
+            "underlying": None,
+            "timeframe": "swing_3d_10d",
+        }
+        return {
+            "status": "found",
+            "signal_id": stored_signal["signal_id"],
+            "ledger_ref": str(ledger_path),
+            "storage": "legacy_reconstructed_storage",
+            "db_required": False,
+            "filters": {
+                "asset": "SSO",
+                "underlying": None,
+                "timeframe": "swing_3d_10d",
+            },
+            "source_repository_ref": source_repository_ref,
+            "record": {"signal": stored_signal},
+            "label_outcome": None,
+            "missing_links": [],
+            "live_data_required": False,
+        }
+
+    monkeypatch.setattr(
+        reporting,
+        "get_latest_signal_record",
+        fake_get_latest_signal_record,
+    )
+    payload = generate_latest_signal_report(asset="sso", ledger_path=f" {ledger_path} ")
+
+    assert payload["source_repository_ref"] == source_repository_ref
+    assert payload["evidence_context"]["source_repository_ref"] == source_repository_ref
+    assert "legacy_reconstructed_storage" not in iter_nested_strings(
+        payload["source_repository_ref"]
+    )
+    assert str(ledger_path) not in iter_nested_strings(payload["source_repository_ref"])
+    assert payload["report_payload_guard"]["status"] == "ok"
+
+
 def test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_GATE
-review_tier: S0_trivial
+status: P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_GATE
+review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified latest signal repository boundary cleanup; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified latest signal source_repository_ref propagation; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -54,8 +54,9 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/recording.py
+  - src/halo_swing_mcp/tools/reporting.py
   - tests/test_mvp_tools.py
-  - tests/test_signal_repository.py
+  - tests/test_reporting.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -73,16 +74,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - obsolete tool-layer _select_latest_matching_record helper is removed
-  - get_latest_signal_record works through repository.latest_matching_record without repository.list_records
-  - existing JSONL and SQLite latest matching behavior remains unchanged
-  - missing-source structured error and path-free filter metadata remain unchanged
+  - get_latest_signal_record exposes path-free source_repository_ref with storage, db_required, and normalized filters
+  - source_repository_ref omits ledger_ref, ledger_path, database_path, SQLite filenames, and absolute local paths
+  - generate_latest_signal_report consumes source_repository_ref from get_latest_signal_record when present
+  - existing report source metadata and missing-source behavior remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -186,6 +187,48 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_GATE
+scope: path-free latest signal source_repository_ref and latest report propagation
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 924 passed in 48.24s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/recording.py
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_mvp_tools.py
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - get_latest_signal_record now includes source_repository_ref with storage, db_required, and normalized filters
+  - source_repository_ref omits ledger_ref, ledger_path, database_path, SQLite filenames, and absolute local paths
+  - generate_latest_signal_report now consumes latest_record.source_repository_ref when present
+  - existing report source metadata and missing-source behavior remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
 
 ```text
 status: passed
