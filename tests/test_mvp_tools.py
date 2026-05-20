@@ -23,6 +23,7 @@ from halo_swing_mcp.tools.market import (
 )
 from halo_swing_mcp.tools.recording import (
     evaluate_recorded_score_performance,
+    get_latest_signal_record,
     get_signal_replay_bundle,
     label_signal_outcome,
     record_signal,
@@ -1001,6 +1002,68 @@ def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
             == len(replay["artifact_refs"])
         )
     assert not (tmp_path / "signal_ledger.jsonl").exists()
+
+
+def test_get_latest_signal_record_reads_jsonl_and_sqlite(tmp_path: Path) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    database_path = tmp_path / "halo_swing.sqlite"
+    first_signal = {
+        **score_leverage_swing("TQQQ"),
+        "signal_id": "sig_latest_tqqq",
+        "run_id": "run_latest_tqqq",
+        "created_at": "2026-05-20T10:00:00Z",
+    }
+    second_signal = {
+        **score_leverage_swing("SSO"),
+        "signal_id": "sig_latest_sso",
+        "run_id": "run_latest_sso",
+        "created_at": "2026-05-20T11:00:00Z",
+    }
+
+    for repository_payload in (
+        {"ledger_path": f" {ledger_path} "},
+        {"database_path": f" {database_path} "},
+    ):
+        record_signal(signal=first_signal, **repository_payload)
+        record_signal(signal=second_signal, **repository_payload)
+        label_signal_outcome(
+            signal_id=second_signal["signal_id"],
+            **repository_payload,
+        )
+
+        latest = get_latest_signal_record(**repository_payload)
+        latest_tqqq = get_latest_signal_record(asset=" tqqq ", **repository_payload)
+        latest_spy = get_latest_signal_record(underlying=" spy ", **repository_payload)
+        missing = get_latest_signal_record(asset="SOXL", **repository_payload)
+
+        assert latest["status"] == "found"
+        assert latest["signal_id"] == second_signal["signal_id"]
+        assert latest["record"]["signal"]["asset"] == "SSO"
+        assert latest["record"]["run_journal"]["run_id"] == second_signal["run_id"]
+        assert latest["label_outcome"]["signal_id"] == second_signal["signal_id"]
+        assert latest["missing_links"] == []
+        assert latest["live_data_required"] is False
+
+        assert latest_tqqq["status"] == "found"
+        assert latest_tqqq["signal_id"] == first_signal["signal_id"]
+        assert latest_tqqq["filters"] == {"asset": "TQQQ", "underlying": None}
+        assert latest_spy["status"] == "found"
+        assert latest_spy["signal_id"] == second_signal["signal_id"]
+        assert latest_spy["filters"] == {"asset": None, "underlying": "SPY"}
+
+        assert missing["status"] == "not_found"
+        assert missing["record"] == {}
+        assert missing["label_outcome"] is None
+        assert missing["missing_links"] == [
+            {
+                "code": "MISSING_REQUIRED_LINK",
+                "message": (
+                    "no signal record matched the selected repository and filters"
+                ),
+                "missing_ref_type": "signal_ledger",
+                "missing_ref_id": "latest:asset=SOXL",
+            }
+        ]
 
 
 def test_signal_replay_bundle_reports_missing_signal(tmp_path: Path) -> None:

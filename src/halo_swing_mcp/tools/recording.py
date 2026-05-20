@@ -359,6 +359,77 @@ def get_signal_replay_bundle(
     ).model_dump(mode="json")
 
 
+def get_latest_signal_record(
+    ledger_path: str | None = None,
+    database_path: str | None = None,
+    asset: str | None = None,
+    underlying: str | None = None,
+) -> dict[str, Any]:
+    """Return the latest recorded signal, optionally constrained by asset keys."""
+
+    normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    normalized_database_path = _normalize_optional_path(database_path, "database_path")
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
+    normalized_asset = _normalize_optional_asset_filter(asset, "asset")
+    normalized_underlying = _normalize_optional_asset_filter(underlying, "underlying")
+
+    repository = get_signal_ledger_repository(
+        normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
+    record = _select_latest_matching_record(
+        repository.list_records(),
+        asset=normalized_asset,
+        underlying=normalized_underlying,
+    )
+    filters = {
+        "asset": normalized_asset,
+        "underlying": normalized_underlying,
+    }
+
+    if record is None:
+        return {
+            "status": "not_found",
+            "signal_id": None,
+            "ledger_ref": repository.ledger_ref,
+            "storage": repository.storage_name,
+            "db_required": repository.db_required,
+            "filters": filters,
+            "record": {},
+            "label_outcome": None,
+            "missing_links": [
+                ReplayMissingLinkError(
+                    code=ReplayErrorCode.MISSING_REQUIRED_LINK,
+                    message=(
+                        "no signal record matched the selected repository and filters"
+                    ),
+                    missing_ref_type="signal_ledger",
+                    missing_ref_id=_latest_signal_missing_ref_id(
+                        asset=normalized_asset,
+                        underlying=normalized_underlying,
+                    ),
+                ).model_dump(mode="json")
+            ],
+            "live_data_required": False,
+        }
+
+    signal = _expect_mapping(record.get("signal"), "record.signal")
+    labels = record.get("labels") if isinstance(record.get("labels"), list) else []
+    return {
+        "status": "found",
+        "signal_id": signal.get("signal_id"),
+        "ledger_ref": repository.ledger_ref,
+        "storage": repository.storage_name,
+        "db_required": repository.db_required,
+        "filters": filters,
+        "record": record,
+        "label_outcome": labels[-1] if labels else None,
+        "missing_links": [],
+        "live_data_required": _stored_record_live_data_required(record),
+    }
+
+
 def _normalize_signal_payload(signal: dict[str, Any] | None) -> dict[str, Any]:
     if signal is None:
         return score_leverage_swing()
@@ -429,6 +500,11 @@ def _normalize_optional_string_identity(value: str | None, field_name: str) -> s
     if not normalized:
         raise ValueError(f"{field_name} must be a nonempty string")
     return normalized
+
+
+def _normalize_optional_asset_filter(value: str | None, field_name: str) -> str | None:
+    normalized = _normalize_optional_string_identity(value, field_name)
+    return normalized.upper() if normalized is not None else None
 
 
 def _normalize_optional_path(value: str | None, field_name: str) -> str | None:
@@ -506,6 +582,40 @@ def _select_record(
         if record.get("signal", {}).get("signal_id") == signal_id:
             return record
     return None
+
+
+def _select_latest_matching_record(
+    records: list[dict[str, Any]],
+    *,
+    asset: str | None,
+    underlying: str | None,
+) -> dict[str, Any] | None:
+    for record in reversed(records):
+        signal = record.get("signal")
+        if not isinstance(signal, dict):
+            continue
+        if asset is not None and str(signal.get("asset", "")).upper() != asset:
+            continue
+        if (
+            underlying is not None
+            and str(signal.get("underlying", "")).upper() != underlying
+        ):
+            continue
+        return record
+    return None
+
+
+def _latest_signal_missing_ref_id(
+    *,
+    asset: str | None,
+    underlying: str | None,
+) -> str:
+    filters = []
+    if asset is not None:
+        filters.append(f"asset={asset}")
+    if underlying is not None:
+        filters.append(f"underlying={underlying}")
+    return "latest" if not filters else f"latest:{','.join(filters)}"
 
 
 def _run_journal(

@@ -1,31 +1,37 @@
 {
-  "gate_id": "P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.078",
-  "next_atomic_step": "no open code step remains after verified full strategy_config replay preservation; continue with next explicit repository or storage slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.079",
+  "next_atomic_step": "no open code step remains after verified latest signal record read tool; continue with next explicit repository or storage slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/signal_repository.py",
+    "README.md",
+    "docs/devops-setup-guide.md",
+    "src/halo_swing_mcp/server.py",
+    "src/halo_swing_mcp/tool_registry.py",
     "src/halo_swing_mcp/tools/recording.py",
+    "tests/golden/health_check.json",
+    "tests/golden/mvp_tool_contracts.json",
     "tests/test_mvp_tools.py",
-    "tests/test_signal_repository.py"
+    "tests/test_tool_registry.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.058",
+    "docs/halo-swing-development-plan.md#3.5.4",
     "docs/halo-swing-development-plan.md#3.5.6",
-    "migrations/202605100001_initial_replay_schema.sql",
+    "src/halo_swing_mcp/signal_repository.py",
     "src/halo_swing_mcp/tools/scoring.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
     "src/halo_swing_mcp/live_adapters/",
+    "migrations/",
     "data/",
     "artifacts/",
     "state/"
@@ -37,7 +43,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -52,11 +58,11 @@
     "read_only": true
   },
   "done_means": [
-    "record_signal stores full strategy_config details when the source signal provides them",
-    "JSONL replay returns strategy_config weights, thresholds, risk settings, version, and config_hash",
-    "SQLite replay stores and returns the same full strategy_config JSON through the strategy_config table",
-    "fallback minimal strategy_config remains available for caller-supplied legacy signals without strategy_config",
-    "tests validate config_hash, weights, thresholds, and risk settings survive record and replay paths",
+    "get_latest_signal_record is exposed through the shared tool registry, MCP server wrapper, CLI harness, health_check, and MVP manifest",
+    "the tool reads the latest recorded signal from JSONL and SQLite repositories using explicit ledger_path or database_path inputs",
+    "optional asset and underlying filters select the latest matching recorded signal without live data or network calls",
+    "empty repositories return a structured not_found result without creating repo data/state/artifact files",
+    "README and DevOps capability lists stay aligned with health_check",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],

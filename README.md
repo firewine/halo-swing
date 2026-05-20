@@ -82,6 +82,7 @@ record_signal
 label_signal_outcome
 evaluate_score_performance
 get_signal_replay_bundle
+get_latest_signal_record
 get_storage_health
 apply_storage_migrations
 suggest_weight_update
@@ -165,6 +166,9 @@ Signal labels support `TAKE_PROFIT_FIRST`, `STOP_LOSS_FIRST`, `TIME_EXIT`,
 realized R are calculated only inside `price_path[:time_barrier_days]`.
 `record_signal` stores a `run_journal.v1` entry in the JSONL ledger with
 run/config traceability, an idempotency key, and no-network/no-DB guards.
+After an explicit SQLite or JSONL repository path has records,
+`get_latest_signal_record` can read the newest matching signal by optional
+asset or underlying filter without enabling live data or env-based DB selection.
 `get_integration_readiness` reports blocked deployment gates without network
 calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
 macro, and news API-key readiness. Live data providers auto-select when their

@@ -36,6 +36,7 @@ from halo_swing_mcp.tools.market import (
 )
 from halo_swing_mcp.tools.recording import (
     evaluate_recorded_score_performance,
+    get_latest_signal_record,
     get_signal_replay_bundle,
     label_signal_outcome,
     record_signal,
@@ -176,6 +177,11 @@ TOOL_SPECS: tuple[ToolSpec, ...] = (
         "get_signal_replay_bundle",
         get_signal_replay_bundle,
         "Return one recorded signal replay bundle.",
+    ),
+    ToolSpec(
+        "get_latest_signal_record",
+        get_latest_signal_record,
+        "Return the latest recorded signal from a selected repository.",
     ),
     ToolSpec(
         "get_storage_health",

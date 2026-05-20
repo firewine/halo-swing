@@ -406,6 +406,28 @@ def get_signal_replay_bundle(
 
 
 @mcp.tool()
+def get_latest_signal_record(
+    ledger_path: str | None = None,
+    database_path: str | None = None,
+    asset: str | None = None,
+    underlying: str | None = None,
+) -> dict[str, Any]:
+    """Return the latest recorded signal from a selected repository."""
+
+    payload = {
+        "ledger_path": ledger_path,
+        "database_path": database_path,
+        "asset": asset,
+        "underlying": underlying,
+    }
+    return _audited_tool_call(
+        "get_latest_signal_record",
+        payload,
+        call_tool("get_latest_signal_record", payload),
+    )
+
+
+@mcp.tool()
 def get_storage_health(database_path: str) -> dict[str, Any]:
     """Return SQLite storage health for an explicit database path."""
 

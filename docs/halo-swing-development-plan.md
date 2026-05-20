@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.079 P1 Repository Latest Signal Record Gate Record - 2026-05-20
+
+### A. 목적
+
+P1 storage/schema decision log의 두 번째 질문은 최신 actionable report에 필요한
+핵심 필드를 빠르게 조회할 수 있는가이다. Repository 내부에는 최신 record 조회
+경계가 있지만, Hermes 없이 CLI/MCP에서 명시적 repository path로 확인하는 read
+tool surface는 아직 없다. 이번 slice는 JSONL과 SQLite repository의 최신 signal
+record를 결정론적으로 읽는 도구를 노출한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - expose get_latest_signal_record through registry, MCP server wrapper, CLI harness, health_check, and MVP manifest
+  - support explicit ledger_path or database_path inputs only
+  - support optional asset and underlying filters for latest matching signal lookup
+  - return structured not_found output for empty or unmatched repositories
+  - update README and DevOps capability lists to stay aligned with health_check
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 898 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or storage slice
+```
+
 ## 4.078 P1 Repository Replay Strategy Config Gate Record - 2026-05-20
 
 ### A. 목적

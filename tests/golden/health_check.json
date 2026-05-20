@@ -15,6 +15,7 @@
     "label_signal_outcome",
     "evaluate_score_performance",
     "get_signal_replay_bundle",
+    "get_latest_signal_record",
     "get_storage_health",
     "apply_storage_migrations",
     "suggest_weight_update",

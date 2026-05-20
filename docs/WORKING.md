@@ -42,25 +42,31 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_VERIFIED
-gate_id: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_GATE
+status: P1_REPOSITORY_LATEST_SIGNAL_RECORD_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_RECORD_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified full strategy_config replay preservation; continue with next explicit repository or storage slice
+next_atomic_step: no open code step remains after verified latest signal record read tool; continue with next explicit repository or storage slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/signal_repository.py
+  - README.md
+  - docs/devops-setup-guide.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
   - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
   - tests/test_mvp_tools.py
-  - tests/test_signal_repository.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
   - src/halo_swing_mcp/live_adapters/
+  - migrations/
   - data/
   - artifacts/
   - state/
@@ -73,17 +79,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - record_signal stores full strategy_config details when the source signal provides them
-  - JSONL replay returns strategy_config weights, thresholds, risk settings, version, and config_hash
-  - SQLite replay stores and returns the same full strategy_config JSON through the strategy_config table
-  - fallback minimal strategy_config remains available for caller-supplied legacy signals without strategy_config
-  - tests validate config_hash, weights, thresholds, and risk settings survive record and replay paths
+  - get_latest_signal_record is exposed through the shared tool registry, MCP server wrapper, CLI harness, health_check, and MVP manifest
+  - the tool reads the latest recorded signal from JSONL and SQLite repositories using explicit ledger_path or database_path inputs
+  - optional asset and underlying filters select the latest matching recorded signal without live data or network calls
+  - empty repositories return a structured not_found result without creating repo data/state/artifact files
+  - README and DevOps capability lists stay aligned with health_check
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -190,15 +196,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_GATE
-scope: full strategy_config preservation for JSONL and SQLite replay
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_RECORD_GATE
+scope: latest signal record read tool for JSONL and SQLite repositories
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -207,25 +213,30 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q: 7 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 37.51s
+  - git status --short --branch: modified expected docs/task/code/test/golden files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 5 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 898 passed in 37.71s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/signal_repository.py
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tool_registry.py
   - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
   - tests/test_mvp_tools.py
 next_state: continue with next explicit repository or storage slice
 notes:
-  - record_signal now stores full strategy_config details when the source signal provides them
-  - JSONL replay returns strategy_config weights, thresholds, risk settings, version, and config_hash
-  - SQLite replay stores and returns the same full strategy_config JSON through strategy_config.config_json
-  - fallback minimal strategy_config remains available for caller-supplied legacy signals without strategy_config
+  - get_latest_signal_record is now exposed through registry, MCP wrapper, CLI harness, health_check, and MVP manifest
+  - JSONL and SQLite explicit repository paths can return the latest signal record and latest matching asset/underlying filter
+  - empty or unmatched repositories return status=not_found with a structured missing link
+  - README and DevOps capability lists remain aligned with health_check
   - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 
