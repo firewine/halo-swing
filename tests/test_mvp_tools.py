@@ -8,6 +8,7 @@ import pytest
 
 from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.signal_repository import SQLiteSignalLedgerRepository
 from halo_swing_mcp.storage_migrations import DOMAIN_TABLES, get_storage_health
 from halo_swing_mcp.tools import scoring as scoring_tools
 from halo_swing_mcp.strategy import get_strategy_config, validate_strategy_config
@@ -1121,6 +1122,60 @@ def test_get_latest_signal_record_filters_by_timeframe(tmp_path: Path) -> None:
         assert missing["missing_links"][0]["missing_ref_id"] == (
             "latest:asset=TQQQ,timeframe=intraday"
         )
+
+
+def test_get_latest_signal_record_uses_sqlite_repository_query_surface(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    swing_signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_latest_sqlite_query_swing",
+        "run_id": "run_latest_sqlite_query_swing",
+        "created_at": "2026-05-20T10:00:00Z",
+    }
+    alternate_signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_5d_20d"),
+        "signal_id": "sig_latest_sqlite_query_alt",
+        "run_id": "run_latest_sqlite_query_alt",
+        "created_at": "2026-05-20T11:00:00Z",
+    }
+    record_signal(signal=swing_signal, database_path=str(database_path))
+    record_signal(signal=alternate_signal, database_path=str(database_path))
+
+    def unexpected_list_records(_self: SQLiteSignalLedgerRepository) -> list[dict]:
+        raise AssertionError("latest lookup must use the repository query surface")
+
+    monkeypatch.setattr(
+        SQLiteSignalLedgerRepository,
+        "list_records",
+        unexpected_list_records,
+    )
+
+    latest = get_latest_signal_record(
+        database_path=str(database_path),
+        asset="TQQQ",
+        timeframe="swing_3d_10d",
+    )
+    missing = get_latest_signal_record(
+        database_path=str(database_path),
+        asset="TQQQ",
+        timeframe="intraday",
+    )
+
+    assert latest["status"] == "found"
+    assert latest["signal_id"] == swing_signal["signal_id"]
+    assert latest["filters"] == {
+        "asset": "TQQQ",
+        "underlying": None,
+        "timeframe": "swing_3d_10d",
+    }
+    assert missing["status"] == "not_found"
+    assert missing["record"] == {}
+    assert missing["missing_links"][0]["missing_ref_id"] == (
+        "latest:asset=TQQQ,timeframe=intraday"
+    )
 
 
 def test_signal_replay_bundle_reports_missing_signal(tmp_path: Path) -> None:

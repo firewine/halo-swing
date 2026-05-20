@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.094 P1 Repository Latest Signal Searchable Query Gate Record - 2026-05-20
+
+### A. 목적
+
+P1 read-model의 searchable core fields는 `signal_ledger.asset`,
+`underlying`, `timeframe`, `created_at` 컬럼으로 질의 가능해야 한다.
+`get_latest_signal_record`는 JSONL/SQLite 양쪽을 지원하지만, 현재 SQLite path도
+전체 replay record를 hydrate한 뒤 Python에서 필터링한다. 이번 slice는 repository
+boundary에 latest matching query를 추가해 SQLite가 searchable core columns로
+필터링한 뒤 필요한 replay record만 hydrate하게 하고, JSONL behavior와 path-free
+missing-source metadata는 유지한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add repository-level latest_matching_record(asset, underlying, timeframe)
+  - make SQLite query signal_ledger searchable core columns before replay hydration
+  - keep JSONL latest matching behavior equivalent to existing reverse scan
+  - make get_latest_signal_record delegate matching to the repository boundary
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py::test_sqlite_signal_repository_latest_matching_record_uses_searchable_core_fields tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused repository latest query tests: 2 passed
+  - full pytest: 921 passed in 49.48s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.093 P1 Repository Latest Report Context Summary Text Guard Gate Record - 2026-05-20
 
 ### A. 목적

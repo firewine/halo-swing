@@ -380,8 +380,7 @@ def get_latest_signal_record(
         normalized_ledger_path,
         database_path=normalized_database_path,
     )
-    record = _select_latest_matching_record(
-        repository.list_records(),
+    record = repository.latest_matching_record(
         asset=normalized_asset,
         underlying=normalized_underlying,
         timeframe=normalized_timeframe,

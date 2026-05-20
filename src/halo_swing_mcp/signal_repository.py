@@ -36,6 +36,15 @@ class SignalLedgerRepository(Protocol):
     def latest_record(self) -> dict[str, Any] | None:
         """Return the newest ledger record if present."""
 
+    def latest_matching_record(
+        self,
+        *,
+        asset: str | None = None,
+        underlying: str | None = None,
+        timeframe: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Return the newest ledger record matching searchable signal fields."""
+
     def append_if_absent(
         self,
         *,
@@ -99,6 +108,23 @@ class JsonlSignalLedgerRepository:
     def latest_record(self) -> dict[str, Any] | None:
         records = self.list_records()
         return records[-1] if records else None
+
+    def latest_matching_record(
+        self,
+        *,
+        asset: str | None = None,
+        underlying: str | None = None,
+        timeframe: str | None = None,
+    ) -> dict[str, Any] | None:
+        for record in reversed(self.list_records()):
+            if _record_matches_signal_filters(
+                record,
+                asset=asset,
+                underlying=underlying,
+                timeframe=timeframe,
+            ):
+                return record
+        return None
 
     def append_if_absent(
         self,
@@ -211,6 +237,44 @@ class SQLiteSignalLedgerRepository:
                 LIMIT 1
                 """
             ).fetchone()
+            return self._record_from_row(connection, row) if row else None
+
+    def latest_matching_record(
+        self,
+        *,
+        asset: str | None = None,
+        underlying: str | None = None,
+        timeframe: str | None = None,
+    ) -> dict[str, Any] | None:
+        where_clauses: list[str] = []
+        parameters: list[str] = []
+        if asset is not None:
+            where_clauses.append("asset = ?")
+            parameters.append(asset)
+        if underlying is not None:
+            where_clauses.append("underlying = ?")
+            parameters.append(underlying)
+        if timeframe is not None:
+            where_clauses.append("timeframe = ?")
+            parameters.append(timeframe)
+
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+        query = f"""
+            SELECT
+                signal_id,
+                signal_json,
+                feature_snapshot_id,
+                evidence_card_ids_json,
+                artifact_ref_ids_json,
+                run_id,
+                config_hash
+            FROM signal_ledger
+            {where_sql}
+            ORDER BY created_at DESC, signal_id DESC
+            LIMIT 1
+            """
+        with self._connect() as connection:
+            row = connection.execute(query, parameters).fetchone()
             return self._record_from_row(connection, row) if row else None
 
     def append_if_absent(
@@ -570,6 +634,23 @@ def _normalize_ledger_path(value: str | os.PathLike[str], field_name: str) -> st
     if any(ord(character) < 32 or ord(character) == 127 for character in normalized):
         raise ValueError(f"{field_name} must not contain control characters")
     return normalized.strip()
+
+
+def _record_matches_signal_filters(
+    record: dict[str, Any],
+    *,
+    asset: str | None,
+    underlying: str | None,
+    timeframe: str | None,
+) -> bool:
+    signal = record.get("signal")
+    if not isinstance(signal, dict):
+        return False
+    if asset is not None and str(signal.get("asset", "")).upper() != asset:
+        return False
+    if underlying is not None and str(signal.get("underlying", "")).upper() != underlying:
+        return False
+    return timeframe is None or str(signal.get("timeframe", "")) == timeframe
 
 
 def _json_dumps(value: Any) -> str:
