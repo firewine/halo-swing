@@ -5524,6 +5524,10 @@ def _evidence_guard(
     ]
     if report["data_warnings"]:
         expected_guard_check_names.append("data_warnings_reflected_in_cautions")
+    if isinstance(report.get("label_status"), dict):
+        expected_guard_check_names.append(
+            "label_status_reflected_in_evidence_context"
+        )
     expected_guard_check_names.extend(
         [
             "evidence_guard_check_names_match_expected_schema",
@@ -5629,6 +5633,16 @@ def _evidence_guard(
                 "passed": all(warning in cautions for warning in report["data_warnings"]),
                 "expected": report["data_warnings"],
                 "actual": cautions,
+            }
+        )
+    if isinstance(report.get("label_status"), dict):
+        checks.append(
+            {
+                "name": "label_status_reflected_in_evidence_context",
+                "passed": evidence_context.get("label_status")
+                == report["label_status"],
+                "expected": report["label_status"],
+                "actual": evidence_context.get("label_status"),
             }
         )
     guard_check_names_actual = [

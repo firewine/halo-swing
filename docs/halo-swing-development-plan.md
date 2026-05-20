@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.088 P1 Repository Latest Report Evidence Label Status Guard Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed latest report의 `evidence_context.label_status`가
+`latest_signal_report.label_status`와 맞아야 한다는 계약은 현재 테스트로는 확인되지만,
+payload 자체의 `evidence_guard`에는 아직 이 검사가 없다. 이번 slice는 label 상태가
+있는 repository-backed report에서 guard가 해당 mirror 관계를 직접 검증하게 하고,
+label이 없는 default no-repository report의 golden snapshot은 그대로 둔다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add evidence_guard check for label_status_reflected_in_evidence_context
+  - include the check only when latest_signal_report.label_status is present
+  - keep default no-repository golden snapshot unchanged
+  - avoid schema migration, persistence, live adapters, or transport changes
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused evidence label status guard tests: 3 passed
+  - full pytest: 913 passed in 44.57s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.087 P1 Repository Latest Report Evidence Label Status Gate Record - 2026-05-20
 
 ### A. 목적

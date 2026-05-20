@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GATE
+status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GUARD_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GUARD_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest report evidence label status; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified repository-backed latest report evidence label status guard; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,16 +72,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report includes structured label_status in evidence_context when a stored label exists
-  - evidence_context label_status matches latest_signal_report label_status
-  - default no-repository evidence_context and golden snapshot remain unchanged
-  - evidence_context label_status does not expose ledger_path, database_path, SQLite filenames, or absolute local paths
+  - repository-backed generate_latest_signal_report evidence_guard validates evidence_context label_status mirrors latest_signal_report label_status
+  - guard check schema includes label_status_reflected_in_evidence_context only when report label_status is present
+  - default no-repository evidence_guard and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -185,6 +184,45 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GUARD_GATE
+scope: evidence_guard validation for repository-backed latest report evidence label status
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 913 passed in 44.57s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - evidence_guard now adds label_status_reflected_in_evidence_context when latest_signal_report.label_status is present
+  - repository-backed labeled report guard verifies evidence_context.label_status matches latest_signal_report.label_status
+  - default no-repository golden snapshot remains unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
 
 ```text
 status: passed

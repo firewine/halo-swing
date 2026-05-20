@@ -775,6 +775,49 @@ def test_latest_signal_report_repository_source_includes_jsonl_evidence_label_st
     )
 
 
+def test_latest_signal_report_repository_source_evidence_guard_validates_label_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_evidence_label_guard_jsonl",
+        "run_id": "run_report_evidence_label_guard_jsonl",
+        "created_at": "2026-05-20T14:07:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+    label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        ledger_path=str(ledger_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="SSO", ledger_path=str(ledger_path))
+    guard_checks = {
+        check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+
+    assert payload["evidence_guard"]["status"] == "ok"
+    assert guard_checks["label_status_reflected_in_evidence_context"] == {
+        "name": "label_status_reflected_in_evidence_context",
+        "passed": True,
+        "expected": payload["latest_signal_report"]["label_status"],
+        "actual": payload["evidence_context"]["label_status"],
+    }
+    assert "label_status_reflected_in_evidence_context" in guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "label_status_reflected_in_evidence_context" in guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
+
+
 def test_latest_signal_report_repository_source_includes_sqlite_label_status(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
