@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_INTRADAY_CONTEXT_SUMMARY_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_INTRADAY_CONTEXT_SUMMARY_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SUMMARY_TEXT_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SUMMARY_TEXT_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified SQLite intraday latest report context summary coverage; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified SQLite latest report source summary text coverage; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -71,16 +71,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed intraday_risk_watch latest reports preserve repository source summary in the Cautions fallback section and text
-  - SQLite repository-backed intraday_risk_watch latest reports preserve stored label summary in the Cautions fallback section and text
-  - intraday_risk_watch output remains aligned to Target, Decision, Stop, Cautions with no Reasons section
-  - SQLite intraday context summary text remains path-free and omits database path details
+  - SQLite repository-backed default latest reports preserve repository source summary in the Reasons section and text
+  - SQLite source summary text remains path-free and omits database path details
+  - SQLite source summary coverage stays aligned with existing SQLite source metadata guard coverage
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -185,6 +184,47 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SUMMARY_TEXT_COVERAGE_GATE
+scope: SQLite repository-backed default latest report source summary sections/text coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 933 passed in 44.56s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite repository-backed default latest reports now have direct coverage for source summary in Reasons/text
+  - SQLite source summary output omits database path details and SQLite filenames
+  - existing SQLite source metadata guard coverage remains unchanged
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed

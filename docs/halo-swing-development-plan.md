@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.105 P1 Repository SQLite Latest Report Source Summary Text Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.104에서 SQLite repository-backed `intraday_risk_watch` latest report가 `Reasons` 없는
+intent에서도 repository source summary를 fallback section/text에 유지함을 고정했다.
+하지만 기본 latest report의 `Reasons` 섹션과 text에 SQLite repository source summary가
+직접 표시되는지는 JSONL coverage에 비해 아직 단독 검증이 약하다. 이번 slice는 명시적
+`database_path` SQLite latest report에서도 source summary가 user-facing default report에
+path-free로 표시됨을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add SQLite repository-backed latest report source summary sections/text coverage
+  - assert source summary appears in the default Reasons section and report text
+  - assert source summary omits database path and SQLite filenames
+  - keep existing SQLite source metadata guard coverage unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite source summary text coverage tests: 3 passed
+  - full pytest: 933 passed in 44.56s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.104 P1 Repository SQLite Latest Report Intraday Context Summary Coverage Gate Record - 2026-05-20
 
 ### A. 목적

@@ -1016,6 +1016,57 @@ def test_latest_signal_report_repository_source_includes_sqlite_source_metadata(
     }
 
 
+def test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD", timeframe="swing_5d_20d"),
+        "signal_id": "sig_report_repo_source_summary_sqlite",
+        "run_id": "run_report_repo_source_summary_sqlite",
+        "created_at": "2026-05-20T13:47:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        timeframe=" swing_5d_20d ",
+        database_path=f" {database_path} ",
+    )
+    reasons = next(
+        section for section in payload["sections"] if section["title"] == "Reasons"
+    )
+    source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=QLD underlying=<any> timeframe=swing_5d_20d"
+    )
+
+    assert source_summary in reasons["items"]
+    assert f"- {source_summary}" in payload["text"]
+    assert payload["source_repository_ref"] == {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "QLD",
+            "underlying": None,
+            "timeframe": "swing_5d_20d",
+        },
+    }
+    assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(reasons)
+    assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(reasons)
+    )
+
+
 def test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
