@@ -191,6 +191,20 @@ outside the repository, and rotate or delete old local copies manually according
 to your local retention policy. Do not commit backups, dumps, WAL/SHM sidecars,
 or copied database files.
 
+P1 storage/repository final verification is local and offline:
+
+```bash
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_signal_repository.py -q
+PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py tests/test_mvp_tools.py tests/test_tool_registry.py -q
+PYTHONPATH=src ./.venv/bin/python -m pytest
+PYTHONPATH=src ./.venv/bin/python -m ruff check .
+```
+
+The verification path must stay fixture/tmp_path based: no live network calls,
+no Hermes runtime start, no Telegram send, no broker/order submission, no
+automatic `.env` database activation, and no committed SQLite data files.
+
 Indicator timeframe smoke:
 
 ```bash

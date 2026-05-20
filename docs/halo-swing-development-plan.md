@@ -776,6 +776,42 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.062 P1 Docs DevOps Storage Final Verification Guide Record - 2026-05-20
+
+### A. 목적
+
+P1 storage/repository docs_devops sign-off의 `final verification 확인`
+항목을 DevOps guide와 테스트로 고정했다. 검증 경로는 local/offline,
+fixture/tmp_path 기반이며, live network, Hermes runtime, Telegram send,
+broker/order submission, automatic `.env` DB activation, committed SQLite
+파일을 포함하지 않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md documents P1 storage/repository final verification commands
+  - docs/devops-setup-guide.md documents final verification safety boundaries
+  - tests/test_setup_docs.py covers the final verification command set and safety wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+```
+
 ## 4.061 P1 Docs DevOps SQLite Backup Retention Guide Record - 2026-05-20
 
 ### A. 목적

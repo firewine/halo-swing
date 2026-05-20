@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_VERIFIED
-gate_id: P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE
+status: DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_VERIFIED
+gate_id: P1_DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified SQLite backup and retention guide update; continue with next explicit repository/docs_devops slice from SSOT
+next_atomic_step: no open code step remains after verified P1 storage final verification guide update; continue with next explicit repository/docs_devops slice from SSOT
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,16 +72,17 @@ required_verification:
   - git diff --check
   - git status --short --branch
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - DevOps guide documents SQLite repository backup responsibility after REPOSITORY_GO
-  - DevOps guide documents SQLite repository retention remains manual and local until tooling exists
-  - DevOps guide keeps SQLite repository files, backups, dumps, and WAL/SHM sidecars out of committed repo artifacts
-  - setup docs tests cover the SQLite backup and retention wording
+  - DevOps guide documents the P1 storage/repository final verification command set
+  - DevOps guide keeps the final verification path local, offline, fixture-backed, and tmp_path-backed
+  - DevOps guide states final verification must not start Hermes, send Telegram, submit broker orders, call live networks, auto-activate database envs, or commit SQLite files
+  - setup docs tests cover the final verification command set and safety boundary
   - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added
-  - verification passes
+  - verification passes, including full pytest
 
 approval_source: "user message: REPOSITORY_GO 승인"
 next_state_after_success: continue with next explicit repository/docs_devops slice from SSOT
@@ -186,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE
-scope: DevOps guide SQLite backup and retention note after REPOSITORY_GO
+gate_id: P1_DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_GATE
+scope: DevOps guide P1 storage/repository final verification commands after REPOSITORY_GO
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -195,6 +196,7 @@ commands:
   - git diff --check
   - git status --short --branch
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 results:
@@ -204,6 +206,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
@@ -215,9 +218,9 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: continue with next explicit repository/docs_devops slice from SSOT
 notes:
-  - DevOps guide documents SQLite repository files as local operational state
-  - SQLite backup tooling and retention automation remain not implemented in this slice
-  - guide tells operators not to commit SQLite files, backups, dumps, WAL/SHM sidecars, or copied DB files
+  - DevOps guide documents P1 storage/repository final verification commands
+  - final verification is documented as local/offline and fixture/tmp_path based
+  - guide states final verification must not start Hermes, send Telegram, submit broker orders, call live networks, auto-activate database envs, or commit SQLite files
   - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE",
+  "gate_id": "P1_DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_GATE",
   "mode": "implement",
-  "status": "DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_VERIFIED",
+  "status": "DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified SQLite backup and retention guide update; continue with next explicit repository/docs_devops slice from SSOT",
+  "next_atomic_step": "no open code step remains after verified P1 storage final verification guide update; continue with next explicit repository/docs_devops slice from SSOT",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -17,7 +17,7 @@
     "AGENTS.md",
     "docs/WORKING.md",
     "docs/halo-swing-development-plan.md#3.5",
-    "docs/halo-swing-development-plan.md#4.060",
+    "docs/halo-swing-development-plan.md#4.061",
     "docs/devops-setup-guide.md"
   ],
   "blocked_path_prefixes": [
@@ -35,6 +35,7 @@
     "git diff --check",
     "git status --short --branch",
     "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
   ],
@@ -48,12 +49,12 @@
     "read_only": true
   },
   "done_means": [
-    "DevOps guide documents SQLite repository backup responsibility after REPOSITORY_GO",
-    "DevOps guide documents SQLite repository retention remains manual and local until tooling exists",
-    "DevOps guide keeps SQLite repository files, backups, dumps, and WAL/SHM sidecars out of committed repo artifacts",
-    "setup docs tests cover the SQLite backup and retention wording",
+    "DevOps guide documents the P1 storage/repository final verification command set",
+    "DevOps guide keeps the final verification path local, offline, fixture-backed, and tmp_path-backed",
+    "DevOps guide states final verification must not start Hermes, send Telegram, submit broker orders, call live networks, auto-activate database envs, or commit SQLite files",
+    "setup docs tests cover the final verification command set and safety boundary",
     "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added",
-    "verification passes"
+    "verification passes, including full pytest"
   ],
   "approval_source": "user message: REPOSITORY_GO 승인",
   "repository_defaults": {
@@ -61,6 +62,7 @@
     "default_repository": "jsonl_signal_ledger_record",
     "sqlite_repository": "sqlite_signal_repository",
     "backup_retention_policy": "manual_local_operator_responsibility_until_tooling_exists",
+    "final_verification_policy": "local_offline_fixture_tmp_path_only",
     "test_database_policy": "tmp_path_only"
   },
   "next_state_after_success": "continue with next explicit repository/docs_devops slice from SSOT"

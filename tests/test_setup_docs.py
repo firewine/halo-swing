@@ -158,6 +158,12 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "does not yet\nship backup tooling or retention automation" in guide
     assert "SQLite-safe tooling\noutside the repository" in guide
     assert "Do not commit backups, dumps, WAL/SHM sidecars" in guide
+    assert "P1 storage/repository final verification is local and offline" in guide
+    assert "tests/test_storage_migrations.py tests/test_signal_repository.py -q" in guide
+    assert "tests/test_contracts.py tests/test_mvp_tools.py tests/test_tool_registry.py -q" in guide
+    assert "PYTHONPATH=src ./.venv/bin/python -m pytest" in guide
+    assert "no live network calls" in guide
+    assert "no automatic `.env` database activation" in guide_text
     assert "MIGRATION_GO` and `REPOSITORY_GO` still stay\nblocked" not in guide
     assert "durable\nstorage approvals recorded in the SSOT" in guide
     assert "explicit `database_path` tool inputs" in guide
