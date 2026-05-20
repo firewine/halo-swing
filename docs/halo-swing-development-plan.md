@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.086 P1 Repository Latest Report Evidence Source Metadata Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed `generate_latest_signal_report`는 path-free
+`source_repository_ref`를 top-level payload에 드러낸다. 하지만 Hermes가 요약 근거로
+소비하는 `evidence_context`에는 아직 source repository metadata가 없어, 저장된
+신호를 사용했다는 provenance가 LLM-facing evidence context에서 빠진다. 이번 slice는
+default no-repository report를 바꾸지 않고 repository-backed evidence context에만
+동일한 path-free source metadata를 포함한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - include source_repository_ref in evidence_context only for repository-backed reports
+  - keep evidence_context path-free and aligned with top-level source_repository_ref
+  - keep default no-repository golden snapshot unchanged
+  - avoid schema migration, persistence, live adapters, or transport changes
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused evidence source metadata tests: 3 passed
+  - full pytest: 911 passed in 45.24s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.085 P1 Repository Latest Report Missing Source Filter Error Gate Record - 2026-05-20
 
 ### A. 목적

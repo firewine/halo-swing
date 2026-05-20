@@ -42,19 +42,17 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_MISSING_SOURCE_FILTER_ERROR_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_MISSING_SOURCE_FILTER_ERROR_GATE
+status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest report missing-source filter errors; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified repository-backed latest report evidence source metadata; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - README.md
-  - docs/devops-setup-guide.md
   - src/halo_swing_mcp/tools/reporting.py
   - tests/test_reporting.py
 
@@ -74,16 +72,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_missing_repository_source_error_includes_path_free_filters tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report missing-source errors include normalized asset, underlying, and timeframe filter evidence
-  - missing-source errors do not include ledger_path, database_path, SQLite filenames, or absolute local paths
+  - repository-backed generate_latest_signal_report includes path-free source_repository_ref in evidence_context
+  - default no-repository evidence_context and golden snapshot remain unchanged
+  - evidence_context source_repository_ref matches top-level source_repository_ref when present
+  - evidence_context source_repository_ref does not expose ledger_path, database_path, SQLite filenames, or absolute local paths
   - default no-repository report behavior and golden snapshot remain unchanged
-  - existing missing-repository source rejection behavior remains a ValueError
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -190,15 +189,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_LATEST_REPORT_MISSING_SOURCE_FILTER_ERROR_GATE
-scope: path-free normalized filter evidence in repository-backed latest report missing-source errors
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_GATE
+scope: path-free source repository metadata in repository-backed latest report evidence_context
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_missing_repository_source_error_includes_path_free_filters tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -208,8 +207,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_missing_repository_source_error_includes_path_free_filters tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q: 3 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 910 passed in 43.86s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 911 passed in 45.24s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -221,10 +220,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - repository-backed latest report missing-source errors now include normalized asset, underlying, and timeframe filters
-  - missing-source errors omit ledger_path, database_path, SQLite filenames, absolute local paths, and repository refs
-  - default no-repository latest report golden snapshot remains unchanged
-  - existing missing repository source behavior remains a ValueError
+  - repository-backed latest report evidence_context now includes source_repository_ref
+  - evidence_context source_repository_ref matches the top-level source_repository_ref
+  - evidence_context source_repository_ref omits ledger_path, database_path, SQLite filenames, and absolute local paths
+  - default no-repository latest report golden snapshot and evidence_context remain unchanged
   - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 

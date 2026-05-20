@@ -535,6 +535,40 @@ def test_latest_signal_report_repository_source_includes_jsonl_source_metadata(
     ]["passed"] is True
 
 
+def test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_repo_evidence_meta_jsonl",
+        "run_id": "run_report_repo_evidence_meta_jsonl",
+        "created_at": "2026-05-20T13:35:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="SSO", ledger_path=str(ledger_path))
+    evidence_source_ref = payload["evidence_context"]["source_repository_ref"]
+
+    assert evidence_source_ref == payload["source_repository_ref"]
+    assert evidence_source_ref["storage"] == "jsonl_signal_ledger_record"
+    assert evidence_source_ref["filters"] == {
+        "asset": "SSO",
+        "underlying": None,
+        "timeframe": "swing_3d_10d",
+    }
+    assert str(ledger_path) not in iter_nested_strings(evidence_source_ref)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_source_ref)
+    )
+
+
 def test_latest_signal_report_repository_source_includes_sqlite_source_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

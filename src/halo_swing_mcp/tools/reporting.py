@@ -141,7 +141,11 @@ def generate_latest_signal_report(
         delivery_contract=delivery_contract,
         structured_payload_key="latest_signal_report",
     )
-    evidence_context = _evidence_context(signal, report)
+    evidence_context = _evidence_context(
+        signal,
+        report,
+        source_repository_ref=source_repository_ref,
+    )
     payload_live_data_required = bool(signal.get("live_data_required"))
     payload = {
         "schema_version": REPORT_SCHEMA_VERSION,
@@ -964,6 +968,7 @@ def _format_position_review_text(
 def _evidence_context(
     signal: dict[str, Any],
     report: dict[str, Any],
+    source_repository_ref: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     components = dict(signal.get("component_scores") or {})
     scored_components = {
@@ -973,7 +978,7 @@ def _evidence_context(
     }
     strongest = max(scored_components, key=scored_components.get)
     weakest = min(scored_components, key=scored_components.get)
-    return {
+    context = {
         "reason_summary": report["reason_summary"],
         "evidence_summary": report["evidence_summary"],
         "risk_warnings": list(signal.get("risk_warnings") or []),
@@ -993,6 +998,9 @@ def _evidence_context(
         },
         "conflict_flags": _evidence_conflict_flags(signal, report),
     }
+    if source_repository_ref is not None:
+        context["source_repository_ref"] = dict(source_repository_ref)
+    return context
 
 
 def _multimodal_context(
