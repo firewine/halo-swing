@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.082 P1 Repository Latest Report Label Status Gate Record - 2026-05-20
+
+### A. 목적
+
+`latest_signal_report` DTO는 optional `label_status`를 갖고, repository-backed
+latest record는 `label_outcome`을 반환한다. 하지만 repository-backed
+`generate_latest_signal_report`는 아직 저장된 label을 report read-model에
+반영하지 않는다. 이번 slice는 저장된 최신 label outcome을 report의
+`label_status`로 드러내어 최신 리포트가 label_store 연결 상태를 확인할 수 있게
+한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - map repository latest label_outcome into latest_signal_report.label_status
+  - keep LatestSignalReport label_status structured instead of scalar text
+  - preserve schema_version, outcome, realized_r, first_barrier_hit, labeled_at, and time_barrier_days
+  - cover JSONL and SQLite repository-backed latest reports
+  - keep unlabeled/default no-repository reports at label_status=null
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_latest_signal_report_accepts_structured_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused label status/contract/report tests: 4 passed
+  - full pytest: 906 passed in 37.79s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.081 P1 Repository Latest Signal Timeframe Filter Gate Record - 2026-05-20
 
 ### A. 목적

@@ -13,7 +13,7 @@ from halo_swing_mcp.tools.market import (
     create_document_evidence_card,
 )
 from halo_swing_mcp.tools import reporting
-from halo_swing_mcp.tools.recording import record_signal
+from halo_swing_mcp.tools.recording import label_signal_outcome, record_signal
 from halo_swing_mcp.tools.reporting import (
     generate_cron_prompt_pack,
     generate_latest_signal_report,
@@ -523,6 +523,83 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
     assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
+
+
+def test_latest_signal_report_repository_source_includes_jsonl_label_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_label_jsonl",
+        "run_id": "run_report_label_jsonl",
+        "created_at": "2026-05-20T14:00:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        ledger_path=str(ledger_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="SSO", ledger_path=str(ledger_path))
+    label_status = payload["latest_signal_report"]["label_status"]
+
+    assert label_status == {
+        "schema_version": "signal_label_outcome.v1",
+        "signal_id": stored_signal["signal_id"],
+        "outcome": label["outcome"],
+        "realized_r": label["realized_r"],
+        "first_barrier_hit": label["first_barrier_hit"],
+        "labeled_at": label["labeled_at"],
+        "time_barrier_days": label["time_barrier_days"],
+        "live_data_required": False,
+    }
+
+
+def test_latest_signal_report_repository_source_includes_sqlite_label_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD"),
+        "signal_id": "sig_report_label_sqlite",
+        "run_id": "run_report_label_sqlite",
+        "created_at": "2026-05-20T15:00:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        database_path=str(database_path),
+    )
+    label_status = payload["latest_signal_report"]["label_status"]
+
+    assert label_status["schema_version"] == "signal_label_outcome.v1"
+    assert label_status["signal_id"] == stored_signal["signal_id"]
+    assert label_status["outcome"] == label["outcome"]
+    assert label_status["realized_r"] == label["realized_r"]
+    assert label_status["first_barrier_hit"] == label["first_barrier_hit"]
+    assert label_status["labeled_at"] == label["labeled_at"]
+    assert label_status["time_barrier_days"] == label["time_barrier_days"]
+    assert label_status["live_data_required"] is False
 
 
 def test_latest_signal_report_rejects_missing_repository_source(

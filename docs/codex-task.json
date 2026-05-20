@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_TIMEFRAME_FILTER_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_REPORT_LABEL_STATUS_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_SIGNAL_TIMEFRAME_FILTER_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_REPORT_LABEL_STATUS_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.081",
-  "next_atomic_step": "no open code step remains after verified latest signal timeframe filtering; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.082",
+  "next_atomic_step": "no open code step remains after verified repository-backed latest report label_status; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -12,19 +12,17 @@
     "docs/halo-swing-development-plan.md",
     "README.md",
     "docs/devops-setup-guide.md",
-    "src/halo_swing_mcp/server.py",
-    "src/halo_swing_mcp/tools/recording.py",
+    "src/halo_swing_mcp/contracts.py",
     "src/halo_swing_mcp/tools/reporting.py",
-    "tests/test_mvp_tools.py",
-    "tests/test_reporting.py",
-    "tests/test_tool_registry.py"
+    "tests/test_contracts.py",
+    "tests/test_reporting.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.5.3",
     "docs/halo-swing-development-plan.md#3.5.4",
-    "docs/halo-swing-development-plan.md#3.5.6"
+    "docs/halo-swing-development-plan.md#3.5.6",
+    "src/halo_swing_mcp/tools/recording.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -41,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_latest_signal_report_accepts_structured_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -56,11 +54,11 @@
     "read_only": true
   },
   "done_means": [
-    "get_latest_signal_record accepts an optional timeframe filter and includes it in returned filters and missing-link refs",
-    "JSONL and SQLite latest record lookup select the latest signal matching asset, underlying, and timeframe",
-    "generate_latest_signal_report passes its normalized timeframe into repository-backed latest signal source selection",
-    "repository-backed reports no longer use a latest same-asset signal from a different timeframe",
-    "default no-repository report behavior remains unchanged",
+    "repository-backed generate_latest_signal_report maps latest label_outcome into latest_signal_report.label_status",
+    "LatestSignalReport accepts structured label_status with label outcome summary fields",
+    "label_status preserves label schema_version, outcome, realized_r, first_barrier_hit, labeled_at, and time_barrier_days without adding live data or network calls",
+    "JSONL and SQLite repository-backed latest reports both expose label_status when a label exists",
+    "unlabeled and default no-repository report behavior remain unchanged with label_status null",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],

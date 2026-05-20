@@ -63,6 +63,17 @@ class ArtifactRef(StrictBaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class ReportLabelStatus(StrictBaseModel):
+    schema_version: str
+    signal_id: str
+    outcome: LabelOutcome
+    realized_r: float
+    first_barrier_hit: str | None = None
+    labeled_at: str
+    time_barrier_days: int
+    live_data_required: bool
+
+
 class ReplayMissingLinkError(StrictBaseModel):
     code: ReplayErrorCode
     message: str
@@ -91,7 +102,7 @@ class LatestSignalReport(StrictBaseModel):
     config_hash: str
     reason_summary: str | None = None
     evidence_summary: str | None = None
-    label_status: str | None = None
+    label_status: ReportLabelStatus | None = None
     chart_ref: ArtifactRef | None = None
 
 
@@ -122,6 +133,7 @@ __all__ = [
     "DataFreshnessStatus",
     "LatestSignalReport",
     "LabelOutcome",
+    "ReportLabelStatus",
     "ReplayErrorCode",
     "ReplayMissingLinkError",
     "SignalReplayBundle",

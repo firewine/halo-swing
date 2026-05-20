@@ -95,6 +95,24 @@ def test_latest_signal_report_fixtures_validate_and_contrast() -> None:
             assert value.strip()
 
 
+def test_latest_signal_report_accepts_structured_label_status() -> None:
+    payload = load_json("latest_signal_report.json")
+    payload["label_status"] = {
+        "schema_version": "signal_label_outcome.v1",
+        "signal_id": payload["signal_id"],
+        "outcome": "TAKE_PROFIT_FIRST",
+        "realized_r": 2.0,
+        "first_barrier_hit": "take_profit",
+        "labeled_at": "2026-05-20T00:00:00Z",
+        "time_barrier_days": 2,
+        "live_data_required": False,
+    }
+
+    report = LatestSignalReport.model_validate(payload).model_dump(mode="json")
+
+    assert report["label_status"] == payload["label_status"]
+
+
 def test_signal_replay_bundle_fixture_validates_and_preserves_links() -> None:
     payload = load_json("signal_replay_bundle.json")
     bundle = SignalReplayBundle.model_validate(payload)

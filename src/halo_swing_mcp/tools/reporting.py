@@ -670,7 +670,32 @@ def _latest_report_source_signal(
     record = latest_record.get("record")
     if not isinstance(record, dict) or not isinstance(record.get("signal"), dict):
         raise ValueError("latest signal report source record.signal must be an object")
-    return record["signal"]
+    signal = dict(record["signal"])
+    label_status = _report_label_status_from_outcome(latest_record.get("label_outcome"))
+    if label_status is not None:
+        signal["label_status"] = label_status
+    return signal
+
+
+def _report_label_status_from_outcome(label_outcome: Any) -> dict[str, Any] | None:
+    if not isinstance(label_outcome, dict):
+        return None
+    label_contract = label_outcome.get("label_contract")
+    schema_version = (
+        label_contract.get("schema_version")
+        if isinstance(label_contract, dict)
+        else None
+    )
+    return {
+        "schema_version": schema_version,
+        "signal_id": label_outcome.get("signal_id"),
+        "outcome": label_outcome.get("outcome"),
+        "realized_r": label_outcome.get("realized_r"),
+        "first_barrier_hit": label_outcome.get("first_barrier_hit"),
+        "labeled_at": label_outcome.get("labeled_at"),
+        "time_barrier_days": label_outcome.get("time_barrier_days"),
+        "live_data_required": bool(label_outcome.get("live_data_required")),
+    }
 
 
 def _report_sections(

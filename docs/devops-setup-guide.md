@@ -187,8 +187,8 @@ The SQLite path applies migrations idempotently, stores `run_journal`,
 return replay sections plus structured missing-link errors, lets
 `get_latest_signal_record` read the latest matching asset/timeframe signal for
 report-oriented checks, lets `generate_latest_signal_report` build from the
-stored latest signal, and exposes `get_storage_health` for migration/table
-checks.
+stored latest signal and its label status when labeled, and exposes
+`get_storage_health` for migration/table checks.
 `apply_storage_migrations` can apply the same idempotent migration runner
 explicitly before repository writes. The default JSONL path remains available
 for lightweight local smoke runs.
