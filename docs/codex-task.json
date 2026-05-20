@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_REPORT_SOURCE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_SIGNAL_REPORT_SOURCE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.079",
-  "next_atomic_step": "no open code step remains after verified latest signal record read tool; continue with next explicit repository or storage slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.080",
+  "next_atomic_step": "no open code step remains after verified repository-backed latest signal report source; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -13,19 +13,15 @@
     "README.md",
     "docs/devops-setup-guide.md",
     "src/halo_swing_mcp/server.py",
-    "src/halo_swing_mcp/tool_registry.py",
-    "src/halo_swing_mcp/tools/recording.py",
-    "tests/golden/health_check.json",
-    "tests/golden/mvp_tool_contracts.json",
-    "tests/test_mvp_tools.py",
-    "tests/test_tool_registry.py"
+    "src/halo_swing_mcp/tools/reporting.py",
+    "tests/test_reporting.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
     "docs/halo-swing-development-plan.md#3.5.4",
     "docs/halo-swing-development-plan.md#3.5.6",
-    "src/halo_swing_mcp/signal_repository.py",
+    "src/halo_swing_mcp/tools/recording.py",
     "src/halo_swing_mcp/tools/scoring.py"
   ],
   "blocked_path_prefixes": [
@@ -43,7 +39,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_reads_jsonl_and_sqlite tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_can_use_jsonl_repository_source tests/test_reporting.py::test_latest_signal_report_can_use_sqlite_repository_source tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -58,14 +54,14 @@
     "read_only": true
   },
   "done_means": [
-    "get_latest_signal_record is exposed through the shared tool registry, MCP server wrapper, CLI harness, health_check, and MVP manifest",
-    "the tool reads the latest recorded signal from JSONL and SQLite repositories using explicit ledger_path or database_path inputs",
-    "optional asset and underlying filters select the latest matching recorded signal without live data or network calls",
-    "empty repositories return a structured not_found result without creating repo data/state/artifact files",
-    "README and DevOps capability lists stay aligned with health_check",
+    "generate_latest_signal_report accepts explicit ledger_path or database_path inputs and rejects using both",
+    "when a repository path is provided, the report source signal comes from get_latest_signal_record instead of fresh score_leverage_swing output",
+    "source_signal_ref, latest_signal_report identity fields, report sections, and guards reflect the stored signal",
+    "missing repository source returns a clear ValueError instead of silently falling back to fixture scoring",
+    "default no-repository report behavior and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],
   "approval_source": "user objective: 개발문서 목표확인해서 계속 개발진행해",
-  "next_state_after_success": "continue with next explicit repository or storage slice"
+  "next_state_after_success": "continue with next explicit repository or report read-model slice"
 }

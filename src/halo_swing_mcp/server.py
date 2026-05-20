@@ -478,6 +478,8 @@ def generate_latest_signal_report(
     chart_timeframe: str = "1d",
     chart_output_dir: str | None = None,
     extra_evidence_cards: list[dict[str, Any]] | None = None,
+    ledger_path: str | None = None,
+    database_path: str | None = None,
 ) -> dict[str, Any]:
     """Generate a deterministic Hermes-facing latest signal report."""
 
@@ -489,6 +491,8 @@ def generate_latest_signal_report(
         "chart_timeframe": chart_timeframe,
         "chart_output_dir": chart_output_dir,
         "extra_evidence_cards": extra_evidence_cards,
+        "ledger_path": ledger_path,
+        "database_path": database_path,
     }
     return _audited_tool_call(
         "generate_latest_signal_report",

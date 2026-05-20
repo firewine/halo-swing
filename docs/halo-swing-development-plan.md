@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.080 P1 Repository Latest Signal Report Source Gate Record - 2026-05-20
+
+### A. 목적
+
+`get_latest_signal_record`가 JSONL/SQLite repository의 최신 signal record를
+읽을 수 있게 되었지만, `generate_latest_signal_report`는 여전히 항상 fixture
+scoring output을 새로 만든다. P1의 "최신 actionable report" read-model 목표에
+맞게, 명시적 repository path가 주어졌을 때 latest signal report가 저장된 최신
+signal을 source of truth로 사용하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add explicit ledger_path/database_path inputs to generate_latest_signal_report
+  - keep default no-repository report behavior unchanged
+  - when repository path is provided, read latest matching signal through get_latest_signal_record
+  - make source_signal_ref, latest_signal_report identity, sections, and guards reflect the stored signal
+  - reject missing repository source instead of silently falling back to fixture scoring
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_can_use_jsonl_repository_source tests/test_reporting.py::test_latest_signal_report_can_use_sqlite_repository_source tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 901 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.079 P1 Repository Latest Signal Record Gate Record - 2026-05-20
 
 ### A. 목적

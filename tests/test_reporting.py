@@ -13,6 +13,7 @@ from halo_swing_mcp.tools.market import (
     create_document_evidence_card,
 )
 from halo_swing_mcp.tools import reporting
+from halo_swing_mcp.tools.recording import record_signal
 from halo_swing_mcp.tools.reporting import (
     generate_cron_prompt_pack,
     generate_latest_signal_report,
@@ -427,6 +428,89 @@ def test_latest_signal_report_snapshot_matches_golden() -> None:
 
     assert payload == load_golden()
     LatestSignalReport.model_validate(payload["latest_signal_report"])
+
+
+def test_latest_signal_report_can_use_jsonl_repository_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_repo_sso",
+        "run_id": "run_report_repo_sso",
+        "created_at": "2026-05-20T12:00:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="SSO", ledger_path=f" {ledger_path} ")
+
+    assert payload["latest_signal_report"]["signal_id"] == stored_signal["signal_id"]
+    assert payload["latest_signal_report"]["asset"] == "SSO"
+    assert payload["latest_signal_report"]["created_at"] == stored_signal["created_at"]
+    assert payload["source_signal_ref"] == {
+        "signal_id": stored_signal["signal_id"],
+        "run_id": stored_signal["run_id"],
+        "config_hash": stored_signal["config_hash"],
+    }
+    assert payload["sections"][0]["items"] == ["SSO / SPY"]
+    assert payload["report_contract_guard"]["status"] == "ok"
+
+
+def test_latest_signal_report_can_use_sqlite_repository_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD"),
+        "signal_id": "sig_report_repo_qld",
+        "run_id": "run_report_repo_qld",
+        "created_at": "2026-05-20T13:00:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        database_path=f" {database_path} ",
+    )
+
+    assert payload["latest_signal_report"]["signal_id"] == stored_signal["signal_id"]
+    assert payload["latest_signal_report"]["asset"] == "QLD"
+    assert payload["source_signal_ref"]["run_id"] == stored_signal["run_id"]
+    assert payload["report_payload_guard"]["status"] == "ok"
+    assert payload["live_data_required"] is False
+
+
+def test_latest_signal_report_rejects_missing_repository_source(
+    tmp_path: Path,
+) -> None:
+    ledger_path = tmp_path / "missing_signal_ledger.jsonl"
+
+    with pytest.raises(
+        ValueError,
+        match="latest signal report source was not found",
+    ):
+        generate_latest_signal_report(asset="SOXL", ledger_path=str(ledger_path))
+
+    with pytest.raises(
+        ValueError,
+        match="ledger_path and database_path cannot both be provided",
+    ):
+        generate_latest_signal_report(
+            ledger_path=str(ledger_path),
+            database_path=str(tmp_path / "halo_swing.sqlite"),
+        )
+
+    assert not ledger_path.exists()
 
 
 def test_latest_signal_report_contains_required_report_sections() -> None:

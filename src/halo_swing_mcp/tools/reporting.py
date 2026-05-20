@@ -8,6 +8,7 @@ from typing import Any
 
 from halo_swing_mcp.contracts import LatestSignalReport
 from halo_swing_mcp.tools.market import DOCUMENT_SUMMARY_MAX_CHARS, render_chart
+from halo_swing_mcp.tools.recording import get_latest_signal_record
 from halo_swing_mcp.tools.scoring import evaluate_position, score_leverage_swing
 
 
@@ -76,11 +77,23 @@ def generate_latest_signal_report(
     chart_timeframe: str = "1d",
     chart_output_dir: str | None = None,
     extra_evidence_cards: list[dict[str, Any]] | None = None,
+    ledger_path: str | None = None,
+    database_path: str | None = None,
 ) -> dict[str, Any]:
     """Build a stable report snapshot from deterministic scoring output."""
 
     normalized_asset = _normalize_report_asset(asset)
     normalized_timeframe = _normalize_report_timeframe(timeframe)
+    normalized_ledger_path = _normalize_report_repository_path(
+        ledger_path,
+        "ledger_path",
+    )
+    normalized_database_path = _normalize_report_repository_path(
+        database_path,
+        "database_path",
+    )
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
     normalized_report_intent = _normalize_report_intent(report_intent)
     intent_contract = _report_intent_contract(normalized_report_intent)
     normalized_include_chart = _normalize_report_include_chart(include_chart)
@@ -97,7 +110,12 @@ def generate_latest_signal_report(
     normalized_extra_evidence_cards = _normalize_extra_evidence_cards(
         extra_evidence_cards
     )
-    signal = score_leverage_swing(asset=normalized_asset, timeframe=normalized_timeframe)
+    signal = _latest_report_source_signal(
+        asset=normalized_asset,
+        timeframe=normalized_timeframe,
+        ledger_path=normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
     chart_payload = (
         render_chart(
             symbol=signal["underlying"],
@@ -627,6 +645,31 @@ def _latest_signal_report_from_signal(
         }
     )
     return report.model_dump(mode="json")
+
+
+def _latest_report_source_signal(
+    *,
+    asset: str,
+    timeframe: str,
+    ledger_path: str | None,
+    database_path: str | None,
+) -> dict[str, Any]:
+    if ledger_path is None and database_path is None:
+        return score_leverage_swing(asset=asset, timeframe=timeframe)
+
+    latest_record = get_latest_signal_record(
+        ledger_path=ledger_path,
+        database_path=database_path,
+        asset=asset,
+    )
+    if latest_record["status"] != "found":
+        raise ValueError(
+            "latest signal report source was not found in the selected repository"
+        )
+    record = latest_record.get("record")
+    if not isinstance(record, dict) or not isinstance(record.get("signal"), dict):
+        raise ValueError("latest signal report source record.signal must be an object")
+    return record["signal"]
 
 
 def _report_sections(
@@ -3198,6 +3241,22 @@ def _normalize_report_chart_output_dir(chart_output_dir: str | None) -> str | No
     normalized = chart_output_dir.strip()
     if not normalized:
         raise ValueError("chart_output_dir must be a nonempty string")
+    return normalized
+
+
+def _normalize_report_repository_path(
+    value: str | None,
+    field_name: str,
+) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a nonempty string")
+    if not _has_no_control_characters(value):
+        raise ValueError(f"{field_name} must not contain control characters")
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError(f"{field_name} must be a nonempty string")
     return normalized
 
 
