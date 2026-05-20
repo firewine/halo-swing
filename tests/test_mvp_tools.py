@@ -1,4 +1,5 @@
 import json
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -7,6 +8,7 @@ import pytest
 
 from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.storage_migrations import DOMAIN_TABLES, get_storage_health
 from halo_swing_mcp.tools import scoring as scoring_tools
 from halo_swing_mcp.strategy import get_strategy_config, validate_strategy_config
 from halo_swing_mcp.tools.health import health_check
@@ -21,6 +23,7 @@ from halo_swing_mcp.tools.market import (
 )
 from halo_swing_mcp.tools.recording import (
     evaluate_recorded_score_performance,
+    get_signal_replay_bundle,
     label_signal_outcome,
     record_signal,
 )
@@ -911,6 +914,83 @@ def test_record_label_and_evaluate_ledger(tmp_path: Path) -> None:
         assert field in label["label_contract"]["barrier_fields"]
     assert performance["sample_size"] == 1
     assert performance["ledger_ref"] == str(ledger_path)
+
+
+def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    signal = score_leverage_swing("TQQQ")
+
+    recorded = record_signal(signal=signal, database_path=f" {database_path} ")
+    duplicate = record_signal(signal=signal, database_path=f" {database_path} ")
+    label = label_signal_outcome(
+        signal_id=signal["signal_id"],
+        database_path=f" {database_path} ",
+    )
+    replay = get_signal_replay_bundle(
+        signal_id=signal["signal_id"],
+        database_path=f" {database_path} ",
+    )
+    performance = evaluate_recorded_score_performance(
+        database_path=f" {database_path} ",
+    )
+    health = get_storage_health(database_path)
+
+    assert recorded["status"] == "recorded"
+    assert duplicate["status"] == "duplicate"
+    assert recorded["ledger_ref"] == f"sqlite:{database_path}"
+    assert recorded["run_journal_contract"]["storage"] == "sqlite_signal_repository"
+    assert recorded["run_journal_contract"]["db_required"] is True
+    assert recorded["record"]["run_journal"]["db_required"] is True
+    assert recorded["record"]["strategy_config"]["config_hash"] == signal["config_hash"]
+    assert recorded["record"]["feature_snapshot"]["indicator_symbol"] == "QQQ"
+    assert recorded["record"]["evidence_cards"]
+    assert label["label_contract"]["db_required"] is True
+    assert replay["signal"]["signal_id"] == signal["signal_id"]
+    assert replay["feature_snapshot"]["indicator_symbol"] == "QQQ"
+    assert replay["evidence_cards"]
+    assert replay["strategy_config"]["config_hash"] == signal["config_hash"]
+    assert replay["run_journal"]["run_id"] == signal["run_id"]
+    assert replay["label_outcome"]["signal_id"] == signal["signal_id"]
+    assert replay["missing_links"] == []
+    assert performance["sample_size"] == 1
+    assert performance["ledger_ref"] == f"sqlite:{database_path}"
+    assert health["migration_count"] == 1
+    assert health["domain_tables_present"] == list(DOMAIN_TABLES)
+    with sqlite3.connect(database_path) as connection:
+        assert (
+            connection.execute("SELECT COUNT(*) FROM signal_ledger").fetchone()[0] == 1
+        )
+        assert (
+            connection.execute("SELECT COUNT(*) FROM label_store").fetchone()[0] == 1
+        )
+        assert (
+            connection.execute("SELECT COUNT(*) FROM run_journal").fetchone()[0] == 1
+        )
+    assert not (tmp_path / "signal_ledger.jsonl").exists()
+
+
+def test_signal_replay_bundle_reports_missing_signal(tmp_path: Path) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+
+    replay = get_signal_replay_bundle(
+        signal_id="missing_signal",
+        database_path=str(database_path),
+    )
+
+    assert replay["signal"] == {}
+    assert replay["feature_snapshot"] == {}
+    assert replay["evidence_cards"] == []
+    assert replay["strategy_config"] == {}
+    assert replay["run_journal"] == {}
+    assert replay["label_outcome"] is None
+    assert replay["missing_links"] == [
+        {
+            "code": "MISSING_REQUIRED_LINK",
+            "message": "signal_id was not found in the selected repository",
+            "missing_ref_type": "signal_ledger",
+            "missing_ref_id": "missing_signal",
+        }
+    ]
 
 
 def test_record_signal_preserves_live_source_metadata(

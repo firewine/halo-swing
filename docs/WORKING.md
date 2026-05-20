@@ -42,21 +42,26 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: MIGRATION_GO_INITIAL_REPLAY_SCHEMA_VERIFIED
-gate_id: P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE
+status: REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_VERIFIED
+gate_id: P1_REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_GATE
 review_tier: S2_medium
 
-next_atomic_step: no open code step remains after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap
+next_atomic_step: no open code step remains after verified SQLite signal repository and replay query; continue with the next explicit repository or docs_devops slice from SSOT
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - migrations/
-  - migrations/202605100001_initial_replay_schema.sql
-  - src/halo_swing_mcp/storage_migrations.py
-  - tests/test_storage_migrations.py
+  - docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/signal_repository.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/mvp_tool_contracts.json
+  - tests/golden/health_check.json
+  - tests/test_mvp_tools.py
+  - tests/test_signal_repository.py
   - tests/test_tool_registry.py
 
 blocked_path_prefixes:
@@ -74,39 +79,40 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - MIGRATION_GO approval is recorded in SSOT and WORKING.md
-  - migration runner applies migrations idempotently and fails on checksum mismatch
-  - initial replay schema creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store
-  - migration-specific tests prove tmp_path-only database creation and storage_health applied migration/domain table reporting
-  - default import guard allows sqlite3 only in the migration runner introduced by MIGRATION_GO
-  - no repository-backed DB persistence, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
+  - REPOSITORY_GO approval is recorded in SSOT, gate packet, and WORKING.md
+  - record_signal supports explicit database_path SQLite persistence and remains idempotent
+  - label_signal_outcome writes repository-backed label_store rows when database_path is provided
+  - evaluate_score_performance reads repository-backed signal and label rows when database_path is provided
+  - get_signal_replay_bundle returns signal_ledger, feature_store, evidence_card, strategy_config, run_journal, latest label, and structured missing links
+  - default JSONL ledger behavior remains unchanged when database_path is omitted
+  - SQLite repository tests create databases only under tmp_path and no repo data/state SQLite artifacts are created
+  - default import guard allows sqlite3 only in the migration runner and signal repository introduced by storage gates
+  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - verification passes
 
-approval_source: "user message: MIGRATION_GO 승인"
-next_state_after_success: wait for explicit REPOSITORY_GO approval or another migration-only schema gap
+approval_source: "user message: REPOSITORY_GO 승인"
+next_state_after_success: continue with next explicit repository slice after verified SQLite signal repository path
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE
-scope: MIGRATION_GO approved initial replay schema migration
+gate_id: P1_REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_GATE
+scope: REPOSITORY_GO approved SQLite signal repository and replay query
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
   - PYTHONPATH=src ./.venv/bin/python -m pytest
@@ -116,30 +122,36 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected task/docs/code files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q: 18 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q: 10 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 882 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
 files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - migrations/202605100001_initial_replay_schema.sql
-  - src/halo_swing_mcp/storage_migrations.py
-  - tests/test_storage_migrations.py
+  - docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md
+  - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/signal_repository.py
+  - src/halo_swing_mcp/tool_registry.py
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/health_check.json
+  - tests/golden/mvp_tool_contracts.json
+  - tests/test_mvp_tools.py
+  - tests/test_signal_repository.py
   - tests/test_tool_registry.py
-next_state: no open code step after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap
+next_state: continue with next explicit repository slice after verified SQLite signal repository path
 notes:
-  - user explicitly approved MIGRATION_GO
-  - SSOT records MIGRATION_GO approved migration defaults from the readiness packet
-  - initial SQLite replay schema migration creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store
-  - migration runner is idempotent and fails loudly on checksum mismatch
-  - storage health helper reports applied migration count, latest migration, and domain tables
-  - migration tests create SQLite DBs only under tmp_path and assert no repo data/state SQLite artifacts
-  - tests/test_tool_registry.py keeps live/default sqlite3 import blocked except for src/halo_swing_mcp/storage_migrations.py
-  - REPOSITORY_GO remains required before repository-backed DB persistence
+  - user explicitly approved REPOSITORY_GO
+  - SSOT and gate packet record REPOSITORY_GO approved repository-backed SQLite persistence
+  - record_signal accepts explicit database_path and writes run_journal, strategy_config, feature_store, evidence_card, artifact_ref, and signal_ledger rows in one repository transaction
+  - label_signal_outcome accepts explicit database_path and writes label_store rows
+  - evaluate_score_performance reads repository-backed signal and label rows
+  - get_signal_replay_bundle is exposed through registry, server, harness, health, and MVP manifest and returns structured missing links
+  - default JSONL behavior remains unchanged without database_path
+  - tests create SQLite DBs only under tmp_path and no repo data/state DB artifacts are added
+  - tests/test_tool_registry.py keeps live/default sqlite3 import blocked except for src/halo_swing_mcp/storage_migrations.py and src/halo_swing_mcp/signal_repository.py
 ```
 
 Previous completed directive:

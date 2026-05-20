@@ -776,6 +776,61 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.058 P1 Repository GO SQLite Signal Repository Gate Record - 2026-05-20
+
+### A. 승인 기록
+
+```text
+status: verified
+approval_source: user message "REPOSITORY_GO 승인"
+gate_packet: docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md
+review_tier: S2_medium
+```
+
+### B. 구현 범위
+
+```text
+implemented:
+  - explicit database_path SQLiteSignalLedgerRepository
+  - repository-backed record_signal path
+  - repository-backed label_signal_outcome path
+  - repository-backed evaluate_score_performance path
+  - get_signal_replay_bundle replay query
+  - tmp_path-only SQLite repository coverage
+
+preserved:
+  - default JSONL ledger behavior
+  - no default repo data/state DB artifact creation
+  - live_data_required and network_call metadata propagation
+```
+
+### C. 계속 금지
+
+```text
+still_blocked:
+  - live_adapters
+  - broker/order execution
+  - Hermes runtime, Telegram send, scheduler, or cron runner
+  - committed repo data/state/artifact DB files
+  - automatic .env mutation or secret value output
+```
+
+### D. 필수 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q: 10 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository slice after verified SQLite signal repository path
+```
+
 ## 4.057 P1 Migration GO Initial Replay Schema Gate Record - 2026-05-20
 
 ### A. 승인 기록

@@ -5,7 +5,12 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from halo_swing_mcp.contracts import LabelOutcome
+from halo_swing_mcp.contracts import (
+    LabelOutcome,
+    ReplayErrorCode,
+    ReplayMissingLinkError,
+    SignalReplayBundle,
+)
 from halo_swing_mcp.fixtures import AS_OF, future_price_path
 from halo_swing_mcp.signal_repository import get_signal_ledger_repository
 from halo_swing_mcp.tools.market import calculate_indicators, get_news_bundle
@@ -28,13 +33,20 @@ LABEL_BARRIER_FIELDS = [
 def record_signal(
     signal: dict[str, Any] | None = None,
     ledger_path: str | None = None,
+    database_path: str | None = None,
 ) -> dict[str, Any]:
     """Record a signal in a local JSONL ledger with idempotent signal_id handling."""
 
     normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    normalized_database_path = _normalize_optional_path(database_path, "database_path")
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
     payload = _normalize_signal_payload(signal)
     signal_id = str(payload["signal_id"])
-    repository = get_signal_ledger_repository(normalized_ledger_path)
+    repository = get_signal_ledger_repository(
+        normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
     feature_snapshot = calculate_indicators(str(payload["underlying"]))
     news_bundle = get_news_bundle(topic="all")
     live_data_required = _live_data_required(
@@ -47,6 +59,7 @@ def record_signal(
         payload,
         live_data_required=live_data_required,
         network_call=network_call,
+        db_required=repository.db_required,
     )
 
     record = {
@@ -55,6 +68,7 @@ def record_signal(
         "feature_snapshot": feature_snapshot,
         "evidence_cards": news_bundle["evidence_cards"],
         "run_journal": run_journal,
+        "strategy_config": _record_strategy_config(payload),
         "config_hash": payload.get("config_hash"),
         "labels": [],
     }
@@ -67,7 +81,10 @@ def record_signal(
         "status": status,
         "signal_id": signal_id,
         "ledger_ref": repository.ledger_ref,
-        "run_journal_contract": _run_journal_contract(stored_record),
+        "run_journal_contract": _run_journal_contract(
+            stored_record,
+            repository=repository,
+        ),
         "record": stored_record,
         "live_data_required": _stored_record_live_data_required(stored_record),
     }
@@ -80,6 +97,7 @@ def label_signal_outcome(
     take_profit_pct: float = 0.10,
     time_barrier_days: int = 10,
     ledger_path: str | None = None,
+    database_path: str | None = None,
     invalidated_by_event: bool = False,
     invalidating_event_id: str | None = None,
 ) -> dict[str, Any]:
@@ -108,8 +126,14 @@ def label_signal_outcome(
         "invalidating_event_id",
     )
     normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    normalized_database_path = _normalize_optional_path(database_path, "database_path")
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
 
-    repository = get_signal_ledger_repository(normalized_ledger_path)
+    repository = get_signal_ledger_repository(
+        normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
     records = repository.list_records()
     record = _select_record(records, normalized_signal_id)
     signal = record["signal"] if record else score_leverage_swing()
@@ -127,6 +151,7 @@ def label_signal_outcome(
             first_barrier_hit="event_invalidation",
             label_reason="invalidated_by_event",
             invalidating_event_id=normalized_invalidating_event_id,
+            db_required=repository.db_required,
         )
         _append_label_if_recorded(repository, record, selected_signal_id, label)
         return label
@@ -142,6 +167,7 @@ def label_signal_outcome(
             first_barrier_hit=None,
             label_reason="empty_price_path",
             invalidating_event_id=None,
+            db_required=repository.db_required,
         )
         _append_label_if_recorded(repository, record, selected_signal_id, label)
         return label
@@ -162,6 +188,7 @@ def label_signal_outcome(
             first_barrier_hit=None,
             label_reason="missing_future_price_path",
             invalidating_event_id=None,
+            db_required=repository.db_required,
         )
         _append_label_if_recorded(repository, record, selected_signal_id, label)
         return label
@@ -210,7 +237,10 @@ def label_signal_outcome(
         "mfe": round(mfe, 6),
         "mae": round(mae, 6),
         "realized_r": round(realized_r, 4),
-        "label_contract": _label_contract("triple_barrier"),
+        "label_contract": _label_contract(
+            "triple_barrier",
+            db_required=repository.db_required,
+        ),
         "live_data_required": False,
     }
 
@@ -221,6 +251,7 @@ def label_signal_outcome(
 
 def evaluate_recorded_score_performance(
     ledger_path: str | None = None,
+    database_path: str | None = None,
     days: int = 90,
     signals: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
@@ -228,10 +259,16 @@ def evaluate_recorded_score_performance(
 
     normalized_days = _normalize_positive_integer(days, "days")
     normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    normalized_database_path = _normalize_optional_path(database_path, "database_path")
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
     if signals is not None:
         return evaluate_score_performance(signals=signals, days=normalized_days)
 
-    repository = get_signal_ledger_repository(normalized_ledger_path)
+    repository = get_signal_ledger_repository(
+        normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
     records = repository.list_records()
     if not records:
         return evaluate_score_performance(days=normalized_days)
@@ -245,7 +282,8 @@ def evaluate_recorded_score_performance(
         else:
             label = label_signal_outcome(
                 signal_id=signal["signal_id"],
-                ledger_path=repository.ledger_ref,
+                database_path=normalized_database_path,
+                ledger_path=normalized_ledger_path,
             )
         outcomes.append(
             {
@@ -260,6 +298,62 @@ def evaluate_recorded_score_performance(
     performance = evaluate_score_performance(outcomes, days=normalized_days)
     performance["ledger_ref"] = repository.ledger_ref
     return performance
+
+
+def get_signal_replay_bundle(
+    signal_id: str,
+    ledger_path: str | None = None,
+    database_path: str | None = None,
+) -> dict[str, Any]:
+    """Return the replay bundle for one recorded signal."""
+
+    normalized_signal_id = _normalize_optional_string_identity(signal_id, "signal_id")
+    normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
+    normalized_database_path = _normalize_optional_path(database_path, "database_path")
+    if normalized_ledger_path is not None and normalized_database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
+
+    repository = get_signal_ledger_repository(
+        normalized_ledger_path,
+        database_path=normalized_database_path,
+    )
+    record = repository.find_by_signal_id(str(normalized_signal_id))
+    if record is None:
+        return SignalReplayBundle(
+            signal={},
+            feature_snapshot={},
+            evidence_cards=[],
+            strategy_config={},
+            run_journal={},
+            label_outcome=None,
+            missing_links=[
+                ReplayMissingLinkError(
+                    code=ReplayErrorCode.MISSING_REQUIRED_LINK,
+                    message="signal_id was not found in the selected repository",
+                    missing_ref_type="signal_ledger",
+                    missing_ref_id=str(normalized_signal_id),
+                )
+            ],
+        ).model_dump(mode="json")
+
+    missing_links = _replay_missing_links(record)
+    labels = record.get("labels") if isinstance(record.get("labels"), list) else []
+    label_outcome = labels[-1] if labels else None
+    return SignalReplayBundle(
+        signal=_expect_mapping(record.get("signal"), "record.signal"),
+        feature_snapshot=_expect_mapping(
+            record.get("feature_snapshot"),
+            "record.feature_snapshot",
+        ),
+        evidence_cards=_expect_list(record.get("evidence_cards"), "record.evidence_cards"),
+        strategy_config=_expect_mapping(
+            record.get("strategy_config"),
+            "record.strategy_config",
+        ),
+        run_journal=_expect_mapping(record.get("run_journal"), "record.run_journal"),
+        label_outcome=label_outcome,
+        missing_links=missing_links,
+    ).model_dump(mode="json")
 
 
 def _normalize_signal_payload(signal: dict[str, Any] | None) -> dict[str, Any]:
@@ -280,6 +374,14 @@ def _normalize_signal_payload(signal: dict[str, Any] | None) -> dict[str, Any]:
         payload[field_name] = _normalize_required_signal_field(payload, field_name)
     payload["underlying"] = str(payload["underlying"]).upper()
     return payload
+
+
+def _record_strategy_config(signal: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": "strategy_config.v1",
+        "config_hash": signal.get("config_hash"),
+        "config_version": signal.get("config_version"),
+    }
 
 
 def _normalize_required_signal_field(
@@ -397,6 +499,7 @@ def _run_journal(
     *,
     live_data_required: bool | None = None,
     network_call: bool | None = None,
+    db_required: bool = False,
 ) -> dict[str, Any]:
     run_id = str(signal.get("run_id"))
     signal_id = str(signal.get("signal_id"))
@@ -414,7 +517,7 @@ def _run_journal(
         "network_call": _payload_network_call(signal)
         if network_call is None
         else network_call,
-        "db_required": False,
+        "db_required": db_required,
         "secret_values_returned": False,
         "live_data_required": bool(signal.get("live_data_required"))
         if live_data_required is None
@@ -460,13 +563,17 @@ def _stored_record_network_call(record: dict[str, Any] | None) -> bool:
     return False
 
 
-def _run_journal_contract(record: dict[str, Any] | None = None) -> dict[str, Any]:
+def _run_journal_contract(
+    record: dict[str, Any] | None = None,
+    *,
+    repository: Any | None = None,
+) -> dict[str, Any]:
     return {
         "schema_version": RUN_JOURNAL_SCHEMA_VERSION,
-        "storage": "jsonl_signal_ledger_record",
+        "storage": getattr(repository, "storage_name", "jsonl_signal_ledger_record"),
         "idempotency_key_field": "idempotency_key",
         "network_call": _stored_record_network_call(record),
-        "db_required": False,
+        "db_required": bool(getattr(repository, "db_required", False)),
         "secret_values_returned": False,
     }
 
@@ -482,6 +589,7 @@ def _non_price_barrier_label(
     first_barrier_hit: str | None,
     label_reason: str,
     invalidating_event_id: str | None,
+    db_required: bool,
 ) -> dict[str, Any]:
     upper_barrier = entry_price * (1 + take_profit_pct)
     lower_barrier = entry_price * (1 - stop_loss_pct)
@@ -500,12 +608,12 @@ def _non_price_barrier_label(
         "realized_r": 0.0,
         "label_reason": label_reason,
         "invalidating_event_id": invalidating_event_id,
-        "label_contract": _label_contract(label_reason),
+        "label_contract": _label_contract(label_reason, db_required=db_required),
         "live_data_required": False,
     }
 
 
-def _label_contract(label_reason: str) -> dict[str, Any]:
+def _label_contract(label_reason: str, *, db_required: bool = False) -> dict[str, Any]:
     return {
         "schema_version": LABEL_OUTCOME_SCHEMA_VERSION,
         "label_reason": label_reason,
@@ -514,7 +622,7 @@ def _label_contract(label_reason: str) -> dict[str, Any]:
         "mfe_mae_window": "price_path[:time_barrier_days]",
         "realized_r_unit": "stop_loss_risk",
         "network_call": False,
-        "db_required": False,
+        "db_required": db_required,
         "secret_values_returned": False,
         "supported_outcomes": [outcome.value for outcome in LabelOutcome],
     }
@@ -528,3 +636,44 @@ def _append_label_if_recorded(
 ) -> None:
     if record is not None:
         repository.append_label(signal_id=signal_id, label=label)
+
+
+def _expect_mapping(value: Any, field_name: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{field_name} must be an object")
+    return value
+
+
+def _expect_list(value: Any, field_name: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        raise ValueError(f"{field_name} must be a list")
+    if not all(isinstance(item, dict) for item in value):
+        raise ValueError(f"{field_name} must be a list of objects")
+    return value
+
+
+def _replay_missing_links(record: dict[str, Any]) -> list[ReplayMissingLinkError]:
+    required_sections = {
+        "signal": "signal_ledger",
+        "feature_snapshot": "feature_store",
+        "evidence_cards": "evidence_card",
+        "strategy_config": "strategy_config",
+        "run_journal": "run_journal",
+    }
+    missing_links: list[ReplayMissingLinkError] = []
+    for section_name, ref_type in required_sections.items():
+        value = record.get(section_name)
+        missing = not value if section_name != "evidence_cards" else not isinstance(
+            value,
+            list,
+        )
+        if missing:
+            missing_links.append(
+                ReplayMissingLinkError(
+                    code=ReplayErrorCode.MISSING_REQUIRED_LINK,
+                    message=f"{section_name} is missing from replay bundle",
+                    missing_ref_type=ref_type,
+                    missing_ref_id=None,
+                )
+            )
+    return missing_links

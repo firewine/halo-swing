@@ -1,26 +1,32 @@
 {
-  "gate_id": "P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE",
+  "gate_id": "P1_REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_GATE",
   "mode": "implement",
-  "status": "MIGRATION_GO_INITIAL_REPLAY_SCHEMA_VERIFIED",
+  "status": "REPOSITORY_GO_SQLITE_SIGNAL_REPOSITORY_VERIFIED",
   "review_tier": "S2_medium",
-  "source_gate_packet": "docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md",
-  "next_atomic_step": "no open code step remains after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap",
+  "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
+  "next_atomic_step": "no open code step remains after verified SQLite signal repository and replay query; continue with the next explicit repository or docs_devops slice from SSOT",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "migrations/",
-    "migrations/202605100001_initial_replay_schema.sql",
-    "src/halo_swing_mcp/storage_migrations.py",
-    "tests/test_storage_migrations.py",
+    "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
+    "src/halo_swing_mcp/server.py",
+    "src/halo_swing_mcp/signal_repository.py",
+    "src/halo_swing_mcp/tool_registry.py",
+    "src/halo_swing_mcp/tools/recording.py",
+    "tests/golden/mvp_tool_contracts.json",
+    "tests/golden/health_check.json",
+    "tests/test_mvp_tools.py",
+    "tests/test_signal_repository.py",
     "tests/test_tool_registry.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md",
-    "docs/halo-swing-development-plan.md#3.32"
+    "docs/halo-swing-development-plan.md#3.5",
+    "docs/halo-swing-development-plan.md#4.057",
+    "migrations/202605100001_initial_replay_schema.sql"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -36,8 +42,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -45,28 +50,33 @@
   "post_implementation_review": {
     "roles": [
       "be",
+      "db",
       "qc",
       "devops",
+      "security",
       "docs-gardener"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "MIGRATION_GO approval is recorded in SSOT and WORKING.md",
-    "migration runner applies migrations idempotently and fails on checksum mismatch",
-    "initial replay schema creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store",
-    "migration-specific tests prove tmp_path-only database creation and storage_health applied migration/domain table reporting",
-    "default import guard allows sqlite3 only in the migration runner introduced by MIGRATION_GO",
-    "no repository-backed DB persistence, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
+    "REPOSITORY_GO approval is recorded in SSOT, gate packet, and WORKING.md",
+    "record_signal supports explicit database_path SQLite persistence and remains idempotent",
+    "label_signal_outcome writes repository-backed label_store rows when database_path is provided",
+    "evaluate_score_performance reads repository-backed signal and label rows when database_path is provided",
+    "get_signal_replay_bundle returns signal_ledger, feature_store, evidence_card, strategy_config, run_journal, latest label, and structured missing links",
+    "default JSONL ledger behavior remains unchanged when database_path is omitted",
+    "SQLite repository tests create databases only under tmp_path and no repo data/state SQLite artifacts are created",
+    "default import guard allows sqlite3 only in the migration runner and signal repository introduced by storage gates",
+    "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
     "verification passes"
   ],
-  "approval_source": "user message: MIGRATION_GO 승인",
-  "migration_defaults": {
-    "id_policy": "text",
-    "timestamp_policy": "utc_iso8601_text",
-    "label_store_policy": "one_signal_to_many_labels",
-    "watchdog_event_table": "deferred"
+  "approval_source": "user message: REPOSITORY_GO 승인",
+  "repository_defaults": {
+    "database_activation": "explicit_database_path_only",
+    "default_repository": "jsonl_signal_ledger_record",
+    "sqlite_repository": "sqlite_signal_repository",
+    "test_database_policy": "tmp_path_only"
   },
-  "next_state_after_success": "wait for explicit REPOSITORY_GO approval or another migration-only schema gap"
+  "next_state_after_success": "continue with next explicit repository slice after verified SQLite signal repository path"
 }

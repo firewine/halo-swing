@@ -33,6 +33,7 @@ FORBIDDEN_DEFAULT_IMPORTS = {
     "ccxt",
 }
 ALLOWED_DEFAULT_IMPORTS_BY_PATH = {
+    SRC_ROOT / "signal_repository.py": {"sqlite3"},
     SRC_ROOT / "storage_migrations.py": {"sqlite3"},
 }
 

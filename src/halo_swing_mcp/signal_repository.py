@@ -1,13 +1,15 @@
-"""Repository contract and JSONL adapter for signal ledger records."""
+"""Repository contract plus JSONL and SQLite adapters for signal ledger records."""
 
 from __future__ import annotations
 
 import json
 import os
+import sqlite3
 from pathlib import Path
 from typing import Any, Protocol
 
 from halo_swing_mcp.config import get_settings
+from halo_swing_mcp.storage_migrations import apply_migrations
 
 
 class SignalLedgerRepository(Protocol):
@@ -16,6 +18,14 @@ class SignalLedgerRepository(Protocol):
     @property
     def ledger_ref(self) -> str:
         """Portable reference to the backing ledger."""
+
+    @property
+    def storage_name(self) -> str:
+        """Stable storage contract name for run journal metadata."""
+
+    @property
+    def db_required(self) -> bool:
+        """Return whether this repository persists through a database."""
 
     def list_records(self) -> list[dict[str, Any]]:
         """Return all ledger records in insertion order."""
@@ -59,6 +69,14 @@ class JsonlSignalLedgerRepository:
     @property
     def ledger_ref(self) -> str:
         return str(self.path)
+
+    @property
+    def storage_name(self) -> str:
+        return "jsonl_signal_ledger_record"
+
+    @property
+    def db_required(self) -> bool:
+        return False
 
     def list_records(self) -> list[dict[str, Any]]:
         if not self.path.exists():
@@ -119,11 +137,386 @@ class JsonlSignalLedgerRepository:
         temporary_path.replace(self.path)
 
 
+class SQLiteSignalLedgerRepository:
+    """SQLite implementation for replay-safe repository persistence."""
+
+    def __init__(self, database_path: str | os.PathLike[str]) -> None:
+        configured = _normalize_ledger_path(database_path, "database_path")
+        self.path = Path(configured)
+        apply_migrations(self.path)
+
+    @property
+    def ledger_ref(self) -> str:
+        return f"sqlite:{self.path}"
+
+    @property
+    def storage_name(self) -> str:
+        return "sqlite_signal_repository"
+
+    @property
+    def db_required(self) -> bool:
+        return True
+
+    def list_records(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            signal_rows = connection.execute(
+                """
+                SELECT
+                    signal_id,
+                    signal_json,
+                    feature_snapshot_id,
+                    evidence_card_ids_json,
+                    run_id,
+                    config_hash
+                FROM signal_ledger
+                ORDER BY created_at, signal_id
+                """
+            ).fetchall()
+            return [self._record_from_row(connection, row) for row in signal_rows]
+
+    def find_by_signal_id(self, signal_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT
+                    signal_id,
+                    signal_json,
+                    feature_snapshot_id,
+                    evidence_card_ids_json,
+                    run_id,
+                    config_hash
+                FROM signal_ledger
+                WHERE signal_id = ?
+                """,
+                (signal_id,),
+            ).fetchone()
+            return self._record_from_row(connection, row) if row else None
+
+    def latest_record(self) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT
+                    signal_id,
+                    signal_json,
+                    feature_snapshot_id,
+                    evidence_card_ids_json,
+                    run_id,
+                    config_hash
+                FROM signal_ledger
+                ORDER BY created_at DESC, signal_id DESC
+                LIMIT 1
+                """
+            ).fetchone()
+            return self._record_from_row(connection, row) if row else None
+
+    def append_if_absent(
+        self,
+        *,
+        signal_id: str,
+        record: dict[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
+        existing = self.find_by_signal_id(signal_id)
+        if existing is not None:
+            return "duplicate", existing
+
+        with self._connect() as connection:
+            try:
+                connection.execute("BEGIN")
+                self._insert_record(connection, signal_id, record)
+            except Exception:
+                connection.rollback()
+                raise
+            else:
+                connection.commit()
+
+        stored = self.find_by_signal_id(signal_id)
+        return "recorded", stored if stored is not None else record
+
+    def append_label(self, *, signal_id: str, label: dict[str, Any]) -> bool:
+        if self.find_by_signal_id(signal_id) is None:
+            return False
+
+        with self._connect() as connection:
+            label_count = connection.execute(
+                "SELECT COUNT(*) FROM label_store WHERE signal_id = ?",
+                (signal_id,),
+            ).fetchone()[0]
+            label_id = f"{signal_id}:label:{label_count + 1}"
+            connection.execute(
+                """
+                INSERT INTO label_store (
+                    label_id,
+                    signal_id,
+                    outcome,
+                    labeled_at,
+                    horizon_days,
+                    label_json
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    label_id,
+                    signal_id,
+                    str(label.get("outcome", "UNKNOWN")),
+                    str(label.get("labeled_at", "")),
+                    label.get("time_barrier_days"),
+                    _json_dumps(label),
+                ),
+            )
+        return True
+
+    def _connect(self) -> sqlite3.Connection:
+        connection = sqlite3.connect(self.path)
+        connection.execute("PRAGMA foreign_keys = ON")
+        return connection
+
+    def _insert_record(
+        self,
+        connection: sqlite3.Connection,
+        signal_id: str,
+        record: dict[str, Any],
+    ) -> None:
+        signal = _expect_mapping(record.get("signal"), "record.signal")
+        feature_snapshot = _expect_mapping(
+            record.get("feature_snapshot"),
+            "record.feature_snapshot",
+        )
+        run_journal = _expect_mapping(record.get("run_journal"), "record.run_journal")
+        evidence_cards = _expect_list(record.get("evidence_cards"), "record.evidence_cards")
+
+        run_id = str(run_journal["run_id"])
+        config_hash = str(signal["config_hash"])
+        created_at = str(signal["created_at"])
+        feature_snapshot_id = f"{signal_id}:feature_snapshot"
+        evidence_ids = [str(card["evidence_id"]) for card in evidence_cards]
+        artifact_ids: list[str] = []
+
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO strategy_config (
+                config_hash,
+                schema_version,
+                config_json,
+                created_at
+            )
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                config_hash,
+                "strategy_config.v1",
+                _json_dumps(
+                    {
+                        "config_hash": config_hash,
+                        "config_version": signal.get("config_version"),
+                    }
+                ),
+                created_at,
+            ),
+        )
+        connection.execute(
+            """
+            INSERT INTO run_journal (
+                run_id,
+                idempotency_key,
+                run_type,
+                status,
+                started_at,
+                completed_at,
+                metadata_json
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                run_id,
+                run_journal.get("idempotency_key"),
+                str(run_journal.get("trigger", "record_signal")),
+                str(run_journal.get("status", "completed")),
+                str(run_journal.get("started_at", created_at)),
+                run_journal.get("finished_at"),
+                _json_dumps(run_journal),
+            ),
+        )
+        connection.execute(
+            """
+            INSERT INTO feature_store (
+                feature_snapshot_id,
+                asset,
+                underlying,
+                timeframe,
+                created_at,
+                features_json
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                feature_snapshot_id,
+                str(signal.get("asset", "")),
+                str(signal["underlying"]),
+                str(signal.get("timeframe", "swing_3d_10d")),
+                created_at,
+                _json_dumps(feature_snapshot),
+            ),
+        )
+
+        for card in evidence_cards:
+            self._insert_evidence_card(connection, card, created_at, artifact_ids)
+
+        connection.execute(
+            """
+            INSERT INTO signal_ledger (
+                signal_id,
+                created_at,
+                asset,
+                underlying,
+                timeframe,
+                action,
+                final_score,
+                confidence,
+                data_freshness_status,
+                run_id,
+                feature_snapshot_id,
+                config_hash,
+                evidence_card_ids_json,
+                artifact_ref_ids_json,
+                signal_json
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                signal_id,
+                created_at,
+                str(signal.get("asset", "")),
+                str(signal["underlying"]),
+                str(signal.get("timeframe", "swing_3d_10d")),
+                str(signal.get("action", "")),
+                float(signal.get("final_score", 0.0)),
+                float(signal.get("confidence", 0.0)),
+                str(signal.get("data_freshness_status", "UNKNOWN")),
+                run_id,
+                feature_snapshot_id,
+                config_hash,
+                _json_dumps(evidence_ids),
+                _json_dumps(artifact_ids),
+                _json_dumps(signal),
+            ),
+        )
+
+    def _insert_evidence_card(
+        self,
+        connection: sqlite3.Connection,
+        card: dict[str, Any],
+        created_at: str,
+        artifact_ids: list[str],
+    ) -> None:
+        evidence_id = str(card["evidence_id"])
+        artifact_ref = card.get("artifact_ref")
+        if isinstance(artifact_ref, dict):
+            artifact_ref_id = f"{evidence_id}:artifact"
+            artifact_ids.append(artifact_ref_id)
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO artifact_ref (
+                    artifact_ref_id,
+                    ref_type,
+                    ref,
+                    metadata_json,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    artifact_ref_id,
+                    str(artifact_ref.get("ref_type", "OTHER")),
+                    str(artifact_ref.get("ref", "")),
+                    _json_dumps(artifact_ref.get("metadata", {})),
+                    created_at,
+                ),
+            )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO evidence_card (
+                evidence_id,
+                modality,
+                summary,
+                source_ref,
+                created_at,
+                payload_json
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                evidence_id,
+                str(card.get("modality", "unknown")),
+                str(card.get("summary", "")),
+                str(card.get("source") or card.get("source_group") or ""),
+                created_at,
+                _json_dumps(card),
+            ),
+        )
+
+    def _record_from_row(
+        self,
+        connection: sqlite3.Connection,
+        row: sqlite3.Row | tuple[Any, ...],
+    ) -> dict[str, Any]:
+        signal_id, signal_json, feature_snapshot_id, evidence_ids_json, run_id, config_hash = row
+        signal = _json_loads(str(signal_json))
+        feature_row = connection.execute(
+            "SELECT features_json FROM feature_store WHERE feature_snapshot_id = ?",
+            (feature_snapshot_id,),
+        ).fetchone()
+        run_row = connection.execute(
+            "SELECT metadata_json FROM run_journal WHERE run_id = ?",
+            (run_id,),
+        ).fetchone()
+        config_row = connection.execute(
+            "SELECT config_json FROM strategy_config WHERE config_hash = ?",
+            (config_hash,),
+        ).fetchone()
+        evidence_cards = []
+        for evidence_id in _json_loads(str(evidence_ids_json)):
+            evidence_row = connection.execute(
+                "SELECT payload_json FROM evidence_card WHERE evidence_id = ?",
+                (str(evidence_id),),
+            ).fetchone()
+            if evidence_row:
+                evidence_cards.append(_json_loads(evidence_row[0]))
+        labels = [
+            _json_loads(row[0])
+            for row in connection.execute(
+                """
+                SELECT label_json
+                FROM label_store
+                WHERE signal_id = ?
+                ORDER BY rowid
+                """,
+                (signal_id,),
+            ).fetchall()
+        ]
+        return {
+            "recorded_at": signal.get("created_at"),
+            "signal": signal,
+            "feature_snapshot": _json_loads(feature_row[0]) if feature_row else {},
+            "evidence_cards": evidence_cards,
+            "run_journal": _json_loads(run_row[0]) if run_row else {},
+            "strategy_config": _json_loads(config_row[0]) if config_row else {},
+            "config_hash": config_hash,
+            "labels": labels,
+        }
+
+
 def get_signal_ledger_repository(
     ledger_path: str | os.PathLike[str] | None = None,
+    *,
+    database_path: str | os.PathLike[str] | None = None,
 ) -> SignalLedgerRepository:
     """Return the default replay-safe signal ledger repository."""
 
+    if ledger_path is not None and database_path is not None:
+        raise ValueError("ledger_path and database_path cannot both be provided")
+    if database_path is not None:
+        return SQLiteSignalLedgerRepository(database_path)
     return JsonlSignalLedgerRepository(ledger_path)
 
 
@@ -136,8 +529,31 @@ def _normalize_ledger_path(value: str | os.PathLike[str], field_name: str) -> st
     return normalized.strip()
 
 
+def _json_dumps(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True)
+
+
+def _json_loads(value: str) -> Any:
+    return json.loads(value)
+
+
+def _expect_mapping(value: Any, field_name: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{field_name} must be an object")
+    return value
+
+
+def _expect_list(value: Any, field_name: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        raise ValueError(f"{field_name} must be a list")
+    if not all(isinstance(item, dict) for item in value):
+        raise ValueError(f"{field_name} must be a list of objects")
+    return value
+
+
 __all__ = [
     "JsonlSignalLedgerRepository",
+    "SQLiteSignalLedgerRepository",
     "SignalLedgerRepository",
     "get_signal_ledger_repository",
 ]

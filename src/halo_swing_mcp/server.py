@@ -315,13 +315,19 @@ def evaluate_position(
 def record_signal(
     signal: dict[str, Any] | None = None,
     ledger_path: str | None = None,
+    database_path: str | None = None,
 ) -> dict[str, Any]:
     """Record a signal in the local runtime ledger."""
 
+    payload = {
+        "signal": signal,
+        "ledger_path": ledger_path,
+        "database_path": database_path,
+    }
     return _audited_tool_call(
         "record_signal",
-        {"signal": signal, "ledger_path": ledger_path},
-        call_tool("record_signal", {"signal": signal, "ledger_path": ledger_path}),
+        payload,
+        call_tool("record_signal", payload),
     )
 
 
@@ -333,54 +339,69 @@ def label_signal_outcome(
     take_profit_pct: float = 0.10,
     time_barrier_days: int = 10,
     ledger_path: str | None = None,
+    database_path: str | None = None,
     invalidated_by_event: bool = False,
     invalidating_event_id: str | None = None,
 ) -> dict[str, Any]:
     """Label a signal outcome with triple-barrier logic."""
 
+    payload = {
+        "signal_id": signal_id,
+        "price_path": price_path,
+        "stop_loss_pct": stop_loss_pct,
+        "take_profit_pct": take_profit_pct,
+        "time_barrier_days": time_barrier_days,
+        "ledger_path": ledger_path,
+        "database_path": database_path,
+        "invalidated_by_event": invalidated_by_event,
+        "invalidating_event_id": invalidating_event_id,
+    }
     return _audited_tool_call(
         "label_signal_outcome",
-        {
-            "signal_id": signal_id,
-            "price_path": price_path,
-            "stop_loss_pct": stop_loss_pct,
-            "take_profit_pct": take_profit_pct,
-            "time_barrier_days": time_barrier_days,
-            "ledger_path": ledger_path,
-            "invalidated_by_event": invalidated_by_event,
-            "invalidating_event_id": invalidating_event_id,
-        },
-        call_tool(
-            "label_signal_outcome",
-            {
-                "signal_id": signal_id,
-                "price_path": price_path,
-                "stop_loss_pct": stop_loss_pct,
-                "take_profit_pct": take_profit_pct,
-                "time_barrier_days": time_barrier_days,
-                "ledger_path": ledger_path,
-                "invalidated_by_event": invalidated_by_event,
-                "invalidating_event_id": invalidating_event_id,
-            },
-        ),
+        payload,
+        call_tool("label_signal_outcome", payload),
     )
 
 
 @mcp.tool()
 def evaluate_score_performance(
     ledger_path: str | None = None,
+    database_path: str | None = None,
     days: int = 90,
     signals: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Evaluate score calibration and realized-R performance."""
 
+    payload = {
+        "ledger_path": ledger_path,
+        "database_path": database_path,
+        "days": days,
+        "signals": signals,
+    }
     return _audited_tool_call(
         "evaluate_score_performance",
-        {"ledger_path": ledger_path, "days": days, "signals": signals},
-        call_tool(
-            "evaluate_score_performance",
-            {"ledger_path": ledger_path, "days": days, "signals": signals},
-        ),
+        payload,
+        call_tool("evaluate_score_performance", payload),
+    )
+
+
+@mcp.tool()
+def get_signal_replay_bundle(
+    signal_id: str,
+    ledger_path: str | None = None,
+    database_path: str | None = None,
+) -> dict[str, Any]:
+    """Return the replay bundle for a recorded signal."""
+
+    payload = {
+        "signal_id": signal_id,
+        "ledger_path": ledger_path,
+        "database_path": database_path,
+    }
+    return _audited_tool_call(
+        "get_signal_replay_bundle",
+        payload,
+        call_tool("get_signal_replay_bundle", payload),
     )
 
 

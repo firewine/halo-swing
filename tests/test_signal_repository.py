@@ -2,7 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from halo_swing_mcp.signal_repository import JsonlSignalLedgerRepository
+from halo_swing_mcp.signal_repository import (
+    JsonlSignalLedgerRepository,
+    SQLiteSignalLedgerRepository,
+)
 
 
 def test_jsonl_signal_repository_appends_and_deduplicates(tmp_path: Path) -> None:
@@ -88,3 +91,15 @@ def test_jsonl_signal_repository_rejects_invalid_env_ledger_path(
             JsonlSignalLedgerRepository()
 
         assert not unexpected_path.exists()
+
+
+def test_sqlite_signal_repository_initializes_migrated_database(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    repository = SQLiteSignalLedgerRepository(database_path)
+
+    assert repository.ledger_ref == f"sqlite:{database_path}"
+    assert repository.storage_name == "sqlite_signal_repository"
+    assert repository.db_required is True
+    assert database_path.exists()
