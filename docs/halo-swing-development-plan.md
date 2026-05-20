@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.091 P1 Repository Latest Report Label Summary Text Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed latest report의 저장된 label outcome은 payload/evidence/guard에서
+확인되지만, Hermes나 Telegram이 소비할 `sections`와 `text`에는 사후평가 상태가 아직
+드러나지 않는다. 이번 slice는 저장된 label이 있을 때만 `Reasons`에 path-free label
+outcome summary를 추가하고, 기본 no-repository report와 golden snapshot은 그대로
+유지한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - include a stored label outcome summary in Reasons when label_status exists
+  - render the same summary in report text through existing section formatting
+  - keep the summary path-free and free of ledger/database local path values
+  - keep default no-repository golden snapshot unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused repository label summary text tests: 3 passed
+  - full pytest: 916 passed in 46.34s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.090 P1 Repository Latest Report Source Summary Text Gate Record - 2026-05-20
 
 ### A. 목적

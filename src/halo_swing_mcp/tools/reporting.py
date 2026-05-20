@@ -851,6 +851,9 @@ def _report_sections(
     reason_items = [report["reason_summary"], report["evidence_summary"]]
     if source_repository_ref is not None:
         reason_items.append(_source_repository_summary(source_repository_ref))
+    label_status = report.get("label_status")
+    if isinstance(label_status, dict):
+        reason_items.append(_label_status_summary(label_status))
 
     sections = [
         {
@@ -904,6 +907,15 @@ def _source_repository_summary(source_repository_ref: dict[str, Any]) -> str:
         f"Repository source: {source_repository_ref.get('storage')}; "
         f"db_required={db_required}; "
         f"filters asset={asset} underlying={underlying} timeframe={timeframe}"
+    )
+
+
+def _label_status_summary(label_status: dict[str, Any]) -> str:
+    return (
+        f"Stored label: outcome={label_status.get('outcome')}; "
+        f"realized_r={label_status.get('realized_r')}; "
+        f"first_barrier_hit={label_status.get('first_barrier_hit')}; "
+        f"time_barrier_days={label_status.get('time_barrier_days')}"
     )
 
 
