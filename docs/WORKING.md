@@ -42,17 +42,17 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_VERIFIED
-gate_id: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD
+status: README_STORAGE_APPROVAL_STATUS_GUIDE_VERIFIED
+gate_id: README_STORAGE_APPROVAL_STATUS_GUIDE_GATE
 review_tier: S1_small
 
-next_atomic_step: P1 storage/docs_devops close readiness evidence is verified; continue with the next explicit non-storage SSOT slice
+next_atomic_step: no open code step remains after verified README storage approval status update; continue with the next explicit non-storage SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
 
@@ -77,10 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - DevOps guide records current P1 storage/docs_devops close readiness as verified by SSOT storage records and task mirror evidence
-  - DevOps guide states the close readiness record does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts
-  - SSOT records the P1 storage/docs_devops close readiness evidence and points next work to the next explicit non-storage SSOT slice
-  - setup docs tests cover the close readiness wording and blocked boundary
+  - README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked after durable approval
+  - README all-env readiness text points database repository use at explicit database_path tool inputs rather than automatic .env activation
+  - setup docs tests cover README and DevOps guide storage approval status wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes, including full pytest
 
@@ -187,8 +186,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD
-scope: P1 storage/docs_devops close readiness evidence record after REPOSITORY_GO
+gate_id: README_STORAGE_APPROVAL_STATUS_GUIDE_GATE
+scope: README all-env readiness storage approval status after REPOSITORY_GO
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -211,15 +210,15 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
+  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - P1 storage/docs_devops close readiness is recorded as verified for storage/docs_devops evidence only
-  - this does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts
+  - README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked
+  - README all-env readiness text now points database repository use at explicit database_path tool inputs instead of automatic .env activation
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

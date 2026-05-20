@@ -776,6 +776,41 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.065 README Storage Approval Status Guide Record - 2026-05-20
+
+### A. 목적
+
+P1 storage/docs_devops close readiness 이후 README all-env readiness 문단에
+남아 있던 `MIGRATION_GO` / `REPOSITORY_GO` blocked 문구를 현재 SSOT 상태에
+맞게 정리했다. 저장소 사용은 승인되었지만 여전히 명시적 `database_path`
+도구 입력으로만 활성화되고, 자동 `.env` DB activation은 승인하지 않는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README.md no longer says MIGRATION_GO and REPOSITORY_GO remain blocked
+  - README.md points database repository use to explicit database_path tool inputs rather than automatic .env activation
+  - tests/test_setup_docs.py covers README and DevOps guide storage approval status wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit non-storage SSOT slice
+```
+
 ## 4.064 P1 Storage Docs DevOps Close Readiness Record - 2026-05-20
 
 ### A. 목적

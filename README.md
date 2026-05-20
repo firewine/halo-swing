@@ -203,10 +203,11 @@ trading env flag, encrypted credentials, manual passphrase input, and passing
 risk checks.
 Together, repo-root `.env` values can make Hermes, Telegram, live data,
 Binance testnet read-only, and live-order readiness evidence pass without
-public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` remain blocked until
-their durable gates are approved. This all-env readiness smoke still performs
-no network call, no Hermes runtime start, no Telegram send, and no order
-submission.
+public tool inputs. `MIGRATION_GO` and `REPOSITORY_GO` are durable storage
+approvals recorded in the SSOT, but database repository use still requires
+explicit `database_path` tool inputs rather than automatic `.env` activation.
+This all-env readiness smoke still performs no network call, no Hermes runtime
+start, no Telegram send, and no order submission.
 `get_integration_setup_checklist` turns the same readiness state into a local
 setup checklist of `.env` keys, durable gate approvals, and harness commands:
 

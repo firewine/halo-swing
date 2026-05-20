@@ -1,24 +1,23 @@
 {
-  "gate_id": "P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_RECORD",
+  "gate_id": "README_STORAGE_APPROVAL_STATUS_GUIDE_GATE",
   "mode": "implement",
-  "status": "P1_STORAGE_DOCS_DEVOPS_CLOSE_READINESS_VERIFIED",
+  "status": "README_STORAGE_APPROVAL_STATUS_GUIDE_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "P1 storage/docs_devops close readiness evidence is verified; continue with the next explicit non-storage SSOT slice",
+  "next_atomic_step": "no open code step remains after verified README storage approval status update; continue with the next explicit non-storage SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
+    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
-    "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.5",
-    "docs/halo-swing-development-plan.md#4.063",
-    "docs/devops-setup-guide.md"
+    "docs/halo-swing-development-plan.md#4.064",
+    "README.md"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -42,17 +41,16 @@
   "post_implementation_review": {
     "roles": [
       "devops",
-      "qc",
-      "docs-gardener"
+      "docs-gardener",
+      "qc"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "DevOps guide records current P1 storage/docs_devops close readiness as verified by SSOT storage records and task mirror evidence",
-    "DevOps guide states the close readiness record does not approve live_adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env-based DB activation, or committed SQLite artifacts",
-    "SSOT records the P1 storage/docs_devops close readiness evidence and points next work to the next explicit non-storage SSOT slice",
-    "setup docs tests cover the close readiness wording and blocked boundary",
+    "README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked after durable approval",
+    "README all-env readiness text points database repository use at explicit database_path tool inputs rather than automatic .env activation",
+    "setup docs tests cover README and DevOps guide storage approval status wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes, including full pytest"
   ],
@@ -61,9 +59,6 @@
     "database_activation": "explicit_database_path_only",
     "default_repository": "jsonl_signal_ledger_record",
     "sqlite_repository": "sqlite_signal_repository",
-    "backup_retention_policy": "manual_local_operator_responsibility_until_tooling_exists",
-    "final_verification_policy": "local_offline_fixture_tmp_path_only",
-    "close_checklist_policy": "evidence_required_before_p1_storage_docs_devops_close",
     "close_readiness": "verified_for_p1_storage_docs_devops_only",
     "test_database_policy": "tmp_path_only"
   },

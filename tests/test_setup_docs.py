@@ -2548,6 +2548,10 @@ def test_setup_docs_describe_all_env_readiness_smoke_boundary() -> None:
         assert "repo-root `.env`" in document or "repo-root .env" in document
         assert "MIGRATION_GO" in document
         assert "REPOSITORY_GO" in document
+        assert "durable storage approvals recorded in the SSOT" in document
+        assert "explicit `database_path` tool inputs" in document
+        assert "automatic `.env` activation" in document
+        assert "MIGRATION_GO` and `REPOSITORY_GO` remain blocked" not in document
         assert "no network call" in document
         assert "no Telegram send" in document
         assert "no order submission" in document
