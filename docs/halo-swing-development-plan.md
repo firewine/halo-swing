@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.078 P1 Repository Replay Strategy Config Gate Record - 2026-05-20
+
+### A. 목적
+
+`record_signal`은 source signal 안의 full `strategy_config`를 받을 수 있지만,
+현재 replay 저장 경로는 `config_hash`와 `config_version`만 보존한다. 3.5.5의
+"config_hash로 어떤 가중치/임계값을 썼는지 재현" 요구에 맞게 JSONL과 SQLite
+replay bundle 모두에서 weights, thresholds, risk 설정을 포함한 full
+`strategy_config`를 보존한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - record full strategy_config when the source signal provides it
+  - keep schema_version/config_hash/config_version present in stored strategy_config
+  - store full strategy_config JSON in SQLite strategy_config.config_json
+  - return full strategy_config from JSONL and SQLite replay bundles
+  - keep a minimal fallback for legacy caller-supplied signals without strategy_config
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - automatic HALO_SWING_DATABASE_URL activation
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q: 7 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or storage slice
+```
+
 ## 4.077 P1 Repository Replay Artifact Refs Gate Record - 2026-05-20
 
 ### A. 목적

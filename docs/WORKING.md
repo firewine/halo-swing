@@ -42,22 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_VERIFIED
-gate_id: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_GATE
+status: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_VERIFIED
+gate_id: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified replay artifact_ref records; continue with next explicit repository or storage slice
+next_atomic_step: no open code step remains after verified full strategy_config replay preservation; continue with next explicit repository or storage slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/contracts.py
   - src/halo_swing_mcp/signal_repository.py
   - src/halo_swing_mcp/tools/recording.py
-  - tests/golden/signal_replay_bundle.json
-  - tests/test_contracts.py
   - tests/test_mvp_tools.py
   - tests/test_signal_repository.py
 
@@ -76,17 +73,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SignalReplayBundle includes artifact_refs as a named top-level section
-  - get_signal_replay_bundle returns portable artifact_ref records for JSONL evidence cards and SQLite artifact_ref rows when present
-  - SQLite replay reads artifact_ref_ids_json and artifact_ref rows instead of relying only on embedded evidence cards
-  - missing-signal replay returns artifact_refs as an empty list without changing missing-link semantics
-  - golden fixture and tests validate artifact_refs are preserved and portable
+  - record_signal stores full strategy_config details when the source signal provides them
+  - JSONL replay returns strategy_config weights, thresholds, risk settings, version, and config_hash
+  - SQLite replay stores and returns the same full strategy_config JSON through the strategy_config table
+  - fallback minimal strategy_config remains available for caller-supplied legacy signals without strategy_config
+  - tests validate config_hash, weights, thresholds, and risk settings survive record and replay paths
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -193,15 +190,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_GATE
-scope: SignalReplayBundle artifact_ref records for JSONL and SQLite replay
+gate_id: P1_REPOSITORY_REPLAY_STRATEGY_CONFIG_GATE
+scope: full strategy_config preservation for JSONL and SQLite replay
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -211,8 +208,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q: 9 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 38.45s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_signal_repository.py -q: 7 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 37.51s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -220,18 +217,15 @@ files_changed:
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/contracts.py
   - src/halo_swing_mcp/signal_repository.py
   - src/halo_swing_mcp/tools/recording.py
-  - tests/golden/signal_replay_bundle.json
-  - tests/test_contracts.py
   - tests/test_mvp_tools.py
 next_state: continue with next explicit repository or storage slice
 notes:
-  - SignalReplayBundle now includes artifact_refs as a named top-level section
-  - JSONL-backed replay derives portable artifact_refs from evidence cards
-  - SQLite replay reads artifact_ref_ids_json and artifact_ref rows into replay artifact_refs
-  - missing-signal replay returns artifact_refs=[] with existing missing-link semantics
+  - record_signal now stores full strategy_config details when the source signal provides them
+  - JSONL replay returns strategy_config weights, thresholds, risk settings, version, and config_hash
+  - SQLite replay stores and returns the same full strategy_config JSON through strategy_config.config_json
+  - fallback minimal strategy_config remains available for caller-supplied legacy signals without strategy_config
   - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 

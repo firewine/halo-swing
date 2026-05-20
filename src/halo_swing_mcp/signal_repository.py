@@ -286,6 +286,10 @@ class SQLiteSignalLedgerRepository:
             "record.feature_snapshot",
         )
         run_journal = _expect_mapping(record.get("run_journal"), "record.run_journal")
+        strategy_config = _expect_mapping(
+            record.get("strategy_config"),
+            "record.strategy_config",
+        )
         evidence_cards = _expect_list(record.get("evidence_cards"), "record.evidence_cards")
 
         run_id = str(run_journal["run_id"])
@@ -310,8 +314,16 @@ class SQLiteSignalLedgerRepository:
                 "strategy_config.v1",
                 _json_dumps(
                     {
+                        **strategy_config,
+                        "schema_version": strategy_config.get(
+                            "schema_version",
+                            "strategy_config.v1",
+                        ),
                         "config_hash": config_hash,
-                        "config_version": signal.get("config_version"),
+                        "config_version": strategy_config.get(
+                            "config_version",
+                            signal.get("config_version"),
+                        ),
                     }
                 ),
                 created_at,

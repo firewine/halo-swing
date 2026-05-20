@@ -901,6 +901,14 @@ def test_record_label_and_evaluate_ledger(tmp_path: Path) -> None:
     assert run_journal["db_required"] is False
     assert signal["signal_id"] in run_journal["idempotency_key"]
     assert ledger_path.exists()
+    assert recorded["record"]["strategy_config"]["config_hash"] == signal["config_hash"]
+    assert recorded["record"]["strategy_config"]["version"] == signal["config_version"]
+    assert recorded["record"]["strategy_config"]["weights"] == signal["strategy_config"]["weights"]
+    assert (
+        recorded["record"]["strategy_config"]["thresholds"]
+        == signal["strategy_config"]["thresholds"]
+    )
+    assert recorded["record"]["strategy_config"]["risk"] == signal["strategy_config"]["risk"]
     assert label["outcome"] in MVP_CONTRACT["labeling_fixture"]["allowed_outcomes"]
     assert (
         label["label_contract"]["schema_version"]
@@ -949,6 +957,13 @@ def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
     assert recorded["run_journal_contract"]["db_required"] is True
     assert recorded["record"]["run_journal"]["db_required"] is True
     assert recorded["record"]["strategy_config"]["config_hash"] == signal["config_hash"]
+    assert recorded["record"]["strategy_config"]["version"] == signal["config_version"]
+    assert recorded["record"]["strategy_config"]["weights"] == signal["strategy_config"]["weights"]
+    assert (
+        recorded["record"]["strategy_config"]["thresholds"]
+        == signal["strategy_config"]["thresholds"]
+    )
+    assert recorded["record"]["strategy_config"]["risk"] == signal["strategy_config"]["risk"]
     assert recorded["record"]["feature_snapshot"]["indicator_symbol"] == "QQQ"
     assert recorded["record"]["evidence_cards"]
     assert label["label_contract"]["db_required"] is True
@@ -960,6 +975,10 @@ def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
     assert all(ref["artifact_ref_id"].endswith(":artifact") for ref in replay["artifact_refs"])
     assert all(not ref["ref"].startswith("/") for ref in replay["artifact_refs"])
     assert replay["strategy_config"]["config_hash"] == signal["config_hash"]
+    assert replay["strategy_config"]["version"] == signal["config_version"]
+    assert replay["strategy_config"]["weights"] == signal["strategy_config"]["weights"]
+    assert replay["strategy_config"]["thresholds"] == signal["strategy_config"]["thresholds"]
+    assert replay["strategy_config"]["risk"] == signal["strategy_config"]["risk"]
     assert replay["run_journal"]["run_id"] == signal["run_id"]
     assert replay["label_outcome"]["signal_id"] == signal["signal_id"]
     assert replay["missing_links"] == []

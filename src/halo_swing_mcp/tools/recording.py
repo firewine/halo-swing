@@ -380,11 +380,22 @@ def _normalize_signal_payload(signal: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def _record_strategy_config(signal: dict[str, Any]) -> dict[str, Any]:
-    return {
+    fallback = {
         "schema_version": "strategy_config.v1",
         "config_hash": signal.get("config_hash"),
         "config_version": signal.get("config_version"),
     }
+    source_config = signal.get("strategy_config")
+    if not isinstance(source_config, dict):
+        return fallback
+
+    config = dict(source_config)
+    config["schema_version"] = "strategy_config.v1"
+    config["config_hash"] = signal.get("config_hash")
+    config.setdefault("config_version", signal.get("config_version"))
+    if signal.get("config_version") is not None:
+        config.setdefault("version", signal.get("config_version"))
+    return config
 
 
 def _normalize_required_signal_field(
