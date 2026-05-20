@@ -1,10 +1,10 @@
 {
-  "gate_id": "CONTEXT_READ_POLICY_ALIGNMENT_GATE",
+  "gate_id": "CONTEXT_PRODUCT_SHAPE_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "CONTEXT_READ_POLICY_ALIGNMENT_VERIFIED",
+  "status": "CONTEXT_PRODUCT_SHAPE_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.067",
-  "next_atomic_step": "no open code step remains after verified CONTEXT read-policy alignment; continue with the next explicit SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.068",
+  "next_atomic_step": "no open code step remains after verified CONTEXT product-shape alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/CONTEXT.md",
@@ -17,7 +17,8 @@
     "AGENTS.md",
     "docs/CONTEXT.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.066"
+    "docs/halo-swing-development-plan.md#4.067",
+    "tests/golden/health_check.json"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -48,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md",
-    "docs/CONTEXT.md points normal implementation agents to root AGENTS.md and docs/WORKING.md as the active operating contract",
-    "docs/CONTEXT.md says SSOT and CONTEXT sections should be read narrowly when referenced by WORKING.md or the current task",
-    "setup docs tests cover CONTEXT.md read policy wording",
+    "docs/CONTEXT.md no longer presents the current MCP surface as only the early core tool list",
+    "docs/CONTEXT.md summarizes current MVP capability families including health, evidence/reporting, replay, readiness/live-smoke harnesses, audit/runtime, and BTC risk/Binance guarded tools",
+    "docs/CONTEXT.md keeps automatic trading and live/runtime side effects out of scope unless later gates approve them",
+    "setup docs tests cover CONTEXT.md product shape wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes"
   ],

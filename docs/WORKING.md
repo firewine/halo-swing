@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: CONTEXT_READ_POLICY_ALIGNMENT_VERIFIED
-gate_id: CONTEXT_READ_POLICY_ALIGNMENT_GATE
+status: CONTEXT_PRODUCT_SHAPE_ALIGNMENT_VERIFIED
+gate_id: CONTEXT_PRODUCT_SHAPE_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified CONTEXT read-policy alignment; continue with the next explicit SSOT slice
+next_atomic_step: no open code step remains after verified CONTEXT product-shape alignment; continue with the next explicit SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md
-  - docs/CONTEXT.md points normal implementation agents to root AGENTS.md and docs/WORKING.md as the active operating contract
-  - docs/CONTEXT.md says SSOT and CONTEXT sections should be read narrowly when referenced by WORKING.md or the current task
-  - setup docs tests cover CONTEXT.md read policy wording
+  - docs/CONTEXT.md no longer presents the current MCP surface as only the early core tool list
+  - docs/CONTEXT.md summarizes current MVP capability families including health, evidence/reporting, replay, readiness/live-smoke harnesses, audit/runtime, and BTC risk/Binance guarded tools
+  - docs/CONTEXT.md keeps automatic trading and live/runtime side effects out of scope unless later gates approve them
+  - setup docs tests cover CONTEXT.md product shape wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes
 
@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: CONTEXT_READ_POLICY_ALIGNMENT_GATE
-scope: docs/CONTEXT.md read-policy alignment with root AGENTS.md and active WORKING contract
+gate_id: CONTEXT_PRODUCT_SHAPE_ALIGNMENT_GATE
+scope: docs/CONTEXT.md product-shape alignment with current health_check MVP capability surface
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -205,8 +205,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 44 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 887 passed in 37.04s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 45 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 888 passed in 37.11s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -218,9 +218,10 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - docs/CONTEXT.md now points agent runners to root AGENTS.md and WORKING.md for the active operating contract
-  - docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md
-  - setup docs tests cover the CONTEXT read-policy wording
+  - docs/CONTEXT.md now summarizes current MVP capability families instead of only the early core tool list
+  - docs/CONTEXT.md points the authoritative capability list to health_check and tests/golden/health_check.json
+  - docs/CONTEXT.md keeps automatic trading and live/runtime side effects out of scope until later gates
+  - setup docs tests cover the CONTEXT product-shape wording
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

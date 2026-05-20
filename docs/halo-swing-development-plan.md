@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.068 CONTEXT Product Shape Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+새 대화 진입용 `docs/CONTEXT.md`의 제품 표면 설명이 초기 core tool 목록에
+머물러 있어, 현재 `health_check` capability surface보다 좁게 보이는 문제를
+정리한다. `CONTEXT.md`는 전체 manifest를 복제하지 않고 현재 MVP tool family와
+권위 목록 위치만 요약한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md renames Initial Product Shape to Current Product Shape
+  - docs/CONTEXT.md points authoritative capability list to health_check and tests/golden/health_check.json
+  - docs/CONTEXT.md summarizes current MVP capability families including replay, readiness/live-smoke, audit/runtime, and BTC guarded tools
+  - docs/CONTEXT.md keeps automatic trading and live/runtime side effects outside product scope until later gates
+  - tests/test_setup_docs.py covers CONTEXT.md product-shape wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 45 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 888 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.067 CONTEXT Read Policy Alignment Gate Record - 2026-05-20
 
 ### A. 목적

@@ -135,25 +135,36 @@ docs/
     - 시스템 정의, 아키텍처, 단계별 계획, 계산 근거
 ```
 
-## 6. Initial Product Shape
+## 6. Current Product Shape
 
-초기 제품은 다음 MCP 도구를 제공한다.
+현재 MCP tool surface의 권위 있는 목록은 `health_check`와
+`tests/golden/health_check.json`의 `capabilities`다. 이 문서는 전체 manifest를
+복제하지 않고 현재 MVP 계열만 요약한다.
 
 ```text
-get_market_snapshot
-get_macro_snapshot
-get_event_calendar
-get_news_bundle
-calculate_indicators
-render_chart
-score_leverage_swing
-generate_trade_guide
-evaluate_position
-record_signal
-label_signal_outcome
-evaluate_score_performance
-compare_champion_challenger
+core market context
+  - market, macro, events, news, evidence card, indicators, chart
+
+swing decision and reporting
+  - score, trade guide, position review, latest signal report, cron prompt pack
+
+recording, replay, and feedback
+  - record signal, label outcome, evaluate performance, replay bundle,
+    weight suggestion, champion/challenger comparison
+
+integration and live-smoke harnesses
+  - readiness, setup checklist, API-key status, provider route,
+    live-data smoke validation, integration/API-key pipeline smokes
+
+audit, runtime, and guarded BTC operations
+  - audit summary, runtime status/checkpoint, BTC risk settings/status,
+    Binance credential/connectivity/account snapshot normalization,
+    BTC order preview and confirmation-gated execution tool
 ```
+
+자동 주문, broker/order submission, Hermes runtime start, Telegram send,
+scheduler, live adapter 확장, `.env` 기반 DB 자동 활성화는 별도 gate 승인 전까지
+제품 범위로 보지 않는다.
 
 최종 출력 액션:
 

@@ -36,6 +36,21 @@ def test_context_read_policy_matches_agents_working_contract() -> None:
     assert "1. 이 문서 2. [WORKING.md](./WORKING.md)" not in text
 
 
+def test_context_product_shape_matches_current_mvp_surface() -> None:
+    text = _normalized_text(CONTEXT)
+
+    assert "## 6. Current Product Shape" in CONTEXT.read_text(encoding="utf-8")
+    assert "`tests/golden/health_check.json`의 `capabilities`" in text
+    assert "recording, replay, and feedback" in text
+    assert "replay bundle" in text
+    assert "integration and live-smoke harnesses" in text
+    assert "audit, runtime, and guarded BTC operations" in text
+    assert "BTC order preview and confirmation-gated execution tool" in text
+    assert "자동 주문, broker/order submission, Hermes runtime start, Telegram send" in text
+    assert "Initial Product Shape" not in text
+    assert "초기 제품은 다음 MCP 도구를 제공한다" not in text
+
+
 def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:
     text = _normalized_text(README)
     guide = _normalized_text(DEVOPS_GUIDE)
