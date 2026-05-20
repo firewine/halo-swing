@@ -1016,6 +1016,63 @@ def test_latest_signal_report_repository_source_includes_sqlite_source_metadata(
     }
 
 
+def test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD", timeframe="swing_5d_20d"),
+        "signal_id": "sig_report_repo_guard_sqlite",
+        "run_id": "run_report_repo_guard_sqlite",
+        "created_at": "2026-05-20T13:46:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        timeframe=" swing_5d_20d ",
+        database_path=f" {database_path} ",
+    )
+    latest_record_guard = payload["latest_record_guard"]
+    latest_record_guard_checks = {
+        check["name"]: check for check in latest_record_guard["checks"]
+    }
+
+    assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
+    assert latest_record_guard["status"] == "ok"
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_matches_top_level_source"
+    ]["expected"] == {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "QLD",
+            "underlying": None,
+            "timeframe": "swing_5d_20d",
+        },
+    }
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert str(database_path) not in iter_nested_strings(latest_record_guard)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(latest_record_guard)
+    )
+    assert payload["report_payload_guard"]["status"] == "ok"
+    assert payload["evidence_guard"]["status"] == "ok"
+
+
 def test_latest_signal_report_repository_source_filters_by_timeframe(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
