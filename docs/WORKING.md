@@ -77,7 +77,7 @@ done_means:
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - verification passes
 
-next_state_after_success: pushed to origin/main through task mirror sync commit c1b2b21, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+next_state_after_success: pushed to origin/main; git log is authoritative for ledger-only sync commits, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 ```
 
 Latest verification result:
@@ -104,7 +104,8 @@ files_changed:
   - docs/WORKING.md
   - docs/codex-task.json
 pushed_commit: 399701d Prefer simple keys in provider smoke metadata
-pushed_task_sync_commit: c1b2b21 Sync current task after provider smoke push
+task_state_synced_to_origin_main: true
+task_state_commit_source: git log is authoritative for latest ledger-only sync commits
 next_state: no open code step after push; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 notes:
   - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first
@@ -112,6 +113,7 @@ notes:
   - follow-up dynamic audit found no provider-family accepted_env_keys, required_env_keys, env_keys, or missing_env_keys lists that expose preferred API keys behind aliases in API-key setup/status/route/pipeline summary payloads
   - task contract mirrors now record the pushed/no-open-code-step state rather than a fresh implementation step
   - task mirror sync verification passed: task diff clean, both JSON mirrors parse, git diff --check passed, health_check status ok
+  - volatile latest-ledger commit fields were replaced with a stable git-log-authoritative state marker to avoid stale self-referential ledger churn
 ```
 
 Previous completed directive:

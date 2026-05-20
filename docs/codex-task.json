@@ -49,6 +49,7 @@
     "verification passes"
   ],
   "pushed_commit": "399701d Prefer simple keys in provider smoke metadata",
-  "latest_ledger_commit": "c1b2b21 Sync current task after provider smoke push",
+  "task_state_synced_to_origin_main": true,
+  "task_state_commit_source": "git log is authoritative for latest ledger-only sync commits",
   "next_state_after_success": "wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap"
 }
