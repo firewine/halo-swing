@@ -42,18 +42,17 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_SIGNAL_SEARCHABLE_QUERY_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_SIGNAL_SEARCHABLE_QUERY_GATE
-review_tier: S1_small
+status: P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_GATE
+review_tier: S0_trivial
 
-next_atomic_step: no open code step remains after verified repository-level latest signal searchable query; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified latest signal repository boundary cleanup; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/signal_repository.py
   - src/halo_swing_mcp/tools/recording.py
   - tests/test_mvp_tools.py
   - tests/test_signal_repository.py
@@ -74,15 +73,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py::test_sqlite_signal_repository_latest_matching_record_uses_searchable_core_fields tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_latest_signal_record delegates latest matching lookup to the repository boundary
-  - SQLite latest matching lookup filters on searchable signal_ledger core columns before replay hydration
-  - JSONL latest matching behavior remains unchanged
+  - obsolete tool-layer _select_latest_matching_record helper is removed
+  - get_latest_signal_record works through repository.latest_matching_record without repository.list_records
+  - existing JSONL and SQLite latest matching behavior remains unchanged
   - missing-source structured error and path-free filter metadata remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -187,6 +186,46 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_GATE
+scope: stale tool-layer latest selector removal and repository boundary delegation guard
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 922 passed in 43.62s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/test_mvp_tools.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - obsolete _select_latest_matching_record helper was removed from recording.py
+  - get_latest_signal_record now has focused coverage proving it uses repository.latest_matching_record without scanning repository.list_records
+  - JSONL and SQLite latest matching coverage remains in place
+  - missing-source structured error and path-free filter metadata remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
 
 ```text
 status: passed

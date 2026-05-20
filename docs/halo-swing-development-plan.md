@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.095 P1 Repository Latest Signal Boundary Cleanup Gate Record - 2026-05-20
+
+### A. 목적
+
+4.094에서 latest signal lookup은 repository boundary의 `latest_matching_record`로
+옮겨졌다. 하지만 `recording.py`에 이전 tool-layer `_select_latest_matching_record`
+helper가 남아 있으면 이후 변경에서 searchable repository query를 우회하는 경로가
+되살아날 수 있다. 이번 slice는 stale helper를 제거하고, `get_latest_signal_record`가
+repository boundary에 위임한다는 것을 직접 테스트로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - remove obsolete tool-layer _select_latest_matching_record helper
+  - add focused coverage that get_latest_signal_record uses repository.latest_matching_record
+  - keep JSONL and SQLite latest matching behavior unchanged
+  - keep missing-source structured error and filter metadata unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused repository boundary cleanup tests: 3 passed
+  - full pytest: 922 passed in 43.62s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.094 P1 Repository Latest Signal Searchable Query Gate Record - 2026-05-20
 
 ### A. 목적

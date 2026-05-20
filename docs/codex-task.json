@@ -1,16 +1,15 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_SEARCHABLE_QUERY_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_SIGNAL_SEARCHABLE_QUERY_VERIFIED",
-  "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.094",
-  "next_atomic_step": "no open code step remains after verified repository-level latest signal searchable query; continue with next explicit repository or report read-model slice",
+  "status": "P1_REPOSITORY_LATEST_SIGNAL_BOUNDARY_CLEANUP_VERIFIED",
+  "review_tier": "S0_trivial",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.095",
+  "next_atomic_step": "no open code step remains after verified latest signal repository boundary cleanup; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
-    "src/halo_swing_mcp/signal_repository.py",
     "src/halo_swing_mcp/tools/recording.py",
     "tests/test_mvp_tools.py",
     "tests/test_signal_repository.py"
@@ -39,7 +38,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_signal_repository.py::test_sqlite_signal_repository_latest_matching_record_uses_searchable_core_fields tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_delegates_matching_to_repository_boundary tests/test_mvp_tools.py::test_get_latest_signal_record_uses_sqlite_repository_query_surface tests/test_signal_repository.py::test_jsonl_signal_repository_latest_matching_record_matches_existing_reverse_scan -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -54,9 +53,9 @@
     "read_only": true
   },
   "done_means": [
-    "get_latest_signal_record delegates latest matching lookup to the repository boundary",
-    "SQLite latest matching lookup filters on searchable signal_ledger core columns before replay hydration",
-    "JSONL latest matching behavior remains unchanged",
+    "obsolete tool-layer _select_latest_matching_record helper is removed",
+    "get_latest_signal_record works through repository.latest_matching_record without repository.list_records",
+    "existing JSONL and SQLite latest matching behavior remains unchanged",
     "missing-source structured error and path-free filter metadata remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

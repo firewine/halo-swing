@@ -10,6 +10,7 @@ from halo_swing_mcp.audit import read_audit_events
 from halo_swing_mcp.config import get_settings
 from halo_swing_mcp.signal_repository import SQLiteSignalLedgerRepository
 from halo_swing_mcp.storage_migrations import DOMAIN_TABLES, get_storage_health
+from halo_swing_mcp.tools import recording as recording_tools
 from halo_swing_mcp.tools import scoring as scoring_tools
 from halo_swing_mcp.strategy import get_strategy_config, validate_strategy_config
 from halo_swing_mcp.tools.health import health_check
@@ -1122,6 +1123,98 @@ def test_get_latest_signal_record_filters_by_timeframe(tmp_path: Path) -> None:
         assert missing["missing_links"][0]["missing_ref_id"] == (
             "latest:asset=TQQQ,timeframe=intraday"
         )
+
+
+def test_get_latest_signal_record_delegates_matching_to_repository_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeRepository:
+        ledger_ref = "fake:latest"
+        storage_name = "fake_signal_repository"
+        db_required = False
+
+        def __init__(self) -> None:
+            self.latest_matching_calls: list[dict[str, str | None]] = []
+
+        def list_records(self) -> list[dict[str, object]]:
+            raise AssertionError("get_latest_signal_record must not scan records")
+
+        def latest_matching_record(
+            self,
+            *,
+            asset: str | None = None,
+            underlying: str | None = None,
+            timeframe: str | None = None,
+        ) -> dict[str, object]:
+            self.latest_matching_calls.append(
+                {
+                    "asset": asset,
+                    "underlying": underlying,
+                    "timeframe": timeframe,
+                }
+            )
+            return {
+                "signal": {
+                    "signal_id": "sig_fake_latest",
+                    "asset": "TQQQ",
+                    "underlying": "QQQ",
+                    "timeframe": "swing_3d_10d",
+                },
+                "labels": [
+                    {
+                        "signal_id": "sig_fake_latest",
+                        "outcome": "TIME_EXIT",
+                    }
+                ],
+                "run_journal": {
+                    "live_data_required": False,
+                },
+            }
+
+    repository = FakeRepository()
+
+    def fake_get_signal_ledger_repository(
+        ledger_path: str | None,
+        *,
+        database_path: str | None = None,
+    ) -> FakeRepository:
+        assert ledger_path == "fake-ledger.jsonl"
+        assert database_path is None
+        return repository
+
+    monkeypatch.setattr(
+        recording_tools,
+        "get_signal_ledger_repository",
+        fake_get_signal_ledger_repository,
+    )
+
+    latest = get_latest_signal_record(
+        ledger_path=" fake-ledger.jsonl ",
+        asset=" tqqq ",
+        underlying=" qqq ",
+        timeframe=" swing_3d_10d ",
+    )
+
+    assert repository.latest_matching_calls == [
+        {
+            "asset": "TQQQ",
+            "underlying": "QQQ",
+            "timeframe": "swing_3d_10d",
+        }
+    ]
+    assert latest["status"] == "found"
+    assert latest["signal_id"] == "sig_fake_latest"
+    assert latest["ledger_ref"] == "fake:latest"
+    assert latest["storage"] == "fake_signal_repository"
+    assert latest["filters"] == {
+        "asset": "TQQQ",
+        "underlying": "QQQ",
+        "timeframe": "swing_3d_10d",
+    }
+    assert latest["label_outcome"] == {
+        "signal_id": "sig_fake_latest",
+        "outcome": "TIME_EXIT",
+    }
 
 
 def test_get_latest_signal_record_uses_sqlite_repository_query_surface(

@@ -588,30 +588,6 @@ def _select_record(
     return None
 
 
-def _select_latest_matching_record(
-    records: list[dict[str, Any]],
-    *,
-    asset: str | None,
-    underlying: str | None,
-    timeframe: str | None,
-) -> dict[str, Any] | None:
-    for record in reversed(records):
-        signal = record.get("signal")
-        if not isinstance(signal, dict):
-            continue
-        if asset is not None and str(signal.get("asset", "")).upper() != asset:
-            continue
-        if (
-            underlying is not None
-            and str(signal.get("underlying", "")).upper() != underlying
-        ):
-            continue
-        if timeframe is not None and str(signal.get("timeframe", "")) != timeframe:
-            continue
-        return record
-    return None
-
-
 def _latest_signal_missing_ref_id(
     *,
     asset: str | None,
