@@ -1,8 +1,29 @@
-"""Storage health tool surface for explicit SQLite repository checks."""
+"""Storage tool surface for explicit SQLite repository checks."""
 
 from __future__ import annotations
 
-from halo_swing_mcp.storage_migrations import get_storage_health as _get_storage_health
+from halo_swing_mcp.storage_migrations import (
+    apply_migrations,
+    get_storage_health as _get_storage_health,
+)
+
+
+def apply_storage_migrations(database_path: str) -> dict[str, object]:
+    """Apply SQLite storage migrations for an explicit database path."""
+
+    normalized_database_path = _normalize_database_path(database_path)
+    result = apply_migrations(normalized_database_path)
+    return {
+        "status": "ok",
+        "database_path": result.database_path,
+        "applied_versions": list(result.applied_versions),
+        "skipped_versions": list(result.skipped_versions),
+        "latest_migration": result.latest_migration,
+        "migration_count": result.migration_count,
+        "domain_tables_present": list(result.domain_tables_present),
+        "live_data_required": False,
+        "secret_values_returned": False,
+    }
 
 
 def get_storage_health(database_path: str) -> dict[str, object]:

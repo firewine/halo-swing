@@ -266,6 +266,7 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "database_path" in guide
     assert "state/halo_swing.sqlite" in guide
     assert "get_signal_replay_bundle" in guide
+    assert "apply_storage_migrations" in guide
     assert "`HALO_SWING_DATABASE_URL`\nremains blank by default" in guide
     assert "env-based repository selection is not wired in this slice" in guide_text
     assert "do not commit SQLite files" in guide

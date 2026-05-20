@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_STORAGE_HEALTH_TOOL_VERIFIED
-gate_id: P1_REPOSITORY_STORAGE_HEALTH_TOOL_GATE
+status: P1_STORAGE_MIGRATION_TOOL_VERIFIED
+gate_id: P1_STORAGE_MIGRATION_TOOL_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified explicit database_path storage health tool; continue with next explicit repository or storage slice
+next_atomic_step: no open code step remains after verified explicit database_path storage migration tool; continue with next explicit repository or storage slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -60,6 +60,7 @@ allowed_edit_paths:
   - src/halo_swing_mcp/tools/storage.py
   - tests/golden/health_check.json
   - tests/golden/mvp_tool_contracts.json
+  - tests/test_setup_docs.py
   - tests/test_storage_migrations.py
   - tests/test_setup_docs.py
   - tests/test_tool_registry.py
@@ -79,16 +80,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_storage_health is callable through the shared registry, CLI harness, and MCP server wrapper with explicit database_path input
-  - get_storage_health returns the existing StorageHealth DTO shape and reports missing database paths without creating repo DB artifacts
-  - health_check, README, DevOps guide, and MVP tool contract fixtures include get_storage_health in deterministic tool order
-  - storage health tests cover unmigrated, migrated, harness, and server/registry wrapper paths
+  - apply_storage_migrations is callable through the shared registry, CLI harness, and MCP server wrapper with explicit database_path input
+  - apply_storage_migrations returns deterministic migration result fields and applies the existing idempotent SQLite migration runner
+  - health_check, README, DevOps guide, and MVP tool contract fixtures include apply_storage_migrations in deterministic tool order
+  - storage migration tests cover registry, harness, idempotency, server wrapper metadata, and repo-artifact isolation
   - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -195,15 +196,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_STORAGE_HEALTH_TOOL_GATE
-scope: explicit database_path SQLite storage health MCP/CLI tool
+gate_id: P1_STORAGE_MIGRATION_TOOL_GATE
+scope: explicit database_path SQLite storage migration MCP/CLI tool
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -213,8 +214,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 13 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 895 passed in 37.79s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 14 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 38.85s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -232,10 +233,10 @@ files_changed:
   - tests/test_storage_migrations.py
 next_state: continue with next explicit repository or storage slice
 notes:
-  - get_storage_health is now callable through the shared registry, CLI harness, and MCP server wrapper
-  - the tool requires explicit database_path and returns the existing StorageHealth DTO shape
-  - missing database paths report zero migrations/domain tables without creating repository DB artifacts
-  - health_check, README, DevOps guide, and MVP contract fixtures include get_storage_health in deterministic tool order
+  - apply_storage_migrations is now callable through the shared registry, CLI harness, and MCP server wrapper
+  - the tool requires explicit database_path and returns deterministic migration result fields
+  - repeated calls are idempotent and return applied/skipped migration versions
+  - health_check, README, DevOps guide, and MVP contract fixtures include apply_storage_migrations in deterministic tool order
   - no live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 

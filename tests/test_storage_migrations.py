@@ -74,6 +74,42 @@ def test_storage_health_tool_reports_missing_database_without_creating_artifact(
     assert list((ROOT / "state").glob("*.sqlite")) == []
 
 
+def test_apply_storage_migrations_tool_is_idempotent_and_reports_tables(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "nested" / "halo_swing.sqlite"
+
+    first_result = call_tool(
+        "apply_storage_migrations",
+        {"database_path": f" {database_path} "},
+    )
+    second_result = call_tool(
+        "apply_storage_migrations",
+        {"database_path": str(database_path)},
+    )
+
+    assert first_result["status"] == "ok"
+    assert first_result["database_path"] == str(database_path)
+    assert first_result["applied_versions"] == [
+        "202605100001_initial_replay_schema",
+    ]
+    assert first_result["skipped_versions"] == []
+    assert first_result["migration_count"] == 1
+    assert first_result["latest_migration"] == "202605100001_initial_replay_schema"
+    assert first_result["domain_tables_present"] == list(DOMAIN_TABLES)
+    assert first_result["live_data_required"] is False
+    assert first_result["secret_values_returned"] is False
+    assert second_result["applied_versions"] == []
+    assert second_result["skipped_versions"] == [
+        "202605100001_initial_replay_schema",
+    ]
+    assert second_result["domain_tables_present"] == list(DOMAIN_TABLES)
+    assert database_path.exists()
+    assert database_path.is_relative_to(tmp_path)
+    assert list((ROOT / "data").glob("*.sqlite")) == []
+    assert list((ROOT / "state").glob("*.sqlite")) == []
+
+
 def test_storage_health_harness_reports_migrated_database(
     tmp_path: Path,
 ) -> None:
@@ -101,6 +137,37 @@ def test_storage_health_harness_reports_migrated_database(
     assert health["migration_count"] == 1
     assert health["latest_migration"] == "202605100001_initial_replay_schema"
     assert health["domain_tables_present"] == list(DOMAIN_TABLES)
+
+
+def test_apply_storage_migrations_harness_reports_idempotent_result(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "halo_swing_mcp.harness",
+            "apply_storage_migrations",
+            "--input-json",
+            json.dumps({"database_path": str(database_path)}),
+            "--no-audit",
+        ],
+        check=True,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    payload = json.loads(result.stdout)
+
+    assert payload["status"] == "ok"
+    assert payload["database_path"] == str(database_path)
+    assert payload["applied_versions"] == ["202605100001_initial_replay_schema"]
+    assert payload["skipped_versions"] == []
+    assert payload["migration_count"] == 1
+    assert payload["domain_tables_present"] == list(DOMAIN_TABLES)
+    assert payload["secret_values_returned"] is False
 
 
 def test_initial_replay_schema_contains_required_indexes_and_foreign_keys(

@@ -175,6 +175,7 @@ PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness record_signal --inpu
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness label_signal_outcome --input-json '{"database_path":"state/halo_swing.sqlite"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_signal_replay_bundle --input-json '{"signal_id":"sig_fixture_20260511_tqqq","database_path":"state/halo_swing.sqlite"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness get_storage_health --input-json '{"database_path":"state/halo_swing.sqlite"}'
+PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness apply_storage_migrations --input-json '{"database_path":"state/halo_swing.sqlite"}'
 PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness evaluate_score_performance --input-json '{"database_path":"state/halo_swing.sqlite"}'
 ```
 
@@ -182,8 +183,10 @@ The SQLite path applies migrations idempotently, stores `run_journal`,
 `strategy_config`, `feature_store`, `evidence_card`, `artifact_ref`,
 `signal_ledger`, and `label_store` rows, lets `get_signal_replay_bundle`
 return replay sections plus structured missing-link errors, and exposes
-`get_storage_health` for migration/table checks. The default JSONL path remains
-available for lightweight local smoke runs.
+`get_storage_health` for migration/table checks. `apply_storage_migrations`
+can apply the same idempotent migration runner explicitly before repository
+writes. The default JSONL path remains available for lightweight local smoke
+runs.
 
 SQLite repository files are local operational state. This project does not yet
 ship backup tooling or retention automation for SQLite repositories. Before
@@ -2189,6 +2192,7 @@ mcp_servers:
         - evaluate_score_performance
         - get_signal_replay_bundle
         - get_storage_health
+        - apply_storage_migrations
         - suggest_weight_update
         - compare_champion_challenger
         - generate_latest_signal_report

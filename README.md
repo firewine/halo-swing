@@ -83,6 +83,7 @@ label_signal_outcome
 evaluate_score_performance
 get_signal_replay_bundle
 get_storage_health
+apply_storage_migrations
 suggest_weight_update
 compare_champion_challenger
 generate_latest_signal_report

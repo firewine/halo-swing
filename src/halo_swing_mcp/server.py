@@ -418,6 +418,18 @@ def get_storage_health(database_path: str) -> dict[str, Any]:
 
 
 @mcp.tool()
+def apply_storage_migrations(database_path: str) -> dict[str, Any]:
+    """Apply SQLite storage migrations for an explicit database path."""
+
+    payload = {"database_path": database_path}
+    return _audited_tool_call(
+        "apply_storage_migrations",
+        payload,
+        call_tool("apply_storage_migrations", payload),
+    )
+
+
+@mcp.tool()
 def suggest_weight_update() -> dict[str, Any]:
     """Return a challenger config proposal without promotion."""
 
