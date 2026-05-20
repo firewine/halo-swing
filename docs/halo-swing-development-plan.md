@@ -776,6 +776,42 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.069 README Capability List Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+README 상단의 MCP tool list가 `health_check` capability surface보다 좁게
+남아 있는 문제를 정리한다. README는 새 사용자와 operator가 먼저 보는 문서이므로,
+현재 권위 목록인 `tests/golden/health_check.json`의 `capabilities`와 같은 순서의
+tool surface를 보여야 한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - README.md says health_check is the authoritative local capability surface
+  - README.md top MCP tool list includes every tests/golden/health_check.json capability in order
+  - README.md keeps live, network, and order side effects guarded and disabled by default tests
+  - tests/test_setup_docs.py compares README.md capability block with the health_check golden fixture
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 46 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 889 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.068 CONTEXT Product Shape Alignment Gate Record - 2026-05-20
 
 ### A. 목적

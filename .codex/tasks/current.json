@@ -1,13 +1,13 @@
 {
-  "gate_id": "CONTEXT_PRODUCT_SHAPE_ALIGNMENT_GATE",
+  "gate_id": "README_CAPABILITY_LIST_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "CONTEXT_PRODUCT_SHAPE_ALIGNMENT_VERIFIED",
+  "status": "README_CAPABILITY_LIST_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.068",
-  "next_atomic_step": "no open code step remains after verified CONTEXT product-shape alignment; continue with the next explicit SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.069",
+  "next_atomic_step": "no open code step remains after verified README capability-list alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "docs/CONTEXT.md",
+    "README.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -15,9 +15,9 @@
   ],
   "read_only_context": [
     "AGENTS.md",
-    "docs/CONTEXT.md",
+    "README.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.067",
+    "docs/halo-swing-development-plan.md#4.068",
     "tests/golden/health_check.json"
   ],
   "blocked_path_prefixes": [
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "docs/CONTEXT.md no longer presents the current MCP surface as only the early core tool list",
-    "docs/CONTEXT.md summarizes current MVP capability families including health, evidence/reporting, replay, readiness/live-smoke harnesses, audit/runtime, and BTC risk/Binance guarded tools",
-    "docs/CONTEXT.md keeps automatic trading and live/runtime side effects out of scope unless later gates approve them",
-    "setup docs tests cover CONTEXT.md product shape wording",
+    "README.md top MCP capability list includes every tests/golden/health_check.json capability in order",
+    "README.md no longer describes the list as only fixture-backed core tools",
+    "README.md still says live/network/order side effects remain guarded and disabled by default tests",
+    "setup docs tests compare README.md capability block with tests/golden/health_check.json",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes"
   ],

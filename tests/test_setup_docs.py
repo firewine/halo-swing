@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 
@@ -6,10 +7,19 @@ AGENTS = ROOT / "AGENTS.md"
 CONTEXT = ROOT / "docs" / "CONTEXT.md"
 README = ROOT / "README.md"
 DEVOPS_GUIDE = ROOT / "docs" / "devops-setup-guide.md"
+HEALTH_CHECK_GOLDEN = ROOT / "tests" / "golden" / "health_check.json"
 
 
 def _normalized_text(path: Path) -> str:
     return " ".join(path.read_text(encoding="utf-8").split())
+
+
+def _readme_capability_block() -> list[str]:
+    readme = README.read_text(encoding="utf-8")
+    marker = "`health_check` is the authoritative local capability surface."
+    block = readme.split(marker, maxsplit=1)[1].split("```text", maxsplit=1)[1]
+    block = block.split("```", maxsplit=1)[0]
+    return [line.strip() for line in block.splitlines() if line.strip()]
 
 
 def test_agents_guide_records_current_storage_gate_status() -> None:
@@ -49,6 +59,16 @@ def test_context_product_shape_matches_current_mvp_surface() -> None:
     assert "자동 주문, broker/order submission, Hermes runtime start, Telegram send" in text
     assert "Initial Product Shape" not in text
     assert "초기 제품은 다음 MCP 도구를 제공한다" not in text
+
+
+def test_readme_capability_list_matches_health_check_golden() -> None:
+    golden = json.loads(HEALTH_CHECK_GOLDEN.read_text(encoding="utf-8"))
+    text = _normalized_text(README)
+
+    assert _readme_capability_block() == golden["capabilities"]
+    assert "`health_check` is the authoritative local capability surface" in text
+    assert "live, network, and order side effects remain guarded" in text
+    assert "fixture-backed versions of the core MCP tools" not in text
 
 
 def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:
