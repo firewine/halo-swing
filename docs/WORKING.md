@@ -42,15 +42,15 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DEVOPS_CAPABILITY_LIST_ALIGNMENT_VERIFIED
-gate_id: DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE
+status: CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_VERIFIED
+gate_id: CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified DevOps capability-list alignment; continue with the next explicit SSOT slice
+next_atomic_step: no open code step remains after verified CONTEXT BTC order-boundary alignment; continue with the next explicit SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - docs/devops-setup-guide.md
+  - docs/CONTEXT.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - docs/devops-setup-guide.md Hermes tool include list includes every tests/golden/health_check.json capability in order
-  - docs/devops-setup-guide.md does not omit replay, readiness/live-smoke, audit/runtime, or BTC guarded tools from the include list
-  - docs/devops-setup-guide.md still says offline MVP tools require no API keys
-  - setup docs tests compare the DevOps include list with tests/golden/health_check.json
+  - docs/CONTEXT.md no longer says automatic order execution is simply outside MVP without the current BTC exception boundary
+  - docs/CONTEXT.md states only BTC COIN-M order execution is exposed and only through explicit confirmation, live-trading flag, encrypted credentials, manual passphrase, and passing risk checks
+  - docs/CONTEXT.md keeps leveraged ETF orders, broker/order expansion, Hermes runtime start, Telegram send, scheduler, and live adapter expansion out of scope until later gates
+  - setup docs tests cover CONTEXT.md BTC order boundary wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes
 
@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE
-scope: docs/devops-setup-guide.md Hermes tool include list alignment with tests/golden/health_check.json
+gate_id: CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_GATE
+scope: docs/CONTEXT.md risk wording alignment with current BTC COIN-M confirmation-gated execution boundary
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -205,22 +205,23 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 47 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 890 passed in 36.95s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 48 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 891 passed in 36.54s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
   - .codex/tasks/current.json
+  - docs/CONTEXT.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - docs/devops-setup-guide.md Hermes tools.include list now matches tests/golden/health_check.json capabilities in order
-  - docs/devops-setup-guide.md registration example includes replay, readiness/live-smoke, audit/runtime, and BTC guarded tools
-  - setup docs tests compare the DevOps include list with the health_check golden fixture
+  - docs/CONTEXT.md now states the current order execution surface is limited to BTC COIN-M confirmation-gated tooling
+  - docs/CONTEXT.md keeps leveraged ETF orders and generic broker/order expansion outside MVP scope
+  - docs/CONTEXT.md records explicit confirmation, live-trading flag, encrypted credentials, manual passphrase, and risk checks as BTC execution requirements
+  - setup docs tests cover the CONTEXT BTC order-boundary wording
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

@@ -72,6 +72,18 @@ def test_context_product_shape_matches_current_mvp_surface() -> None:
     assert "초기 제품은 다음 MCP 도구를 제공한다" not in text
 
 
+def test_context_describes_current_btc_order_boundary() -> None:
+    text = _normalized_text(CONTEXT)
+
+    assert "BTC COIN-M에 한정된 confirmation-gated 도구" in text
+    assert "레버리지 ETF 주문과 범용 broker 자동화는 MVP 범위가 아니다" in text
+    assert "BTC COIN-M order execution만 별도 guarded surface로 존재한다" in text
+    assert "명시적 확인문구, live-trading flag, 암호화 credential" in text
+    assert "수동 passphrase, risk check 통과" in text
+    assert "Hermes runtime start, Telegram send, scheduler 기반 자동 실행" in text
+    assert "자동 주문은 MVP 범위가 아니다" not in text
+
+
 def test_readme_capability_list_matches_health_check_golden() -> None:
     golden = json.loads(HEALTH_CHECK_GOLDEN.read_text(encoding="utf-8"))
     text = _normalized_text(README)

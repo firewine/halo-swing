@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.071 CONTEXT BTC Order Boundary Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+`docs/CONTEXT.md`가 여전히 자동 주문 전체를 MVP 밖으로만 표현해, 현재
+BTC COIN-M confirmation-gated execution tool surface를 정확히 반영하지 못하는
+문제를 정리한다. 이 기록은 주문 범위를 확장하지 않고, 현재 존재하는 BTC 한정
+guarded execution과 여전히 금지인 ETF/broker/runtime 자동화를 구분한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md states the current order execution surface is limited to BTC COIN-M confirmation-gated tooling
+  - docs/CONTEXT.md keeps leveraged ETF orders and generic broker/order expansion outside MVP scope
+  - docs/CONTEXT.md records explicit confirmation, live-trading flag, encrypted credentials, manual passphrase, and risk checks as BTC execution requirements
+  - docs/CONTEXT.md keeps Hermes runtime start, Telegram send, and scheduler-based automatic execution outside product scope until later gates
+  - tests/test_setup_docs.py covers CONTEXT.md BTC order-boundary wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 48 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 891 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.070 DevOps Capability List Alignment Gate Record - 2026-05-20
 
 ### A. 목적

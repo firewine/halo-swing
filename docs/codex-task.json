@@ -1,13 +1,13 @@
 {
-  "gate_id": "DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE",
+  "gate_id": "CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "DEVOPS_CAPABILITY_LIST_ALIGNMENT_VERIFIED",
+  "status": "CONTEXT_BTC_ORDER_BOUNDARY_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.070",
-  "next_atomic_step": "no open code step remains after verified DevOps capability-list alignment; continue with the next explicit SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.071",
+  "next_atomic_step": "no open code step remains after verified CONTEXT BTC order-boundary alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "docs/devops-setup-guide.md",
+    "docs/CONTEXT.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -15,10 +15,10 @@
   ],
   "read_only_context": [
     "AGENTS.md",
-    "docs/devops-setup-guide.md",
+    "docs/CONTEXT.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.069",
-    "tests/golden/health_check.json"
+    "docs/halo-swing-development-plan.md#4.070",
+    "README.md#btc-coin-m-trading-admin"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "docs/devops-setup-guide.md Hermes tool include list includes every tests/golden/health_check.json capability in order",
-    "docs/devops-setup-guide.md does not omit replay, readiness/live-smoke, audit/runtime, or BTC guarded tools from the include list",
-    "docs/devops-setup-guide.md still says offline MVP tools require no API keys",
-    "setup docs tests compare the DevOps include list with tests/golden/health_check.json",
+    "docs/CONTEXT.md no longer says automatic order execution is simply outside MVP without the current BTC exception boundary",
+    "docs/CONTEXT.md states only BTC COIN-M order execution is exposed and only through explicit confirmation, live-trading flag, encrypted credentials, manual passphrase, and passing risk checks",
+    "docs/CONTEXT.md keeps leveraged ETF orders, broker/order expansion, Hermes runtime start, Telegram send, scheduler, and live adapter expansion out of scope until later gates",
+    "setup docs tests cover CONTEXT.md BTC order boundary wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes"
   ],
