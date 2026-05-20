@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.109 P1 Repository SQLite Latest Report Label Status Path-Free Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.102와 4.108에서 SQLite repository-backed latest report의 stored `label_status`가
+`evidence_context`에 path-free로 mirror되고, `evidence_guard` schema에도 포함됨을
+고정했다. 하지만 top-level `latest_signal_report.label_status` 자체가 database path나
+SQLite filename을 노출하지 않는지는 direct assertion이 약하다. 이번 slice는 명시적
+`database_path` SQLite latest report의 top-level label status도 path-free임을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite repository-backed top-level label_status coverage
+  - assert latest_signal_report.label_status omits database path details
+  - assert latest_signal_report.label_status omits SQLite filenames
+  - keep existing SQLite evidence label guard coverage unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite label_status path-free coverage tests: 3 passed
+  - full pytest: 935 passed in 42.33s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.108 P1 Repository SQLite Latest Report Evidence Label Guard Schema Coverage Gate Record - 2026-05-20
 
 ### A. 목적

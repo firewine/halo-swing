@@ -1599,6 +1599,11 @@ def test_latest_signal_report_repository_source_includes_sqlite_label_status(
     assert label_status["labeled_at"] == label["labeled_at"]
     assert label_status["time_barrier_days"] == label["time_barrier_days"]
     assert label_status["live_data_required"] is False
+    assert str(database_path) not in iter_nested_strings(label_status)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(label_status)
+    )
 
 
 def test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context(
