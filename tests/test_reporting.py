@@ -1290,6 +1290,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     record_signal(signal=swing_signal, database_path=str(database_path))
     record_signal(signal=alternate_signal, database_path=str(database_path))
+    selected_label = label_signal_outcome(
+        signal_id=swing_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+    label_signal_outcome(
+        signal_id=alternate_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 450.0],
+        time_barrier_days=3,
+    )
 
     def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
         raise AssertionError("repository-backed report must not rescore the signal")
@@ -1332,9 +1344,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "timeframe": "swing_3d_10d",
         },
     }
+    selected_label_summary = (
+        f"Stored label: outcome={selected_label['outcome']}; "
+        f"realized_r={selected_label['realized_r']}; "
+        f"first_barrier_hit={selected_label['first_barrier_hit']}; "
+        "time_barrier_days=2"
+    )
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
+    label_status = payload["latest_signal_report"]["label_status"]
+    assert label_status["schema_version"] == "signal_label_outcome.v1"
+    assert label_status["signal_id"] == swing_signal["signal_id"]
+    assert label_status["outcome"] == selected_label["outcome"]
+    assert label_status["realized_r"] == selected_label["realized_r"]
+    assert label_status["first_barrier_hit"] == selected_label["first_barrier_hit"]
+    assert label_status["labeled_at"] == selected_label["labeled_at"]
+    assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
+    assert label_status["live_data_required"] is False
     assert payload["source_signal_ref"] == {
         "signal_id": swing_signal["signal_id"],
         "run_id": swing_signal["run_id"],
@@ -1378,6 +1405,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
+    assert selected_label_summary in reasons["items"]
+    assert f"- {selected_label_summary}" in payload["text"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == ["storage", "db_required", "filters"]
@@ -1413,6 +1442,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash_digest_hex": True,
     }
     assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
@@ -1420,6 +1450,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(label_status)
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_signal_ref"])
@@ -1466,6 +1500,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     record_signal(signal=qqq_signal, database_path=str(database_path))
     record_signal(signal=ndx_signal, database_path=str(database_path))
+    selected_label = label_signal_outcome(
+        signal_id=qqq_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+    label_signal_outcome(
+        signal_id=ndx_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 450.0],
+        time_barrier_days=3,
+    )
 
     def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
         raise AssertionError("repository-backed report must not rescore the signal")
@@ -1508,9 +1554,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "timeframe": "swing_3d_10d",
         },
     }
+    selected_label_summary = (
+        f"Stored label: outcome={selected_label['outcome']}; "
+        f"realized_r={selected_label['realized_r']}; "
+        f"first_barrier_hit={selected_label['first_barrier_hit']}; "
+        "time_barrier_days=2"
+    )
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
+    label_status = payload["latest_signal_report"]["label_status"]
+    assert label_status["schema_version"] == "signal_label_outcome.v1"
+    assert label_status["signal_id"] == qqq_signal["signal_id"]
+    assert label_status["outcome"] == selected_label["outcome"]
+    assert label_status["realized_r"] == selected_label["realized_r"]
+    assert label_status["first_barrier_hit"] == selected_label["first_barrier_hit"]
+    assert label_status["labeled_at"] == selected_label["labeled_at"]
+    assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
+    assert label_status["live_data_required"] is False
     assert payload["source_signal_ref"] == {
         "signal_id": qqq_signal["signal_id"],
         "run_id": qqq_signal["run_id"],
@@ -1554,6 +1615,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
+    assert selected_label_summary in reasons["items"]
+    assert f"- {selected_label_summary}" in payload["text"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == ["storage", "db_required", "filters"]
@@ -1589,6 +1652,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash_digest_hex": True,
     }
     assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
@@ -1596,6 +1660,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(label_status)
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_signal_ref"])
