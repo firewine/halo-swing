@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.106 P1 Repository SQLite Latest Report Context Summary Text Guard Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.104와 4.105에서 SQLite repository-backed latest report의 source/label summary가
+default report와 `intraday_risk_watch` text에 표시됨을 고정했다. JSONL 경로는
+`report_contract_guard`가 `Reasons` 없는 intraday fallback에서도 source summary와
+label summary의 text reflection을 expected/actual로 검증하는지 직접 확인한다. 이번
+slice는 명시적 `database_path` SQLite 경로에도 같은 guard evidence coverage를 붙여,
+report text가 보이는 것뿐 아니라 guard가 그 사실을 path-free로 증명함을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add SQLite repository-backed intraday report_contract_guard context summary coverage
+  - assert report_contract_guard validates repository source summary text reflection
+  - assert report_contract_guard validates stored label summary text reflection
+  - assert guard checks and schema references omit database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_context_summary_text_guard_validates_intraday_fallback tests/test_reporting.py::test_latest_signal_report_sqlite_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_repository_context_summary_text_guard_validates_intraday_fallback -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite context summary text guard coverage tests: 3 passed
+  - full pytest: 934 passed in 49.65s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.105 P1 Repository SQLite Latest Report Source Summary Text Coverage Gate Record - 2026-05-20
 
 ### A. 목적

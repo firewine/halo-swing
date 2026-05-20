@@ -1690,6 +1690,75 @@ def test_latest_signal_report_sqlite_repository_context_summaries_survive_intrad
     )
 
 
+def test_latest_signal_report_sqlite_repository_context_summary_text_guard_validates_intraday_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD"),
+        "signal_id": "sig_report_intraday_context_guard_sqlite",
+        "run_id": "run_report_intraday_context_guard_sqlite",
+        "created_at": "2026-05-20T15:09:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        database_path=f" {database_path} ",
+        report_intent="intraday_risk_watch",
+    )
+    guard_checks = {
+        check["name"]: check for check in payload["report_contract_guard"]["checks"]
+    }
+    source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=QLD underlying=<any> timeframe=swing_3d_10d"
+    )
+    label_summary = (
+        f"Stored label: outcome={label['outcome']}; "
+        f"realized_r={label['realized_r']}; "
+        f"first_barrier_hit={label['first_barrier_hit']}; "
+        "time_barrier_days=2"
+    )
+
+    assert payload["report_contract_guard"]["status"] == "ok"
+    assert guard_checks["report_text_reflects_source_repository_summary"] == {
+        "name": "report_text_reflects_source_repository_summary",
+        "passed": True,
+        "expected": source_summary,
+        "actual": source_summary,
+    }
+    assert guard_checks["report_text_reflects_label_status_summary"] == {
+        "name": "report_text_reflects_label_status_summary",
+        "passed": True,
+        "expected": label_summary,
+        "actual": label_summary,
+    }
+    assert "report_text_reflects_source_repository_summary" in guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "report_text_reflects_label_status_summary" in guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
+    assert str(database_path) not in iter_nested_strings(guard_checks)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(guard_checks)
+    )
+
+
 def test_latest_signal_report_rejects_missing_repository_source(
     tmp_path: Path,
 ) -> None:
