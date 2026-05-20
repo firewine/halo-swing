@@ -128,6 +128,8 @@ notes:
   - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first
   - provider resolver tuples and credential selection behavior were not changed
   - follow-up dynamic audit found no provider-family accepted_env_keys, required_env_keys, env_keys, or missing_env_keys lists that expose preferred API keys behind aliases in API-key setup/status/route/pipeline summary payloads
+  - task contract mirrors now record the pushed/no-open-code-step state rather than a fresh implementation step
+  - task mirror sync verification passed: task diff clean, both JSON mirrors parse, git diff --check passed, health_check status ok
 ```
 
 Previous completed directive:
