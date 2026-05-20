@@ -42,7 +42,7 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_VERIFIED
+status: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_PUSHED
 gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
 review_tier: S1_small
 
@@ -87,7 +87,7 @@ done_means:
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified direct provider smoke accepted-key order gate, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+next_state_after_success: pushed to origin/main in commit 399701d, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 ```
 
 Latest verification result:
@@ -122,10 +122,12 @@ files_changed:
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/market.py
   - tests/test_providers.py
-next_state: commit and push this verified direct provider smoke accepted-key order gate
+pushed_commit: 399701d Prefer simple keys in provider smoke metadata
+next_state: no open code step after push; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 notes:
   - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first
   - provider resolver tuples and credential selection behavior were not changed
+  - follow-up dynamic audit found no provider-family accepted_env_keys, required_env_keys, env_keys, or missing_env_keys lists that expose preferred API keys behind aliases in API-key setup/status/route/pipeline summary payloads
 ```
 
 Previous completed directive:
