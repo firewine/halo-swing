@@ -884,9 +884,9 @@ def test_macro_snapshot_declares_live_fred_boundary_without_secret(
         "smoke_command_name": "get_macro_snapshot_live_smoke",
         "preferred_env_key": "FRED_API_KEY",
         "accepted_env_keys": [
+            "FRED_API_KEY",
             "HALO_SWING_MACRO_API_KEY",
             "HALO_SWING_FRED_API_KEY",
-            "FRED_API_KEY",
         ],
         "expected_live_contract": "macro_filter_contract",
         "expected_live_checks": [
@@ -988,9 +988,9 @@ def test_news_bundle_marks_newsapi_cards_as_live(monkeypatch) -> None:
         "smoke_command_name": "get_news_bundle_live_smoke",
         "preferred_env_key": "NEWSAPI_KEY",
         "accepted_env_keys": [
+            "NEWSAPI_KEY",
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
-            "NEWSAPI_KEY",
         ],
         "expected_live_contract": "news_source_policy_contract",
         "expected_live_checks": [
@@ -1074,8 +1074,8 @@ def test_market_snapshot_declares_live_provider_boundary_without_secret(
         "smoke_command_name": "get_market_snapshot_live_smoke",
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
-            "HALO_SWING_MARKET_DATA_API_KEY",
             "POLYGON_API_KEY",
+            "HALO_SWING_MARKET_DATA_API_KEY",
         ],
         "expected_live_contract": "market_snapshot_contract",
         "expected_live_checks": ["live_data_boundary_declared"],
@@ -1135,8 +1135,8 @@ def test_market_snapshot_live_provider_exception_returns_recovery_metadata(
         "smoke_command_name": "get_market_snapshot_live_smoke",
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
-            "HALO_SWING_MARKET_DATA_API_KEY",
             "POLYGON_API_KEY",
+            "HALO_SWING_MARKET_DATA_API_KEY",
         ],
         "next_setup_action": "verify_provider_credentials_or_network",
         "expected_live_contract": "market_snapshot_contract",
@@ -1198,9 +1198,9 @@ def test_macro_snapshot_live_provider_exception_returns_recovery_metadata(
         "smoke_command_name": "get_macro_snapshot_live_smoke",
         "preferred_env_key": "FRED_API_KEY",
         "accepted_env_keys": [
+            "FRED_API_KEY",
             "HALO_SWING_MACRO_API_KEY",
             "HALO_SWING_FRED_API_KEY",
-            "FRED_API_KEY",
         ],
         "next_setup_action": "verify_provider_credentials_or_network",
         "expected_live_contract": "macro_filter_contract",
@@ -1267,9 +1267,9 @@ def test_news_bundle_live_provider_exception_returns_recovery_metadata(
         "smoke_command_name": "get_news_bundle_live_smoke",
         "preferred_env_key": "NEWSAPI_KEY",
         "accepted_env_keys": [
+            "NEWSAPI_KEY",
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
-            "NEWSAPI_KEY",
         ],
         "next_setup_action": "verify_provider_credentials_or_network",
         "expected_live_contract": "news_source_policy_contract",

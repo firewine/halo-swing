@@ -48,8 +48,8 @@ PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
     "market": {
         "preferred_env_key": "POLYGON_API_KEY",
         "accepted_env_keys": [
-            "HALO_SWING_MARKET_DATA_API_KEY",
             "POLYGON_API_KEY",
+            "HALO_SWING_MARKET_DATA_API_KEY",
         ],
         "expected_live_contract": "market_snapshot_contract",
         "expected_live_checks": ["live_data_boundary_declared"],
@@ -57,9 +57,9 @@ PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
     "macro": {
         "preferred_env_key": "FRED_API_KEY",
         "accepted_env_keys": [
+            "FRED_API_KEY",
             "HALO_SWING_MACRO_API_KEY",
             "HALO_SWING_FRED_API_KEY",
-            "FRED_API_KEY",
         ],
         "expected_live_contract": "macro_filter_contract",
         "expected_live_checks": [
@@ -70,9 +70,9 @@ PROVIDER_SMOKE_ERROR_HINTS: dict[str, dict[str, Any]] = {
     "news": {
         "preferred_env_key": "NEWSAPI_KEY",
         "accepted_env_keys": [
+            "NEWSAPI_KEY",
             "HALO_SWING_NEWS_API_KEY",
             "NEWS_API_KEY",
-            "NEWSAPI_KEY",
         ],
         "expected_live_contract": "news_source_policy_contract",
         "expected_live_checks": [

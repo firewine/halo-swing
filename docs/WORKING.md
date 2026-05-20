@@ -42,20 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_VERIFIED
-gate_id: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_GATE
+status: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: make get_live_data_provider_route route-level provider accepted_env_keys show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing resolver priority or configured_env_keys order
+next_atomic_step: make direct live provider smoke success and recovery accepted_env_keys show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing provider resolver priority
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/market.py
   - tests/test_providers.py
-  - tests/test_readiness.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -72,37 +71,37 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_live_data_provider_route providers.market.accepted_env_keys lists POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
-  - get_live_data_provider_route providers.macro.accepted_env_keys lists FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
-  - get_live_data_provider_route providers.news.accepted_env_keys lists NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
-  - provider resolver constants remain unchanged and configured_env_keys still follow the resolver detection order
+  - direct get_market_snapshot provider_smoke_summary and error_summary accepted_env_keys list POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
+  - direct get_macro_snapshot provider_smoke_summary and error_summary accepted_env_keys list FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
+  - direct get_news_bundle provider_smoke_summary and error_summary accepted_env_keys list NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
+  - provider resolver constants and credential selection priority remain unchanged
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified provider route accepted-key order gate, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+next_state_after_success: commit and push this verified direct provider smoke accepted-key order gate, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_GATE
+gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -111,8 +110,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q: 4 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q: 169 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q: 6 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
   - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
@@ -121,14 +120,12 @@ files_changed:
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/providers.py
+  - src/halo_swing_mcp/tools/market.py
   - tests/test_providers.py
-  - tests/test_readiness.py
-next_state: commit and push this verified provider route accepted-key order gate
+next_state: commit and push this verified direct provider smoke accepted-key order gate
 notes:
-  - API-key status, setup checklist, provider smoke metadata, docs, and setup summaries already prefer POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
-  - get_live_data_provider_route route-level providers now expose accepted_env_keys preferred-first
-  - provider resolver constants and configured_env_keys detection order remain unchanged
+  - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first
+  - provider resolver tuples and credential selection behavior were not changed
 ```
 
 Previous completed directive:

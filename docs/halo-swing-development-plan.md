@@ -776,6 +776,65 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.056 API Key Integration Direct Provider Smoke Accepted-Key Order Gate Record - 2026-05-20
+
+### A. 목적
+
+4.055 aligned route-level provider `accepted_env_keys` display with the preferred
+simple keys while preserving resolver priority. Direct live provider smoke
+payloads still share the same hint table for success summaries and recovery
+metadata, and that table still lists project-specific aliases before the
+preferred copy/paste keys. This slice makes direct provider smoke
+`accepted_env_keys` display preferred-first for market, macro, and news without
+changing provider resolver tuples or credential selection behavior.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - order get_market_snapshot provider_smoke_summary and error_summary accepted_env_keys as POLYGON_API_KEY, HALO_SWING_MARKET_DATA_API_KEY
+  - order get_macro_snapshot provider_smoke_summary and error_summary accepted_env_keys as FRED_API_KEY, HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY
+  - order get_news_bundle provider_smoke_summary and error_summary accepted_env_keys as NEWSAPI_KEY, HALO_SWING_NEWS_API_KEY, NEWS_API_KEY
+  - preserve provider resolver tuple order and credential selection priority
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key removal
+  - route configured_env_keys order change
+  - operator docs or .env.example change
+  - automatic .env mutation
+  - secret value insertion
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q: 6 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적
