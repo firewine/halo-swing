@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.103 P1 Repository SQLite Latest Report Label Summary Text Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.102에서 SQLite repository-backed latest report의 stored `label_status`가
+`evidence_context`와 `evidence_guard`에 반영됨을 고정했다. JSONL 경로는 stored label
+summary가 `sections`와 `text`에 표시되는지도 직접 검증하지만, SQLite 경로는 아직
+top-level/evidence coverage 중심이다. 이번 slice는 명시적 `database_path` SQLite
+report에서도 stored label summary가 user-facing sections/text에 path-free로 반영됨을
+고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add SQLite repository-backed latest report label summary sections/text coverage
+  - assert label summary text omits database path and SQLite filenames
+  - keep existing SQLite label_status evidence coverage unchanged
+  - keep default no-repository latest report payload and golden snapshot unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_summary_appears_in_sections_and_text tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context tests/test_reporting.py::test_latest_signal_report_repository_label_summary_appears_in_sections_and_text -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite latest report label summary text coverage tests: 3 passed
+  - full pytest: 931 passed in 54.00s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.102 P1 Repository SQLite Latest Report Label Evidence Coverage Gate Record - 2026-05-20
 
 ### A. 목적

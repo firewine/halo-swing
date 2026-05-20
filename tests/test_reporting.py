@@ -1531,6 +1531,53 @@ def test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evi
     assert payload["evidence_guard"]["status"] == "ok"
 
 
+def test_latest_signal_report_sqlite_repository_label_summary_appears_in_sections_and_text(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD"),
+        "signal_id": "sig_report_label_summary_sqlite",
+        "run_id": "run_report_label_summary_sqlite",
+        "created_at": "2026-05-20T15:06:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        database_path=f" {database_path} ",
+    )
+    reasons = next(
+        section for section in payload["sections"] if section["title"] == "Reasons"
+    )
+    label_summary = (
+        f"Stored label: outcome={label['outcome']}; "
+        f"realized_r={label['realized_r']}; "
+        f"first_barrier_hit={label['first_barrier_hit']}; "
+        "time_barrier_days=2"
+    )
+
+    assert label_summary in reasons["items"]
+    assert f"- {label_summary}" in payload["text"]
+    assert str(database_path) not in iter_nested_strings(reasons)
+    assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(reasons)
+    )
+
+
 def test_latest_signal_report_rejects_missing_repository_source(
     tmp_path: Path,
 ) -> None:
