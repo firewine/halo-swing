@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE
-scope: AGENTS.md storage gate status after P1 storage/docs_devops close readiness
+gate_id: FULL_FEATURE_INSPECTION_2026_05_20
+scope: full repository feature inspection after MIGRATION_GO and REPOSITORY_GO approval
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -204,24 +204,20 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: modified expected docs/task/test files only before commit
+  - git status --short --branch: clean before this WORKING.md inspection log update
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 43 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 886 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 886 passed in 36.81s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
-  - .codex/tasks/current.json
-  - AGENTS.md
   - docs/WORKING.md
-  - docs/codex-task.json
-  - docs/halo-swing-development-plan.md
-  - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded
-  - AGENTS.md now records current storage gates and explicit database_path-only repository activation
-  - AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates
-  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
+  - full offline test suite passes after SQLite migration and explicit database_path repository work
+  - MCP harness advertises 43 capabilities and reports live_data_required=false with status ok
+  - MIGRATION_GO and REPOSITORY_GO implementation is complete for the approved P1 storage/repository slice
+  - live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts remain blocked until later gates
+  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added during this inspection
 ```
 
 Previous completed directive:
