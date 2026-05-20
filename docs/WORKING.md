@@ -42,15 +42,15 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: README_CAPABILITY_LIST_ALIGNMENT_VERIFIED
-gate_id: README_CAPABILITY_LIST_ALIGNMENT_GATE
+status: DEVOPS_CAPABILITY_LIST_ALIGNMENT_VERIFIED
+gate_id: DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified README capability-list alignment; continue with the next explicit SSOT slice
+next_atomic_step: no open code step remains after verified DevOps capability-list alignment; continue with the next explicit SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
+  - docs/devops-setup-guide.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README.md top MCP capability list includes every tests/golden/health_check.json capability in order
-  - README.md no longer describes the list as only fixture-backed core tools
-  - README.md still says live/network/order side effects remain guarded and disabled by default tests
-  - setup docs tests compare README.md capability block with tests/golden/health_check.json
+  - docs/devops-setup-guide.md Hermes tool include list includes every tests/golden/health_check.json capability in order
+  - docs/devops-setup-guide.md does not omit replay, readiness/live-smoke, audit/runtime, or BTC guarded tools from the include list
+  - docs/devops-setup-guide.md still says offline MVP tools require no API keys
+  - setup docs tests compare the DevOps include list with tests/golden/health_check.json
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes
 
@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: README_CAPABILITY_LIST_ALIGNMENT_GATE
-scope: README.md top MCP capability list alignment with tests/golden/health_check.json
+gate_id: DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE
+scope: docs/devops-setup-guide.md Hermes tool include list alignment with tests/golden/health_check.json
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -205,23 +205,22 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 46 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 889 passed in 36.74s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 47 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 890 passed in 36.95s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - README.md top capability list now matches tests/golden/health_check.json capabilities in order
-  - README.md names health_check as the authoritative local capability surface
-  - README.md no longer describes the full list as only fixture-backed core tools
-  - setup docs tests compare the README capability block with the health_check golden fixture
+  - docs/devops-setup-guide.md Hermes tools.include list now matches tests/golden/health_check.json capabilities in order
+  - docs/devops-setup-guide.md registration example includes replay, readiness/live-smoke, audit/runtime, and BTC guarded tools
+  - setup docs tests compare the DevOps include list with the health_check golden fixture
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

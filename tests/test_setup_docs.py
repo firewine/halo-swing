@@ -22,6 +22,17 @@ def _readme_capability_block() -> list[str]:
     return [line.strip() for line in block.splitlines() if line.strip()]
 
 
+def _devops_tool_include_block() -> list[str]:
+    guide = DEVOPS_GUIDE.read_text(encoding="utf-8")
+    block = guide.split("tools:\n      include:", maxsplit=1)[1]
+    block = block.split("```", maxsplit=1)[0]
+    return [
+        line.split("-", maxsplit=1)[1].strip()
+        for line in block.splitlines()
+        if line.strip().startswith("- ")
+    ]
+
+
 def test_agents_guide_records_current_storage_gate_status() -> None:
     text = _normalized_text(AGENTS)
 
@@ -69,6 +80,15 @@ def test_readme_capability_list_matches_health_check_golden() -> None:
     assert "`health_check` is the authoritative local capability surface" in text
     assert "live, network, and order side effects remain guarded" in text
     assert "fixture-backed versions of the core MCP tools" not in text
+
+
+def test_devops_tool_include_list_matches_health_check_golden() -> None:
+    golden = json.loads(HEALTH_CHECK_GOLDEN.read_text(encoding="utf-8"))
+    guide = _normalized_text(DEVOPS_GUIDE)
+
+    assert _devops_tool_include_block() == golden["capabilities"]
+    assert "Later live-data phases may add API keys to `env`" in guide
+    assert "offline MVP tools must not require them" in guide
 
 
 def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:

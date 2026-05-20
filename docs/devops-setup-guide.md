@@ -2185,12 +2185,22 @@ mcp_servers:
         - record_signal
         - label_signal_outcome
         - evaluate_score_performance
+        - get_signal_replay_bundle
         - suggest_weight_update
         - compare_champion_challenger
         - generate_latest_signal_report
         - generate_position_review_report
         - generate_cron_prompt_pack
         - get_integration_readiness
+        - get_integration_setup_checklist
+        - get_live_data_api_key_status
+        - get_live_data_provider_route
+        - validate_live_data_smoke_result
+        - run_live_data_smoke
+        - run_integration_smoke
+        - run_live_signal_workflow_smoke
+        - run_live_recording_smoke
+        - run_api_key_pipeline_smoke
         - get_audit_log
         - get_audit_summary
         - get_runtime_status

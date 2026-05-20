@@ -1,13 +1,13 @@
 {
-  "gate_id": "README_CAPABILITY_LIST_ALIGNMENT_GATE",
+  "gate_id": "DEVOPS_CAPABILITY_LIST_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "README_CAPABILITY_LIST_ALIGNMENT_VERIFIED",
+  "status": "DEVOPS_CAPABILITY_LIST_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.069",
-  "next_atomic_step": "no open code step remains after verified README capability-list alignment; continue with the next explicit SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.070",
+  "next_atomic_step": "no open code step remains after verified DevOps capability-list alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "README.md",
+    "docs/devops-setup-guide.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -15,9 +15,9 @@
   ],
   "read_only_context": [
     "AGENTS.md",
-    "README.md",
+    "docs/devops-setup-guide.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.068",
+    "docs/halo-swing-development-plan.md#4.069",
     "tests/golden/health_check.json"
   ],
   "blocked_path_prefixes": [
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "README.md top MCP capability list includes every tests/golden/health_check.json capability in order",
-    "README.md no longer describes the list as only fixture-backed core tools",
-    "README.md still says live/network/order side effects remain guarded and disabled by default tests",
-    "setup docs tests compare README.md capability block with tests/golden/health_check.json",
+    "docs/devops-setup-guide.md Hermes tool include list includes every tests/golden/health_check.json capability in order",
+    "docs/devops-setup-guide.md does not omit replay, readiness/live-smoke, audit/runtime, or BTC guarded tools from the include list",
+    "docs/devops-setup-guide.md still says offline MVP tools require no API keys",
+    "setup docs tests compare the DevOps include list with tests/golden/health_check.json",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes"
   ],

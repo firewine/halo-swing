@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.070 DevOps Capability List Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+DevOps guide의 Hermes MCP 등록 예시 `tools.include` 목록이 현재
+`health_check` capability surface보다 좁게 남아 있는 문제를 정리한다. Operator가
+등록 예시를 그대로 사용할 때 replay, readiness/live-smoke, audit/runtime, BTC
+guarded tools가 누락되지 않도록 `tests/golden/health_check.json`과 같은 순서로
+고정한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md Hermes tools.include list includes every health_check golden capability in order
+  - docs/devops-setup-guide.md includes replay, readiness/live-smoke, audit/runtime, and BTC guarded tools in the registration example
+  - docs/devops-setup-guide.md keeps offline MVP tools API-key-free by default
+  - tests/test_setup_docs.py compares the DevOps include list with tests/golden/health_check.json
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 47 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 890 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.069 README Capability List Alignment Gate Record - 2026-05-20
 
 ### A. 목적
