@@ -1649,6 +1649,17 @@ def test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evi
         "expected": payload["latest_signal_report"]["label_status"],
         "actual": evidence_label_status,
     }
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
+    assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_guard_checks)
+    )
     assert payload["evidence_guard"]["status"] == "ok"
 
 

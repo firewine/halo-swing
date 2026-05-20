@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.108 P1 Repository SQLite Latest Report Evidence Label Guard Schema Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.102에서 SQLite repository-backed latest report의 stored `label_status`가
+`evidence_context`에 mirror되고 `evidence_guard`의 reflection check가 통과함을 고정했다.
+JSONL 경로는 같은 check가 `evidence_guard` check-name schema와 check-key schema에도
+포함되는지 직접 검증한다. 이번 slice는 SQLite 경로에도 같은 schema reference coverage를
+붙여, label evidence guard가 단순히 통과하는 것뿐 아니라 guard schema에 명시적으로
+포함됨을 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite repository-backed label evidence guard coverage
+  - assert evidence_guard check-name schema includes label_status_reflected_in_evidence_context
+  - assert evidence_guard check-key schema includes label_status_reflected_in_evidence_context
+  - assert SQLite label evidence guard checks omit database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused SQLite evidence label guard schema coverage tests: 3 passed
+  - full pytest: 935 passed in 42.66s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.107 P1 Repository SQLite Latest Report Evidence Source Guard Coverage Gate Record - 2026-05-20
 
 ### A. 목적
