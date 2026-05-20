@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_SIGNAL_REPORT_SOURCE_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_SIGNAL_REPORT_SOURCE_GATE
+status: P1_REPOSITORY_LATEST_SIGNAL_TIMEFRAME_FILTER_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_TIMEFRAME_FILTER_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest signal report source; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified latest signal timeframe filtering; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -56,8 +56,11 @@ allowed_edit_paths:
   - README.md
   - docs/devops-setup-guide.md
   - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tools/recording.py
   - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_mvp_tools.py
   - tests/test_reporting.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -75,17 +78,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_can_use_jsonl_repository_source tests/test_reporting.py::test_latest_signal_report_can_use_sqlite_repository_source tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - generate_latest_signal_report accepts explicit ledger_path or database_path inputs and rejects using both
-  - when a repository path is provided, the report source signal comes from get_latest_signal_record instead of fresh score_leverage_swing output
-  - source_signal_ref, latest_signal_report identity fields, report sections, and guards reflect the stored signal
-  - missing repository source returns a clear ValueError instead of silently falling back to fixture scoring
-  - default no-repository report behavior and golden snapshot remain unchanged
+  - get_latest_signal_record accepts an optional timeframe filter and includes it in returned filters and missing-link refs
+  - JSONL and SQLite latest record lookup select the latest signal matching asset, underlying, and timeframe
+  - generate_latest_signal_report passes its normalized timeframe into repository-backed latest signal source selection
+  - repository-backed reports no longer use a latest same-asset signal from a different timeframe
+  - default no-repository report behavior remains unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -192,15 +195,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_LATEST_SIGNAL_REPORT_SOURCE_GATE
-scope: repository-backed latest signal report source for JSONL and SQLite repositories
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_TIMEFRAME_FILTER_GATE
+scope: timeframe filtering for latest signal record and repository-backed latest report source
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_can_use_jsonl_repository_source tests/test_reporting.py::test_latest_signal_report_can_use_sqlite_repository_source tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -209,9 +212,9 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: modified expected docs/task/reporting/server/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_can_use_jsonl_repository_source tests/test_reporting.py::test_latest_signal_report_can_use_sqlite_repository_source tests/test_reporting.py::test_latest_signal_report_rejects_missing_repository_source tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q: 4 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 901 passed in 37.42s
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 903 passed in 37.94s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -222,15 +225,17 @@ files_changed:
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/server.py
+  - src/halo_swing_mcp/tools/recording.py
   - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_mvp_tools.py
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - generate_latest_signal_report now accepts explicit ledger_path and database_path inputs
-  - repository-backed reports use get_latest_signal_record as the source signal instead of rescoring
-  - source_signal_ref, latest_signal_report identity, report sections, and guards reflect the stored signal
-  - missing repository source raises ValueError instead of silently falling back to fixture scoring
-  - default no-repository latest signal report snapshot remains unchanged
+  - get_latest_signal_record now accepts optional timeframe and includes it in filters and missing-link refs
+  - JSONL and SQLite latest record lookup selects the latest signal matching asset, underlying, and timeframe
+  - repository-backed generate_latest_signal_report passes its normalized timeframe into latest record source selection
+  - repository-backed reports no longer use a latest same-asset signal from a different timeframe
+  - default no-repository latest signal report behavior remains unchanged
   - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 

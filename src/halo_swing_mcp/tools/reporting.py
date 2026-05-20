@@ -661,6 +661,7 @@ def _latest_report_source_signal(
         ledger_path=ledger_path,
         database_path=database_path,
         asset=asset,
+        timeframe=timeframe,
     )
     if latest_record["status"] != "found":
         raise ValueError(

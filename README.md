@@ -168,7 +168,8 @@ realized R are calculated only inside `price_path[:time_barrier_days]`.
 run/config traceability, an idempotency key, and no-network/no-DB guards.
 After an explicit SQLite or JSONL repository path has records,
 `get_latest_signal_record` can read the newest matching signal by optional
-asset or underlying filter without enabling live data or env-based DB selection.
+asset, underlying, or timeframe filter without enabling live data or env-based
+DB selection.
 `generate_latest_signal_report` can use the same explicit repository paths as
 its source signal, so report text and `source_signal_ref` can reflect the stored
 latest record instead of a freshly generated fixture score.

@@ -1046,10 +1046,18 @@ def test_get_latest_signal_record_reads_jsonl_and_sqlite(tmp_path: Path) -> None
 
         assert latest_tqqq["status"] == "found"
         assert latest_tqqq["signal_id"] == first_signal["signal_id"]
-        assert latest_tqqq["filters"] == {"asset": "TQQQ", "underlying": None}
+        assert latest_tqqq["filters"] == {
+            "asset": "TQQQ",
+            "underlying": None,
+            "timeframe": None,
+        }
         assert latest_spy["status"] == "found"
         assert latest_spy["signal_id"] == second_signal["signal_id"]
-        assert latest_spy["filters"] == {"asset": None, "underlying": "SPY"}
+        assert latest_spy["filters"] == {
+            "asset": None,
+            "underlying": "SPY",
+            "timeframe": None,
+        }
 
         assert missing["status"] == "not_found"
         assert missing["record"] == {}
@@ -1064,6 +1072,55 @@ def test_get_latest_signal_record_reads_jsonl_and_sqlite(tmp_path: Path) -> None
                 "missing_ref_id": "latest:asset=SOXL",
             }
         ]
+
+
+def test_get_latest_signal_record_filters_by_timeframe(tmp_path: Path) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    database_path = tmp_path / "halo_swing.sqlite"
+    swing_signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_latest_tqqq_swing",
+        "run_id": "run_latest_tqqq_swing",
+        "created_at": "2026-05-20T10:00:00Z",
+    }
+    alternate_signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_5d_20d"),
+        "signal_id": "sig_latest_tqqq_alt",
+        "run_id": "run_latest_tqqq_alt",
+        "created_at": "2026-05-20T11:00:00Z",
+    }
+
+    for repository_payload in (
+        {"ledger_path": f" {ledger_path} "},
+        {"database_path": f" {database_path} "},
+    ):
+        record_signal(signal=swing_signal, **repository_payload)
+        record_signal(signal=alternate_signal, **repository_payload)
+
+        unfiltered = get_latest_signal_record(asset="TQQQ", **repository_payload)
+        filtered = get_latest_signal_record(
+            asset="TQQQ",
+            timeframe=" swing_3d_10d ",
+            **repository_payload,
+        )
+        missing = get_latest_signal_record(
+            asset="TQQQ",
+            timeframe="intraday",
+            **repository_payload,
+        )
+
+        assert unfiltered["signal_id"] == alternate_signal["signal_id"]
+        assert filtered["status"] == "found"
+        assert filtered["signal_id"] == swing_signal["signal_id"]
+        assert filtered["filters"] == {
+            "asset": "TQQQ",
+            "underlying": None,
+            "timeframe": "swing_3d_10d",
+        }
+        assert missing["status"] == "not_found"
+        assert missing["missing_links"][0]["missing_ref_id"] == (
+            "latest:asset=TQQQ,timeframe=intraday"
+        )
 
 
 def test_signal_replay_bundle_reports_missing_signal(tmp_path: Path) -> None:

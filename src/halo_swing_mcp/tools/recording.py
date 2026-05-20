@@ -364,8 +364,9 @@ def get_latest_signal_record(
     database_path: str | None = None,
     asset: str | None = None,
     underlying: str | None = None,
+    timeframe: str | None = None,
 ) -> dict[str, Any]:
-    """Return the latest recorded signal, optionally constrained by asset keys."""
+    """Return the latest recorded signal, optionally constrained by report keys."""
 
     normalized_ledger_path = _normalize_optional_path(ledger_path, "ledger_path")
     normalized_database_path = _normalize_optional_path(database_path, "database_path")
@@ -373,6 +374,7 @@ def get_latest_signal_record(
         raise ValueError("ledger_path and database_path cannot both be provided")
     normalized_asset = _normalize_optional_asset_filter(asset, "asset")
     normalized_underlying = _normalize_optional_asset_filter(underlying, "underlying")
+    normalized_timeframe = _normalize_optional_string_identity(timeframe, "timeframe")
 
     repository = get_signal_ledger_repository(
         normalized_ledger_path,
@@ -382,10 +384,12 @@ def get_latest_signal_record(
         repository.list_records(),
         asset=normalized_asset,
         underlying=normalized_underlying,
+        timeframe=normalized_timeframe,
     )
     filters = {
         "asset": normalized_asset,
         "underlying": normalized_underlying,
+        "timeframe": normalized_timeframe,
     }
 
     if record is None:
@@ -408,6 +412,7 @@ def get_latest_signal_record(
                     missing_ref_id=_latest_signal_missing_ref_id(
                         asset=normalized_asset,
                         underlying=normalized_underlying,
+                        timeframe=normalized_timeframe,
                     ),
                 ).model_dump(mode="json")
             ],
@@ -589,6 +594,7 @@ def _select_latest_matching_record(
     *,
     asset: str | None,
     underlying: str | None,
+    timeframe: str | None,
 ) -> dict[str, Any] | None:
     for record in reversed(records):
         signal = record.get("signal")
@@ -601,6 +607,8 @@ def _select_latest_matching_record(
             and str(signal.get("underlying", "")).upper() != underlying
         ):
             continue
+        if timeframe is not None and str(signal.get("timeframe", "")) != timeframe:
+            continue
         return record
     return None
 
@@ -609,12 +617,15 @@ def _latest_signal_missing_ref_id(
     *,
     asset: str | None,
     underlying: str | None,
+    timeframe: str | None,
 ) -> str:
     filters = []
     if asset is not None:
         filters.append(f"asset={asset}")
     if underlying is not None:
         filters.append(f"underlying={underlying}")
+    if timeframe is not None:
+        filters.append(f"timeframe={timeframe}")
     return "latest" if not filters else f"latest:{','.join(filters)}"
 
 

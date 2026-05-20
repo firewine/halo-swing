@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.081 P1 Repository Latest Signal Timeframe Filter Gate Record - 2026-05-20
+
+### A. 목적
+
+P1 read model의 searchable core fields에는 `asset`, `underlying`,
+`timeframe`이 함께 포함된다. `get_latest_signal_record`는 최신 signal record를
+asset/underlying으로 필터링할 수 있지만 timeframe은 아직 보지 않는다. 이 상태면
+repository-backed `generate_latest_signal_report(asset, timeframe, database_path)`
+가 같은 asset의 다른 timeframe 최신 신호를 리포트 source로 사용할 수 있다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add optional timeframe filter to get_latest_signal_record
+  - include timeframe in returned filters and missing-link refs
+  - make JSONL and SQLite repository lookups select the latest matching asset/underlying/timeframe signal
+  - make generate_latest_signal_report pass its normalized timeframe into repository-backed source selection
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 903 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.080 P1 Repository Latest Signal Report Source Gate Record - 2026-05-20
 
 ### A. 목적

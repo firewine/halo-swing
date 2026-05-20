@@ -411,6 +411,7 @@ def get_latest_signal_record(
     database_path: str | None = None,
     asset: str | None = None,
     underlying: str | None = None,
+    timeframe: str | None = None,
 ) -> dict[str, Any]:
     """Return the latest recorded signal from a selected repository."""
 
@@ -419,6 +420,7 @@ def get_latest_signal_record(
         "database_path": database_path,
         "asset": asset,
         "underlying": underlying,
+        "timeframe": timeframe,
     }
     return _audited_tool_call(
         "get_latest_signal_record",

@@ -490,6 +490,41 @@ def test_latest_signal_report_can_use_sqlite_repository_source(
     assert payload["live_data_required"] is False
 
 
+def test_latest_signal_report_repository_source_filters_by_timeframe(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    swing_signal = {
+        **reporting.score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_report_repo_tqqq_swing",
+        "run_id": "run_report_repo_tqqq_swing",
+        "created_at": "2026-05-20T12:00:00Z",
+    }
+    alternate_signal = {
+        **reporting.score_leverage_swing("TQQQ", timeframe="swing_5d_20d"),
+        "signal_id": "sig_report_repo_tqqq_alt",
+        "run_id": "run_report_repo_tqqq_alt",
+        "created_at": "2026-05-20T13:00:00Z",
+    }
+    record_signal(signal=swing_signal, database_path=str(database_path))
+    record_signal(signal=alternate_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="TQQQ",
+        timeframe=" swing_3d_10d ",
+        database_path=f" {database_path} ",
+    )
+
+    assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
+    assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
+    assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
+
+
 def test_latest_signal_report_rejects_missing_repository_source(
     tmp_path: Path,
 ) -> None:
