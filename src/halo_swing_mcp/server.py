@@ -475,6 +475,7 @@ def compare_champion_challenger() -> dict[str, Any]:
 def generate_latest_signal_report(
     asset: str = "TQQQ",
     timeframe: str = "swing_3d_10d",
+    underlying: str | None = None,
     report_intent: str = "pre_market_swing_report",
     include_chart: bool = False,
     chart_timeframe: str = "1d",
@@ -488,6 +489,7 @@ def generate_latest_signal_report(
     payload = {
         "asset": asset,
         "timeframe": timeframe,
+        "underlying": underlying,
         "report_intent": report_intent,
         "include_chart": include_chart,
         "chart_timeframe": chart_timeframe,

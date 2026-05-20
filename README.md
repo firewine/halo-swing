@@ -172,10 +172,11 @@ asset, underlying, or timeframe filter without enabling live data or env-based
 DB selection.
 `generate_latest_signal_report` can use the same explicit repository paths as
 its source signal, so report text and `source_signal_ref` can reflect the stored
-latest record instead of a freshly generated fixture score. When that stored
-record has a label, the report `label_status` summarizes the label outcome. For
-repository-backed reports, `source_repository_ref` records portable storage and
-filter metadata without local ledger or database paths.
+latest record instead of a freshly generated fixture score. Repository-backed
+reports can filter the source by asset, underlying, and timeframe. When that
+stored record has a label, the report `label_status` summarizes the label
+outcome. For repository-backed reports, `source_repository_ref` records portable
+storage and filter metadata without local ledger or database paths.
 `get_integration_readiness` reports blocked deployment gates without network
 calls or secrets, including `live_data_source_readiness.v1` for market OHLCV,
 macro, and news API-key readiness. Live data providers auto-select when their

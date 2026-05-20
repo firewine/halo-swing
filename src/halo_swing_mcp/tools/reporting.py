@@ -72,6 +72,7 @@ REPORT_INTENTS = {
 def generate_latest_signal_report(
     asset: str = "TQQQ",
     timeframe: str = "swing_3d_10d",
+    underlying: str | None = None,
     report_intent: str = "pre_market_swing_report",
     include_chart: bool = False,
     chart_timeframe: str = "1d",
@@ -84,6 +85,7 @@ def generate_latest_signal_report(
 
     normalized_asset = _normalize_report_asset(asset)
     normalized_timeframe = _normalize_report_timeframe(timeframe)
+    normalized_underlying = _normalize_report_underlying_filter(underlying)
     normalized_ledger_path = _normalize_report_repository_path(
         ledger_path,
         "ledger_path",
@@ -113,6 +115,7 @@ def generate_latest_signal_report(
     signal = _latest_report_source_signal(
         asset=normalized_asset,
         timeframe=normalized_timeframe,
+        underlying=normalized_underlying,
         ledger_path=normalized_ledger_path,
         database_path=normalized_database_path,
     )
@@ -689,6 +692,7 @@ def _latest_report_source_signal(
     *,
     asset: str,
     timeframe: str,
+    underlying: str | None,
     ledger_path: str | None,
     database_path: str | None,
 ) -> dict[str, Any]:
@@ -699,6 +703,7 @@ def _latest_report_source_signal(
         ledger_path=ledger_path,
         database_path=database_path,
         asset=asset,
+        underlying=underlying,
         timeframe=timeframe,
     )
     if latest_record["status"] != "found":
@@ -3357,6 +3362,19 @@ def _normalize_report_timeframe(timeframe: str) -> str:
     normalized = timeframe.strip()
     if not normalized:
         raise ValueError("timeframe must be a nonempty string")
+    return normalized
+
+
+def _normalize_report_underlying_filter(underlying: str | None) -> str | None:
+    if underlying is None:
+        return None
+    if not isinstance(underlying, str):
+        raise ValueError("underlying must be a nonempty string")
+    if not _has_no_control_characters(underlying):
+        raise ValueError("underlying must not contain control characters")
+    normalized = underlying.strip().upper()
+    if not normalized:
+        raise ValueError("underlying must be a nonempty string")
     return normalized
 
 

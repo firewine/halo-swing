@@ -86,6 +86,65 @@ results:
 next_state: continue with next explicit repository or report read-model slice
 ```
 
+## 4.084 P1 Repository Latest Report Underlying Filter Gate Record - 2026-05-20
+
+### A. 목적
+
+P1 latest report read-model의 source selection은 `asset`, `underlying`,
+`timeframe`을 core filter로 다뤄야 한다. `get_latest_signal_record`는 이미
+underlying filter를 지원하지만 repository-backed `generate_latest_signal_report`
+공개 입력에는 underlying이 없어 report source selection에서 그 필터를 사용할 수
+없다. 이번 slice는 default fixture report를 바꾸지 않고 explicit repository
+source에 underlying 필터를 전달한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add optional underlying input to generate_latest_signal_report and MCP wrapper
+  - pass normalized underlying into get_latest_signal_record for repository-backed source selection
+  - keep no-repository default report behavior unchanged
+  - include normalized underlying in source_repository_ref.filters when provided
+  - keep server wrapper and registered tool signatures aligned
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused underlying/source metadata/signature tests: 4 passed
+  - full pytest: 909 passed in 37.59s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.082 P1 Repository Latest Report Label Status Gate Record - 2026-05-20
 
 ### A. 목적
