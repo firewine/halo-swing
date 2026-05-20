@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.077 P1 Repository Replay Artifact Refs Gate Record - 2026-05-20
+
+### A. 목적
+
+SQLite repository는 evidence card의 portable `artifact_ref`를 `artifact_ref`
+테이블과 `signal_ledger.artifact_ref_ids_json`에 저장하지만,
+`get_signal_replay_bundle`은 아직 linked artifact refs를 named section으로
+반환하지 않는다. 3.5.6 replay contract의 "linked artifact_ref records when
+present" 요구를 현재 repository replay surface에 반영한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add artifact_refs as a named SignalReplayBundle top-level section
+  - return artifact_refs from JSONL-backed replay by extracting evidence card artifact_ref values
+  - return artifact_refs from SQLite replay by reading artifact_ref_ids_json and artifact_ref rows
+  - keep missing-signal replay semantics unchanged with artifact_refs=[]
+  - update golden fixture and focused replay tests
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - automatic HALO_SWING_DATABASE_URL activation
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q: 9 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository or storage slice
+```
+
 ## 4.076 P1 Storage Migration Tool Gate Record - 2026-05-20
 
 ### A. 목적

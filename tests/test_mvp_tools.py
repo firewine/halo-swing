@@ -874,6 +874,10 @@ def test_record_label_and_evaluate_ledger(tmp_path: Path) -> None:
         signal_id=signal["signal_id"],
         ledger_path=f" {ledger_path} ",
     )
+    replay = get_signal_replay_bundle(
+        signal_id=signal["signal_id"],
+        ledger_path=f" {ledger_path} ",
+    )
     performance = evaluate_recorded_score_performance(ledger_path=f" {ledger_path} ")
 
     assert recorded["status"] == "recorded"
@@ -914,6 +918,9 @@ def test_record_label_and_evaluate_ledger(tmp_path: Path) -> None:
         assert field in label["label_contract"]["barrier_fields"]
     assert performance["sample_size"] == 1
     assert performance["ledger_ref"] == str(ledger_path)
+    assert replay["artifact_refs"]
+    assert {ref["ref_type"] for ref in replay["artifact_refs"]} >= {"PDF", "NEWS"}
+    assert all(not ref["ref"].startswith("/") for ref in replay["artifact_refs"])
 
 
 def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
@@ -948,6 +955,10 @@ def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
     assert replay["signal"]["signal_id"] == signal["signal_id"]
     assert replay["feature_snapshot"]["indicator_symbol"] == "QQQ"
     assert replay["evidence_cards"]
+    assert replay["artifact_refs"]
+    assert {ref["ref_type"] for ref in replay["artifact_refs"]} >= {"PDF", "NEWS"}
+    assert all(ref["artifact_ref_id"].endswith(":artifact") for ref in replay["artifact_refs"])
+    assert all(not ref["ref"].startswith("/") for ref in replay["artifact_refs"])
     assert replay["strategy_config"]["config_hash"] == signal["config_hash"]
     assert replay["run_journal"]["run_id"] == signal["run_id"]
     assert replay["label_outcome"]["signal_id"] == signal["signal_id"]
@@ -966,6 +977,10 @@ def test_record_label_and_evaluate_sqlite_repository(tmp_path: Path) -> None:
         assert (
             connection.execute("SELECT COUNT(*) FROM run_journal").fetchone()[0] == 1
         )
+        assert (
+            connection.execute("SELECT COUNT(*) FROM artifact_ref").fetchone()[0]
+            == len(replay["artifact_refs"])
+        )
     assert not (tmp_path / "signal_ledger.jsonl").exists()
 
 
@@ -980,6 +995,7 @@ def test_signal_replay_bundle_reports_missing_signal(tmp_path: Path) -> None:
     assert replay["signal"] == {}
     assert replay["feature_snapshot"] == {}
     assert replay["evidence_cards"] == []
+    assert replay["artifact_refs"] == []
     assert replay["strategy_config"] == {}
     assert replay["run_journal"] == {}
     assert replay["label_outcome"] is None

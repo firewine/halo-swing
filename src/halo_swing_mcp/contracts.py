@@ -99,6 +99,7 @@ class SignalReplayBundle(StrictBaseModel):
     signal: dict[str, Any]
     feature_snapshot: dict[str, Any]
     evidence_cards: list[dict[str, Any]]
+    artifact_refs: list[dict[str, Any]]
     strategy_config: dict[str, Any]
     run_journal: dict[str, Any]
     label_outcome: dict[str, Any] | None = None

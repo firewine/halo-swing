@@ -104,6 +104,9 @@ def test_signal_replay_bundle_fixture_validates_and_preserves_links() -> None:
     assert bundle.signal["run_id"] == bundle.run_journal["run_id"]
     assert len(bundle.evidence_cards) >= 2
     assert all(card["modality"] for card in bundle.evidence_cards)
+    assert len(bundle.artifact_refs) == len(bundle.evidence_cards)
+    assert all(ref["artifact_ref_id"].endswith(":artifact") for ref in bundle.artifact_refs)
+    assert all(ref["ref"] and not ref["ref"].startswith("/") for ref in bundle.artifact_refs)
 
 
 def test_latest_signal_report_rejects_missing_required_field() -> None:

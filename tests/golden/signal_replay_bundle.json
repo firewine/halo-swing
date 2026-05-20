@@ -57,6 +57,24 @@
       }
     }
   ],
+  "artifact_refs": [
+    {
+      "artifact_ref_id": "ev_demo_macro_policy_001:artifact",
+      "ref_type": "EXTERNAL",
+      "ref": "https://example.invalid/evidence/macro-policy-note",
+      "metadata": {
+        "description": "Example macro policy evidence"
+      }
+    },
+    {
+      "artifact_ref_id": "ev_demo_market_technical_001:artifact",
+      "ref_type": "CHART",
+      "ref": "https://example.invalid/artifacts/halo-swing-chart.png",
+      "metadata": {
+        "description": "Example market technical chart"
+      }
+    }
+  ],
   "strategy_config": {
     "config_hash": "cfg_demo_sha256_001",
     "version": "demo-2026-04-29",

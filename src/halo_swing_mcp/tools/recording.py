@@ -323,6 +323,7 @@ def get_signal_replay_bundle(
             signal={},
             feature_snapshot={},
             evidence_cards=[],
+            artifact_refs=[],
             strategy_config={},
             run_journal={},
             label_outcome=None,
@@ -339,13 +340,15 @@ def get_signal_replay_bundle(
     missing_links = _replay_missing_links(record)
     labels = record.get("labels") if isinstance(record.get("labels"), list) else []
     label_outcome = labels[-1] if labels else None
+    evidence_cards = _expect_list(record.get("evidence_cards"), "record.evidence_cards")
     return SignalReplayBundle(
         signal=_expect_mapping(record.get("signal"), "record.signal"),
         feature_snapshot=_expect_mapping(
             record.get("feature_snapshot"),
             "record.feature_snapshot",
         ),
-        evidence_cards=_expect_list(record.get("evidence_cards"), "record.evidence_cards"),
+        evidence_cards=evidence_cards,
+        artifact_refs=_record_artifact_refs(record, evidence_cards),
         strategy_config=_expect_mapping(
             record.get("strategy_config"),
             "record.strategy_config",
@@ -650,6 +653,30 @@ def _expect_list(value: Any, field_name: str) -> list[dict[str, Any]]:
     if not all(isinstance(item, dict) for item in value):
         raise ValueError(f"{field_name} must be a list of objects")
     return value
+
+
+def _record_artifact_refs(
+    record: dict[str, Any],
+    evidence_cards: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    artifact_refs = record.get("artifact_refs")
+    if artifact_refs is not None:
+        return _expect_list(artifact_refs, "record.artifact_refs")
+
+    refs: list[dict[str, Any]] = []
+    for card in evidence_cards:
+        artifact_ref = card.get("artifact_ref")
+        if isinstance(artifact_ref, dict):
+            evidence_id = str(card.get("evidence_id", "unknown_evidence"))
+            refs.append(
+                {
+                    "artifact_ref_id": f"{evidence_id}:artifact",
+                    "ref_type": artifact_ref.get("ref_type", "OTHER"),
+                    "ref": artifact_ref.get("ref", ""),
+                    "metadata": artifact_ref.get("metadata", {}),
+                }
+            )
+    return refs
 
 
 def _replay_missing_links(record: dict[str, Any]) -> list[ReplayMissingLinkError]:

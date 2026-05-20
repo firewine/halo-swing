@@ -166,6 +166,7 @@ class SQLiteSignalLedgerRepository:
                     signal_json,
                     feature_snapshot_id,
                     evidence_card_ids_json,
+                    artifact_ref_ids_json,
                     run_id,
                     config_hash
                 FROM signal_ledger
@@ -183,6 +184,7 @@ class SQLiteSignalLedgerRepository:
                     signal_json,
                     feature_snapshot_id,
                     evidence_card_ids_json,
+                    artifact_ref_ids_json,
                     run_id,
                     config_hash
                 FROM signal_ledger
@@ -201,6 +203,7 @@ class SQLiteSignalLedgerRepository:
                     signal_json,
                     feature_snapshot_id,
                     evidence_card_ids_json,
+                    artifact_ref_ids_json,
                     run_id,
                     config_hash
                 FROM signal_ledger
@@ -460,7 +463,15 @@ class SQLiteSignalLedgerRepository:
         connection: sqlite3.Connection,
         row: sqlite3.Row | tuple[Any, ...],
     ) -> dict[str, Any]:
-        signal_id, signal_json, feature_snapshot_id, evidence_ids_json, run_id, config_hash = row
+        (
+            signal_id,
+            signal_json,
+            feature_snapshot_id,
+            evidence_ids_json,
+            artifact_ids_json,
+            run_id,
+            config_hash,
+        ) = row
         signal = _json_loads(str(signal_json))
         feature_row = connection.execute(
             "SELECT features_json FROM feature_store WHERE feature_snapshot_id = ?",
@@ -482,6 +493,25 @@ class SQLiteSignalLedgerRepository:
             ).fetchone()
             if evidence_row:
                 evidence_cards.append(_json_loads(evidence_row[0]))
+        artifact_refs = []
+        for artifact_ref_id in _json_loads(str(artifact_ids_json)):
+            artifact_row = connection.execute(
+                """
+                SELECT artifact_ref_id, ref_type, ref, metadata_json
+                FROM artifact_ref
+                WHERE artifact_ref_id = ?
+                """,
+                (str(artifact_ref_id),),
+            ).fetchone()
+            if artifact_row:
+                artifact_refs.append(
+                    {
+                        "artifact_ref_id": artifact_row[0],
+                        "ref_type": artifact_row[1],
+                        "ref": artifact_row[2],
+                        "metadata": _json_loads(artifact_row[3]),
+                    }
+                )
         labels = [
             _json_loads(row[0])
             for row in connection.execute(
@@ -499,6 +529,7 @@ class SQLiteSignalLedgerRepository:
             "signal": signal,
             "feature_snapshot": _json_loads(feature_row[0]) if feature_row else {},
             "evidence_cards": evidence_cards,
+            "artifact_refs": artifact_refs,
             "run_journal": _json_loads(run_row[0]) if run_row else {},
             "strategy_config": _json_loads(config_row[0]) if config_row else {},
             "config_hash": config_hash,

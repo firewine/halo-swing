@@ -42,28 +42,24 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_STORAGE_MIGRATION_TOOL_VERIFIED
-gate_id: P1_STORAGE_MIGRATION_TOOL_GATE
+status: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_VERIFIED
+gate_id: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified explicit database_path storage migration tool; continue with next explicit repository or storage slice
+next_atomic_step: no open code step remains after verified replay artifact_ref records; continue with next explicit repository or storage slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - README.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/storage.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
-  - tests/test_setup_docs.py
-  - tests/test_storage_migrations.py
-  - tests/test_setup_docs.py
-  - tests/test_tool_registry.py
+  - src/halo_swing_mcp/contracts.py
+  - src/halo_swing_mcp/signal_repository.py
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/signal_replay_bundle.json
+  - tests/test_contracts.py
+  - tests/test_mvp_tools.py
+  - tests/test_signal_repository.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -80,17 +76,18 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - apply_storage_migrations is callable through the shared registry, CLI harness, and MCP server wrapper with explicit database_path input
-  - apply_storage_migrations returns deterministic migration result fields and applies the existing idempotent SQLite migration runner
-  - health_check, README, DevOps guide, and MVP tool contract fixtures include apply_storage_migrations in deterministic tool order
-  - storage migration tests cover registry, harness, idempotency, server wrapper metadata, and repo-artifact isolation
-  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
+  - SignalReplayBundle includes artifact_refs as a named top-level section
+  - get_signal_replay_bundle returns portable artifact_ref records for JSONL evidence cards and SQLite artifact_ref rows when present
+  - SQLite replay reads artifact_ref_ids_json and artifact_ref rows instead of relying only on embedded evidence cards
+  - missing-signal replay returns artifact_refs as an empty list without changing missing-link semantics
+  - golden fixture and tests validate artifact_refs are preserved and portable
+  - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
 approval_source: "user objective: 개발문서 목표확인해서 계속 개발진행해"
@@ -196,15 +193,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_STORAGE_MIGRATION_TOOL_GATE
-scope: explicit database_path SQLite storage migration MCP/CLI tool
+gate_id: P1_REPOSITORY_REPLAY_ARTIFACT_REFS_GATE
+scope: SignalReplayBundle artifact_ref records for JSONL and SQLite replay
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -214,30 +211,28 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_tool_registry.py::test_tool_registry_matches_mvp_contract_and_health_capabilities tests/test_tool_registry.py::test_server_mcp_tool_wrapper_parameters_match_registered_functions tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients tests/test_setup_docs.py::test_readme_capability_list_matches_health_check_golden tests/test_setup_docs.py::test_devops_tool_include_list_matches_health_check_golden -q: 14 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 38.85s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_signal_replay_bundle_fixture_validates_and_preserves_links tests/test_mvp_tools.py::test_record_label_and_evaluate_ledger tests/test_mvp_tools.py::test_record_label_and_evaluate_sqlite_repository tests/test_mvp_tools.py::test_signal_replay_bundle_reports_missing_signal tests/test_signal_repository.py -q: 9 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 897 passed in 38.45s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
   - .codex/tasks/current.json
-  - README.md
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/server.py
-  - src/halo_swing_mcp/tool_registry.py
-  - src/halo_swing_mcp/tools/storage.py
-  - tests/golden/health_check.json
-  - tests/golden/mvp_tool_contracts.json
-  - tests/test_storage_migrations.py
+  - src/halo_swing_mcp/contracts.py
+  - src/halo_swing_mcp/signal_repository.py
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/golden/signal_replay_bundle.json
+  - tests/test_contracts.py
+  - tests/test_mvp_tools.py
 next_state: continue with next explicit repository or storage slice
 notes:
-  - apply_storage_migrations is now callable through the shared registry, CLI harness, and MCP server wrapper
-  - the tool requires explicit database_path and returns deterministic migration result fields
-  - repeated calls are idempotent and return applied/skipped migration versions
-  - health_check, README, DevOps guide, and MVP contract fixtures include apply_storage_migrations in deterministic tool order
-  - no live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
+  - SignalReplayBundle now includes artifact_refs as a named top-level section
+  - JSONL-backed replay derives portable artifact_refs from evidence cards
+  - SQLite replay reads artifact_ref_ids_json and artifact_ref rows into replay artifact_refs
+  - missing-signal replay returns artifact_refs=[] with existing missing-link semantics
+  - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 
 Previous completed directive:
