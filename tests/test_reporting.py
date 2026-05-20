@@ -1163,6 +1163,14 @@ def test_latest_signal_report_sqlite_repository_includes_path_free_latest_record
     latest_record_guard_checks = {
         check["name"]: check for check in latest_record_guard["checks"]
     }
+    evidence_guard_checks = {
+        check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+    expected_latest_record_guard_check_names = [
+        "latest_record_source_repository_ref_keys_match_expected_schema",
+        "latest_record_source_repository_ref_is_path_free",
+        "latest_record_source_repository_ref_matches_top_level_source",
+    ]
 
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
@@ -1189,6 +1197,27 @@ def test_latest_signal_report_sqlite_repository_includes_path_free_latest_record
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(latest_record_guard)
+    )
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_check_names_match_expected_schema"
+    ] == {
+        "name": "evidence_latest_record_guard_check_names_match_expected_schema",
+        "passed": True,
+        "expected": expected_latest_record_guard_check_names,
+        "actual": expected_latest_record_guard_check_names,
+    }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_checks_all_passed"
+    ] == {
+        "name": "evidence_latest_record_guard_checks_all_passed",
+        "passed": True,
+        "expected": True,
+        "actual": [True, True, True],
+    }
+    assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_guard_checks)
     )
     assert payload["report_payload_guard"]["status"] == "ok"
     assert payload["evidence_guard"]["status"] == "ok"

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_PATH_FREE_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_PATH_FREE_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_RECORD_GUARD_EVIDENCE_CHECKS_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_RECORD_GUARD_EVIDENCE_CHECKS_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified SQLite latest report label_status path-free coverage; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified SQLite latest report record guard evidence checks coverage; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -71,15 +71,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard tests/test_reporting.py::test_latest_signal_report_evidence_guard_validates_latest_record_guard_checks tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest_signal_report.label_status remains path-free
-  - SQLite top-level label_status omits database path details and SQLite filenames
-  - existing SQLite label evidence guard coverage remains unchanged
+  - SQLite repository-backed latest report evidence_guard validates latest_record_guard expected check names
+  - SQLite repository-backed latest report evidence_guard validates latest_record_guard all-passed state
+  - SQLite latest_record_guard evidence checks remain path-free and omit database path details
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -184,6 +184,47 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_RECORD_GUARD_EVIDENCE_CHECKS_COVERAGE_GATE
+scope: SQLite repository-backed latest report latest_record_guard evidence checks coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard tests/test_reporting.py::test_latest_signal_report_evidence_guard_validates_latest_record_guard_checks tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard tests/test_reporting.py::test_latest_signal_report_evidence_guard_validates_latest_record_guard_checks tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.90s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite repository-backed latest report evidence_guard now has direct coverage for latest_record_guard expected check names
+  - SQLite repository-backed latest report evidence_guard now has direct coverage for latest_record_guard all-passed state
+  - SQLite latest_record_guard evidence check payloads omit database path details and SQLite filenames
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed
