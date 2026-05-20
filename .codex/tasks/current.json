@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.086",
-  "next_atomic_step": "no open code step remains after verified repository-backed latest report evidence source metadata; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.087",
+  "next_atomic_step": "no open code step remains after verified repository-backed latest report evidence label status; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -36,7 +36,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -51,14 +51,13 @@
     "read_only": true
   },
   "done_means": [
-    "repository-backed generate_latest_signal_report includes path-free source_repository_ref in evidence_context",
+    "repository-backed generate_latest_signal_report includes structured label_status in evidence_context when a stored label exists",
+    "evidence_context label_status matches latest_signal_report label_status",
     "default no-repository evidence_context and golden snapshot remain unchanged",
-    "evidence_context source_repository_ref matches top-level source_repository_ref when present",
-    "evidence_context source_repository_ref does not expose ledger_path, database_path, SQLite filenames, or absolute local paths",
-    "default no-repository report behavior and golden snapshot remain unchanged",
+    "evidence_context label_status does not expose ledger_path, database_path, SQLite filenames, or absolute local paths",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],
-  "approval_source": "user objective: 개발문서 목표확인해서 계속 개발진행해",
+  "approval_source": "user approved REPOSITORY_GO and requested continued implementation plus full feature checks",
   "next_state_after_success": "continue with next explicit repository or report read-model slice"
 }

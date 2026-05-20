@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.087 P1 Repository Latest Report Evidence Label Status Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed `generate_latest_signal_report`는 저장된 label outcome을
+`latest_signal_report.label_status`로 드러낸다. 하지만 Hermes가 요약 근거로 소비하는
+`evidence_context`에는 아직 label 상태가 없어, LLM-facing evidence context만 보면
+저장된 사후평가가 있는지 알 수 없다. 이번 slice는 default no-repository report를
+바꾸지 않고, 저장소 기반 리포트에 label이 있을 때만 동일한 structured
+`label_status`를 evidence context에 포함한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - include label_status in evidence_context when latest_signal_report has label_status
+  - keep evidence_context label_status aligned with latest_signal_report.label_status
+  - keep default no-repository golden snapshot unchanged
+  - avoid schema migration, persistence, live adapters, or transport changes
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused evidence label status tests: 3 passed
+  - full pytest: 912 passed in 45.40s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.086 P1 Repository Latest Report Evidence Source Metadata Gate Record - 2026-05-20
 
 ### A. 목적

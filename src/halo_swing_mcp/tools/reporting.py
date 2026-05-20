@@ -1000,6 +1000,9 @@ def _evidence_context(
     }
     if source_repository_ref is not None:
         context["source_repository_ref"] = dict(source_repository_ref)
+    label_status = report.get("label_status")
+    if isinstance(label_status, dict):
+        context["label_status"] = dict(label_status)
     return context
 
 

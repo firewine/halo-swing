@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_SOURCE_METADATA_GATE
+status: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest report evidence source metadata; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified repository-backed latest report evidence label status; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -72,21 +72,20 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report includes path-free source_repository_ref in evidence_context
+  - repository-backed generate_latest_signal_report includes structured label_status in evidence_context when a stored label exists
+  - evidence_context label_status matches latest_signal_report label_status
   - default no-repository evidence_context and golden snapshot remain unchanged
-  - evidence_context source_repository_ref matches top-level source_repository_ref when present
-  - evidence_context source_repository_ref does not expose ledger_path, database_path, SQLite filenames, or absolute local paths
-  - default no-repository report behavior and golden snapshot remain unchanged
+  - evidence_context label_status does not expose ledger_path, database_path, SQLite filenames, or absolute local paths
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
-approval_source: "user objective: 개발문서 목표확인해서 계속 개발진행해"
+approval_source: "user approved REPOSITORY_GO and requested continued implementation plus full feature checks"
 next_state_after_success: continue with next explicit repository or report read-model slice
 ```
 
@@ -186,6 +185,46 @@ notes:
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_REPORT_EVIDENCE_LABEL_STATUS_GATE
+scope: structured label status in repository-backed latest report evidence_context
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden tests/test_reporting.py::test_latest_signal_report_limits_evidence_and_flags_conflicts -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 912 passed in 45.40s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/reporting.py
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - repository-backed latest report evidence_context now includes label_status when a stored label exists
+  - evidence_context.label_status matches latest_signal_report.label_status
+  - default no-repository golden snapshot remains unchanged
+  - label status evidence contains no ledger_path, database_path, SQLite filename, or absolute local path
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
 
 ```text
 status: passed
