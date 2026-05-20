@@ -46,15 +46,12 @@ status: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_PUSHED
 gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: make direct live provider smoke success and recovery accepted_env_keys show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing provider resolver priority
+next_atomic_step: no open code step remains after pushed provider smoke accepted-key order gate; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_providers.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -71,23 +68,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - git status --short --branch
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - direct get_market_snapshot provider_smoke_summary and error_summary accepted_env_keys list POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
-  - direct get_macro_snapshot provider_smoke_summary and error_summary accepted_env_keys list FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
-  - direct get_news_bundle provider_smoke_summary and error_summary accepted_env_keys list NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
-  - provider resolver constants and credential selection priority remain unchanged
+  - task contract and portable mirror match the pushed/no-open-code-step state
+  - WORKING.md records the pushed commit and no-open-code-step state
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
-  - task contract and portable mirror match
-  - all required verification passes
-  - WORKING.md records result and verification status only
+  - verification passes
 
-next_state_after_success: pushed to origin/main in commit 399701d, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+next_state_after_success: pushed to origin/main through task mirror sync commit c1b2b21, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 ```
 
 Latest verification result:
@@ -100,29 +90,21 @@ commands:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - git status --short --branch
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 results:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_macro_snapshot_declares_live_fred_boundary_without_secret tests/test_providers.py::test_news_bundle_marks_newsapi_cards_as_live tests/test_providers.py::test_market_snapshot_declares_live_provider_boundary_without_secret tests/test_providers.py::test_market_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_macro_snapshot_live_provider_exception_returns_recovery_metadata tests/test_providers.py::test_news_bundle_live_provider_exception_returns_recovery_metadata -q: 6 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py -q: 37 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - git status --short --branch: main matches origin/main after push
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-  - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/market.py
-  - tests/test_providers.py
 pushed_commit: 399701d Prefer simple keys in provider smoke metadata
+pushed_task_sync_commit: c1b2b21 Sync current task after provider smoke push
 next_state: no open code step after push; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 notes:
   - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first

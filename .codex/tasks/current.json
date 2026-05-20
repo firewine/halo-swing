@@ -49,6 +49,6 @@
     "verification passes"
   ],
   "pushed_commit": "399701d Prefer simple keys in provider smoke metadata",
-  "latest_ledger_commit": "4158f41 Record provider smoke gate push status",
+  "latest_ledger_commit": "c1b2b21 Sync current task after provider smoke push",
   "next_state_after_success": "wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap"
 }
