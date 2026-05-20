@@ -182,6 +182,7 @@ def generate_latest_signal_report(
             prompt_contract,
             delivery_contract,
             intent_contract,
+            source_repository_ref=source_repository_ref,
         ),
         "source_signal_ref": {
             "signal_id": signal["signal_id"],
@@ -5170,6 +5171,7 @@ def _report_contract_guard(
     prompt_contract: dict[str, Any],
     delivery_contract: dict[str, Any],
     intent_contract: dict[str, Any],
+    source_repository_ref: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     section_titles = [section["title"] for section in sections]
     text = _format_report_text(report, sections)
@@ -5236,10 +5238,20 @@ def _report_contract_guard(
         "report_telegram_chunking_contract_matches_expected",
         "delivery_numeric_authority_is_latest_signal_report",
         "report_text_reflects_latest_signal_numeric_fields",
-        "report_contract_guard_check_names_match_expected_schema",
-        "report_contract_guard_check_keys_match_expected_schema",
-        "report_contract_guard_keys_match_expected_schema",
     ]
+    if source_repository_ref is not None:
+        expected_guard_check_names.append(
+            "report_text_reflects_source_repository_summary"
+        )
+    if isinstance(report.get("label_status"), dict):
+        expected_guard_check_names.append("report_text_reflects_label_status_summary")
+    expected_guard_check_names.extend(
+        [
+            "report_contract_guard_check_names_match_expected_schema",
+            "report_contract_guard_check_keys_match_expected_schema",
+            "report_contract_guard_keys_match_expected_schema",
+        ]
+    )
     expected_default_guard_check_keys = [
         "name",
         "passed",
@@ -5480,6 +5492,27 @@ def _report_contract_guard(
             "actual": numeric_field_presence,
         },
     ]
+    if source_repository_ref is not None:
+        source_summary = _source_repository_summary(source_repository_ref)
+        checks.append(
+            {
+                "name": "report_text_reflects_source_repository_summary",
+                "passed": source_summary in text,
+                "expected": source_summary,
+                "actual": source_summary if source_summary in text else None,
+            }
+        )
+    label_status = report.get("label_status")
+    if isinstance(label_status, dict):
+        label_summary = _label_status_summary(label_status)
+        checks.append(
+            {
+                "name": "report_text_reflects_label_status_summary",
+                "passed": label_summary in text,
+                "expected": label_summary,
+                "actual": label_summary if label_summary in text else None,
+            }
+        )
     guard_check_names_actual = [
         check["name"]
         for check in checks

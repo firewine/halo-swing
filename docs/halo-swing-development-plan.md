@@ -28,6 +28,63 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.093 P1 Repository Latest Report Context Summary Text Guard Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed latest report의 source/label summaries는 intent에 따라 `Reasons`나
+`Cautions`를 통해 text에 표시된다. 하지만 `report_contract_guard`는 아직 이 summaries
+가 실제 text에 반영됐는지 직접 검증하지 않는다. 이번 slice는 repository-backed
+summary가 있을 때 guard가 text 반영 여부를 검증하게 하고, 기본 no-repository report와
+golden snapshot은 그대로 유지한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add report_contract_guard source summary text reflection check when source_repository_ref exists
+  - add report_contract_guard label summary text reflection check when label_status exists
+  - keep default no-repository guard schema and golden snapshot unchanged
+  - keep guard check output path-free
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_context_summary_text_guard_validates_intraday_fallback tests/test_reporting.py::test_latest_signal_report_repository_context_summaries_survive_intraday_intent_without_reasons tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused context summary text guard tests: 3 passed
+  - full pytest: 918 passed in 58.01s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.092 P1 Repository Latest Report Context Summary Intent Fallback Gate Record - 2026-05-20
 
 ### A. 목적
