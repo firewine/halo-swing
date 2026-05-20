@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_RECORD_GUARD_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_EVIDENCE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_RECORD_GUARD_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_EVIDENCE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.101",
-  "next_atomic_step": "no open code step remains after verified SQLite latest report record guard coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.102",
+  "next_atomic_step": "no open code step remains after verified SQLite latest report label evidence coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.100",
+    "docs/halo-swing-development-plan.md#4.101",
     "tests/test_reporting.py"
   ],
   "blocked_path_prefixes": [
@@ -33,7 +33,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard tests/test_reporting.py::test_latest_signal_report_evidence_guard_validates_latest_record_guard_checks tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_label_status -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -48,9 +48,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest reports include latest_record_guard at top level and in evidence_context",
-    "SQLite latest_record_guard remains path-free and reflects db_required repository source metadata",
-    "report_payload_guard and evidence_guard stay ok for SQLite repository-backed latest reports",
+    "SQLite repository-backed latest reports mirror stored label_status into evidence_context",
+    "evidence_guard validates SQLite label_status reflection when stored labels exist",
+    "SQLite evidence label_status remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

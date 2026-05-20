@@ -1480,6 +1480,57 @@ def test_latest_signal_report_repository_source_includes_sqlite_label_status(
     assert label_status["live_data_required"] is False
 
 
+def test_latest_signal_report_sqlite_repository_label_status_is_reflected_in_evidence_context(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD"),
+        "signal_id": "sig_report_evidence_label_sqlite",
+        "run_id": "run_report_evidence_label_sqlite",
+        "created_at": "2026-05-20T15:05:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+    label = label_signal_outcome(
+        signal_id=stored_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 560.0],
+        time_barrier_days=2,
+    )
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        database_path=f" {database_path} ",
+    )
+    evidence_label_status = payload["evidence_context"]["label_status"]
+    evidence_guard_checks = {
+        check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+
+    assert evidence_label_status == payload["latest_signal_report"]["label_status"]
+    assert evidence_label_status["schema_version"] == "signal_label_outcome.v1"
+    assert evidence_label_status["signal_id"] == stored_signal["signal_id"]
+    assert evidence_label_status["outcome"] == label["outcome"]
+    assert evidence_label_status["realized_r"] == label["realized_r"]
+    assert str(database_path) not in iter_nested_strings(evidence_label_status)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_label_status)
+    )
+    assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
+        "name": "label_status_reflected_in_evidence_context",
+        "passed": True,
+        "expected": payload["latest_signal_report"]["label_status"],
+        "actual": evidence_label_status,
+    }
+    assert payload["evidence_guard"]["status"] == "ok"
+
+
 def test_latest_signal_report_rejects_missing_repository_source(
     tmp_path: Path,
 ) -> None:
