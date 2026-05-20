@@ -1362,6 +1362,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert label_status["labeled_at"] == selected_label["labeled_at"]
     assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
     assert label_status["live_data_required"] is False
+    evidence_label_status = payload["evidence_context"]["label_status"]
+    assert evidence_label_status == label_status
+    assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
+        "name": "label_status_reflected_in_evidence_context",
+        "passed": True,
+        "expected": label_status,
+        "actual": evidence_label_status,
+    }
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert payload["source_signal_ref"] == {
         "signal_id": swing_signal["signal_id"],
         "run_id": swing_signal["run_id"],
@@ -1443,6 +1457,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
+    assert str(database_path) not in iter_nested_strings(evidence_label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
@@ -1453,6 +1468,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_label_status)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -1572,6 +1591,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert label_status["labeled_at"] == selected_label["labeled_at"]
     assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
     assert label_status["live_data_required"] is False
+    evidence_label_status = payload["evidence_context"]["label_status"]
+    assert evidence_label_status == label_status
+    assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
+        "name": "label_status_reflected_in_evidence_context",
+        "passed": True,
+        "expected": label_status,
+        "actual": evidence_label_status,
+    }
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "label_status_reflected_in_evidence_context" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert payload["source_signal_ref"] == {
         "signal_id": qqq_signal["signal_id"],
         "run_id": qqq_signal["run_id"],
@@ -1653,6 +1686,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
+    assert str(database_path) not in iter_nested_strings(evidence_label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
@@ -1663,6 +1697,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_label_status)
     )
     assert all(
         ".sqlite" not in value.lower()
