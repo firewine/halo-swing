@@ -482,6 +482,9 @@ def test_latest_signal_report_can_use_sqlite_repository_source(
         asset="QLD",
         database_path=f" {database_path} ",
     )
+    report_payload_guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == stored_signal["signal_id"]
     assert payload["latest_signal_report"]["asset"] == "QLD"
@@ -494,6 +497,34 @@ def test_latest_signal_report_can_use_sqlite_repository_source(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_signal_ref"])
+    )
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["actual"] == ["signal_id", "run_id", "config_hash"]
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["actual"] == {
+        "signal_id": stored_signal["signal_id"],
+        "config_hash": stored_signal["config_hash"],
+        "run_id_nonempty": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_values_have_traceable_format"
+    ]["actual"] == {
+        "signal_id_nonempty": True,
+        "run_id_nonempty": True,
+        "config_hash_sha256_prefix": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["actual"] == {
+        "config_hash_digest_length": 64,
+        "config_hash_digest_hex": True,
+    }
+    assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(report_payload_guard_checks)
     )
     assert payload["report_payload_guard"]["status"] == "ok"
     assert payload["live_data_required"] is False
