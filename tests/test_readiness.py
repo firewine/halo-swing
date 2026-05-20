@@ -3195,14 +3195,14 @@ def test_integration_setup_checklist_reports_blocked_defaults(monkeypatch) -> No
     assert env_requirements["telegram"]["secret"] is True
     assert env_requirements["live_data"]["secret"] is True
     assert env_requirements["live_data"]["env_keys"] == [
-        "HALO_SWING_MARKET_DATA_API_KEY",
         "POLYGON_API_KEY",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+        "FRED_API_KEY",
         "HALO_SWING_MACRO_API_KEY",
         "HALO_SWING_FRED_API_KEY",
-        "FRED_API_KEY",
+        "NEWSAPI_KEY",
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
-        "NEWSAPI_KEY",
     ]
     assert env_requirements["binance_credentials"]["configured"] is False
     assert env_requirements["binance_credentials"]["missing"] == [

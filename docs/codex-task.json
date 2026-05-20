@@ -1,9 +1,9 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_SETUP_CHECKLIST_NEWSAPI_ALIAS_GATE",
+  "gate_id": "API_KEY_INTEGRATION_SETUP_CHECKLIST_KEY_ORDER_GATE",
   "mode": "implement",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.052",
-  "next_atomic_step": "add NEWSAPI_KEY to integration setup checklist live_data env_requirements without changing resolver priority or accepted aliases",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.053",
+  "next_atomic_step": "make integration setup checklist live_data env_requirements list POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing resolver priority or accepted aliases",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.052",
+    "docs/halo-swing-development-plan.md#4.053",
     "src/halo_swing_mcp/tools/readiness_parts/api_key_pipeline_runner.py",
     "tests/test_readiness.py"
   ],
@@ -50,13 +50,14 @@
     "read_only": true
   },
   "done_means": [
-    "integration setup checklist live_data env_requirements include NEWSAPI_KEY",
-    "integration setup checklist live_data env_requirements still include existing accepted live-data aliases",
-    "live_data setup summary preferred key fields remain POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY",
+    "integration setup checklist live_data env_requirements list POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY",
+    "integration setup checklist live_data env_requirements list FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY",
+    "integration setup checklist live_data env_requirements list NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY",
+    "integration setup checklist live_data env_requirements still include every accepted live-data alias",
     "no provider resolver priority, live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
     "task contract and portable mirror match",
     "all required verification passes",
     "WORKING.md records result and verification status only"
   ],
-  "next_state_after_success": "commit and push this verified setup checklist NEWSAPI alias gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
+  "next_state_after_success": "commit and push this verified setup checklist key order gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval"
 }

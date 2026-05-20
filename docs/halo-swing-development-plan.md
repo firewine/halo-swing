@@ -595,6 +595,63 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.053 API Key Integration Setup Checklist Key Order Gate Record - 2026-05-20
+
+### A. 목적
+
+4.052 added `NEWSAPI_KEY` to the integration setup checklist's `live_data`
+`env_keys`, but that checklist still presents project-specific env names before
+the preferred copy/paste keys. Other API-key setup surfaces now show
+`POLYGON_API_KEY`, `FRED_API_KEY`, and `NEWSAPI_KEY` first. This slice aligns
+the setup checklist order with those surfaces while preserving every accepted
+alias and resolver priority.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - order live_data env_requirements as POLYGON_API_KEY, HALO_SWING_MARKET_DATA_API_KEY
+  - order macro keys as FRED_API_KEY, HALO_SWING_MACRO_API_KEY, HALO_SWING_FRED_API_KEY
+  - order news keys as NEWSAPI_KEY, HALO_SWING_NEWS_API_KEY, NEWS_API_KEY
+  - keep resolver priority and accepted aliases unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - provider resolver priority change
+  - accepted env-key tuple change
+  - operator docs or .env.example change
+  - automatic .env mutation
+  - secret value insertion
+  - live_adapters path
+  - broker or order submission
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler
+  - DB migration or repository persistence
+  - committed runtime artifact
+  - URL, API key value, or secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_integration_setup_checklist_reports_blocked_defaults tests/test_readiness.py::test_integration_setup_checklist_uses_repo_root_env_without_secret_exposure -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q: 132 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+```
+
 ## 4.041 API Key Integration NEWSAPI_KEY Preferred Example Gate Record - 2026-05-18
 
 ### A. 목적
