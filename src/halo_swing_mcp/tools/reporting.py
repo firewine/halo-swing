@@ -5524,6 +5524,14 @@ def _evidence_guard(
     ]
     if report["data_warnings"]:
         expected_guard_check_names.append("data_warnings_reflected_in_cautions")
+    source_repository_ref = evidence_context.get("source_repository_ref")
+    if source_repository_ref is not None:
+        expected_guard_check_names.extend(
+            [
+                "evidence_source_repository_ref_keys_match_expected_schema",
+                "evidence_source_repository_ref_is_path_free",
+            ]
+        )
     if isinstance(report.get("label_status"), dict):
         expected_guard_check_names.append(
             "label_status_reflected_in_evidence_context"
@@ -5634,6 +5642,51 @@ def _evidence_guard(
                 "expected": report["data_warnings"],
                 "actual": cautions,
             }
+        )
+    if source_repository_ref is not None:
+        source_repository_ref_is_dict = isinstance(source_repository_ref, dict)
+        checks.extend(
+            [
+                {
+                    "name": (
+                        "evidence_source_repository_ref_keys_match_expected_schema"
+                    ),
+                    "passed": source_repository_ref_is_dict
+                    and list(source_repository_ref) == [
+                        "storage",
+                        "db_required",
+                        "filters",
+                    ],
+                    "expected": ["storage", "db_required", "filters"],
+                    "actual": (
+                        list(source_repository_ref)
+                        if source_repository_ref_is_dict
+                        else type(source_repository_ref).__name__
+                    ),
+                },
+                {
+                    "name": "evidence_source_repository_ref_is_path_free",
+                    "passed": source_repository_ref_is_dict
+                    and _source_repository_ref_is_path_free(source_repository_ref),
+                    "expected": {
+                        "omits_ledger_ref": True,
+                        "omits_ledger_path": True,
+                        "omits_database_path": True,
+                        "omits_absolute_or_sqlite_paths": True,
+                    },
+                    "actual": (
+                        _source_repository_ref_path_free_summary(
+                            source_repository_ref
+                        )
+                        if source_repository_ref_is_dict
+                        else {
+                            "source_repository_ref_type": type(
+                                source_repository_ref
+                            ).__name__
+                        }
+                    ),
+                },
+            ]
         )
     if isinstance(report.get("label_status"), dict):
         checks.append(

@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.089 P1 Repository Latest Report Evidence Source Metadata Guard Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed latest report의 `evidence_context.source_repository_ref`는 이미
+path-free provenance를 담는다. 하지만 이 값의 schema와 path-free 속성은
+`report_payload_guard`에서 top-level `source_repository_ref`만 검증하고,
+Hermes가 직접 소비하는 `evidence_context` 자체의 guard에는 아직 없다. 이번 slice는
+repository-backed evidence context에 source metadata가 있을 때 `evidence_guard`가
+해당 metadata의 key schema와 path-free 계약을 직접 검증하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add evidence_guard checks for evidence source_repository_ref key schema and path-free summary
+  - include the checks only when evidence_context.source_repository_ref is present
+  - keep default no-repository golden snapshot unchanged
+  - avoid schema migration, persistence, live adapters, or transport changes
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_evidence_guard_validates_source_metadata tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_evidence_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused evidence source metadata guard tests: 3 passed
+  - full pytest: 914 passed in 43.74s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.088 P1 Repository Latest Report Evidence Label Status Guard Gate Record - 2026-05-20
 
 ### A. 목적
