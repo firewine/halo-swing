@@ -1067,6 +1067,76 @@ def test_latest_signal_report_sqlite_repository_source_summary_appears_in_sectio
     )
 
 
+def test_latest_signal_report_sqlite_repository_source_evidence_guard_validates_source_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD", timeframe="swing_5d_20d"),
+        "signal_id": "sig_report_repo_evidence_meta_guard_sqlite",
+        "run_id": "run_report_repo_evidence_meta_guard_sqlite",
+        "created_at": "2026-05-20T13:48:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        timeframe=" swing_5d_20d ",
+        database_path=f" {database_path} ",
+    )
+    guard_checks = {
+        check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+
+    assert payload["evidence_guard"]["status"] == "ok"
+    assert guard_checks[
+        "evidence_source_repository_ref_keys_match_expected_schema"
+    ] == {
+        "name": "evidence_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
+    assert guard_checks["evidence_source_repository_ref_is_path_free"] == {
+        "name": "evidence_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+        "actual": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+    }
+    assert "evidence_source_repository_ref_is_path_free" in guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert payload["evidence_context"]["source_repository_ref"] == {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "QLD",
+            "underlying": None,
+            "timeframe": "swing_5d_20d",
+        },
+    }
+    assert str(database_path) not in iter_nested_strings(guard_checks)
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(guard_checks)
+    )
+
+
 def test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
