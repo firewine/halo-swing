@@ -1335,7 +1335,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
-    assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
+    assert payload["source_signal_ref"] == {
+        "signal_id": swing_signal["signal_id"],
+        "run_id": swing_signal["run_id"],
+        "config_hash": swing_signal["config_hash"],
+    }
     assert payload["source_repository_ref"] == source_repository_ref
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
@@ -1385,13 +1389,41 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "omits_database_path": True,
         "omits_absolute_or_sqlite_paths": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["actual"] == ["signal_id", "run_id", "config_hash"]
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["actual"] == {
+        "signal_id": swing_signal["signal_id"],
+        "config_hash": swing_signal["config_hash"],
+        "run_id_nonempty": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_values_have_traceable_format"
+    ]["actual"] == {
+        "signal_id_nonempty": True,
+        "run_id_nonempty": True,
+        "config_hash_sha256_prefix": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["actual"] == {
+        "config_hash_digest_length": 64,
+        "config_hash_digest_hex": True,
+    }
     assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(payload["source_signal_ref"])
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_repository_ref"])
@@ -1479,7 +1511,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
-    assert payload["source_signal_ref"]["run_id"] == qqq_signal["run_id"]
+    assert payload["source_signal_ref"] == {
+        "signal_id": qqq_signal["signal_id"],
+        "run_id": qqq_signal["run_id"],
+        "config_hash": qqq_signal["config_hash"],
+    }
     assert payload["source_repository_ref"] == source_repository_ref
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
@@ -1529,13 +1565,41 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "omits_database_path": True,
         "omits_absolute_or_sqlite_paths": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["actual"] == ["signal_id", "run_id", "config_hash"]
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["actual"] == {
+        "signal_id": qqq_signal["signal_id"],
+        "config_hash": qqq_signal["config_hash"],
+        "run_id_nonempty": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_values_have_traceable_format"
+    ]["actual"] == {
+        "signal_id_nonempty": True,
+        "run_id_nonempty": True,
+        "config_hash_sha256_prefix": True,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["actual"] == {
+        "config_hash_digest_length": 64,
+        "config_hash_digest_hex": True,
+    }
     assert payload["report_payload_guard"]["status"] == "ok"
+    assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(payload["source_signal_ref"])
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_repository_ref"])
