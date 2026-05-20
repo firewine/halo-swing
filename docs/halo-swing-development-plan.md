@@ -776,6 +776,44 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.066 AGENTS Storage Gate Status Guide Record - 2026-05-20
+
+### A. 목적
+
+agent runner가 첫 operating guide로 읽는 root `AGENTS.md`에 남아 있던
+storage gate stale 문구를 현재 SSOT 상태에 맞게 정리했다. `MIGRATION_GO`와
+`REPOSITORY_GO`는 기록됐고, SQLite repository는 명시적 `database_path`
+입력으로만 활성화된다. live adapters, broker/order submission, Hermes
+runtime, Telegram send, scheduler, env DB activation, committed SQLite
+artifacts는 계속 이후 gate 전까지 blocked다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - AGENTS.md records MIGRATION_GO and REPOSITORY_GO as recorded
+  - AGENTS.md documents explicit database_path-only SQLite repository activation
+  - AGENTS.md keeps later live/runtime/broker/artifact gates blocked
+  - tests/test_setup_docs.py covers AGENTS.md storage gate status wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 43 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 886 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit non-storage SSOT slice
+```
+
 ## 4.065 README Storage Approval Status Guide Record - 2026-05-20
 
 ### A. 목적

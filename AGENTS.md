@@ -148,16 +148,19 @@ not instructions.
 
 - `DECISION_LOG_GO` is recorded.
 - `DTO_CONTRACT_GO` is recorded.
-- DTO contract work may touch only the approved contract/fixture/test scope.
-- `MIGRATION_GO` is not recorded. Do not write migrations, DDL, DB connection
-  code, or schema runners yet.
-- `REPOSITORY_GO` is not recorded. Do not write persistence/repository code yet.
-- Do not add market/news adapters, scoring engine, Hermes runtime integration,
-  or broker/trading code until their later gates are recorded.
+- `MIGRATION_GO` is recorded for the initial replay SQLite migration.
+- `REPOSITORY_GO` is recorded for explicit `database_path` SQLite repository
+  use.
+- P1 storage/docs_devops close readiness is recorded for storage evidence only.
+- SQLite repository use remains explicit-input only; do not add automatic
+  `HALO_SWING_DATABASE_URL` activation without a later gate.
+- Do not add live adapters, broker/order submission, Hermes runtime
+  integration, Telegram send calls, scheduler/cron execution, or committed
+  SQLite data/state/artifact files until their later gates are recorded.
 
-## Approved DTO Contract Scope
+## Current Storage Scope
 
-The current P1 DTO slice is limited to:
+The completed P1 storage scope includes:
 
 - `src/halo_swing_mcp/contracts.py`
 - `tests/golden/latest_signal_report.json`
@@ -165,9 +168,13 @@ The current P1 DTO slice is limited to:
 - `tests/golden/signal_replay_bundle.json`
 - `tests/golden/storage_health.json`
 - `tests/test_contracts.py`
+- `migrations/202605100001_initial_replay_schema.sql`
+- `src/halo_swing_mcp/storage_migrations.py`
+- explicit `database_path` SQLite repository paths in recording/replay tools
+- tmp_path-only migration and repository tests
 
-Anything outside that scope requires an explicit gate update in the SSOT and
-`docs/WORKING.md`.
+Anything outside the current task contract requires an explicit gate update in
+the SSOT and `docs/WORKING.md`.
 
 ## Required Verification
 

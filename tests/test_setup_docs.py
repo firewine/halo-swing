@@ -2,12 +2,26 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+AGENTS = ROOT / "AGENTS.md"
 README = ROOT / "README.md"
 DEVOPS_GUIDE = ROOT / "docs" / "devops-setup-guide.md"
 
 
 def _normalized_text(path: Path) -> str:
     return " ".join(path.read_text(encoding="utf-8").split())
+
+
+def test_agents_guide_records_current_storage_gate_status() -> None:
+    text = _normalized_text(AGENTS)
+
+    assert "`MIGRATION_GO` is recorded" in text
+    assert "`REPOSITORY_GO` is recorded" in text
+    assert "explicit `database_path` SQLite repository use" in text
+    assert "P1 storage/docs_devops close readiness is recorded" in text
+    assert "do not add automatic `HALO_SWING_DATABASE_URL` activation" in text
+    assert "`MIGRATION_GO` is not recorded" not in text
+    assert "`REPOSITORY_GO` is not recorded" not in text
+    assert "The current P1 DTO slice is limited to" not in text
 
 
 def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:

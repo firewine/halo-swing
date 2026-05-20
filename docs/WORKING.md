@@ -42,15 +42,15 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: README_STORAGE_APPROVAL_STATUS_GUIDE_VERIFIED
-gate_id: README_STORAGE_APPROVAL_STATUS_GUIDE_GATE
+status: AGENTS_STORAGE_GATE_STATUS_GUIDE_VERIFIED
+gate_id: AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified README storage approval status update; continue with the next explicit non-storage SSOT slice
+next_atomic_step: no open code step remains after verified AGENTS storage gate status update; continue with the next explicit non-storage SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - README.md
+  - AGENTS.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
@@ -77,9 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked after durable approval
-  - README all-env readiness text points database repository use at explicit database_path tool inputs rather than automatic .env activation
-  - setup docs tests cover README and DevOps guide storage approval status wording
+  - AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded
+  - AGENTS.md records current storage gate status and explicit database_path-only repository activation
+  - AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates
+  - setup docs tests cover AGENTS.md storage gate status wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
   - verification passes, including full pytest
 
@@ -186,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: README_STORAGE_APPROVAL_STATUS_GUIDE_GATE
-scope: README all-env readiness storage approval status after REPOSITORY_GO
+gate_id: AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE
+scope: AGENTS.md storage gate status after P1 storage/docs_devops close readiness
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -210,15 +211,16 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
   - .codex/tasks/current.json
-  - README.md
+  - AGENTS.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked
-  - README all-env readiness text now points database repository use at explicit database_path tool inputs instead of automatic .env activation
+  - AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded
+  - AGENTS.md now records current storage gates and explicit database_path-only repository activation
+  - AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates
   - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

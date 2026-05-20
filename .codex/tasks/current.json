@@ -1,13 +1,13 @@
 {
-  "gate_id": "README_STORAGE_APPROVAL_STATUS_GUIDE_GATE",
+  "gate_id": "AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE",
   "mode": "implement",
-  "status": "README_STORAGE_APPROVAL_STATUS_GUIDE_VERIFIED",
+  "status": "AGENTS_STORAGE_GATE_STATUS_GUIDE_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified README storage approval status update; continue with the next explicit non-storage SSOT slice",
+  "next_atomic_step": "no open code step remains after verified AGENTS storage gate status update; continue with the next explicit non-storage SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "README.md",
+    "AGENTS.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -16,8 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.064",
-    "README.md"
+    "docs/halo-swing-development-plan.md#4.065"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -48,9 +47,10 @@
     "read_only": true
   },
   "done_means": [
-    "README no longer says MIGRATION_GO and REPOSITORY_GO remain blocked after durable approval",
-    "README all-env readiness text points database repository use at explicit database_path tool inputs rather than automatic .env activation",
-    "setup docs tests cover README and DevOps guide storage approval status wording",
+    "AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded",
+    "AGENTS.md records current storage gate status and explicit database_path-only repository activation",
+    "AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates",
+    "setup docs tests cover AGENTS.md storage gate status wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
     "verification passes, including full pytest"
   ],
