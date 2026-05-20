@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_REPORT_LABEL_STATUS_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_REPORT_LABEL_STATUS_GATE
+status: P1_REPOSITORY_LATEST_REPORT_SOURCE_METADATA_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_REPORT_SOURCE_METADATA_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified repository-backed latest report label_status; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified repository-backed latest report source metadata; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -55,9 +55,7 @@ allowed_edit_paths:
   - docs/halo-swing-development-plan.md
   - README.md
   - docs/devops-setup-guide.md
-  - src/halo_swing_mcp/contracts.py
   - src/halo_swing_mcp/tools/reporting.py
-  - tests/test_contracts.py
   - tests/test_reporting.py
 
 blocked_path_prefixes:
@@ -76,17 +74,17 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_latest_signal_report_accepts_structured_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - repository-backed generate_latest_signal_report maps latest label_outcome into latest_signal_report.label_status
-  - LatestSignalReport accepts structured label_status with label outcome summary fields
-  - label_status preserves label schema_version, outcome, realized_r, first_barrier_hit, labeled_at, and time_barrier_days without adding live data or network calls
-  - JSONL and SQLite repository-backed latest reports both expose label_status when a label exists
-  - unlabeled and default no-repository report behavior remain unchanged with label_status null
+  - repository-backed generate_latest_signal_report adds source_repository_ref with storage, db_required, and normalized filters
+  - source_repository_ref is omitted for default no-repository reports so golden snapshot remains unchanged
+  - source_repository_ref does not expose ledger_path, database_path, sqlite file paths, or absolute local paths
+  - report_payload_guard validates conditional source_repository_ref key schema and path-free metadata when present
+  - JSONL and SQLite repository-backed latest reports both expose correct portable source metadata
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -193,15 +191,15 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_LATEST_REPORT_LABEL_STATUS_GATE
-scope: repository-backed latest signal report label_status from stored label_outcome
+gate_id: P1_REPOSITORY_LATEST_REPORT_SOURCE_METADATA_GATE
+scope: path-free repository source metadata for repository-backed latest signal reports
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_latest_signal_report_accepts_structured_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
@@ -211,8 +209,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/code/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_contracts.py::test_latest_signal_report_accepts_structured_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_label_status tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_label_status tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q: 4 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 906 passed in 37.79s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q: 3 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 908 passed in 36.81s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -222,16 +220,14 @@ files_changed:
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/contracts.py
   - src/halo_swing_mcp/tools/reporting.py
-  - tests/test_contracts.py
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - LatestSignalReport now accepts structured ReportLabelStatus instead of scalar text for label_status
-  - repository-backed generate_latest_signal_report maps stored latest label_outcome into latest_signal_report.label_status
-  - JSONL and SQLite latest reports expose label schema_version, outcome, realized_r, first_barrier_hit, labeled_at, time_barrier_days, and live_data_required when labeled
-  - unlabeled and default no-repository latest signal report behavior remains unchanged with label_status null
+  - repository-backed generate_latest_signal_report now includes source_repository_ref with storage, db_required, and normalized filters
+  - source_repository_ref is omitted from the default no-repository golden snapshot
+  - source_repository_ref intentionally omits ledger_ref, ledger_path, database_path, SQLite filenames, and absolute local paths
+  - report_payload_guard conditionally validates source_repository_ref key schema and path-free metadata when present
   - no migration, live adapter, broker, send, scheduler, automatic env DB activation, state DB artifact, or secret output changes were added
 ```
 

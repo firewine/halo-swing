@@ -490,6 +490,104 @@ def test_latest_signal_report_can_use_sqlite_repository_source(
     assert payload["live_data_required"] is False
 
 
+def test_latest_signal_report_repository_source_includes_jsonl_source_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    stored_signal = {
+        **reporting.score_leverage_swing("SSO"),
+        "signal_id": "sig_report_repo_meta_jsonl",
+        "run_id": "run_report_repo_meta_jsonl",
+        "created_at": "2026-05-20T13:30:00Z",
+    }
+    record_signal(signal=stored_signal, ledger_path=str(ledger_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(asset="sso", ledger_path=f" {ledger_path} ")
+    source_repository_ref = payload["source_repository_ref"]
+
+    assert source_repository_ref == {
+        "storage": "jsonl_signal_ledger_record",
+        "db_required": False,
+        "filters": {
+            "asset": "SSO",
+            "underlying": None,
+            "timeframe": "swing_3d_10d",
+        },
+    }
+    assert "ledger_ref" not in source_repository_ref
+    assert "ledger_path" not in source_repository_ref
+    assert "database_path" not in source_repository_ref
+    assert str(ledger_path) not in iter_nested_strings(source_repository_ref)
+    assert payload["report_payload_guard"]["status"] == "ok"
+    guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+    assert guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["passed"] is True
+    assert guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["passed"] is True
+
+
+def test_latest_signal_report_repository_source_includes_sqlite_source_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "halo_swing.sqlite"
+    stored_signal = {
+        **reporting.score_leverage_swing("QLD", timeframe="swing_5d_20d"),
+        "signal_id": "sig_report_repo_meta_sqlite",
+        "run_id": "run_report_repo_meta_sqlite",
+        "created_at": "2026-05-20T13:45:00Z",
+    }
+    record_signal(signal=stored_signal, database_path=str(database_path))
+
+    def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise AssertionError("repository-backed report must not rescore the signal")
+
+    monkeypatch.setattr(reporting, "score_leverage_swing", unexpected_score_call)
+    payload = generate_latest_signal_report(
+        asset="QLD",
+        timeframe=" swing_5d_20d ",
+        database_path=f" {database_path} ",
+    )
+    source_repository_ref = payload["source_repository_ref"]
+
+    assert source_repository_ref == {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "QLD",
+            "underlying": None,
+            "timeframe": "swing_5d_20d",
+        },
+    }
+    strings = iter_nested_strings(source_repository_ref)
+    assert str(database_path) not in strings
+    assert all(".sqlite" not in value.lower() for value in strings)
+    assert payload["report_payload_guard"]["status"] == "ok"
+    guard_checks = {
+        check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+    assert guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["actual"] == ["storage", "db_required", "filters"]
+    assert guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+
+
 def test_latest_signal_report_repository_source_filters_by_timeframe(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -116,6 +116,7 @@ def generate_latest_signal_report(
         ledger_path=normalized_ledger_path,
         database_path=normalized_database_path,
     )
+    source_repository_ref = signal.pop("_source_repository_ref", None)
     chart_payload = (
         render_chart(
             symbol=signal["underlying"],
@@ -175,8 +176,10 @@ def generate_latest_signal_report(
             "run_id": signal["run_id"],
             "config_hash": signal["config_hash"],
         },
-        "live_data_required": payload_live_data_required,
     }
+    if source_repository_ref is not None:
+        payload["source_repository_ref"] = source_repository_ref
+    payload["live_data_required"] = payload_live_data_required
     if chart_payload is not None:
         payload["chart_code_guard"] = _chart_code_guard(signal, chart_payload)
     if chart_payload is not None or normalized_extra_evidence_cards:
@@ -241,83 +244,103 @@ def generate_latest_signal_report(
             "multimodal_context"
         ]["guard"]["status"]
     payload["report_payload_guard"] = {"status": "pending", "checks": []}
-    payload["report_payload_guard"] = _payload_contract_guard(
-        payload=payload,
-        expected_schema_version=REPORT_SCHEMA_VERSION,
-        expected_keys=_expected_report_payload_keys(
-            include_chart=chart_payload is not None,
-            include_multimodal=chart_payload is not None
-            or bool(normalized_extra_evidence_cards),
-        ),
-        schema_check_name="report_payload_schema_version_matches_expected",
-        live_data_check_name="report_payload_live_data_required_matches_expected",
-        keys_check_name="report_payload_keys_match_expected_schema",
-        expected_live_data_required=payload_live_data_required,
-        extra_checks=[
-            {
-                "name": "report_payload_source_signal_ref_keys_match_expected_schema",
-                "passed": list(payload["source_signal_ref"])
-                == ["signal_id", "run_id", "config_hash"],
-                "expected": ["signal_id", "run_id", "config_hash"],
-                "actual": list(payload["source_signal_ref"]),
+    report_extra_checks = [
+        {
+            "name": "report_payload_source_signal_ref_keys_match_expected_schema",
+            "passed": list(payload["source_signal_ref"])
+            == ["signal_id", "run_id", "config_hash"],
+            "expected": ["signal_id", "run_id", "config_hash"],
+            "actual": list(payload["source_signal_ref"]),
+        },
+        {
+            "name": "report_payload_source_signal_ref_matches_report_identity",
+            "passed": (
+                payload["source_signal_ref"]["signal_id"]
+                == payload["latest_signal_report"]["signal_id"]
+                and payload["source_signal_ref"]["config_hash"]
+                == payload["latest_signal_report"]["config_hash"]
+                and bool(payload["source_signal_ref"]["run_id"])
+            ),
+            "expected": {
+                "signal_id": payload["latest_signal_report"]["signal_id"],
+                "config_hash": payload["latest_signal_report"]["config_hash"],
+                "run_id_nonempty": True,
             },
-            {
-                "name": "report_payload_source_signal_ref_matches_report_identity",
-                "passed": (
-                    payload["source_signal_ref"]["signal_id"]
-                    == payload["latest_signal_report"]["signal_id"]
-                    and payload["source_signal_ref"]["config_hash"]
-                    == payload["latest_signal_report"]["config_hash"]
-                    and bool(payload["source_signal_ref"]["run_id"])
-                ),
-                "expected": {
-                    "signal_id": payload["latest_signal_report"]["signal_id"],
-                    "config_hash": payload["latest_signal_report"]["config_hash"],
-                    "run_id_nonempty": True,
-                },
-                "actual": {
-                    "signal_id": payload["source_signal_ref"]["signal_id"],
-                    "config_hash": payload["source_signal_ref"]["config_hash"],
-                    "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
-                },
+            "actual": {
+                "signal_id": payload["source_signal_ref"]["signal_id"],
+                "config_hash": payload["source_signal_ref"]["config_hash"],
+                "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
             },
-            {
-                "name": "report_payload_source_signal_ref_values_have_traceable_format",
-                "passed": (
-                    bool(payload["source_signal_ref"]["signal_id"])
-                    and bool(payload["source_signal_ref"]["run_id"])
-                    and payload["source_signal_ref"]["config_hash"].startswith(
-                        "sha256:"
-                    )
-                ),
-                "expected": {
-                    "signal_id_nonempty": True,
-                    "run_id_nonempty": True,
-                    "config_hash_sha256_prefix": True,
-                },
-                "actual": {
-                    "signal_id_nonempty": bool(payload["source_signal_ref"]["signal_id"]),
-                    "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
-                    "config_hash_sha256_prefix": payload["source_signal_ref"][
-                        "config_hash"
-                    ].startswith("sha256:"),
-                },
+        },
+        {
+            "name": "report_payload_source_signal_ref_values_have_traceable_format",
+            "passed": (
+                bool(payload["source_signal_ref"]["signal_id"])
+                and bool(payload["source_signal_ref"]["run_id"])
+                and payload["source_signal_ref"]["config_hash"].startswith(
+                    "sha256:"
+                )
+            ),
+            "expected": {
+                "signal_id_nonempty": True,
+                "run_id_nonempty": True,
+                "config_hash_sha256_prefix": True,
             },
-            {
-                "name": "report_payload_source_signal_ref_config_hash_digest_is_sha256",
-                "passed": (
-                    len(source_config_hash_digest) == 64
-                    and source_config_hash_digest_is_hex
-                ),
-                "expected": {
-                    "config_hash_digest_length": 64,
-                    "config_hash_digest_hex": True,
-                },
-                "actual": {
-                    "config_hash_digest_length": len(source_config_hash_digest),
-                    "config_hash_digest_hex": source_config_hash_digest_is_hex,
-                },
+            "actual": {
+                "signal_id_nonempty": bool(payload["source_signal_ref"]["signal_id"]),
+                "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
+                "config_hash_sha256_prefix": payload["source_signal_ref"][
+                    "config_hash"
+                ].startswith("sha256:"),
             },
+        },
+        {
+            "name": "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+            "passed": (
+                len(source_config_hash_digest) == 64
+                and source_config_hash_digest_is_hex
+            ),
+            "expected": {
+                "config_hash_digest_length": 64,
+                "config_hash_digest_hex": True,
+            },
+            "actual": {
+                "config_hash_digest_length": len(source_config_hash_digest),
+                "config_hash_digest_hex": source_config_hash_digest_is_hex,
+            },
+        },
+    ]
+    if source_repository_ref is not None:
+        report_extra_checks.extend(
+            [
+                {
+                    "name": (
+                        "report_payload_source_repository_ref_keys_match_expected_schema"
+                    ),
+                    "passed": list(source_repository_ref)
+                    == ["storage", "db_required", "filters"],
+                    "expected": ["storage", "db_required", "filters"],
+                    "actual": list(source_repository_ref),
+                },
+                {
+                    "name": "report_payload_source_repository_ref_is_path_free",
+                    "passed": _source_repository_ref_is_path_free(
+                        source_repository_ref
+                    ),
+                    "expected": {
+                        "omits_ledger_ref": True,
+                        "omits_ledger_path": True,
+                        "omits_database_path": True,
+                        "omits_absolute_or_sqlite_paths": True,
+                    },
+                    "actual": _source_repository_ref_path_free_summary(
+                        source_repository_ref
+                    ),
+                },
+            ]
+        )
+    report_extra_checks.extend(
+        [
             {
                 "name": "report_payload_intent_matches_contract",
                 "passed": (
@@ -365,7 +388,22 @@ def generate_latest_signal_report(
                 "expected": expected_optional_context_guard_statuses,
                 "actual": actual_optional_context_guard_statuses,
             },
-        ],
+        ]
+    )
+    payload["report_payload_guard"] = _payload_contract_guard(
+        payload=payload,
+        expected_schema_version=REPORT_SCHEMA_VERSION,
+        expected_keys=_expected_report_payload_keys(
+            include_chart=chart_payload is not None,
+            include_multimodal=chart_payload is not None
+            or bool(normalized_extra_evidence_cards),
+            include_source_repository=source_repository_ref is not None,
+        ),
+        schema_check_name="report_payload_schema_version_matches_expected",
+        live_data_check_name="report_payload_live_data_required_matches_expected",
+        keys_check_name="report_payload_keys_match_expected_schema",
+        expected_live_data_required=payload_live_data_required,
+        extra_checks=report_extra_checks,
         check_names_check_name=(
             "report_payload_guard_check_names_match_expected_schema"
         ),
@@ -674,7 +712,83 @@ def _latest_report_source_signal(
     label_status = _report_label_status_from_outcome(latest_record.get("label_outcome"))
     if label_status is not None:
         signal["label_status"] = label_status
+    signal["_source_repository_ref"] = _source_repository_ref_from_latest_record(
+        latest_record
+    )
     return signal
+
+
+def _source_repository_ref_from_latest_record(
+    latest_record: dict[str, Any],
+) -> dict[str, Any]:
+    filters = latest_record.get("filters")
+    normalized_filters = filters if isinstance(filters, dict) else {}
+    return {
+        "storage": latest_record.get("storage"),
+        "db_required": bool(latest_record.get("db_required")),
+        "filters": {
+            "asset": normalized_filters.get("asset"),
+            "underlying": normalized_filters.get("underlying"),
+            "timeframe": normalized_filters.get("timeframe"),
+        },
+    }
+
+
+def _source_repository_ref_is_path_free(source_repository_ref: dict[str, Any]) -> bool:
+    summary = _source_repository_ref_path_free_summary(source_repository_ref)
+    return all(summary.values())
+
+
+def _source_repository_ref_path_free_summary(
+    source_repository_ref: dict[str, Any],
+) -> dict[str, bool]:
+    keys = _nested_keys(source_repository_ref)
+    strings = _nested_string_values(source_repository_ref)
+    lowered_strings = [value.lower() for value in strings]
+    return {
+        "omits_ledger_ref": "ledger_ref" not in keys,
+        "omits_ledger_path": "ledger_path" not in keys,
+        "omits_database_path": "database_path" not in keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in lowered
+            and "file://" not in lowered
+            and ".sqlite" not in lowered
+            and ".sqlite3" not in lowered
+            and not lowered.startswith("sqlite:")
+            for value, lowered in zip(strings, lowered_strings, strict=True)
+        ),
+    }
+
+
+def _nested_keys(value: Any) -> set[str]:
+    if isinstance(value, dict):
+        keys = set(value)
+        for nested_value in value.values():
+            keys.update(_nested_keys(nested_value))
+        return keys
+    if isinstance(value, list):
+        keys: set[str] = set()
+        for nested_value in value:
+            keys.update(_nested_keys(nested_value))
+        return keys
+    return set()
+
+
+def _nested_string_values(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        strings: list[str] = []
+        for nested_value in value.values():
+            strings.extend(_nested_string_values(nested_value))
+        return strings
+    if isinstance(value, list):
+        strings = []
+        for nested_value in value:
+            strings.extend(_nested_string_values(nested_value))
+        return strings
+    return []
 
 
 def _report_label_status_from_outcome(label_outcome: Any) -> dict[str, Any] | None:
@@ -3365,6 +3479,7 @@ def _expected_report_payload_keys(
     *,
     include_chart: bool,
     include_multimodal: bool,
+    include_source_repository: bool = False,
 ) -> list[str]:
     keys = [
         "schema_version",
@@ -3387,8 +3502,10 @@ def _expected_report_payload_keys(
         "report_intent_contract",
         "report_contract_guard",
         "source_signal_ref",
-        "live_data_required",
     ]
+    if include_source_repository:
+        keys.append("source_repository_ref")
+    keys.append("live_data_required")
     if include_chart:
         keys.append("chart_code_guard")
     if include_multimodal:

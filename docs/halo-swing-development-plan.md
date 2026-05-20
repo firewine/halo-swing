@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.083 P1 Repository Latest Report Source Metadata Gate Record - 2026-05-20
+
+### A. 목적
+
+Repository-backed `generate_latest_signal_report`는 저장된 최신 signal과 label을
+read-model로 드러내지만, report payload에는 이 값이 JSONL/SQLite 중 어떤
+repository source와 어떤 normalized filter에서 왔는지 path-free metadata가 없다.
+이번 slice는 local path를 노출하지 않고 report read-model의 repository source를
+추적할 수 있게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add source_repository_ref only when explicit ledger_path or database_path is used
+  - include storage, db_required, and normalized asset/underlying/timeframe filters
+  - omit ledger_ref, ledger_path, database_path, SQLite file path, and absolute local path values
+  - keep default no-repository report snapshot unchanged
+  - add report_payload_guard checks for conditional source_repository_ref shape
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata tests/test_reporting.py::test_latest_signal_report_repository_source_includes_sqlite_source_metadata tests/test_reporting.py::test_latest_signal_report_snapshot_matches_golden -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused repository source metadata tests: 3 passed
+  - full pytest: 908 passed in 36.81s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.082 P1 Repository Latest Report Label Status Gate Record - 2026-05-20
 
 ### A. 목적
