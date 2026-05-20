@@ -1,24 +1,30 @@
 {
-  "gate_id": "API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE",
+  "gate_id": "P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE",
   "mode": "implement",
-  "status": "API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_PUSHED",
-  "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.056",
-  "next_atomic_step": "no open code step remains after pushed provider smoke accepted-key order gate; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap",
+  "status": "MIGRATION_GO_INITIAL_REPLAY_SCHEMA_VERIFIED",
+  "review_tier": "S2_medium",
+  "source_gate_packet": "docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md",
+  "next_atomic_step": "no open code step remains after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
-    "docs/codex-task.json"
+    "docs/codex-task.json",
+    "docs/halo-swing-development-plan.md",
+    "migrations/",
+    "migrations/202605100001_initial_replay_schema.sql",
+    "src/halo_swing_mcp/storage_migrations.py",
+    "tests/test_storage_migrations.py",
+    "tests/test_tool_registry.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.056"
+    "docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md",
+    "docs/halo-swing-development-plan.md#3.32"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
     "src/halo_swing_mcp/live_adapters/",
-    "migrations/",
     "data/",
     "artifacts/",
     "state/"
@@ -30,6 +36,10 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest",
+    "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
   ],
   "post_implementation_review": {
@@ -43,13 +53,20 @@
     "read_only": true
   },
   "done_means": [
-    "task contract and portable mirror match the pushed/no-open-code-step state",
-    "WORKING.md records the pushed commit and no-open-code-step state",
-    "no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
+    "MIGRATION_GO approval is recorded in SSOT and WORKING.md",
+    "migration runner applies migrations idempotently and fails on checksum mismatch",
+    "initial replay schema creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store",
+    "migration-specific tests prove tmp_path-only database creation and storage_health applied migration/domain table reporting",
+    "default import guard allows sqlite3 only in the migration runner introduced by MIGRATION_GO",
+    "no repository-backed DB persistence, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
     "verification passes"
   ],
-  "pushed_commit": "399701d Prefer simple keys in provider smoke metadata",
-  "task_state_synced_to_origin_main": true,
-  "task_state_commit_source": "git log is authoritative for latest ledger-only sync commits",
-  "next_state_after_success": "wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap"
+  "approval_source": "user message: MIGRATION_GO 승인",
+  "migration_defaults": {
+    "id_policy": "text",
+    "timestamp_policy": "utc_iso8601_text",
+    "label_store_policy": "one_signal_to_many_labels",
+    "watchdog_event_table": "deferred"
+  },
+  "next_state_after_success": "wait for explicit REPOSITORY_GO approval or another migration-only schema gap"
 }

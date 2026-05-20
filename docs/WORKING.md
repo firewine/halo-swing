@@ -42,21 +42,26 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_PUSHED
-gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
-review_tier: S1_small
+status: MIGRATION_GO_INITIAL_REPLAY_SCHEMA_VERIFIED
+gate_id: P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE
+review_tier: S2_medium
 
-next_atomic_step: no open code step remains after pushed provider smoke accepted-key order gate; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+next_atomic_step: no open code step remains after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - migrations/
+  - migrations/202605100001_initial_replay_schema.sql
+  - src/halo_swing_mcp/storage_migrations.py
+  - tests/test_storage_migrations.py
+  - tests/test_tool_registry.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
   - src/halo_swing_mcp/live_adapters/
-  - migrations/
   - data/
   - artifacts/
   - state/
@@ -69,51 +74,72 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - task contract and portable mirror match the pushed/no-open-code-step state
-  - WORKING.md records the pushed commit and no-open-code-step state
-  - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
+  - MIGRATION_GO approval is recorded in SSOT and WORKING.md
+  - migration runner applies migrations idempotently and fails on checksum mismatch
+  - initial replay schema creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store
+  - migration-specific tests prove tmp_path-only database creation and storage_health applied migration/domain table reporting
+  - default import guard allows sqlite3 only in the migration runner introduced by MIGRATION_GO
+  - no repository-backed DB persistence, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - verification passes
 
-next_state_after_success: pushed to origin/main; git log is authoritative for ledger-only sync commits, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+approval_source: "user message: MIGRATION_GO 승인"
+next_state_after_success: wait for explicit REPOSITORY_GO approval or another migration-only schema gap
 ```
 
 Latest verification result:
 
 ```text
 status: passed
-gate_id: API_KEY_INTEGRATION_DIRECT_PROVIDER_SMOKE_ACCEPTED_KEY_ORDER_GATE
+gate_id: P1_MIGRATION_GO_INITIAL_REPLAY_SCHEMA_GATE
+scope: MIGRATION_GO approved initial replay schema migration
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
 results:
   - diff -u .codex/tasks/current.json docs/codex-task.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: main matches origin/main after push
+  - git status --short --branch: modified expected task/docs/code files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q: 18 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 882 passed
 files_changed:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
-pushed_commit: 399701d Prefer simple keys in provider smoke metadata
-task_state_synced_to_origin_main: true
-task_state_commit_source: git log is authoritative for latest ledger-only sync commits
-next_state: no open code step after push; wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
+  - docs/halo-swing-development-plan.md
+  - migrations/202605100001_initial_replay_schema.sql
+  - src/halo_swing_mcp/storage_migrations.py
+  - tests/test_storage_migrations.py
+  - tests/test_tool_registry.py
+next_state: no open code step after verified initial replay schema migration; wait for explicit REPOSITORY_GO approval or another migration-only schema gap
 notes:
-  - direct provider smoke success and recovery metadata now expose accepted_env_keys preferred-first
-  - provider resolver tuples and credential selection behavior were not changed
-  - follow-up dynamic audit found no provider-family accepted_env_keys, required_env_keys, env_keys, or missing_env_keys lists that expose preferred API keys behind aliases in API-key setup/status/route/pipeline summary payloads
-  - task contract mirrors now record the pushed/no-open-code-step state rather than a fresh implementation step
-  - task mirror sync verification passed: task diff clean, both JSON mirrors parse, git diff --check passed, health_check status ok
-  - volatile latest-ledger commit fields were replaced with a stable git-log-authoritative state marker to avoid stale self-referential ledger churn
+  - user explicitly approved MIGRATION_GO
+  - SSOT records MIGRATION_GO approved migration defaults from the readiness packet
+  - initial SQLite replay schema migration creates schema_migrations, strategy_config, run_journal, feature_store, evidence_card, artifact_ref, signal_ledger, and label_store
+  - migration runner is idempotent and fails loudly on checksum mismatch
+  - storage health helper reports applied migration count, latest migration, and domain tables
+  - migration tests create SQLite DBs only under tmp_path and assert no repo data/state SQLite artifacts
+  - tests/test_tool_registry.py keeps live/default sqlite3 import blocked except for src/halo_swing_mcp/storage_migrations.py
+  - REPOSITORY_GO remains required before repository-backed DB persistence
 ```
 
 Previous completed directive:

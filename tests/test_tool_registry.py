@@ -32,6 +32,9 @@ FORBIDDEN_DEFAULT_IMPORTS = {
     "sqlalchemy",
     "ccxt",
 }
+ALLOWED_DEFAULT_IMPORTS_BY_PATH = {
+    SRC_ROOT / "storage_migrations.py": {"sqlite3"},
+}
 
 
 @pytest.fixture(autouse=True)
@@ -795,9 +798,10 @@ def test_harness_rejects_audit_log_path_delete_character_without_fallback_audit(
 
 
 def test_default_source_does_not_import_live_db_or_broker_clients() -> None:
-    imported_modules: set[str] = set()
+    disallowed_imports: dict[str, list[str]] = {}
 
     for path in SRC_ROOT.rglob("*.py"):
+        imported_modules: set[str] = set()
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
@@ -806,5 +810,11 @@ def test_default_source_does_not_import_live_db_or_broker_clients() -> None:
                 )
             elif isinstance(node, ast.ImportFrom) and node.module:
                 imported_modules.add(node.module.split(".", maxsplit=1)[0])
+        allowed_modules = ALLOWED_DEFAULT_IMPORTS_BY_PATH.get(path, set())
+        disallowed_modules = sorted(
+            (imported_modules & FORBIDDEN_DEFAULT_IMPORTS) - allowed_modules
+        )
+        if disallowed_modules:
+            disallowed_imports[str(path.relative_to(ROOT))] = disallowed_modules
 
-    assert imported_modules.isdisjoint(FORBIDDEN_DEFAULT_IMPORTS)
+    assert disallowed_imports == {}

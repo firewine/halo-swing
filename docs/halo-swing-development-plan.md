@@ -776,6 +776,68 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.057 P1 Migration GO Initial Replay Schema Gate Record - 2026-05-20
+
+### A. 승인 기록
+
+```text
+status: verified
+approval_source: user message "MIGRATION_GO 승인"
+source_readiness_packet: docs/gates/P1_MIGRATION_GATE_READINESS_2026-05-10.md
+review_tier: S2_medium
+```
+
+### B. 승인된 migration 기본값
+
+```yaml
+id_policy: text
+timestamp_policy: utc_iso8601_text
+initial_tables:
+  - schema_migrations
+  - strategy_config
+  - run_journal
+  - feature_store
+  - evidence_card
+  - artifact_ref
+  - signal_ledger
+  - label_store
+label_store_policy: one_signal_to_many_labels
+watchdog_event_table: deferred
+```
+
+### C. 최초 구현 범위
+
+```text
+allowed:
+  - migrations/202605100001_initial_replay_schema.sql
+  - idempotent SQLite migration runner
+  - storage health helper reporting applied migration count and domain tables
+  - tmp_path-only migration tests
+
+still_blocked_until_REPOSITORY_GO:
+  - repository-backed DB persistence
+  - DB-backed record_signal, label_signal_outcome, or evaluate_score_performance paths
+  - repo data/state DB artifact
+  - live adapters, broker/order code, Hermes runtime calls, Telegram sends, or scheduler work
+```
+
+### D. 필수 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_storage_migrations.py tests/test_contracts.py -q: 18 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_tool_registry.py::test_default_source_does_not_import_live_db_or_broker_clients -q: 1 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 882 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: wait for explicit REPOSITORY_GO approval or another migration-only schema gap
+```
+
 ## 4.056 API Key Integration Direct Provider Smoke Accepted-Key Order Gate Record - 2026-05-20
 
 ### A. 목적
