@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_PROVENANCE_GUARD_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_GUARD_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_PROVENANCE_GUARD_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_GUARD_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.113",
-  "next_atomic_step": "no open code step remains after verified SQLite latest report filter provenance guard coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.114",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered latest_record_guard provenance coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.112",
+    "docs/halo-swing-development-plan.md#4.113",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -34,7 +34,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_sqlite_repository_source_summary_appears_in_sections_and_text -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter provenance is reflected in source_repository_ref filters",
-    "SQLite repository-backed latest report underlying filter provenance is reflected in source_repository_ref filters",
-    "SQLite filter provenance appears in report sections/text without database path or SQLite filename leakage",
-    "report_payload_guard source_repository_ref checks remain ok and path-free for filtered SQLite reports",
+    "SQLite repository-backed latest report timeframe filter provenance is reflected in latest_record_guard",
+    "SQLite repository-backed latest report underlying filter provenance is reflected in latest_record_guard",
+    "latest_record_guard source_repository_ref matches top-level source_repository_ref for filtered SQLite reports",
+    "latest_record_guard filtered provenance checks remain path-free and omit database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

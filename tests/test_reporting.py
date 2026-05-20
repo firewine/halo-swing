@@ -1298,16 +1298,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
+    latest_record_guard = payload["latest_record_guard"]
+    latest_record_guard_checks = {
+        check["name"]: check for check in latest_record_guard["checks"]
+    }
     source_summary = (
         "Repository source: sqlite_signal_repository; "
         "db_required=true; "
         "filters asset=TQQQ underlying=<any> timeframe=swing_3d_10d"
     )
-
-    assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
-    assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
-    assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
-    assert payload["source_repository_ref"] == {
+    source_repository_ref = {
         "storage": "sqlite_signal_repository",
         "db_required": True,
         "filters": {
@@ -1315,6 +1315,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "underlying": None,
             "timeframe": "swing_3d_10d",
         },
+    }
+
+    assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
+    assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
+    assert payload["source_signal_ref"]["run_id"] == swing_signal["run_id"]
+    assert payload["source_repository_ref"] == source_repository_ref
+    assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
+    assert latest_record_guard["status"] == "ok"
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_matches_top_level_source"
+    ] == {
+        "name": "latest_record_source_repository_ref_matches_top_level_source",
+        "passed": True,
+        "expected": source_repository_ref,
+        "actual": source_repository_ref,
+    }
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
     }
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
@@ -1331,12 +1354,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
+    assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_repository_ref"])
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(latest_record_guard)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -1384,19 +1412,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
+    latest_record_guard = payload["latest_record_guard"]
+    latest_record_guard_checks = {
+        check["name"]: check for check in latest_record_guard["checks"]
+    }
     source_summary = (
         "Repository source: sqlite_signal_repository; "
         "db_required=true; "
         "filters asset=TQQQ underlying=QQQ timeframe=swing_3d_10d"
     )
+    source_repository_ref = {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+        "filters": {
+            "asset": "TQQQ",
+            "underlying": "QQQ",
+            "timeframe": "swing_3d_10d",
+        },
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
     assert payload["source_signal_ref"]["run_id"] == qqq_signal["run_id"]
-    assert payload["source_repository_ref"]["filters"] == {
-        "asset": "TQQQ",
-        "underlying": "QQQ",
-        "timeframe": "swing_3d_10d",
+    assert payload["source_repository_ref"] == source_repository_ref
+    assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
+    assert latest_record_guard["status"] == "ok"
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_matches_top_level_source"
+    ] == {
+        "name": "latest_record_source_repository_ref_matches_top_level_source",
+        "passed": True,
+        "expected": source_repository_ref,
+        "actual": source_repository_ref,
+    }
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
     }
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
@@ -1413,12 +1468,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
+    assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(payload["source_repository_ref"])
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(latest_record_guard)
     )
     assert all(
         ".sqlite" not in value.lower()
