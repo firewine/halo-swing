@@ -67,7 +67,10 @@ def test_context_product_shape_matches_current_mvp_surface() -> None:
     assert "integration and live-smoke harnesses" in text
     assert "audit, runtime, and guarded BTC operations" in text
     assert "BTC order preview and confirmation-gated execution tool" in text
-    assert "자동 주문, broker/order submission, Hermes runtime start, Telegram send" in text
+    assert "BTC COIN-M 실행은 confirmation-gated tooling 안에 한정한다" in text
+    assert "ETF 주문, 범용 broker 확장, Telegram send, Hermes runtime start" in text
+    assert "scheduler 자동 실행, live adapter 확장" in text
+    assert "자동 주문, broker/order submission" not in text
     assert "Initial Product Shape" not in text
     assert "초기 제품은 다음 MCP 도구를 제공한다" not in text
 

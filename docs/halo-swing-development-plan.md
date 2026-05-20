@@ -776,6 +776,43 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.074 CONTEXT Product Shape Order Boundary Gate Record - 2026-05-20
+
+### A. 목적
+
+`docs/CONTEXT.md`의 Current Product Shape가 guarded BTC operations를 현재
+capability family로 요약한 직후, "자동 주문, broker/order submission" 전체를
+제품 범위 밖으로 둔다고 넓게 말해 BTC COIN-M confirmation-gated tooling과
+충돌했다. Product Shape 문구도 BTC 한정 guarded surface와 later-gate 금지 항목을
+구분하도록 정리한다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md Current Product Shape now limits BTC COIN-M execution to confirmation-gated tooling
+  - docs/CONTEXT.md Current Product Shape keeps ETF orders, generic broker expansion, Telegram send, Hermes runtime start, scheduler automation, live adapter expansion, and env DB activation outside later gates
+  - docs/CONTEXT.md no longer broadly says automatic orders or broker/order submission are outside product scope immediately after listing BTC guarded tools
+  - tests/test_setup_docs.py covers the CONTEXT product-shape order-boundary wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 50 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 893 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.073 CONTEXT Order Checklist Alignment Gate Record - 2026-05-20
 
 ### A. 목적

@@ -172,9 +172,10 @@ audit, runtime, and guarded BTC operations
     BTC order preview and confirmation-gated execution tool
 ```
 
-자동 주문, broker/order submission, Hermes runtime start, Telegram send,
-scheduler, live adapter 확장, `.env` 기반 DB 자동 활성화는 별도 gate 승인 전까지
-제품 범위로 보지 않는다.
+BTC COIN-M 실행은 confirmation-gated tooling 안에 한정한다. ETF 주문,
+범용 broker 확장, Telegram send, Hermes runtime start, scheduler 자동 실행,
+live adapter 확장, `.env` 기반 DB 자동 활성화는 별도 gate 승인 전까지 제품
+범위로 보지 않는다.
 
 최종 출력 액션:
 
