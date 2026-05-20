@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENTS = ROOT / "AGENTS.md"
+CONTEXT = ROOT / "docs" / "CONTEXT.md"
 README = ROOT / "README.md"
 DEVOPS_GUIDE = ROOT / "docs" / "devops-setup-guide.md"
 
@@ -22,6 +23,17 @@ def test_agents_guide_records_current_storage_gate_status() -> None:
     assert "`MIGRATION_GO` is not recorded" not in text
     assert "`REPOSITORY_GO` is not recorded" not in text
     assert "The current P1 DTO slice is limited to" not in text
+
+
+def test_context_read_policy_matches_agents_working_contract() -> None:
+    text = _normalized_text(CONTEXT)
+
+    assert "repository root의 [AGENTS.md](../AGENTS.md)" in text
+    assert "[WORKING.md](./WORKING.md)를 active contract로 먼저 읽고" in text
+    assert "`read_only_context`가 지정한 SSOT 또는 CONTEXT 구간만 좁게 읽는다" in text
+    assert "구현 작업마다 전문을 읽지 않는다" in text
+    assert "작업 시작 전 최소 확인 순서" not in text
+    assert "1. 이 문서 2. [WORKING.md](./WORKING.md)" not in text
 
 
 def test_setup_docs_describe_repo_root_dotenv_precedence() -> None:

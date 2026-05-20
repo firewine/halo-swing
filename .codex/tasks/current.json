@@ -1,13 +1,13 @@
 {
-  "gate_id": "AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE",
+  "gate_id": "CONTEXT_READ_POLICY_ALIGNMENT_GATE",
   "mode": "implement",
-  "status": "AGENTS_STORAGE_GATE_STATUS_GUIDE_VERIFIED",
+  "status": "CONTEXT_READ_POLICY_ALIGNMENT_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified AGENTS storage gate status update; continue with the next explicit non-storage SSOT slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.067",
+  "next_atomic_step": "no open code step remains after verified CONTEXT read-policy alignment; continue with the next explicit SSOT slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    "AGENTS.md",
+    "docs/CONTEXT.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
@@ -15,8 +15,9 @@
   ],
   "read_only_context": [
     "AGENTS.md",
+    "docs/CONTEXT.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.065"
+    "docs/halo-swing-development-plan.md#4.066"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -47,20 +48,13 @@
     "read_only": true
   },
   "done_means": [
-    "AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded",
-    "AGENTS.md records current storage gate status and explicit database_path-only repository activation",
-    "AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates",
-    "setup docs tests cover AGENTS.md storage gate status wording",
+    "docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md",
+    "docs/CONTEXT.md points normal implementation agents to root AGENTS.md and docs/WORKING.md as the active operating contract",
+    "docs/CONTEXT.md says SSOT and CONTEXT sections should be read narrowly when referenced by WORKING.md or the current task",
+    "setup docs tests cover CONTEXT.md read policy wording",
     "no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added",
-    "verification passes, including full pytest"
+    "verification passes"
   ],
-  "approval_source": "user message: REPOSITORY_GO 승인",
-  "repository_defaults": {
-    "database_activation": "explicit_database_path_only",
-    "default_repository": "jsonl_signal_ledger_record",
-    "sqlite_repository": "sqlite_signal_repository",
-    "close_readiness": "verified_for_p1_storage_docs_devops_only",
-    "test_database_policy": "tmp_path_only"
-  },
-  "next_state_after_success": "continue with the next explicit non-storage SSOT slice"
+  "approval_source": "user objective: 개발문서 목표확인해서 계속 개발진행해",
+  "next_state_after_success": "continue with the next explicit SSOT slice"
 }

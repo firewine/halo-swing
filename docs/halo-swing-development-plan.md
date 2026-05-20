@@ -776,6 +776,42 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.067 CONTEXT Read Policy Alignment Gate Record - 2026-05-20
+
+### A. 목적
+
+새 대화 진입용 `docs/CONTEXT.md`가 root `AGENTS.md`의 현재 read policy와
+어긋나지 않도록 정리한다. 일반 구현 작업의 active contract는
+`docs/WORKING.md`이며, SSOT와 CONTEXT는 현재 task contract 또는
+`read_only_context`가 지정한 구간만 좁게 읽는다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/CONTEXT.md points agent runners to root AGENTS.md as the first operating guide
+  - docs/CONTEXT.md says WORKING.md is the normal implementation active contract
+  - docs/CONTEXT.md says SSOT/CONTEXT sections should be read narrowly when referenced
+  - tests/test_setup_docs.py covers CONTEXT.md read-policy wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 44 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 887 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with the next explicit SSOT slice
+```
+
 ## 4.066 AGENTS Storage Gate Status Guide Record - 2026-05-20
 
 ### A. 목적

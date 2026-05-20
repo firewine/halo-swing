@@ -42,15 +42,15 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: AGENTS_STORAGE_GATE_STATUS_GUIDE_VERIFIED
-gate_id: AGENTS_STORAGE_GATE_STATUS_GUIDE_GATE
+status: CONTEXT_READ_POLICY_ALIGNMENT_VERIFIED
+gate_id: CONTEXT_READ_POLICY_ALIGNMENT_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified AGENTS storage gate status update; continue with the next explicit non-storage SSOT slice
+next_atomic_step: no open code step remains after verified CONTEXT read-policy alignment; continue with the next explicit SSOT slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - AGENTS.md
+  - docs/CONTEXT.md
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
@@ -77,15 +77,15 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - AGENTS.md no longer says MIGRATION_GO and REPOSITORY_GO are not recorded
-  - AGENTS.md records current storage gate status and explicit database_path-only repository activation
-  - AGENTS.md keeps live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts blocked until later gates
-  - setup docs tests cover AGENTS.md storage gate status wording
+  - docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md
+  - docs/CONTEXT.md points normal implementation agents to root AGENTS.md and docs/WORKING.md as the active operating contract
+  - docs/CONTEXT.md says SSOT and CONTEXT sections should be read narrowly when referenced by WORKING.md or the current task
+  - setup docs tests cover CONTEXT.md read policy wording
   - no source code, live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or repo data/state/artifact files are added
-  - verification passes, including full pytest
+  - verification passes
 
-approval_source: "user message: REPOSITORY_GO 승인"
-next_state_after_success: continue with the next explicit non-storage SSOT slice
+approval_source: "user objective: 개발문서 목표확인해서 계속 개발진행해"
+next_state_after_success: continue with the next explicit SSOT slice
 ```
 
 Previous repository verification result:
@@ -187,8 +187,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: FULL_FEATURE_INSPECTION_2026_05_20
-scope: full repository feature inspection after MIGRATION_GO and REPOSITORY_GO approval
+gate_id: CONTEXT_READ_POLICY_ALIGNMENT_GATE
+scope: docs/CONTEXT.md read-policy alignment with root AGENTS.md and active WORKING contract
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -204,20 +204,24 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: clean before this WORKING.md inspection log update
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 43 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 886 passed in 36.81s
+  - git status --short --branch: modified expected docs/task/test files only before commit
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 44 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 887 passed in 37.04s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
+  - .codex/tasks/current.json
+  - docs/CONTEXT.md
   - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_setup_docs.py
 next_state: continue with the next explicit non-storage SSOT slice
 notes:
-  - full offline test suite passes after SQLite migration and explicit database_path repository work
-  - MCP harness advertises 43 capabilities and reports live_data_required=false with status ok
-  - MIGRATION_GO and REPOSITORY_GO implementation is complete for the approved P1 storage/repository slice
-  - live adapters, broker/order submission, Hermes runtime, Telegram send, scheduler, env DB activation, and committed SQLite artifacts remain blocked until later gates
-  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added during this inspection
+  - docs/CONTEXT.md now points agent runners to root AGENTS.md and WORKING.md for the active operating contract
+  - docs/CONTEXT.md no longer says every task should start by reading CONTEXT.md before WORKING.md
+  - setup docs tests cover the CONTEXT read-policy wording
+  - no source code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 
 Previous completed directive:
