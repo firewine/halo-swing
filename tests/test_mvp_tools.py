@@ -1190,6 +1190,111 @@ def test_get_latest_signal_record_exposes_path_free_source_repository_ref(
         assert "/users/" not in serialized_source_ref.lower()
 
 
+def test_get_latest_signal_record_guard_validates_source_repository_ref_contract(
+    tmp_path: Path,
+) -> None:
+    ledger_path = tmp_path / "signal_ledger.jsonl"
+    database_path = tmp_path / "halo_swing.sqlite"
+    signal = {
+        **score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_latest_guard_source_ref",
+        "run_id": "run_latest_guard_source_ref",
+        "created_at": "2026-05-20T10:00:00Z",
+    }
+
+    for repository_payload, expected_storage, expected_db_required, blocked_text in (
+        (
+            {"ledger_path": f" {ledger_path} "},
+            "jsonl_signal_ledger_record",
+            False,
+            str(ledger_path),
+        ),
+        (
+            {"database_path": f" {database_path} "},
+            "sqlite_signal_repository",
+            True,
+            str(database_path),
+        ),
+    ):
+        record_signal(signal=signal, **repository_payload)
+        latest = get_latest_signal_record(
+            asset=" tqqq ",
+            timeframe=" swing_3d_10d ",
+            **repository_payload,
+        )
+        missing = get_latest_signal_record(
+            asset="SOXL",
+            **repository_payload,
+        )
+
+        for payload, expected_filters in (
+            (
+                latest,
+                {
+                    "asset": "TQQQ",
+                    "underlying": None,
+                    "timeframe": "swing_3d_10d",
+                },
+            ),
+            (
+                missing,
+                {
+                    "asset": "SOXL",
+                    "underlying": None,
+                    "timeframe": None,
+                },
+            ),
+        ):
+            expected_source_repository_ref = {
+                "storage": expected_storage,
+                "db_required": expected_db_required,
+                "filters": expected_filters,
+            }
+            guard = payload["latest_record_guard"]
+            guard_checks = {check["name"]: check for check in guard["checks"]}
+
+            assert guard["status"] == "ok"
+            assert list(guard_checks) == [
+                "latest_record_source_repository_ref_keys_match_expected_schema",
+                "latest_record_source_repository_ref_is_path_free",
+                "latest_record_source_repository_ref_matches_top_level_source",
+            ]
+            assert guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ] == {
+                "name": (
+                    "latest_record_source_repository_ref_keys_match_expected_schema"
+                ),
+                "passed": True,
+                "expected": ["storage", "db_required", "filters"],
+                "actual": ["storage", "db_required", "filters"],
+            }
+            assert guard_checks["latest_record_source_repository_ref_is_path_free"][
+                "passed"
+            ] is True
+            assert guard_checks["latest_record_source_repository_ref_is_path_free"][
+                "actual"
+            ] == {
+                "omits_ledger_ref": True,
+                "omits_ledger_path": True,
+                "omits_database_path": True,
+                "omits_absolute_or_sqlite_paths": True,
+            }
+            assert guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ] == {
+                "name": (
+                    "latest_record_source_repository_ref_matches_top_level_source"
+                ),
+                "passed": True,
+                "expected": expected_source_repository_ref,
+                "actual": expected_source_repository_ref,
+            }
+            assert payload["source_repository_ref"] == expected_source_repository_ref
+            assert json.dumps(guard, sort_keys=True).find(blocked_text) == -1
+            assert ".sqlite" not in json.dumps(guard, sort_keys=True).lower()
+
+
 def test_get_latest_signal_record_delegates_matching_to_repository_boundary(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

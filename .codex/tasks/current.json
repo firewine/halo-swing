@@ -1,28 +1,24 @@
 {
-  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_GATE",
+  "gate_id": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_GUARD_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_VERIFIED",
+  "status": "P1_REPOSITORY_LATEST_SIGNAL_RECORD_GUARD_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.096",
-  "next_atomic_step": "no open code step remains after verified latest signal source_repository_ref propagation; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.097",
+  "next_atomic_step": "no open code step remains after verified latest signal record guard; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/halo-swing-development-plan.md",
     "src/halo_swing_mcp/tools/recording.py",
-    "src/halo_swing_mcp/tools/reporting.py",
-    "tests/test_mvp_tools.py",
-    "tests/test_reporting.py"
+    "tests/test_mvp_tools.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#3.5.4",
-    "docs/halo-swing-development-plan.md#3.5.6",
+    "docs/halo-swing-development-plan.md#4.096",
     "src/halo_swing_mcp/tools/recording.py",
-    "src/halo_swing_mcp/signal_repository.py",
-    "docs/halo-swing-development-plan.md#3.5.5"
+    "tests/test_mvp_tools.py"
   ],
   "blocked_path_prefixes": [
     "src/halo_swing_mcp/broker/",
@@ -39,7 +35,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_guard_validates_source_repository_ref_contract tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -54,10 +50,10 @@
     "read_only": true
   },
   "done_means": [
-    "get_latest_signal_record exposes path-free source_repository_ref with storage, db_required, and normalized filters",
-    "source_repository_ref omits ledger_ref, ledger_path, database_path, SQLite filenames, and absolute local paths",
-    "generate_latest_signal_report consumes source_repository_ref from get_latest_signal_record when present",
-    "existing report source metadata and missing-source behavior remain unchanged",
+    "get_latest_signal_record found and not_found payloads include latest_record_guard",
+    "latest_record_guard verifies source_repository_ref keys, source_repository_ref path-free status, and alignment with top-level storage, db_required, and filters",
+    "existing latest signal record source_repository_ref payloads remain path-free and unchanged",
+    "existing JSONL and SQLite latest signal lookup behavior remains unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
   ],

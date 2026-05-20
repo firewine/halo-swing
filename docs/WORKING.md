@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_VERIFIED
-gate_id: P1_REPOSITORY_LATEST_SIGNAL_SOURCE_REF_PROPAGATION_GATE
+status: P1_REPOSITORY_LATEST_SIGNAL_RECORD_GUARD_VERIFIED
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_RECORD_GUARD_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified latest signal source_repository_ref propagation; continue with next explicit repository or report read-model slice
+next_atomic_step: no open code step remains after verified latest signal record guard; continue with next explicit repository or report read-model slice
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -54,9 +54,7 @@ allowed_edit_paths:
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
   - src/halo_swing_mcp/tools/recording.py
-  - src/halo_swing_mcp/tools/reporting.py
   - tests/test_mvp_tools.py
-  - tests/test_reporting.py
 
 blocked_path_prefixes:
   - src/halo_swing_mcp/broker/
@@ -74,16 +72,16 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_source_repository_ref tests/test_reporting.py::test_latest_signal_report_repository_source_includes_jsonl_source_metadata -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_guard_validates_source_repository_ref_contract tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_latest_signal_record exposes path-free source_repository_ref with storage, db_required, and normalized filters
-  - source_repository_ref omits ledger_ref, ledger_path, database_path, SQLite filenames, and absolute local paths
-  - generate_latest_signal_report consumes source_repository_ref from get_latest_signal_record when present
-  - existing report source metadata and missing-source behavior remain unchanged
+  - get_latest_signal_record found and not_found payloads include latest_record_guard
+  - latest_record_guard verifies source_repository_ref keys, source_repository_ref path-free status, and alignment with top-level storage, db_required, and filters
+  - existing latest signal record source_repository_ref payloads remain path-free and unchanged
+  - existing JSONL and SQLite latest signal lookup behavior remains unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 
@@ -186,7 +184,48 @@ notes:
   - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 
-Latest user-requested full feature check result:
+Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_LATEST_SIGNAL_RECORD_GUARD_GATE
+scope: latest signal record guard for path-free repository source metadata
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_guard_validates_source_repository_ref_contract tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/code/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_guard_validates_source_repository_ref_contract tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref -q: 2 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 925 passed in 44.96s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/tools/recording.py
+  - tests/test_mvp_tools.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - get_latest_signal_record found and not_found payloads now include latest_record_guard
+  - latest_record_guard verifies source_repository_ref key schema, path-free status, and alignment with top-level storage/db_required/filters
+  - existing path-free source_repository_ref shape and JSONL/SQLite latest lookup behavior remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous user-requested full feature check result:
 
 ```text
 status: passed
@@ -216,7 +255,7 @@ notes:
   - REPOSITORY_GO remains explicit database_path only
 ```
 
-Latest verification result:
+Previous verification result:
 
 ```text
 status: passed

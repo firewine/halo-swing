@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.097 P1 Repository Latest Signal Record Guard Gate Record - 2026-05-20
+
+### A. 목적
+
+4.096에서 latest signal read-model은 path-free `source_repository_ref`를 직접
+제공하게 됐다. 이번 slice는 이 metadata가 top-level `storage`, `db_required`,
+`filters`와 drift되지 않고 계속 path-free인지 `get_latest_signal_record`
+응답의 deterministic guard로 고정한다. Report read-model은 이 값을 그대로 소비하므로,
+repository source provenance의 numeric/metadata authority를 latest record 경계에
+둔다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add latest_record_guard to get_latest_signal_record found/not_found payloads
+  - verify source_repository_ref key schema, path-free status, and alignment with top-level storage/db_required/filters
+  - keep existing source_repository_ref shape and JSONL/SQLite latest lookup behavior unchanged
+  - keep default repository activation explicit-input only
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_mvp_tools.py::test_get_latest_signal_record_guard_validates_source_repository_ref_contract tests/test_mvp_tools.py::test_get_latest_signal_record_exposes_path_free_source_repository_ref -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused latest signal record guard tests: 2 passed
+  - full pytest: 925 passed in 44.96s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.096 P1 Repository Latest Signal Source Ref Propagation Gate Record - 2026-05-20
 
 ### A. 목적

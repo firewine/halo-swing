@@ -394,6 +394,12 @@ def get_latest_signal_record(
         repository=repository,
         filters=filters,
     )
+    latest_record_guard = _latest_record_guard(
+        storage=repository.storage_name,
+        db_required=repository.db_required,
+        filters=filters,
+        source_repository_ref=source_repository_ref,
+    )
 
     if record is None:
         return {
@@ -404,6 +410,7 @@ def get_latest_signal_record(
             "db_required": repository.db_required,
             "filters": filters,
             "source_repository_ref": source_repository_ref,
+            "latest_record_guard": latest_record_guard,
             "record": {},
             "label_outcome": None,
             "missing_links": [
@@ -433,6 +440,7 @@ def get_latest_signal_record(
         "db_required": repository.db_required,
         "filters": filters,
         "source_repository_ref": source_repository_ref,
+        "latest_record_guard": latest_record_guard,
         "record": record,
         "label_outcome": labels[-1] if labels else None,
         "missing_links": [],
@@ -620,6 +628,105 @@ def _source_repository_ref(
         "db_required": repository.db_required,
         "filters": dict(filters),
     }
+
+
+def _latest_record_guard(
+    *,
+    storage: str,
+    db_required: bool,
+    filters: dict[str, str | None],
+    source_repository_ref: dict[str, Any],
+) -> dict[str, Any]:
+    expected_source_repository_ref = {
+        "storage": storage,
+        "db_required": db_required,
+        "filters": filters,
+    }
+    path_free_summary = _source_repository_ref_path_free_summary(
+        source_repository_ref
+    )
+    checks = [
+        {
+            "name": "latest_record_source_repository_ref_keys_match_expected_schema",
+            "passed": list(source_repository_ref)
+            == ["storage", "db_required", "filters"],
+            "expected": ["storage", "db_required", "filters"],
+            "actual": list(source_repository_ref),
+        },
+        {
+            "name": "latest_record_source_repository_ref_is_path_free",
+            "passed": all(path_free_summary.values()),
+            "expected": {
+                "omits_ledger_ref": True,
+                "omits_ledger_path": True,
+                "omits_database_path": True,
+                "omits_absolute_or_sqlite_paths": True,
+            },
+            "actual": path_free_summary,
+        },
+        {
+            "name": "latest_record_source_repository_ref_matches_top_level_source",
+            "passed": source_repository_ref == expected_source_repository_ref,
+            "expected": expected_source_repository_ref,
+            "actual": source_repository_ref,
+        },
+    ]
+    return {
+        "status": "ok" if all(check["passed"] for check in checks) else "failed",
+        "checks": checks,
+    }
+
+
+def _source_repository_ref_path_free_summary(
+    source_repository_ref: dict[str, Any],
+) -> dict[str, bool]:
+    keys = _nested_keys(source_repository_ref)
+    strings = _nested_string_values(source_repository_ref)
+    lowered_strings = [value.lower() for value in strings]
+    return {
+        "omits_ledger_ref": "ledger_ref" not in keys,
+        "omits_ledger_path": "ledger_path" not in keys,
+        "omits_database_path": "database_path" not in keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in lowered
+            and "file://" not in lowered
+            and ".sqlite" not in lowered
+            and ".sqlite3" not in lowered
+            and not lowered.startswith("sqlite:")
+            for value, lowered in zip(strings, lowered_strings, strict=True)
+        ),
+    }
+
+
+def _nested_keys(value: Any) -> set[str]:
+    if isinstance(value, dict):
+        keys = set(value)
+        for nested_value in value.values():
+            keys.update(_nested_keys(nested_value))
+        return keys
+    if isinstance(value, list):
+        keys: set[str] = set()
+        for nested_value in value:
+            keys.update(_nested_keys(nested_value))
+        return keys
+    return set()
+
+
+def _nested_string_values(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        strings: list[str] = []
+        for nested_value in value.values():
+            strings.extend(_nested_string_values(nested_value))
+        return strings
+    if isinstance(value, list):
+        strings = []
+        for nested_value in value:
+            strings.extend(_nested_string_values(nested_value))
+        return strings
+    return []
 
 
 def _run_journal(
