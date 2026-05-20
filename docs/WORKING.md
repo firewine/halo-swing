@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_VERIFIED
-gate_id: P1_DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_GATE
+status: DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_VERIFIED
+gate_id: P1_DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified P1 storage final verification guide update; continue with next explicit repository/docs_devops slice from SSOT
+next_atomic_step: no open code step remains after verified P1 storage close checklist guide update; continue with next explicit repository/docs_devops slice from SSOT
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,11 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - DevOps guide documents the P1 storage/repository final verification command set
-  - DevOps guide keeps the final verification path local, offline, fixture-backed, and tmp_path-backed
-  - DevOps guide states final verification must not start Hermes, send Telegram, submit broker orders, call live networks, auto-activate database envs, or commit SQLite files
-  - setup docs tests cover the final verification command set and safety boundary
+  - DevOps guide documents a P1 storage/docs_devops close checklist
+  - close checklist requires durable MIGRATION_GO and REPOSITORY_GO SSOT evidence
+  - close checklist requires verified migration, repository, SQLite command guide, backup/retention note, and final verification guide records
+  - close checklist requires task mirror, full pytest, ruff, health_check, explicit database_path use, blank database URL default, and no blocked runtime/broker/live artifacts
+  - setup docs tests cover the close checklist wording
   - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added
   - verification passes, including full pytest
 
@@ -187,8 +188,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_DOCS_DEVOPS_STORAGE_FINAL_VERIFICATION_GUIDE_GATE
-scope: DevOps guide P1 storage/repository final verification commands after REPOSITORY_GO
+gate_id: P1_DOCS_DEVOPS_STORAGE_CLOSE_CHECKLIST_GUIDE_GATE
+scope: DevOps guide P1 storage/docs_devops close checklist after REPOSITORY_GO
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -218,9 +219,9 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: continue with next explicit repository/docs_devops slice from SSOT
 notes:
-  - DevOps guide documents P1 storage/repository final verification commands
-  - final verification is documented as local/offline and fixture/tmp_path based
-  - guide states final verification must not start Hermes, send Telegram, submit broker orders, call live networks, auto-activate database envs, or commit SQLite files
+  - DevOps guide documents P1 storage/docs_devops close checklist evidence
+  - checklist requires MIGRATION_GO and REPOSITORY_GO SSOT records, verified storage records, task mirror, full pytest, ruff, and health_check
+  - checklist preserves explicit database_path use, blank HALO_SWING_DATABASE_URL default, and blocked runtime/live/broker artifact boundaries
   - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

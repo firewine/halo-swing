@@ -164,6 +164,13 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "PYTHONPATH=src ./.venv/bin/python -m pytest" in guide
     assert "no live network calls" in guide
     assert "no automatic `.env` database activation" in guide_text
+    assert "P1 storage/docs_devops close checklist" in guide
+    assert "MIGRATION_GO and REPOSITORY_GO are recorded in the SSOT" in guide
+    assert "migration, repository, SQLite command guide, backup/retention note" in guide
+    assert "task contract mirror matches `.codex/tasks/current.json`" in guide
+    assert "full pytest, ruff, and health_check pass from a clean worktree" in guide
+    assert "`HALO_SWING_DATABASE_URL` remains blank" in guide
+    assert "keep P1 storage/docs_devops open" in guide
     assert "MIGRATION_GO` and `REPOSITORY_GO` still stay\nblocked" not in guide
     assert "durable\nstorage approvals recorded in the SSOT" in guide
     assert "explicit `database_path` tool inputs" in guide

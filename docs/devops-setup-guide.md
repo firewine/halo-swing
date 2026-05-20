@@ -205,6 +205,22 @@ The verification path must stay fixture/tmp_path based: no live network calls,
 no Hermes runtime start, no Telegram send, no broker/order submission, no
 automatic `.env` database activation, and no committed SQLite data files.
 
+P1 storage/docs_devops close checklist:
+
+```text
+required_evidence:
+  - MIGRATION_GO and REPOSITORY_GO are recorded in the SSOT
+  - migration, repository, SQLite command guide, backup/retention note, and final verification guide records are verified
+  - task contract mirror matches `.codex/tasks/current.json` and `docs/codex-task.json`
+  - full pytest, ruff, and health_check pass from a clean worktree
+  - DevOps guide still documents explicit `database_path` SQLite usage
+  - `HALO_SWING_DATABASE_URL` remains blank unless a later env-activation gate approves it
+  - no live adapters, broker/order submission, Hermes runtime start, Telegram send, scheduler, or committed SQLite artifacts are added
+```
+
+If any item is missing, keep P1 storage/docs_devops open and continue with the
+next explicit SSOT slice instead of treating the phase as closed.
+
 Indicator timeframe smoke:
 
 ```bash

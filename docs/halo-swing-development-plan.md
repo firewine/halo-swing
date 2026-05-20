@@ -776,6 +776,42 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.063 P1 Docs DevOps Storage Close Checklist Guide Record - 2026-05-20
+
+### A. 목적
+
+P1 storage/docs_devops의 `P1 close 판단` 항목을 완료 선언이 아니라
+증거 checklist로 고정했다. close 판단에는 durable gate 기록, migration /
+repository / guide 기록, task mirror, full verification, explicit
+`database_path` policy, blank DB env default, blocked runtime/live/broker
+경계가 모두 필요하다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md documents P1 storage/docs_devops close checklist evidence
+  - docs/devops-setup-guide.md states missing checklist items keep P1 storage/docs_devops open
+  - tests/test_setup_docs.py covers the close checklist wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+```
+
 ## 4.062 P1 Docs DevOps Storage Final Verification Guide Record - 2026-05-20
 
 ### A. 목적
