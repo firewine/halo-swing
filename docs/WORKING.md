@@ -205,8 +205,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only before commit
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 885 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 43 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 886 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 files_changed:
