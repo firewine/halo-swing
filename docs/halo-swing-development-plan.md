@@ -776,6 +776,41 @@ verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
 ```
 
+## 4.061 P1 Docs DevOps SQLite Backup Retention Guide Record - 2026-05-20
+
+### A. 목적
+
+`REPOSITORY_GO` 이후 SQLite repository 사용 문단에 남은 docs_devops
+마감 항목을 정리했다. SQLite repository 파일은 명시적 `database_path`로만
+만들어지는 local operational state이며, backup/retention 자동화는 아직
+제공하지 않는다는 운영 경계를 DevOps guide와 테스트로 고정했다.
+
+### B. 구현 결과
+
+```text
+status: verified
+implemented:
+  - docs/devops-setup-guide.md documents SQLite repository backup responsibility
+  - docs/devops-setup-guide.md documents SQLite retention remains manual until tooling exists
+  - docs/devops-setup-guide.md tells operators not to commit SQLite files, backups, dumps, WAL/SHM sidecars, or copied DB files
+  - tests/test_setup_docs.py covers the SQLite backup and retention wording
+```
+
+### C. 검증
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+next_state: continue with next explicit repository/docs_devops slice from SSOT
+```
+
 ## 4.060 P1 Docs DevOps Storage Gate Status Guide Record - 2026-05-20
 
 ### A. 목적

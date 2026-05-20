@@ -1,26 +1,23 @@
 {
-  "gate_id": "P1_DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_GATE",
+  "gate_id": "P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE",
   "mode": "implement",
-  "status": "DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_VERIFIED",
+  "status": "DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_VERIFIED",
   "review_tier": "S1_small",
   "source_gate_packet": "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-  "next_atomic_step": "no open code step remains after verified storage gate status guide update; continue with next explicit repository/docs_devops slice from SSOT",
+  "next_atomic_step": "no open code step remains after verified SQLite backup and retention guide update; continue with next explicit repository/docs_devops slice from SSOT",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
-    ".env.example",
     "docs/WORKING.md",
     "docs/codex-task.json",
     "docs/devops-setup-guide.md",
     "docs/halo-swing-development-plan.md",
-    "docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md",
-    "tests/test_env_template.py",
     "tests/test_setup_docs.py"
   ],
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
     "docs/halo-swing-development-plan.md#3.5",
-    "docs/halo-swing-development-plan.md#4.058",
+    "docs/halo-swing-development-plan.md#4.060",
     "docs/devops-setup-guide.md"
   ],
   "blocked_path_prefixes": [
@@ -43,21 +40,19 @@
   ],
   "post_implementation_review": {
     "roles": [
-      "be",
-      "db",
-      "qc",
       "devops",
-      "security",
+      "qc",
       "docs-gardener"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "DevOps guide no longer says MIGRATION_GO and REPOSITORY_GO are blocked after durable approval",
-    "DevOps guide points operators to explicit database_path repository commands instead of env-based DB activation",
-    "setup docs tests cover the updated durable storage gate status text",
-    "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added",
+    "DevOps guide documents SQLite repository backup responsibility after REPOSITORY_GO",
+    "DevOps guide documents SQLite repository retention remains manual and local until tooling exists",
+    "DevOps guide keeps SQLite repository files, backups, dumps, and WAL/SHM sidecars out of committed repo artifacts",
+    "setup docs tests cover the SQLite backup and retention wording",
+    "no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added",
     "verification passes"
   ],
   "approval_source": "user message: REPOSITORY_GO 승인",
@@ -65,6 +60,7 @@
     "database_activation": "explicit_database_path_only",
     "default_repository": "jsonl_signal_ledger_record",
     "sqlite_repository": "sqlite_signal_repository",
+    "backup_retention_policy": "manual_local_operator_responsibility_until_tooling_exists",
     "test_database_policy": "tmp_path_only"
   },
   "next_state_after_success": "continue with next explicit repository/docs_devops slice from SSOT"

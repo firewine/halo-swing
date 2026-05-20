@@ -183,6 +183,14 @@ The SQLite path applies migrations idempotently, stores `run_journal`,
 return replay sections plus structured missing-link errors. The default JSONL
 path remains available for lightweight local smoke runs.
 
+SQLite repository files are local operational state. This project does not yet
+ship backup tooling or retention automation for SQLite repositories. Before
+keeping a local database beyond smoke testing, place it under ignored local
+state or another backup-controlled path, snapshot it with SQLite-safe tooling
+outside the repository, and rotate or delete old local copies manually according
+to your local retention policy. Do not commit backups, dumps, WAL/SHM sidecars,
+or copied database files.
+
 Indicator timeframe smoke:
 
 ```bash

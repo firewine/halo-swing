@@ -42,21 +42,18 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_VERIFIED
-gate_id: P1_DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_GATE
+status: DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_VERIFIED
+gate_id: P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE
 review_tier: S1_small
 
-next_atomic_step: no open code step remains after verified storage gate status guide update; continue with next explicit repository/docs_devops slice from SSOT
+next_atomic_step: no open code step remains after verified SQLite backup and retention guide update; continue with next explicit repository/docs_devops slice from SSOT
 
 allowed_edit_paths:
   - .codex/tasks/current.json
-  - .env.example
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/devops-setup-guide.md
   - docs/halo-swing-development-plan.md
-  - docs/gates/P1_REPOSITORY_GO_RECORD_2026-05-20.md
-  - tests/test_env_template.py
   - tests/test_setup_docs.py
 
 blocked_path_prefixes:
@@ -79,10 +76,11 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - DevOps guide no longer says MIGRATION_GO and REPOSITORY_GO are blocked after durable approval
-  - DevOps guide points operators to explicit database_path repository commands instead of env-based DB activation
-  - setup docs tests cover the updated durable storage gate status text
-  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
+  - DevOps guide documents SQLite repository backup responsibility after REPOSITORY_GO
+  - DevOps guide documents SQLite repository retention remains manual and local until tooling exists
+  - DevOps guide keeps SQLite repository files, backups, dumps, and WAL/SHM sidecars out of committed repo artifacts
+  - setup docs tests cover the SQLite backup and retention wording
+  - no live_adapters, broker, Telegram send, Hermes runtime, scheduler, order submission, automatic .env mutation, URL, API key value, secret value output, or source code changes are added
   - verification passes
 
 approval_source: "user message: REPOSITORY_GO 승인"
@@ -188,8 +186,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_DOCS_DEVOPS_STORAGE_GATE_STATUS_GUIDE_GATE
-scope: DevOps guide storage approval status text after REPOSITORY_GO
+gate_id: P1_DOCS_DEVOPS_SQLITE_BACKUP_RETENTION_GUIDE_GATE
+scope: DevOps guide SQLite backup and retention note after REPOSITORY_GO
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -204,7 +202,7 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
-  - git status --short --branch: modified expected docs/task/test files only
+  - git status --short --branch: modified expected docs/task/test files only before commit
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_setup_docs.py -q: 42 passed
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
@@ -217,8 +215,9 @@ files_changed:
   - tests/test_setup_docs.py
 next_state: continue with next explicit repository/docs_devops slice from SSOT
 notes:
-  - DevOps guide no longer says MIGRATION_GO and REPOSITORY_GO are blocked
-  - all-env readiness text now points DB use at explicit database_path tool inputs instead of automatic env activation
+  - DevOps guide documents SQLite repository files as local operational state
+  - SQLite backup tooling and retention automation remain not implemented in this slice
+  - guide tells operators not to commit SQLite files, backups, dumps, WAL/SHM sidecars, or copied DB files
   - no code, live adapter, broker, send, scheduler, state artifact, or secret output changes were added
 ```
 

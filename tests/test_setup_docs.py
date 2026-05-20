@@ -154,6 +154,10 @@ def test_devops_guide_shows_dotenv_key_only_live_data_setup() -> None:
     assert "`HALO_SWING_DATABASE_URL`\nremains blank by default" in guide
     assert "env-based repository selection is not wired in this slice" in guide_text
     assert "do not commit SQLite files" in guide
+    assert "SQLite repository files are local operational state" in guide
+    assert "does not yet\nship backup tooling or retention automation" in guide
+    assert "SQLite-safe tooling\noutside the repository" in guide
+    assert "Do not commit backups, dumps, WAL/SHM sidecars" in guide
     assert "MIGRATION_GO` and `REPOSITORY_GO` still stay\nblocked" not in guide
     assert "durable\nstorage approvals recorded in the SSOT" in guide
     assert "explicit `database_path` tool inputs" in guide
