@@ -5636,6 +5636,8 @@ def _evidence_guard(
             [
                 "evidence_latest_record_guard_keys_match_expected_schema",
                 "evidence_latest_record_guard_status_is_ok",
+                "evidence_latest_record_guard_check_names_match_expected_schema",
+                "evidence_latest_record_guard_checks_all_passed",
             ]
         )
     if isinstance(report.get("label_status"), dict):
@@ -5796,6 +5798,25 @@ def _evidence_guard(
         )
     if latest_record_guard is not None:
         latest_record_guard_is_dict = isinstance(latest_record_guard, dict)
+        expected_latest_record_guard_check_names = [
+            "latest_record_source_repository_ref_keys_match_expected_schema",
+            "latest_record_source_repository_ref_is_path_free",
+            "latest_record_source_repository_ref_matches_top_level_source",
+        ]
+        latest_record_guard_checks = (
+            latest_record_guard.get("checks")
+            if latest_record_guard_is_dict
+            else None
+        )
+        latest_record_guard_check_names = (
+            [
+                check.get("name")
+                for check in latest_record_guard_checks
+                if isinstance(check, dict)
+            ]
+            if isinstance(latest_record_guard_checks, list)
+            else type(latest_record_guard_checks).__name__
+        )
         checks.extend(
             [
                 {
@@ -5818,6 +5839,36 @@ def _evidence_guard(
                         latest_record_guard.get("status")
                         if latest_record_guard_is_dict
                         else type(latest_record_guard).__name__
+                    ),
+                },
+                {
+                    "name": (
+                        "evidence_latest_record_guard_check_names_match_expected_schema"
+                    ),
+                    "passed": (
+                        latest_record_guard_check_names
+                        == expected_latest_record_guard_check_names
+                    ),
+                    "expected": expected_latest_record_guard_check_names,
+                    "actual": latest_record_guard_check_names,
+                },
+                {
+                    "name": "evidence_latest_record_guard_checks_all_passed",
+                    "passed": isinstance(latest_record_guard_checks, list)
+                    and all(
+                        isinstance(check, dict) and check.get("passed") is True
+                        for check in latest_record_guard_checks
+                    ),
+                    "expected": True,
+                    "actual": (
+                        [
+                            check.get("passed")
+                            if isinstance(check, dict)
+                            else type(check).__name__
+                            for check in latest_record_guard_checks
+                        ]
+                        if isinstance(latest_record_guard_checks, list)
+                        else type(latest_record_guard_checks).__name__
                     ),
                 },
             ]

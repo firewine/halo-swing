@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.100 P1 Repository Latest Report Evidence Record Guard Checks Gate Record - 2026-05-20
+
+### A. 목적
+
+4.099에서 `latest_record_guard`는 repository-backed latest report의
+`evidence_context`에 들어가고 `evidence_guard`가 key schema와 status를 확인한다.
+하지만 guard 내부 check names와 각 check의 passed 상태까지 보지 않으면 status만
+`ok`인 손상된 guard를 evidence bundle에서 놓칠 수 있다. 이번 slice는
+`evidence_guard`가 latest record guard의 기대 check names와 all-passed 상태를
+검증하게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add evidence_guard checks for latest_record_guard expected check names
+  - add evidence_guard check that every latest_record_guard check has passed=true
+  - keep default no-repository latest report payload and golden snapshot unchanged
+  - keep source_repository_ref, top-level latest_record_guard, and evidence_context propagation unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_evidence_guard_validates_latest_record_guard_checks tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard_in_evidence_context tests/test_reporting.py::test_latest_signal_report_reuses_latest_record_guard -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - focused latest report evidence record guard check tests: 3 passed
+  - full pytest: 928 passed in 47.35s
+  - ruff check: passed
+  - health_check: status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.099 P1 Repository Latest Report Evidence Record Guard Gate Record - 2026-05-20
 
 ### A. 목적
