@@ -4008,6 +4008,20 @@ def test_live_data_provider_route_reports_blocked_defaults(monkeypatch) -> None:
         "macro_api_key",
         "news_api_key",
     ]
+    assert payload["providers"]["market"]["accepted_env_keys"] == [
+        "POLYGON_API_KEY",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+    ]
+    assert payload["providers"]["macro"]["accepted_env_keys"] == [
+        "FRED_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+    ]
+    assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "NEWSAPI_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
     assert payload["api_key_status"]["status"] == "blocked"
     assert payload["network_call"] is False
     assert payload["mutates_local_state"] is False
@@ -4050,6 +4064,20 @@ def test_live_data_provider_route_accepts_api_key_aliases_without_secret_values(
     assert payload["providers"]["macro"]["configured_env_keys"] == ["FRED_API_KEY"]
     assert payload["providers"]["news"]["configured_env_keys"] == [
         "HALO_SWING_NEWS_API_KEY"
+    ]
+    assert payload["providers"]["market"]["accepted_env_keys"] == [
+        "POLYGON_API_KEY",
+        "HALO_SWING_MARKET_DATA_API_KEY",
+    ]
+    assert payload["providers"]["macro"]["accepted_env_keys"] == [
+        "FRED_API_KEY",
+        "HALO_SWING_MACRO_API_KEY",
+        "HALO_SWING_FRED_API_KEY",
+    ]
+    assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "NEWSAPI_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
     ]
     assert payload["api_key_status"]["status"] == "ready"
     assert payload["network_call"] is False

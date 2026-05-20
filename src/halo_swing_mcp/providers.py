@@ -426,6 +426,7 @@ def describe_market_data_provider_route() -> dict[str, Any]:
             provider="polygon",
             provider_class="PolygonMarketDataProvider",
             env_keys=MARKET_API_KEY_ENV_KEYS,
+            accepted_env_keys=("POLYGON_API_KEY", "HALO_SWING_MARKET_DATA_API_KEY"),
             missing_name="market_ohlcv_api_key",
         ),
         "macro": _provider_family_status(
@@ -433,6 +434,11 @@ def describe_market_data_provider_route() -> dict[str, Any]:
             provider="fred",
             provider_class="FredMacroDataProvider",
             env_keys=MACRO_API_KEY_ENV_KEYS,
+            accepted_env_keys=(
+                "FRED_API_KEY",
+                "HALO_SWING_MACRO_API_KEY",
+                "HALO_SWING_FRED_API_KEY",
+            ),
             missing_name="macro_api_key",
         ),
         "news": _provider_family_status(
@@ -440,6 +446,11 @@ def describe_market_data_provider_route() -> dict[str, Any]:
             provider="newsapi",
             provider_class="NewsApiDataProvider",
             env_keys=NEWS_API_KEY_ENV_KEYS,
+            accepted_env_keys=(
+                "NEWSAPI_KEY",
+                "HALO_SWING_NEWS_API_KEY",
+                "NEWS_API_KEY",
+            ),
             missing_name="news_api_key",
         ),
     }
@@ -576,6 +587,7 @@ def _provider_family_status(
     provider: str,
     provider_class: str,
     env_keys: tuple[str, ...],
+    accepted_env_keys: tuple[str, ...] | None = None,
     missing_name: str,
 ) -> dict[str, Any]:
     configured_env_keys = [
@@ -590,7 +602,7 @@ def _provider_family_status(
         "provider_class": provider_class,
         "configured": configured,
         "configured_env_keys": configured_env_keys,
-        "accepted_env_keys": list(env_keys),
+        "accepted_env_keys": list(accepted_env_keys or env_keys),
         "missing": [] if configured else [missing_name],
         "auto_selects_live_provider": configured,
         "selected": False,

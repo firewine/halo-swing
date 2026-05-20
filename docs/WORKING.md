@@ -42,21 +42,19 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: API_KEY_INTEGRATION_PROVIDER_STATUS_ACCEPTED_KEY_ORDER_VERIFIED
-gate_id: API_KEY_INTEGRATION_PROVIDER_STATUS_ACCEPTED_KEY_ORDER_GATE
+status: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_GATE
 review_tier: S1_small
 
-next_atomic_step: make live data API-key status, dotenv template metadata, provider selection hints, and provider smoke setup metadata show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing provider resolver priority
+next_atomic_step: make get_live_data_provider_route route-level provider accepted_env_keys show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing resolver priority or configured_env_keys order
 
 allowed_edit_paths:
   - .codex/tasks/current.json
   - docs/WORKING.md
   - docs/codex-task.json
   - docs/halo-swing-development-plan.md
-  - src/halo_swing_mcp/tools/readiness_parts/live_data_setup.py
-  - src/halo_swing_mcp/tools/readiness_parts/public_tools.py
-  - src/halo_swing_mcp/tools/readiness_parts/setup_file_integration.py
-  - tests/test_env_template.py
+  - src/halo_swing_mcp/providers.py
+  - tests/test_providers.py
   - tests/test_readiness.py
 
 blocked_path_prefixes:
@@ -67,37 +65,84 @@ blocked_path_prefixes:
   - artifacts/
   - state/
 
-blocked_exact_paths:
-  - src/halo_swing_mcp/providers.py
+blocked_exact_paths: []
 
 required_verification:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py::test_live_data_api_key_status_reports_blocked_defaults tests/test_readiness.py::test_run_api_key_pipeline_smoke_summary_only_keeps_api_key_requirements tests/test_readiness.py::test_run_api_key_pipeline_smoke_surfaces_live_data_provider_error_summaries -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_env_template.py::test_readiness_live_data_keys_preserve_provider_auto_select_aliases -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
   - PYTHONPATH=src ./.venv/bin/python -m pytest
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - get_live_data_api_key_status provider accepted_env_keys list POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
-  - get_live_data_api_key_status provider accepted_env_keys list FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
-  - get_live_data_api_key_status provider accepted_env_keys list NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
-  - dotenv template metadata, provider selection hints, live_data_setup_summary provider_setup_actions, and provider_smoke_plan preserve every accepted live-data alias with preferred-first display order
-  - env template tests prove dotenv template metadata preserves provider auto-select aliases without requiring resolver-order display
-  - provider resolver constants and credential selection priority remain unchanged in src/halo_swing_mcp/providers.py
+  - get_live_data_provider_route providers.market.accepted_env_keys lists POLYGON_API_KEY before HALO_SWING_MARKET_DATA_API_KEY
+  - get_live_data_provider_route providers.macro.accepted_env_keys lists FRED_API_KEY before HALO_SWING_MACRO_API_KEY and HALO_SWING_FRED_API_KEY
+  - get_live_data_provider_route providers.news.accepted_env_keys lists NEWSAPI_KEY before HALO_SWING_NEWS_API_KEY and NEWS_API_KEY
+  - provider resolver constants remain unchanged and configured_env_keys still follow the resolver detection order
   - no live_adapters, broker, Telegram send, Hermes runtime, migration, repository, scheduler, order submission, automatic .env mutation, URL, API key value, or secret value output changes are added
   - task contract and portable mirror match
   - all required verification passes
   - WORKING.md records result and verification status only
 
-next_state_after_success: commit and push this verified provider status accepted-key order gate, then continue toward API-key-only integration setup or wait for explicit MIGRATION_GO/REPOSITORY_GO approval
+next_state_after_success: commit and push this verified provider route accepted-key order gate, then wait for explicit MIGRATION_GO/REPOSITORY_GO approval or another API-key-only integration setup gap
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: API_KEY_INTEGRATION_PROVIDER_ROUTE_ACCEPTED_KEY_ORDER_GATE
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias tests/test_providers.py::test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholder_sibling tests/test_readiness.py::test_live_data_provider_route_reports_blocked_defaults tests/test_readiness.py::test_live_data_provider_route_accepts_api_key_aliases_without_secret_values -q: 4 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_providers.py tests/test_readiness.py -q: 169 passed
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 877 passed
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: passed
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - src/halo_swing_mcp/providers.py
+  - tests/test_providers.py
+  - tests/test_readiness.py
+next_state: commit and push this verified provider route accepted-key order gate
+notes:
+  - API-key status, setup checklist, provider smoke metadata, docs, and setup summaries already prefer POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY
+  - get_live_data_provider_route route-level providers now expose accepted_env_keys preferred-first
+  - provider resolver constants and configured_env_keys detection order remain unchanged
+```
+
+Previous completed directive:
+
+```yaml
+mode: implement
+status: API_KEY_INTEGRATION_PROVIDER_STATUS_ACCEPTED_KEY_ORDER_VERIFIED
+gate_id: API_KEY_INTEGRATION_PROVIDER_STATUS_ACCEPTED_KEY_ORDER_GATE
+review_tier: S1_small
+
+next_atomic_step: make live data API-key status, dotenv template metadata, provider selection hints, and provider smoke setup metadata show POLYGON_API_KEY, FRED_API_KEY, and NEWSAPI_KEY before accepted aliases without changing provider resolver priority
+```
+
+Previous verification result:
 
 ```text
 status: passed

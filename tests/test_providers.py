@@ -10,6 +10,7 @@ from halo_swing_mcp.env import clear_local_env_cache
 from halo_swing_mcp.providers import (
     FredMacroDataProvider,
     MarketDataProvider,
+    NEWS_API_KEY_ENV_KEYS,
     NewsApiDataProvider,
     PolygonMarketDataProvider,
     ReplayMarketDataProvider,
@@ -549,10 +550,15 @@ def test_market_data_provider_auto_uses_newsapi_key_alias(monkeypatch) -> None:
     assert payload["providers"]["news"]["configured"] is True
     assert payload["providers"]["news"]["configured_env_keys"] == ["NEWSAPI_KEY"]
     assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "NEWSAPI_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert NEWS_API_KEY_ENV_KEYS == (
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
         "NEWSAPI_KEY",
-    ]
+    )
     assert payload["selected_provider_classes"] == [
         "ReplayMarketDataProvider",
         "NewsApiDataProvider",
@@ -578,10 +584,15 @@ def test_market_data_provider_auto_uses_newsapi_key_alias_with_legacy_placeholde
     assert payload["providers"]["news"]["configured"] is True
     assert payload["providers"]["news"]["configured_env_keys"] == ["NEWSAPI_KEY"]
     assert payload["providers"]["news"]["accepted_env_keys"] == [
+        "NEWSAPI_KEY",
+        "HALO_SWING_NEWS_API_KEY",
+        "NEWS_API_KEY",
+    ]
+    assert NEWS_API_KEY_ENV_KEYS == (
         "HALO_SWING_NEWS_API_KEY",
         "NEWS_API_KEY",
         "NEWSAPI_KEY",
-    ]
+    )
     assert "newsapi-alias-secret" not in serialized
 
     get_settings.cache_clear()
