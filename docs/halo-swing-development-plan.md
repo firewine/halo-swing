@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.115 P1 Repository SQLite Latest Report Filtered Latest Record Evidence Guard Coverage Gate Record - 2026-05-20
+
+### A. 목적
+
+4.114에서 SQLite repository-backed filtered latest report의 `latest_record_guard`가
+top-level `source_repository_ref`와 일치하고 path-free임을 고정했다. 이번 slice는 같은
+filtered `latest_record_guard`가 `evidence_guard`에서도 check names와 all-passed 상태로
+검증되며, evidence guard payload가 database path나 SQLite filename을 노출하지 않음을
+직접 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extended SQLite timeframe-filtered latest_record_guard evidence_guard coverage
+  - extended SQLite underlying-filtered latest_record_guard evidence_guard coverage
+  - asserted evidence_guard validates latest_record_guard check names and all-passed state
+  - asserted filtered latest_record_guard evidence checks omit database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_sqlite_repository_includes_path_free_latest_record_guard -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task mirror diff passed
+  - task JSON validation passed
+  - git diff --check passed
+  - focused latest_record_guard evidence coverage tests: 3 passed
+  - full pytest: 935 passed in 46.34s
+  - ruff check passed
+  - health_check status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.114 P1 Repository SQLite Latest Report Filtered Latest Record Guard Coverage Gate Record - 2026-05-20
 
 ### A. 목적
