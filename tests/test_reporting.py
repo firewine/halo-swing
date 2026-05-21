@@ -3454,6 +3454,55 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
     }
+    selected_label_status_propagation_targets = {
+        "latest_signal_report_label_status": [
+            label_status[field] == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+        "evidence_context_label_status": [
+            evidence_label_status[field] == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+        "evidence_guard_label_status": [
+            evidence_guard_checks[
+                "label_status_reflected_in_evidence_context"
+            ]["expected"][field]
+            == selected_label[field]
+            and evidence_guard_checks[
+                "label_status_reflected_in_evidence_context"
+            ]["actual"][field]
+            == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+    }
+    selected_label_status_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_label_status_propagation_targets.items()
+    }
+    assert selected_label_status_propagation_summary == {
+        name: True for name in selected_label_status_propagation_targets
+    }
     selected_source_summary_presence_targets = {
         "source_repository_ref": (
             payload["source_repository_ref"],
@@ -6276,6 +6325,55 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
+    }
+    selected_label_status_propagation_targets = {
+        "latest_signal_report_label_status": [
+            label_status[field] == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+        "evidence_context_label_status": [
+            evidence_label_status[field] == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+        "evidence_guard_label_status": [
+            evidence_guard_checks[
+                "label_status_reflected_in_evidence_context"
+            ]["expected"][field]
+            == selected_label[field]
+            and evidence_guard_checks[
+                "label_status_reflected_in_evidence_context"
+            ]["actual"][field]
+            == selected_label[field]
+            for field in (
+                "signal_id",
+                "outcome",
+                "realized_r",
+                "first_barrier_hit",
+                "labeled_at",
+                "time_barrier_days",
+            )
+        ],
+    }
+    selected_label_status_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_label_status_propagation_targets.items()
+    }
+    assert selected_label_status_propagation_summary == {
+        name: True for name in selected_label_status_propagation_targets
     }
     selected_source_summary_presence_targets = {
         "source_repository_ref": (
