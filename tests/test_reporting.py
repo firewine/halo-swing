@@ -1727,6 +1727,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert [check["name"] for check in latest_record_guard["checks"]] == (
         expected_latest_record_guard_check_names
     )
+    expected_latest_record_guard_passes = [True, True, True]
+    latest_record_guard_passes = [
+        check["passed"] for check in latest_record_guard["checks"]
+    ]
+    assert latest_record_guard_passes == expected_latest_record_guard_passes
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -1766,8 +1771,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "name": "evidence_latest_record_guard_checks_all_passed",
         "passed": True,
         "expected": True,
-        "actual": [True, True, True],
+        "actual": expected_latest_record_guard_passes,
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_checks_all_passed"
+    ]["actual"] == latest_record_guard_passes
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
@@ -2845,6 +2853,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert [check["name"] for check in latest_record_guard["checks"]] == (
         expected_latest_record_guard_check_names
     )
+    expected_latest_record_guard_passes = [True, True, True]
+    latest_record_guard_passes = [
+        check["passed"] for check in latest_record_guard["checks"]
+    ]
+    assert latest_record_guard_passes == expected_latest_record_guard_passes
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -2884,8 +2897,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "name": "evidence_latest_record_guard_checks_all_passed",
         "passed": True,
         "expected": True,
-        "actual": [True, True, True],
+        "actual": expected_latest_record_guard_passes,
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_checks_all_passed"
+    ]["actual"] == latest_record_guard_passes
     assert source_summary in reasons["items"]
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
