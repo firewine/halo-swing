@@ -3743,6 +3743,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_status_guard_pass_summary == {
         name: True for name in selected_label_status_guard_pass_targets
     }
+    excluded_label_statuses = [alternate_label, older_matching_label]
+    selected_label_status_guard_exclusion_targets = {
+        "evidence_guard_label_status_expected": [
+            label_status_guard_check["expected"]["signal_id"]
+            != excluded_label["signal_id"]
+            and label_status_guard_check["expected"]["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "evidence_guard_label_status_actual": [
+            label_status_guard_check["actual"]["signal_id"]
+            != excluded_label["signal_id"]
+            and label_status_guard_check["actual"]["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != excluded_label["signal_id"]
+            and label_status["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "evidence_context_label_status": [
+            evidence_label_status["signal_id"] != excluded_label["signal_id"]
+            and evidence_label_status["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+    }
+    selected_label_status_guard_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_label_status_guard_exclusion_targets.items()
+    }
+    assert selected_label_status_guard_exclusion_summary == {
+        name: True for name in selected_label_status_guard_exclusion_targets
+    }
     selected_source_summary_presence_targets = {
         "source_repository_ref": (
             payload["source_repository_ref"],
@@ -7164,6 +7200,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_label_status_guard_pass_summary == {
         name: True for name in selected_label_status_guard_pass_targets
+    }
+    excluded_label_statuses = [alternate_label, older_matching_label]
+    selected_label_status_guard_exclusion_targets = {
+        "evidence_guard_label_status_expected": [
+            label_status_guard_check["expected"]["signal_id"]
+            != excluded_label["signal_id"]
+            and label_status_guard_check["expected"]["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "evidence_guard_label_status_actual": [
+            label_status_guard_check["actual"]["signal_id"]
+            != excluded_label["signal_id"]
+            and label_status_guard_check["actual"]["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != excluded_label["signal_id"]
+            and label_status["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+        "evidence_context_label_status": [
+            evidence_label_status["signal_id"] != excluded_label["signal_id"]
+            and evidence_label_status["time_barrier_days"]
+            != excluded_label["time_barrier_days"]
+            for excluded_label in excluded_label_statuses
+        ],
+    }
+    selected_label_status_guard_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_label_status_guard_exclusion_targets.items()
+    }
+    assert selected_label_status_guard_exclusion_summary == {
+        name: True for name in selected_label_status_guard_exclusion_targets
     }
     selected_source_summary_presence_targets = {
         "source_repository_ref": (

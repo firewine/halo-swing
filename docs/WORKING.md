@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_EXCLUSION_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_EXCLUSION_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected label status guard pass values align with selected label status surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected label status guard values exclude filtered-out and older matching label statuses
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected label status evidence guard name and pass state
-  - SQLite repository-backed latest report underlying filter validates selected label status evidence guard name and pass state
-  - selected label status guard expected and actual values align with the selected stored label
-  - latest_signal_report label_status and evidence context label_status remain aligned with the selected stored label
+  - SQLite repository-backed latest report timeframe filter validates selected label status guard expected and actual values exclude filtered-out timeframe and older matching label statuses
+  - SQLite repository-backed latest report underlying filter validates selected label status guard expected and actual values exclude filtered-out underlying and older matching label statuses
+  - latest_signal_report label_status and evidence context label_status remain selected-label-only across filtered report paths
+  - label status guard exclusion summary remains derived from emitted evidence guard expected and actual values
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_GATE
-scope: SQLite repository-backed filtered label status guard pass coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_EXCLUSION_COVERAGE_GATE
+scope: SQLite repository-backed filtered label status guard exclusion coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.91s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.09s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.42s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected label status evidence guard name and pass state
-  - SQLite underlying-filtered latest report validates selected label status evidence guard name and pass state
-  - selected label status guard expected and actual values align with the selected stored label
-  - latest_signal_report label_status and evidence context label_status remain aligned with the selected stored label
+  - SQLite timeframe-filtered latest report validates selected label status guard expected and actual values exclude filtered-out timeframe and older matching label statuses
+  - SQLite underlying-filtered latest report validates selected label status guard expected and actual values exclude filtered-out underlying and older matching label statuses
+  - latest_signal_report label_status and evidence context label_status remain selected-label-only across filtered report paths
+  - label status guard exclusion summary remains derived from emitted evidence guard expected and actual values
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

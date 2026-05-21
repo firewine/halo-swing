@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_EXCLUSION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_EXCLUSION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.236",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected label status guard pass values align with selected label status surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.237",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected label status guard values exclude filtered-out and older matching label statuses",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.235",
+    "docs/halo-swing-development-plan.md#4.236",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected label status evidence guard name and pass state",
-    "SQLite repository-backed latest report underlying filter validates selected label status evidence guard name and pass state",
-    "selected label status guard expected and actual values align with the selected stored label",
-    "latest_signal_report label_status and evidence context label_status remain aligned with the selected stored label",
+    "SQLite repository-backed latest report timeframe filter validates selected label status guard expected and actual values exclude filtered-out timeframe and older matching label statuses",
+    "SQLite repository-backed latest report underlying filter validates selected label status guard expected and actual values exclude filtered-out underlying and older matching label statuses",
+    "latest_signal_report label_status and evidence context label_status remain selected-label-only across filtered report paths",
+    "label status guard exclusion summary remains derived from emitted evidence guard expected and actual values",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
