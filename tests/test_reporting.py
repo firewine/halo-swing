@@ -2023,6 +2023,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected_max_chars": 3900,
         "actual_chars": len(payload["text"]),
     }
+    assert report_contract_guard_checks["telegram_text_fits_single_message"][
+        "expected_max_chars"
+    ] == telegram_contract["max_chars"]
+    assert report_contract_guard_checks["telegram_text_fits_single_message"][
+        "actual_chars"
+    ] == len(payload["text"])
     assert report_contract_guard_checks[
         "report_telegram_max_chars_matches_expected"
     ] == {
@@ -2031,6 +2037,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": 3900,
         "actual": 3900,
     }
+    assert report_contract_guard_checks[
+        "report_telegram_max_chars_matches_expected"
+    ]["actual"] == telegram_contract["max_chars"]
     assert report_contract_guard_checks[
         "report_text_reflects_latest_signal_numeric_fields"
     ] == {
@@ -3611,6 +3620,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected_max_chars": 3900,
         "actual_chars": len(payload["text"]),
     }
+    assert report_contract_guard_checks["telegram_text_fits_single_message"][
+        "expected_max_chars"
+    ] == telegram_contract["max_chars"]
+    assert report_contract_guard_checks["telegram_text_fits_single_message"][
+        "actual_chars"
+    ] == len(payload["text"])
     assert report_contract_guard_checks[
         "report_telegram_max_chars_matches_expected"
     ] == {
@@ -3619,6 +3634,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": 3900,
         "actual": 3900,
     }
+    assert report_contract_guard_checks[
+        "report_telegram_max_chars_matches_expected"
+    ]["actual"] == telegram_contract["max_chars"]
     assert report_contract_guard_checks[
         "report_text_reflects_latest_signal_numeric_fields"
     ] == {
