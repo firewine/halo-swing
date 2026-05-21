@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.211 P1 Repository SQLite Latest Report Filtered Selected Decision Identity Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.210에서 SQLite repository-backed filtered latest report의 선택된 SQLite source repository summary와
+filter tokens가 source, reason, text, guard surfaces에 보존되는지 고정했다. 이번 slice는 같은
+filtered report에서 선택된 decision identity fields가 top-level payload, latest_signal_report,
+Target/Decision sections, payload text, report payload top-level identity guard actuals에 보존되는지
+nested strings 기반 summary로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered selected-decision identity presence coverage
+  - extend SQLite underlying-filtered selected-decision identity presence coverage
+  - assert selected asset, underlying, timeframe, action, and confidence label surface where emitted as strings
+  - assert selected decision identity summary is derived from emitted nested strings
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.85s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.84s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.210 P1 Repository SQLite Latest Report Filtered Selected Source Summary Coverage Gate Record - 2026-05-22
 
 ### A. 목적

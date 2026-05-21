@@ -1330,6 +1330,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     reasons = next(
         section for section in payload["sections"] if section["title"] == "Reasons"
     )
+    target_section = next(
+        section for section in payload["sections"] if section["title"] == "Target"
+    )
+    decision_section = next(
+        section for section in payload["sections"] if section["title"] == "Decision"
+    )
     cautions = next(
         section["items"]
         for section in payload["sections"]
@@ -3380,6 +3386,70 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
     }
+    selected_decision_identity_presence_targets = {
+        "top_level_identity": (
+            actual_top_level_identity,
+            [
+                swing_signal["asset"],
+                swing_signal["underlying"],
+                "swing_3d_10d",
+                swing_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            [
+                swing_signal["asset"],
+                swing_signal["underlying"],
+                "swing_3d_10d",
+                swing_signal["action"],
+            ],
+        ),
+        "target_section": (
+            target_section,
+            [swing_signal["asset"], swing_signal["underlying"]],
+        ),
+        "decision_section": (
+            decision_section,
+            [swing_signal["action"], payload["confidence_label"]],
+        ),
+        "payload_text": (
+            [payload["text"]],
+            [
+                swing_signal["asset"],
+                swing_signal["underlying"],
+                "swing_3d_10d",
+                swing_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+        "report_payload_top_level_identity_guard": (
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["actual"],
+            [
+                swing_signal["asset"],
+                swing_signal["underlying"],
+                "swing_3d_10d",
+                swing_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+    }
+    selected_decision_identity_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_decision_identity_presence_targets.items()
+    }
+    assert selected_decision_identity_presence_summary == {
+        name: True for name in selected_decision_identity_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -3486,6 +3556,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     )
     reasons = next(
         section for section in payload["sections"] if section["title"] == "Reasons"
+    )
+    target_section = next(
+        section for section in payload["sections"] if section["title"] == "Target"
+    )
+    decision_section = next(
+        section for section in payload["sections"] if section["title"] == "Decision"
     )
     cautions = next(
         section["items"]
@@ -5536,6 +5612,70 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
+    }
+    selected_decision_identity_presence_targets = {
+        "top_level_identity": (
+            actual_top_level_identity,
+            [
+                qqq_signal["asset"],
+                qqq_signal["underlying"],
+                qqq_signal["timeframe"],
+                qqq_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            [
+                qqq_signal["asset"],
+                qqq_signal["underlying"],
+                qqq_signal["timeframe"],
+                qqq_signal["action"],
+            ],
+        ),
+        "target_section": (
+            target_section,
+            [qqq_signal["asset"], qqq_signal["underlying"]],
+        ),
+        "decision_section": (
+            decision_section,
+            [qqq_signal["action"], payload["confidence_label"]],
+        ),
+        "payload_text": (
+            [payload["text"]],
+            [
+                qqq_signal["asset"],
+                qqq_signal["underlying"],
+                qqq_signal["timeframe"],
+                qqq_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+        "report_payload_top_level_identity_guard": (
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["actual"],
+            [
+                qqq_signal["asset"],
+                qqq_signal["underlying"],
+                qqq_signal["timeframe"],
+                qqq_signal["action"],
+                payload["confidence_label"],
+            ],
+        ),
+    }
+    selected_decision_identity_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_decision_identity_presence_targets.items()
+    }
+    assert selected_decision_identity_presence_summary == {
+        name: True for name in selected_decision_identity_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()

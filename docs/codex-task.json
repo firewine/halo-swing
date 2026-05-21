@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_SOURCE_SUMMARY_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DECISION_IDENTITY_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_SOURCE_SUMMARY_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DECISION_IDENTITY_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.210",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected SQLite source repository summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.211",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected decision identity fields are preserved across emitted top-level, latest report, section, text, and guard surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.209",
+    "docs/halo-swing-development-plan.md#4.210",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces",
-    "SQLite repository-backed latest report underlying filter validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces",
-    "filtered selected-source summary remains derived from emitted nested strings",
-    "filtered selected-source summary covers source_repository_ref, reasons, payload text, and source guard actuals",
+    "SQLite repository-backed latest report timeframe filter validates selected decision identity fields are preserved across emitted top-level, latest report, section, text, and guard surfaces",
+    "SQLite repository-backed latest report underlying filter validates selected decision identity fields are preserved across emitted top-level, latest report, section, text, and guard surfaces",
+    "filtered selected-decision summary remains derived from emitted nested strings",
+    "filtered selected-decision summary covers top-level identity, latest_signal_report, Target/Decision sections, payload text, and top-level identity guard actuals",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
