@@ -28,6 +28,60 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.246 P1 Repository SQLite Latest Report Filtered Evidence Caution Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.245에서 SQLite repository-backed filtered latest report의 filtered-out trade plan section exclusion을
+고정했다. 이번 slice는 filtered-out record와 older matching record의 reason summary 및 risk warning
+값이 evidence context, latest report, reasons, cautions, rendered report text, evidence guard,
+Telegram chunks, reconstructed Telegram text에 섞이지 않는지 sentinel 기반으로 확장 검증한다.
+selected repository record의 evidence and caution values만 사용자-facing report and delivery
+surfaces에 남아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - add filtered-out timeframe evidence/caution sentinels that must not render
+  - add older matching timeframe evidence/caution sentinels that must not render
+  - add filtered-out underlying evidence/caution sentinels that must not render
+  - add older matching underlying evidence/caution sentinels that must not render
+  - assert selected evidence context, latest report, reasons, cautions, text, evidence guard, Telegram chunks, and reconstructed Telegram text exclude those sentinel values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.90s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.96s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.245 P1 Repository SQLite Latest Report Filtered Trade Plan Section Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적

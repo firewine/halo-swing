@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TRADE_PLAN_SECTION_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_CAUTION_EXCLUSION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TRADE_PLAN_SECTION_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_CAUTION_EXCLUSION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.245",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving filtered-out and older trade plan values do not leak into report section or delivery preview surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.246",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving filtered-out and older evidence or caution values do not leak into evidence, reason, caution, report text, or delivery preview surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.244",
+    "docs/halo-swing-development-plan.md#4.245",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching trade plan sentinel values do not leak into latest report, report text, trade plan sections, Telegram chunks, or reconstructed Telegram text",
-    "SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching trade plan sentinel values do not leak into latest report, report text, trade plan sections, Telegram chunks, or reconstructed Telegram text",
-    "selected trade plan values remain present while excluded repository trade plan values remain absent after filtered repository selection",
-    "database_path marker remains absent from report and delivery surfaces",
+    "SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching reason summary or risk warning sentinel values do not leak into evidence context, latest report, reasons, cautions, report text, evidence guard, Telegram chunks, or reconstructed Telegram text",
+    "SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching reason summary or risk warning sentinel values do not leak into evidence context, latest report, reasons, cautions, report text, evidence guard, Telegram chunks, or reconstructed Telegram text",
+    "selected evidence and caution values remain present while excluded repository evidence and caution values remain absent after filtered repository selection",
+    "database_path marker remains absent from evidence, report, and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
