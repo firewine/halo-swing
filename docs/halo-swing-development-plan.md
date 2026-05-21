@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.196 P1 Repository SQLite Latest Report Filtered Text Summary Pass Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.195에서 SQLite repository-backed filtered latest report의 Telegram schema version 및 chunking
+contract guard `passed` 값들이 실제 emitted Telegram contract actual 값과 expected contract
+비교에서 파생되는지 묶어서 고정했다. 이번 slice는 같은 filtered report에서 source repository
+summary 및 label status summary guard `passed` 값들이 실제 emitted report text actual 값과 expected
+summary 비교에서 직접 파생되는지 묶어서 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source repository summary pass-value coverage
+  - extend SQLite timeframe-filtered label status summary pass-value coverage
+  - extend SQLite underlying-filtered source repository summary pass-value coverage
+  - extend SQLite underlying-filtered label status summary pass-value coverage
+  - assert filtered report text summary pass-value output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.07s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 48.95s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.195 P1 Repository SQLite Latest Report Filtered Telegram Contract Pass Coverage Gate Record - 2026-05-22
 
 ### A. 목적
