@@ -1318,6 +1318,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
+    report_contract_guard_checks = {
+        check["name"]: check for check in payload["report_contract_guard"]["checks"]
+    }
     latest_record_guard = payload["latest_record_guard"]
     latest_record_guard_checks = {
         check["name"]: check for check in latest_record_guard["checks"]
@@ -1421,6 +1424,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
     assert f"- {selected_label_summary}" in payload["text"]
+    assert payload["report_contract_guard"]["status"] == "ok"
+    assert report_contract_guard_checks[
+        "report_text_reflects_source_repository_summary"
+    ] == {
+        "name": "report_text_reflects_source_repository_summary",
+        "passed": True,
+        "expected": source_summary,
+        "actual": source_summary,
+    }
+    assert report_contract_guard_checks[
+        "report_text_reflects_label_status_summary"
+    ] == {
+        "name": "report_text_reflects_label_status_summary",
+        "passed": True,
+        "expected": selected_label_summary,
+        "actual": selected_label_summary,
+    }
+    assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == ["storage", "db_required", "filters"]
@@ -1462,6 +1488,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
@@ -1488,6 +1515,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(report_contract_guard_checks)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -1546,6 +1577,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     )
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
+    }
+    report_contract_guard_checks = {
+        check["name"]: check for check in payload["report_contract_guard"]["checks"]
     }
     latest_record_guard = payload["latest_record_guard"]
     latest_record_guard_checks = {
@@ -1650,6 +1684,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
     assert f"- {selected_label_summary}" in payload["text"]
+    assert payload["report_contract_guard"]["status"] == "ok"
+    assert report_contract_guard_checks[
+        "report_text_reflects_source_repository_summary"
+    ] == {
+        "name": "report_text_reflects_source_repository_summary",
+        "passed": True,
+        "expected": source_summary,
+        "actual": source_summary,
+    }
+    assert report_contract_guard_checks[
+        "report_text_reflects_label_status_summary"
+    ] == {
+        "name": "report_text_reflects_label_status_summary",
+        "passed": True,
+        "expected": selected_label_summary,
+        "actual": selected_label_summary,
+    }
+    assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == ["storage", "db_required", "filters"]
@@ -1691,6 +1748,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
@@ -1717,6 +1775,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(report_contract_guard_checks)
     )
     assert all(
         ".sqlite" not in value.lower()
