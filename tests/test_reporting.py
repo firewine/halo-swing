@@ -3610,6 +3610,49 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_summary_guard_summary == {
         name: True for name in selected_label_summary_guard_targets
     }
+    excluded_label_summaries = [
+        (
+            f"Stored label: outcome={alternate_label['outcome']}; "
+            f"realized_r={alternate_label['realized_r']}; "
+            f"first_barrier_hit={alternate_label['first_barrier_hit']}; "
+            "time_barrier_days=3"
+        ),
+        (
+            f"Stored label: outcome={older_matching_label['outcome']}; "
+            f"realized_r={older_matching_label['realized_r']}; "
+            f"first_barrier_hit={older_matching_label['first_barrier_hit']}; "
+            "time_barrier_days=4"
+        ),
+    ]
+    selected_label_summary_exclusion_targets = {
+        "report_contract_label_summary_guard": (
+            [
+                report_contract_guard_checks[
+                    "report_text_reflects_label_status_summary"
+                ]["expected"],
+                report_contract_guard_checks[
+                    "report_text_reflects_label_status_summary"
+                ]["actual"],
+            ],
+            excluded_label_summaries,
+        ),
+        "reasons_label_summary": (reasons, excluded_label_summaries),
+        "payload_text_label_summary": ([payload["text"]], excluded_label_summaries),
+    }
+    selected_label_summary_exclusion_summary = {
+        name: all(
+            excluded_summary not in value
+            for value in iter_nested_strings(target)
+            for excluded_summary in excluded_summaries
+        )
+        for name, (
+            target,
+            excluded_summaries,
+        ) in selected_label_summary_exclusion_targets.items()
+    }
+    assert selected_label_summary_exclusion_summary == {
+        name: True for name in selected_label_summary_exclusion_targets
+    }
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
             label_status[field] == selected_label[field]
@@ -6947,6 +6990,49 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_label_summary_guard_summary == {
         name: True for name in selected_label_summary_guard_targets
+    }
+    excluded_label_summaries = [
+        (
+            f"Stored label: outcome={alternate_label['outcome']}; "
+            f"realized_r={alternate_label['realized_r']}; "
+            f"first_barrier_hit={alternate_label['first_barrier_hit']}; "
+            "time_barrier_days=3"
+        ),
+        (
+            f"Stored label: outcome={older_matching_label['outcome']}; "
+            f"realized_r={older_matching_label['realized_r']}; "
+            f"first_barrier_hit={older_matching_label['first_barrier_hit']}; "
+            "time_barrier_days=4"
+        ),
+    ]
+    selected_label_summary_exclusion_targets = {
+        "report_contract_label_summary_guard": (
+            [
+                report_contract_guard_checks[
+                    "report_text_reflects_label_status_summary"
+                ]["expected"],
+                report_contract_guard_checks[
+                    "report_text_reflects_label_status_summary"
+                ]["actual"],
+            ],
+            excluded_label_summaries,
+        ),
+        "reasons_label_summary": (reasons, excluded_label_summaries),
+        "payload_text_label_summary": ([payload["text"]], excluded_label_summaries),
+    }
+    selected_label_summary_exclusion_summary = {
+        name: all(
+            excluded_summary not in value
+            for value in iter_nested_strings(target)
+            for excluded_summary in excluded_summaries
+        )
+        for name, (
+            target,
+            excluded_summaries,
+        ) in selected_label_summary_exclusion_targets.items()
+    }
+    assert selected_label_summary_exclusion_summary == {
+        name: True for name in selected_label_summary_exclusion_targets
     }
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
