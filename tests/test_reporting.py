@@ -1364,6 +1364,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "timeframe": "swing_3d_10d",
         },
     }
+    expected_source_repository_ref_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
     selected_label_summary = (
         f"Stored label: outcome={selected_label['outcome']}; "
         f"realized_r={selected_label['realized_r']}; "
@@ -2033,14 +2039,19 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ]["expected"]["default_check_names"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
-    ]["actual"] == ["storage", "db_required", "filters"]
+    ] == {
+        "name": "report_payload_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_is_path_free"
-    ]["actual"] == {
-        "omits_ledger_ref": True,
-        "omits_ledger_path": True,
-        "omits_database_path": True,
-        "omits_absolute_or_sqlite_paths": True,
+    ] == {
+        "name": "report_payload_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": expected_source_repository_ref_path_free,
+        "actual": expected_source_repository_ref_path_free,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
@@ -2407,6 +2418,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "underlying": "QQQ",
             "timeframe": "swing_3d_10d",
         },
+    }
+    expected_source_repository_ref_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_absolute_or_sqlite_paths": True,
     }
     selected_label_summary = (
         f"Stored label: outcome={selected_label['outcome']}; "
@@ -3077,14 +3094,19 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]["expected"]["default_check_names"]
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
-    ]["actual"] == ["storage", "db_required", "filters"]
+    ] == {
+        "name": "report_payload_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_is_path_free"
-    ]["actual"] == {
-        "omits_ledger_ref": True,
-        "omits_ledger_path": True,
-        "omits_database_path": True,
-        "omits_absolute_or_sqlite_paths": True,
+    ] == {
+        "name": "report_payload_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": expected_source_repository_ref_path_free,
+        "actual": expected_source_repository_ref_path_free,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
