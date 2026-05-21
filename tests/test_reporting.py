@@ -3179,6 +3179,44 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    filtered_report_path_free_targets = {
+        "label_status": label_status,
+        "evidence_contract": evidence_contract,
+        "evidence_context": evidence_context,
+        "evidence_label_status": evidence_label_status,
+        "source_signal_ref": payload["source_signal_ref"],
+        "source_repository_ref": payload["source_repository_ref"],
+        "latest_record_guard": latest_record_guard,
+        "evidence_guard_checks": evidence_guard_checks,
+        "prompt_contract": prompt_contract,
+        "report_intent_contract": report_intent_contract,
+        "delivery_contract": delivery_contract,
+        "delivery_preview": delivery_preview,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "reasons": reasons,
+        "payload_text": [payload["text"]],
+    }
+    filtered_report_path_free_summary = {
+        name: all(
+            str(database_path) not in value
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_path_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_sqlite_name_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_sqlite_name_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5135,6 +5173,44 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
+    filtered_report_path_free_targets = {
+        "label_status": label_status,
+        "evidence_contract": evidence_contract,
+        "evidence_context": evidence_context,
+        "evidence_label_status": evidence_label_status,
+        "source_signal_ref": payload["source_signal_ref"],
+        "source_repository_ref": payload["source_repository_ref"],
+        "latest_record_guard": latest_record_guard,
+        "evidence_guard_checks": evidence_guard_checks,
+        "prompt_contract": prompt_contract,
+        "report_intent_contract": report_intent_contract,
+        "delivery_contract": delivery_contract,
+        "delivery_preview": delivery_preview,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "reasons": reasons,
+        "payload_text": [payload["text"]],
+    }
+    filtered_report_path_free_summary = {
+        name: all(
+            str(database_path) not in value
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_path_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_sqlite_name_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_sqlite_name_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
