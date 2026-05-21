@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.138 P1 Repository SQLite Latest Report Filtered Payload Intent Guard Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.137에서 SQLite repository-backed filtered latest report의 payload check-key schema를 고정했다.
+이번 slice는 같은 filtered report에서 top-level `report_intent`가 `report_intent_contract.name`과
+일치하고, `report_payload_guard`의 `report_payload_intent_matches_contract` check가 이를 직접
+검증하며, repository path details를 노출하지 않는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extended SQLite timeframe-filtered payload intent guard coverage
+  - extended SQLite underlying-filtered payload intent guard coverage
+  - asserted filtered payload intent guard output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.66s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 39.24s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.137 P1 Repository SQLite Latest Report Filtered Payload Check Keys Coverage Gate Record - 2026-05-21
 
 ### A. 목적

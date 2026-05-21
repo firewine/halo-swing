@@ -1727,6 +1727,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "llm_role": expected_prompt_identity["llm_role"],
         "must_include": expected_prompt_terms,
     }
+    assert payload["report_intent"] == "pre_market_swing_report"
+    assert payload["report_intent"] == report_intent_contract["name"]
     assert report_intent_contract == expected_report_intent_contract
     assert section_titles == expected_report_sections
     assert report_contract_guard_checks["required_sections_present"] == {
@@ -2063,6 +2065,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
+        "name": "report_payload_intent_matches_contract",
+        "passed": True,
+        "expected": expected_report_intent_contract["name"],
+        "actual": "pre_market_swing_report",
+    }
+    assert "report_payload_intent_matches_contract" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]["report_payload_intent_matches_contract"] == [
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    ]
     assert report_payload_guard_checks[
         "report_payload_top_level_identity_matches_latest_signal_report"
     ] == {
@@ -2750,6 +2771,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "llm_role": expected_prompt_identity["llm_role"],
         "must_include": expected_prompt_terms,
     }
+    assert payload["report_intent"] == "pre_market_swing_report"
+    assert payload["report_intent"] == report_intent_contract["name"]
     assert report_intent_contract == expected_report_intent_contract
     assert section_titles == expected_report_sections
     assert report_contract_guard_checks["required_sections_present"] == {
@@ -3086,6 +3109,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
+        "name": "report_payload_intent_matches_contract",
+        "passed": True,
+        "expected": expected_report_intent_contract["name"],
+        "actual": "pre_market_swing_report",
+    }
+    assert "report_payload_intent_matches_contract" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]["report_payload_intent_matches_contract"] == [
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    ]
     assert report_payload_guard_checks[
         "report_payload_top_level_identity_matches_latest_signal_report"
     ] == {

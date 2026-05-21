@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_CHECK_KEYS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_INTENT_GUARD_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_CHECK_KEYS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_INTENT_GUARD_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.137",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered payload check-key schema coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.138",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered payload intent guard coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.136",
+    "docs/halo-swing-development-plan.md#4.137",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates report_payload_guard check keys are name/passed/expected/actual",
-    "SQLite repository-backed latest report underlying filter validates report_payload_guard check keys are name/passed/expected/actual",
-    "filtered report_payload_guard validates report_payload_guard_check_keys_match_expected_schema",
-    "filtered payload check-key schema output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates report_intent matches report_intent_contract name",
+    "SQLite repository-backed latest report underlying filter validates report_intent matches report_intent_contract name",
+    "filtered report_payload_guard validates report_payload_intent_matches_contract",
+    "filtered payload intent guard output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
