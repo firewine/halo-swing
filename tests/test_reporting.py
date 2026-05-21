@@ -3343,6 +3343,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
+        alternate_signal["config_hash"],
     ]
     filtered_report_excluded_record_free_summary = {
         name: all(
@@ -3359,6 +3360,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
         alternate_signal["timeframe"],
+        alternate_signal["config_hash"],
     ]
     filtered_report_excluded_record_identity_free_summary = {
         name: all(
@@ -3394,6 +3396,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
         older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
     ]
     latest_matching_record_excludes_older_summary = {
         name: all(
@@ -7256,6 +7259,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
+        ndx_signal["config_hash"],
     ]
     filtered_report_excluded_record_free_summary = {
         name: all(
@@ -7272,6 +7276,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
         ndx_signal["underlying"],
+        ndx_signal["config_hash"],
     ]
     filtered_report_excluded_record_identity_free_summary = {
         name: all(
@@ -7307,6 +7312,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
         older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
     ]
     latest_matching_record_excludes_older_summary = {
         name: all(
