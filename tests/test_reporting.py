@@ -4018,6 +4018,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_exclusion_summary == {
         name: True for name in selected_source_summary_exclusion_targets
     }
+    source_summary_hermes_boundary_tokens = [
+        source_summary,
+        excluded_source_summary,
+        swing_signal["signal_id"],
+        alternate_signal["signal_id"],
+    ]
+    source_summary_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    source_summary_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in source_summary_hermes_boundary_tokens
+        )
+        for name, target in source_summary_hermes_boundary_targets.items()
+    }
+    assert source_summary_hermes_boundary_summary == {
+        name: True for name in source_summary_hermes_boundary_targets
+    }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
             payload["source_repository_ref"] == source_repository_ref,
@@ -7977,6 +8013,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_summary_exclusion_summary == {
         name: True for name in selected_source_summary_exclusion_targets
+    }
+    source_summary_hermes_boundary_tokens = [
+        source_summary,
+        excluded_source_summary,
+        qqq_signal["signal_id"],
+        ndx_signal["signal_id"],
+    ]
+    source_summary_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    source_summary_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in source_summary_hermes_boundary_tokens
+        )
+        for name, target in source_summary_hermes_boundary_targets.items()
+    }
+    assert source_summary_hermes_boundary_summary == {
+        name: True for name in source_summary_hermes_boundary_targets
     }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
