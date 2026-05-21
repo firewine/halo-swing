@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_KEYS_ACTUAL_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_LIVE_DATA_ACTUAL_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_KEYS_ACTUAL_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_LIVE_DATA_ACTUAL_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.153",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered report_payload_guard payload-key actual-value coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.154",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered report_payload_guard live_data_required actual-value coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.152",
+    "docs/halo-swing-development-plan.md#4.153",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates report_payload_guard payload-key actual values match emitted payload top-level keys",
-    "SQLite repository-backed latest report underlying filter validates report_payload_guard payload-key actual values match emitted payload top-level keys",
-    "filtered report_payload_guard payload-key actual values remain derived from emitted payload keys",
-    "filtered report_payload_guard payload-key actual-value output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates report_payload_guard live_data_required actual value matches emitted payload live_data_required",
+    "SQLite repository-backed latest report underlying filter validates report_payload_guard live_data_required actual value matches emitted payload live_data_required",
+    "filtered report_payload_guard live_data_required actual value remains derived from emitted payload",
+    "filtered report_payload_guard live_data_required actual-value output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

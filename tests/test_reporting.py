@@ -2234,6 +2234,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": False,
         "actual": False,
     }
+    assert report_payload_guard_checks[
+        "report_payload_live_data_required_matches_expected"
+    ]["actual"] is payload["live_data_required"]
     assert "report_payload_live_data_required_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -3408,6 +3411,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": False,
         "actual": False,
     }
+    assert report_payload_guard_checks[
+        "report_payload_live_data_required_matches_expected"
+    ]["actual"] is payload["live_data_required"]
     assert "report_payload_live_data_required_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
