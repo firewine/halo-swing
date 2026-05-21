@@ -2165,6 +2165,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]["expected"]["default_check_names"]
     )
     assert payload["report_contract_guard"]["status"] == "ok"
+    report_contract_guard_passes = [
+        check["passed"] for check in payload["report_contract_guard"]["checks"]
+    ]
+    assert report_contract_guard_passes == [
+        True for _check in payload["report_contract_guard"]["checks"]
+    ]
+    assert payload["report_contract_guard"]["status"] == (
+        "ok" if all(report_contract_guard_passes) else "conflict"
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_keys_match_expected_schema"
     ] == {
@@ -3532,6 +3541,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]["expected"]["default_check_names"]
     )
     assert payload["report_contract_guard"]["status"] == "ok"
+    report_contract_guard_passes = [
+        check["passed"] for check in payload["report_contract_guard"]["checks"]
+    ]
+    assert report_contract_guard_passes == [
+        True for _check in payload["report_contract_guard"]["checks"]
+    ]
+    assert payload["report_contract_guard"]["status"] == (
+        "ok" if all(report_contract_guard_passes) else "conflict"
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_keys_match_expected_schema"
     ] == {

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTRACT_GUARD_KEYS_ACTUAL_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTRACT_GUARD_STATUS_DERIVATION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTRACT_GUARD_KEYS_ACTUAL_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTRACT_GUARD_STATUS_DERIVATION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.176",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered report_contract_guard top-level key schema actual-value coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.177",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered report_contract_guard status derivation coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.175",
+    "docs/halo-swing-development-plan.md#4.176",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates report_contract_guard key schema actual value matches emitted report_contract_guard top-level keys",
-    "SQLite repository-backed latest report underlying filter validates report_contract_guard key schema actual value matches emitted report_contract_guard top-level keys",
-    "filtered report_contract_guard key schema actual value remains derived from emitted payload",
-    "filtered report_contract_guard key schema actual-value output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates report_contract_guard status matches emitted report_contract_guard check pass states",
+    "SQLite repository-backed latest report underlying filter validates report_contract_guard status matches emitted report_contract_guard check pass states",
+    "filtered report_contract_guard status remains derived from emitted guard check pass states",
+    "filtered report_contract_guard status derivation output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
