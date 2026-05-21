@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SUMMARY_DELIVERY_PRESENCE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SUMMARY_DELIVERY_EXCLUSION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SUMMARY_DELIVERY_PRESENCE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SUMMARY_DELIVERY_EXCLUSION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.256",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving the selected source repository summary is present in Telegram delivery preview chunks and reconstructed Telegram text",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.257",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving filtered-out source repository summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.255",
+    "docs/halo-swing-development-plan.md#4.256",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected source repository summary is present in Telegram delivery preview chunks and reconstructed Telegram text",
-    "SQLite repository-backed latest report underlying filter validates selected source repository summary is present in Telegram delivery preview chunks and reconstructed Telegram text",
-    "excluded repository source summaries remain absent from delivery preview surfaces after filtered repository selection",
+    "SQLite repository-backed latest report timeframe filter validates filtered-out source repository summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
+    "SQLite repository-backed latest report underlying filter validates filtered-out source repository summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
+    "selected source repository summary remains present while excluded repository source summaries remain absent from delivery preview surfaces after filtered repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

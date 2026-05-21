@@ -3995,6 +3995,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [payload["text"]],
             [excluded_source_summary, alternate_signal["signal_id"]],
         ),
+        "telegram_chunks_source_summary": (
+            telegram_preview["chunks"],
+            [excluded_source_summary, alternate_signal["signal_id"]],
+        ),
+        "reconstructed_telegram_text_source_summary": (
+            [reconstructed_telegram_text],
+            [excluded_source_summary, alternate_signal["signal_id"]],
+        ),
     }
     selected_source_summary_exclusion_summary = {
         name: all(
@@ -7945,6 +7953,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ),
         "payload_text_source_summary": (
             [payload["text"]],
+            [excluded_source_summary, ndx_signal["signal_id"]],
+        ),
+        "telegram_chunks_source_summary": (
+            telegram_preview["chunks"],
+            [excluded_source_summary, ndx_signal["signal_id"]],
+        ),
+        "reconstructed_telegram_text_source_summary": (
+            [reconstructed_telegram_text],
             [excluded_source_summary, ndx_signal["signal_id"]],
         ),
     }
