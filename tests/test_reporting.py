@@ -3512,6 +3512,39 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_conflict_flag_presence_summary == {
         name: True for name in selected_conflict_flag_presence_targets
     }
+    selected_component_extreme_tokens = [
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+    ]
+    selected_component_extreme_presence_targets = {
+        "evidence_context_component_extremes": (
+            evidence_context["component_extremes"],
+            selected_component_extreme_tokens,
+        ),
+        "evidence_context_reason_summary": (
+            [evidence_context["reason_summary"]],
+            selected_component_extreme_tokens,
+        ),
+        "latest_signal_report_reason_summary": (
+            [payload["latest_signal_report"]["reason_summary"]],
+            selected_component_extreme_tokens,
+        ),
+        "reasons": (reasons, selected_component_extreme_tokens),
+        "payload_text": ([payload["text"]], selected_component_extreme_tokens),
+    }
+    selected_component_extreme_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_component_extreme_presence_targets.items()
+    }
+    assert selected_component_extreme_presence_summary == {
+        name: True for name in selected_component_extreme_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5800,6 +5833,39 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_conflict_flag_presence_summary == {
         name: True for name in selected_conflict_flag_presence_targets
+    }
+    selected_component_extreme_tokens = [
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+    ]
+    selected_component_extreme_presence_targets = {
+        "evidence_context_component_extremes": (
+            evidence_context["component_extremes"],
+            selected_component_extreme_tokens,
+        ),
+        "evidence_context_reason_summary": (
+            [evidence_context["reason_summary"]],
+            selected_component_extreme_tokens,
+        ),
+        "latest_signal_report_reason_summary": (
+            [payload["latest_signal_report"]["reason_summary"]],
+            selected_component_extreme_tokens,
+        ),
+        "reasons": (reasons, selected_component_extreme_tokens),
+        "payload_text": ([payload["text"]], selected_component_extreme_tokens),
+    }
+    selected_component_extreme_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_component_extreme_presence_targets.items()
+    }
+    assert selected_component_extreme_presence_summary == {
+        name: True for name in selected_component_extreme_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()

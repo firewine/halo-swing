@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CONFLICT_FLAG_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_COMPONENT_EXTREME_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CONFLICT_FLAG_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_COMPONENT_EXTREME_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.213",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected conflict flags are preserved across emitted evidence context and guard surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.214",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected component extremes are preserved across emitted evidence context, reason summary, reasons, and text surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.212",
+    "docs/halo-swing-development-plan.md#4.213",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected conflict flags are preserved across emitted evidence context and guard surfaces",
-    "SQLite repository-backed latest report underlying filter validates selected conflict flags are preserved across emitted evidence context and guard surfaces",
-    "filtered selected-conflict summary remains derived from emitted nested strings",
-    "filtered selected-conflict summary covers evidence_context conflict flag identity fields, required-field guard actuals, and acknowledgement guard actuals",
+    "SQLite repository-backed latest report timeframe filter validates selected component extremes are preserved across emitted evidence context, reason summary, reasons, and text surfaces",
+    "SQLite repository-backed latest report underlying filter validates selected component extremes are preserved across emitted evidence context, reason summary, reasons, and text surfaces",
+    "filtered selected-component-extreme summary remains derived from emitted nested strings",
+    "filtered selected-component-extreme summary covers component_extremes, evidence_context reason summary, latest report reason summary, Reasons section, and payload text",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
