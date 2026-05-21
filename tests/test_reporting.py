@@ -4576,6 +4576,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_timestamp_propagation_summary == {
         name: True for name in selected_timestamp_propagation_targets
     }
+    excluded_timestamp_tokens = [
+        alternate_signal["created_at"],
+        older_matching_signal["created_at"],
+    ]
+    selected_timestamp_exclusion_targets = {
+        "top_level_as_of": [payload["as_of"]],
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "payload_text": [payload["text"]],
+        "report_payload_top_level_identity_guard": report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_timestamp_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_timestamp_tokens
+        )
+        for name, target in selected_timestamp_exclusion_targets.items()
+    }
+    assert selected_timestamp_exclusion_summary == {
+        name: True for name in selected_timestamp_exclusion_targets
+    }
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
             evidence_context["risk_warnings"],
@@ -8397,6 +8423,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_timestamp_propagation_summary == {
         name: True for name in selected_timestamp_propagation_targets
+    }
+    excluded_timestamp_tokens = [
+        ndx_signal["created_at"],
+        older_matching_signal["created_at"],
+    ]
+    selected_timestamp_exclusion_targets = {
+        "top_level_as_of": [payload["as_of"]],
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "payload_text": [payload["text"]],
+        "report_payload_top_level_identity_guard": report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_timestamp_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_timestamp_tokens
+        )
+        for name, target in selected_timestamp_exclusion_targets.items()
+    }
+    assert selected_timestamp_exclusion_summary == {
+        name: True for name in selected_timestamp_exclusion_targets
     }
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
