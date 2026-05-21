@@ -1724,6 +1724,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert payload["source_repository_ref"] == source_repository_ref
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
+    assert [check["name"] for check in latest_record_guard["checks"]] == (
+        expected_latest_record_guard_check_names
+    )
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -2839,6 +2842,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert payload["source_repository_ref"] == source_repository_ref
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
+    assert [check["name"] for check in latest_record_guard["checks"]] == (
+        expected_latest_record_guard_check_names
+    )
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
