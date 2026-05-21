@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.126 P1 Repository SQLite Latest Report Filtered Delivery Preview Guard Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.125에서 SQLite repository-backed filtered latest report의 optional context guard가
+repository source만으로 chart/multimodal context를 만들지 않음을 고정했다. 이번 slice는
+같은 filtered report의 `delivery_preview` 표면이 Telegram 전송 전 preview만 만들고,
+chunk text가 report text를 반영하며, no-network/no-send guard와 schema guard가 계속
+통과하는지 직접 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered delivery_preview guard coverage
+  - extend SQLite underlying-filtered delivery_preview guard coverage
+  - assert filtered delivery_preview output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task mirror diff passed
+  - task JSON validation passed
+  - git diff --check passed
+  - focused filtered delivery preview guard coverage tests: 3 passed
+  - full pytest: 935 passed in 39.89s
+  - ruff check passed
+  - health_check status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.125 P1 Repository SQLite Latest Report Filtered Optional Context Guard Coverage Gate Record - 2026-05-21
 
 ### A. 목적

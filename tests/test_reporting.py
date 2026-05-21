@@ -1328,6 +1328,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     evidence_guard_checks = {
         check["name"]: check for check in payload["evidence_guard"]["checks"]
     }
+    delivery_preview = payload["delivery_preview"]
+    telegram_preview = delivery_preview["channels"]["telegram"]
+    delivery_preview_guard_checks = {
+        check["name"]: check for check in delivery_preview["guard"]["checks"]
+    }
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
         "latest_record_source_repository_ref_is_path_free",
@@ -1464,6 +1469,56 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
     assert f"- {selected_label_summary}" in payload["text"]
+    assert delivery_preview["guard"]["status"] == "ok"
+    assert telegram_preview["schema_version"] == "telegram_report_format.v1"
+    assert telegram_preview["network_call"] is False
+    assert telegram_preview["send_call"] is False
+    assert telegram_preview["message_count"] == len(telegram_preview["chunks"])
+    assert (
+        telegram_preview["section_separator"].join(
+            chunk["text"] for chunk in telegram_preview["chunks"]
+        )
+        == payload["text"]
+    )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_network_side_effect"
+    ] == {
+        "name": "delivery_preview_has_no_network_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_send_side_effect"
+    ] == {
+        "name": "delivery_preview_has_no_send_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert (
+        delivery_preview_guard_checks[
+            "delivery_preview_guard_check_names_match_expected_schema"
+        ]["passed"]
+        is True
+    )
+    assert (
+        "delivery_preview_has_no_network_side_effect"
+        in delivery_preview_guard_checks[
+            "delivery_preview_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert (
+        "delivery_preview_has_no_send_side_effect"
+        in delivery_preview_guard_checks[
+            "delivery_preview_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]["actual"]["telegram_chunk_keys"] == [
+        ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
+    ]
     assert payload["report_contract_guard"]["status"] == "ok"
     assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
@@ -1611,6 +1666,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
@@ -1638,6 +1694,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(delivery_preview)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -1710,6 +1770,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     evidence_guard_checks = {
         check["name"]: check for check in payload["evidence_guard"]["checks"]
+    }
+    delivery_preview = payload["delivery_preview"]
+    telegram_preview = delivery_preview["channels"]["telegram"]
+    delivery_preview_guard_checks = {
+        check["name"]: check for check in delivery_preview["guard"]["checks"]
     }
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
@@ -1847,6 +1912,56 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert f"- {source_summary}" in payload["text"]
     assert selected_label_summary in reasons["items"]
     assert f"- {selected_label_summary}" in payload["text"]
+    assert delivery_preview["guard"]["status"] == "ok"
+    assert telegram_preview["schema_version"] == "telegram_report_format.v1"
+    assert telegram_preview["network_call"] is False
+    assert telegram_preview["send_call"] is False
+    assert telegram_preview["message_count"] == len(telegram_preview["chunks"])
+    assert (
+        telegram_preview["section_separator"].join(
+            chunk["text"] for chunk in telegram_preview["chunks"]
+        )
+        == payload["text"]
+    )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_network_side_effect"
+    ] == {
+        "name": "delivery_preview_has_no_network_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_send_side_effect"
+    ] == {
+        "name": "delivery_preview_has_no_send_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert (
+        delivery_preview_guard_checks[
+            "delivery_preview_guard_check_names_match_expected_schema"
+        ]["passed"]
+        is True
+    )
+    assert (
+        "delivery_preview_has_no_network_side_effect"
+        in delivery_preview_guard_checks[
+            "delivery_preview_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert (
+        "delivery_preview_has_no_send_side_effect"
+        in delivery_preview_guard_checks[
+            "delivery_preview_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]["actual"]["telegram_chunk_keys"] == [
+        ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
+    ]
     assert payload["report_contract_guard"]["status"] == "ok"
     assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
@@ -1994,6 +2109,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
     assert str(database_path) not in iter_nested_strings(reasons)
@@ -2021,6 +2137,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(delivery_preview)
     )
     assert all(
         ".sqlite" not in value.lower()
