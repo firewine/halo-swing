@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_TEXT_PRESERVATION_ACTUAL_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_SECTION_ACTUAL_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_TEXT_PRESERVATION_ACTUAL_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_SECTION_ACTUAL_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.189",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving Telegram preview nonempty, separator, and overflow guard actual values are derived from emitted Telegram preview chunks and text",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.190",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving Telegram preview required and unrequested section guard actual values are derived from emitted Telegram preview text",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.188",
+    "docs/halo-swing-development-plan.md#4.189",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates Telegram preview nonempty, separator, and overflow guard actual values match emitted Telegram preview chunks and text",
-    "SQLite repository-backed latest report underlying filter validates Telegram preview nonempty, separator, and overflow guard actual values match emitted Telegram preview chunks and text",
-    "filtered Telegram preview text-preservation actual values remain derived from emitted delivery preview payload",
-    "filtered Telegram preview text-preservation actual-value output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates Telegram preview required and unrequested section guard actual values match emitted Telegram preview text",
+    "SQLite repository-backed latest report underlying filter validates Telegram preview required and unrequested section guard actual values match emitted Telegram preview text",
+    "filtered Telegram preview section actual values remain derived from emitted delivery preview text",
+    "filtered Telegram preview section actual-value output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

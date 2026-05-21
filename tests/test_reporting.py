@@ -2183,6 +2183,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         )
         == payload["text"]
     )
+    reconstructed_telegram_text = telegram_preview["section_separator"].join(
+        chunk["text"] for chunk in telegram_preview["chunks"]
+    )
+    required_section_headers = [
+        f"{section}:" for section in telegram_contract["required_sections"]
+    ]
+    unrequested_section_headers = [
+        f"{section}:"
+        for section in reporting.TELEGRAM_KNOWN_SECTIONS
+        if section not in telegram_contract["required_sections"]
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_required_sections_present_in_preview"
+    ]["actual"] == [
+        header for header in required_section_headers
+        if header in reconstructed_telegram_text
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_unrequested_sections_absent_from_preview"
+    ]["actual_present"] == [
+        header for header in unrequested_section_headers
+        if header in reconstructed_telegram_text
+    ]
     assert delivery_preview_guard_checks["telegram_format_schema_declared"][
         "actual"
     ] == telegram_preview["schema_version"]
@@ -3832,6 +3855,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         )
         == payload["text"]
     )
+    reconstructed_telegram_text = telegram_preview["section_separator"].join(
+        chunk["text"] for chunk in telegram_preview["chunks"]
+    )
+    required_section_headers = [
+        f"{section}:" for section in telegram_contract["required_sections"]
+    ]
+    unrequested_section_headers = [
+        f"{section}:"
+        for section in reporting.TELEGRAM_KNOWN_SECTIONS
+        if section not in telegram_contract["required_sections"]
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_required_sections_present_in_preview"
+    ]["actual"] == [
+        header for header in required_section_headers
+        if header in reconstructed_telegram_text
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_unrequested_sections_absent_from_preview"
+    ]["actual_present"] == [
+        header for header in unrequested_section_headers
+        if header in reconstructed_telegram_text
+    ]
     assert delivery_preview_guard_checks["telegram_format_schema_declared"][
         "actual"
     ] == telegram_preview["schema_version"]
