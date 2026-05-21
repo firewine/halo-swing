@@ -1769,6 +1769,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         check["passed"] for check in latest_record_guard["checks"]
     ]
     assert latest_record_guard_passes == expected_latest_record_guard_passes
+    assert latest_record_guard["status"] == (
+        "ok" if all(latest_record_guard_passes) else "conflict"
+    )
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -1794,6 +1797,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_source_repository_ref_path_free,
     }
     assert payload["evidence_guard"]["status"] == "ok"
+    evidence_guard_passes = [
+        check["passed"] for check in payload["evidence_guard"]["checks"]
+    ]
+    assert evidence_guard_passes == [
+        True for _check in payload["evidence_guard"]["checks"]
+    ]
+    assert payload["evidence_guard"]["status"] == (
+        "ok" if all(evidence_guard_passes) else "conflict"
+    )
     assert evidence_guard_checks[
         "evidence_latest_record_guard_keys_match_expected_schema"
     ] == {
@@ -3154,6 +3166,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         check["passed"] for check in latest_record_guard["checks"]
     ]
     assert latest_record_guard_passes == expected_latest_record_guard_passes
+    assert latest_record_guard["status"] == (
+        "ok" if all(latest_record_guard_passes) else "conflict"
+    )
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -3179,6 +3194,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": expected_source_repository_ref_path_free,
     }
     assert payload["evidence_guard"]["status"] == "ok"
+    evidence_guard_passes = [
+        check["passed"] for check in payload["evidence_guard"]["checks"]
+    ]
+    assert evidence_guard_passes == [
+        True for _check in payload["evidence_guard"]["checks"]
+    ]
+    assert payload["evidence_guard"]["status"] == (
+        "ok" if all(evidence_guard_passes) else "conflict"
+    )
     assert evidence_guard_checks[
         "evidence_latest_record_guard_keys_match_expected_schema"
     ] == {
