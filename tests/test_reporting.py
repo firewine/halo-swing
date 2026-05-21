@@ -2085,8 +2085,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": "pre_market_swing_report",
     }
     assert report_contract_guard_checks["report_intent_is_supported"][
+        "expected"
+    ] == delivery_contract["cron_intents"]
+    assert report_contract_guard_checks["report_intent_is_supported"][
         "actual"
     ] == payload["report_intent"]
+    assert report_contract_guard_checks[
+        "delivery_cron_intents_match_report_intent_registry"
+    ]["expected"] == list(reporting.REPORT_INTENTS)
+    assert report_contract_guard_checks[
+        "delivery_cron_intents_match_report_intent_registry"
+    ]["actual"] == delivery_contract["cron_intents"]
     assert report_contract_guard_checks[
         "report_intent_contract_keys_match_expected_schema"
     ] == {
@@ -3776,8 +3785,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": "pre_market_swing_report",
     }
     assert report_contract_guard_checks["report_intent_is_supported"][
+        "expected"
+    ] == delivery_contract["cron_intents"]
+    assert report_contract_guard_checks["report_intent_is_supported"][
         "actual"
     ] == payload["report_intent"]
+    assert report_contract_guard_checks[
+        "delivery_cron_intents_match_report_intent_registry"
+    ]["expected"] == list(reporting.REPORT_INTENTS)
+    assert report_contract_guard_checks[
+        "delivery_cron_intents_match_report_intent_registry"
+    ]["actual"] == delivery_contract["cron_intents"]
     assert report_contract_guard_checks[
         "report_intent_contract_keys_match_expected_schema"
     ] == {
