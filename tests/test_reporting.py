@@ -4984,6 +4984,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_trade_plan_exclusion_summary == {
         name: True for name in selected_trade_plan_exclusion_targets
     }
+    trade_plan_hermes_boundary_tokens = (
+        selected_latest_report_trade_plan_tokens
+        + selected_text_trade_plan_tokens
+        + excluded_trade_plan_tokens
+        + [
+            swing_signal["signal_id"],
+            alternate_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+    )
+    trade_plan_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    trade_plan_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in trade_plan_hermes_boundary_tokens
+        )
+        for name, target in trade_plan_hermes_boundary_targets.items()
+    }
+    assert trade_plan_hermes_boundary_summary == {
+        name: True for name in trade_plan_hermes_boundary_targets
+    }
     selected_delivery_preview_tokens = (
         [
             swing_signal["asset"],
@@ -9015,6 +9055,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_trade_plan_exclusion_summary == {
         name: True for name in selected_trade_plan_exclusion_targets
+    }
+    trade_plan_hermes_boundary_tokens = (
+        selected_latest_report_trade_plan_tokens
+        + selected_text_trade_plan_tokens
+        + excluded_trade_plan_tokens
+        + [
+            qqq_signal["signal_id"],
+            ndx_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+    )
+    trade_plan_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    trade_plan_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in trade_plan_hermes_boundary_tokens
+        )
+        for name, target in trade_plan_hermes_boundary_targets.items()
+    }
+    assert trade_plan_hermes_boundary_summary == {
+        name: True for name in trade_plan_hermes_boundary_targets
     }
     selected_delivery_preview_tokens = (
         [
