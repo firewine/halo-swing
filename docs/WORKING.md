@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RISK_WARNING_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RISK_WARNING_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CONFLICT_FLAG_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CONFLICT_FLAG_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected risk warnings are preserved across emitted evidence, cautions, text, and guard surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected conflict flags are preserved across emitted evidence context and guard surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected risk warnings are preserved across emitted evidence, cautions, text, and guard surfaces
-  - SQLite repository-backed latest report underlying filter validates selected risk warnings are preserved across emitted evidence, cautions, text, and guard surfaces
-  - filtered selected-risk summary remains derived from emitted nested strings
-  - filtered selected-risk summary covers evidence_context risk warnings, Cautions items, payload text, and evidence guard actuals
+  - SQLite repository-backed latest report timeframe filter validates selected conflict flags are preserved across emitted evidence context and guard surfaces
+  - SQLite repository-backed latest report underlying filter validates selected conflict flags are preserved across emitted evidence context and guard surfaces
+  - filtered selected-conflict summary remains derived from emitted nested strings
+  - filtered selected-conflict summary covers evidence_context conflict flag identity fields, required-field guard actuals, and acknowledgement guard actuals
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RISK_WARNING_COVERAGE_GATE
-scope: SQLite repository-backed filtered selected-risk warning coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CONFLICT_FLAG_COVERAGE_GATE
+scope: SQLite repository-backed filtered selected-conflict flag coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.91s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.96s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.89s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.62s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected risk warnings are preserved across emitted evidence, cautions, text, and guard surfaces
-  - SQLite underlying-filtered latest report validates selected risk warnings are preserved across emitted evidence, cautions, text, and guard surfaces
-  - filtered selected-risk summary remains derived from emitted nested strings
-  - filtered selected-risk summary covers evidence_context risk warnings, Cautions items, payload text, and evidence guard actuals
+  - SQLite timeframe-filtered latest report validates selected conflict flags are preserved across emitted evidence context and guard surfaces
+  - SQLite underlying-filtered latest report validates selected conflict flags are preserved across emitted evidence context and guard surfaces
+  - filtered selected-conflict summary remains derived from emitted nested strings
+  - filtered selected-conflict summary covers evidence_context conflict flag identity fields, required-field guard actuals, and acknowledgement guard actuals
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

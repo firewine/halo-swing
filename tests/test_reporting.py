@@ -3475,6 +3475,43 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_risk_warning_presence_summary == {
         name: True for name in selected_risk_warning_presence_targets
     }
+    selected_conflict_flag_tokens = [
+        token
+        for flag in evidence_context["conflict_flags"]
+        for token in (
+            flag["name"],
+            flag["severity"],
+            flag["status"],
+            flag["details"],
+        )
+    ]
+    selected_conflict_flag_presence_targets = {
+        "evidence_context_conflict_flags": (
+            evidence_context["conflict_flags"],
+            selected_conflict_flag_tokens,
+        ),
+        "evidence_guard_conflict_field_schema": (
+            evidence_guard_checks["conflict_flags_have_required_fields"]["actual"],
+            evidence_contract["required_conflict_fields"],
+        ),
+        "evidence_guard_conflict_acknowledgements": (
+            evidence_guard_checks["flagged_conflicts_are_acknowledged"]["actual"],
+            ["acknowledged"],
+        ),
+    }
+    selected_conflict_flag_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_conflict_flag_presence_targets.items()
+    }
+    assert selected_conflict_flag_presence_summary == {
+        name: True for name in selected_conflict_flag_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5726,6 +5763,43 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_risk_warning_presence_summary == {
         name: True for name in selected_risk_warning_presence_targets
+    }
+    selected_conflict_flag_tokens = [
+        token
+        for flag in evidence_context["conflict_flags"]
+        for token in (
+            flag["name"],
+            flag["severity"],
+            flag["status"],
+            flag["details"],
+        )
+    ]
+    selected_conflict_flag_presence_targets = {
+        "evidence_context_conflict_flags": (
+            evidence_context["conflict_flags"],
+            selected_conflict_flag_tokens,
+        ),
+        "evidence_guard_conflict_field_schema": (
+            evidence_guard_checks["conflict_flags_have_required_fields"]["actual"],
+            evidence_contract["required_conflict_fields"],
+        ),
+        "evidence_guard_conflict_acknowledgements": (
+            evidence_guard_checks["flagged_conflicts_are_acknowledged"]["actual"],
+            ["acknowledged"],
+        ),
+    }
+    selected_conflict_flag_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_conflict_flag_presence_targets.items()
+    }
+    assert selected_conflict_flag_presence_summary == {
+        name: True for name in selected_conflict_flag_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
