@@ -1725,6 +1725,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_keys_match_expected_schema"
+    ] == {
+        "name": "latest_record_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_matches_top_level_source"
     ] == {
         "name": "latest_record_source_repository_ref_matches_top_level_source",
@@ -1734,11 +1742,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_is_path_free"
-    ]["actual"] == {
-        "omits_ledger_ref": True,
-        "omits_ledger_path": True,
-        "omits_database_path": True,
-        "omits_absolute_or_sqlite_paths": True,
+    ] == {
+        "name": "latest_record_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": expected_source_repository_ref_path_free,
+        "actual": expected_source_repository_ref_path_free,
     }
     assert payload["evidence_guard"]["status"] == "ok"
     assert evidence_guard_checks[
@@ -2832,6 +2840,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert latest_record_guard["status"] == "ok"
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_keys_match_expected_schema"
+    ] == {
+        "name": "latest_record_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_matches_top_level_source"
     ] == {
         "name": "latest_record_source_repository_ref_matches_top_level_source",
@@ -2841,11 +2857,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert latest_record_guard_checks[
         "latest_record_source_repository_ref_is_path_free"
-    ]["actual"] == {
-        "omits_ledger_ref": True,
-        "omits_ledger_path": True,
-        "omits_database_path": True,
-        "omits_absolute_or_sqlite_paths": True,
+    ] == {
+        "name": "latest_record_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": expected_source_repository_ref_path_free,
+        "actual": expected_source_repository_ref_path_free,
     }
     assert payload["evidence_guard"]["status"] == "ok"
     assert evidence_guard_checks[
