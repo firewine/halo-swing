@@ -1466,6 +1466,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "positions_ascending": True,
         "positions": expected_text_section_positions,
     }
+    latest_report = payload["latest_signal_report"]
+    expected_numeric_field_presence = {
+        "decision_line_present": True,
+        "confidence_line_present": True,
+        "score_line_present": True,
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1586,6 +1592,56 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_contract_guard_checks[
             "report_contract_guard_check_keys_match_expected_schema"
         ]["expected"]["default_check_names"]
+    )
+    assert f"Decision: {latest_report['action']}" in payload["text"]
+    assert (
+        f"Confidence: {payload['confidence_label']} ({latest_report['confidence']})"
+        in payload["text"]
+    )
+    assert f"Score: {latest_report['final_score']}" in payload["text"]
+    assert report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ] == {
+        "name": "delivery_numeric_authority_is_latest_signal_report",
+        "passed": True,
+        "expected": "latest_signal_report",
+        "actual": "latest_signal_report",
+    }
+    assert report_contract_guard_checks["telegram_text_fits_single_message"] == {
+        "name": "telegram_text_fits_single_message",
+        "passed": True,
+        "expected_max_chars": 3900,
+        "actual_chars": len(payload["text"]),
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_max_chars_matches_expected"
+    ] == {
+        "name": "report_telegram_max_chars_matches_expected",
+        "passed": True,
+        "expected": 3900,
+        "actual": 3900,
+    }
+    assert report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ] == {
+        "name": "report_text_reflects_latest_signal_numeric_fields",
+        "passed": True,
+        "expected": {
+            "action": latest_report["action"],
+            "confidence": latest_report["confidence"],
+            "final_score": latest_report["final_score"],
+        },
+        "actual": expected_numeric_field_presence,
+    }
+    assert "delivery_numeric_authority_is_latest_signal_report" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "telegram_text_fits_single_message" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["special_check_keys"]
     )
     assert report_contract_guard_checks["report_intent_is_supported"] == {
         "name": "report_intent_is_supported",
@@ -2176,6 +2232,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "positions_ascending": True,
         "positions": expected_text_section_positions,
     }
+    latest_report = payload["latest_signal_report"]
+    expected_numeric_field_presence = {
+        "decision_line_present": True,
+        "confidence_line_present": True,
+        "score_line_present": True,
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -2296,6 +2358,56 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_contract_guard_checks[
             "report_contract_guard_check_keys_match_expected_schema"
         ]["expected"]["default_check_names"]
+    )
+    assert f"Decision: {latest_report['action']}" in payload["text"]
+    assert (
+        f"Confidence: {payload['confidence_label']} ({latest_report['confidence']})"
+        in payload["text"]
+    )
+    assert f"Score: {latest_report['final_score']}" in payload["text"]
+    assert report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ] == {
+        "name": "delivery_numeric_authority_is_latest_signal_report",
+        "passed": True,
+        "expected": "latest_signal_report",
+        "actual": "latest_signal_report",
+    }
+    assert report_contract_guard_checks["telegram_text_fits_single_message"] == {
+        "name": "telegram_text_fits_single_message",
+        "passed": True,
+        "expected_max_chars": 3900,
+        "actual_chars": len(payload["text"]),
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_max_chars_matches_expected"
+    ] == {
+        "name": "report_telegram_max_chars_matches_expected",
+        "passed": True,
+        "expected": 3900,
+        "actual": 3900,
+    }
+    assert report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ] == {
+        "name": "report_text_reflects_latest_signal_numeric_fields",
+        "passed": True,
+        "expected": {
+            "action": latest_report["action"],
+            "confidence": latest_report["confidence"],
+            "final_score": latest_report["final_score"],
+        },
+        "actual": expected_numeric_field_presence,
+    }
+    assert "delivery_numeric_authority_is_latest_signal_report" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "telegram_text_fits_single_message" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["special_check_keys"]
     )
     assert report_contract_guard_checks["report_intent_is_supported"] == {
         "name": "report_intent_is_supported",
