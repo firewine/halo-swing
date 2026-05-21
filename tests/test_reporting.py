@@ -1715,6 +1715,38 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in payload["evidence_guard"]["checks"]
+    ]
+    emitted_evidence_guard_check_keys = {
+        check["name"]: list(check)
+        for check in payload["evidence_guard"]["checks"]
+    }
+    assert evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in emitted_evidence_guard_check_keys.items()
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            check_name: emitted_evidence_guard_check_keys[check_name]
+            for check_name in expected_evidence_special_check_keys
+        },
+    }
+    assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"] == {
+        "name": "evidence_guard_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["status", "checks"],
+        "actual": ["status", "checks"],
+    }
+    assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"][
+        "actual"
+    ] == list(payload["evidence_guard"])
     assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
@@ -3157,6 +3189,38 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in payload["evidence_guard"]["checks"]
+    ]
+    emitted_evidence_guard_check_keys = {
+        check["name"]: list(check)
+        for check in payload["evidence_guard"]["checks"]
+    }
+    assert evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in emitted_evidence_guard_check_keys.items()
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            check_name: emitted_evidence_guard_check_keys[check_name]
+            for check_name in expected_evidence_special_check_keys
+        },
+    }
+    assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"] == {
+        "name": "evidence_guard_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["status", "checks"],
+        "actual": ["status", "checks"],
+    }
+    assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"][
+        "actual"
+    ] == list(payload["evidence_guard"])
     assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
