@@ -1813,6 +1813,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": ["storage", "db_required", "filters"],
     }
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_keys_match_expected_schema"
+    ]["actual"] == list(payload["source_repository_ref"])
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_matches_top_level_source"
     ] == {
         "name": "latest_record_source_repository_ref_matches_top_level_source",
@@ -1821,12 +1824,35 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": source_repository_ref,
     }
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_matches_top_level_source"
+    ]["actual"] == payload["source_repository_ref"]
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_is_path_free"
     ] == {
         "name": "latest_record_source_repository_ref_is_path_free",
         "passed": True,
         "expected": expected_source_repository_ref_path_free,
         "actual": expected_source_repository_ref_path_free,
+    }
+    source_repository_ref_keys = iter_nested_keys(payload["source_repository_ref"])
+    source_repository_ref_strings = iter_nested_strings(
+        payload["source_repository_ref"]
+    )
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": "ledger_ref" not in source_repository_ref_keys,
+        "omits_ledger_path": "ledger_path" not in source_repository_ref_keys,
+        "omits_database_path": "database_path" not in source_repository_ref_keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in source_repository_ref_strings
+        ),
     }
     assert payload["evidence_guard"]["status"] == "ok"
     evidence_guard_passes = [
@@ -1866,6 +1892,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_latest_record_guard_check_names,
         "actual": expected_latest_record_guard_check_names,
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in latest_record_guard["checks"]
+    ]
     assert evidence_guard_checks[
         "evidence_latest_record_guard_checks_all_passed"
     ] == {
@@ -3287,6 +3318,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": ["storage", "db_required", "filters"],
     }
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_keys_match_expected_schema"
+    ]["actual"] == list(payload["source_repository_ref"])
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_matches_top_level_source"
     ] == {
         "name": "latest_record_source_repository_ref_matches_top_level_source",
@@ -3295,12 +3329,35 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": source_repository_ref,
     }
     assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_matches_top_level_source"
+    ]["actual"] == payload["source_repository_ref"]
+    assert latest_record_guard_checks[
         "latest_record_source_repository_ref_is_path_free"
     ] == {
         "name": "latest_record_source_repository_ref_is_path_free",
         "passed": True,
         "expected": expected_source_repository_ref_path_free,
         "actual": expected_source_repository_ref_path_free,
+    }
+    source_repository_ref_keys = iter_nested_keys(payload["source_repository_ref"])
+    source_repository_ref_strings = iter_nested_strings(
+        payload["source_repository_ref"]
+    )
+    assert latest_record_guard_checks[
+        "latest_record_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": "ledger_ref" not in source_repository_ref_keys,
+        "omits_ledger_path": "ledger_path" not in source_repository_ref_keys,
+        "omits_database_path": "database_path" not in source_repository_ref_keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in source_repository_ref_strings
+        ),
     }
     assert payload["evidence_guard"]["status"] == "ok"
     evidence_guard_passes = [
@@ -3340,6 +3397,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_latest_record_guard_check_names,
         "actual": expected_latest_record_guard_check_names,
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in latest_record_guard["checks"]
+    ]
     assert evidence_guard_checks[
         "evidence_latest_record_guard_checks_all_passed"
     ] == {
