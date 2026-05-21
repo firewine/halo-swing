@@ -3450,6 +3450,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
     }
+    selected_risk_warning_presence_targets = {
+        "evidence_context_risk_warnings": (
+            evidence_context["risk_warnings"],
+            evidence_context["risk_warnings"],
+        ),
+        "cautions": (cautions, evidence_context["risk_warnings"]),
+        "payload_text": ([payload["text"]], evidence_context["risk_warnings"]),
+        "evidence_guard_risk_warnings": (
+            evidence_guard_checks["risk_warnings_reflected_in_cautions"]["actual"],
+            evidence_context["risk_warnings"],
+        ),
+    }
+    selected_risk_warning_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_risk_warning_presence_targets.items()
+    }
+    assert selected_risk_warning_presence_summary == {
+        name: True for name in selected_risk_warning_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5676,6 +5701,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
+    }
+    selected_risk_warning_presence_targets = {
+        "evidence_context_risk_warnings": (
+            evidence_context["risk_warnings"],
+            evidence_context["risk_warnings"],
+        ),
+        "cautions": (cautions, evidence_context["risk_warnings"]),
+        "payload_text": ([payload["text"]], evidence_context["risk_warnings"]),
+        "evidence_guard_risk_warnings": (
+            evidence_guard_checks["risk_warnings_reflected_in_cautions"]["actual"],
+            evidence_context["risk_warnings"],
+        ),
+    }
+    selected_risk_warning_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_risk_warning_presence_targets.items()
+    }
+    assert selected_risk_warning_presence_summary == {
+        name: True for name in selected_risk_warning_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
