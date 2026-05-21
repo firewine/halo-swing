@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_INTENT_PROMPT_CONTRACT_ACTUAL_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SECTION_ORDER_ACTUAL_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_INTENT_PROMPT_CONTRACT_ACTUAL_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SECTION_ORDER_ACTUAL_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.183",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered report_intent_contract and prompt_contract actual-value coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.184",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving section and text order guard actual values are derived from emitted sections, text, intent contract, and Telegram contract",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.182",
+    "docs/halo-swing-development-plan.md#4.183",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates report_intent_contract and prompt_contract guard actual values match emitted contracts",
-    "SQLite repository-backed latest report underlying filter validates report_intent_contract and prompt_contract guard actual values match emitted contracts",
-    "filtered intent and prompt contract actual values remain derived from emitted payload",
-    "filtered intent and prompt contract actual-value output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates section and text order guard actual values match emitted sections, text, intent contract, and Telegram contract",
+    "SQLite repository-backed latest report underlying filter validates section and text order guard actual values match emitted sections, text, intent contract, and Telegram contract",
+    "filtered section and text order actual values remain derived from emitted payload",
+    "filtered section and text order actual-value output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

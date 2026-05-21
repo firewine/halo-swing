@@ -1927,23 +1927,56 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["required_sections_present"][
+        "actual"
+    ] == [
+        section["title"]
+        for section in payload["sections"]
+        if section["title"] in report_intent_contract["required_sections"]
+    ]
     assert report_contract_guard_checks["intent_required_sections_present"] == {
         "name": "intent_required_sections_present",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["intent_required_sections_present"][
+        "actual"
+    ] == [
+        title for title in report_intent_contract["required_sections"]
+        if title in section_titles
+    ]
     assert report_contract_guard_checks["report_sections_match_intent_order"] == {
         "name": "report_sections_match_intent_order",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["report_sections_match_intent_order"][
+        "actual"
+    ] == section_titles
     assert report_contract_guard_checks["report_text_sections_match_intent_order"] == {
         "name": "report_text_sections_match_intent_order",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_text_order_actual,
+    }
+    emitted_text_section_positions = {
+        title: payload["text"].find(f"{title}:")
+        for title in report_intent_contract["required_sections"]
+    }
+    assert report_contract_guard_checks["report_text_sections_match_intent_order"][
+        "actual"
+    ] == {
+        "found_sections": [
+            title for title in report_intent_contract["required_sections"]
+            if emitted_text_section_positions[title] >= 0
+        ],
+        "positions_ascending": (
+            list(emitted_text_section_positions.values())
+            == sorted(emitted_text_section_positions.values())
+        ),
+        "positions": emitted_text_section_positions,
     }
     assert all(
         position >= 0 for position in expected_text_section_positions.values()
@@ -1954,6 +1987,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["telegram_required_sections_match_intent"][
+        "actual"
+    ] == telegram_contract["required_sections"]
     assert "report_text_sections_match_intent_order" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"
@@ -3456,23 +3492,56 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["required_sections_present"][
+        "actual"
+    ] == [
+        section["title"]
+        for section in payload["sections"]
+        if section["title"] in report_intent_contract["required_sections"]
+    ]
     assert report_contract_guard_checks["intent_required_sections_present"] == {
         "name": "intent_required_sections_present",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["intent_required_sections_present"][
+        "actual"
+    ] == [
+        title for title in report_intent_contract["required_sections"]
+        if title in section_titles
+    ]
     assert report_contract_guard_checks["report_sections_match_intent_order"] == {
         "name": "report_sections_match_intent_order",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["report_sections_match_intent_order"][
+        "actual"
+    ] == section_titles
     assert report_contract_guard_checks["report_text_sections_match_intent_order"] == {
         "name": "report_text_sections_match_intent_order",
         "passed": True,
         "expected": expected_report_sections,
         "actual": expected_text_order_actual,
+    }
+    emitted_text_section_positions = {
+        title: payload["text"].find(f"{title}:")
+        for title in report_intent_contract["required_sections"]
+    }
+    assert report_contract_guard_checks["report_text_sections_match_intent_order"][
+        "actual"
+    ] == {
+        "found_sections": [
+            title for title in report_intent_contract["required_sections"]
+            if emitted_text_section_positions[title] >= 0
+        ],
+        "positions_ascending": (
+            list(emitted_text_section_positions.values())
+            == sorted(emitted_text_section_positions.values())
+        ),
+        "positions": emitted_text_section_positions,
     }
     assert all(
         position >= 0 for position in expected_text_section_positions.values()
@@ -3483,6 +3552,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_report_sections,
         "actual": expected_report_sections,
     }
+    assert report_contract_guard_checks["telegram_required_sections_match_intent"][
+        "actual"
+    ] == telegram_contract["required_sections"]
     assert "report_text_sections_match_intent_order" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"
