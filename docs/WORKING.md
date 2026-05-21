@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_PROPAGATION_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_PROPAGATION_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected source_signal_ref fields propagate consistently into latest_signal_report and report payload source-signal-ref guard surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected source_signal_ref traceable format and sha256 config_hash digest guards stay aligned with emitted source refs
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values
-  - SQLite repository-backed latest report underlying filter validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values
-  - filtered source signal ref propagation summary remains derived from emitted source_signal_ref, latest_signal_report, and report_payload_guard surfaces
-  - filtered-out and older matching record identities remain excluded through existing exclusion and latest-matching coverage
+  - SQLite repository-backed latest report timeframe filter validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
+  - SQLite repository-backed latest report underlying filter validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
+  - filtered source signal ref traceability summary remains derived from emitted source_signal_ref and report_payload_guard traceability surfaces
+  - selected source_signal_ref config_hash remains sha256-prefixed with a 64-character lowercase hex digest
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_PROPAGATION_COVERAGE_GATE
-scope: SQLite repository-backed filtered source signal ref propagation coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_GATE
+scope: SQLite repository-backed filtered source signal ref traceability coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -112,7 +112,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.75s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.34s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values
-  - SQLite underlying-filtered latest report validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values
-  - filtered source signal ref propagation summary remains derived from emitted source_signal_ref, latest_signal_report, and report_payload_guard surfaces
-  - filtered-out and older matching record identities remain excluded through existing exclusion and latest-matching coverage
+  - SQLite timeframe-filtered latest report validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
+  - SQLite underlying-filtered latest report validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
+  - filtered source signal ref traceability summary remains derived from emitted source_signal_ref and report_payload_guard traceability surfaces
+  - selected source_signal_ref config_hash remains sha256-prefixed with a 64-character lowercase hex digest
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

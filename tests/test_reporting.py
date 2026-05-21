@@ -3462,6 +3462,70 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_signal_ref_propagation_summary == {
         name: True for name in selected_source_signal_ref_propagation_targets
     }
+    selected_source_signal_ref_traceability_targets = {
+        "traceable_format_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["signal_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["config_hash_sha256_prefix"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["signal_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["config_hash_sha256_prefix"]
+            is True,
+        ],
+        "config_hash_digest_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["expected"]["config_hash_digest_length"]
+            == 64,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["expected"]["config_hash_digest_hex"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["actual"]["config_hash_digest_length"]
+            == 64,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["actual"]["config_hash_digest_hex"]
+            is True,
+        ],
+        "emitted_config_hash_digest": [
+            payload["source_signal_ref"]["config_hash"].startswith("sha256:"),
+            len(payload["source_signal_ref"]["config_hash"].removeprefix("sha256:"))
+            == 64,
+            all(
+                character in "0123456789abcdef"
+                for character in payload["source_signal_ref"][
+                    "config_hash"
+                ].removeprefix("sha256:")
+            ),
+        ],
+    }
+    selected_source_signal_ref_traceability_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_traceability_targets.items()
+    }
+    assert selected_source_signal_ref_traceability_summary == {
+        name: True for name in selected_source_signal_ref_traceability_targets
+    }
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (
             label_status,
@@ -6380,6 +6444,70 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_signal_ref_propagation_summary == {
         name: True for name in selected_source_signal_ref_propagation_targets
+    }
+    selected_source_signal_ref_traceability_targets = {
+        "traceable_format_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["signal_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["expected"]["config_hash_sha256_prefix"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["signal_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]["actual"]["config_hash_sha256_prefix"]
+            is True,
+        ],
+        "config_hash_digest_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["expected"]["config_hash_digest_length"]
+            == 64,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["expected"]["config_hash_digest_hex"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["actual"]["config_hash_digest_length"]
+            == 64,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]["actual"]["config_hash_digest_hex"]
+            is True,
+        ],
+        "emitted_config_hash_digest": [
+            payload["source_signal_ref"]["config_hash"].startswith("sha256:"),
+            len(payload["source_signal_ref"]["config_hash"].removeprefix("sha256:"))
+            == 64,
+            all(
+                character in "0123456789abcdef"
+                for character in payload["source_signal_ref"][
+                    "config_hash"
+                ].removeprefix("sha256:")
+            ),
+        ],
+    }
+    selected_source_signal_ref_traceability_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_traceability_targets.items()
+    }
+    assert selected_source_signal_ref_traceability_summary == {
+        name: True for name in selected_source_signal_ref_traceability_targets
     }
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (

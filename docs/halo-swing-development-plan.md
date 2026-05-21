@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.227 P1 Repository SQLite Latest Report Source Signal Ref Traceability Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.226에서 SQLite repository-backed filtered latest report의 selected `source_signal_ref` value
+propagation을 고정했다. 이번 slice는 같은 selected source ref가 traceable format guard 및 sha256
+config hash digest guard와 일치하는지, emitted `source_signal_ref.config_hash`가 `sha256:` prefix와
+64-character lowercase hex digest를 유지하는지 summary 형태로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source signal ref traceability coverage
+  - extend SQLite underlying-filtered source signal ref traceability coverage
+  - assert source signal ref traceable-format guard expected and actual values pass
+  - assert config_hash digest guard expected and actual values match emitted sha256 digest shape
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.34s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.226 P1 Repository SQLite Latest Report Source Signal Ref Propagation Coverage Gate Record - 2026-05-22
 
 ### A. 목적
