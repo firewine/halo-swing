@@ -2073,6 +2073,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]["passed"]
         is True
     )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in delivery_preview["guard"]["checks"]
+    ]
     assert (
         "delivery_preview_has_no_network_side_effect"
         in delivery_preview_guard_checks[
@@ -2085,11 +2090,51 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "delivery_preview_guard_check_keys_match_expected_schema"
         ]["expected"]["default_check_names"]
     )
+    emitted_delivery_preview_guard_check_keys = {
+        check["name"]: list(check)
+        for check in delivery_preview["guard"]["checks"]
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in (
+                emitted_delivery_preview_guard_check_keys.items()
+            )
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            "telegram_unrequested_sections_absent_from_preview": (
+                emitted_delivery_preview_guard_check_keys[
+                    "telegram_unrequested_sections_absent_from_preview"
+                ]
+            ),
+            "telegram_chunks_fit_max_chars": (
+                emitted_delivery_preview_guard_check_keys[
+                    "telegram_chunks_fit_max_chars"
+                ]
+            ),
+        },
+    }
     assert delivery_preview_guard_checks[
         "delivery_preview_payload_keys_match_expected_schema"
     ]["actual"]["telegram_chunk_keys"] == [
         ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
     ]
+    assert delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]["actual"] == {
+        "preview_keys": list(delivery_preview),
+        "channel_names": list(delivery_preview["channels"]),
+        "hermes_channel_keys": list(delivery_preview["channels"]["hermes"]),
+        "telegram_channel_keys": list(telegram_preview),
+        "telegram_chunk_keys": [
+            list(chunk) for chunk in telegram_preview["chunks"]
+        ],
+        "guard_keys": list(delivery_preview["guard"]),
+    }
     assert delivery_contract["cron_intents"] == [
         "pre_market_swing_report",
         "intraday_risk_watch",
@@ -3470,6 +3515,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]["passed"]
         is True
     )
+    assert delivery_preview_guard_checks[
+        "delivery_preview_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in delivery_preview["guard"]["checks"]
+    ]
     assert (
         "delivery_preview_has_no_network_side_effect"
         in delivery_preview_guard_checks[
@@ -3482,11 +3532,51 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "delivery_preview_guard_check_keys_match_expected_schema"
         ]["expected"]["default_check_names"]
     )
+    emitted_delivery_preview_guard_check_keys = {
+        check["name"]: list(check)
+        for check in delivery_preview["guard"]["checks"]
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in (
+                emitted_delivery_preview_guard_check_keys.items()
+            )
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            "telegram_unrequested_sections_absent_from_preview": (
+                emitted_delivery_preview_guard_check_keys[
+                    "telegram_unrequested_sections_absent_from_preview"
+                ]
+            ),
+            "telegram_chunks_fit_max_chars": (
+                emitted_delivery_preview_guard_check_keys[
+                    "telegram_chunks_fit_max_chars"
+                ]
+            ),
+        },
+    }
     assert delivery_preview_guard_checks[
         "delivery_preview_payload_keys_match_expected_schema"
     ]["actual"]["telegram_chunk_keys"] == [
         ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
     ]
+    assert delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]["actual"] == {
+        "preview_keys": list(delivery_preview),
+        "channel_names": list(delivery_preview["channels"]),
+        "hermes_channel_keys": list(delivery_preview["channels"]["hermes"]),
+        "telegram_channel_keys": list(telegram_preview),
+        "telegram_chunk_keys": [
+            list(chunk) for chunk in telegram_preview["chunks"]
+        ],
+        "guard_keys": list(delivery_preview["guard"]),
+    }
     assert delivery_contract["cron_intents"] == [
         "pre_market_swing_report",
         "intraday_risk_watch",
