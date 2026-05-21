@@ -4058,6 +4058,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     source_summary_hermes_boundary_tokens = [
         source_summary,
         excluded_source_summary,
+        "sqlite_signal_repository",
+        "db_required=true",
+        "filters asset=TQQQ",
+        "underlying=<any>",
+        "timeframe=swing_3d_10d",
+        "timeframe=swing_5d_20d",
         swing_signal["signal_id"],
         alternate_signal["signal_id"],
     ]
@@ -8342,6 +8348,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     source_summary_hermes_boundary_tokens = [
         source_summary,
         excluded_source_summary,
+        "sqlite_signal_repository",
+        "db_required=true",
+        "filters asset=TQQQ",
+        "underlying=QQQ",
+        "underlying=SOXX",
+        "timeframe=swing_3d_10d",
         qqq_signal["signal_id"],
         ndx_signal["signal_id"],
     ]
