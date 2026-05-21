@@ -1302,6 +1302,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "signal_id": "sig_report_repo_tqqq_alt",
         "run_id": "run_report_repo_tqqq_alt",
         "created_at": "2026-05-20T13:00:00Z",
+        "action": "EXIT",
+        "action_label": "ALT_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
+        "final_score": 0.1111,
+        "confidence": 0.1111,
         "entry_summary": "ALT_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "ALT_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "ALT_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -1320,6 +1324,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "signal_id": "sig_report_repo_tqqq_swing_old",
         "run_id": "run_report_repo_tqqq_swing_old",
         "created_at": "2026-05-20T11:00:00Z",
+        "action": "STOP",
+        "action_label": "OLD_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
+        "final_score": 0.2222,
+        "confidence": 0.2222,
         "entry_summary": "OLD_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "OLD_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "OLD_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -4509,6 +4517,37 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
     }
+    excluded_decision_tokens = [
+        token
+        for excluded_signal in (alternate_signal, older_matching_signal)
+        for token in (
+            excluded_signal["action_label"],
+            f"{excluded_signal['final_score']}",
+            f"{excluded_signal['confidence']}",
+        )
+    ]
+    selected_decision_exclusion_targets = {
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "decision_section": decision_section,
+        "payload_text": [payload["text"]],
+        "report_payload_top_level_identity_guard": report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_decision_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_decision_tokens
+        )
+        for name, target in selected_decision_exclusion_targets.items()
+    }
+    assert selected_decision_exclusion_summary == {
+        name: True for name in selected_decision_exclusion_targets
+    }
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
             payload["as_of"] == swing_signal["created_at"],
@@ -5086,6 +5125,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "run_id": "run_report_repo_tqqq_soxx",
         "created_at": "2026-05-20T13:00:00Z",
         "underlying": "SOXX",
+        "action": "EXIT",
+        "action_label": "ALT_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
+        "final_score": 0.3333,
+        "confidence": 0.3333,
         "entry_summary": "ALT_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "ALT_UNDERLYING_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "ALT_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -5104,6 +5147,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "signal_id": "sig_report_repo_tqqq_qqq_old",
         "run_id": "run_report_repo_tqqq_qqq_old",
         "created_at": "2026-05-20T11:00:00Z",
+        "action": "STOP",
+        "action_label": "OLD_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
+        "final_score": 0.4444,
+        "confidence": 0.4444,
         "entry_summary": "OLD_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "OLD_UNDERLYING_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "OLD_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -8291,6 +8338,37 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
+    }
+    excluded_decision_tokens = [
+        token
+        for excluded_signal in (ndx_signal, older_matching_signal)
+        for token in (
+            excluded_signal["action_label"],
+            f"{excluded_signal['final_score']}",
+            f"{excluded_signal['confidence']}",
+        )
+    ]
+    selected_decision_exclusion_targets = {
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "decision_section": decision_section,
+        "payload_text": [payload["text"]],
+        "report_payload_top_level_identity_guard": report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_decision_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_decision_tokens
+        )
+        for name, target in selected_decision_exclusion_targets.items()
+    }
+    assert selected_decision_exclusion_summary == {
+        name: True for name in selected_decision_exclusion_targets
     }
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
