@@ -2237,6 +2237,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_keys_match_expected_schema"
     ]["actual"]
     expected_default_check_keys = ["name", "passed", "expected", "actual"]
+    expected_payload_check_keys = {
+        check_name: expected_default_check_keys
+        for check_name in expected_payload_check_names
+    }
     payload_check_keys = report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
     ]["actual"]
@@ -2248,10 +2252,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ] == expected_default_check_keys
     assert report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
-    ]["passed"] is True
-    assert report_payload_guard_checks[
-        "report_payload_guard_check_keys_match_expected_schema"
-    ]["expected"] == expected_default_check_keys
+    ] == {
+        "name": "report_payload_guard_check_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_default_check_keys,
+        "actual": expected_payload_check_keys,
+    }
     assert all(
         check_keys == expected_default_check_keys
         for check_keys in payload_check_keys.values()
@@ -3338,6 +3344,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_keys_match_expected_schema"
     ]["actual"]
     expected_default_check_keys = ["name", "passed", "expected", "actual"]
+    expected_payload_check_keys = {
+        check_name: expected_default_check_keys
+        for check_name in expected_payload_check_names
+    }
     payload_check_keys = report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
     ]["actual"]
@@ -3349,10 +3359,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ] == expected_default_check_keys
     assert report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
-    ]["passed"] is True
-    assert report_payload_guard_checks[
-        "report_payload_guard_check_keys_match_expected_schema"
-    ]["expected"] == expected_default_check_keys
+    ] == {
+        "name": "report_payload_guard_check_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_default_check_keys,
+        "actual": expected_payload_check_keys,
+    }
     assert all(
         check_keys == expected_default_check_keys
         for check_keys in payload_check_keys.values()
