@@ -1333,6 +1333,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     delivery_preview_guard_checks = {
         check["name"]: check for check in delivery_preview["guard"]["checks"]
     }
+    delivery_contract = payload["delivery_contract"]
+    delivery_channels = delivery_contract["channels"]
+    telegram_contract = delivery_channels["telegram"]
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
         "latest_record_source_repository_ref_is_path_free",
@@ -1398,6 +1401,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "live_data_required",
         "report_payload_guard",
     ]
+    expected_delivery_contract_schema = {
+        "contract_keys": ["channels", "cron_intents"],
+        "channel_names": ["hermes", "telegram"],
+        "hermes_channel_keys": ["format", "network_call", "numeric_authority"],
+        "telegram_channel_keys": [
+            "schema_version",
+            "format",
+            "network_call",
+            "max_chars",
+            "required_sections",
+            "overflow_policy",
+            "section_separator",
+            "chunk_indexing",
+            "send_call",
+        ],
+    }
+    expected_delivery_channel_formats = {
+        "hermes": "structured_json_plus_text",
+        "telegram": "plain_text",
+    }
+    expected_telegram_chunking_contract = {
+        "overflow_policy": "split_on_section_boundary",
+        "section_separator": "\n\n",
+        "chunk_indexing": "1_based",
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1519,6 +1547,78 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ]["actual"]["telegram_chunk_keys"] == [
         ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
     ]
+    assert delivery_contract["cron_intents"] == [
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    ]
+    assert delivery_channels["hermes"]["network_call"] is False
+    assert delivery_channels["hermes"]["numeric_authority"] == "latest_signal_report"
+    assert telegram_contract["schema_version"] == "telegram_report_format.v1"
+    assert telegram_contract["network_call"] is False
+    assert telegram_contract["send_call"] is False
+    assert (
+        telegram_contract["required_sections"]
+        == payload["report_intent_contract"]["required_sections"]
+    )
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_network_side_effect"
+    ] == {
+        "name": "delivery_contract_has_no_network_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_send_side_effect"
+    ] == {
+        "name": "delivery_contract_has_no_send_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ] == {
+        "name": "delivery_contract_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_delivery_contract_schema,
+        "actual": expected_delivery_contract_schema,
+    }
+    assert report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ] == {
+        "name": "delivery_channel_formats_match_expected",
+        "passed": True,
+        "expected": expected_delivery_channel_formats,
+        "actual": expected_delivery_channel_formats,
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ] == {
+        "name": "report_telegram_schema_version_matches_expected",
+        "passed": True,
+        "expected": "telegram_report_format.v1",
+        "actual": "telegram_report_format.v1",
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ] == {
+        "name": "report_telegram_chunking_contract_matches_expected",
+        "passed": True,
+        "expected": expected_telegram_chunking_contract,
+        "actual": expected_telegram_chunking_contract,
+    }
+    assert "delivery_contract_has_no_network_side_effect" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "delivery_contract_keys_match_expected_schema" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
     assert payload["report_contract_guard"]["status"] == "ok"
     assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
@@ -1666,6 +1766,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(delivery_contract)
     assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
@@ -1694,6 +1795,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(delivery_contract)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -1776,6 +1881,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     delivery_preview_guard_checks = {
         check["name"]: check for check in delivery_preview["guard"]["checks"]
     }
+    delivery_contract = payload["delivery_contract"]
+    delivery_channels = delivery_contract["channels"]
+    telegram_contract = delivery_channels["telegram"]
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
         "latest_record_source_repository_ref_is_path_free",
@@ -1841,6 +1949,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "live_data_required",
         "report_payload_guard",
     ]
+    expected_delivery_contract_schema = {
+        "contract_keys": ["channels", "cron_intents"],
+        "channel_names": ["hermes", "telegram"],
+        "hermes_channel_keys": ["format", "network_call", "numeric_authority"],
+        "telegram_channel_keys": [
+            "schema_version",
+            "format",
+            "network_call",
+            "max_chars",
+            "required_sections",
+            "overflow_policy",
+            "section_separator",
+            "chunk_indexing",
+            "send_call",
+        ],
+    }
+    expected_delivery_channel_formats = {
+        "hermes": "structured_json_plus_text",
+        "telegram": "plain_text",
+    }
+    expected_telegram_chunking_contract = {
+        "overflow_policy": "split_on_section_boundary",
+        "section_separator": "\n\n",
+        "chunk_indexing": "1_based",
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -1962,6 +2095,78 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]["actual"]["telegram_chunk_keys"] == [
         ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
     ]
+    assert delivery_contract["cron_intents"] == [
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    ]
+    assert delivery_channels["hermes"]["network_call"] is False
+    assert delivery_channels["hermes"]["numeric_authority"] == "latest_signal_report"
+    assert telegram_contract["schema_version"] == "telegram_report_format.v1"
+    assert telegram_contract["network_call"] is False
+    assert telegram_contract["send_call"] is False
+    assert (
+        telegram_contract["required_sections"]
+        == payload["report_intent_contract"]["required_sections"]
+    )
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_network_side_effect"
+    ] == {
+        "name": "delivery_contract_has_no_network_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_send_side_effect"
+    ] == {
+        "name": "delivery_contract_has_no_send_side_effect",
+        "passed": True,
+        "expected": False,
+        "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ] == {
+        "name": "delivery_contract_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_delivery_contract_schema,
+        "actual": expected_delivery_contract_schema,
+    }
+    assert report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ] == {
+        "name": "delivery_channel_formats_match_expected",
+        "passed": True,
+        "expected": expected_delivery_channel_formats,
+        "actual": expected_delivery_channel_formats,
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ] == {
+        "name": "report_telegram_schema_version_matches_expected",
+        "passed": True,
+        "expected": "telegram_report_format.v1",
+        "actual": "telegram_report_format.v1",
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ] == {
+        "name": "report_telegram_chunking_contract_matches_expected",
+        "passed": True,
+        "expected": expected_telegram_chunking_contract,
+        "actual": expected_telegram_chunking_contract,
+    }
+    assert "delivery_contract_has_no_network_side_effect" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "delivery_contract_keys_match_expected_schema" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
     assert payload["report_contract_guard"]["status"] == "ok"
     assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
@@ -2109,6 +2314,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
     assert str(database_path) not in iter_nested_strings(latest_record_guard)
     assert str(database_path) not in iter_nested_strings(evidence_guard_checks)
+    assert str(database_path) not in iter_nested_strings(delivery_contract)
     assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
@@ -2137,6 +2343,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(evidence_guard_checks)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(delivery_contract)
     )
     assert all(
         ".sqlite" not in value.lower()
