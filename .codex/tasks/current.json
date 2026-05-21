@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTEXT_TEXT_GUARD_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_NESTED_GUARD_STATUS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_CONTEXT_TEXT_GUARD_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_NESTED_GUARD_STATUS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.119",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered report_contract_guard context text coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.120",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered report_payload_guard nested guard status coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.118",
+    "docs/halo-swing-development-plan.md#4.119",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -34,7 +34,7 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
     "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_sqlite_repository_context_summary_text_guard_validates_intraday_fallback -q",
+    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q",
     "PYTHONPATH=src ./.venv/bin/python -m pytest",
     "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
     "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter report_contract_guard validates selected source repository summary text reflection",
-    "SQLite repository-backed latest report underlying filter report_contract_guard validates selected label_status summary text reflection",
-    "filtered report_contract_guard selected source and label checks remain path-free and omit database path details",
+    "SQLite repository-backed latest report timeframe filter report_payload_guard validates nested guard statuses including latest_record_guard",
+    "SQLite repository-backed latest report underlying filter report_payload_guard validates nested guard statuses including latest_record_guard",
+    "filtered nested guard status checks remain path-free and omit database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

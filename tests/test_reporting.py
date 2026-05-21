@@ -1353,6 +1353,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         f"first_barrier_hit={selected_label['first_barrier_hit']}; "
         "time_barrier_days=2"
     )
+    expected_nested_guard_statuses = {
+        "delivery_preview.guard": "ok",
+        "evidence_guard": "ok",
+        "report_contract_guard": "ok",
+        "latest_record_guard": "ok",
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1481,6 +1487,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ] == {
+        "name": "report_payload_nested_guard_statuses_are_ok",
+        "passed": True,
+        "expected": expected_nested_guard_statuses,
+        "actual": expected_nested_guard_statuses,
+    }
+    assert "report_payload_nested_guard_statuses_are_ok" in report_payload_guard_checks[
+        "report_payload_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "latest_record_guard" in report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(evidence_label_status)
@@ -1613,6 +1633,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         f"first_barrier_hit={selected_label['first_barrier_hit']}; "
         "time_barrier_days=2"
     )
+    expected_nested_guard_statuses = {
+        "delivery_preview.guard": "ok",
+        "evidence_guard": "ok",
+        "report_contract_guard": "ok",
+        "latest_record_guard": "ok",
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -1741,6 +1767,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ] == {
+        "name": "report_payload_nested_guard_statuses_are_ok",
+        "passed": True,
+        "expected": expected_nested_guard_statuses,
+        "actual": expected_nested_guard_statuses,
+    }
+    assert "report_payload_nested_guard_statuses_are_ok" in report_payload_guard_checks[
+        "report_payload_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "latest_record_guard" in report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(evidence_label_status)
