@@ -3730,6 +3730,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ),
         "reasons_label_summary": (reasons, excluded_label_summaries),
         "payload_text_label_summary": ([payload["text"]], excluded_label_summaries),
+        "telegram_chunks_label_summary": (
+            telegram_preview["chunks"],
+            excluded_label_summaries,
+        ),
+        "reconstructed_telegram_text_label_summary": (
+            [reconstructed_telegram_text],
+            excluded_label_summaries,
+        ),
     }
     selected_label_summary_exclusion_summary = {
         name: all(
@@ -7672,6 +7680,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ),
         "reasons_label_summary": (reasons, excluded_label_summaries),
         "payload_text_label_summary": ([payload["text"]], excluded_label_summaries),
+        "telegram_chunks_label_summary": (
+            telegram_preview["chunks"],
+            excluded_label_summaries,
+        ),
+        "reconstructed_telegram_text_label_summary": (
+            [reconstructed_telegram_text],
+            excluded_label_summaries,
+        ),
     }
     selected_label_summary_exclusion_summary = {
         name: all(

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LABEL_STATUS_DETAIL_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LABEL_SUMMARY_DELIVERY_EXCLUSION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LABEL_STATUS_DETAIL_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LABEL_SUMMARY_DELIVERY_EXCLUSION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.253",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving filtered-out and older label status detail tuples do not leak into latest report, evidence context, or evidence guard surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.254",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving filtered-out and older label status summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.252",
+    "docs/halo-swing-development-plan.md#4.253",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching label status detail tuples do not leak into latest report, evidence context, or evidence guard surfaces",
-    "SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching label status detail tuples do not leak into latest report, evidence context, or evidence guard surfaces",
-    "selected label status remains present while excluded repository label status details remain absent after filtered repository selection",
+    "SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching label status summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
+    "SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching label status summaries do not leak into Telegram delivery preview chunks or reconstructed Telegram text",
+    "selected label summary remains present while excluded repository label summaries remain absent from delivery preview surfaces after filtered repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
