@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EXCLUDED_RECORD_FREE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RECORD_IDENTITY_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EXCLUDED_RECORD_FREE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RECORD_IDENTITY_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.207",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving emitted output summaries omit signal and run identifiers from records excluded by timeframe or underlying filters",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.208",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving emitted source and identity surfaces preserve the selected record signal and run identifiers",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.206",
+    "docs/halo-swing-development-plan.md#4.207",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates emitted output summaries omit signal and run identifiers from the timeframe-excluded record",
-    "SQLite repository-backed latest report underlying filter validates emitted output summaries omit signal and run identifiers from the underlying-excluded record",
-    "filtered excluded-record-free summary remains derived from emitted nested strings across every expected surface",
-    "filtered excluded-record-free summary covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces",
+    "SQLite repository-backed latest report timeframe filter validates selected record signal and run identifiers are preserved in emitted source and identity surfaces",
+    "SQLite repository-backed latest report underlying filter validates selected record signal and run identifiers are preserved in emitted source and identity surfaces",
+    "filtered selected-record identity summary remains derived from emitted nested strings",
+    "filtered selected-record identity summary covers source_signal_ref, latest_signal_report, and source identity guard actuals",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

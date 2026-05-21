@@ -3285,6 +3285,35 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    selected_record_identity_presence_targets = {
+        "source_signal_ref": (
+            payload["source_signal_ref"],
+            [swing_signal["signal_id"], swing_signal["run_id"]],
+        ),
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            [swing_signal["signal_id"]],
+        ),
+        "report_payload_source_signal_ref_identity_guard": (
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"],
+            [swing_signal["signal_id"]],
+        ),
+    }
+    selected_record_identity_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_record_identity_presence_targets.items()
+    }
+    assert selected_record_identity_presence_summary == {
+        name: True for name in selected_record_identity_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5346,6 +5375,35 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
+    }
+    selected_record_identity_presence_targets = {
+        "source_signal_ref": (
+            payload["source_signal_ref"],
+            [qqq_signal["signal_id"], qqq_signal["run_id"]],
+        ),
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            [qqq_signal["signal_id"]],
+        ),
+        "report_payload_source_signal_ref_identity_guard": (
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"],
+            [qqq_signal["signal_id"]],
+        ),
+    }
+    selected_record_identity_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_record_identity_presence_targets.items()
+    }
+    assert selected_record_identity_presence_summary == {
+        name: True for name in selected_record_identity_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
