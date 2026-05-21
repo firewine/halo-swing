@@ -2119,6 +2119,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": "telegram_report_format.v1",
     }
     assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ]["actual"] == telegram_contract["schema_version"]
+    assert report_contract_guard_checks[
         "report_telegram_chunking_contract_matches_expected"
     ] == {
         "name": "report_telegram_chunking_contract_matches_expected",
@@ -3410,6 +3413,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": "telegram_report_format.v1",
         "actual": "telegram_report_format.v1",
     }
+    assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ]["actual"] == telegram_contract["schema_version"]
     assert report_contract_guard_checks[
         "report_telegram_chunking_contract_matches_expected"
     ] == {
