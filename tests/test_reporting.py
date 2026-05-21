@@ -2166,6 +2166,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     )
     assert payload["report_contract_guard"]["status"] == "ok"
     assert report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ] == {
+        "name": "report_contract_guard_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["status", "checks"],
+        "actual": ["status", "checks"],
+    }
+    assert report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["report_contract_guard"])
+    assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
     ] == {
         "name": "report_text_reflects_source_repository_summary",
@@ -3521,6 +3532,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]["expected"]["default_check_names"]
     )
     assert payload["report_contract_guard"]["status"] == "ok"
+    assert report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ] == {
+        "name": "report_contract_guard_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["status", "checks"],
+        "actual": ["status", "checks"],
+    }
+    assert report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["report_contract_guard"])
     assert report_contract_guard_checks[
         "report_text_reflects_source_repository_summary"
     ] == {
