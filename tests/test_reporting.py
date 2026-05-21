@@ -2076,6 +2076,28 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    assert payload["schema_version"] == "hermes_report.v1"
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ] == {
+        "name": "report_payload_schema_version_matches_expected",
+        "passed": True,
+        "expected": "hermes_report.v1",
+        "actual": "hermes_report.v1",
+    }
+    assert "report_payload_schema_version_matches_expected" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]["report_payload_schema_version_matches_expected"] == [
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    ]
     assert payload["live_data_required"] is False
     assert report_payload_guard_checks[
         "report_payload_live_data_required_matches_expected"
@@ -3053,6 +3075,28 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    assert payload["schema_version"] == "hermes_report.v1"
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ] == {
+        "name": "report_payload_schema_version_matches_expected",
+        "passed": True,
+        "expected": "hermes_report.v1",
+        "actual": "hermes_report.v1",
+    }
+    assert "report_payload_schema_version_matches_expected" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]["report_payload_schema_version_matches_expected"] == [
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    ]
     assert payload["live_data_required"] is False
     assert report_payload_guard_checks[
         "report_payload_live_data_required_matches_expected"
