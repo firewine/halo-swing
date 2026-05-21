@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_TRADE_PLAN_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_TRADE_PLAN_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_PREVIEW_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_PREVIEW_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected trade plan fields are preserved across emitted latest report, Entry, Stop, Take Profit, and text surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected trade plan fields are preserved across emitted latest report, Entry, Stop, Take Profit, and text surfaces
-  - SQLite repository-backed latest report underlying filter validates selected trade plan fields are preserved across emitted latest report, Entry, Stop, Take Profit, and text surfaces
-  - filtered selected-trade-plan summary remains derived from emitted nested strings
-  - filtered selected-trade-plan summary covers latest_signal_report summaries, Entry section, Stop section, Take Profit section, and payload text
+  - SQLite repository-backed latest report timeframe filter validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces
+  - SQLite repository-backed latest report underlying filter validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces
+  - filtered selected-delivery-preview summary remains derived from emitted nested strings
+  - filtered selected-delivery-preview summary covers Telegram chunks, reconstructed Telegram text, required section headers, and Hermes structured payload ref
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_TRADE_PLAN_COVERAGE_GATE
-scope: SQLite repository-backed filtered selected-trade plan coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_PREVIEW_COVERAGE_GATE
+scope: SQLite repository-backed filtered selected-delivery preview coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.90s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.62s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.87s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.77s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected trade plan fields are preserved across emitted latest report, Entry, Stop, Take Profit, and text surfaces
-  - SQLite underlying-filtered latest report validates selected trade plan fields are preserved across emitted latest report, Entry, Stop, Take Profit, and text surfaces
-  - filtered selected-trade-plan summary remains derived from emitted nested strings
-  - filtered selected-trade-plan summary covers latest_signal_report summaries, Entry section, Stop section, Take Profit section, and payload text
+  - SQLite timeframe-filtered latest report validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces
+  - SQLite underlying-filtered latest report validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces
+  - filtered selected-delivery-preview summary remains derived from emitted nested strings
+  - filtered selected-delivery-preview summary covers Telegram chunks, reconstructed Telegram text, required section headers, and Hermes structured payload ref
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

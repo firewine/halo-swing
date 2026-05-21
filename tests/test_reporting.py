@@ -3599,6 +3599,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_trade_plan_presence_summary == {
         name: True for name in selected_trade_plan_presence_targets
     }
+    selected_delivery_preview_tokens = (
+        [
+            swing_signal["asset"],
+            swing_signal["underlying"],
+            "swing_3d_10d",
+            swing_signal["action"],
+        ]
+        + selected_text_trade_plan_tokens
+    )
+    selected_delivery_preview_presence_targets = {
+        "telegram_chunks": (
+            telegram_preview["chunks"],
+            selected_delivery_preview_tokens,
+        ),
+        "reconstructed_telegram_text": (
+            [reconstructed_telegram_text],
+            selected_delivery_preview_tokens,
+        ),
+        "telegram_required_section_headers": (
+            required_section_headers,
+            ["Target:", "Decision:", "Entry:", "Stop:", "Take Profit:"],
+        ),
+        "hermes_preview_payload_ref": (
+            hermes_preview,
+            ["latest_signal_report"],
+        ),
+    }
+    selected_delivery_preview_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_delivery_preview_presence_targets.items()
+    }
+    assert selected_delivery_preview_presence_summary == {
+        name: True for name in selected_delivery_preview_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5974,6 +6014,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_trade_plan_presence_summary == {
         name: True for name in selected_trade_plan_presence_targets
+    }
+    selected_delivery_preview_tokens = (
+        [
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+            qqq_signal["timeframe"],
+            qqq_signal["action"],
+        ]
+        + selected_text_trade_plan_tokens
+    )
+    selected_delivery_preview_presence_targets = {
+        "telegram_chunks": (
+            telegram_preview["chunks"],
+            selected_delivery_preview_tokens,
+        ),
+        "reconstructed_telegram_text": (
+            [reconstructed_telegram_text],
+            selected_delivery_preview_tokens,
+        ),
+        "telegram_required_section_headers": (
+            required_section_headers,
+            ["Target:", "Decision:", "Entry:", "Stop:", "Take Profit:"],
+        ),
+        "hermes_preview_payload_ref": (
+            hermes_preview,
+            ["latest_signal_report"],
+        ),
+    }
+    selected_delivery_preview_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_delivery_preview_presence_targets.items()
+    }
+    assert selected_delivery_preview_presence_summary == {
+        name: True for name in selected_delivery_preview_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
