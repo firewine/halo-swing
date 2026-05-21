@@ -1547,6 +1547,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
     ]["actual"]
+    expected_default_check_keys = ["name", "passed", "expected", "actual"]
+    payload_check_keys = report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]
+    assert payload_check_keys[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_source_repository_ref_is_path_free"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_keys_match_expected_schema"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ] == expected_default_check_keys
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
@@ -1887,6 +1903,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
     ]["actual"]
+    expected_default_check_keys = ["name", "passed", "expected", "actual"]
+    payload_check_keys = report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["actual"]
+    assert payload_check_keys[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_source_repository_ref_is_path_free"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_keys_match_expected_schema"
+    ] == expected_default_check_keys
+    assert payload_check_keys[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ] == expected_default_check_keys
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
