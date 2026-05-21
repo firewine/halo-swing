@@ -2195,6 +2195,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_source_signal_ref_config_hash_digest,
         "actual": expected_source_signal_ref_config_hash_digest,
     }
+    source_signal_ref_config_hash_digest = payload["source_signal_ref"][
+        "config_hash"
+    ].removeprefix("sha256:")
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["actual"] == {
+        "config_hash_digest_length": len(source_signal_ref_config_hash_digest),
+        "config_hash_digest_hex": all(
+            character in "0123456789abcdef"
+            for character in source_signal_ref_config_hash_digest
+        ),
+    }
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
         "passed": True,
@@ -3404,6 +3416,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_source_signal_ref_config_hash_digest,
         "actual": expected_source_signal_ref_config_hash_digest,
+    }
+    source_signal_ref_config_hash_digest = payload["source_signal_ref"][
+        "config_hash"
+    ].removeprefix("sha256:")
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["actual"] == {
+        "config_hash_digest_length": len(source_signal_ref_config_hash_digest),
+        "config_hash_digest_hex": all(
+            character in "0123456789abcdef"
+            for character in source_signal_ref_config_hash_digest
+        ),
     }
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
