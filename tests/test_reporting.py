@@ -4400,6 +4400,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_contract_raw_marker_free_summary == {
         name: True for name in selected_filter_contract_raw_marker_free_targets
     }
+    selected_filter_section_raw_marker_free_targets = {
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "target_section": target_section,
+        "decision_section": decision_section,
+        "entry_section": entry_section,
+        "stop_section": stop_section,
+        "take_profit_section": take_profit_section,
+        "cautions": cautions,
+    }
+    selected_filter_section_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_section_raw_marker_free_targets.items()
+    }
+    assert selected_filter_section_raw_marker_free_summary == {
+        name: True for name in selected_filter_section_raw_marker_free_targets
+    }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
             actual_top_level_identity,
@@ -8075,6 +8096,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_filter_contract_raw_marker_free_summary == {
         name: True for name in selected_filter_contract_raw_marker_free_targets
+    }
+    selected_filter_section_raw_marker_free_targets = {
+        "top_level_identity": actual_top_level_identity,
+        "latest_signal_report": payload["latest_signal_report"],
+        "target_section": target_section,
+        "decision_section": decision_section,
+        "entry_section": entry_section,
+        "stop_section": stop_section,
+        "take_profit_section": take_profit_section,
+        "cautions": cautions,
+    }
+    selected_filter_section_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_section_raw_marker_free_targets.items()
+    }
+    assert selected_filter_section_raw_marker_free_summary == {
+        name: True for name in selected_filter_section_raw_marker_free_targets
     }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (

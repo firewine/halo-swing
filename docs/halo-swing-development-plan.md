@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.244 P1 Repository SQLite Latest Report Filter Raw Marker Section Surface Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.243에서 SQLite repository-backed filtered latest report의 delivery, prompt, report intent,
+evidence, Telegram, Hermes contract/preview surfaces를 고정했다. 이번 slice는 top-level
+identity, latest signal report payload, target, decision, entry, stop, take-profit, caution section
+surfaces까지 raw filter request markers가 새지 않는지 확장 검증한다. 사용자-facing report
+sections는 filtered repository selection 이후에도 canonicalized selected state만 노출해야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered raw marker-free coverage across report section surfaces
+  - extend SQLite underlying-filtered raw marker-free coverage across report section surfaces
+  - assert top-level identity and latest signal report payload exclude raw request markers
+  - assert target, decision, entry, stop, take-profit, and caution sections exclude raw request markers
+  - keep database_path marker absent from the section surface set
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.91s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.02s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.243 P1 Repository SQLite Latest Report Filter Raw Marker Contract Surface Coverage Gate Record - 2026-05-22
 
 ### A. 목적
