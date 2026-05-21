@@ -1430,6 +1430,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "live_data_required",
         "report_payload_guard",
     ]
+    expected_payload_check_names = [
+        "report_payload_schema_version_matches_expected",
+        "report_payload_live_data_required_matches_expected",
+        "report_payload_keys_match_expected_schema",
+        "report_payload_source_signal_ref_keys_match_expected_schema",
+        "report_payload_source_signal_ref_matches_report_identity",
+        "report_payload_source_signal_ref_values_have_traceable_format",
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+        "report_payload_source_repository_ref_keys_match_expected_schema",
+        "report_payload_source_repository_ref_is_path_free",
+        "report_payload_intent_matches_contract",
+        "report_payload_top_level_identity_matches_latest_signal_report",
+        "report_payload_nested_guard_statuses_are_ok",
+        "report_payload_optional_context_statuses_are_ok",
+        "report_payload_optional_context_guards_are_ok",
+        "report_payload_guard_check_names_match_expected_schema",
+        "report_payload_guard_keys_match_expected_schema",
+        "report_payload_guard_check_keys_match_expected_schema",
+    ]
     expected_delivery_contract_schema = {
         "contract_keys": ["channels", "cron_intents"],
         "channel_names": ["hermes", "telegram"],
@@ -2198,8 +2217,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     payload_check_names = report_payload_guard_checks[
         "report_payload_guard_check_names_match_expected_schema"
     ]
-    assert payload_check_names["passed"] is True
-    assert payload_check_names["actual"] == payload_check_names["expected"]
+    assert payload_check_names == {
+        "name": "report_payload_guard_check_names_match_expected_schema",
+        "passed": True,
+        "expected": expected_payload_check_names,
+        "actual": expected_payload_check_names,
+    }
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
@@ -2507,6 +2530,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "latest_record_guard",
         "live_data_required",
         "report_payload_guard",
+    ]
+    expected_payload_check_names = [
+        "report_payload_schema_version_matches_expected",
+        "report_payload_live_data_required_matches_expected",
+        "report_payload_keys_match_expected_schema",
+        "report_payload_source_signal_ref_keys_match_expected_schema",
+        "report_payload_source_signal_ref_matches_report_identity",
+        "report_payload_source_signal_ref_values_have_traceable_format",
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+        "report_payload_source_repository_ref_keys_match_expected_schema",
+        "report_payload_source_repository_ref_is_path_free",
+        "report_payload_intent_matches_contract",
+        "report_payload_top_level_identity_matches_latest_signal_report",
+        "report_payload_nested_guard_statuses_are_ok",
+        "report_payload_optional_context_statuses_are_ok",
+        "report_payload_optional_context_guards_are_ok",
+        "report_payload_guard_check_names_match_expected_schema",
+        "report_payload_guard_keys_match_expected_schema",
+        "report_payload_guard_check_keys_match_expected_schema",
     ]
     expected_delivery_contract_schema = {
         "contract_keys": ["channels", "cron_intents"],
@@ -3276,8 +3318,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     payload_check_names = report_payload_guard_checks[
         "report_payload_guard_check_names_match_expected_schema"
     ]
-    assert payload_check_names["passed"] is True
-    assert payload_check_names["actual"] == payload_check_names["expected"]
+    assert payload_check_names == {
+        "name": "report_payload_guard_check_names_match_expected_schema",
+        "passed": True,
+        "expected": expected_payload_check_names,
+        "actual": expected_payload_check_names,
+    }
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
