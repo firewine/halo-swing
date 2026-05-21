@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_COMPONENT_EXTREME_HERMES_PREVIEW_BOUNDARY_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DECISION_IDENTITY_HERMES_PREVIEW_BOUNDARY_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_COMPONENT_EXTREME_HERMES_PREVIEW_BOUNDARY_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DECISION_IDENTITY_HERMES_PREVIEW_BOUNDARY_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.264",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected component extreme details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.265",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected decision identity details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.263",
+    "docs/halo-swing-development-plan.md#4.264",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,8 +49,8 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected component extreme details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
-    "SQLite repository-backed latest report underlying filter validates selected component extreme details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
+    "SQLite repository-backed latest report timeframe filter validates selected decision identity details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
+    "SQLite repository-backed latest report underlying filter validates selected decision identity details do not leak into Hermes delivery preview metadata or Hermes delivery guard references",
     "Telegram delivery preview still preserves selected report details while Hermes preview remains ref-only after filtered repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",

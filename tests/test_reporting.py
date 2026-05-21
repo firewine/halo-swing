@@ -4686,6 +4686,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_exclusion_summary == {
         name: True for name in selected_decision_exclusion_targets
     }
+    selected_decision_identity_hermes_boundary_tokens = [
+        swing_signal["signal_id"],
+        swing_signal["asset"],
+        swing_signal["underlying"],
+        "swing_3d_10d",
+        swing_signal["action"],
+        payload["confidence_label"],
+        swing_signal["created_at"],
+    ]
+    selected_decision_identity_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    selected_decision_identity_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_decision_identity_hermes_boundary_tokens
+        )
+        for name, target in selected_decision_identity_hermes_boundary_targets.items()
+    }
+    assert selected_decision_identity_hermes_boundary_summary == {
+        name: True
+        for name in selected_decision_identity_hermes_boundary_targets
+    }
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
             payload["as_of"] == swing_signal["created_at"],
@@ -8906,6 +8946,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_decision_exclusion_summary == {
         name: True for name in selected_decision_exclusion_targets
+    }
+    selected_decision_identity_hermes_boundary_tokens = [
+        qqq_signal["signal_id"],
+        qqq_signal["asset"],
+        qqq_signal["underlying"],
+        qqq_signal["timeframe"],
+        qqq_signal["action"],
+        payload["confidence_label"],
+        qqq_signal["created_at"],
+    ]
+    selected_decision_identity_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    selected_decision_identity_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_decision_identity_hermes_boundary_tokens
+        )
+        for name, target in selected_decision_identity_hermes_boundary_targets.items()
+    }
+    assert selected_decision_identity_hermes_boundary_summary == {
+        name: True
+        for name in selected_decision_identity_hermes_boundary_targets
     }
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
