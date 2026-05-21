@@ -2090,6 +2090,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_delivery_contract_schema,
     }
     assert report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ]["actual"] == {
+        "contract_keys": list(delivery_contract),
+        "channel_names": list(delivery_channels),
+        "hermes_channel_keys": list(delivery_channels["hermes"]),
+        "telegram_channel_keys": list(telegram_contract),
+    }
+    assert report_contract_guard_checks[
         "delivery_channel_formats_match_expected"
     ] == {
         "name": "delivery_channel_formats_match_expected",
@@ -3367,6 +3375,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_delivery_contract_schema,
         "actual": expected_delivery_contract_schema,
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ]["actual"] == {
+        "contract_keys": list(delivery_contract),
+        "channel_names": list(delivery_channels),
+        "hermes_channel_keys": list(delivery_channels["hermes"]),
+        "telegram_channel_keys": list(telegram_contract),
     }
     assert report_contract_guard_checks[
         "delivery_channel_formats_match_expected"
