@@ -3641,6 +3641,47 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
     }
+    selected_source_summary_guard_targets = {
+        "report_contract_source_summary_guard_pass": [
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["passed"]
+            is True,
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["expected"]
+            == source_summary,
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"]
+            == source_summary,
+        ],
+        "report_text_source_summary_rendering": [
+            f"- {source_summary}" in payload["text"],
+            source_summary in reasons["items"],
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"]
+            == (source_summary if source_summary in payload["text"] else None),
+        ],
+        "report_contract_source_summary_schema_presence": [
+            "report_text_reflects_source_repository_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_text_reflects_source_repository_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["actual"],
+        ],
+    }
+    selected_source_summary_guard_summary = {
+        name: all(checks)
+        for name, checks in selected_source_summary_guard_targets.items()
+    }
+    assert selected_source_summary_guard_summary == {
+        name: True for name in selected_source_summary_guard_targets
+    }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
             payload["source_repository_ref"] == source_repository_ref,
@@ -6852,6 +6893,47 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
+    }
+    selected_source_summary_guard_targets = {
+        "report_contract_source_summary_guard_pass": [
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["passed"]
+            is True,
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["expected"]
+            == source_summary,
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"]
+            == source_summary,
+        ],
+        "report_text_source_summary_rendering": [
+            f"- {source_summary}" in payload["text"],
+            source_summary in reasons["items"],
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"]
+            == (source_summary if source_summary in payload["text"] else None),
+        ],
+        "report_contract_source_summary_schema_presence": [
+            "report_text_reflects_source_repository_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_text_reflects_source_repository_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["actual"],
+        ],
+    }
+    selected_source_summary_guard_summary = {
+        name: all(checks)
+        for name, checks in selected_source_summary_guard_targets.items()
+    }
+    assert selected_source_summary_guard_summary == {
+        name: True for name in selected_source_summary_guard_targets
     }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
