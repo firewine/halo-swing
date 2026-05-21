@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.198 P1 Repository SQLite Latest Report Filtered Source Repository Ref Pass Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.197에서 SQLite repository-backed filtered latest report의 report contract guard 자체 schema guard
+`passed` 값들이 실제 emitted guard actual 값과 expected schema 비교에서 파생되는지 묶어서 고정했다.
+이번 slice는 같은 filtered report에서 `source_repository_ref` payload guard `passed` 값들이 실제
+emitted source repository ref keys 및 path-free summary actual 값과 expected 비교에서 직접
+파생되는지 묶어서 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source repository ref keys pass-value coverage
+  - extend SQLite timeframe-filtered source repository ref path-free pass-value coverage
+  - extend SQLite underlying-filtered source repository ref keys pass-value coverage
+  - extend SQLite underlying-filtered source repository ref path-free pass-value coverage
+  - assert filtered source repository ref payload guard output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.85s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 47.50s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.197 P1 Repository SQLite Latest Report Filtered Contract Guard Schema Pass Coverage Gate Record - 2026-05-22
 
 ### A. 목적

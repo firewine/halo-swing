@@ -2669,6 +2669,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == list(payload["source_repository_ref"])
     assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
         "report_payload_source_repository_ref_is_path_free"
     ] == {
         "name": "report_payload_source_repository_ref_is_path_free",
@@ -2696,6 +2706,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for value in source_repository_ref_strings
         ),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_is_path_free"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_repository_ref_is_path_free"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
     ] == {
@@ -4459,6 +4479,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ]["actual"] == list(payload["source_repository_ref"])
     assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
         "report_payload_source_repository_ref_is_path_free"
     ] == {
         "name": "report_payload_source_repository_ref_is_path_free",
@@ -4486,6 +4516,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for value in source_repository_ref_strings
         ),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_is_path_free"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_repository_ref_is_path_free"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
     ] == {
