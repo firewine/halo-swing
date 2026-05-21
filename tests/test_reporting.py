@@ -3807,6 +3807,68 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_side_effect_summary == {
         name: True for name in selected_delivery_side_effect_targets
     }
+    selected_offline_live_data_boundary_targets = {
+        "payload_live_data_required": [
+            payload["live_data_required"] is False,
+        ],
+        "report_payload_live_data_guard": [
+            report_payload_guard_checks[
+                "report_payload_live_data_required_matches_expected"
+            ]["actual"]
+            is False,
+            report_payload_guard_checks[
+                "report_payload_live_data_required_matches_expected"
+            ]["expected"]
+            is False,
+        ],
+        "source_repository_ref_db_required": [
+            payload["source_repository_ref"]["db_required"] is True,
+            evidence_context["source_repository_ref"]["db_required"] is True,
+        ],
+        "source_repository_ref_storage": [
+            payload["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+            evidence_context["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+        ],
+        "delivery_contract_no_live_activation": [
+            channel["network_call"] is False
+            for channel in delivery_contract["channels"].values()
+        ],
+        "delivery_preview_no_live_activation": [
+            channel["network_call"] is False
+            for channel in delivery_preview["channels"].values()
+        ],
+    }
+    selected_offline_live_data_boundary_summary = {
+        name: all(checks)
+        for name, checks in selected_offline_live_data_boundary_targets.items()
+    }
+    assert selected_offline_live_data_boundary_summary == {
+        name: True for name in selected_offline_live_data_boundary_targets
+    }
+    live_activation_markers = [
+        "HALO_SWING_DATABASE_URL",
+        "database_url",
+        "sqlite://",
+    ]
+    selected_offline_live_activation_free_targets = {
+        "source_repository_ref": payload["source_repository_ref"],
+        "evidence_context": evidence_context,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "payload_text": [payload["text"]],
+    }
+    selected_offline_live_activation_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in live_activation_markers
+        )
+        for name, target in selected_offline_live_activation_free_targets.items()
+    }
+    assert selected_offline_live_activation_free_summary == {
+        name: True for name in selected_offline_live_activation_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -6390,6 +6452,68 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_delivery_side_effect_summary == {
         name: True for name in selected_delivery_side_effect_targets
+    }
+    selected_offline_live_data_boundary_targets = {
+        "payload_live_data_required": [
+            payload["live_data_required"] is False,
+        ],
+        "report_payload_live_data_guard": [
+            report_payload_guard_checks[
+                "report_payload_live_data_required_matches_expected"
+            ]["actual"]
+            is False,
+            report_payload_guard_checks[
+                "report_payload_live_data_required_matches_expected"
+            ]["expected"]
+            is False,
+        ],
+        "source_repository_ref_db_required": [
+            payload["source_repository_ref"]["db_required"] is True,
+            evidence_context["source_repository_ref"]["db_required"] is True,
+        ],
+        "source_repository_ref_storage": [
+            payload["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+            evidence_context["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+        ],
+        "delivery_contract_no_live_activation": [
+            channel["network_call"] is False
+            for channel in delivery_contract["channels"].values()
+        ],
+        "delivery_preview_no_live_activation": [
+            channel["network_call"] is False
+            for channel in delivery_preview["channels"].values()
+        ],
+    }
+    selected_offline_live_data_boundary_summary = {
+        name: all(checks)
+        for name, checks in selected_offline_live_data_boundary_targets.items()
+    }
+    assert selected_offline_live_data_boundary_summary == {
+        name: True for name in selected_offline_live_data_boundary_targets
+    }
+    live_activation_markers = [
+        "HALO_SWING_DATABASE_URL",
+        "database_url",
+        "sqlite://",
+    ]
+    selected_offline_live_activation_free_targets = {
+        "source_repository_ref": payload["source_repository_ref"],
+        "evidence_context": evidence_context,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "payload_text": [payload["text"]],
+    }
+    selected_offline_live_activation_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in live_activation_markers
+        )
+        for name, target in selected_offline_live_activation_free_targets.items()
+    }
+    assert selected_offline_live_activation_free_summary == {
+        name: True for name in selected_offline_live_activation_free_targets
     }
     assert all(
         ".sqlite" not in value.lower()
