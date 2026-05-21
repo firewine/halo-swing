@@ -2183,12 +2183,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": {"hermes": False, "telegram": False},
     }
     assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_network_side_effect"
+    ]["actual"] == {
+        name: channel["network_call"]
+        for name, channel in delivery_preview["channels"].items()
+    }
+    assert delivery_preview_guard_checks[
         "delivery_preview_has_no_send_side_effect"
     ] == {
         "name": "delivery_preview_has_no_send_side_effect",
         "passed": True,
         "expected": False,
         "actual": {"hermes": False, "telegram": False},
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_send_side_effect"
+    ]["actual"] == {
+        name: channel.get("send_call", False)
+        for name, channel in delivery_preview["channels"].items()
     }
     assert (
         delivery_preview_guard_checks[
@@ -2281,12 +2293,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": {"hermes": False, "telegram": False},
     }
     assert report_contract_guard_checks[
+        "delivery_contract_has_no_network_side_effect"
+    ]["actual"] == {
+        name: channel["network_call"] for name, channel in delivery_channels.items()
+    }
+    assert report_contract_guard_checks[
         "delivery_contract_has_no_send_side_effect"
     ] == {
         "name": "delivery_contract_has_no_send_side_effect",
         "passed": True,
         "expected": False,
         "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_send_side_effect"
+    ]["actual"] == {
+        name: channel.get("send_call", False)
+        for name, channel in delivery_channels.items()
     }
     assert report_contract_guard_checks[
         "delivery_contract_keys_match_expected_schema"
@@ -3748,12 +3771,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": {"hermes": False, "telegram": False},
     }
     assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_network_side_effect"
+    ]["actual"] == {
+        name: channel["network_call"]
+        for name, channel in delivery_preview["channels"].items()
+    }
+    assert delivery_preview_guard_checks[
         "delivery_preview_has_no_send_side_effect"
     ] == {
         "name": "delivery_preview_has_no_send_side_effect",
         "passed": True,
         "expected": False,
         "actual": {"hermes": False, "telegram": False},
+    }
+    assert delivery_preview_guard_checks[
+        "delivery_preview_has_no_send_side_effect"
+    ]["actual"] == {
+        name: channel.get("send_call", False)
+        for name, channel in delivery_preview["channels"].items()
     }
     assert (
         delivery_preview_guard_checks[
@@ -3846,12 +3881,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": {"hermes": False, "telegram": False},
     }
     assert report_contract_guard_checks[
+        "delivery_contract_has_no_network_side_effect"
+    ]["actual"] == {
+        name: channel["network_call"] for name, channel in delivery_channels.items()
+    }
+    assert report_contract_guard_checks[
         "delivery_contract_has_no_send_side_effect"
     ] == {
         "name": "delivery_contract_has_no_send_side_effect",
         "passed": True,
         "expected": False,
         "actual": {"hermes": False, "telegram": False},
+    }
+    assert report_contract_guard_checks[
+        "delivery_contract_has_no_send_side_effect"
+    ]["actual"] == {
+        name: channel.get("send_call", False)
+        for name, channel in delivery_channels.items()
     }
     assert report_contract_guard_checks[
         "delivery_contract_keys_match_expected_schema"
