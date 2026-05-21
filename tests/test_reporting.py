@@ -4909,6 +4909,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             swing_signal["underlying"],
             "swing_3d_10d",
             swing_signal["action"],
+            source_summary,
             selected_label_summary,
         ]
         + selected_text_trade_plan_tokens
@@ -8859,6 +8860,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             qqq_signal["underlying"],
             qqq_signal["timeframe"],
             qqq_signal["action"],
+            source_summary,
             selected_label_summary,
         ]
         + selected_text_trade_plan_tokens
