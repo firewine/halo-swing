@@ -1396,6 +1396,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_contract_guard": "ok",
         "latest_record_guard": "ok",
     }
+    actual_nested_guard_statuses = {
+        "delivery_preview.guard": delivery_preview["guard"]["status"],
+        "evidence_guard": payload["evidence_guard"]["status"],
+        "report_contract_guard": payload["report_contract_guard"]["status"],
+        "latest_record_guard": latest_record_guard["status"],
+    }
     expected_top_level_identity = {
         "as_of": swing_signal["created_at"],
         "asset": "TQQQ",
@@ -2332,6 +2338,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_nested_guard_statuses,
         "actual": expected_nested_guard_statuses,
     }
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["expected"] == actual_nested_guard_statuses
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["actual"] == actual_nested_guard_statuses
     assert "report_payload_nested_guard_statuses_are_ok" in report_payload_guard_checks[
         "report_payload_guard_check_names_match_expected_schema"
     ]["expected"]
@@ -2542,6 +2554,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "evidence_guard": "ok",
         "report_contract_guard": "ok",
         "latest_record_guard": "ok",
+    }
+    actual_nested_guard_statuses = {
+        "delivery_preview.guard": delivery_preview["guard"]["status"],
+        "evidence_guard": payload["evidence_guard"]["status"],
+        "report_contract_guard": payload["report_contract_guard"]["status"],
+        "latest_record_guard": latest_record_guard["status"],
     }
     expected_top_level_identity = {
         "as_of": qqq_signal["created_at"],
@@ -3479,6 +3497,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_nested_guard_statuses,
         "actual": expected_nested_guard_statuses,
     }
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["expected"] == actual_nested_guard_statuses
+    assert report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]["actual"] == actual_nested_guard_statuses
     assert "report_payload_nested_guard_statuses_are_ok" in report_payload_guard_checks[
         "report_payload_guard_check_names_match_expected_schema"
     ]["expected"]
