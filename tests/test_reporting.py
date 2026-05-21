@@ -2194,6 +2194,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": ["signal_id", "run_id", "config_hash"],
     }
     assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["actual"] == list(payload["source_signal_ref"])
+    assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
     ] == {
         "name": "report_payload_source_signal_ref_matches_report_identity",
@@ -3438,6 +3441,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": ["signal_id", "run_id", "config_hash"],
         "actual": ["signal_id", "run_id", "config_hash"],
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["actual"] == list(payload["source_signal_ref"])
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
     ] == {
