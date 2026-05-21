@@ -3197,6 +3197,35 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons": reasons,
         "payload_text": [payload["text"]],
     }
+    expected_filtered_report_path_free_surface_names = [
+        "label_status",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "evidence_guard_checks",
+        "prompt_contract",
+        "report_intent_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "report_contract_guard_checks",
+        "report_payload_guard_checks",
+        "reasons",
+        "payload_text",
+    ]
+    assert list(filtered_report_path_free_targets) == (
+        expected_filtered_report_path_free_surface_names
+    )
+    filtered_report_path_free_surface_string_counts = {
+        name: len(iter_nested_strings(target))
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert all(
+        count > 0
+        for count in filtered_report_path_free_surface_string_counts.values()
+    )
     filtered_report_path_free_summary = {
         name: all(
             str(database_path) not in value
@@ -5191,6 +5220,35 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons": reasons,
         "payload_text": [payload["text"]],
     }
+    expected_filtered_report_path_free_surface_names = [
+        "label_status",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "evidence_guard_checks",
+        "prompt_contract",
+        "report_intent_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "report_contract_guard_checks",
+        "report_payload_guard_checks",
+        "reasons",
+        "payload_text",
+    ]
+    assert list(filtered_report_path_free_targets) == (
+        expected_filtered_report_path_free_surface_names
+    )
+    filtered_report_path_free_surface_string_counts = {
+        name: len(iter_nested_strings(target))
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert all(
+        count > 0
+        for count in filtered_report_path_free_surface_string_counts.values()
+    )
     filtered_report_path_free_summary = {
         name: all(
             str(database_path) not in value

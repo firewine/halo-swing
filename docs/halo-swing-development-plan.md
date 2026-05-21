@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.204 P1 Repository SQLite Latest Report Filtered Path-Free Surface Schema Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.203에서 SQLite repository-backed filtered latest report의 label, evidence, source refs, guards,
+prompt, intent, delivery, reason, report text surface가 database path 및 SQLite filename을
+노출하지 않는지 emitted output strings 기반 summary로 고정했다. 이번 slice는 같은 summary가
+기대 surface schema를 빠짐없이 포함하고 각 surface가 실제 string 출력을 제공한 뒤에만
+leakage-free check가 통과하도록 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered path-free surface-name schema coverage
+  - extend SQLite timeframe-filtered path-free surface nonempty string-count coverage
+  - extend SQLite underlying-filtered path-free surface-name schema coverage
+  - extend SQLite underlying-filtered path-free surface nonempty string-count coverage
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.81s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.75s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.203 P1 Repository SQLite Latest Report Filtered Path-Free Summary Coverage Gate Record - 2026-05-22
 
 ### A. 목적
