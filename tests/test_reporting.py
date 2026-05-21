@@ -423,6 +423,21 @@ def iter_nested_strings(value: object) -> list[str]:
     return []
 
 
+def iter_nested_keys(value: object) -> list[str]:
+    if isinstance(value, dict):
+        keys: list[str] = []
+        for key, nested in value.items():
+            keys.append(str(key))
+            keys.extend(iter_nested_keys(nested))
+        return keys
+    if isinstance(value, list):
+        keys = []
+        for nested in value:
+            keys.extend(iter_nested_keys(nested))
+        return keys
+    return []
+
+
 def test_latest_signal_report_snapshot_matches_golden() -> None:
     payload = generate_latest_signal_report("TQQQ")
 
@@ -2150,6 +2165,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_source_repository_ref_path_free,
         "actual": expected_source_repository_ref_path_free,
     }
+    source_repository_ref_keys = iter_nested_keys(payload["source_repository_ref"])
+    source_repository_ref_strings = iter_nested_strings(
+        payload["source_repository_ref"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": "ledger_ref" not in source_repository_ref_keys,
+        "omits_ledger_path": "ledger_path" not in source_repository_ref_keys,
+        "omits_database_path": "database_path" not in source_repository_ref_keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in source_repository_ref_strings
+        ),
+    }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
     ] == {
@@ -3374,6 +3409,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_source_repository_ref_path_free,
         "actual": expected_source_repository_ref_path_free,
+    }
+    source_repository_ref_keys = iter_nested_keys(payload["source_repository_ref"])
+    source_repository_ref_strings = iter_nested_strings(
+        payload["source_repository_ref"]
+    )
+    assert report_payload_guard_checks[
+        "report_payload_source_repository_ref_is_path_free"
+    ]["actual"] == {
+        "omits_ledger_ref": "ledger_ref" not in source_repository_ref_keys,
+        "omits_ledger_path": "ledger_path" not in source_repository_ref_keys,
+        "omits_database_path": "database_path" not in source_repository_ref_keys,
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in source_repository_ref_strings
+        ),
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
