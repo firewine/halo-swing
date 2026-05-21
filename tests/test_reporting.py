@@ -1575,6 +1575,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_guard_check_keys_match_expected_schema"
     ] == expected_default_check_keys
     assert report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ] == {
+        "name": "report_payload_optional_context_statuses_are_ok",
+        "passed": True,
+        "expected": {},
+        "actual": {},
+    }
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ] == {
+        "name": "report_payload_optional_context_guards_are_ok",
+        "passed": True,
+        "expected": {},
+        "actual": {},
+    }
+    assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
         "name": "report_payload_nested_guard_statuses_are_ok",
@@ -1941,6 +1957,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert payload_check_keys[
         "report_payload_guard_check_keys_match_expected_schema"
     ] == expected_default_check_keys
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ] == {
+        "name": "report_payload_optional_context_statuses_are_ok",
+        "passed": True,
+        "expected": {},
+        "actual": {},
+    }
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ] == {
+        "name": "report_payload_optional_context_guards_are_ok",
+        "passed": True,
+        "expected": {},
+        "actual": {},
+    }
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
