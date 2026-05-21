@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_FILTER_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_STORAGE_METADATA_EXCLUSION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_FILTER_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_STORAGE_METADATA_EXCLUSION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.239",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected source repository filters exclude filtered-out filter values",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.240",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected source repository storage metadata excludes no-repository fallback metadata",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.238",
+    "docs/halo-swing-development-plan.md#4.239",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected source_repository_ref filters exclude filtered-out timeframe values",
-    "SQLite repository-backed latest report underlying filter validates selected source_repository_ref filters exclude filtered-out underlying values",
-    "latest record guard source_repository_ref expected and actual filters remain selected-filter-only",
-    "rendered repository source summary excludes filtered-out filter text",
+    "SQLite repository-backed latest report timeframe filter validates selected source_repository_ref storage metadata excludes no-repository fallback metadata",
+    "SQLite repository-backed latest report underlying filter validates selected source_repository_ref storage metadata excludes no-repository fallback metadata",
+    "latest record guard source_repository_ref expected and actual storage metadata remain explicit SQLite repository metadata",
+    "rendered repository source summary excludes db_required=false fallback text",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

@@ -4119,6 +4119,51 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
     }
+    selected_source_repository_storage_metadata_exclusion_targets = {
+        "top_level_source_repository_storage_metadata": [
+            payload["source_repository_ref"]["storage"] != "latest_signal_record",
+            payload["source_repository_ref"]["db_required"] is not False,
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            evidence_context["source_repository_ref"]["storage"]
+            != "latest_signal_record",
+            evidence_context["source_repository_ref"]["db_required"] is not False,
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["storage"]
+            != "latest_signal_record",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["db_required"]
+            is not False,
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["storage"]
+            != "latest_signal_record",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["db_required"]
+            is not False,
+        ],
+        "source_summary_storage_metadata_text": [
+            "db_required=false" not in source_summary,
+            "db_required=false" not in payload["text"],
+        ],
+    }
+    selected_source_repository_storage_metadata_exclusion_summary = {
+        name: all(checks)
+        for name, checks in (
+            selected_source_repository_storage_metadata_exclusion_targets.items()
+        )
+    }
+    assert selected_source_repository_storage_metadata_exclusion_summary == {
+        name: True
+        for name in selected_source_repository_storage_metadata_exclusion_targets
+    }
     selected_source_repository_guard_pass_targets = {
         "latest_record_source_repository_ref_guards": [
             latest_record_guard["status"] == "ok",
@@ -7643,6 +7688,51 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
+    }
+    selected_source_repository_storage_metadata_exclusion_targets = {
+        "top_level_source_repository_storage_metadata": [
+            payload["source_repository_ref"]["storage"] != "latest_signal_record",
+            payload["source_repository_ref"]["db_required"] is not False,
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            evidence_context["source_repository_ref"]["storage"]
+            != "latest_signal_record",
+            evidence_context["source_repository_ref"]["db_required"] is not False,
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["storage"]
+            != "latest_signal_record",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["db_required"]
+            is not False,
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["storage"]
+            != "latest_signal_record",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["db_required"]
+            is not False,
+        ],
+        "source_summary_storage_metadata_text": [
+            "db_required=false" not in source_summary,
+            "db_required=false" not in payload["text"],
+        ],
+    }
+    selected_source_repository_storage_metadata_exclusion_summary = {
+        name: all(checks)
+        for name, checks in (
+            selected_source_repository_storage_metadata_exclusion_targets.items()
+        )
+    }
+    assert selected_source_repository_storage_metadata_exclusion_summary == {
+        name: True
+        for name in selected_source_repository_storage_metadata_exclusion_targets
     }
     selected_source_repository_guard_pass_targets = {
         "latest_record_source_repository_ref_guards": [

@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.240 P1 Repository SQLite Latest Report Source Repository Storage Metadata Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.239에서 SQLite repository-backed filtered latest report의 selected source repository filter
+exclusion을 고정했다. 이번 slice는 explicit SQLite repository-backed report가 no-repository fallback
+storage metadata로 퇴행하지 않는지 고정한다. top-level/evidence context source_repository_ref와
+latest record guard expected/actual storage metadata는 explicit SQLite repository metadata를 유지해야
+하며, rendered repository source summary에는 `db_required=false` fallback text가 없어야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source_repository_ref storage metadata exclusion coverage
+  - extend SQLite underlying-filtered source_repository_ref storage metadata exclusion coverage
+  - assert top-level and evidence context source_repository_ref storage metadata exclude no-repository fallback metadata
+  - assert latest record guard source_repository_ref expected/actual storage metadata remain explicit SQLite repository metadata
+  - assert rendered repository source summary excludes db_required=false fallback text
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.09s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.65s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.239 P1 Repository SQLite Latest Report Source Repository Filter Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적
