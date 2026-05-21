@@ -4794,6 +4794,45 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
     }
+    risk_warning_hermes_boundary_tokens = (
+        evidence_context["risk_warnings"]
+        + excluded_evidence_tokens
+        + [
+            swing_signal["signal_id"],
+            alternate_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+    )
+    risk_warning_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    risk_warning_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in risk_warning_hermes_boundary_tokens
+        )
+        for name, target in risk_warning_hermes_boundary_targets.items()
+    }
+    assert risk_warning_hermes_boundary_summary == {
+        name: True for name in risk_warning_hermes_boundary_targets
+    }
     excluded_degradation_tokens = [
         token
         for excluded_signal in (alternate_signal, older_matching_signal)
@@ -8865,6 +8904,45 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
+    }
+    risk_warning_hermes_boundary_tokens = (
+        evidence_context["risk_warnings"]
+        + excluded_evidence_tokens
+        + [
+            qqq_signal["signal_id"],
+            ndx_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+    )
+    risk_warning_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    risk_warning_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in risk_warning_hermes_boundary_tokens
+        )
+        for name, target in risk_warning_hermes_boundary_targets.items()
+    }
+    assert risk_warning_hermes_boundary_summary == {
+        name: True for name in risk_warning_hermes_boundary_targets
     }
     excluded_degradation_tokens = [
         token
