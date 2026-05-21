@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.183 P1 Repository SQLite Latest Report Filtered Intent Prompt Contract Actual Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.182에서 SQLite repository-backed filtered latest report의 `latest_record_guard` source metadata
+checks와 `evidence_latest_record_guard_check_names_match_expected_schema.actual`이 실제 emitted
+source 및 guard checks에서 파생되는지 묶어서 고정했다. 이번 slice는 같은 filtered report에서
+`report_intent_contract`와 `prompt_contract` 관련 report contract guard actual 값들이 실제
+emitted contracts에서 직접 파생되는지 묶어서 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered report_intent_contract key actual-value coverage
+  - extend SQLite timeframe-filtered report_intent_contract registry actual-value coverage
+  - extend SQLite timeframe-filtered prompt_contract key and identity actual-value coverage
+  - extend SQLite underlying-filtered report_intent_contract key actual-value coverage
+  - extend SQLite underlying-filtered report_intent_contract registry actual-value coverage
+  - extend SQLite underlying-filtered prompt_contract key and identity actual-value coverage
+  - assert filtered intent and prompt contract actual-value output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.87s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 47.01s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.182 P1 Repository SQLite Latest Report Filtered Latest Record Source Actual Coverage Gate Record - 2026-05-21
 
 ### A. 목적

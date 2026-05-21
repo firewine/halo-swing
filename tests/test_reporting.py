@@ -2038,6 +2038,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": delivery_contract["cron_intents"],
         "actual": "pre_market_swing_report",
     }
+    assert report_contract_guard_checks["report_intent_is_supported"][
+        "actual"
+    ] == payload["report_intent"]
     assert report_contract_guard_checks[
         "report_intent_contract_keys_match_expected_schema"
     ] == {
@@ -2047,6 +2050,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": ["name", "schedule_hint", "decision_focus", "required_sections"],
     }
     assert report_contract_guard_checks[
+        "report_intent_contract_keys_match_expected_schema"
+    ]["actual"] == list(report_intent_contract)
+    assert report_contract_guard_checks[
         "report_intent_contract_matches_registry"
     ] == {
         "name": "report_intent_contract_matches_registry",
@@ -2054,12 +2060,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_report_intent_contract,
         "actual": expected_report_intent_contract,
     }
+    assert report_contract_guard_checks[
+        "report_intent_contract_matches_registry"
+    ]["actual"] == report_intent_contract
     assert report_contract_guard_checks["prompt_must_include_is_covered"] == {
         "name": "prompt_must_include_is_covered",
         "passed": True,
         "expected": expected_prompt_terms,
         "actual": expected_prompt_terms,
     }
+    assert report_contract_guard_checks["prompt_must_include_is_covered"][
+        "actual"
+    ] == prompt_contract["must_include"]
     assert report_contract_guard_checks[
         "report_prompt_must_include_matches_intent_terms"
     ] == {
@@ -2069,6 +2081,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_prompt_terms,
     }
     assert report_contract_guard_checks[
+        "report_prompt_must_include_matches_intent_terms"
+    ]["actual"] == prompt_contract["must_include"]
+    assert report_contract_guard_checks[
         "report_prompt_contract_keys_match_expected_schema"
     ] == {
         "name": "report_prompt_contract_keys_match_expected_schema",
@@ -2077,12 +2092,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": ["numeric_authority", "llm_role", "must_include"],
     }
     assert report_contract_guard_checks[
+        "report_prompt_contract_keys_match_expected_schema"
+    ]["actual"] == list(prompt_contract)
+    assert report_contract_guard_checks[
         "report_prompt_contract_identity_matches_expected"
     ] == {
         "name": "report_prompt_contract_identity_matches_expected",
         "passed": True,
         "expected": expected_prompt_identity,
         "actual": expected_prompt_identity,
+    }
+    assert report_contract_guard_checks[
+        "report_prompt_contract_identity_matches_expected"
+    ]["actual"] == {
+        "numeric_authority": prompt_contract["numeric_authority"],
+        "llm_role": prompt_contract["llm_role"],
     }
     assert "report_prompt_contract_identity_matches_expected" in (
         report_contract_guard_checks[
@@ -3543,6 +3567,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": delivery_contract["cron_intents"],
         "actual": "pre_market_swing_report",
     }
+    assert report_contract_guard_checks["report_intent_is_supported"][
+        "actual"
+    ] == payload["report_intent"]
     assert report_contract_guard_checks[
         "report_intent_contract_keys_match_expected_schema"
     ] == {
@@ -3552,6 +3579,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": ["name", "schedule_hint", "decision_focus", "required_sections"],
     }
     assert report_contract_guard_checks[
+        "report_intent_contract_keys_match_expected_schema"
+    ]["actual"] == list(report_intent_contract)
+    assert report_contract_guard_checks[
         "report_intent_contract_matches_registry"
     ] == {
         "name": "report_intent_contract_matches_registry",
@@ -3559,12 +3589,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_report_intent_contract,
         "actual": expected_report_intent_contract,
     }
+    assert report_contract_guard_checks[
+        "report_intent_contract_matches_registry"
+    ]["actual"] == report_intent_contract
     assert report_contract_guard_checks["prompt_must_include_is_covered"] == {
         "name": "prompt_must_include_is_covered",
         "passed": True,
         "expected": expected_prompt_terms,
         "actual": expected_prompt_terms,
     }
+    assert report_contract_guard_checks["prompt_must_include_is_covered"][
+        "actual"
+    ] == prompt_contract["must_include"]
     assert report_contract_guard_checks[
         "report_prompt_must_include_matches_intent_terms"
     ] == {
@@ -3574,6 +3610,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": expected_prompt_terms,
     }
     assert report_contract_guard_checks[
+        "report_prompt_must_include_matches_intent_terms"
+    ]["actual"] == prompt_contract["must_include"]
+    assert report_contract_guard_checks[
         "report_prompt_contract_keys_match_expected_schema"
     ] == {
         "name": "report_prompt_contract_keys_match_expected_schema",
@@ -3582,12 +3621,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": ["numeric_authority", "llm_role", "must_include"],
     }
     assert report_contract_guard_checks[
+        "report_prompt_contract_keys_match_expected_schema"
+    ]["actual"] == list(prompt_contract)
+    assert report_contract_guard_checks[
         "report_prompt_contract_identity_matches_expected"
     ] == {
         "name": "report_prompt_contract_identity_matches_expected",
         "passed": True,
         "expected": expected_prompt_identity,
         "actual": expected_prompt_identity,
+    }
+    assert report_contract_guard_checks[
+        "report_prompt_contract_identity_matches_expected"
+    ]["actual"] == {
+        "numeric_authority": prompt_contract["numeric_authority"],
+        "llm_role": prompt_contract["llm_role"],
     }
     assert "report_prompt_contract_identity_matches_expected" in (
         report_contract_guard_checks[
