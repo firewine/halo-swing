@@ -28,6 +28,64 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.133 P1 Repository SQLite Latest Report Filtered Component Extremes Guard Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.132에서 SQLite repository-backed filtered latest report의 evidence cautions/conflict guard를
+고정했다. 이번 slice는 같은 filtered report에서 `evidence_context.component_extremes`가
+선택된 repository signal의 component scores에서 만들어지고, `event_risk`를 제외한 strongest,
+weakest, spread 의미를 유지하며, repository path details를 노출하지 않는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered component extremes guard coverage
+  - extend SQLite underlying-filtered component extremes guard coverage
+  - assert filtered component_extremes output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+verification:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task mirror diff passed
+  - task JSON validation passed
+  - git diff --check passed
+  - focused filtered component extremes guard coverage tests: 3 passed
+  - full pytest: 935 passed in 39.69s
+  - ruff check passed
+  - health_check status ok
+next_state: continue with next explicit repository or report read-model slice
+```
+
 ## 4.132 P1 Repository SQLite Latest Report Filtered Evidence Cautions Guard Coverage Gate Record - 2026-05-21
 
 ### A. 목적

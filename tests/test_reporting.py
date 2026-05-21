@@ -1505,9 +1505,47 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "confidence_line_present": True,
         "score_line_present": True,
     }
+    selected_component_scores = {
+        key: float(value)
+        for key, value in swing_signal["component_scores"].items()
+        if key != "event_risk"
+    }
+    strongest_component = max(
+        selected_component_scores,
+        key=selected_component_scores.get,
+    )
+    weakest_component = min(
+        selected_component_scores,
+        key=selected_component_scores.get,
+    )
+    expected_component_extremes = {
+        "strongest": {
+            "name": strongest_component,
+            "score": round(selected_component_scores[strongest_component], 4),
+        },
+        "weakest": {
+            "name": weakest_component,
+            "score": round(selected_component_scores[weakest_component], 4),
+        },
+        "spread": round(
+            selected_component_scores[strongest_component]
+            - selected_component_scores[weakest_component],
+            4,
+        ),
+    }
 
     assert evidence_contract == expected_evidence_contract
     assert evidence_context["source_repository_ref"] == source_repository_ref
+    assert evidence_context["component_extremes"] == expected_component_extremes
+    assert evidence_context["component_extremes"]["spread"] > 0
+    assert evidence_context["component_extremes"]["strongest"]["name"] in (
+        selected_component_scores
+    )
+    assert evidence_context["component_extremes"]["weakest"]["name"] in (
+        selected_component_scores
+    )
+    assert evidence_context["component_extremes"]["strongest"]["name"] != "event_risk"
+    assert evidence_context["component_extremes"]["weakest"]["name"] != "event_risk"
     assert (
         len(evidence_context["reason_summary"])
         <= evidence_contract["max_reason_summary_chars"]
@@ -2422,9 +2460,47 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "confidence_line_present": True,
         "score_line_present": True,
     }
+    selected_component_scores = {
+        key: float(value)
+        for key, value in qqq_signal["component_scores"].items()
+        if key != "event_risk"
+    }
+    strongest_component = max(
+        selected_component_scores,
+        key=selected_component_scores.get,
+    )
+    weakest_component = min(
+        selected_component_scores,
+        key=selected_component_scores.get,
+    )
+    expected_component_extremes = {
+        "strongest": {
+            "name": strongest_component,
+            "score": round(selected_component_scores[strongest_component], 4),
+        },
+        "weakest": {
+            "name": weakest_component,
+            "score": round(selected_component_scores[weakest_component], 4),
+        },
+        "spread": round(
+            selected_component_scores[strongest_component]
+            - selected_component_scores[weakest_component],
+            4,
+        ),
+    }
 
     assert evidence_contract == expected_evidence_contract
     assert evidence_context["source_repository_ref"] == source_repository_ref
+    assert evidence_context["component_extremes"] == expected_component_extremes
+    assert evidence_context["component_extremes"]["spread"] > 0
+    assert evidence_context["component_extremes"]["strongest"]["name"] in (
+        selected_component_scores
+    )
+    assert evidence_context["component_extremes"]["weakest"]["name"] in (
+        selected_component_scores
+    )
+    assert evidence_context["component_extremes"]["strongest"]["name"] != "event_risk"
+    assert evidence_context["component_extremes"]["weakest"]["name"] != "event_risk"
     assert (
         len(evidence_context["reason_summary"])
         <= evidence_contract["max_reason_summary_chars"]
