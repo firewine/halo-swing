@@ -2426,6 +2426,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": {},
         "actual": {},
     }
+    actual_optional_context_statuses = {
+        key: payload[key]["status"]
+        for key in ("chart_code_guard", "multimodal_context")
+        if key in payload
+    }
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ]["actual"] == actual_optional_context_statuses
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ] == {
@@ -2434,6 +2442,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": {},
         "actual": {},
     }
+    actual_optional_context_guard_statuses = {
+        key: payload[key]["status"]
+        for key in ("chart_code_guard",)
+        if key in payload
+    }
+    if "multimodal_context" in payload:
+        actual_optional_context_guard_statuses["multimodal_context.guard"] = payload[
+            "multimodal_context"
+        ]["guard"]["status"]
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ]["actual"] == actual_optional_context_guard_statuses
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
@@ -3674,6 +3694,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": {},
         "actual": {},
     }
+    actual_optional_context_statuses = {
+        key: payload[key]["status"]
+        for key in ("chart_code_guard", "multimodal_context")
+        if key in payload
+    }
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ]["actual"] == actual_optional_context_statuses
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ] == {
@@ -3682,6 +3710,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": {},
         "actual": {},
     }
+    actual_optional_context_guard_statuses = {
+        key: payload[key]["status"]
+        for key in ("chart_code_guard",)
+        if key in payload
+    }
+    if "multimodal_context" in payload:
+        actual_optional_context_guard_statuses["multimodal_context.guard"] = payload[
+            "multimodal_context"
+        ]["guard"]["status"]
+    assert report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ]["actual"] == actual_optional_context_guard_statuses
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
