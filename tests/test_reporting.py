@@ -1367,6 +1367,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action": swing_signal["action"],
         "confidence_label": payload["confidence_label"],
     }
+    expected_payload_keys = [
+        "schema_version",
+        "as_of",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "confidence_label",
+        "report_intent",
+        "latest_signal_report",
+        "sections",
+        "text",
+        "prompt_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_guard",
+        "report_intent_contract",
+        "report_contract_guard",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "live_data_required",
+        "report_payload_guard",
+    ]
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1508,6 +1534,19 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    assert report_payload_guard_checks["report_payload_keys_match_expected_schema"] == {
+        "name": "report_payload_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_payload_keys,
+        "actual": expected_payload_keys,
+    }
+    assert payload["source_repository_ref"] == source_repository_ref
+    assert "source_repository_ref" in report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["actual"]
+    assert "latest_record_guard" in report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["actual"]
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
@@ -1668,6 +1707,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action": qqq_signal["action"],
         "confidence_label": payload["confidence_label"],
     }
+    expected_payload_keys = [
+        "schema_version",
+        "as_of",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "confidence_label",
+        "report_intent",
+        "latest_signal_report",
+        "sections",
+        "text",
+        "prompt_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_guard",
+        "report_intent_contract",
+        "report_contract_guard",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "live_data_required",
+        "report_payload_guard",
+    ]
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -1809,6 +1874,19 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    assert report_payload_guard_checks["report_payload_keys_match_expected_schema"] == {
+        "name": "report_payload_keys_match_expected_schema",
+        "passed": True,
+        "expected": expected_payload_keys,
+        "actual": expected_payload_keys,
+    }
+    assert payload["source_repository_ref"] == source_repository_ref
+    assert "source_repository_ref" in report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["actual"]
+    assert "latest_record_guard" in report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["actual"]
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
