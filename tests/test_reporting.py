@@ -2183,6 +2183,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         )
         == payload["text"]
     )
+    assert delivery_preview_guard_checks["telegram_format_schema_declared"][
+        "actual"
+    ] == telegram_preview["schema_version"]
+    assert delivery_preview_guard_checks["telegram_chunks_fit_max_chars"][
+        "expected_max_chars"
+    ] == telegram_preview["max_chars"]
+    assert delivery_preview_guard_checks["telegram_chunks_fit_max_chars"][
+        "actual_chars"
+    ] == [chunk["chars"] for chunk in telegram_preview["chunks"]]
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
@@ -3780,6 +3789,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         )
         == payload["text"]
     )
+    assert delivery_preview_guard_checks["telegram_format_schema_declared"][
+        "actual"
+    ] == telegram_preview["schema_version"]
+    assert delivery_preview_guard_checks["telegram_chunks_fit_max_chars"][
+        "expected_max_chars"
+    ] == telegram_preview["max_chars"]
+    assert delivery_preview_guard_checks["telegram_chunks_fit_max_chars"][
+        "actual_chars"
+    ] == [chunk["chars"] for chunk in telegram_preview["chunks"]]
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
