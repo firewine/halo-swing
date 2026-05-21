@@ -2168,6 +2168,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert payload_check_keys[
         "report_payload_source_repository_ref_is_path_free"
     ] == expected_default_check_keys
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["passed"] is True
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["expected"] == expected_default_check_keys
+    assert all(
+        check_keys == expected_default_check_keys
+        for check_keys in payload_check_keys.values()
+    )
     assert payload_check_keys[
         "report_payload_keys_match_expected_schema"
     ] == expected_default_check_keys
@@ -3181,6 +3191,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert payload_check_keys[
         "report_payload_source_repository_ref_is_path_free"
     ] == expected_default_check_keys
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["passed"] is True
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["expected"] == expected_default_check_keys
+    assert all(
+        check_keys == expected_default_check_keys
+        for check_keys in payload_check_keys.values()
+    )
     assert payload_check_keys[
         "report_payload_keys_match_expected_schema"
     ] == expected_default_check_keys
