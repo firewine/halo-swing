@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.234 P1 Repository SQLite Latest Report Label Summary Guard Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.233에서 SQLite repository-backed filtered latest report의 selected source summary exclusion을
+고정했다. 이번 slice는 selected label summary가 report contract guard, reasons, rendered report text
+surfaces에서 일관되게 보존되고, guard `passed`, `expected`, `actual` 값이 rendered label summary
+text와 정렬되는지 summary 형태로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered label summary guard coverage
+  - extend SQLite underlying-filtered label summary guard coverage
+  - assert report_text_reflects_label_status_summary keeps passed=true
+  - assert label summary guard expected/actual values match rendered label summary text
+  - assert label summary remains present in reasons and report text bullet rendering
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.49s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.233 P1 Repository SQLite Latest Report Source Summary Filter Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적

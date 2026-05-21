@@ -3565,6 +3565,51 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
     }
+    selected_label_summary_guard_targets = {
+        "report_contract_label_summary_guard_pass": [
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["passed"]
+            is True,
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["expected"]
+            == selected_label_summary,
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"]
+            == selected_label_summary,
+        ],
+        "report_text_label_summary_rendering": [
+            f"- {selected_label_summary}" in payload["text"],
+            selected_label_summary in reasons["items"],
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"]
+            == (
+                selected_label_summary
+                if selected_label_summary in payload["text"]
+                else None
+            ),
+        ],
+        "report_contract_label_summary_schema_presence": [
+            "report_text_reflects_label_status_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_text_reflects_label_status_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["actual"],
+        ],
+    }
+    selected_label_summary_guard_summary = {
+        name: all(checks)
+        for name, checks in selected_label_summary_guard_targets.items()
+    }
+    assert selected_label_summary_guard_summary == {
+        name: True for name in selected_label_summary_guard_targets
+    }
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
             label_status[field] == selected_label[field]
@@ -6857,6 +6902,51 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
+    }
+    selected_label_summary_guard_targets = {
+        "report_contract_label_summary_guard_pass": [
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["passed"]
+            is True,
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["expected"]
+            == selected_label_summary,
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"]
+            == selected_label_summary,
+        ],
+        "report_text_label_summary_rendering": [
+            f"- {selected_label_summary}" in payload["text"],
+            selected_label_summary in reasons["items"],
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"]
+            == (
+                selected_label_summary
+                if selected_label_summary in payload["text"]
+                else None
+            ),
+        ],
+        "report_contract_label_summary_schema_presence": [
+            "report_text_reflects_label_status_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_text_reflects_label_status_summary"
+            in report_contract_guard_checks[
+                "report_contract_guard_check_names_match_expected_schema"
+            ]["actual"],
+        ],
+    }
+    selected_label_summary_guard_summary = {
+        name: all(checks)
+        for name, checks in selected_label_summary_guard_targets.items()
+    }
+    assert selected_label_summary_guard_summary == {
+        name: True for name in selected_label_summary_guard_targets
     }
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
