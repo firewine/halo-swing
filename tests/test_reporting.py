@@ -1766,12 +1766,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": ["status", "checks"],
         "actual": ["status", "checks"],
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["evidence_context"]["latest_record_guard"])
     assert evidence_guard_checks["evidence_latest_record_guard_status_is_ok"] == {
         "name": "evidence_latest_record_guard_status_is_ok",
         "passed": True,
         "expected": "ok",
         "actual": "ok",
     }
+    assert evidence_guard_checks["evidence_latest_record_guard_status_is_ok"][
+        "actual"
+    ] == payload["evidence_context"]["latest_record_guard"]["status"]
     assert evidence_guard_checks[
         "evidence_latest_record_guard_check_names_match_expected_schema"
     ] == {
@@ -2907,12 +2913,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": ["status", "checks"],
         "actual": ["status", "checks"],
     }
+    assert evidence_guard_checks[
+        "evidence_latest_record_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["evidence_context"]["latest_record_guard"])
     assert evidence_guard_checks["evidence_latest_record_guard_status_is_ok"] == {
         "name": "evidence_latest_record_guard_status_is_ok",
         "passed": True,
         "expected": "ok",
         "actual": "ok",
     }
+    assert evidence_guard_checks["evidence_latest_record_guard_status_is_ok"][
+        "actual"
+    ] == payload["evidence_context"]["latest_record_guard"]["status"]
     assert evidence_guard_checks[
         "evidence_latest_record_guard_check_names_match_expected_schema"
     ] == {
