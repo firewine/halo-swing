@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_REF_PASS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_IDENTITY_PASS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_REF_PASS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PAYLOAD_IDENTITY_PASS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.199",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving source signal ref payload guard pass values are derived from emitted ref actual values",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.200",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving payload identity guard pass values are derived from emitted payload actual values",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.198",
+    "docs/halo-swing-development-plan.md#4.199",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates source signal ref payload guard pass values match emitted ref actual values",
-    "SQLite repository-backed latest report underlying filter validates source signal ref payload guard pass values match emitted ref actual values",
-    "filtered source signal ref payload guard pass values remain derived from emitted ref keys, report identity, traceable format, and sha256 digest summary",
-    "filtered source signal ref payload guard output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates payload identity guard pass values match emitted payload actual values",
+    "SQLite repository-backed latest report underlying filter validates payload identity guard pass values match emitted payload actual values",
+    "filtered payload identity guard pass values remain derived from emitted report intent, top-level identity, schema version, and live data required values",
+    "filtered payload identity guard output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

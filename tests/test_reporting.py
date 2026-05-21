@@ -2828,6 +2828,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks["report_payload_intent_matches_contract"][
         "actual"
     ] == payload["report_intent"]
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"][
+        "passed"
+    ] == (
+        report_payload_guard_checks["report_payload_intent_matches_contract"][
+            "actual"
+        ]
+        == report_payload_guard_checks["report_payload_intent_matches_contract"][
+            "expected"
+        ]
+    )
     assert "report_payload_intent_matches_contract" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -2852,6 +2862,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_top_level_identity_matches_latest_signal_report"
     ]["actual"] == actual_top_level_identity
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ]["expected"]
+    )
     assert "report_payload_top_level_identity_matches_latest_signal_report" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -2869,6 +2889,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_schema_version_matches_expected"
     ]["actual"] == payload["schema_version"]
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_schema_version_matches_expected"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_schema_version_matches_expected"
+        ]["expected"]
+    )
     assert "report_payload_schema_version_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -2894,6 +2924,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_live_data_required_matches_expected"
     ]["actual"] is payload["live_data_required"]
+    assert report_payload_guard_checks[
+        "report_payload_live_data_required_matches_expected"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["expected"]
+    )
     assert "report_payload_live_data_required_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -4678,6 +4718,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks["report_payload_intent_matches_contract"][
         "actual"
     ] == payload["report_intent"]
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"][
+        "passed"
+    ] == (
+        report_payload_guard_checks["report_payload_intent_matches_contract"][
+            "actual"
+        ]
+        == report_payload_guard_checks["report_payload_intent_matches_contract"][
+            "expected"
+        ]
+    )
     assert "report_payload_intent_matches_contract" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -4702,6 +4752,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_top_level_identity_matches_latest_signal_report"
     ]["actual"] == actual_top_level_identity
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_top_level_identity_matches_latest_signal_report"
+        ]["expected"]
+    )
     assert "report_payload_top_level_identity_matches_latest_signal_report" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -4719,6 +4779,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_schema_version_matches_expected"
     ]["actual"] == payload["schema_version"]
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_schema_version_matches_expected"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_schema_version_matches_expected"
+        ]["expected"]
+    )
     assert "report_payload_schema_version_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -4744,6 +4814,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_live_data_required_matches_expected"
     ]["actual"] is payload["live_data_required"]
+    assert report_payload_guard_checks[
+        "report_payload_live_data_required_matches_expected"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["expected"]
+    )
     assert "report_payload_live_data_required_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
