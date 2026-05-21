@@ -3836,12 +3836,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True for name in selected_label_status_guard_pass_targets
     }
     excluded_label_statuses = [alternate_label, older_matching_label]
+    label_status_detail_fields = (
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+    )
     selected_label_status_guard_exclusion_targets = {
         "evidence_guard_label_status_expected": [
             label_status_guard_check["expected"]["signal_id"]
             != excluded_label["signal_id"]
             and label_status_guard_check["expected"]["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status_guard_check["expected"][field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "evidence_guard_label_status_actual": [
@@ -3849,18 +3860,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             != excluded_label["signal_id"]
             and label_status_guard_check["actual"]["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status_guard_check["actual"][field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "latest_signal_report_label_status": [
             label_status["signal_id"] != excluded_label["signal_id"]
             and label_status["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status[field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "evidence_context_label_status": [
             evidence_label_status["signal_id"] != excluded_label["signal_id"]
             and evidence_label_status["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                evidence_label_status[field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
     }
@@ -7755,12 +7778,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in selected_label_status_guard_pass_targets
     }
     excluded_label_statuses = [alternate_label, older_matching_label]
+    label_status_detail_fields = (
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+    )
     selected_label_status_guard_exclusion_targets = {
         "evidence_guard_label_status_expected": [
             label_status_guard_check["expected"]["signal_id"]
             != excluded_label["signal_id"]
             and label_status_guard_check["expected"]["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status_guard_check["expected"][field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "evidence_guard_label_status_actual": [
@@ -7768,18 +7802,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             != excluded_label["signal_id"]
             and label_status_guard_check["actual"]["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status_guard_check["actual"][field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "latest_signal_report_label_status": [
             label_status["signal_id"] != excluded_label["signal_id"]
             and label_status["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                label_status[field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
         "evidence_context_label_status": [
             evidence_label_status["signal_id"] != excluded_label["signal_id"]
             and evidence_label_status["time_barrier_days"]
             != excluded_label["time_barrier_days"]
+            and any(
+                evidence_label_status[field] != excluded_label[field]
+                for field in label_status_detail_fields
+            )
             for excluded_label in excluded_label_statuses
         ],
     }
