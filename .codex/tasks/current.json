@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_NESTED_GUARD_STATUS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TOP_LEVEL_IDENTITY_GUARD_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_NESTED_GUARD_STATUS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TOP_LEVEL_IDENTITY_GUARD_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.120",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered report_payload_guard nested guard status coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.121",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered report_payload_guard top-level identity coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.119",
+    "docs/halo-swing-development-plan.md#4.120",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter report_payload_guard validates nested guard statuses including latest_record_guard",
-    "SQLite repository-backed latest report underlying filter report_payload_guard validates nested guard statuses including latest_record_guard",
-    "filtered nested guard status checks remain path-free and omit database path details",
+    "SQLite repository-backed latest report timeframe filter report_payload_guard validates top-level identity for the selected record",
+    "SQLite repository-backed latest report underlying filter report_payload_guard validates top-level identity for the selected record",
+    "filtered top-level identity guard checks remain path-free and omit database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

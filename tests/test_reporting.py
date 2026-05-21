@@ -1359,6 +1359,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_contract_guard": "ok",
         "latest_record_guard": "ok",
     }
+    expected_top_level_identity = {
+        "as_of": swing_signal["created_at"],
+        "asset": "TQQQ",
+        "underlying": swing_signal["underlying"],
+        "timeframe": "swing_3d_10d",
+        "action": swing_signal["action"],
+        "confidence_label": payload["confidence_label"],
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1487,6 +1495,19 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ] == {
+        "name": "report_payload_top_level_identity_matches_latest_signal_report",
+        "passed": True,
+        "expected": expected_top_level_identity,
+        "actual": expected_top_level_identity,
+    }
+    assert "report_payload_top_level_identity_matches_latest_signal_report" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
@@ -1639,6 +1660,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_contract_guard": "ok",
         "latest_record_guard": "ok",
     }
+    expected_top_level_identity = {
+        "as_of": qqq_signal["created_at"],
+        "asset": "TQQQ",
+        "underlying": "QQQ",
+        "timeframe": qqq_signal["timeframe"],
+        "action": qqq_signal["action"],
+        "confidence_label": payload["confidence_label"],
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -1767,6 +1796,19 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash_digest_length": 64,
         "config_hash_digest_hex": True,
     }
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ] == {
+        "name": "report_payload_top_level_identity_matches_latest_signal_report",
+        "passed": True,
+        "expected": expected_top_level_identity,
+        "actual": expected_top_level_identity,
+    }
+    assert "report_payload_top_level_identity_matches_latest_signal_report" in (
+        report_payload_guard_checks[
+            "report_payload_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ] == {
