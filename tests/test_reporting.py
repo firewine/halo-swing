@@ -2206,6 +2206,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         header for header in unrequested_section_headers
         if header in reconstructed_telegram_text
     ]
+    assert delivery_preview_guard_checks[
+        "telegram_single_message_flag_matches_chunk_count"
+    ]["expected"] == (len(telegram_preview["chunks"]) == 1)
+    assert delivery_preview_guard_checks[
+        "telegram_single_message_flag_matches_chunk_count"
+    ]["actual"] == telegram_preview["fits_single_message"]
+    assert delivery_preview_guard_checks["telegram_chunks_preserve_text"][
+        "passed"
+    ] == (reconstructed_telegram_text == payload["text"])
     assert delivery_preview_guard_checks["telegram_format_schema_declared"][
         "actual"
     ] == telegram_preview["schema_version"]
@@ -3878,6 +3887,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         header for header in unrequested_section_headers
         if header in reconstructed_telegram_text
     ]
+    assert delivery_preview_guard_checks[
+        "telegram_single_message_flag_matches_chunk_count"
+    ]["expected"] == (len(telegram_preview["chunks"]) == 1)
+    assert delivery_preview_guard_checks[
+        "telegram_single_message_flag_matches_chunk_count"
+    ]["actual"] == telegram_preview["fits_single_message"]
+    assert delivery_preview_guard_checks["telegram_chunks_preserve_text"][
+        "passed"
+    ] == (reconstructed_telegram_text == payload["text"])
     assert delivery_preview_guard_checks["telegram_format_schema_declared"][
         "actual"
     ] == telegram_preview["schema_version"]
