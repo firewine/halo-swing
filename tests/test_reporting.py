@@ -2956,6 +2956,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
     ]["actual"] == list(payload)
+    assert report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_keys_match_expected_schema"
+        ]["expected"]
+    )
     assert list(payload["report_payload_guard"]) == ["status", "checks"]
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
@@ -2968,6 +2978,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["actual"] == list(payload["report_payload_guard"])
+    assert report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_guard_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_guard_keys_match_expected_schema"
+        ]["expected"]
+    )
     assert "report_payload_guard_keys_match_expected_schema" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -2983,6 +3003,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_payload_check_names,
     }
     assert payload_check_names["actual"] == actual_payload_check_names
+    assert payload_check_names["passed"] == (
+        payload_check_names["actual"] == payload_check_names["expected"]
+    )
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
@@ -3019,6 +3042,19 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_default_check_keys,
         "actual": expected_payload_check_keys,
     }
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["passed"] == (
+        all(
+            check_keys
+            == report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["expected"]
+            for check_keys in report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"].values()
+        )
+    )
     assert all(
         check_keys == expected_default_check_keys
         for check_keys in payload_check_keys.values()
@@ -4846,6 +4882,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
     ]["actual"] == list(payload)
+    assert report_payload_guard_checks[
+        "report_payload_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_keys_match_expected_schema"
+        ]["expected"]
+    )
     assert list(payload["report_payload_guard"]) == ["status", "checks"]
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
@@ -4858,6 +4904,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["actual"] == list(payload["report_payload_guard"])
+    assert report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_guard_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_guard_keys_match_expected_schema"
+        ]["expected"]
+    )
     assert "report_payload_guard_keys_match_expected_schema" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -4873,6 +4929,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": expected_payload_check_names,
     }
     assert payload_check_names["actual"] == actual_payload_check_names
+    assert payload_check_names["passed"] == (
+        payload_check_names["actual"] == payload_check_names["expected"]
+    )
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
@@ -4909,6 +4968,19 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_default_check_keys,
         "actual": expected_payload_check_keys,
     }
+    assert report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]["passed"] == (
+        all(
+            check_keys
+            == report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["expected"]
+            for check_keys in report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"].values()
+        )
+    )
     assert all(
         check_keys == expected_default_check_keys
         for check_keys in payload_check_keys.values()
