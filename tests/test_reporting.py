@@ -1356,6 +1356,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         check["name"]: check for check in payload["evidence_guard"]["checks"]
     }
     delivery_preview = payload["delivery_preview"]
+    hermes_preview = delivery_preview["channels"]["hermes"]
     telegram_preview = delivery_preview["channels"]["telegram"]
     delivery_preview_guard_checks = {
         check["name"]: check for check in delivery_preview["guard"]["checks"]
@@ -2173,6 +2174,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert delivery_preview["guard"]["status"] == (
         "ok" if all(delivery_preview_guard_passes) else "conflict"
     )
+    assert delivery_preview_guard_checks[
+        "hermes_payload_ref_matches_structured_payload"
+    ]["actual"] == hermes_preview["payload_ref"]
+    assert delivery_preview_guard_checks[
+        "hermes_numeric_authority_matches_payload_ref"
+    ]["expected"] == hermes_preview["payload_ref"]
+    assert delivery_preview_guard_checks[
+        "hermes_numeric_authority_matches_payload_ref"
+    ]["actual"] == hermes_preview["numeric_authority"]
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
@@ -3037,6 +3047,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         check["name"]: check for check in payload["evidence_guard"]["checks"]
     }
     delivery_preview = payload["delivery_preview"]
+    hermes_preview = delivery_preview["channels"]["hermes"]
     telegram_preview = delivery_preview["channels"]["telegram"]
     delivery_preview_guard_checks = {
         check["name"]: check for check in delivery_preview["guard"]["checks"]
@@ -3854,6 +3865,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert delivery_preview["guard"]["status"] == (
         "ok" if all(delivery_preview_guard_passes) else "conflict"
     )
+    assert delivery_preview_guard_checks[
+        "hermes_payload_ref_matches_structured_payload"
+    ]["actual"] == hermes_preview["payload_ref"]
+    assert delivery_preview_guard_checks[
+        "hermes_numeric_authority_matches_payload_ref"
+    ]["expected"] == hermes_preview["payload_ref"]
+    assert delivery_preview_guard_checks[
+        "hermes_numeric_authority_matches_payload_ref"
+    ]["actual"] == hermes_preview["numeric_authority"]
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False

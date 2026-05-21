@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_FLAG_PRESERVE_ACTUAL_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_FLAG_PRESERVE_ACTUAL_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_HERMES_PREVIEW_ACTUAL_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_HERMES_PREVIEW_ACTUAL_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving Telegram preview single-message flag and preserve-text guard values are derived from emitted Telegram preview chunks and text
+next_atomic_step: add SQLite filtered latest report coverage proving Hermes preview payload_ref and numeric_authority guard actual values are derived from emitted Hermes preview channel
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates Telegram preview single-message flag and preserve-text guard values match emitted Telegram preview chunks and text
-  - SQLite repository-backed latest report underlying filter validates Telegram preview single-message flag and preserve-text guard values match emitted Telegram preview chunks and text
-  - filtered Telegram preview flag/preserve values remain derived from emitted delivery preview payload
-  - filtered Telegram preview flag/preserve output remains path-free and omits database path details
+  - SQLite repository-backed latest report timeframe filter validates Hermes preview payload_ref and numeric_authority guard actual values match emitted Hermes preview channel
+  - SQLite repository-backed latest report underlying filter validates Hermes preview payload_ref and numeric_authority guard actual values match emitted Hermes preview channel
+  - filtered Hermes preview actual values remain derived from emitted delivery preview payload
+  - filtered Hermes preview actual-value output remains path-free and omits database path details
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -90,6 +90,48 @@ next_state_after_success: continue with next explicit repository or report read-
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_HERMES_PREVIEW_ACTUAL_COVERAGE_GATE
+scope: SQLite repository-backed filtered Hermes preview payload_ref and numeric_authority actual-value coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.78s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.84s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite timeframe-filtered latest report validates Hermes preview payload_ref and numeric_authority guard actual values match emitted Hermes preview channel
+  - SQLite underlying-filtered latest report validates Hermes preview payload_ref and numeric_authority guard actual values match emitted Hermes preview channel
+  - filtered Hermes preview actual values remain derived from emitted delivery preview payload
+  - filtered Hermes preview actual-value output remains path-free through existing path checks
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed
