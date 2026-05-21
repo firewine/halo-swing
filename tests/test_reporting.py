@@ -1932,6 +1932,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         },
         "actual": expected_numeric_field_presence,
     }
+    assert report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ]["actual"] == {
+        "decision_line_present": (
+            f"Decision: {latest_report['action']}" in payload["text"]
+        ),
+        "confidence_line_present": (
+            "Confidence: "
+            f"{payload['confidence_label']} ({latest_report['confidence']})"
+            in payload["text"]
+        ),
+        "score_line_present": (
+            f"Score: {latest_report['final_score']}" in payload["text"]
+        ),
+    }
     assert "delivery_numeric_authority_is_latest_signal_report" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"
@@ -3236,6 +3251,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "final_score": latest_report["final_score"],
         },
         "actual": expected_numeric_field_presence,
+    }
+    assert report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ]["actual"] == {
+        "decision_line_present": (
+            f"Decision: {latest_report['action']}" in payload["text"]
+        ),
+        "confidence_line_present": (
+            "Confidence: "
+            f"{payload['confidence_label']} ({latest_report['confidence']})"
+            in payload["text"]
+        ),
+        "score_line_present": (
+            f"Score: {latest_report['final_score']}" in payload["text"]
+        ),
     }
     assert "delivery_numeric_authority_is_latest_signal_report" in (
         report_contract_guard_checks[
