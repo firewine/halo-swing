@@ -2484,6 +2484,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_telegram_schema_version_matches_expected"
     ]["actual"] == telegram_contract["schema_version"]
     assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ]["passed"] == (
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"]
+        == report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["expected"]
+    )
+    assert report_contract_guard_checks[
         "report_telegram_chunking_contract_matches_expected"
     ] == {
         "name": "report_telegram_chunking_contract_matches_expected",
@@ -2498,6 +2508,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "section_separator": telegram_contract["section_separator"],
         "chunk_indexing": telegram_contract["chunk_indexing"],
     }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["passed"] == (
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"]
+        == report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["expected"]
+    )
     assert "delivery_contract_has_no_network_side_effect" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"
@@ -4204,6 +4224,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_telegram_schema_version_matches_expected"
     ]["actual"] == telegram_contract["schema_version"]
     assert report_contract_guard_checks[
+        "report_telegram_schema_version_matches_expected"
+    ]["passed"] == (
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"]
+        == report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["expected"]
+    )
+    assert report_contract_guard_checks[
         "report_telegram_chunking_contract_matches_expected"
     ] == {
         "name": "report_telegram_chunking_contract_matches_expected",
@@ -4218,6 +4248,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "section_separator": telegram_contract["section_separator"],
         "chunk_indexing": telegram_contract["chunk_indexing"],
     }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["passed"] == (
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"]
+        == report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["expected"]
+    )
     assert "delivery_contract_has_no_network_side_effect" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_FORMAT_SCHEMA_PASS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CONTRACT_PASS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_FORMAT_SCHEMA_PASS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CONTRACT_PASS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.194",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving delivery format and schema guard pass values are derived from emitted delivery contract actual values",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.195",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving Telegram schema version and chunking guard pass values are derived from emitted Telegram contract actual values",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.193",
+    "docs/halo-swing-development-plan.md#4.194",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates delivery format and schema guard pass values match emitted delivery contract actual values",
-    "SQLite repository-backed latest report underlying filter validates delivery format and schema guard pass values match emitted delivery contract actual values",
-    "filtered delivery format and schema pass values remain derived from emitted delivery contract",
-    "filtered delivery format/schema output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates Telegram schema version and chunking guard pass values match emitted Telegram contract actual values",
+    "SQLite repository-backed latest report underlying filter validates Telegram schema version and chunking guard pass values match emitted Telegram contract actual values",
+    "filtered Telegram schema version and chunking pass values remain derived from emitted Telegram contract",
+    "filtered Telegram contract pass-value output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
