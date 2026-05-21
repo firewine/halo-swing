@@ -2262,6 +2262,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": ["status", "checks"],
         "actual": ["status", "checks"],
     }
+    assert report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["report_payload_guard"])
     assert "report_payload_guard_keys_match_expected_schema" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -3430,6 +3433,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": ["status", "checks"],
         "actual": ["status", "checks"],
     }
+    assert report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]["actual"] == list(payload["report_payload_guard"])
     assert "report_payload_guard_keys_match_expected_schema" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
