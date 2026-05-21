@@ -2211,6 +2211,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for chunk in telegram_preview["chunks"]
     ]
+    assert delivery_preview_guard_checks["telegram_chunks_are_nonempty"][
+        "actual"
+    ] == [
+        {
+            "index": chunk["index"],
+            "chars": chunk["chars"],
+            "text_empty": not bool(str(chunk["text"])),
+        }
+        for chunk in telegram_preview["chunks"]
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_section_separator_preserves_preview_text"
+    ]["actual"] == "declared_separator_reconstructed_text"
+    assert delivery_preview_guard_checks[
+        "telegram_overflow_policy_splits_on_section_boundary"
+    ]["actual"] == {
+        "overflow_policy": telegram_preview["overflow_policy"],
+        "continuation_chunk_starts": [
+            str(chunk["text"]).splitlines()[0]
+            if str(chunk["text"]).splitlines()
+            else ""
+            for chunk in telegram_preview["chunks"][1:]
+        ],
+    }
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
@@ -3836,6 +3860,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for chunk in telegram_preview["chunks"]
     ]
+    assert delivery_preview_guard_checks["telegram_chunks_are_nonempty"][
+        "actual"
+    ] == [
+        {
+            "index": chunk["index"],
+            "chars": chunk["chars"],
+            "text_empty": not bool(str(chunk["text"])),
+        }
+        for chunk in telegram_preview["chunks"]
+    ]
+    assert delivery_preview_guard_checks[
+        "telegram_section_separator_preserves_preview_text"
+    ]["actual"] == "declared_separator_reconstructed_text"
+    assert delivery_preview_guard_checks[
+        "telegram_overflow_policy_splits_on_section_boundary"
+    ]["actual"] == {
+        "overflow_policy": telegram_preview["overflow_policy"],
+        "continuation_chunk_starts": [
+            str(chunk["text"]).splitlines()[0]
+            if str(chunk["text"]).splitlines()
+            else ""
+            for chunk in telegram_preview["chunks"][1:]
+        ],
+    }
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {

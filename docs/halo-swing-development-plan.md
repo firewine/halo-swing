@@ -28,6 +28,61 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.189 P1 Repository SQLite Latest Report Filtered Telegram Preview Text Preservation Actual Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.188에서 SQLite repository-backed filtered latest report의 Telegram preview message count, chunk
+index, chunk char-count guard actual 값들이 실제 emitted Telegram preview chunks에서 파생되는지
+묶어서 고정했다. 이번 slice는 같은 filtered report에서 Telegram preview nonempty, separator
+reconstruction, overflow policy guard actual 값들이 실제 emitted Telegram preview chunks와 text에서
+직접 파생되는지 묶어서 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered Telegram nonempty chunk actual-value coverage
+  - extend SQLite timeframe-filtered Telegram separator reconstruction actual-value coverage
+  - extend SQLite timeframe-filtered Telegram overflow policy actual-value coverage
+  - extend SQLite underlying-filtered Telegram nonempty chunk actual-value coverage
+  - extend SQLite underlying-filtered Telegram separator reconstruction actual-value coverage
+  - extend SQLite underlying-filtered Telegram overflow policy actual-value coverage
+  - assert filtered Telegram preview text-preservation actual-value output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.93s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.45s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.188 P1 Repository SQLite Latest Report Filtered Telegram Preview Count Index Actual Coverage Gate Record - 2026-05-21
 
 ### A. 목적
