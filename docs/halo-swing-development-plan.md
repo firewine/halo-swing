@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.269 P1 Repository SQLite Latest Report Filtered Evidence Guard Hermes Preview Boundary Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.268에서 SQLite repository-backed filtered latest report의 report payload guard metadata가 Hermes delivery preview
+metadata와 Hermes delivery guard reference에 인라인되지 않는지 고정했다. 이번 slice는 evidence guard metadata와 evidence
+guard check names도 Hermes ref-only boundary에 섞이지 않는지 검증한다. Evidence guard는 structured payload 내부 검증으로만
+남고 Hermes preview는 structured payload reference만 유지해야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend timeframe-filtered Hermes preview metadata boundary checks for evidence guard metadata
+  - extend timeframe-filtered Hermes delivery guard ref boundary checks for evidence guard metadata
+  - extend underlying-filtered Hermes preview metadata boundary checks for evidence guard metadata
+  - extend underlying-filtered Hermes delivery guard ref boundary checks for evidence guard metadata
+  - keep evidence guard metadata preserved inside structured payload checks
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.91s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.89s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.268 P1 Repository SQLite Latest Report Filtered Report Payload Guard Hermes Preview Boundary Coverage Gate Record - 2026-05-22
 
 ### A. 목적
