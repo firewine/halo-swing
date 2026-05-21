@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_SUMMARY_FILTER_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_SUMMARY_FILTER_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_GUARD_PASS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.235",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected label summary excludes filtered-out and older matching label summaries",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.236",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected label status guard pass values align with selected label status surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.234",
+    "docs/halo-swing-development-plan.md#4.235",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected label summary excludes filtered-out timeframe and older matching label summaries from report contract guard, reasons, and rendered report text",
-    "SQLite repository-backed latest report underlying filter validates selected label summary excludes filtered-out underlying and older matching label summaries from report contract guard, reasons, and rendered report text",
-    "filtered label summary exclusion summary remains derived from emitted report_contract_guard, reasons, and payload text surfaces",
-    "selected label summary remains the only label summary exposed on selected report summary surfaces",
+    "SQLite repository-backed latest report timeframe filter validates selected label status evidence guard name and pass state",
+    "SQLite repository-backed latest report underlying filter validates selected label status evidence guard name and pass state",
+    "selected label status guard expected and actual values align with the selected stored label",
+    "latest_signal_report label_status and evidence context label_status remain aligned with the selected stored label",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
