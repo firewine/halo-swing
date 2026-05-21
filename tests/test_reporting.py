@@ -1903,6 +1903,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": "latest_signal_report",
         "actual": "latest_signal_report",
     }
+    assert report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ]["actual"] == delivery_channels["hermes"]["numeric_authority"]
     assert report_contract_guard_checks["telegram_text_fits_single_message"] == {
         "name": "telegram_text_fits_single_message",
         "passed": True,
@@ -3205,6 +3208,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": "latest_signal_report",
         "actual": "latest_signal_report",
     }
+    assert report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ]["actual"] == delivery_channels["hermes"]["numeric_authority"]
     assert report_contract_guard_checks["telegram_text_fits_single_message"] == {
         "name": "telegram_text_fits_single_message",
         "passed": True,

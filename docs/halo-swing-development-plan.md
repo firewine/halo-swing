@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.170 P1 Repository SQLite Latest Report Filtered Delivery Numeric Authority Actual Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.169에서 SQLite repository-backed filtered latest report의
+`report_telegram_chunking_contract_matches_expected.actual`이 실제 emitted
+`delivery_contract.channels.telegram`의 chunking fields에서 파생되는지 고정했다. 이번 slice는
+같은 filtered report에서 `delivery_numeric_authority_is_latest_signal_report.actual`이 실제
+emitted `delivery_contract.channels.hermes.numeric_authority`에서 직접 파생되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered report_contract_guard delivery numeric authority actual-value coverage
+  - extend SQLite underlying-filtered report_contract_guard delivery numeric authority actual-value coverage
+  - assert filtered report_contract_guard delivery numeric authority actual-value output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.63s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 38.12s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.169 P1 Repository SQLite Latest Report Filtered Telegram Chunking Contract Actual Coverage Gate Record - 2026-05-21
 
 ### A. 목적
