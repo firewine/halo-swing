@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_FILTER_EXCLUSION_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_FILTER_EXCLUSION_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_FILTER_EXCLUSION_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_FILTER_EXCLUSION_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected source signal ref excludes filtered-out and older matching records
+next_atomic_step: add SQLite filtered latest report coverage proving selected source repository filters exclude filtered-out filter values
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected source_signal_ref excludes filtered-out timeframe and older matching record identities
-  - SQLite repository-backed latest report underlying filter validates selected source_signal_ref excludes filtered-out underlying and older matching record identities
-  - latest_signal_report identity remains selected-record-only across filtered report paths
-  - report payload source signal identity guard expected and actual values remain selected-record-only
+  - SQLite repository-backed latest report timeframe filter validates selected source_repository_ref filters exclude filtered-out timeframe values
+  - SQLite repository-backed latest report underlying filter validates selected source_repository_ref filters exclude filtered-out underlying values
+  - latest record guard source_repository_ref expected and actual filters remain selected-filter-only
+  - rendered repository source summary excludes filtered-out filter text
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_FILTER_EXCLUSION_COVERAGE_GATE
-scope: SQLite repository-backed filtered source signal ref exclusion coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_FILTER_EXCLUSION_COVERAGE_GATE
+scope: SQLite repository-backed filtered source repository filter exclusion coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 42.83s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.09s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.77s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected source_signal_ref excludes filtered-out timeframe and older matching record identities
-  - SQLite underlying-filtered latest report validates selected source_signal_ref excludes filtered-out underlying and older matching record identities
-  - latest_signal_report identity remains selected-record-only across filtered report paths
-  - report payload source signal identity guard expected and actual values remain selected-record-only
+  - SQLite timeframe-filtered latest report validates selected source_repository_ref filters exclude filtered-out timeframe values
+  - SQLite underlying-filtered latest report validates selected source_repository_ref filters exclude filtered-out underlying values
+  - latest record guard source_repository_ref expected and actual filters remain selected-filter-only
+  - rendered repository source summary excludes filtered-out filter text
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

@@ -4041,6 +4041,39 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_filter_field_summary == {
         name: True for name in selected_source_repository_filter_field_targets
     }
+    selected_source_repository_filter_exclusion_targets = {
+        "top_level_source_repository_filters": [
+            payload["source_repository_ref"]["filters"]["timeframe"]
+            != alternate_signal["timeframe"],
+        ],
+        "evidence_context_source_repository_filters": [
+            evidence_context["source_repository_ref"]["filters"]["timeframe"]
+            != alternate_signal["timeframe"],
+        ],
+        "latest_record_guard_expected_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["timeframe"]
+            != alternate_signal["timeframe"],
+        ],
+        "latest_record_guard_actual_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["timeframe"]
+            != alternate_signal["timeframe"],
+        ],
+        "source_summary_filter_text": [
+            f"timeframe={alternate_signal['timeframe']}" not in source_summary,
+            f"timeframe={alternate_signal['timeframe']}" not in payload["text"],
+        ],
+    }
+    selected_source_repository_filter_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_filter_exclusion_targets.items()
+    }
+    assert selected_source_repository_filter_exclusion_summary == {
+        name: True for name in selected_source_repository_filter_exclusion_targets
+    }
     selected_source_repository_storage_metadata_targets = {
         "top_level_source_repository_storage_metadata": [
             payload["source_repository_ref"]["storage"] == "sqlite_signal_repository",
@@ -7532,6 +7565,39 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_filter_field_summary == {
         name: True for name in selected_source_repository_filter_field_targets
+    }
+    selected_source_repository_filter_exclusion_targets = {
+        "top_level_source_repository_filters": [
+            payload["source_repository_ref"]["filters"]["underlying"]
+            != ndx_signal["underlying"],
+        ],
+        "evidence_context_source_repository_filters": [
+            evidence_context["source_repository_ref"]["filters"]["underlying"]
+            != ndx_signal["underlying"],
+        ],
+        "latest_record_guard_expected_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["underlying"]
+            != ndx_signal["underlying"],
+        ],
+        "latest_record_guard_actual_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["underlying"]
+            != ndx_signal["underlying"],
+        ],
+        "source_summary_filter_text": [
+            f"underlying={ndx_signal['underlying']}" not in source_summary,
+            f"underlying={ndx_signal['underlying']}" not in payload["text"],
+        ],
+    }
+    selected_source_repository_filter_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_filter_exclusion_targets.items()
+    }
+    assert selected_source_repository_filter_exclusion_summary == {
+        name: True for name in selected_source_repository_filter_exclusion_targets
     }
     selected_source_repository_storage_metadata_targets = {
         "top_level_source_repository_storage_metadata": [
