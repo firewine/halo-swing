@@ -2185,6 +2185,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_report_intent_contract["name"],
         "actual": "pre_market_swing_report",
     }
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"][
+        "actual"
+    ] == payload["report_intent"]
     assert "report_payload_intent_matches_contract" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -3376,6 +3379,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_report_intent_contract["name"],
         "actual": "pre_market_swing_report",
     }
+    assert report_payload_guard_checks["report_payload_intent_matches_contract"][
+        "actual"
+    ] == payload["report_intent"]
     assert "report_payload_intent_matches_contract" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
