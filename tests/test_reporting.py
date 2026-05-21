@@ -1323,6 +1323,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
+    actual_payload_check_names = [
+        check["name"] for check in payload["report_payload_guard"]["checks"]
+    ]
     report_contract_guard_checks = {
         check["name"]: check for check in payload["report_contract_guard"]["checks"]
     }
@@ -2269,6 +2272,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_payload_check_names,
         "actual": expected_payload_check_names,
     }
+    assert payload_check_names["actual"] == actual_payload_check_names
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
@@ -2482,6 +2486,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
+    actual_payload_check_names = [
+        check["name"] for check in payload["report_payload_guard"]["checks"]
+    ]
     report_contract_guard_checks = {
         check["name"]: check for check in payload["report_contract_guard"]["checks"]
     }
@@ -3428,6 +3435,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_payload_check_names,
         "actual": expected_payload_check_names,
     }
+    assert payload_check_names["actual"] == actual_payload_check_names
     assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
         payload_check_names["expected"]
     )
