@@ -2192,6 +2192,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["expected"]
+    assert report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in payload["report_contract_guard"]["checks"]
+    ]
     assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
@@ -3520,6 +3525,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["expected"]
+    assert report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]["actual"] == [
+        check["name"] for check in payload["report_contract_guard"]["checks"]
+    ]
     assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
