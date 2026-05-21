@@ -2728,6 +2728,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_source_signal_ref_keys_match_expected_schema"
     ]["actual"] == list(payload["source_signal_ref"])
     assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
     ] == {
         "name": "report_payload_source_signal_ref_matches_report_identity",
@@ -2742,6 +2752,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash": payload["latest_signal_report"]["config_hash"],
         "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_matches_report_identity"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_matches_report_identity"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
     ] == {
@@ -2759,6 +2779,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "config_hash"
         ].startswith("sha256:"),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_values_have_traceable_format"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_values_have_traceable_format"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_values_have_traceable_format"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_config_hash_digest_is_sha256"
     ] == {
@@ -2779,6 +2809,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for character in source_signal_ref_config_hash_digest
         ),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+        ]["expected"]
+    )
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
         "passed": True,
@@ -4538,6 +4578,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_source_signal_ref_keys_match_expected_schema"
     ]["actual"] == list(payload["source_signal_ref"])
     assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_keys_match_expected_schema"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+        ]["expected"]
+    )
+    assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
     ] == {
         "name": "report_payload_source_signal_ref_matches_report_identity",
@@ -4552,6 +4602,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash": payload["latest_signal_report"]["config_hash"],
         "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_matches_report_identity"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_matches_report_identity"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
     ] == {
@@ -4569,6 +4629,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "config_hash"
         ].startswith("sha256:"),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_values_have_traceable_format"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_values_have_traceable_format"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_values_have_traceable_format"
+        ]["expected"]
+    )
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_config_hash_digest_is_sha256"
     ] == {
@@ -4589,6 +4659,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for character in source_signal_ref_config_hash_digest
         ),
     }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+    ]["passed"] == (
+        report_payload_guard_checks[
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+        ]["actual"]
+        == report_payload_guard_checks[
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+        ]["expected"]
+    )
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
         "passed": True,
