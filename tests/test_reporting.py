@@ -1417,6 +1417,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action": swing_signal["action"],
         "confidence_label": payload["confidence_label"],
     }
+    actual_top_level_identity = {
+        "as_of": payload["as_of"],
+        "asset": payload["asset"],
+        "underlying": payload["underlying"],
+        "timeframe": payload["timeframe"],
+        "action": payload["action"],
+        "confidence_label": payload["confidence_label"],
+    }
     expected_payload_keys = [
         "schema_version",
         "as_of",
@@ -2198,6 +2206,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_top_level_identity,
         "actual": expected_top_level_identity,
     }
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ]["actual"] == actual_top_level_identity
     assert "report_payload_top_level_identity_matches_latest_signal_report" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -2595,6 +2606,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "underlying": "QQQ",
         "timeframe": qqq_signal["timeframe"],
         "action": qqq_signal["action"],
+        "confidence_label": payload["confidence_label"],
+    }
+    actual_top_level_identity = {
+        "as_of": payload["as_of"],
+        "asset": payload["asset"],
+        "underlying": payload["underlying"],
+        "timeframe": payload["timeframe"],
+        "action": payload["action"],
         "confidence_label": payload["confidence_label"],
     }
     expected_payload_keys = [
@@ -3378,6 +3397,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_top_level_identity,
         "actual": expected_top_level_identity,
     }
+    assert report_payload_guard_checks[
+        "report_payload_top_level_identity_matches_latest_signal_report"
+    ]["actual"] == actual_top_level_identity
     assert "report_payload_top_level_identity_matches_latest_signal_report" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
