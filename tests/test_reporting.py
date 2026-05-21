@@ -2020,6 +2020,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]["expected"]["default_check_names"]
     )
     assert delivery_preview["guard"]["status"] == "ok"
+    delivery_preview_guard_passes = [
+        check["passed"] for check in delivery_preview["guard"]["checks"]
+    ]
+    assert delivery_preview_guard_passes == [
+        True for _check in delivery_preview["guard"]["checks"]
+    ]
+    assert delivery_preview["guard"]["status"] == (
+        "ok" if all(delivery_preview_guard_passes) else "conflict"
+    )
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
@@ -3396,6 +3405,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]["expected"]["default_check_names"]
     )
     assert delivery_preview["guard"]["status"] == "ok"
+    delivery_preview_guard_passes = [
+        check["passed"] for check in delivery_preview["guard"]["checks"]
+    ]
+    assert delivery_preview_guard_passes == [
+        True for _check in delivery_preview["guard"]["checks"]
+    ]
+    assert delivery_preview["guard"]["status"] == (
+        "ok" if all(delivery_preview_guard_passes) else "conflict"
+    )
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
