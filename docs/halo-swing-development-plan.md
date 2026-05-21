@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.238 P1 Repository SQLite Latest Report Source Signal Ref Filter Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.237에서 SQLite repository-backed filtered latest report의 selected label status guard exclusion을
+고정했다. 이번 slice는 selected `source_signal_ref`와 latest report identity가 filtered-out record
+및 older matching record의 identity를 노출하지 않는지 고정한다. report payload source signal
+identity guard의 expected/actual 값도 selected record only 상태를 유지해야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source_signal_ref exclusion coverage
+  - extend SQLite underlying-filtered source_signal_ref exclusion coverage
+  - assert source_signal_ref excludes filtered-out and older matching record signal_id/run_id values
+  - assert latest_signal_report identity excludes filtered-out and older matching record signal_id values
+  - assert report payload source signal identity guard expected/actual values remain selected-record-only
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 42.83s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.237 P1 Repository SQLite Latest Report Label Status Guard Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적

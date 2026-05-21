@@ -3462,6 +3462,40 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_signal_ref_propagation_summary == {
         name: True for name in selected_source_signal_ref_propagation_targets
     }
+    excluded_source_signals = [alternate_signal, older_matching_signal]
+    selected_source_signal_ref_exclusion_targets = {
+        "source_signal_ref": [
+            payload["source_signal_ref"]["signal_id"] != excluded_signal["signal_id"]
+            and payload["source_signal_ref"]["run_id"] != excluded_signal["run_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "latest_signal_report": [
+            payload["latest_signal_report"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_source_signal_ref_identity_guard_expected": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_source_signal_ref_identity_guard_actual": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+    }
+    selected_source_signal_ref_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_exclusion_targets.items()
+    }
+    assert selected_source_signal_ref_exclusion_summary == {
+        name: True for name in selected_source_signal_ref_exclusion_targets
+    }
     selected_source_signal_ref_traceability_targets = {
         "traceable_format_guard": [
             report_payload_guard_checks[
@@ -6919,6 +6953,40 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_signal_ref_propagation_summary == {
         name: True for name in selected_source_signal_ref_propagation_targets
+    }
+    excluded_source_signals = [ndx_signal, older_matching_signal]
+    selected_source_signal_ref_exclusion_targets = {
+        "source_signal_ref": [
+            payload["source_signal_ref"]["signal_id"] != excluded_signal["signal_id"]
+            and payload["source_signal_ref"]["run_id"] != excluded_signal["run_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "latest_signal_report": [
+            payload["latest_signal_report"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_source_signal_ref_identity_guard_expected": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_source_signal_ref_identity_guard_actual": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["signal_id"]
+            != excluded_signal["signal_id"]
+            for excluded_signal in excluded_source_signals
+        ],
+    }
+    selected_source_signal_ref_exclusion_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_exclusion_targets.items()
+    }
+    assert selected_source_signal_ref_exclusion_summary == {
+        name: True for name in selected_source_signal_ref_exclusion_targets
     }
     selected_source_signal_ref_traceability_targets = {
         "traceable_format_guard": [
