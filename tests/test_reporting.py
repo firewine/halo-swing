@@ -2106,6 +2106,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_delivery_channel_formats,
     }
     assert report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ]["actual"] == {
+        name: channel["format"] for name, channel in delivery_channels.items()
+    }
+    assert report_contract_guard_checks[
         "report_telegram_schema_version_matches_expected"
     ] == {
         "name": "report_telegram_schema_version_matches_expected",
@@ -3391,6 +3396,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_delivery_channel_formats,
         "actual": expected_delivery_channel_formats,
+    }
+    assert report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ]["actual"] == {
+        name: channel["format"] for name, channel in delivery_channels.items()
     }
     assert report_contract_guard_checks[
         "report_telegram_schema_version_matches_expected"
