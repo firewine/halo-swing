@@ -3770,6 +3770,43 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_cron_intent_presence_summary == {
         name: True for name in selected_cron_intent_presence_targets
     }
+    selected_delivery_side_effect_targets = {
+        "delivery_contract_no_network": [
+            channel["network_call"] is False
+            for channel in delivery_channels.values()
+        ],
+        "delivery_contract_no_send": [
+            channel.get("send_call", False) is False
+            for channel in delivery_channels.values()
+        ],
+        "delivery_preview_no_network": [
+            channel["network_call"] is False
+            for channel in delivery_preview["channels"].values()
+        ],
+        "delivery_preview_no_send": [
+            channel.get("send_call", False) is False
+            for channel in delivery_preview["channels"].values()
+        ],
+        "delivery_preview_no_network_guard": [
+            value is False
+            for value in delivery_preview_guard_checks[
+                "delivery_preview_has_no_network_side_effect"
+            ]["actual"].values()
+        ],
+        "delivery_preview_no_send_guard": [
+            value is False
+            for value in delivery_preview_guard_checks[
+                "delivery_preview_has_no_send_side_effect"
+            ]["actual"].values()
+        ],
+    }
+    selected_delivery_side_effect_summary = {
+        name: all(checks)
+        for name, checks in selected_delivery_side_effect_targets.items()
+    }
+    assert selected_delivery_side_effect_summary == {
+        name: True for name in selected_delivery_side_effect_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -6316,6 +6353,43 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_cron_intent_presence_summary == {
         name: True for name in selected_cron_intent_presence_targets
+    }
+    selected_delivery_side_effect_targets = {
+        "delivery_contract_no_network": [
+            channel["network_call"] is False
+            for channel in delivery_channels.values()
+        ],
+        "delivery_contract_no_send": [
+            channel.get("send_call", False) is False
+            for channel in delivery_channels.values()
+        ],
+        "delivery_preview_no_network": [
+            channel["network_call"] is False
+            for channel in delivery_preview["channels"].values()
+        ],
+        "delivery_preview_no_send": [
+            channel.get("send_call", False) is False
+            for channel in delivery_preview["channels"].values()
+        ],
+        "delivery_preview_no_network_guard": [
+            value is False
+            for value in delivery_preview_guard_checks[
+                "delivery_preview_has_no_network_side_effect"
+            ]["actual"].values()
+        ],
+        "delivery_preview_no_send_guard": [
+            value is False
+            for value in delivery_preview_guard_checks[
+                "delivery_preview_has_no_send_side_effect"
+            ]["actual"].values()
+        ],
+    }
+    selected_delivery_side_effect_summary = {
+        name: all(checks)
+        for name, checks in selected_delivery_side_effect_targets.items()
+    }
+    assert selected_delivery_side_effect_summary == {
+        name: True for name in selected_delivery_side_effect_targets
     }
     assert all(
         ".sqlite" not in value.lower()

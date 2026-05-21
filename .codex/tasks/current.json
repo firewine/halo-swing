@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CRON_INTENT_PROFILE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_SIDE_EFFECT_BOUNDARY_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CRON_INTENT_PROFILE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_SIDE_EFFECT_BOUNDARY_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.218",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.219",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving delivery contract and preview side-effect boundaries remain no-network and no-send",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.217",
+    "docs/halo-swing-development-plan.md#4.218",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces",
-    "SQLite repository-backed latest report underlying filter validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces",
-    "filtered selected-cron-intent summary remains derived from emitted nested strings",
-    "filtered selected-cron-intent summary covers report intent, report intent contract, delivery contract cron intents, supported-intent guard actuals, registry guard actuals, and registry-match guard actuals",
+    "SQLite repository-backed latest report timeframe filter validates delivery contract and preview side-effect boundaries remain no-network and no-send",
+    "SQLite repository-backed latest report underlying filter validates delivery contract and preview side-effect boundaries remain no-network and no-send",
+    "filtered delivery side-effect summary remains derived from emitted delivery contract, preview channels, and preview guard actuals",
+    "filtered delivery side-effect summary covers delivery contract channel flags, delivery preview channel flags, preview no-network guard actuals, and preview no-send guard actuals",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
