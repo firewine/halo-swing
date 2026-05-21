@@ -3314,6 +3314,45 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
     }
+    selected_label_presence_targets = {
+        "latest_signal_report_label_status": (
+            label_status,
+            [
+                selected_label["signal_id"],
+                selected_label["outcome"],
+                selected_label["first_barrier_hit"],
+            ],
+        ),
+        "evidence_label_status": (
+            evidence_label_status,
+            [
+                selected_label["signal_id"],
+                selected_label["outcome"],
+                selected_label["first_barrier_hit"],
+            ],
+        ),
+        "reasons": (reasons, [selected_label_summary]),
+        "payload_text": ([payload["text"]], [selected_label_summary]),
+        "report_contract_label_guard": (
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"],
+            [selected_label_summary],
+        ),
+    }
+    selected_label_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_label_presence_targets.items()
+    }
+    assert selected_label_presence_summary == {
+        name: True for name in selected_label_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5404,6 +5443,45 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
+    }
+    selected_label_presence_targets = {
+        "latest_signal_report_label_status": (
+            label_status,
+            [
+                selected_label["signal_id"],
+                selected_label["outcome"],
+                selected_label["first_barrier_hit"],
+            ],
+        ),
+        "evidence_label_status": (
+            evidence_label_status,
+            [
+                selected_label["signal_id"],
+                selected_label["outcome"],
+                selected_label["first_barrier_hit"],
+            ],
+        ),
+        "reasons": (reasons, [selected_label_summary]),
+        "payload_text": ([payload["text"]], [selected_label_summary]),
+        "report_contract_label_guard": (
+            report_contract_guard_checks[
+                "report_text_reflects_label_status_summary"
+            ]["actual"],
+            [selected_label_summary],
+        ),
+    }
+    selected_label_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_label_presence_targets.items()
+    }
+    assert selected_label_presence_summary == {
+        name: True for name in selected_label_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
