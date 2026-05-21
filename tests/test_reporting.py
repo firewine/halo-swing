@@ -2129,6 +2129,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_telegram_chunking_contract,
         "actual": expected_telegram_chunking_contract,
     }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["actual"] == {
+        "overflow_policy": telegram_contract["overflow_policy"],
+        "section_separator": telegram_contract["section_separator"],
+        "chunk_indexing": telegram_contract["chunk_indexing"],
+    }
     assert "delivery_contract_has_no_network_side_effect" in (
         report_contract_guard_checks[
             "report_contract_guard_check_names_match_expected_schema"
@@ -3423,6 +3430,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_telegram_chunking_contract,
         "actual": expected_telegram_chunking_contract,
+    }
+    assert report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["actual"] == {
+        "overflow_policy": telegram_contract["overflow_policy"],
+        "section_separator": telegram_contract["section_separator"],
+        "chunk_indexing": telegram_contract["chunk_indexing"],
     }
     assert "delivery_contract_has_no_network_side_effect" in (
         report_contract_guard_checks[
