@@ -1370,6 +1370,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "omits_database_path": True,
         "omits_absolute_or_sqlite_paths": True,
     }
+    expected_source_signal_ref_identity = {
+        "signal_id": swing_signal["signal_id"],
+        "config_hash": swing_signal["config_hash"],
+        "run_id_nonempty": True,
+    }
+    expected_source_signal_ref_traceable_format = {
+        "signal_id_nonempty": True,
+        "run_id_nonempty": True,
+        "config_hash_sha256_prefix": True,
+    }
+    expected_source_signal_ref_config_hash_digest = {
+        "config_hash_digest_length": 64,
+        "config_hash_digest_hex": True,
+    }
     selected_label_summary = (
         f"Stored label: outcome={selected_label['outcome']}; "
         f"realized_r={selected_label['realized_r']}; "
@@ -2055,26 +2069,35 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
-    ]["actual"] == ["signal_id", "run_id", "config_hash"]
+    ] == {
+        "name": "report_payload_source_signal_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["signal_id", "run_id", "config_hash"],
+        "actual": ["signal_id", "run_id", "config_hash"],
+    }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
-    ]["actual"] == {
-        "signal_id": swing_signal["signal_id"],
-        "config_hash": swing_signal["config_hash"],
-        "run_id_nonempty": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_matches_report_identity",
+        "passed": True,
+        "expected": expected_source_signal_ref_identity,
+        "actual": expected_source_signal_ref_identity,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
-    ]["actual"] == {
-        "signal_id_nonempty": True,
-        "run_id_nonempty": True,
-        "config_hash_sha256_prefix": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_values_have_traceable_format",
+        "passed": True,
+        "expected": expected_source_signal_ref_traceable_format,
+        "actual": expected_source_signal_ref_traceable_format,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_config_hash_digest_is_sha256"
-    ]["actual"] == {
-        "config_hash_digest_length": 64,
-        "config_hash_digest_hex": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+        "passed": True,
+        "expected": expected_source_signal_ref_config_hash_digest,
+        "actual": expected_source_signal_ref_config_hash_digest,
     }
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
@@ -2424,6 +2447,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "omits_ledger_path": True,
         "omits_database_path": True,
         "omits_absolute_or_sqlite_paths": True,
+    }
+    expected_source_signal_ref_identity = {
+        "signal_id": qqq_signal["signal_id"],
+        "config_hash": qqq_signal["config_hash"],
+        "run_id_nonempty": True,
+    }
+    expected_source_signal_ref_traceable_format = {
+        "signal_id_nonempty": True,
+        "run_id_nonempty": True,
+        "config_hash_sha256_prefix": True,
+    }
+    expected_source_signal_ref_config_hash_digest = {
+        "config_hash_digest_length": 64,
+        "config_hash_digest_hex": True,
     }
     selected_label_summary = (
         f"Stored label: outcome={selected_label['outcome']}; "
@@ -3110,26 +3147,35 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_keys_match_expected_schema"
-    ]["actual"] == ["signal_id", "run_id", "config_hash"]
+    ] == {
+        "name": "report_payload_source_signal_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["signal_id", "run_id", "config_hash"],
+        "actual": ["signal_id", "run_id", "config_hash"],
+    }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_matches_report_identity"
-    ]["actual"] == {
-        "signal_id": qqq_signal["signal_id"],
-        "config_hash": qqq_signal["config_hash"],
-        "run_id_nonempty": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_matches_report_identity",
+        "passed": True,
+        "expected": expected_source_signal_ref_identity,
+        "actual": expected_source_signal_ref_identity,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
-    ]["actual"] == {
-        "signal_id_nonempty": True,
-        "run_id_nonempty": True,
-        "config_hash_sha256_prefix": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_values_have_traceable_format",
+        "passed": True,
+        "expected": expected_source_signal_ref_traceable_format,
+        "actual": expected_source_signal_ref_traceable_format,
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_config_hash_digest_is_sha256"
-    ]["actual"] == {
-        "config_hash_digest_length": 64,
-        "config_hash_digest_hex": True,
+    ] == {
+        "name": "report_payload_source_signal_ref_config_hash_digest_is_sha256",
+        "passed": True,
+        "expected": expected_source_signal_ref_config_hash_digest,
+        "actual": expected_source_signal_ref_config_hash_digest,
     }
     assert report_payload_guard_checks["report_payload_intent_matches_contract"] == {
         "name": "report_payload_intent_matches_contract",
