@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_CONTRACT_PROFILE_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_CONTRACT_PROFILE_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CRON_INTENT_PROFILE_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CRON_INTENT_PROFILE_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces
-  - SQLite repository-backed latest report underlying filter validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces
-  - filtered selected-delivery-contract summary remains derived from emitted nested strings
-  - filtered selected-delivery-contract summary covers report intent, prompt contract, Hermes and Telegram delivery contracts, Telegram preview profile, and report contract guard actuals
+  - SQLite repository-backed latest report timeframe filter validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces
+  - SQLite repository-backed latest report underlying filter validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces
+  - filtered selected-cron-intent summary remains derived from emitted nested strings
+  - filtered selected-cron-intent summary covers report intent, report intent contract, delivery contract cron intents, supported-intent guard actuals, registry guard actuals, and registry-match guard actuals
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_CONTRACT_PROFILE_COVERAGE_GATE
-scope: SQLite repository-backed filtered selected-delivery contract profile coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_CRON_INTENT_PROFILE_COVERAGE_GATE
+scope: SQLite repository-backed filtered selected-cron intent profile coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.89s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.81s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.86s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.43s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces
-  - SQLite underlying-filtered latest report validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces
-  - filtered selected-delivery-contract summary remains derived from emitted nested strings
-  - filtered selected-delivery-contract summary covers report intent, prompt contract, Hermes and Telegram delivery contracts, Telegram preview profile, and report contract guard actuals
+  - SQLite timeframe-filtered latest report validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces
+  - SQLite underlying-filtered latest report validates selected cron intent and schedule profiles are preserved across emitted intent, delivery contract, and guard surfaces
+  - filtered selected-cron-intent summary remains derived from emitted nested strings
+  - filtered selected-cron-intent summary covers report intent, report intent contract, delivery contract cron intents, supported-intent guard actuals, registry guard actuals, and registry-match guard actuals
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

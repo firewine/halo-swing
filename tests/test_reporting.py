@@ -3710,6 +3710,66 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_contract_profile_summary == {
         name: True for name in selected_delivery_contract_profile_targets
     }
+    selected_cron_intent_tokens = [
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    ]
+    selected_cron_schedule_tokens = [
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+    ]
+    selected_cron_intent_presence_targets = {
+        "payload_report_intent": (
+            [payload["report_intent"]],
+            ["pre_market_swing_report"],
+        ),
+        "report_intent_contract": (
+            report_intent_contract,
+            selected_cron_schedule_tokens,
+        ),
+        "delivery_contract_cron_intents": (
+            delivery_contract["cron_intents"],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_supported_intent_guard": (
+            [
+                report_contract_guard_checks["report_intent_is_supported"][
+                    "expected"
+                ],
+                report_contract_guard_checks["report_intent_is_supported"][
+                    "actual"
+                ],
+            ],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_cron_registry_guard": (
+            report_contract_guard_checks[
+                "delivery_cron_intents_match_report_intent_registry"
+            ]["actual"],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_intent_registry_match_guard": (
+            report_contract_guard_checks[
+                "report_intent_contract_matches_registry"
+            ]["actual"],
+            selected_cron_schedule_tokens,
+        ),
+    }
+    selected_cron_intent_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_cron_intent_presence_targets.items()
+    }
+    assert selected_cron_intent_presence_summary == {
+        name: True for name in selected_cron_intent_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -6196,6 +6256,66 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_delivery_contract_profile_summary == {
         name: True for name in selected_delivery_contract_profile_targets
+    }
+    selected_cron_intent_tokens = [
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    ]
+    selected_cron_schedule_tokens = [
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+    ]
+    selected_cron_intent_presence_targets = {
+        "payload_report_intent": (
+            [payload["report_intent"]],
+            ["pre_market_swing_report"],
+        ),
+        "report_intent_contract": (
+            report_intent_contract,
+            selected_cron_schedule_tokens,
+        ),
+        "delivery_contract_cron_intents": (
+            delivery_contract["cron_intents"],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_supported_intent_guard": (
+            [
+                report_contract_guard_checks["report_intent_is_supported"][
+                    "expected"
+                ],
+                report_contract_guard_checks["report_intent_is_supported"][
+                    "actual"
+                ],
+            ],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_cron_registry_guard": (
+            report_contract_guard_checks[
+                "delivery_cron_intents_match_report_intent_registry"
+            ]["actual"],
+            selected_cron_intent_tokens,
+        ),
+        "report_contract_intent_registry_match_guard": (
+            report_contract_guard_checks[
+                "report_intent_contract_matches_registry"
+            ]["actual"],
+            selected_cron_schedule_tokens,
+        ),
+    }
+    selected_cron_intent_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_cron_intent_presence_targets.items()
+    }
+    assert selected_cron_intent_presence_summary == {
+        name: True for name in selected_cron_intent_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
