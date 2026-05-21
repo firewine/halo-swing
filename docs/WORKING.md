@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_FREE_SURFACE_SCHEMA_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_FREE_SURFACE_SCHEMA_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving path-free summary surface names are complete and each surface contributes emitted strings before leakage checks pass
+next_atomic_step: add SQLite filtered latest report coverage proving emitted output summaries omit SQLite storage markers including .sqlite, .sqlite3, and sqlite URI prefixes
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates path-free summary surface names match the expected emitted output schema
-  - SQLite repository-backed latest report underlying filter validates path-free summary surface names match the expected emitted output schema
-  - filtered path-free summary validates every expected surface contributes emitted strings before database path and SQLite filename checks pass
-  - filtered path-free surface schema covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces
+  - SQLite repository-backed latest report timeframe filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers
+  - SQLite repository-backed latest report underlying filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers
+  - filtered storage-marker-free summary remains derived from emitted nested strings across every expected surface
+  - filtered storage-marker-free summary covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_FREE_SURFACE_SCHEMA_COVERAGE_GATE
-scope: SQLite repository-backed filtered path-free surface schema coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_GATE
+scope: SQLite repository-backed filtered storage-marker-free summary coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -112,7 +112,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.81s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.75s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.05s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,9 +123,9 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates path-free summary surface names match expected emitted output schema
-  - SQLite underlying-filtered latest report validates path-free summary surface names match expected emitted output schema
-  - filtered path-free summary validates every expected surface contributes emitted strings before leakage checks pass
+  - SQLite timeframe-filtered latest report validates storage-marker-free summaries across emitted label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces
+  - SQLite underlying-filtered latest report validates storage-marker-free summaries across emitted label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces
+  - filtered storage-marker-free summary rejects .sqlite, .sqlite3, and sqlite URI prefixes in emitted nested strings
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

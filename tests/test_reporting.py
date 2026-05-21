@@ -3246,6 +3246,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_sqlite_name_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    filtered_report_storage_marker_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and "sqlite:" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_storage_marker_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5267,6 +5279,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         for name, target in filtered_report_path_free_targets.items()
     }
     assert filtered_report_sqlite_name_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_storage_marker_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and "sqlite:" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_storage_marker_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
     assert all(

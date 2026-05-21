@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_FREE_SURFACE_SCHEMA_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_FREE_SURFACE_SCHEMA_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.204",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving path-free summary surface names are complete and each surface contributes emitted strings before leakage checks pass",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.205",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving emitted output summaries omit SQLite storage markers including .sqlite, .sqlite3, and sqlite URI prefixes",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.203",
+    "docs/halo-swing-development-plan.md#4.204",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates path-free summary surface names match the expected emitted output schema",
-    "SQLite repository-backed latest report underlying filter validates path-free summary surface names match the expected emitted output schema",
-    "filtered path-free summary validates every expected surface contributes emitted strings before database path and SQLite filename checks pass",
-    "filtered path-free surface schema covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces",
+    "SQLite repository-backed latest report timeframe filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers",
+    "SQLite repository-backed latest report underlying filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers",
+    "filtered storage-marker-free summary remains derived from emitted nested strings across every expected surface",
+    "filtered storage-marker-free summary covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
