@@ -3761,6 +3761,51 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_filter_field_summary == {
         name: True for name in selected_source_repository_filter_field_targets
     }
+    selected_source_repository_storage_metadata_targets = {
+        "top_level_source_repository_storage_metadata": [
+            payload["source_repository_ref"]["storage"] == "sqlite_signal_repository",
+            payload["source_repository_ref"]["db_required"] is True,
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            evidence_context["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+            evidence_context["source_repository_ref"]["db_required"] is True,
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["storage"]
+            == "sqlite_signal_repository",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["db_required"]
+            is True,
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["storage"]
+            == "sqlite_signal_repository",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["db_required"]
+            is True,
+        ],
+        "source_summary_storage_metadata_text": [
+            source_summary.startswith(
+                "Repository source: sqlite_signal_repository; db_required=true;"
+            ),
+            source_summary in reasons["items"],
+            source_summary in payload["text"],
+        ],
+    }
+    selected_source_repository_storage_metadata_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_storage_metadata_targets.items()
+    }
+    assert selected_source_repository_storage_metadata_summary == {
+        name: True for name in selected_source_repository_storage_metadata_targets
+    }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
@@ -6863,6 +6908,51 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_filter_field_summary == {
         name: True for name in selected_source_repository_filter_field_targets
+    }
+    selected_source_repository_storage_metadata_targets = {
+        "top_level_source_repository_storage_metadata": [
+            payload["source_repository_ref"]["storage"] == "sqlite_signal_repository",
+            payload["source_repository_ref"]["db_required"] is True,
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            evidence_context["source_repository_ref"]["storage"]
+            == "sqlite_signal_repository",
+            evidence_context["source_repository_ref"]["db_required"] is True,
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["storage"]
+            == "sqlite_signal_repository",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["db_required"]
+            is True,
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["storage"]
+            == "sqlite_signal_repository",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["db_required"]
+            is True,
+        ],
+        "source_summary_storage_metadata_text": [
+            source_summary.startswith(
+                "Repository source: sqlite_signal_repository; db_required=true;"
+            ),
+            source_summary in reasons["items"],
+            source_summary in payload["text"],
+        ],
+    }
+    selected_source_repository_storage_metadata_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_storage_metadata_targets.items()
+    }
+    assert selected_source_repository_storage_metadata_summary == {
+        name: True for name in selected_source_repository_storage_metadata_targets
     }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
