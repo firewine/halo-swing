@@ -1336,6 +1336,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     decision_section = next(
         section for section in payload["sections"] if section["title"] == "Decision"
     )
+    entry_section = next(
+        section for section in payload["sections"] if section["title"] == "Entry"
+    )
+    stop_section = next(
+        section for section in payload["sections"] if section["title"] == "Stop"
+    )
+    take_profit_section = next(
+        section
+        for section in payload["sections"]
+        if section["title"] == "Take Profit"
+    )
     cautions = next(
         section["items"]
         for section in payload["sections"]
@@ -3545,6 +3556,49 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_component_extreme_presence_summary == {
         name: True for name in selected_component_extreme_presence_targets
     }
+    selected_latest_report_trade_plan_tokens = [
+        swing_signal["entry_summary"],
+        swing_signal["stop_summary"],
+        swing_signal["take_profit_summary"],
+        swing_signal["invalidation_summary"],
+    ]
+    selected_entry_section_tokens = [
+        swing_signal["entry_summary"],
+        swing_signal["entry"]["trigger"],
+    ]
+    selected_stop_section_tokens = list(swing_signal["stop"])
+    selected_take_profit_section_tokens = list(swing_signal["take_profit"])
+    selected_text_trade_plan_tokens = (
+        selected_entry_section_tokens
+        + selected_stop_section_tokens
+        + selected_take_profit_section_tokens
+    )
+    selected_trade_plan_presence_targets = {
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            selected_latest_report_trade_plan_tokens,
+        ),
+        "entry_section": (entry_section, selected_entry_section_tokens),
+        "stop_section": (stop_section, selected_stop_section_tokens),
+        "take_profit_section": (
+            take_profit_section,
+            selected_take_profit_section_tokens,
+        ),
+        "payload_text": ([payload["text"]], selected_text_trade_plan_tokens),
+    }
+    selected_trade_plan_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_trade_plan_presence_targets.items()
+    }
+    assert selected_trade_plan_presence_summary == {
+        name: True for name in selected_trade_plan_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -3657,6 +3711,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     )
     decision_section = next(
         section for section in payload["sections"] if section["title"] == "Decision"
+    )
+    entry_section = next(
+        section for section in payload["sections"] if section["title"] == "Entry"
+    )
+    stop_section = next(
+        section for section in payload["sections"] if section["title"] == "Stop"
+    )
+    take_profit_section = next(
+        section
+        for section in payload["sections"]
+        if section["title"] == "Take Profit"
     )
     cautions = next(
         section["items"]
@@ -5866,6 +5931,49 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_component_extreme_presence_summary == {
         name: True for name in selected_component_extreme_presence_targets
+    }
+    selected_latest_report_trade_plan_tokens = [
+        qqq_signal["entry_summary"],
+        qqq_signal["stop_summary"],
+        qqq_signal["take_profit_summary"],
+        qqq_signal["invalidation_summary"],
+    ]
+    selected_entry_section_tokens = [
+        qqq_signal["entry_summary"],
+        qqq_signal["entry"]["trigger"],
+    ]
+    selected_stop_section_tokens = list(qqq_signal["stop"])
+    selected_take_profit_section_tokens = list(qqq_signal["take_profit"])
+    selected_text_trade_plan_tokens = (
+        selected_entry_section_tokens
+        + selected_stop_section_tokens
+        + selected_take_profit_section_tokens
+    )
+    selected_trade_plan_presence_targets = {
+        "latest_signal_report": (
+            payload["latest_signal_report"],
+            selected_latest_report_trade_plan_tokens,
+        ),
+        "entry_section": (entry_section, selected_entry_section_tokens),
+        "stop_section": (stop_section, selected_stop_section_tokens),
+        "take_profit_section": (
+            take_profit_section,
+            selected_take_profit_section_tokens,
+        ),
+        "payload_text": ([payload["text"]], selected_text_trade_plan_tokens),
+    }
+    selected_trade_plan_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_trade_plan_presence_targets.items()
+    }
+    assert selected_trade_plan_presence_summary == {
+        name: True for name in selected_trade_plan_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()
