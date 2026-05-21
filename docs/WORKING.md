@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_PROPAGATION_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_PROPAGATION_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected source_signal_ref traceable format and sha256 config_hash digest guards stay aligned with emitted source refs
+next_atomic_step: add SQLite filtered latest report coverage proving selected source_repository_ref propagates consistently into top-level, evidence context, latest record guard, evidence guard, and report payload guard surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
-  - SQLite repository-backed latest report underlying filter validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
-  - filtered source signal ref traceability summary remains derived from emitted source_signal_ref and report_payload_guard traceability surfaces
-  - selected source_signal_ref config_hash remains sha256-prefixed with a 64-character lowercase hex digest
+  - SQLite repository-backed latest report timeframe filter validates selected source_repository_ref propagates to top-level payload, evidence context, latest record guard, evidence guard, and report payload guard surfaces
+  - SQLite repository-backed latest report underlying filter validates selected source_repository_ref propagates to top-level payload, evidence context, latest record guard, evidence guard, and report payload guard surfaces
+  - filtered source repository ref propagation summary remains derived from emitted source_repository_ref, evidence_context, latest_record_guard, evidence_guard, and report_payload_guard surfaces
+  - source_repository_ref schema and path-free guard expected/actual values remain aligned with emitted selected repository ref
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_TRACEABILITY_COVERAGE_GATE
-scope: SQLite repository-backed filtered source signal ref traceability coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_PROPAGATION_COVERAGE_GATE
+scope: SQLite repository-backed filtered source repository ref propagation coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -112,7 +112,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.34s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.28s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
-  - SQLite underlying-filtered latest report validates source_signal_ref traceable-format guard and sha256 digest guard align with emitted selected source refs
-  - filtered source signal ref traceability summary remains derived from emitted source_signal_ref and report_payload_guard traceability surfaces
-  - selected source_signal_ref config_hash remains sha256-prefixed with a 64-character lowercase hex digest
+  - SQLite timeframe-filtered latest report validates selected source_repository_ref propagates to top-level payload, evidence context, latest record guard, evidence guard, and report payload guard surfaces
+  - SQLite underlying-filtered latest report validates selected source_repository_ref propagates to top-level payload, evidence context, latest record guard, evidence guard, and report payload guard surfaces
+  - filtered source repository ref propagation summary remains derived from emitted source_repository_ref, evidence_context, latest_record_guard, evidence_guard, and report_payload_guard surfaces
+  - source_repository_ref schema and path-free guard expected/actual values remain aligned with emitted selected repository ref
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

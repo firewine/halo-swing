@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.228 P1 Repository SQLite Latest Report Source Repository Ref Propagation Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.227에서 SQLite repository-backed filtered latest report의 selected `source_signal_ref` traceability를
+고정했다. 이번 slice는 selected `source_repository_ref`가 top-level payload, evidence context,
+latest record guard, evidence guard, report payload guard surfaces로 일관되게 전파되고, schema 및
+path-free guard expected/actual 값이 emitted repository ref와 정렬되는지 summary 형태로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source repository ref propagation coverage
+  - extend SQLite underlying-filtered source repository ref propagation coverage
+  - assert selected source_repository_ref propagates into payload, evidence context, and latest record guard
+  - assert evidence and report payload source repository ref schema/path-free guards stay aligned
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.28s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.227 P1 Repository SQLite Latest Report Source Signal Ref Traceability Coverage Gate Record - 2026-05-22
 
 ### A. 목적
