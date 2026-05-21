@@ -3682,6 +3682,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_guard_summary == {
         name: True for name in selected_source_summary_guard_targets
     }
+    excluded_source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=TQQQ underlying=<any> timeframe=swing_5d_20d"
+    )
+    selected_source_summary_exclusion_targets = {
+        "report_contract_source_summary_guard": (
+            [
+                report_contract_guard_checks[
+                    "report_text_reflects_source_repository_summary"
+                ]["expected"],
+                report_contract_guard_checks[
+                    "report_text_reflects_source_repository_summary"
+                ]["actual"],
+            ],
+            [excluded_source_summary, alternate_signal["signal_id"]],
+        ),
+        "reasons_source_summary": (
+            reasons,
+            [excluded_source_summary, alternate_signal["signal_id"]],
+        ),
+        "payload_text_source_summary": (
+            [payload["text"]],
+            [excluded_source_summary, alternate_signal["signal_id"]],
+        ),
+    }
+    selected_source_summary_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_tokens
+        )
+        for name, (
+            target,
+            excluded_tokens,
+        ) in selected_source_summary_exclusion_targets.items()
+    }
+    assert selected_source_summary_exclusion_summary == {
+        name: True for name in selected_source_summary_exclusion_targets
+    }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
             payload["source_repository_ref"] == source_repository_ref,
@@ -6934,6 +6974,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_summary_guard_summary == {
         name: True for name in selected_source_summary_guard_targets
+    }
+    excluded_source_summary = (
+        "Repository source: sqlite_signal_repository; "
+        "db_required=true; "
+        "filters asset=TQQQ underlying=SOXX timeframe=swing_3d_10d"
+    )
+    selected_source_summary_exclusion_targets = {
+        "report_contract_source_summary_guard": (
+            [
+                report_contract_guard_checks[
+                    "report_text_reflects_source_repository_summary"
+                ]["expected"],
+                report_contract_guard_checks[
+                    "report_text_reflects_source_repository_summary"
+                ]["actual"],
+            ],
+            [excluded_source_summary, ndx_signal["signal_id"]],
+        ),
+        "reasons_source_summary": (
+            reasons,
+            [excluded_source_summary, ndx_signal["signal_id"]],
+        ),
+        "payload_text_source_summary": (
+            [payload["text"]],
+            [excluded_source_summary, ndx_signal["signal_id"]],
+        ),
+    }
+    selected_source_summary_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_tokens
+        )
+        for name, (
+            target,
+            excluded_tokens,
+        ) in selected_source_summary_exclusion_targets.items()
+    }
+    assert selected_source_summary_exclusion_summary == {
+        name: True for name in selected_source_summary_exclusion_targets
     }
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [

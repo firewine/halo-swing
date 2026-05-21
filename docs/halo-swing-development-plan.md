@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.233 P1 Repository SQLite Latest Report Source Summary Filter Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.232에서 SQLite repository-backed filtered latest report의 selected source repository summary guard
+alignment를 고정했다. 이번 slice는 selected source repository summary surfaces가 filtered-out repository
+record의 summary 및 identity token을 노출하지 않는지 고정한다. timeframe filter는 filtered-out
+`swing_5d_20d` summary를 배제하고, underlying filter는 filtered-out `SOXX` summary를 배제해야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source summary exclusion coverage
+  - extend SQLite underlying-filtered source summary exclusion coverage
+  - assert report contract source summary guard excludes filtered-out summary text and signal ids
+  - assert reasons source summary excludes filtered-out summary text and signal ids
+  - assert rendered report text source summary excludes filtered-out summary text and signal ids
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.71s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.232 P1 Repository SQLite Latest Report Source Summary Guard Coverage Gate Record - 2026-05-22
 
 ### A. 목적
