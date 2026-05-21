@@ -1306,6 +1306,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action_label": "ALT_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.1111,
         "confidence": 0.1111,
+        "data_freshness_status": "STALE",
+        "degraded_mode": True,
+        "data_warnings": ["ALT_TIMEFRAME_DATA_WARNING_SHOULD_NOT_RENDER"],
         "entry_summary": "ALT_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "ALT_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "ALT_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -1328,6 +1331,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action_label": "OLD_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.2222,
         "confidence": 0.2222,
+        "data_freshness_status": "PARTIAL",
+        "degraded_mode": True,
+        "data_warnings": ["OLD_TIMEFRAME_DATA_WARNING_SHOULD_NOT_RENDER"],
         "entry_summary": "OLD_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "OLD_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "OLD_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -4656,6 +4662,50 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
     }
+    excluded_degradation_tokens = [
+        token
+        for excluded_signal in (alternate_signal, older_matching_signal)
+        for token in (
+            excluded_signal["data_freshness_status"],
+            *excluded_signal["data_warnings"],
+        )
+    ]
+    selected_degradation_exclusion_targets = {
+        "latest_signal_report": payload["latest_signal_report"],
+        "cautions": cautions,
+        "payload_text": [payload["text"]],
+        "evidence_guard_checks": evidence_guard_checks,
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_degradation_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_degradation_tokens
+        )
+        for name, target in selected_degradation_exclusion_targets.items()
+    }
+    assert selected_degradation_exclusion_summary == {
+        name: True for name in selected_degradation_exclusion_targets
+    }
+    selected_degradation_field_targets = {
+        "latest_signal_report_data_freshness": [
+            payload["latest_signal_report"]["data_freshness_status"]
+            == swing_signal["data_freshness_status"],
+            payload["latest_signal_report"]["degraded_mode"]
+            == swing_signal["degraded_mode"],
+            payload["latest_signal_report"]["data_warnings"]
+            == swing_signal["data_warnings"],
+        ],
+    }
+    selected_degradation_field_summary = {
+        name: all(checks)
+        for name, checks in selected_degradation_field_targets.items()
+    }
+    assert selected_degradation_field_summary == {
+        name: True for name in selected_degradation_field_targets
+    }
     selected_conflict_flag_tokens = [
         token
         for flag in evidence_context["conflict_flags"]
@@ -5155,6 +5205,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action_label": "ALT_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.3333,
         "confidence": 0.3333,
+        "data_freshness_status": "STALE",
+        "degraded_mode": True,
+        "data_warnings": ["ALT_UNDERLYING_DATA_WARNING_SHOULD_NOT_RENDER"],
         "entry_summary": "ALT_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "ALT_UNDERLYING_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "ALT_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -5177,6 +5230,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action_label": "OLD_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.4444,
         "confidence": 0.4444,
+        "data_freshness_status": "PARTIAL",
+        "degraded_mode": True,
+        "data_warnings": ["OLD_UNDERLYING_DATA_WARNING_SHOULD_NOT_RENDER"],
         "entry_summary": "OLD_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
         "stop_summary": "OLD_UNDERLYING_STOP_SHOULD_NOT_RENDER",
         "take_profit_summary": "OLD_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
@@ -8503,6 +8559,50 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
+    }
+    excluded_degradation_tokens = [
+        token
+        for excluded_signal in (ndx_signal, older_matching_signal)
+        for token in (
+            excluded_signal["data_freshness_status"],
+            *excluded_signal["data_warnings"],
+        )
+    ]
+    selected_degradation_exclusion_targets = {
+        "latest_signal_report": payload["latest_signal_report"],
+        "cautions": cautions,
+        "payload_text": [payload["text"]],
+        "evidence_guard_checks": evidence_guard_checks,
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_degradation_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_degradation_tokens
+        )
+        for name, target in selected_degradation_exclusion_targets.items()
+    }
+    assert selected_degradation_exclusion_summary == {
+        name: True for name in selected_degradation_exclusion_targets
+    }
+    selected_degradation_field_targets = {
+        "latest_signal_report_data_freshness": [
+            payload["latest_signal_report"]["data_freshness_status"]
+            == qqq_signal["data_freshness_status"],
+            payload["latest_signal_report"]["degraded_mode"]
+            == qqq_signal["degraded_mode"],
+            payload["latest_signal_report"]["data_warnings"]
+            == qqq_signal["data_warnings"],
+        ],
+    }
+    selected_degradation_field_summary = {
+        name: all(checks)
+        for name, checks in selected_degradation_field_targets.items()
+    }
+    assert selected_degradation_field_summary == {
+        name: True for name in selected_degradation_field_targets
     }
     selected_conflict_flag_tokens = [
         token
