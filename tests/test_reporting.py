@@ -1315,6 +1315,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     reasons = next(
         section for section in payload["sections"] if section["title"] == "Reasons"
     )
+    cautions = next(
+        section["items"]
+        for section in payload["sections"]
+        if section["title"] == "Cautions"
+    )
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
@@ -1549,6 +1554,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for flag in evidence_context["conflict_flags"]
         ],
     }
+    assert evidence_context["risk_warnings"]
+    assert set(evidence_context["risk_warnings"]).issubset(cautions)
+    assert all(
+        flag["status"] == "acknowledged"
+        for flag in evidence_context["conflict_flags"]
+    )
+    assert evidence_guard_checks["risk_warnings_reflected_in_cautions"] == {
+        "name": "risk_warnings_reflected_in_cautions",
+        "passed": True,
+        "expected": evidence_context["risk_warnings"],
+        "actual": cautions,
+    }
+    assert evidence_guard_checks["flagged_conflicts_are_acknowledged"] == {
+        "name": "flagged_conflicts_are_acknowledged",
+        "passed": True,
+        "expected": "acknowledged",
+        "actual": [
+            flag["status"]
+            for flag in evidence_context["conflict_flags"]
+        ],
+    }
     assert evidence_guard_checks[
         "evidence_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -1580,6 +1606,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
     assert "conflict_flags_have_required_fields" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
+    assert "risk_warnings_reflected_in_cautions" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "flagged_conflicts_are_acknowledged" in evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
@@ -2200,6 +2232,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     reasons = next(
         section for section in payload["sections"] if section["title"] == "Reasons"
     )
+    cautions = next(
+        section["items"]
+        for section in payload["sections"]
+        if section["title"] == "Cautions"
+    )
     report_payload_guard_checks = {
         check["name"]: check for check in payload["report_payload_guard"]["checks"]
     }
@@ -2434,6 +2471,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for flag in evidence_context["conflict_flags"]
         ],
     }
+    assert evidence_context["risk_warnings"]
+    assert set(evidence_context["risk_warnings"]).issubset(cautions)
+    assert all(
+        flag["status"] == "acknowledged"
+        for flag in evidence_context["conflict_flags"]
+    )
+    assert evidence_guard_checks["risk_warnings_reflected_in_cautions"] == {
+        "name": "risk_warnings_reflected_in_cautions",
+        "passed": True,
+        "expected": evidence_context["risk_warnings"],
+        "actual": cautions,
+    }
+    assert evidence_guard_checks["flagged_conflicts_are_acknowledged"] == {
+        "name": "flagged_conflicts_are_acknowledged",
+        "passed": True,
+        "expected": "acknowledged",
+        "actual": [
+            flag["status"]
+            for flag in evidence_context["conflict_flags"]
+        ],
+    }
     assert evidence_guard_checks[
         "evidence_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -2465,6 +2523,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
     assert "conflict_flags_have_required_fields" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
+    assert "risk_warnings_reflected_in_cautions" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "flagged_conflicts_are_acknowledged" in evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
