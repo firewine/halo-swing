@@ -4362,6 +4362,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_raw_marker_free_summary == {
         name: True for name in selected_filter_raw_marker_free_targets
     }
+    selected_filter_guard_raw_marker_free_targets = {
+        "evidence_guard_checks": evidence_guard_checks,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "delivery_preview": delivery_preview,
+        "reasons": reasons,
+        "source_summary": [source_summary],
+    }
+    selected_filter_guard_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_guard_raw_marker_free_targets.items()
+    }
+    assert selected_filter_guard_raw_marker_free_summary == {
+        name: True for name in selected_filter_guard_raw_marker_free_targets
+    }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
             actual_top_level_identity,
@@ -7999,6 +8017,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_filter_raw_marker_free_summary == {
         name: True for name in selected_filter_raw_marker_free_targets
+    }
+    selected_filter_guard_raw_marker_free_targets = {
+        "evidence_guard_checks": evidence_guard_checks,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "delivery_preview": delivery_preview,
+        "reasons": reasons,
+        "source_summary": [source_summary],
+    }
+    selected_filter_guard_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_guard_raw_marker_free_targets.items()
+    }
+    assert selected_filter_guard_raw_marker_free_summary == {
+        name: True for name in selected_filter_guard_raw_marker_free_targets
     }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
