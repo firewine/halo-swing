@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.252 P1 Repository SQLite Latest Report Filtered Source Signal Config Digest Surface Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.251에서 SQLite repository-backed filtered latest report의 report, evidence, guard, prompt, delivery,
+rendered text surfaces가 filtered-out source signal `config_hash` 전체 문자열을 노출하지 않는지
+고정했다. 이번 slice는 `sha256:` prefix가 제거된 digest 값만 별도로 새는 경우까지 막는다.
+filtered-out record와 older matching record의 source signal config digest는 사용자-facing 또는
+agent-facing read-model 표면에 남지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - include filtered-out timeframe source signal config digest in full report surface exclusion tokens
+  - include older matching timeframe source signal config digest in full report surface exclusion tokens
+  - include filtered-out underlying source signal config digest in full report surface exclusion tokens
+  - include older matching underlying source signal config digest in full report surface exclusion tokens
+  - keep selected source signal config hash traceability surfaces unchanged
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.90s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.80s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.251 P1 Repository SQLite Latest Report Filtered Source Signal Config Surface Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적
