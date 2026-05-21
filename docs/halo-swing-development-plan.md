@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.207 P1 Repository SQLite Latest Report Filtered Excluded Record Free Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.206에서 SQLite repository-backed filtered latest report의 emitted surface summary가 database
+filename, filename stem, parent directory 같은 path component를 노출하지 않도록 고정했다.
+이번 slice는 timeframe 또는 underlying filter에서 제외된 SQLite record의 `signal_id` 및
+`run_id`가 label, evidence, source, guard, prompt, intent, delivery, reason, text surface에
+섞여 나오지 않도록 emitted nested strings 기반 summary로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered excluded-record-free summary coverage
+  - extend SQLite underlying-filtered excluded-record-free summary coverage
+  - assert emitted summary surfaces omit excluded signal_id and run_id tokens
+  - keep excluded-record checks derived from emitted nested strings
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.85s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.29s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.206 P1 Repository SQLite Latest Report Filtered Path Component Free Coverage Gate Record - 2026-05-22
 
 ### A. 목적

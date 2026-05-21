@@ -3270,6 +3270,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_path_component_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    excluded_record_tokens = [
+        alternate_signal["signal_id"],
+        alternate_signal["run_id"],
+    ]
+    filtered_report_excluded_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_record_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_excluded_record_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5315,6 +5330,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         for name, target in filtered_report_path_free_targets.items()
     }
     assert filtered_report_path_component_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    excluded_record_tokens = [
+        ndx_signal["signal_id"],
+        ndx_signal["run_id"],
+    ]
+    filtered_report_excluded_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_record_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
     assert all(
