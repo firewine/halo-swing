@@ -3415,6 +3415,53 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
     }
+    selected_source_signal_ref_propagation_targets = {
+        "source_signal_ref_values": [
+            payload["source_signal_ref"]["signal_id"] == swing_signal["signal_id"],
+            payload["source_signal_ref"]["run_id"] == swing_signal["run_id"],
+            payload["source_signal_ref"]["config_hash"]
+            == swing_signal["config_hash"],
+        ],
+        "latest_signal_report_values": [
+            payload["latest_signal_report"]["signal_id"]
+            == swing_signal["signal_id"],
+            payload["latest_signal_report"]["config_hash"]
+            == swing_signal["config_hash"],
+        ],
+        "report_payload_source_signal_ref_identity_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["signal_id"]
+            == swing_signal["signal_id"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["config_hash"]
+            == swing_signal["config_hash"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["signal_id"]
+            == swing_signal["signal_id"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["config_hash"]
+            == swing_signal["config_hash"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["run_id_nonempty"]
+            is True,
+        ],
+    }
+    selected_source_signal_ref_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_propagation_targets.items()
+    }
+    assert selected_source_signal_ref_propagation_summary == {
+        name: True for name in selected_source_signal_ref_propagation_targets
+    }
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (
             label_status,
@@ -6286,6 +6333,53 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
+    }
+    selected_source_signal_ref_propagation_targets = {
+        "source_signal_ref_values": [
+            payload["source_signal_ref"]["signal_id"] == qqq_signal["signal_id"],
+            payload["source_signal_ref"]["run_id"] == qqq_signal["run_id"],
+            payload["source_signal_ref"]["config_hash"]
+            == qqq_signal["config_hash"],
+        ],
+        "latest_signal_report_values": [
+            payload["latest_signal_report"]["signal_id"]
+            == qqq_signal["signal_id"],
+            payload["latest_signal_report"]["config_hash"]
+            == qqq_signal["config_hash"],
+        ],
+        "report_payload_source_signal_ref_identity_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["signal_id"]
+            == qqq_signal["signal_id"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["config_hash"]
+            == qqq_signal["config_hash"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["run_id_nonempty"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["signal_id"]
+            == qqq_signal["signal_id"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["config_hash"]
+            == qqq_signal["config_hash"],
+            report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["run_id_nonempty"]
+            is True,
+        ],
+    }
+    selected_source_signal_ref_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_source_signal_ref_propagation_targets.items()
+    }
+    assert selected_source_signal_ref_propagation_summary == {
+        name: True for name in selected_source_signal_ref_propagation_targets
     }
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (

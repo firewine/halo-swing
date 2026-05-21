@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_PROPAGATION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_PROPAGATION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LABEL_STATUS_PROPAGATION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_SIGNAL_REF_PROPAGATION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.225",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected label status fields propagate consistently into latest_signal_report, evidence context, and evidence guard surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.226",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected source_signal_ref fields propagate consistently into latest_signal_report and report payload source-signal-ref guard surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.224",
+    "docs/halo-swing-development-plan.md#4.225",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected label status fields propagate to latest_signal_report, evidence context, and evidence guard expected/actual values",
-    "SQLite repository-backed latest report underlying filter validates selected label status fields propagate to latest_signal_report, evidence context, and evidence guard expected/actual values",
-    "filtered label status propagation summary remains derived from emitted label_status, evidence_context label_status, and evidence_guard surfaces",
-    "filtered-out and older matching record label statuses remain excluded through existing exclusion and latest-matching coverage",
+    "SQLite repository-backed latest report timeframe filter validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values",
+    "SQLite repository-backed latest report underlying filter validates selected source_signal_ref signal_id, run_id, and config_hash propagate to latest_signal_report and payload source-signal-ref guard expected/actual values",
+    "filtered source signal ref propagation summary remains derived from emitted source_signal_ref, latest_signal_report, and report_payload_guard surfaces",
+    "filtered-out and older matching record identities remain excluded through existing exclusion and latest-matching coverage",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
