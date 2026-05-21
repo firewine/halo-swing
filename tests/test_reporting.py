@@ -2200,6 +2200,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
+    emitted_report_contract_guard_check_keys = {
+        check["name"]: list(check)
+        for check in payload["report_contract_guard"]["checks"]
+    }
+    assert report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in (
+                emitted_report_contract_guard_check_keys.items()
+            )
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            "telegram_text_fits_single_message": (
+                emitted_report_contract_guard_check_keys[
+                    "telegram_text_fits_single_message"
+                ]
+            ),
+        },
+    }
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ] == {
@@ -3533,6 +3556,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert "report_text_reflects_label_status_summary" in report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["expected"]["default_check_names"]
+    emitted_report_contract_guard_check_keys = {
+        check["name"]: list(check)
+        for check in payload["report_contract_guard"]["checks"]
+    }
+    assert report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]["actual"] == {
+        "default_keys": ["name", "passed", "expected", "actual"],
+        "default_check_names": [
+            check_name
+            for check_name, check_keys in (
+                emitted_report_contract_guard_check_keys.items()
+            )
+            if check_keys == ["name", "passed", "expected", "actual"]
+        ],
+        "special_check_keys": {
+            "telegram_text_fits_single_message": (
+                emitted_report_contract_guard_check_keys[
+                    "telegram_text_fits_single_message"
+                ]
+            ),
+        },
+    }
     assert report_payload_guard_checks[
         "report_payload_source_repository_ref_keys_match_expected_schema"
     ] == {
