@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_PREVIEW_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_CONTRACT_PROFILE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_PREVIEW_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_DELIVERY_CONTRACT_PROFILE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.216",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.217",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.215",
+    "docs/halo-swing-development-plan.md#4.216",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces",
-    "SQLite repository-backed latest report underlying filter validates selected report text and trade plan fields are preserved across emitted offline delivery preview surfaces",
-    "filtered selected-delivery-preview summary remains derived from emitted nested strings",
-    "filtered selected-delivery-preview summary covers Telegram chunks, reconstructed Telegram text, required section headers, and Hermes structured payload ref",
+    "SQLite repository-backed latest report timeframe filter validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces",
+    "SQLite repository-backed latest report underlying filter validates selected delivery contract profiles and prompt intent terms are preserved across emitted contract and guard surfaces",
+    "filtered selected-delivery-contract summary remains derived from emitted nested strings",
+    "filtered selected-delivery-contract summary covers report intent, prompt contract, Hermes and Telegram delivery contracts, Telegram preview profile, and report contract guard actuals",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

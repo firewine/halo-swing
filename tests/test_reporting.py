@@ -3639,6 +3639,77 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_preview_presence_summary == {
         name: True for name in selected_delivery_preview_presence_targets
     }
+    selected_delivery_contract_profile_targets = {
+        "report_intent_contract": (
+            report_intent_contract,
+            [
+                "pre_market_swing_report",
+                "weekday_pre_market",
+                "new_swing_entry_and_watchlist",
+            ]
+            + expected_report_sections,
+        ),
+        "prompt_contract": (
+            prompt_contract,
+            expected_prompt_terms + list(expected_prompt_identity.values()),
+        ),
+        "hermes_delivery_contract": (
+            delivery_channels["hermes"],
+            ["structured_json_plus_text", "latest_signal_report"],
+        ),
+        "telegram_delivery_contract": (
+            telegram_contract,
+            [
+                "telegram_report_format.v1",
+                "plain_text",
+                "split_on_section_boundary",
+                "1_based",
+            ]
+            + expected_report_sections,
+        ),
+        "telegram_preview_profile": (
+            telegram_preview,
+            [
+                "telegram_report_format.v1",
+                "plain_text",
+                "split_on_section_boundary",
+                "1_based",
+            ],
+        ),
+        "report_contract_guard_delivery_profile": (
+            [
+                report_contract_guard_checks[
+                    "delivery_channel_formats_match_expected"
+                ]["actual"],
+                report_contract_guard_checks[
+                    "report_telegram_schema_version_matches_expected"
+                ]["actual"],
+                report_contract_guard_checks[
+                    "report_telegram_chunking_contract_matches_expected"
+                ]["actual"],
+            ],
+            [
+                "structured_json_plus_text",
+                "plain_text",
+                "telegram_report_format.v1",
+                "split_on_section_boundary",
+                "1_based",
+            ],
+        ),
+    }
+    selected_delivery_contract_profile_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_delivery_contract_profile_targets.items()
+    }
+    assert selected_delivery_contract_profile_summary == {
+        name: True for name in selected_delivery_contract_profile_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -6054,6 +6125,77 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_delivery_preview_presence_summary == {
         name: True for name in selected_delivery_preview_presence_targets
+    }
+    selected_delivery_contract_profile_targets = {
+        "report_intent_contract": (
+            report_intent_contract,
+            [
+                "pre_market_swing_report",
+                "weekday_pre_market",
+                "new_swing_entry_and_watchlist",
+            ]
+            + expected_report_sections,
+        ),
+        "prompt_contract": (
+            prompt_contract,
+            expected_prompt_terms + list(expected_prompt_identity.values()),
+        ),
+        "hermes_delivery_contract": (
+            delivery_channels["hermes"],
+            ["structured_json_plus_text", "latest_signal_report"],
+        ),
+        "telegram_delivery_contract": (
+            telegram_contract,
+            [
+                "telegram_report_format.v1",
+                "plain_text",
+                "split_on_section_boundary",
+                "1_based",
+            ]
+            + expected_report_sections,
+        ),
+        "telegram_preview_profile": (
+            telegram_preview,
+            [
+                "telegram_report_format.v1",
+                "plain_text",
+                "split_on_section_boundary",
+                "1_based",
+            ],
+        ),
+        "report_contract_guard_delivery_profile": (
+            [
+                report_contract_guard_checks[
+                    "delivery_channel_formats_match_expected"
+                ]["actual"],
+                report_contract_guard_checks[
+                    "report_telegram_schema_version_matches_expected"
+                ]["actual"],
+                report_contract_guard_checks[
+                    "report_telegram_chunking_contract_matches_expected"
+                ]["actual"],
+            ],
+            [
+                "structured_json_plus_text",
+                "plain_text",
+                "telegram_report_format.v1",
+                "split_on_section_boundary",
+                "1_based",
+            ],
+        ),
+    }
+    selected_delivery_contract_profile_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_delivery_contract_profile_targets.items()
+    }
+    assert selected_delivery_contract_profile_summary == {
+        name: True for name in selected_delivery_contract_profile_targets
     }
     assert all(
         ".sqlite" not in value.lower()

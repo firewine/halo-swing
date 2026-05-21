@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.217 P1 Repository SQLite Latest Report Filtered Selected Delivery Contract Profile Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.216에서 SQLite repository-backed filtered latest report의 선택된 report text와 trade plan fields가
+offline delivery preview의 Telegram chunks 및 reconstructed text로 보존되는지 고정했다. 이번 slice는
+같은 filtered report에서 delivery contract profile, report intent, prompt terms, Telegram preview
+profile, report contract guard actuals가 선택된 리포트 전달 계약을 유지하는지 nested strings 기반
+summary로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered selected-delivery contract profile coverage
+  - extend SQLite underlying-filtered selected-delivery contract profile coverage
+  - assert report intent and prompt contract terms remain present
+  - assert Hermes/Telegram contract profile tokens and guard actuals remain present
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.89s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.81s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.216 P1 Repository SQLite Latest Report Filtered Selected Delivery Preview Coverage Gate Record - 2026-05-22
 
 ### A. 목적
