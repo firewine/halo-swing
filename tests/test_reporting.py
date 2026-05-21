@@ -2212,6 +2212,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": "hermes_report.v1",
         "actual": "hermes_report.v1",
     }
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ]["actual"] == payload["schema_version"]
     assert "report_payload_schema_version_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"
@@ -3389,6 +3392,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": "hermes_report.v1",
         "actual": "hermes_report.v1",
     }
+    assert report_payload_guard_checks[
+        "report_payload_schema_version_matches_expected"
+    ]["actual"] == payload["schema_version"]
     assert "report_payload_schema_version_matches_expected" in (
         report_payload_guard_checks[
             "report_payload_guard_check_names_match_expected_schema"

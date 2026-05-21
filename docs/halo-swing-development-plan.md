@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.155 P1 Repository SQLite Latest Report Filtered Payload Schema Version Actual Coverage Gate Record - 2026-05-21
+
+### A. 목적
+
+4.154에서 SQLite repository-backed filtered latest report의
+`report_payload_live_data_required_matches_expected.actual`이 실제 emitted
+`payload["live_data_required"]`와 일치하는지 고정했다. 이번 slice는 같은 filtered report에서
+`report_payload_schema_version_matches_expected.actual`이 실제 emitted
+`payload["schema_version"]`과 직접 일치하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered report_payload_guard schema_version actual-value coverage
+  - extend SQLite underlying-filtered report_payload_guard schema_version actual-value coverage
+  - assert filtered report_payload_guard schema_version actual-value output omits database path and SQLite filenames
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.65s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 39.55s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.154 P1 Repository SQLite Latest Report Filtered Payload Live Data Actual Coverage Gate Record - 2026-05-21
 
 ### A. 목적
