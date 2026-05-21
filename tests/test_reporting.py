@@ -1456,6 +1456,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "decision_focus": "new_swing_entry_and_watchlist",
         "required_sections": expected_report_sections,
     }
+    section_titles = [section["title"] for section in payload["sections"]]
+    expected_text_section_positions = {
+        title: payload["text"].find(f"{title}:")
+        for title in expected_report_sections
+    }
+    expected_text_order_actual = {
+        "found_sections": expected_report_sections,
+        "positions_ascending": True,
+        "positions": expected_text_section_positions,
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
@@ -1533,7 +1543,50 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "must_include": expected_prompt_terms,
     }
     assert report_intent_contract == expected_report_intent_contract
-    assert [section["title"] for section in payload["sections"]] == expected_report_sections
+    assert section_titles == expected_report_sections
+    assert report_contract_guard_checks["required_sections_present"] == {
+        "name": "required_sections_present",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["intent_required_sections_present"] == {
+        "name": "intent_required_sections_present",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["report_sections_match_intent_order"] == {
+        "name": "report_sections_match_intent_order",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["report_text_sections_match_intent_order"] == {
+        "name": "report_text_sections_match_intent_order",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_text_order_actual,
+    }
+    assert all(
+        position >= 0 for position in expected_text_section_positions.values()
+    )
+    assert report_contract_guard_checks["telegram_required_sections_match_intent"] == {
+        "name": "telegram_required_sections_match_intent",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert "report_text_sections_match_intent_order" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "telegram_required_sections_match_intent" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
     assert report_contract_guard_checks["report_intent_is_supported"] == {
         "name": "report_intent_is_supported",
         "passed": True,
@@ -2113,6 +2166,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "decision_focus": "new_swing_entry_and_watchlist",
         "required_sections": expected_report_sections,
     }
+    section_titles = [section["title"] for section in payload["sections"]]
+    expected_text_section_positions = {
+        title: payload["text"].find(f"{title}:")
+        for title in expected_report_sections
+    }
+    expected_text_order_actual = {
+        "found_sections": expected_report_sections,
+        "positions_ascending": True,
+        "positions": expected_text_section_positions,
+    }
 
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
@@ -2190,7 +2253,50 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "must_include": expected_prompt_terms,
     }
     assert report_intent_contract == expected_report_intent_contract
-    assert [section["title"] for section in payload["sections"]] == expected_report_sections
+    assert section_titles == expected_report_sections
+    assert report_contract_guard_checks["required_sections_present"] == {
+        "name": "required_sections_present",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["intent_required_sections_present"] == {
+        "name": "intent_required_sections_present",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["report_sections_match_intent_order"] == {
+        "name": "report_sections_match_intent_order",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert report_contract_guard_checks["report_text_sections_match_intent_order"] == {
+        "name": "report_text_sections_match_intent_order",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_text_order_actual,
+    }
+    assert all(
+        position >= 0 for position in expected_text_section_positions.values()
+    )
+    assert report_contract_guard_checks["telegram_required_sections_match_intent"] == {
+        "name": "telegram_required_sections_match_intent",
+        "passed": True,
+        "expected": expected_report_sections,
+        "actual": expected_report_sections,
+    }
+    assert "report_text_sections_match_intent_order" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["expected"]
+    )
+    assert "telegram_required_sections_match_intent" in (
+        report_contract_guard_checks[
+            "report_contract_guard_check_keys_match_expected_schema"
+        ]["expected"]["default_check_names"]
+    )
     assert report_contract_guard_checks["report_intent_is_supported"] == {
         "name": "report_intent_is_supported",
         "passed": True,
