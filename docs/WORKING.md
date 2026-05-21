@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DEGRADATION_METADATA_EXCLUSION_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DEGRADATION_METADATA_EXCLUSION_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_CONFIG_EXCLUSION_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_CONFIG_EXCLUSION_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving filtered-out and older data freshness, degraded mode, and data warning values do not leak into selected report, caution, text, evidence guard, or delivery preview surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving filtered-out and older source signal config hash values do not leak into selected source signal refs, latest report, or report payload guard surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,9 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching data freshness status or data warning sentinel values do not leak into latest report, cautions, report text, evidence guard, Telegram chunks, or reconstructed Telegram text
-  - SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching data freshness status or data warning sentinel values do not leak into latest report, cautions, report text, evidence guard, Telegram chunks, or reconstructed Telegram text
-  - selected degradation metadata remains present while excluded repository degradation metadata remains absent after filtered repository selection
+  - SQLite repository-backed latest report timeframe filter validates filtered-out timeframe and older matching config hash values do not leak into source_signal_ref, latest report, or report payload source signal identity guard surfaces
+  - SQLite repository-backed latest report underlying filter validates filtered-out underlying and older matching config hash values do not leak into source_signal_ref, latest report, or report payload source signal identity guard surfaces
+  - selected source signal config hash remains present while excluded repository source signal config hashes remain absent after filtered repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
@@ -90,6 +90,48 @@ next_state_after_success: continue with next explicit repository or report read-
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_CONFIG_EXCLUSION_COVERAGE_GATE
+scope: SQLite repository-backed filtered source signal config exclusion coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.91s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.86s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite timeframe-filtered latest report validates filtered-out timeframe and older matching config hash values do not leak into source_signal_ref, latest report, or report payload source signal identity guard surfaces
+  - SQLite underlying-filtered latest report validates filtered-out underlying and older matching config hash values do not leak into source_signal_ref, latest report, or report payload source signal identity guard surfaces
+  - selected source signal config hash remains present while excluded repository source signal config hashes remain absent after filtered repository selection
+  - database_path marker remains absent from report and delivery surfaces
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed

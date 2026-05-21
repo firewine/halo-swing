@@ -1306,6 +1306,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action_label": "ALT_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.1111,
         "confidence": 0.1111,
+        "config_hash": f"sha256:{'a' * 64}",
         "data_freshness_status": "STALE",
         "degraded_mode": True,
         "data_warnings": ["ALT_TIMEFRAME_DATA_WARNING_SHOULD_NOT_RENDER"],
@@ -1331,6 +1332,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action_label": "OLD_TIMEFRAME_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.2222,
         "confidence": 0.2222,
+        "config_hash": f"sha256:{'b' * 64}",
         "data_freshness_status": "PARTIAL",
         "degraded_mode": True,
         "data_warnings": ["OLD_TIMEFRAME_DATA_WARNING_SHOULD_NOT_RENDER"],
@@ -3505,11 +3507,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "source_signal_ref": [
             payload["source_signal_ref"]["signal_id"] != excluded_signal["signal_id"]
             and payload["source_signal_ref"]["run_id"] != excluded_signal["run_id"]
+            and payload["source_signal_ref"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "latest_signal_report": [
             payload["latest_signal_report"]["signal_id"]
             != excluded_signal["signal_id"]
+            and payload["latest_signal_report"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "report_payload_source_signal_ref_identity_guard_expected": [
@@ -3517,6 +3523,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["expected"]["signal_id"]
             != excluded_signal["signal_id"]
+            and report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "report_payload_source_signal_ref_identity_guard_actual": [
@@ -3524,6 +3534,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["actual"]["signal_id"]
             != excluded_signal["signal_id"]
+            and report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
     }
@@ -5205,6 +5219,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action_label": "ALT_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.3333,
         "confidence": 0.3333,
+        "config_hash": f"sha256:{'c' * 64}",
         "data_freshness_status": "STALE",
         "degraded_mode": True,
         "data_warnings": ["ALT_UNDERLYING_DATA_WARNING_SHOULD_NOT_RENDER"],
@@ -5230,6 +5245,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action_label": "OLD_UNDERLYING_ACTION_LABEL_SHOULD_NOT_RENDER",
         "final_score": 0.4444,
         "confidence": 0.4444,
+        "config_hash": f"sha256:{'d' * 64}",
         "data_freshness_status": "PARTIAL",
         "degraded_mode": True,
         "data_warnings": ["OLD_UNDERLYING_DATA_WARNING_SHOULD_NOT_RENDER"],
@@ -7404,11 +7420,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "source_signal_ref": [
             payload["source_signal_ref"]["signal_id"] != excluded_signal["signal_id"]
             and payload["source_signal_ref"]["run_id"] != excluded_signal["run_id"]
+            and payload["source_signal_ref"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "latest_signal_report": [
             payload["latest_signal_report"]["signal_id"]
             != excluded_signal["signal_id"]
+            and payload["latest_signal_report"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "report_payload_source_signal_ref_identity_guard_expected": [
@@ -7416,6 +7436,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["expected"]["signal_id"]
             != excluded_signal["signal_id"]
+            and report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["expected"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
         "report_payload_source_signal_ref_identity_guard_actual": [
@@ -7423,6 +7447,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["actual"]["signal_id"]
             != excluded_signal["signal_id"]
+            and report_payload_guard_checks[
+                "report_payload_source_signal_ref_matches_report_identity"
+            ]["actual"]["config_hash"]
+            != excluded_signal["config_hash"]
             for excluded_signal in excluded_source_signals
         ],
     }
