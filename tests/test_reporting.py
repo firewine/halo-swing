@@ -2184,6 +2184,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": selected_label_summary,
         "actual": selected_label_summary,
     }
+    assert report_contract_guard_checks[
+        "report_text_reflects_label_status_summary"
+    ]["actual"] == (
+        selected_label_summary if selected_label_summary in payload["text"] else None
+    )
     assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["expected"]
@@ -3507,6 +3512,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": selected_label_summary,
         "actual": selected_label_summary,
     }
+    assert report_contract_guard_checks[
+        "report_text_reflects_label_status_summary"
+    ]["actual"] == (
+        selected_label_summary if selected_label_summary in payload["text"] else None
+    )
     assert "report_text_reflects_source_repository_summary" in report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["expected"]
