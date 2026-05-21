@@ -2475,6 +2475,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
+    expected_report_payload_guard_status = (
+        "ok"
+        if all(
+            check["passed"]
+            for check in payload["report_payload_guard"]["checks"]
+        )
+        else "failed"
+    )
+    assert payload["report_payload_guard"]["status"] == (
+        expected_report_payload_guard_status
+    )
     assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(evidence_contract)
     assert str(database_path) not in iter_nested_strings(evidence_context)
@@ -3743,6 +3754,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
+    expected_report_payload_guard_status = (
+        "ok"
+        if all(
+            check["passed"]
+            for check in payload["report_payload_guard"]["checks"]
+        )
+        else "failed"
+    )
+    assert payload["report_payload_guard"]["status"] == (
+        expected_report_payload_guard_status
+    )
     assert str(database_path) not in iter_nested_strings(label_status)
     assert str(database_path) not in iter_nested_strings(evidence_contract)
     assert str(database_path) not in iter_nested_strings(evidence_context)
