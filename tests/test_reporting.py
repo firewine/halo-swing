@@ -1338,6 +1338,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     telegram_contract = delivery_channels["telegram"]
     prompt_contract = payload["prompt_contract"]
     report_intent_contract = payload["report_intent_contract"]
+    evidence_contract = payload["evidence_contract"]
+    evidence_context = payload["evidence_context"]
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
         "latest_record_source_repository_ref_is_path_free",
@@ -1450,6 +1452,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "numeric_authority": "Use MCP numeric fields as source of truth.",
         "llm_role": "Summarize conflicts, caveats, and final wording only.",
     }
+    expected_evidence_contract = {
+        "max_reason_summary_chars": 260,
+        "max_evidence_summary_chars": 700,
+        "max_conflict_flags": 8,
+        "required_conflict_fields": ["name", "severity", "status", "details"],
+    }
+    expected_evidence_special_check_keys = {
+        "reason_summary_within_limit": [
+            "name",
+            "passed",
+            "expected_max_chars",
+            "actual_chars",
+        ],
+        "evidence_summary_within_limit": [
+            "name",
+            "passed",
+            "expected_max_chars",
+            "actual_chars",
+        ],
+        "conflict_flags_within_limit": [
+            "name",
+            "passed",
+            "expected_max",
+            "actual_count",
+        ],
+    }
     expected_report_intent_contract = {
         "name": "pre_market_swing_report",
         "schedule_hint": "weekday_pre_market",
@@ -1473,6 +1501,87 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "score_line_present": True,
     }
 
+    assert evidence_contract == expected_evidence_contract
+    assert evidence_context["source_repository_ref"] == source_repository_ref
+    assert (
+        len(evidence_context["reason_summary"])
+        <= evidence_contract["max_reason_summary_chars"]
+    )
+    assert (
+        len(evidence_context["evidence_summary"])
+        <= evidence_contract["max_evidence_summary_chars"]
+    )
+    assert (
+        len(evidence_context["conflict_flags"])
+        <= evidence_contract["max_conflict_flags"]
+    )
+    assert all(
+        all(
+            field in flag
+            for field in evidence_contract["required_conflict_fields"]
+        )
+        for flag in evidence_context["conflict_flags"]
+    )
+    assert evidence_guard_checks["reason_summary_within_limit"] == {
+        "name": "reason_summary_within_limit",
+        "passed": True,
+        "expected_max_chars": evidence_contract["max_reason_summary_chars"],
+        "actual_chars": len(latest_report["reason_summary"]),
+    }
+    assert evidence_guard_checks["evidence_summary_within_limit"] == {
+        "name": "evidence_summary_within_limit",
+        "passed": True,
+        "expected_max_chars": evidence_contract["max_evidence_summary_chars"],
+        "actual_chars": len(latest_report["evidence_summary"]),
+    }
+    assert evidence_guard_checks["conflict_flags_within_limit"] == {
+        "name": "conflict_flags_within_limit",
+        "passed": True,
+        "expected_max": evidence_contract["max_conflict_flags"],
+        "actual_count": len(evidence_context["conflict_flags"]),
+    }
+    assert evidence_guard_checks["conflict_flags_have_required_fields"] == {
+        "name": "conflict_flags_have_required_fields",
+        "passed": True,
+        "expected": evidence_contract["required_conflict_fields"],
+        "actual": [
+            sorted(flag)
+            for flag in evidence_context["conflict_flags"]
+        ],
+    }
+    assert evidence_guard_checks[
+        "evidence_source_repository_ref_keys_match_expected_schema"
+    ] == {
+        "name": "evidence_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
+    assert evidence_guard_checks["evidence_source_repository_ref_is_path_free"] == {
+        "name": "evidence_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+        "actual": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+    }
+    assert evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "conflict_flags_have_required_fields" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert payload["latest_signal_report"]["signal_id"] == swing_signal["signal_id"]
     assert payload["latest_signal_report"]["timeframe"] == "swing_3d_10d"
     label_status = payload["latest_signal_report"]["label_status"]
@@ -1969,6 +2078,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
+    assert str(database_path) not in iter_nested_strings(evidence_contract)
+    assert str(database_path) not in iter_nested_strings(evidence_context)
     assert str(database_path) not in iter_nested_strings(evidence_label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
@@ -1985,6 +2096,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_contract)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_context)
     )
     assert all(
         ".sqlite" not in value.lower()
@@ -2104,6 +2223,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     telegram_contract = delivery_channels["telegram"]
     prompt_contract = payload["prompt_contract"]
     report_intent_contract = payload["report_intent_contract"]
+    evidence_contract = payload["evidence_contract"]
+    evidence_context = payload["evidence_context"]
     expected_latest_record_guard_check_names = [
         "latest_record_source_repository_ref_keys_match_expected_schema",
         "latest_record_source_repository_ref_is_path_free",
@@ -2216,6 +2337,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "numeric_authority": "Use MCP numeric fields as source of truth.",
         "llm_role": "Summarize conflicts, caveats, and final wording only.",
     }
+    expected_evidence_contract = {
+        "max_reason_summary_chars": 260,
+        "max_evidence_summary_chars": 700,
+        "max_conflict_flags": 8,
+        "required_conflict_fields": ["name", "severity", "status", "details"],
+    }
+    expected_evidence_special_check_keys = {
+        "reason_summary_within_limit": [
+            "name",
+            "passed",
+            "expected_max_chars",
+            "actual_chars",
+        ],
+        "evidence_summary_within_limit": [
+            "name",
+            "passed",
+            "expected_max_chars",
+            "actual_chars",
+        ],
+        "conflict_flags_within_limit": [
+            "name",
+            "passed",
+            "expected_max",
+            "actual_count",
+        ],
+    }
     expected_report_intent_contract = {
         "name": "pre_market_swing_report",
         "schedule_hint": "weekday_pre_market",
@@ -2239,6 +2386,87 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "score_line_present": True,
     }
 
+    assert evidence_contract == expected_evidence_contract
+    assert evidence_context["source_repository_ref"] == source_repository_ref
+    assert (
+        len(evidence_context["reason_summary"])
+        <= evidence_contract["max_reason_summary_chars"]
+    )
+    assert (
+        len(evidence_context["evidence_summary"])
+        <= evidence_contract["max_evidence_summary_chars"]
+    )
+    assert (
+        len(evidence_context["conflict_flags"])
+        <= evidence_contract["max_conflict_flags"]
+    )
+    assert all(
+        all(
+            field in flag
+            for field in evidence_contract["required_conflict_fields"]
+        )
+        for flag in evidence_context["conflict_flags"]
+    )
+    assert evidence_guard_checks["reason_summary_within_limit"] == {
+        "name": "reason_summary_within_limit",
+        "passed": True,
+        "expected_max_chars": evidence_contract["max_reason_summary_chars"],
+        "actual_chars": len(latest_report["reason_summary"]),
+    }
+    assert evidence_guard_checks["evidence_summary_within_limit"] == {
+        "name": "evidence_summary_within_limit",
+        "passed": True,
+        "expected_max_chars": evidence_contract["max_evidence_summary_chars"],
+        "actual_chars": len(latest_report["evidence_summary"]),
+    }
+    assert evidence_guard_checks["conflict_flags_within_limit"] == {
+        "name": "conflict_flags_within_limit",
+        "passed": True,
+        "expected_max": evidence_contract["max_conflict_flags"],
+        "actual_count": len(evidence_context["conflict_flags"]),
+    }
+    assert evidence_guard_checks["conflict_flags_have_required_fields"] == {
+        "name": "conflict_flags_have_required_fields",
+        "passed": True,
+        "expected": evidence_contract["required_conflict_fields"],
+        "actual": [
+            sorted(flag)
+            for flag in evidence_context["conflict_flags"]
+        ],
+    }
+    assert evidence_guard_checks[
+        "evidence_source_repository_ref_keys_match_expected_schema"
+    ] == {
+        "name": "evidence_source_repository_ref_keys_match_expected_schema",
+        "passed": True,
+        "expected": ["storage", "db_required", "filters"],
+        "actual": ["storage", "db_required", "filters"],
+    }
+    assert evidence_guard_checks["evidence_source_repository_ref_is_path_free"] == {
+        "name": "evidence_source_repository_ref_is_path_free",
+        "passed": True,
+        "expected": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+        "actual": {
+            "omits_ledger_ref": True,
+            "omits_ledger_path": True,
+            "omits_database_path": True,
+            "omits_absolute_or_sqlite_paths": True,
+        },
+    }
+    assert evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]["expected"]
+    assert "conflict_flags_have_required_fields" in evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]["expected"]["default_check_names"]
     assert payload["latest_signal_report"]["signal_id"] == qqq_signal["signal_id"]
     assert payload["latest_signal_report"]["underlying"] == "QQQ"
     label_status = payload["latest_signal_report"]["label_status"]
@@ -2735,6 +2963,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]["actual"]
     assert payload["report_payload_guard"]["status"] == "ok"
     assert str(database_path) not in iter_nested_strings(label_status)
+    assert str(database_path) not in iter_nested_strings(evidence_contract)
+    assert str(database_path) not in iter_nested_strings(evidence_context)
     assert str(database_path) not in iter_nested_strings(evidence_label_status)
     assert str(database_path) not in iter_nested_strings(payload["source_signal_ref"])
     assert str(database_path) not in iter_nested_strings(payload["source_repository_ref"])
@@ -2751,6 +2981,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_contract)
+    )
+    assert all(
+        ".sqlite" not in value.lower()
+        for value in iter_nested_strings(evidence_context)
     )
     assert all(
         ".sqlite" not in value.lower()
