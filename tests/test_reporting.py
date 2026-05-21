@@ -4860,6 +4860,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_degradation_exclusion_summary == {
         name: True for name in selected_degradation_exclusion_targets
     }
+    degradation_hermes_boundary_tokens = (
+        [
+            swing_signal["data_freshness_status"],
+            swing_signal["signal_id"],
+            alternate_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+        + list(swing_signal["data_warnings"])
+        + excluded_degradation_tokens
+    )
+    degradation_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    degradation_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in degradation_hermes_boundary_tokens
+        )
+        for name, target in degradation_hermes_boundary_targets.items()
+    }
+    assert degradation_hermes_boundary_summary == {
+        name: True for name in degradation_hermes_boundary_targets
+    }
     selected_degradation_field_targets = {
         "latest_signal_report_data_freshness": [
             payload["latest_signal_report"]["data_freshness_status"]
@@ -8970,6 +9010,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_degradation_exclusion_summary == {
         name: True for name in selected_degradation_exclusion_targets
+    }
+    degradation_hermes_boundary_tokens = (
+        [
+            qqq_signal["data_freshness_status"],
+            qqq_signal["signal_id"],
+            ndx_signal["signal_id"],
+            older_matching_signal["signal_id"],
+        ]
+        + list(qqq_signal["data_warnings"])
+        + excluded_degradation_tokens
+    )
+    degradation_hermes_boundary_targets = {
+        "hermes_preview_metadata": hermes_preview,
+        "hermes_payload_ref_guard": [
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_payload_ref_matches_structured_payload"
+            ]["actual"],
+        ],
+        "hermes_numeric_authority_guard": [
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["expected"],
+            delivery_preview_guard_checks[
+                "hermes_numeric_authority_matches_payload_ref"
+            ]["actual"],
+        ],
+    }
+    degradation_hermes_boundary_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in degradation_hermes_boundary_tokens
+        )
+        for name, target in degradation_hermes_boundary_targets.items()
+    }
+    assert degradation_hermes_boundary_summary == {
+        name: True for name in degradation_hermes_boundary_targets
     }
     selected_degradation_field_targets = {
         "latest_signal_report_data_freshness": [
