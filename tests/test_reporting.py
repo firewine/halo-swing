@@ -2193,6 +2193,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual_chars"
     ] == [chunk["chars"] for chunk in telegram_preview["chunks"]]
     assert delivery_preview_guard_checks[
+        "telegram_message_count_matches_chunks"
+    ]["actual"] == telegram_preview["message_count"]
+    assert delivery_preview_guard_checks[
+        "telegram_chunks_are_1_based_sequential"
+    ]["actual"] == {
+        "chunk_indexing": telegram_preview["chunk_indexing"],
+        "indexes": [chunk["index"] for chunk in telegram_preview["chunks"]],
+    }
+    assert delivery_preview_guard_checks[
+        "telegram_chunk_char_counts_match_text"
+    ]["actual"] == [
+        {
+            "index": chunk["index"],
+            "chars": chunk["chars"],
+            "text_len": len(str(chunk["text"])),
+        }
+        for chunk in telegram_preview["chunks"]
+    ]
+    assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
         "name": "delivery_preview_has_no_network_side_effect",
@@ -3798,6 +3817,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert delivery_preview_guard_checks["telegram_chunks_fit_max_chars"][
         "actual_chars"
     ] == [chunk["chars"] for chunk in telegram_preview["chunks"]]
+    assert delivery_preview_guard_checks[
+        "telegram_message_count_matches_chunks"
+    ]["actual"] == telegram_preview["message_count"]
+    assert delivery_preview_guard_checks[
+        "telegram_chunks_are_1_based_sequential"
+    ]["actual"] == {
+        "chunk_indexing": telegram_preview["chunk_indexing"],
+        "indexes": [chunk["index"] for chunk in telegram_preview["chunks"]],
+    }
+    assert delivery_preview_guard_checks[
+        "telegram_chunk_char_counts_match_text"
+    ]["actual"] == [
+        {
+            "index": chunk["index"],
+            "chars": chunk["chars"],
+            "text_len": len(str(chunk["text"])),
+        }
+        for chunk in telegram_preview["chunks"]
+    ]
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
