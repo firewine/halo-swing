@@ -1302,12 +1302,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "signal_id": "sig_report_repo_tqqq_alt",
         "run_id": "run_report_repo_tqqq_alt",
         "created_at": "2026-05-20T13:00:00Z",
+        "entry_summary": "ALT_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
+        "stop_summary": "ALT_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
+        "take_profit_summary": "ALT_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
+        "invalidation_summary": "ALT_TIMEFRAME_INVALIDATION_SHOULD_NOT_RENDER",
+        "entry": {
+            "trigger": "ALT_TIMEFRAME_TRIGGER_SHOULD_NOT_RENDER",
+            "reference_price": 111.11,
+        },
+        "stop": ["ALT_TIMEFRAME_STOP_LEVEL_SHOULD_NOT_RENDER"],
+        "take_profit": ["ALT_TIMEFRAME_TAKE_PROFIT_LEVEL_SHOULD_NOT_RENDER"],
     }
     older_matching_signal = {
         **reporting.score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
         "signal_id": "sig_report_repo_tqqq_swing_old",
         "run_id": "run_report_repo_tqqq_swing_old",
         "created_at": "2026-05-20T11:00:00Z",
+        "entry_summary": "OLD_TIMEFRAME_ENTRY_SHOULD_NOT_RENDER",
+        "stop_summary": "OLD_TIMEFRAME_STOP_SHOULD_NOT_RENDER",
+        "take_profit_summary": "OLD_TIMEFRAME_TAKE_PROFIT_SHOULD_NOT_RENDER",
+        "invalidation_summary": "OLD_TIMEFRAME_INVALIDATION_SHOULD_NOT_RENDER",
+        "entry": {
+            "trigger": "OLD_TIMEFRAME_TRIGGER_SHOULD_NOT_RENDER",
+            "reference_price": 222.22,
+        },
+        "stop": ["OLD_TIMEFRAME_STOP_LEVEL_SHOULD_NOT_RENDER"],
+        "take_profit": ["OLD_TIMEFRAME_TAKE_PROFIT_LEVEL_SHOULD_NOT_RENDER"],
     }
     record_signal(signal=swing_signal, database_path=str(database_path))
     record_signal(signal=alternate_signal, database_path=str(database_path))
@@ -4651,6 +4671,39 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_trade_plan_presence_summary == {
         name: True for name in selected_trade_plan_presence_targets
     }
+    excluded_trade_plan_tokens = [
+        token
+        for excluded_signal in (alternate_signal, older_matching_signal)
+        for token in (
+            excluded_signal["entry_summary"],
+            excluded_signal["stop_summary"],
+            excluded_signal["take_profit_summary"],
+            excluded_signal["invalidation_summary"],
+            excluded_signal["entry"]["trigger"],
+            *excluded_signal["stop"],
+            *excluded_signal["take_profit"],
+        )
+    ]
+    selected_trade_plan_exclusion_targets = {
+        "latest_signal_report": payload["latest_signal_report"],
+        "entry_section": entry_section,
+        "stop_section": stop_section,
+        "take_profit_section": take_profit_section,
+        "payload_text": [payload["text"]],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_trade_plan_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_trade_plan_tokens
+        )
+        for name, target in selected_trade_plan_exclusion_targets.items()
+    }
+    assert selected_trade_plan_exclusion_summary == {
+        name: True for name in selected_trade_plan_exclusion_targets
+    }
     selected_delivery_preview_tokens = (
         [
             swing_signal["asset"],
@@ -5000,12 +5053,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "run_id": "run_report_repo_tqqq_soxx",
         "created_at": "2026-05-20T13:00:00Z",
         "underlying": "SOXX",
+        "entry_summary": "ALT_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
+        "stop_summary": "ALT_UNDERLYING_STOP_SHOULD_NOT_RENDER",
+        "take_profit_summary": "ALT_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
+        "invalidation_summary": "ALT_UNDERLYING_INVALIDATION_SHOULD_NOT_RENDER",
+        "entry": {
+            "trigger": "ALT_UNDERLYING_TRIGGER_SHOULD_NOT_RENDER",
+            "reference_price": 333.33,
+        },
+        "stop": ["ALT_UNDERLYING_STOP_LEVEL_SHOULD_NOT_RENDER"],
+        "take_profit": ["ALT_UNDERLYING_TAKE_PROFIT_LEVEL_SHOULD_NOT_RENDER"],
     }
     older_matching_signal = {
         **reporting.score_leverage_swing("TQQQ"),
         "signal_id": "sig_report_repo_tqqq_qqq_old",
         "run_id": "run_report_repo_tqqq_qqq_old",
         "created_at": "2026-05-20T11:00:00Z",
+        "entry_summary": "OLD_UNDERLYING_ENTRY_SHOULD_NOT_RENDER",
+        "stop_summary": "OLD_UNDERLYING_STOP_SHOULD_NOT_RENDER",
+        "take_profit_summary": "OLD_UNDERLYING_TAKE_PROFIT_SHOULD_NOT_RENDER",
+        "invalidation_summary": "OLD_UNDERLYING_INVALIDATION_SHOULD_NOT_RENDER",
+        "entry": {
+            "trigger": "OLD_UNDERLYING_TRIGGER_SHOULD_NOT_RENDER",
+            "reference_price": 444.44,
+        },
+        "stop": ["OLD_UNDERLYING_STOP_LEVEL_SHOULD_NOT_RENDER"],
+        "take_profit": ["OLD_UNDERLYING_TAKE_PROFIT_LEVEL_SHOULD_NOT_RENDER"],
     }
     record_signal(signal=qqq_signal, database_path=str(database_path))
     record_signal(signal=ndx_signal, database_path=str(database_path))
@@ -8347,6 +8420,39 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_trade_plan_presence_summary == {
         name: True for name in selected_trade_plan_presence_targets
+    }
+    excluded_trade_plan_tokens = [
+        token
+        for excluded_signal in (ndx_signal, older_matching_signal)
+        for token in (
+            excluded_signal["entry_summary"],
+            excluded_signal["stop_summary"],
+            excluded_signal["take_profit_summary"],
+            excluded_signal["invalidation_summary"],
+            excluded_signal["entry"]["trigger"],
+            *excluded_signal["stop"],
+            *excluded_signal["take_profit"],
+        )
+    ]
+    selected_trade_plan_exclusion_targets = {
+        "latest_signal_report": payload["latest_signal_report"],
+        "entry_section": entry_section,
+        "stop_section": stop_section,
+        "take_profit_section": take_profit_section,
+        "payload_text": [payload["text"]],
+        "telegram_chunks": telegram_preview["chunks"],
+        "reconstructed_telegram_text": [reconstructed_telegram_text],
+    }
+    selected_trade_plan_exclusion_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_trade_plan_tokens
+        )
+        for name, target in selected_trade_plan_exclusion_targets.items()
+    }
+    assert selected_trade_plan_exclusion_summary == {
+        name: True for name in selected_trade_plan_exclusion_targets
     }
     selected_delivery_preview_tokens = (
         [
