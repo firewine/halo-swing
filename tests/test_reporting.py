@@ -3706,6 +3706,61 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_ref_propagation_summary == {
         name: True for name in selected_source_repository_ref_propagation_targets
     }
+    selected_source_repository_filter_field_targets = {
+        "top_level_source_repository_filters": [
+            payload["source_repository_ref"]["filters"]["asset"] == "TQQQ",
+            payload["source_repository_ref"]["filters"]["underlying"] is None,
+            payload["source_repository_ref"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "evidence_context_source_repository_filters": [
+            evidence_context["source_repository_ref"]["filters"]["asset"] == "TQQQ",
+            evidence_context["source_repository_ref"]["filters"]["underlying"] is None,
+            evidence_context["source_repository_ref"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "latest_record_guard_expected_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["asset"]
+            == "TQQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["underlying"]
+            is None,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "latest_record_guard_actual_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["asset"]
+            == "TQQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["underlying"]
+            is None,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "source_summary_filter_text": [
+            "filters asset=TQQQ underlying=<any> timeframe=swing_3d_10d"
+            in source_summary,
+            source_summary in reasons["items"],
+            source_summary in payload["text"],
+        ],
+    }
+    selected_source_repository_filter_field_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_filter_field_targets.items()
+    }
+    assert selected_source_repository_filter_field_summary == {
+        name: True for name in selected_source_repository_filter_field_targets
+    }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
@@ -6753,6 +6808,61 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_ref_propagation_summary == {
         name: True for name in selected_source_repository_ref_propagation_targets
+    }
+    selected_source_repository_filter_field_targets = {
+        "top_level_source_repository_filters": [
+            payload["source_repository_ref"]["filters"]["asset"] == "TQQQ",
+            payload["source_repository_ref"]["filters"]["underlying"] == "QQQ",
+            payload["source_repository_ref"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "evidence_context_source_repository_filters": [
+            evidence_context["source_repository_ref"]["filters"]["asset"] == "TQQQ",
+            evidence_context["source_repository_ref"]["filters"]["underlying"] == "QQQ",
+            evidence_context["source_repository_ref"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "latest_record_guard_expected_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["asset"]
+            == "TQQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["underlying"]
+            == "QQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "latest_record_guard_actual_filters": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["asset"]
+            == "TQQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["underlying"]
+            == "QQQ",
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]["timeframe"]
+            == "swing_3d_10d",
+        ],
+        "source_summary_filter_text": [
+            "filters asset=TQQQ underlying=QQQ timeframe=swing_3d_10d"
+            in source_summary,
+            source_summary in reasons["items"],
+            source_summary in payload["text"],
+        ],
+    }
+    selected_source_repository_filter_field_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_filter_field_targets.items()
+    }
+    assert selected_source_repository_filter_field_summary == {
+        name: True for name in selected_source_repository_filter_field_targets
     }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [

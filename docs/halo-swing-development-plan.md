@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.229 P1 Repository SQLite Latest Report Source Repository Ref Filter Fields Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.228에서 SQLite repository-backed filtered latest report의 selected `source_repository_ref` value
+propagation을 고정했다. 이번 slice는 selected `source_repository_ref.filters`의 field-level 값이
+top-level payload, evidence context, latest record guard expected/actual, report text summary surfaces에
+일관되게 남는지 summary 형태로 고정한다. timeframe-only filter는 `underlying=<any>`/`None`
+의미를 유지하고, underlying-filtered report는 canonical `QQQ` 의미를 유지해야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source repository ref filter-field coverage
+  - extend SQLite underlying-filtered source repository ref filter-field coverage
+  - assert selected source_repository_ref filter asset, underlying, and timeframe fields propagate into payload and evidence context
+  - assert latest record guard expected/actual source_repository_ref filters preserve the selected filter fields
+  - assert report text source summary preserves timeframe-only <any> and canonical underlying filter text
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.93s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.228 P1 Repository SQLite Latest Report Source Repository Ref Propagation Coverage Gate Record - 2026-05-22
 
 ### A. 목적
