@@ -3353,6 +3353,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
     }
+    selected_source_summary_presence_targets = {
+        "source_repository_ref": (
+            payload["source_repository_ref"],
+            ["sqlite_signal_repository", "TQQQ", "swing_3d_10d"],
+        ),
+        "reasons": (reasons, [source_summary]),
+        "payload_text": ([payload["text"]], [source_summary]),
+        "report_contract_source_guard": (
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"],
+            [source_summary],
+        ),
+    }
+    selected_source_summary_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_source_summary_presence_targets.items()
+    }
+    assert selected_source_summary_presence_summary == {
+        name: True for name in selected_source_summary_presence_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -5482,6 +5509,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
+    }
+    selected_source_summary_presence_targets = {
+        "source_repository_ref": (
+            payload["source_repository_ref"],
+            ["sqlite_signal_repository", "TQQQ", "QQQ", "swing_3d_10d"],
+        ),
+        "reasons": (reasons, [source_summary]),
+        "payload_text": ([payload["text"]], [source_summary]),
+        "report_contract_source_guard": (
+            report_contract_guard_checks[
+                "report_text_reflects_source_repository_summary"
+            ]["actual"],
+            [source_summary],
+        ),
+    }
+    selected_source_summary_presence_summary = {
+        name: all(
+            any(token in value for value in iter_nested_strings(target))
+            for token in tokens
+        )
+        for name, (
+            target,
+            tokens,
+        ) in selected_source_summary_presence_targets.items()
+    }
+    assert selected_source_summary_presence_summary == {
+        name: True for name in selected_source_summary_presence_targets
     }
     assert all(
         ".sqlite" not in value.lower()

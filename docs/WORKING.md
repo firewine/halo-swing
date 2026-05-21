@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_LABEL_SUMMARY_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_LABEL_SUMMARY_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_SOURCE_SUMMARY_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_SOURCE_SUMMARY_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving selected label status and label summary are preserved in emitted report, evidence, reason, text, and guard surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving selected SQLite source repository summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates selected label status and label summary are preserved in emitted report, evidence, reason, text, and guard surfaces
-  - SQLite repository-backed latest report underlying filter validates selected label status and label summary are preserved in emitted report, evidence, reason, text, and guard surfaces
-  - filtered selected-label summary remains derived from emitted nested strings
-  - filtered selected-label summary covers latest_signal_report.label_status, evidence label_status, reasons, payload text, and label guard actuals
+  - SQLite repository-backed latest report timeframe filter validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces
+  - SQLite repository-backed latest report underlying filter validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces
+  - filtered selected-source summary remains derived from emitted nested strings
+  - filtered selected-source summary covers source_repository_ref, reasons, payload text, and source guard actuals
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_LABEL_SUMMARY_COVERAGE_GATE
-scope: SQLite repository-backed filtered selected-label summary coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_SOURCE_SUMMARY_COVERAGE_GATE
+scope: SQLite repository-backed filtered selected-source summary coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.90s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.86s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.87s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.90s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,9 +123,9 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates selected label status and label summary are preserved in emitted report, evidence, reason, text, and guard surfaces
-  - SQLite underlying-filtered latest report validates selected label status and label summary are preserved in emitted report, evidence, reason, text, and guard surfaces
-  - filtered selected-label summary remains derived from emitted nested strings
+  - SQLite timeframe-filtered latest report validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces
+  - SQLite underlying-filtered latest report validates selected SQLite source summary and filter tokens are preserved in emitted source, reason, text, and guard surfaces
+  - filtered selected-source summary remains derived from emitted nested strings
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```
