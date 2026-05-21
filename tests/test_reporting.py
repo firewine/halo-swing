@@ -3397,6 +3397,71 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
     }
+    selected_filter_canonicalization_targets = {
+        "top_level_identity": [
+            payload["asset"] == "TQQQ",
+            payload["underlying"] == swing_signal["underlying"],
+            payload["timeframe"] == "swing_3d_10d",
+        ],
+        "latest_signal_report_identity": [
+            payload["latest_signal_report"]["asset"] == "TQQQ",
+            payload["latest_signal_report"]["underlying"]
+            == swing_signal["underlying"],
+            payload["latest_signal_report"]["timeframe"] == "swing_3d_10d",
+        ],
+        "source_repository_ref_filters": [
+            payload["source_repository_ref"]["filters"]
+            == {
+                "asset": "TQQQ",
+                "underlying": None,
+                "timeframe": "swing_3d_10d",
+            },
+        ],
+        "evidence_source_repository_ref_filters": [
+            evidence_context["source_repository_ref"]["filters"]
+            == payload["source_repository_ref"]["filters"],
+        ],
+        "latest_record_guard_source_ref_match": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]
+            == source_repository_ref,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            == source_repository_ref,
+        ],
+    }
+    selected_filter_canonicalization_summary = {
+        name: all(checks)
+        for name, checks in selected_filter_canonicalization_targets.items()
+    }
+    assert selected_filter_canonicalization_summary == {
+        name: True for name in selected_filter_canonicalization_targets
+    }
+    raw_filter_markers = [
+        " swing_3d_10d ",
+        "timeframe= swing_3d_10d",
+        "database_path=",
+    ]
+    selected_filter_raw_marker_free_targets = {
+        "source_repository_ref": payload["source_repository_ref"],
+        "evidence_context": evidence_context,
+        "latest_record_guard": latest_record_guard,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "payload_text": [payload["text"]],
+    }
+    selected_filter_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_raw_marker_free_targets.items()
+    }
+    assert selected_filter_raw_marker_free_summary == {
+        name: True for name in selected_filter_raw_marker_free_targets
+    }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
             actual_top_level_identity,
@@ -6042,6 +6107,70 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_summary_presence_summary == {
         name: True for name in selected_source_summary_presence_targets
+    }
+    selected_filter_canonicalization_targets = {
+        "top_level_identity": [
+            payload["asset"] == "TQQQ",
+            payload["underlying"] == "QQQ",
+            payload["timeframe"] == qqq_signal["timeframe"],
+        ],
+        "latest_signal_report_identity": [
+            payload["latest_signal_report"]["asset"] == "TQQQ",
+            payload["latest_signal_report"]["underlying"] == "QQQ",
+            payload["latest_signal_report"]["timeframe"] == qqq_signal["timeframe"],
+        ],
+        "source_repository_ref_filters": [
+            payload["source_repository_ref"]["filters"]
+            == {
+                "asset": "TQQQ",
+                "underlying": "QQQ",
+                "timeframe": "swing_3d_10d",
+            },
+        ],
+        "evidence_source_repository_ref_filters": [
+            evidence_context["source_repository_ref"]["filters"]
+            == payload["source_repository_ref"]["filters"],
+        ],
+        "latest_record_guard_source_ref_match": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]
+            == source_repository_ref,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            == source_repository_ref,
+        ],
+    }
+    selected_filter_canonicalization_summary = {
+        name: all(checks)
+        for name, checks in selected_filter_canonicalization_targets.items()
+    }
+    assert selected_filter_canonicalization_summary == {
+        name: True for name in selected_filter_canonicalization_targets
+    }
+    raw_filter_markers = [
+        " qqq ",
+        "underlying= qqq",
+        "database_path=",
+    ]
+    selected_filter_raw_marker_free_targets = {
+        "source_repository_ref": payload["source_repository_ref"],
+        "evidence_context": evidence_context,
+        "latest_record_guard": latest_record_guard,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "payload_text": [payload["text"]],
+    }
+    selected_filter_raw_marker_free_summary = {
+        name: all(
+            marker not in value
+            for value in iter_nested_strings(target)
+            for marker in raw_filter_markers
+        )
+        for name, target in selected_filter_raw_marker_free_targets.items()
+    }
+    assert selected_filter_raw_marker_free_summary == {
+        name: True for name in selected_filter_raw_marker_free_targets
     }
     selected_decision_identity_presence_targets = {
         "top_level_identity": (

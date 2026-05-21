@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_OFFLINE_LIVE_DATA_BOUNDARY_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_OFFLINE_LIVE_DATA_BOUNDARY_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_CANONICALIZATION_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_CANONICALIZATION_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving repository-backed output remains offline, explicit database_path only, and free of live data or automatic DB activation markers
+next_atomic_step: add SQLite filtered latest report coverage proving repository filter inputs are canonicalized across report identity, source repository refs, evidence context, guards, and text output
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates live_data_required remains false while source_repository_ref db_required remains true
-  - SQLite repository-backed latest report underlying filter validates live_data_required remains false while source_repository_ref db_required remains true
-  - filtered offline/live-data boundary summary remains derived from emitted payload, evidence context, delivery contract, delivery preview, and payload guard actuals
-  - filtered output remains free of automatic DB activation markers such as HALO_SWING_DATABASE_URL, database_url, and sqlite://
+  - SQLite repository-backed latest report timeframe filter validates padded timeframe input is emitted only as canonical swing_3d_10d filter identity
+  - SQLite repository-backed latest report underlying filter validates padded lowercase underlying input is emitted only as canonical QQQ filter identity
+  - filtered canonicalization summary remains derived from emitted top-level identity, latest_signal_report identity, source_repository_ref filters, evidence context filters, and latest record guard source match
+  - filtered output remains free of raw padded filter markers such as raw timeframe, raw underlying, and database_path= input markers
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_OFFLINE_LIVE_DATA_BOUNDARY_COVERAGE_GATE
-scope: SQLite repository-backed filtered offline/live-data boundary coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_CANONICALIZATION_COVERAGE_GATE
+scope: SQLite repository-backed filtered repository filter canonicalization coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.85s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.98s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.84s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.75s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates live_data_required remains false while source_repository_ref db_required remains true
-  - SQLite underlying-filtered latest report validates live_data_required remains false while source_repository_ref db_required remains true
-  - filtered offline/live-data boundary summary remains derived from emitted payload, evidence context, delivery contract, delivery preview, and payload guard actuals
-  - filtered output remains free of automatic DB activation markers such as HALO_SWING_DATABASE_URL, database_url, and sqlite://
+  - SQLite timeframe-filtered latest report validates padded timeframe input is emitted only as canonical swing_3d_10d filter identity
+  - SQLite underlying-filtered latest report validates padded lowercase underlying input is emitted only as canonical QQQ filter identity
+  - filtered canonicalization summary remains derived from emitted top-level identity, latest_signal_report identity, source_repository_ref filters, evidence context filters, and latest record guard source match
+  - filtered output remains free of raw padded filter markers such as raw timeframe, raw underlying, and database_path= input markers
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```

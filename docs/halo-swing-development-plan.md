@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.221 P1 Repository SQLite Latest Report Filter Canonicalization Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.220에서 SQLite repository-backed filtered latest report가 explicit `database_path` 입력으로만
+동작하고 live-data 및 자동 DB 활성화 marker를 출력하지 않는지 고정했다. 이번 slice는 같은
+filtered report에서 padded timeframe 입력과 padded lowercase underlying 입력이 report identity,
+source repository refs, evidence context, latest record guard, text output에 canonical filter identity로만
+보존되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered repository filter canonicalization coverage
+  - extend SQLite underlying-filtered repository filter canonicalization coverage
+  - assert emitted filter identity is canonical across payload, report, source refs, evidence, and latest record guard
+  - assert raw padded filter markers and database_path= input markers do not leak into filtered output
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.84s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.75s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.220 P1 Repository SQLite Latest Report Filtered Offline Live Data Boundary Coverage Gate Record - 2026-05-22
 
 ### A. 목적

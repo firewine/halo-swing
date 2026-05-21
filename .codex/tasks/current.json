@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_OFFLINE_LIVE_DATA_BOUNDARY_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_CANONICALIZATION_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_OFFLINE_LIVE_DATA_BOUNDARY_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_CANONICALIZATION_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.220",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving repository-backed output remains offline, explicit database_path only, and free of live data or automatic DB activation markers",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.221",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving repository filter inputs are canonicalized across report identity, source repository refs, evidence context, guards, and text output",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.219",
+    "docs/halo-swing-development-plan.md#4.220",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates live_data_required remains false while source_repository_ref db_required remains true",
-    "SQLite repository-backed latest report underlying filter validates live_data_required remains false while source_repository_ref db_required remains true",
-    "filtered offline/live-data boundary summary remains derived from emitted payload, evidence context, delivery contract, delivery preview, and payload guard actuals",
-    "filtered output remains free of automatic DB activation markers such as HALO_SWING_DATABASE_URL, database_url, and sqlite://",
+    "SQLite repository-backed latest report timeframe filter validates padded timeframe input is emitted only as canonical swing_3d_10d filter identity",
+    "SQLite repository-backed latest report underlying filter validates padded lowercase underlying input is emitted only as canonical QQQ filter identity",
+    "filtered canonicalization summary remains derived from emitted top-level identity, latest_signal_report identity, source_repository_ref filters, evidence context filters, and latest record guard source match",
+    "filtered output remains free of raw padded filter markers such as raw timeframe, raw underlying, and database_path= input markers",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
