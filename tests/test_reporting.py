@@ -1540,6 +1540,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_payload_keys,
         "actual": expected_payload_keys,
     }
+    payload_check_names = report_payload_guard_checks[
+        "report_payload_guard_check_names_match_expected_schema"
+    ]
+    assert payload_check_names["passed"] is True
+    assert payload_check_names["actual"] == payload_check_names["expected"]
+    assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
+        payload_check_names["expected"]
+    )
+    assert "report_payload_source_repository_ref_is_path_free" in (
+        payload_check_names["expected"]
+    )
     assert payload["source_repository_ref"] == source_repository_ref
     assert "source_repository_ref" in report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
@@ -1896,6 +1907,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_payload_keys,
         "actual": expected_payload_keys,
     }
+    payload_check_names = report_payload_guard_checks[
+        "report_payload_guard_check_names_match_expected_schema"
+    ]
+    assert payload_check_names["passed"] is True
+    assert payload_check_names["actual"] == payload_check_names["expected"]
+    assert "report_payload_source_repository_ref_keys_match_expected_schema" in (
+        payload_check_names["expected"]
+    )
+    assert "report_payload_source_repository_ref_is_path_free" in (
+        payload_check_names["expected"]
+    )
     assert payload["source_repository_ref"] == source_repository_ref
     assert "source_repository_ref" in report_payload_guard_checks[
         "report_payload_keys_match_expected_schema"
