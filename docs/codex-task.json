@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LATEST_MATCHING_RECORD_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_LATEST_MATCHING_RECORD_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.222",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving records excluded by timeframe or underlying filters do not leak identity, filter, or label status into report surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.223",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving the newest matching repository record wins over older matching records even when older records are inserted later",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.221",
+    "docs/halo-swing-development-plan.md#4.222",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates excluded alternate timeframe record identity and filter value stay out of report surfaces",
-    "SQLite repository-backed latest report underlying filter validates excluded alternate underlying record identity and filter value stay out of report surfaces",
-    "filtered exclusion summary remains derived from emitted label status, evidence label status, source refs, guards, reasons, and text output",
-    "selected label status remains tied to the selected record and does not reuse the filtered-out record label status",
+    "SQLite repository-backed latest report timeframe filter validates the newest matching timeframe record wins over an older matching record inserted later",
+    "SQLite repository-backed latest report underlying filter validates the newest matching underlying record wins over an older matching record inserted later",
+    "filtered latest matching summary remains derived from emitted report surfaces, source refs, label status, evidence label status, guards, reasons, and text output",
+    "selected label status remains tied to the newest matching record and does not reuse older matching record label status",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

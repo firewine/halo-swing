@@ -1303,8 +1303,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "run_id": "run_report_repo_tqqq_alt",
         "created_at": "2026-05-20T13:00:00Z",
     }
+    older_matching_signal = {
+        **reporting.score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
+        "signal_id": "sig_report_repo_tqqq_swing_old",
+        "run_id": "run_report_repo_tqqq_swing_old",
+        "created_at": "2026-05-20T11:00:00Z",
+    }
     record_signal(signal=swing_signal, database_path=str(database_path))
     record_signal(signal=alternate_signal, database_path=str(database_path))
+    record_signal(signal=older_matching_signal, database_path=str(database_path))
     selected_label = label_signal_outcome(
         signal_id=swing_signal["signal_id"],
         database_path=str(database_path),
@@ -1316,6 +1323,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         database_path=str(database_path),
         price_path=[500.0, 450.0],
         time_barrier_days=3,
+    )
+    older_matching_label = label_signal_outcome(
+        signal_id=older_matching_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 525.0],
+        time_barrier_days=4,
     )
 
     def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
@@ -3337,6 +3350,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in selected_label_excludes_filtered_out_label_summary
     }
+    older_matching_record_tokens = [
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+    ]
+    latest_matching_record_excludes_older_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in older_matching_record_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert latest_matching_record_excludes_older_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    selected_label_excludes_older_matching_label_summary = {
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != older_matching_label["signal_id"],
+            label_status["time_barrier_days"]
+            != older_matching_label["time_barrier_days"],
+        ],
+        "evidence_label_status": [
+            evidence_label_status["signal_id"]
+            != older_matching_label["signal_id"],
+            evidence_label_status["time_barrier_days"]
+            != older_matching_label["time_barrier_days"],
+        ],
+    }
+    assert {
+        name: all(checks)
+        for name, checks in selected_label_excludes_older_matching_label_summary.items()
+    } == {
+        name: True
+        for name in selected_label_excludes_older_matching_label_summary
+    }
     selected_record_identity_presence_targets = {
         "source_signal_ref": (
             payload["source_signal_ref"],
@@ -4049,8 +4098,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "created_at": "2026-05-20T13:00:00Z",
         "underlying": "SOXX",
     }
+    older_matching_signal = {
+        **reporting.score_leverage_swing("TQQQ"),
+        "signal_id": "sig_report_repo_tqqq_qqq_old",
+        "run_id": "run_report_repo_tqqq_qqq_old",
+        "created_at": "2026-05-20T11:00:00Z",
+    }
     record_signal(signal=qqq_signal, database_path=str(database_path))
     record_signal(signal=ndx_signal, database_path=str(database_path))
+    record_signal(signal=older_matching_signal, database_path=str(database_path))
     selected_label = label_signal_outcome(
         signal_id=qqq_signal["signal_id"],
         database_path=str(database_path),
@@ -4062,6 +4118,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         database_path=str(database_path),
         price_path=[500.0, 450.0],
         time_barrier_days=3,
+    )
+    older_matching_label = label_signal_outcome(
+        signal_id=older_matching_signal["signal_id"],
+        database_path=str(database_path),
+        price_path=[500.0, 525.0],
+        time_barrier_days=4,
     )
 
     def unexpected_score_call(*_args: object, **_kwargs: object) -> dict[str, object]:
@@ -6082,6 +6144,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     } == {
         name: True
         for name in selected_label_excludes_filtered_out_label_summary
+    }
+    older_matching_record_tokens = [
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+    ]
+    latest_matching_record_excludes_older_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in older_matching_record_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert latest_matching_record_excludes_older_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    selected_label_excludes_older_matching_label_summary = {
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != older_matching_label["signal_id"],
+            label_status["time_barrier_days"]
+            != older_matching_label["time_barrier_days"],
+        ],
+        "evidence_label_status": [
+            evidence_label_status["signal_id"]
+            != older_matching_label["signal_id"],
+            evidence_label_status["time_barrier_days"]
+            != older_matching_label["time_barrier_days"],
+        ],
+    }
+    assert {
+        name: all(checks)
+        for name, checks in selected_label_excludes_older_matching_label_summary.items()
+    } == {
+        name: True
+        for name in selected_label_excludes_older_matching_label_summary
     }
     selected_record_identity_presence_targets = {
         "source_signal_ref": (

@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_EXCLUSION_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_EXCLUSION_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_LATEST_MATCHING_RECORD_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LATEST_MATCHING_RECORD_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving records excluded by timeframe or underlying filters do not leak identity, filter, or label status into report surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving the newest matching repository record wins over older matching records even when older records are inserted later
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates excluded alternate timeframe record identity and filter value stay out of report surfaces
-  - SQLite repository-backed latest report underlying filter validates excluded alternate underlying record identity and filter value stay out of report surfaces
-  - filtered exclusion summary remains derived from emitted label status, evidence label status, source refs, guards, reasons, and text output
-  - selected label status remains tied to the selected record and does not reuse the filtered-out record label status
+  - SQLite repository-backed latest report timeframe filter validates the newest matching timeframe record wins over an older matching record inserted later
+  - SQLite repository-backed latest report underlying filter validates the newest matching underlying record wins over an older matching record inserted later
+  - filtered latest matching summary remains derived from emitted report surfaces, source refs, label status, evidence label status, guards, reasons, and text output
+  - selected label status remains tied to the newest matching record and does not reuse older matching record label status
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_EXCLUSION_COVERAGE_GATE
-scope: SQLite repository-backed filtered record exclusion coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_LATEST_MATCHING_RECORD_COVERAGE_GATE
+scope: SQLite repository-backed filtered latest matching record coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -112,7 +112,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.09s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.65s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.71s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates excluded alternate timeframe record identity and filter value stay out of report surfaces
-  - SQLite underlying-filtered latest report validates excluded alternate underlying record identity and filter value stay out of report surfaces
-  - filtered exclusion summary remains derived from emitted label status, evidence label status, source refs, guards, reasons, and text output
-  - selected label status remains tied to the selected record and does not reuse the filtered-out record label status
+  - SQLite timeframe-filtered latest report validates the newest matching timeframe record wins over an older matching record inserted later
+  - SQLite underlying-filtered latest report validates the newest matching underlying record wins over an older matching record inserted later
+  - filtered latest matching summary remains derived from emitted report surfaces, source refs, label status, evidence label status, guards, reasons, and text output
+  - selected label status remains tied to the newest matching record and does not reuse older matching record label status
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```
