@@ -4228,6 +4228,75 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_guard_pass_summary == {
         name: True for name in selected_source_repository_guard_pass_targets
     }
+    selected_source_repository_guard_expected_targets = {
+        "latest_record_source_repository_ref_key_guard": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "latest_record_source_repository_ref_path_guard": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["expected"]
+            == expected_source_repository_ref_path_free,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "report_payload_source_repository_ref_key_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "report_payload_source_repository_ref_path_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["expected"]
+            == expected_source_repository_ref_path_free,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "evidence_source_repository_ref_key_guard": [
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "evidence_source_repository_ref_path_guard": [
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "expected"
+            ]
+            == expected_source_repository_ref_path_free,
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "actual"
+            ]
+            == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_expected_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_guard_expected_targets.items()
+    }
+    assert selected_source_repository_guard_expected_summary == {
+        name: True for name in selected_source_repository_guard_expected_targets
+    }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
@@ -7797,6 +7866,75 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_guard_pass_summary == {
         name: True for name in selected_source_repository_guard_pass_targets
+    }
+    selected_source_repository_guard_expected_targets = {
+        "latest_record_source_repository_ref_key_guard": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "latest_record_source_repository_ref_path_guard": [
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["expected"]
+            == expected_source_repository_ref_path_free,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "report_payload_source_repository_ref_key_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "report_payload_source_repository_ref_path_guard": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["expected"]
+            == expected_source_repository_ref_path_free,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "evidence_source_repository_ref_key_guard": [
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["expected"]
+            == list(source_repository_ref),
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+        ],
+        "evidence_source_repository_ref_path_guard": [
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "expected"
+            ]
+            == expected_source_repository_ref_path_free,
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "actual"
+            ]
+            == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_expected_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_guard_expected_targets.items()
+    }
+    assert selected_source_repository_guard_expected_summary == {
+        name: True for name in selected_source_repository_guard_expected_targets
     }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
