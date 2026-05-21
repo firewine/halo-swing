@@ -1311,7 +1311,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         price_path=[500.0, 560.0],
         time_barrier_days=2,
     )
-    label_signal_outcome(
+    alternate_label = label_signal_outcome(
         signal_id=alternate_signal["signal_id"],
         database_path=str(database_path),
         price_path=[500.0, 450.0],
@@ -3302,6 +3302,41 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    excluded_record_identity_tokens = [
+        alternate_signal["signal_id"],
+        alternate_signal["run_id"],
+        alternate_signal["timeframe"],
+    ]
+    filtered_report_excluded_record_identity_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_record_identity_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_excluded_record_identity_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    selected_label_excludes_filtered_out_label_summary = {
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != alternate_label["signal_id"],
+            label_status["time_barrier_days"]
+            != alternate_label["time_barrier_days"],
+        ],
+        "evidence_label_status": [
+            evidence_label_status["signal_id"] != alternate_label["signal_id"],
+            evidence_label_status["time_barrier_days"]
+            != alternate_label["time_barrier_days"],
+        ],
+    }
+    assert {
+        name: all(checks)
+        for name, checks in selected_label_excludes_filtered_out_label_summary.items()
+    } == {
+        name: True
+        for name in selected_label_excludes_filtered_out_label_summary
+    }
     selected_record_identity_presence_targets = {
         "source_signal_ref": (
             payload["source_signal_ref"],
@@ -4022,7 +4057,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         price_path=[500.0, 560.0],
         time_barrier_days=2,
     )
-    label_signal_outcome(
+    alternate_label = label_signal_outcome(
         signal_id=ndx_signal["signal_id"],
         database_path=str(database_path),
         price_path=[500.0, 450.0],
@@ -6012,6 +6047,41 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
+    }
+    excluded_record_identity_tokens = [
+        ndx_signal["signal_id"],
+        ndx_signal["run_id"],
+        ndx_signal["underlying"],
+    ]
+    filtered_report_excluded_record_identity_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in excluded_record_identity_tokens
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_excluded_record_identity_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    selected_label_excludes_filtered_out_label_summary = {
+        "latest_signal_report_label_status": [
+            label_status["signal_id"] != alternate_label["signal_id"],
+            label_status["time_barrier_days"]
+            != alternate_label["time_barrier_days"],
+        ],
+        "evidence_label_status": [
+            evidence_label_status["signal_id"] != alternate_label["signal_id"],
+            evidence_label_status["time_barrier_days"]
+            != alternate_label["time_barrier_days"],
+        ],
+    }
+    assert {
+        name: all(checks)
+        for name, checks in selected_label_excludes_filtered_out_label_summary.items()
+    } == {
+        name: True
+        for name in selected_label_excludes_filtered_out_label_summary
     }
     selected_record_identity_presence_targets = {
         "source_signal_ref": (

@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.222 P1 Repository SQLite Latest Report Filter Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.221에서 SQLite repository-backed filtered latest report의 filter identity canonicalization을 고정했다.
+이번 slice는 timeframe 또는 underlying filter에서 제외된 repository record의 identity, mismatch filter
+value, label status가 selected report surfaces로 섞이지 않는지 고정한다. selected label status는
+선택된 record의 label만 참조해야 하며, filtered-out record의 label status를 재사용하면 안 된다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered excluded-record leakage coverage
+  - extend SQLite underlying-filtered excluded-record leakage coverage
+  - assert filtered-out record identity and mismatch filter values stay out of report surfaces
+  - assert selected label status does not reuse filtered-out record label status
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.09s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.65s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.221 P1 Repository SQLite Latest Report Filter Canonicalization Coverage Gate Record - 2026-05-22
 
 ### A. 목적
