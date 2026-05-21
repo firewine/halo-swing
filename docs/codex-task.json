@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_STORAGE_METADATA_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_GUARD_PASS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_STORAGE_METADATA_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_SOURCE_REPOSITORY_REF_GUARD_PASS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.230",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving selected source_repository_ref storage metadata propagates consistently into top-level, evidence context, latest record guard, and report text surfaces",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.231",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving selected source_repository_ref guard pass values stay aligned across latest record, report payload, and evidence guard surfaces",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.229",
+    "docs/halo-swing-development-plan.md#4.230",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates selected source_repository_ref storage metadata across top-level payload, evidence context, latest record guard expected/actual, and report text summary surfaces",
-    "SQLite repository-backed latest report underlying filter validates selected source_repository_ref storage metadata across top-level payload, evidence context, latest record guard expected/actual, and report text summary surfaces",
-    "filtered source repository ref storage metadata summary remains derived from emitted source_repository_ref, evidence_context, latest_record_guard, reasons, and payload text surfaces",
-    "selected storage remains sqlite_signal_repository and db_required remains true on repository-backed report surfaces",
+    "SQLite repository-backed latest report timeframe filter validates selected source_repository_ref guard pass values across latest record, report payload, and evidence guard surfaces",
+    "SQLite repository-backed latest report underlying filter validates selected source_repository_ref guard pass values across latest record, report payload, and evidence guard surfaces",
+    "filtered source repository ref guard pass summary remains derived from emitted source_repository_ref, latest_record_guard, report_payload_guard, evidence_guard, and path-free expected values",
+    "selected source_repository_ref guard surfaces keep passed=true and expected/actual values aligned with selected repository ref and path-free checks",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

@@ -3806,6 +3806,70 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
     }
+    selected_source_repository_guard_pass_targets = {
+        "latest_record_source_repository_ref_guards": [
+            latest_record_guard["status"] == "ok",
+            all(
+                latest_record_guard_checks[check_name]["passed"]
+                for check_name in expected_latest_record_guard_check_names
+            ),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            == source_repository_ref,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "report_payload_source_repository_ref_guards": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["passed"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["passed"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "evidence_source_repository_ref_guards": [
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["passed"]
+            is True,
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "passed"
+            ]
+            is True,
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "actual"
+            ]
+            == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_pass_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_guard_pass_targets.items()
+    }
+    assert selected_source_repository_guard_pass_summary == {
+        name: True for name in selected_source_repository_guard_pass_targets
+    }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
@@ -6953,6 +7017,70 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
+    }
+    selected_source_repository_guard_pass_targets = {
+        "latest_record_source_repository_ref_guards": [
+            latest_record_guard["status"] == "ok",
+            all(
+                latest_record_guard_checks[check_name]["passed"]
+                for check_name in expected_latest_record_guard_check_names
+            ),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            == source_repository_ref,
+            latest_record_guard_checks[
+                "latest_record_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "report_payload_source_repository_ref_guards": [
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["passed"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["passed"]
+            is True,
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            report_payload_guard_checks[
+                "report_payload_source_repository_ref_is_path_free"
+            ]["actual"]
+            == expected_source_repository_ref_path_free,
+        ],
+        "evidence_source_repository_ref_guards": [
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["passed"]
+            is True,
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "passed"
+            ]
+            is True,
+            evidence_guard_checks[
+                "evidence_source_repository_ref_keys_match_expected_schema"
+            ]["actual"]
+            == list(source_repository_ref),
+            evidence_guard_checks["evidence_source_repository_ref_is_path_free"][
+                "actual"
+            ]
+            == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_pass_summary = {
+        name: all(checks)
+        for name, checks in selected_source_repository_guard_pass_targets.items()
+    }
+    assert selected_source_repository_guard_pass_summary == {
+        name: True for name in selected_source_repository_guard_pass_targets
     }
     selected_filter_canonicalization_targets = {
         "top_level_identity": [

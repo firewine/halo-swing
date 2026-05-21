@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.231 P1 Repository SQLite Latest Report Source Repository Ref Guard Pass Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.230에서 SQLite repository-backed filtered latest report의 selected `source_repository_ref` storage
+metadata propagation을 고정했다. 이번 slice는 selected `source_repository_ref` 관련 guard pass 값이
+latest record guard, report payload guard, evidence guard surfaces에서 모두 `passed=true`를 유지하고,
+schema 및 path-free expected/actual 값이 selected repository ref와 정렬되는지 summary 형태로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered source repository ref guard pass coverage
+  - extend SQLite underlying-filtered source repository ref guard pass coverage
+  - assert latest record source_repository_ref guards keep ok status and pass values
+  - assert report payload source_repository_ref schema/path-free guards keep pass values
+  - assert evidence source_repository_ref schema/path-free guards keep pass values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.09s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.68s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.230 P1 Repository SQLite Latest Report Source Repository Ref Storage Metadata Coverage Gate Record - 2026-05-22
 
 ### A. 목적
