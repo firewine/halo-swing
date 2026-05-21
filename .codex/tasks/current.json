@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_CHECKS_ALL_PASSED_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_KEYS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_CHECKS_ALL_PASSED_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_LATEST_RECORD_KEYS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.145",
-  "next_atomic_step": "no open code step remains after verified SQLite filtered latest_record_guard all-passed coverage; continue with next explicit repository or report read-model slice",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.146",
+  "next_atomic_step": "no open code step remains after verified SQLite filtered latest_record_guard key schema coverage; continue with next explicit repository or report read-model slice",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.144",
+    "docs/halo-swing-development-plan.md#4.145",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates latest_record_guard check pass list",
-    "SQLite repository-backed latest report underlying filter validates latest_record_guard check pass list",
-    "filtered latest_record_guard all-passed state remains aligned with evidence guard all-passed check",
-    "filtered latest_record_guard pass-list output remains path-free and omits database path details",
+    "SQLite repository-backed latest report timeframe filter validates latest_record_guard top-level key schema",
+    "SQLite repository-backed latest report underlying filter validates latest_record_guard top-level key schema",
+    "filtered latest_record_guard remains status/checks only",
+    "filtered latest_record_guard key-schema output remains path-free and omits database path details",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"
