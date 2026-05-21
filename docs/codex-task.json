@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_COMPONENT_FREE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_STORAGE_MARKER_FREE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_PATH_COMPONENT_FREE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.205",
-  "next_atomic_step": "add SQLite filtered latest report coverage proving emitted output summaries omit SQLite storage markers including .sqlite, .sqlite3, and sqlite URI prefixes",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.206",
+  "next_atomic_step": "add SQLite filtered latest report coverage proving emitted output summaries omit database filename, filename stem, and parent directory path components",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.204",
+    "docs/halo-swing-development-plan.md#4.205",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,10 +49,10 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers",
-    "SQLite repository-backed latest report underlying filter validates emitted output summaries omit .sqlite, .sqlite3, and sqlite URI storage markers",
-    "filtered storage-marker-free summary remains derived from emitted nested strings across every expected surface",
-    "filtered storage-marker-free summary covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces",
+    "SQLite repository-backed latest report timeframe filter validates emitted output summaries omit database filename, filename stem, and parent directory path components",
+    "SQLite repository-backed latest report underlying filter validates emitted output summaries omit database filename, filename stem, and parent directory path components",
+    "filtered path-component-free summary remains derived from emitted nested strings across every expected surface",
+    "filtered path-component-free summary covers label, evidence, source, guard, prompt, intent, delivery, reason, and text surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
     "verification passes"

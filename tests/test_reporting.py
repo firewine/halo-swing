@@ -1290,7 +1290,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    database_path = tmp_path / "halo_swing.sqlite"
+    database_path = tmp_path / "filtered_report_component_sentinel.sqlite3"
     swing_signal = {
         **reporting.score_leverage_swing("TQQQ", timeframe="swing_3d_10d"),
         "signal_id": "sig_report_repo_tqqq_swing",
@@ -3258,6 +3258,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_storage_marker_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    filtered_report_path_component_free_summary = {
+        name: all(
+            database_path.name not in value
+            and database_path.stem not in value
+            and database_path.parent.name not in value
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_path_component_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -3324,7 +3336,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    database_path = tmp_path / "halo_swing.sqlite"
+    database_path = tmp_path / "filtered_report_component_sentinel.sqlite3"
     qqq_signal = {
         **reporting.score_leverage_swing("TQQQ"),
         "signal_id": "sig_report_repo_tqqq_qqq",
@@ -5291,6 +5303,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         for name, target in filtered_report_path_free_targets.items()
     }
     assert filtered_report_storage_marker_free_summary == {
+        name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_path_component_free_summary = {
+        name: all(
+            database_path.name not in value
+            and database_path.stem not in value
+            and database_path.parent.name not in value
+            for value in iter_nested_strings(target)
+        )
+        for name, target in filtered_report_path_free_targets.items()
+    }
+    assert filtered_report_path_component_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
     assert all(
