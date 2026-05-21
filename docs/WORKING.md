@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_GUARD_SURFACE_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_GUARD_SURFACE_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_CONTRACT_SURFACE_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_CONTRACT_SURFACE_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: add SQLite filtered latest report coverage proving raw filter request markers do not leak into guard and rendered report surfaces
+next_atomic_step: add SQLite filtered latest report coverage proving raw filter request markers do not leak into contract surfaces
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,10 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe filter validates raw timeframe request markers do not leak into evidence guard, report contract guard, delivery preview, reasons, or source summary surfaces
-  - SQLite repository-backed latest report underlying filter validates raw underlying request markers do not leak into evidence guard, report contract guard, delivery preview, reasons, or source summary surfaces
-  - guard and rendered report surfaces remain canonicalized after filtered repository selection
-  - database_path marker remains absent from the extended guard/rendered surface set
+  - SQLite repository-backed latest report timeframe filter validates raw timeframe request markers do not leak into delivery, prompt, report intent, evidence, Telegram, or Hermes contract/preview surfaces
+  - SQLite repository-backed latest report underlying filter validates raw underlying request markers do not leak into delivery, prompt, report intent, evidence, Telegram, or Hermes contract/preview surfaces
+  - contract surfaces remain canonicalized after filtered repository selection
+  - database_path marker remains absent from the extended contract surface set
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_GUARD_SURFACE_COVERAGE_GATE
-scope: SQLite repository-backed filtered raw marker guard surface coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTER_RAW_MARKER_CONTRACT_SURFACE_COVERAGE_GATE
+scope: SQLite repository-backed filtered raw marker contract surface coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -112,7 +112,7 @@ results:
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
   - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.13s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.75s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,10 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report validates raw timeframe request markers do not leak into evidence guard, report contract guard, delivery preview, reasons, or source summary surfaces
-  - SQLite underlying-filtered latest report validates raw underlying request markers do not leak into evidence guard, report contract guard, delivery preview, reasons, or source summary surfaces
-  - guard and rendered report surfaces remain canonicalized after filtered repository selection
-  - database_path marker remains absent from the extended guard/rendered surface set
+  - SQLite timeframe-filtered latest report validates raw timeframe request markers do not leak into delivery, prompt, report intent, evidence, Telegram, or Hermes contract/preview surfaces
+  - SQLite underlying-filtered latest report validates raw underlying request markers do not leak into delivery, prompt, report intent, evidence, Telegram, or Hermes contract/preview surfaces
+  - contract surfaces remain canonicalized after filtered repository selection
+  - database_path marker remains absent from the extended contract surface set
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
 ```
