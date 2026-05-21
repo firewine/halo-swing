@@ -2164,6 +2164,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_source_signal_ref_identity,
     }
     assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["actual"] == {
+        "signal_id": payload["latest_signal_report"]["signal_id"],
+        "config_hash": payload["latest_signal_report"]["config_hash"],
+        "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
+    }
+    assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
     ] == {
         "name": "report_payload_source_signal_ref_values_have_traceable_format",
@@ -3356,6 +3363,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": expected_source_signal_ref_identity,
         "actual": expected_source_signal_ref_identity,
+    }
+    assert report_payload_guard_checks[
+        "report_payload_source_signal_ref_matches_report_identity"
+    ]["actual"] == {
+        "signal_id": payload["latest_signal_report"]["signal_id"],
+        "config_hash": payload["latest_signal_report"]["config_hash"],
+        "run_id_nonempty": bool(payload["source_signal_ref"]["run_id"]),
     }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
