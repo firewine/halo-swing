@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.224 P1 Repository SQLite Latest Report Timestamp Propagation Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.223에서 SQLite repository-backed filtered latest report가 최신 matching record를 선택하고 older
+matching record를 report surfaces로 섞지 않는지 고정했다. 이번 slice는 선택된 record의 `created_at`이
+top-level `as_of`, `latest_signal_report.created_at`, report payload identity guard expected/actual 값으로
+일관되게 전파되는지 summary 형태로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - extend SQLite timeframe-filtered selected timestamp propagation coverage
+  - extend SQLite underlying-filtered selected timestamp propagation coverage
+  - assert selected created_at drives top-level as_of and latest_signal_report.created_at
+  - assert report payload identity guard expected and actual values carry the selected created_at
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.88s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.223 P1 Repository SQLite Latest Report Latest Matching Record Coverage Gate Record - 2026-05-22
 
 ### A. 목적

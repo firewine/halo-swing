@@ -3610,6 +3610,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
     }
+    selected_timestamp_propagation_targets = {
+        "top_level_as_of": [
+            payload["as_of"] == swing_signal["created_at"],
+        ],
+        "latest_signal_report_created_at": [
+            payload["latest_signal_report"]["created_at"]
+            == swing_signal["created_at"],
+        ],
+        "report_payload_identity_guard_expected": [
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["expected"]["as_of"]
+            == swing_signal["created_at"],
+        ],
+        "report_payload_identity_guard_actual": [
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["actual"]["as_of"]
+            == swing_signal["created_at"],
+        ],
+    }
+    selected_timestamp_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_timestamp_propagation_targets.items()
+    }
+    assert selected_timestamp_propagation_summary == {
+        name: True for name in selected_timestamp_propagation_targets
+    }
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
             evidence_context["risk_warnings"],
@@ -6403,6 +6431,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
+    }
+    selected_timestamp_propagation_targets = {
+        "top_level_as_of": [
+            payload["as_of"] == qqq_signal["created_at"],
+        ],
+        "latest_signal_report_created_at": [
+            payload["latest_signal_report"]["created_at"]
+            == qqq_signal["created_at"],
+        ],
+        "report_payload_identity_guard_expected": [
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["expected"]["as_of"]
+            == qqq_signal["created_at"],
+        ],
+        "report_payload_identity_guard_actual": [
+            report_payload_guard_checks[
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]["actual"]["as_of"]
+            == qqq_signal["created_at"],
+        ],
+    }
+    selected_timestamp_propagation_summary = {
+        name: all(checks)
+        for name, checks in selected_timestamp_propagation_targets.items()
+    }
+    assert selected_timestamp_propagation_summary == {
+        name: True for name in selected_timestamp_propagation_targets
     }
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
