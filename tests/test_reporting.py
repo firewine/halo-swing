@@ -8212,6 +8212,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in selected_decision_identity_hermes_boundary_targets
     }
+    assert tuple(excluded_decision_identity_hermes_boundary_summary) == tuple(
+        selected_decision_identity_hermes_boundary_targets
+    )
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
             payload["as_of"] == swing_signal["created_at"],
@@ -15960,6 +15963,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True
         for name in selected_decision_identity_hermes_boundary_targets
     }
+    assert tuple(excluded_decision_identity_hermes_boundary_summary) == tuple(
+        selected_decision_identity_hermes_boundary_targets
+    )
     selected_timestamp_propagation_targets = {
         "top_level_as_of": [
             payload["as_of"] == qqq_signal["created_at"],
