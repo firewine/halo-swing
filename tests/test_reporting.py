@@ -7949,6 +7949,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_canonicalization_summary == {
         name: True for name in selected_filter_canonicalization_targets
     }
+    assert tuple(selected_filter_canonicalization_summary) == tuple(
+        selected_filter_canonicalization_targets
+    )
     raw_filter_markers = [
         " swing_3d_10d ",
         "timeframe= swing_3d_10d",
@@ -15672,6 +15675,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_filter_canonicalization_summary == {
         name: True for name in selected_filter_canonicalization_targets
     }
+    assert tuple(selected_filter_canonicalization_summary) == tuple(
+        selected_filter_canonicalization_targets
+    )
     raw_filter_markers = [
         " qqq ",
         "underlying= qqq",
