@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_REF_SCHEMA_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TOP_LEVEL_IDENTITY_SCHEMA_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SIGNAL_REF_SCHEMA_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TOP_LEVEL_IDENTITY_SCHEMA_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.291",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving source_signal_ref remains schema-exact, scalar, and path-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.292",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving top-level report identity remains schema-exact, scalar, and path-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.290",
+    "docs/halo-swing-development-plan.md#4.291",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe source_signal_ref keeps exact signal_id/run_id/config_hash schema after repository selection",
-    "SQLite repository-backed latest report underlying source_signal_ref keeps exact signal_id/run_id/config_hash schema after repository selection",
-    "source_signal_ref values remain scalar strings and omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
+    "SQLite repository-backed latest report timeframe top-level identity keeps exact as_of/asset/underlying/timeframe/action/confidence_label schema after repository selection",
+    "SQLite repository-backed latest report underlying top-level identity keeps exact as_of/asset/underlying/timeframe/action/confidence_label schema after repository selection",
+    "top-level identity values remain scalar strings or None and omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

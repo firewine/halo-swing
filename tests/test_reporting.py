@@ -1511,6 +1511,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "action": payload["action"],
         "confidence_label": payload["confidence_label"],
     }
+    assert list(actual_top_level_identity) == [
+        "as_of",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "confidence_label",
+    ]
+    assert all(
+        value is None or isinstance(value, str)
+        for value in actual_top_level_identity.values()
+    )
+    assert set(actual_top_level_identity).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        value is None
+        or (
+            str(database_path) not in value
+            and not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+        )
+        for value in actual_top_level_identity.values()
+    )
     expected_payload_keys = [
         "schema_version",
         "as_of",
@@ -6314,6 +6342,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "action": payload["action"],
         "confidence_label": payload["confidence_label"],
     }
+    assert list(actual_top_level_identity) == [
+        "as_of",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "confidence_label",
+    ]
+    assert all(
+        value is None or isinstance(value, str)
+        for value in actual_top_level_identity.values()
+    )
+    assert set(actual_top_level_identity).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        value is None
+        or (
+            str(database_path) not in value
+            and not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+        )
+        for value in actual_top_level_identity.values()
+    )
     expected_payload_keys = [
         "schema_version",
         "as_of",

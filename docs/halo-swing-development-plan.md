@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.292 P1 Repository SQLite Latest Report Filtered Top-Level Identity Schema Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.291에서 SQLite repository-backed filtered latest report의 `source_signal_ref`가 schema-exact scalar surface로 유지되도록
+고정했다. 이번 slice는 사용자와 downstream guard가 직접 참조하는 top-level report identity(`as_of`, `asset`, `underlying`,
+`timeframe`, `action`, `confidence_label`)도 repository selection 이후 schema-exact, scalar, path-free 상태를 유지하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered top-level identity keeps exact identity key order
+  - assert timeframe-filtered top-level identity values remain scalar strings or None and path-free
+  - assert underlying-filtered top-level identity keeps exact identity key order
+  - assert underlying-filtered top-level identity values remain scalar strings or None and path-free
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.12s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 51.59s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.291 P1 Repository SQLite Latest Report Filtered Source Signal Ref Schema Coverage Gate Record - 2026-05-22
 
 ### A. 목적
