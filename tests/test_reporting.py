@@ -4955,6 +4955,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(filtered_report_surface_group_by_name_group_counts) == tuple(
         filtered_report_surface_groups
     )
+    filtered_report_surface_group_by_name_group_count_totals = {
+        "group_count_total": sum(
+            filtered_report_surface_group_by_name_group_counts.values()
+        ),
+        "by_name_surfaces": len(filtered_report_surface_group_by_name),
+        "grouped_surfaces": len(filtered_report_grouped_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert filtered_report_surface_group_by_name_group_count_totals == {
+        "group_count_total": len(expected_filtered_report_path_free_surface_names),
+        "by_name_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "grouped_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert tuple(filtered_report_surface_group_by_name_group_count_totals) == (
+        "group_count_total",
+        "by_name_surfaces",
+        "grouped_surfaces",
+        "path_free_surfaces",
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11916,6 +11936,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(filtered_report_surface_group_by_name_group_counts) == tuple(
         filtered_report_surface_groups
+    )
+    filtered_report_surface_group_by_name_group_count_totals = {
+        "group_count_total": sum(
+            filtered_report_surface_group_by_name_group_counts.values()
+        ),
+        "by_name_surfaces": len(filtered_report_surface_group_by_name),
+        "grouped_surfaces": len(filtered_report_grouped_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert filtered_report_surface_group_by_name_group_count_totals == {
+        "group_count_total": len(expected_filtered_report_path_free_surface_names),
+        "by_name_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "grouped_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert tuple(filtered_report_surface_group_by_name_group_count_totals) == (
+        "group_count_total",
+        "by_name_surfaces",
+        "grouped_surfaces",
+        "path_free_surfaces",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]

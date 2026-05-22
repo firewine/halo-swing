@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BY_NAME_GROUP_COUNT_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BY_NAME_GROUP_COUNT_TOTAL_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BY_NAME_GROUP_COUNT_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BY_NAME_GROUP_COUNT_TOTAL_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.369",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving surface group by-name group counts after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.370",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving surface group by-name group count totals after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.368",
+    "docs/halo-swing-development-plan.md#4.369",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe surface group by-name group counts are verified after repository selection",
-    "SQLite repository-backed latest report underlying surface group by-name group counts are verified after repository selection",
-    "surface group by-name values reproduce delivery, intent, evidence, source, narrative, envelope, and guard surface counts after repository selection",
+    "SQLite repository-backed latest report timeframe surface group by-name group count totals are verified after repository selection",
+    "SQLite repository-backed latest report underlying surface group by-name group count totals are verified after repository selection",
+    "surface group by-name group count totals match by-name, grouped, and path-free surface totals after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
