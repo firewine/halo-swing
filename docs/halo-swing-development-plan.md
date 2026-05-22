@@ -28,6 +28,68 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.323 P1 Repository SQLite Latest Report Filtered Report Payload Guard Source Traceability Schema Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.322에서 SQLite repository-backed filtered latest report의 `report_payload_guard` source identity 포함/배제를 고정했다.
+이번 slice는 repository selection 이후 `report_payload_guard`가 source signal ref traceability와 config hash digest guard를
+emitted guard schema surface에 계속 포함하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered report_payload_guard check-name schema includes source traceability guard
+  - assert timeframe-filtered report_payload_guard check-name schema includes config hash digest guard
+  - assert timeframe-filtered report_payload_guard check-key schema preserves both guard key shapes
+  - assert underlying-filtered report_payload_guard check-name schema includes source traceability guard
+  - assert underlying-filtered report_payload_guard check-name schema includes config hash digest guard
+  - assert underlying-filtered report_payload_guard check-key schema preserves both guard key shapes
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.80s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.13s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.322 P1 Repository SQLite Latest Report Filtered Report Payload Guard Source Identity Coverage Gate Record - 2026-05-22
 
 ### A. 목적

@@ -4775,6 +4775,38 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ]["actual"]["config_hash_digest_hex"]
             is True,
         ],
+        "traceable_format_guard_schema": [
+            "report_payload_source_signal_ref_values_have_traceable_format"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_values_have_traceable_format"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "config_hash_digest_guard_schema": [
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]
+            == ["name", "passed", "expected", "actual"],
+        ],
         "emitted_config_hash_digest": [
             payload["source_signal_ref"]["config_hash"].startswith("sha256:"),
             len(payload["source_signal_ref"]["config_hash"].removeprefix("sha256:"))
@@ -10322,6 +10354,38 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "report_payload_source_signal_ref_config_hash_digest_is_sha256"
             ]["actual"]["config_hash_digest_hex"]
             is True,
+        ],
+        "traceable_format_guard_schema": [
+            "report_payload_source_signal_ref_values_have_traceable_format"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_values_have_traceable_format"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_source_signal_ref_values_have_traceable_format"
+            ]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "config_hash_digest_guard_schema": [
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_source_signal_ref_config_hash_digest_is_sha256"
+            ]
+            == ["name", "passed", "expected", "actual"],
         ],
         "emitted_config_hash_digest": [
             payload["source_signal_ref"]["config_hash"].startswith("sha256:"),
