@@ -1960,6 +1960,54 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert label_status["labeled_at"] == selected_label["labeled_at"]
     assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
     assert label_status["live_data_required"] is False
+    expected_label_status_keys = [
+        "schema_version",
+        "signal_id",
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+        "live_data_required",
+    ]
+    assert list(label_status) == expected_label_status_keys
+    assert {
+        "string_fields": all(
+            isinstance(label_status[field], str)
+            for field in (
+                "schema_version",
+                "signal_id",
+                "outcome",
+                "first_barrier_hit",
+                "labeled_at",
+            )
+        ),
+        "realized_r_float": isinstance(label_status["realized_r"], float),
+        "time_barrier_days_int": isinstance(
+            label_status["time_barrier_days"], int
+        ),
+        "live_data_required_bool": isinstance(
+            label_status["live_data_required"], bool
+        ),
+    } == {
+        "string_fields": True,
+        "realized_r_float": True,
+        "time_barrier_days_int": True,
+        "live_data_required_bool": True,
+    }
+    assert set(label_status).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(label_status)
+    )
     evidence_label_status = payload["evidence_context"]["label_status"]
     assert evidence_label_status == label_status
     assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
@@ -6882,6 +6930,54 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert label_status["labeled_at"] == selected_label["labeled_at"]
     assert label_status["time_barrier_days"] == selected_label["time_barrier_days"]
     assert label_status["live_data_required"] is False
+    expected_label_status_keys = [
+        "schema_version",
+        "signal_id",
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+        "live_data_required",
+    ]
+    assert list(label_status) == expected_label_status_keys
+    assert {
+        "string_fields": all(
+            isinstance(label_status[field], str)
+            for field in (
+                "schema_version",
+                "signal_id",
+                "outcome",
+                "first_barrier_hit",
+                "labeled_at",
+            )
+        ),
+        "realized_r_float": isinstance(label_status["realized_r"], float),
+        "time_barrier_days_int": isinstance(
+            label_status["time_barrier_days"], int
+        ),
+        "live_data_required_bool": isinstance(
+            label_status["live_data_required"], bool
+        ),
+    } == {
+        "string_fields": True,
+        "realized_r_float": True,
+        "time_barrier_days_int": True,
+        "live_data_required_bool": True,
+    }
+    assert set(label_status).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(label_status)
+    )
     evidence_label_status = payload["evidence_context"]["label_status"]
     assert evidence_label_status == label_status
     assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
