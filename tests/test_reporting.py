@@ -5125,6 +5125,41 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(filtered_report_path_free_surface_group_string_counts) == tuple(
         filtered_report_surface_groups
     )
+    filtered_report_path_free_surface_group_string_count_totals = {
+        "group_string_total": sum(
+            filtered_report_path_free_surface_group_string_counts.values()
+        ),
+        "path_free_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "grouped_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in filtered_report_grouped_surface_names
+        ),
+        "semantic_group_strings": sum(
+            filtered_report_surface_group_string_counts.values()
+        ),
+    }
+    assert filtered_report_path_free_surface_group_string_count_totals == {
+        "group_string_total": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "path_free_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "grouped_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "semantic_group_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+    }
+    assert tuple(filtered_report_path_free_surface_group_string_count_totals) == (
+        "group_string_total",
+        "path_free_surface_strings",
+        "grouped_surface_strings",
+        "semantic_group_strings",
+    )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -12231,6 +12266,41 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     )
     assert tuple(filtered_report_path_free_surface_group_string_counts) == tuple(
         filtered_report_surface_groups
+    )
+    filtered_report_path_free_surface_group_string_count_totals = {
+        "group_string_total": sum(
+            filtered_report_path_free_surface_group_string_counts.values()
+        ),
+        "path_free_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "grouped_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in filtered_report_grouped_surface_names
+        ),
+        "semantic_group_strings": sum(
+            filtered_report_surface_group_string_counts.values()
+        ),
+    }
+    assert filtered_report_path_free_surface_group_string_count_totals == {
+        "group_string_total": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "path_free_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "grouped_surface_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "semantic_group_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+    }
+    assert tuple(filtered_report_path_free_surface_group_string_count_totals) == (
+        "group_string_total",
+        "path_free_surface_strings",
+        "grouped_surface_strings",
+        "semantic_group_strings",
     )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
