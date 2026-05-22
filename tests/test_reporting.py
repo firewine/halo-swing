@@ -7374,6 +7374,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_exclusion_summary == {
         name: True for name in selected_source_summary_exclusion_targets
     }
+    assert tuple(selected_source_summary_exclusion_summary) == tuple(
+        selected_source_summary_exclusion_targets
+    )
     source_summary_hermes_boundary_tokens = [
         source_summary,
         excluded_source_summary,
@@ -15065,6 +15068,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_summary_exclusion_summary == {
         name: True for name in selected_source_summary_exclusion_targets
     }
+    assert tuple(selected_source_summary_exclusion_summary) == tuple(
+        selected_source_summary_exclusion_targets
+    )
     source_summary_hermes_boundary_tokens = [
         source_summary,
         excluded_source_summary,
