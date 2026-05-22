@@ -8332,6 +8332,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
     }
+    assert tuple(selected_evidence_exclusion_summary) == tuple(
+        selected_evidence_exclusion_targets
+    )
     risk_warning_hermes_boundary_tokens = (
         evidence_context["risk_warnings"]
         + excluded_evidence_tokens
@@ -16092,6 +16095,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_evidence_exclusion_summary == {
         name: True for name in selected_evidence_exclusion_targets
     }
+    assert tuple(selected_evidence_exclusion_summary) == tuple(
+        selected_evidence_exclusion_targets
+    )
     risk_warning_hermes_boundary_tokens = (
         evidence_context["risk_warnings"]
         + excluded_evidence_tokens
