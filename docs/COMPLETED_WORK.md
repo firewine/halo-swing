@@ -1,0 +1,43 @@
+# COMPLETED_WORK
+
+```yaml
+doc_type: completed_work_ledger
+audience: llm_agents_and_humans
+purpose: track completed slices separately from docs/WORKING.md
+detail_policy: compact_summary_plus_pointers
+full_evidence_sources:
+  - docs/halo-swing-development-plan.md
+  - docs/archive/working-ledger-compaction.md
+  - git log
+  - committed test output summaries
+```
+
+## ledger
+
+```yaml
+- date: 2026-05-22
+  commit: 53a2fd1
+  title: Cover sqlite filtered trade plan exclusion order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_EXCLUSION_ORDER_COVERAGE_GATE
+  status: verified_and_pushed
+  verification:
+    focused_pytest: 3 passed in 0.19s
+    full_pytest: 935 passed in 72.28s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - last completed implementation checkpoint before WORKING.md compaction
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.438
+    - full previous WORKING.md ledger is preserved in docs/archive/working-ledger-compaction.md
+```
+
+## maintenance_policy
+
+```yaml
+on_each_completed_slice:
+  - add one compact ledger entry here
+  - keep detailed gate evidence in docs/halo-swing-development-plan.md
+  - keep pre-compaction historical WORKING ledger in docs/archive/working-ledger-compaction.md
+  - keep docs/WORKING.md focused on current_work and next_work only
+  - do not copy long verification transcripts into docs/WORKING.md
+```

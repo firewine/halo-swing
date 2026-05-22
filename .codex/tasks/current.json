@@ -1,27 +1,25 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_EXCLUSION_ORDER_COVERAGE_GATE",
+  "gate_id": "WORKING_LEDGER_COMPACTION_2026_05_22",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_EXCLUSION_ORDER_COVERAGE_VERIFIED",
-  "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.438",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected trade plan exclusion surface order after repository selection",
+  "status": "WORKING_LEDGER_COMPACTION_VERIFIED",
+  "review_tier": "S0_trivial",
+  "source_gate_packet": "AGENTS.md#workingmd-state-ledger",
+  "next_atomic_step": "define docs/WORKING.md as current and next work only with completed work managed separately",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
+    "AGENTS.md",
     "docs/WORKING.md",
     "docs/codex-task.json",
-    "docs/halo-swing-development-plan.md",
-    "tests/test_reporting.py"
+    "docs/COMPLETED_WORK.md",
+    "docs/archive/working-ledger-compaction.md"
   ],
   "read_only_context": [
     "AGENTS.md",
-    "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.437",
-    "tests/test_reporting.py",
-    "src/halo_swing_mcp/tools/reporting.py"
+    "docs/WORKING.md"
   ],
   "blocked_path_prefixes": [
-    "src/halo_swing_mcp/broker/",
-    "src/halo_swing_mcp/live_adapters/",
+    "src/",
+    "tests/",
     "migrations/",
     "data/",
     "artifacts/",
@@ -33,30 +31,25 @@
     "PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json",
     "PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json",
     "git diff --check",
-    "git status --short --branch",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q",
-    "PYTHONPATH=src ./.venv/bin/python -m pytest",
-    "PYTHONPATH=src ./.venv/bin/python -m ruff check .",
-    "PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check"
+    "wc -l docs/WORKING.md docs/COMPLETED_WORK.md docs/archive/working-ledger-compaction.md",
+    "git status --short --branch"
   ],
   "post_implementation_review": {
     "roles": [
-      "devops",
-      "docs-gardener",
-      "qc"
+      "docs-gardener"
     ],
     "rounds": 1,
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe selected trade plan exclusion surface order is verified after repository selection",
-    "SQLite repository-backed latest report underlying selected trade plan exclusion surface order is verified after repository selection",
-    "selected trade plan exclusion coverage preserves trade plan exclusion surface order after repository selection",
-    "database_path marker remains absent from report and delivery surfaces",
-    "default no-repository latest report payload and golden snapshot remain unchanged",
-    "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
+    "docs/WORKING.md is LLM-friendly and reduced to current work and next work only",
+    "completed work is managed separately in docs/COMPLETED_WORK.md",
+    "full pre-compaction WORKING.md ledger is preserved in docs/archive/working-ledger-compaction.md",
+    "completed work points to SSOT gate records and git history",
+    "AGENTS.md defines the split between WORKING.md and completed work ledger",
+    "task contract mirror matches .codex/tasks/current.json and docs/codex-task.json",
     "verification passes"
   ],
-  "approval_source": "user approved REPOSITORY_GO and requested continued implementation plus full feature checks",
-  "next_state_after_success": "continue with next explicit repository or report read-model slice"
+  "approval_source": "user requested WORKING.md cleanup and separation of completed work from current/next work",
+  "next_state_after_success": "resume next explicit repository/report read-model slice only after selecting a fresh task contract"
 }

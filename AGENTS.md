@@ -128,8 +128,15 @@ For `implement` mode:
 
 ## WORKING.md State Ledger
 
-`docs/WORKING.md` is LLM-only operational memory, not a human-facing
-development document.
+`docs/WORKING.md` is LLM-only operational memory, not a human-facing development document.
+
+Keep `docs/WORKING.md` compact and LLM-friendly. It should contain only the
+active executable contract/current work, current gate state, latest verification
+summary, and next work queue. Completed work must be managed separately in
+`docs/COMPLETED_WORK.md` as compact ledger entries, with durable gate evidence
+kept in `docs/halo-swing-development-plan.md`. If `docs/WORKING.md` is
+compacted, preserve the pre-compaction ledger under `docs/archive/` before
+removing it from the active handoff file.
 
 It must preserve this priority order:
 
