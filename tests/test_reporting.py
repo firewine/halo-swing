@@ -5490,6 +5490,28 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_surface_group_boolean_pass_failure_totals = {
+        summary_name: {
+            "groups": len(group_consistency),
+            "passed_groups": sum(
+                1 for pass_state, _ in group_consistency.values() if pass_state is True
+            ),
+            "failed_surfaces": sum(
+                failure_count for _, failure_count in group_consistency.values()
+            ),
+        }
+        for summary_name, group_consistency in (
+            filtered_report_surface_group_boolean_pass_failure_consistency.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_pass_failure_totals == {
+        summary_name: {
+            "groups": len(filtered_report_surface_groups),
+            "passed_groups": len(filtered_report_surface_groups),
+            "failed_surfaces": 0,
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12085,6 +12107,28 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_surface_group_boolean_pass_failure_consistency == {
         summary_name: {
             group_name: (True, 0) for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
+    filtered_report_surface_group_boolean_pass_failure_totals = {
+        summary_name: {
+            "groups": len(group_consistency),
+            "passed_groups": sum(
+                1 for pass_state, _ in group_consistency.values() if pass_state is True
+            ),
+            "failed_surfaces": sum(
+                failure_count for _, failure_count in group_consistency.values()
+            ),
+        }
+        for summary_name, group_consistency in (
+            filtered_report_surface_group_boolean_pass_failure_consistency.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_pass_failure_totals == {
+        summary_name: {
+            "groups": len(filtered_report_surface_groups),
+            "passed_groups": len(filtered_report_surface_groups),
+            "failed_surfaces": 0,
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
