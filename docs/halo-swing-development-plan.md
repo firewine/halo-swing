@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.397 P1 Repository SQLite Latest Report Filtered Path-Free Envelope Latest-Matching Exclusion Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.396에서 SQLite repository-backed filtered latest report의 path-free narrative latest-matching exclusion coverage를 고정했다.
+이번 slice는 envelope surface의 latest matching record exclusion coverage를 path-free surface 목록 기준으로 다시 읽어도
+기존 semantic envelope latest-matching exclusion coverage와 동일하게 유지되는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - asserted timeframe-filtered path-free envelope latest-matching exclusion coverage matches semantic coverage
+  - asserted timeframe-filtered path-free envelope latest-matching exclusion coverage preserves envelope surface order
+  - asserted underlying-filtered path-free envelope latest-matching exclusion coverage matches semantic coverage
+  - asserted underlying-filtered path-free envelope latest-matching exclusion coverage preserves envelope surface order
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.92s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 62.63s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.396 P1 Repository SQLite Latest Report Filtered Path-Free Narrative Latest-Matching Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적

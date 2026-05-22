@@ -6647,6 +6647,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: latest_matching_record_excludes_older_summary[name]
         for name in filtered_report_envelope_surface_names
     } == {name: True for name in filtered_report_envelope_surface_names}
+    filtered_report_path_free_envelope_latest_matching_exclusion_coverage = {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_envelope_surface_names
+        if name in expected_filtered_report_path_free_surface_names
+    }
+    assert (
+        filtered_report_path_free_envelope_latest_matching_exclusion_coverage
+    ) == {name: True for name in filtered_report_envelope_surface_names}
+    assert tuple(
+        filtered_report_path_free_envelope_latest_matching_exclusion_coverage
+    ) == tuple(filtered_report_envelope_surface_names)
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
@@ -14302,6 +14313,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: latest_matching_record_excludes_older_summary[name]
         for name in filtered_report_envelope_surface_names
     } == {name: True for name in filtered_report_envelope_surface_names}
+    filtered_report_path_free_envelope_latest_matching_exclusion_coverage = {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_envelope_surface_names
+        if name in expected_filtered_report_path_free_surface_names
+    }
+    assert (
+        filtered_report_path_free_envelope_latest_matching_exclusion_coverage
+    ) == {name: True for name in filtered_report_envelope_surface_names}
+    assert tuple(
+        filtered_report_path_free_envelope_latest_matching_exclusion_coverage
+    ) == tuple(filtered_report_envelope_surface_names)
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
