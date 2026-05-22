@@ -6359,6 +6359,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
     )
+    filtered_report_path_free_surface_group_boolean_surface_total_consistency = {
+        summary_name: {
+            "surfaces": sum(
+                group_total["surfaces"] for group_total in group_totals.values()
+            ),
+            "passed_surfaces": sum(
+                group_total["passed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+            "failed_surfaces": sum(
+                group_total["failed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+        }
+        for summary_name, group_totals in (
+            filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_surface_total_consistency
+    ) == filtered_report_surface_group_boolean_surface_total_consistency
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_surface_total_consistency
+    ) == tuple(filtered_report_surface_group_boolean_surface_total_consistency)
     filtered_report_boolean_shared_keyset_surface_total_consistency = {
         summary_name: (
             len(filtered_report_shared_summary_keysets[summary_name]),
@@ -13867,6 +13891,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
     )
+    filtered_report_path_free_surface_group_boolean_surface_total_consistency = {
+        summary_name: {
+            "surfaces": sum(
+                group_total["surfaces"] for group_total in group_totals.values()
+            ),
+            "passed_surfaces": sum(
+                group_total["passed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+            "failed_surfaces": sum(
+                group_total["failed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+        }
+        for summary_name, group_totals in (
+            filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_surface_total_consistency
+    ) == filtered_report_surface_group_boolean_surface_total_consistency
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_surface_total_consistency
+    ) == tuple(filtered_report_surface_group_boolean_surface_total_consistency)
     filtered_report_boolean_shared_keyset_surface_total_consistency = {
         summary_name: (
             len(filtered_report_shared_summary_keysets[summary_name]),
