@@ -5605,6 +5605,40 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_surface_group_boolean_surface_totals_by_group_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_surface_totals_by_group
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_totals)
+            for summary_name, group_totals in (
+                filtered_report_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: tuple(group_total)
+                for group_name, group_total in group_totals.items()
+            }
+            for summary_name, group_totals in (
+                filtered_report_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_surface_totals_by_group_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "group_names_by_summary": {
+            summary_name: tuple(filtered_report_surface_groups)
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: ("surfaces", "passed_surfaces", "failed_surfaces")
+                for group_name in filtered_report_surface_groups
+            }
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12317,6 +12351,40 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for group_name, group_names in filtered_report_surface_groups.items()
         }
         for summary_name in filtered_report_boolean_summary_by_name
+    }
+    filtered_report_surface_group_boolean_surface_totals_by_group_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_surface_totals_by_group
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_totals)
+            for summary_name, group_totals in (
+                filtered_report_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: tuple(group_total)
+                for group_name, group_total in group_totals.items()
+            }
+            for summary_name, group_totals in (
+                filtered_report_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_surface_totals_by_group_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "group_names_by_summary": {
+            summary_name: tuple(filtered_report_surface_groups)
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: ("surfaces", "passed_surfaces", "failed_surfaces")
+                for group_name in filtered_report_surface_groups
+            }
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
