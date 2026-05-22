@@ -6826,6 +6826,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_signal_ref_exclusion_summary == {
         name: True for name in selected_source_signal_ref_exclusion_targets
     }
+    assert tuple(selected_source_signal_ref_exclusion_summary) == tuple(
+        selected_source_signal_ref_exclusion_targets
+    )
     selected_source_signal_ref_traceability_targets = {
         "traceable_format_guard": [
             report_payload_guard_checks[
@@ -14502,6 +14505,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_signal_ref_exclusion_summary == {
         name: True for name in selected_source_signal_ref_exclusion_targets
     }
+    assert tuple(selected_source_signal_ref_exclusion_summary) == tuple(
+        selected_source_signal_ref_exclusion_targets
+    )
     selected_source_signal_ref_traceability_targets = {
         "traceable_format_guard": [
             report_payload_guard_checks[
