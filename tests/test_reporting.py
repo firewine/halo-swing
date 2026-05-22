@@ -1425,6 +1425,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     evidence_guard_checks = {
         check["name"]: check for check in payload["evidence_guard"]["checks"]
     }
+    assert list(payload["evidence_guard"]) == ["status", "checks"]
+    assert payload["evidence_guard"]["status"] == "ok"
+    assert isinstance(payload["evidence_guard"]["checks"], list)
+    assert payload["evidence_guard"]["checks"]
+    assert all(check["passed"] is True for check in payload["evidence_guard"]["checks"])
+    assert set(payload["evidence_guard"]).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(payload["evidence_guard"])
+    )
     delivery_preview = payload["delivery_preview"]
     hermes_preview = delivery_preview["channels"]["hermes"]
     telegram_preview = delivery_preview["channels"]["telegram"]
@@ -6554,6 +6572,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     evidence_guard_checks = {
         check["name"]: check for check in payload["evidence_guard"]["checks"]
     }
+    assert list(payload["evidence_guard"]) == ["status", "checks"]
+    assert payload["evidence_guard"]["status"] == "ok"
+    assert isinstance(payload["evidence_guard"]["checks"], list)
+    assert payload["evidence_guard"]["checks"]
+    assert all(check["passed"] is True for check in payload["evidence_guard"]["checks"])
+    assert set(payload["evidence_guard"]).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(payload["evidence_guard"])
+    )
     delivery_preview = payload["delivery_preview"]
     hermes_preview = delivery_preview["channels"]["hermes"]
     telegram_preview = delivery_preview["channels"]["telegram"]
