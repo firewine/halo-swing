@@ -7996,6 +7996,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_guard_raw_marker_free_summary == {
         name: True for name in selected_filter_guard_raw_marker_free_targets
     }
+    assert tuple(selected_filter_guard_raw_marker_free_summary) == tuple(
+        selected_filter_guard_raw_marker_free_targets
+    )
     selected_filter_contract_raw_marker_free_targets = {
         "delivery_contract": delivery_contract,
         "prompt_contract": prompt_contract,
@@ -15725,6 +15728,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_filter_guard_raw_marker_free_summary == {
         name: True for name in selected_filter_guard_raw_marker_free_targets
     }
+    assert tuple(selected_filter_guard_raw_marker_free_summary) == tuple(
+        selected_filter_guard_raw_marker_free_targets
+    )
     selected_filter_contract_raw_marker_free_targets = {
         "delivery_contract": delivery_contract,
         "prompt_contract": prompt_contract,
