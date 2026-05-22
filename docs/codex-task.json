@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_IDENTITY_SCHEMA_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_CORE_SCHEMA_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_IDENTITY_SCHEMA_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_CORE_SCHEMA_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.326",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload_guard intent and top-level identity guards remain present in the emitted guard schema after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.327",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload_guard core payload schema guards remain present in the emitted guard schema after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.325",
+    "docs/halo-swing-development-plan.md#4.326",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe report_payload_guard includes intent and top-level identity guard names after repository selection",
-    "SQLite repository-backed latest report underlying report_payload_guard includes intent and top-level identity guard names after repository selection",
-    "report_payload_guard check-key schema preserves intent and top-level identity guard key shapes after repository selection",
+    "SQLite repository-backed latest report timeframe report_payload_guard includes schema version, live data, and payload keys guard names after repository selection",
+    "SQLite repository-backed latest report underlying report_payload_guard includes schema version, live data, and payload keys guard names after repository selection",
+    "report_payload_guard check-key schema preserves schema version, live data, and payload keys guard key shapes after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

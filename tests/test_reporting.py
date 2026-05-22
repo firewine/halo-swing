@@ -4103,6 +4103,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_keys_match_expected_schema"
         ]["expected"]
     )
+    report_payload_core_schema_guard_targets = {
+        guard_name: [
+            guard_name
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            guard_name
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][guard_name]
+            == ["name", "passed", "expected", "actual"],
+        ]
+        for guard_name in (
+            "report_payload_schema_version_matches_expected",
+            "report_payload_live_data_required_matches_expected",
+            "report_payload_keys_match_expected_schema",
+        )
+    }
+    report_payload_core_schema_guard_summary = {
+        name: all(checks)
+        for name, checks in report_payload_core_schema_guard_targets.items()
+    }
+    assert report_payload_core_schema_guard_summary == {
+        name: True for name in report_payload_core_schema_guard_targets
+    }
     assert list(payload["report_payload_guard"]) == ["status", "checks"]
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
@@ -9798,6 +9826,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_keys_match_expected_schema"
         ]["expected"]
     )
+    report_payload_core_schema_guard_targets = {
+        guard_name: [
+            guard_name
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            guard_name
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][guard_name]
+            == ["name", "passed", "expected", "actual"],
+        ]
+        for guard_name in (
+            "report_payload_schema_version_matches_expected",
+            "report_payload_live_data_required_matches_expected",
+            "report_payload_keys_match_expected_schema",
+        )
+    }
+    report_payload_core_schema_guard_summary = {
+        name: all(checks)
+        for name, checks in report_payload_core_schema_guard_targets.items()
+    }
+    assert report_payload_core_schema_guard_summary == {
+        name: True for name in report_payload_core_schema_guard_targets
+    }
     assert list(payload["report_payload_guard"]) == ["status", "checks"]
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
