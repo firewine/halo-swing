@@ -4686,6 +4686,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_sqlite_name_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_sqlite_name_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4699,6 +4705,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_storage_marker_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_storage_marker_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -4712,6 +4724,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_path_component_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_path_component_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4731,6 +4749,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert (
         filtered_report_excluded_record_free_summary["report_payload_guard"] is True
+    )
+    assert (
+        filtered_report_excluded_record_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
     )
     excluded_record_identity_tokens = [
         alternate_signal["signal_id"],
@@ -4753,6 +4777,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert (
         filtered_report_excluded_record_identity_free_summary[
             "report_payload_guard"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard_status_aggregation"
         ]
         is True
     )
@@ -4795,6 +4825,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
+        is True
+    )
+    assert (
+        latest_matching_record_excludes_older_summary[
+            "report_payload_guard_status_aggregation"
+        ]
         is True
     )
     selected_label_excludes_older_matching_label_summary = {
@@ -10491,6 +10527,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_sqlite_name_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_sqlite_name_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10504,6 +10546,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_storage_marker_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_storage_marker_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -10517,6 +10565,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in filtered_report_path_free_targets
     }
     assert filtered_report_path_component_free_summary["report_payload_guard"] is True
+    assert (
+        filtered_report_path_component_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
     excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10536,6 +10590,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert (
         filtered_report_excluded_record_free_summary["report_payload_guard"] is True
+    )
+    assert (
+        filtered_report_excluded_record_free_summary[
+            "report_payload_guard_status_aggregation"
+        ]
+        is True
     )
     excluded_record_identity_tokens = [
         ndx_signal["signal_id"],
@@ -10558,6 +10618,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         filtered_report_excluded_record_identity_free_summary[
             "report_payload_guard"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard_status_aggregation"
         ]
         is True
     )
@@ -10600,6 +10666,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
+        is True
+    )
+    assert (
+        latest_matching_record_excludes_older_summary[
+            "report_payload_guard_status_aggregation"
+        ]
         is True
     )
     selected_label_excludes_older_matching_label_summary = {
