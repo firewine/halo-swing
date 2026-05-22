@@ -7669,6 +7669,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_filter_exclusion_summary == {
         name: True for name in selected_source_repository_filter_exclusion_targets
     }
+    assert tuple(selected_source_repository_filter_exclusion_summary) == tuple(
+        selected_source_repository_filter_exclusion_targets
+    )
     selected_source_repository_storage_metadata_targets = {
         "top_level_source_repository_storage_metadata": [
             payload["source_repository_ref"]["storage"] == "sqlite_signal_repository",
@@ -15378,6 +15381,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_filter_exclusion_summary == {
         name: True for name in selected_source_repository_filter_exclusion_targets
     }
+    assert tuple(selected_source_repository_filter_exclusion_summary) == tuple(
+        selected_source_repository_filter_exclusion_targets
+    )
     selected_source_repository_storage_metadata_targets = {
         "top_level_source_repository_storage_metadata": [
             payload["source_repository_ref"]["storage"] == "sqlite_signal_repository",
