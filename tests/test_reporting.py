@@ -4659,6 +4659,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "evidence_context",
         "evidence_label_status",
     )
+    filtered_report_source_surface_names = (
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+    )
+    assert {
+        name: filtered_report_path_free_surface_string_counts[name]
+        for name in filtered_report_source_surface_names
+    } == {
+        "source_signal_ref": len(iter_nested_strings(payload["source_signal_ref"])),
+        "source_repository_ref": len(
+            iter_nested_strings(payload["source_repository_ref"])
+        ),
+        "latest_record_guard": len(iter_nested_strings(latest_record_guard)),
+    }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_evidence_surface_names
@@ -4729,6 +4744,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_path_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_path_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4762,6 +4781,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_sqlite_name_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_sqlite_name_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4799,6 +4822,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_storage_marker_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_storage_marker_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -4836,6 +4863,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_path_component_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_path_component_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4880,6 +4911,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_excluded_record_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_excluded_record_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     excluded_record_identity_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4928,6 +4963,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: filtered_report_excluded_record_identity_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_excluded_record_identity_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
@@ -4993,6 +5032,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: latest_matching_record_excludes_older_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
@@ -10660,6 +10703,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "evidence_context",
         "evidence_label_status",
     )
+    filtered_report_source_surface_names = (
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+    )
+    assert {
+        name: filtered_report_path_free_surface_string_counts[name]
+        for name in filtered_report_source_surface_names
+    } == {
+        "source_signal_ref": len(iter_nested_strings(payload["source_signal_ref"])),
+        "source_repository_ref": len(
+            iter_nested_strings(payload["source_repository_ref"])
+        ),
+        "latest_record_guard": len(iter_nested_strings(latest_record_guard)),
+    }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_evidence_surface_names
@@ -10730,6 +10788,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_path_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_path_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10763,6 +10825,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_sqlite_name_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_sqlite_name_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10800,6 +10866,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_storage_marker_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_storage_marker_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -10837,6 +10907,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_path_component_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_path_component_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10881,6 +10955,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_excluded_record_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_excluded_record_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     excluded_record_identity_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10929,6 +11007,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: filtered_report_excluded_record_identity_free_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: filtered_report_excluded_record_identity_free_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
@@ -10994,6 +11076,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: latest_matching_record_excludes_older_summary[name]
         for name in filtered_report_evidence_surface_names
     } == {name: True for name in filtered_report_evidence_surface_names}
+    assert {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_source_surface_names
+    } == {name: True for name in filtered_report_source_surface_names}
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
