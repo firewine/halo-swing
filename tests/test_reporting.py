@@ -2088,6 +2088,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for check_name in expected_evidence_special_check_keys
         },
     }
+    evidence_guard_check_keys = evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]
+    assert evidence_guard_check_keys["expected"] == evidence_guard_check_keys["actual"]
+    assert evidence_guard_check_keys["actual"]["special_check_keys"] == {
+        check_name: emitted_evidence_guard_check_keys[check_name]
+        for check_name in expected_evidence_special_check_keys
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_check_keys)
+    )
     assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"] == {
         "name": "evidence_guard_keys_match_expected_schema",
         "passed": True,
@@ -7256,6 +7274,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for check_name in expected_evidence_special_check_keys
         },
     }
+    evidence_guard_check_keys = evidence_guard_checks[
+        "evidence_guard_check_keys_match_expected_schema"
+    ]
+    assert evidence_guard_check_keys["expected"] == evidence_guard_check_keys["actual"]
+    assert evidence_guard_check_keys["actual"]["special_check_keys"] == {
+        check_name: emitted_evidence_guard_check_keys[check_name]
+        for check_name in expected_evidence_special_check_keys
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_check_keys)
+    )
     assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"] == {
         "name": "evidence_guard_keys_match_expected_schema",
         "passed": True,
