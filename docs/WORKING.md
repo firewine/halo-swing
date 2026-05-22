@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_STRING_COUNT_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_STRING_COUNT_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_SUMMARY_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_SUMMARY_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: extend SQLite filtered latest report coverage proving semantic surface group string-count aggregation after repository selection
+next_atomic_step: extend SQLite filtered latest report coverage proving semantic surface group boolean summary aggregation after repository selection
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,9 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe semantic surface group string-count aggregation is verified after repository selection
-  - SQLite repository-backed latest report underlying semantic surface group string-count aggregation is verified after repository selection
-  - delivery, intent, evidence, source, narrative, envelope, and guard groups aggregate member surface string counts from the shared summary map
+  - SQLite repository-backed latest report timeframe semantic surface group boolean summary aggregation is verified after repository selection
+  - SQLite repository-backed latest report underlying semantic surface group boolean summary aggregation is verified after repository selection
+  - delivery, intent, evidence, source, narrative, envelope, and guard groups aggregate member path-free, sqlite-name, storage-marker, path-component, filtered-record, filtered-record-identity, and older-record exclusion summary pass states
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
@@ -90,6 +90,48 @@ next_state_after_success: continue with next explicit repository or report read-
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_SUMMARY_COVERAGE_GATE
+scope: SQLite repository-backed filtered surface group boolean summary coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.07s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite timeframe-filtered latest report semantic surface group boolean summary aggregation is verified after repository selection
+  - SQLite underlying-filtered latest report semantic surface group boolean summary aggregation is verified after repository selection
+  - delivery, intent, evidence, source, narrative, envelope, and guard groups aggregate member path-free, sqlite-name-free, storage-marker-free, path-component-free, filtered-record exclusion, filtered-record identity exclusion, and older-record exclusion pass states
+  - database_path marker remains absent from report and delivery surfaces
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed
