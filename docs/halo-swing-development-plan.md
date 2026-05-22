@@ -28,6 +28,68 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.331 P1 Repository SQLite Latest Report Filtered Report Payload Guard Status Aggregation Path-Free Surface Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.330에서 SQLite repository-backed filtered latest report의 `report_payload_guard` status aggregation 값을 고정했다.
+이번 slice는 status aggregation이 filtered report path-free surface targets에 포함되어 공통 path/sqlite/local-marker
+summary maps 검증을 함께 받는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered path-free surface includes report_payload_guard_status_aggregation
+  - assert timeframe-filtered status aggregation string count is represented in the shared surface counts
+  - assert timeframe-filtered status aggregation path-free summary value is true
+  - assert underlying-filtered path-free surface includes report_payload_guard_status_aggregation
+  - assert underlying-filtered status aggregation string count is represented in the shared surface counts
+  - assert underlying-filtered status aggregation path-free summary value is true
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.06s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.74s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.330 P1 Repository SQLite Latest Report Filtered Report Payload Guard Status Aggregation Coverage Gate Record - 2026-05-22
 
 ### A. 목적
