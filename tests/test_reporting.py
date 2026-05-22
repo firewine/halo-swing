@@ -3823,6 +3823,43 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_source_signal_ref_matches_report_identity"
         ]["expected"]
     )
+    source_signal_ref_guard_schema_targets = {
+        "source_signal_ref_keys_guard_schema": [
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_source_signal_ref_keys_match_expected_schema"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "source_signal_ref_identity_guard_schema": [
+            "report_payload_source_signal_ref_matches_report_identity"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_matches_report_identity"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_source_signal_ref_matches_report_identity"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+    }
+    source_signal_ref_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in source_signal_ref_guard_schema_targets.items()
+    }
+    assert source_signal_ref_guard_schema_summary == {
+        name: True for name in source_signal_ref_guard_schema_targets
+    }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
     ] == {
@@ -9442,6 +9479,43 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_source_signal_ref_matches_report_identity"
         ]["expected"]
     )
+    source_signal_ref_guard_schema_targets = {
+        "source_signal_ref_keys_guard_schema": [
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_keys_match_expected_schema"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_source_signal_ref_keys_match_expected_schema"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "source_signal_ref_identity_guard_schema": [
+            "report_payload_source_signal_ref_matches_report_identity"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_source_signal_ref_matches_report_identity"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_source_signal_ref_matches_report_identity"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+    }
+    source_signal_ref_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in source_signal_ref_guard_schema_targets.items()
+    }
+    assert source_signal_ref_guard_schema_summary == {
+        name: True for name in source_signal_ref_guard_schema_targets
+    }
     assert report_payload_guard_checks[
         "report_payload_source_signal_ref_values_have_traceable_format"
     ] == {
