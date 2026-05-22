@@ -5111,6 +5111,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "by_name_surface_delta",
         "grouped_surface_delta",
     )
+    filtered_report_path_free_surface_group_string_counts = {
+        group_name: sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in expected_filtered_report_path_free_surface_names
+            if filtered_report_surface_group_by_name[name] == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_path_free_surface_group_string_counts == (
+        filtered_report_surface_group_string_counts
+    )
+    assert tuple(filtered_report_path_free_surface_group_string_counts) == tuple(
+        filtered_report_surface_groups
+    )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -12203,6 +12217,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "path_free_surface_delta",
         "by_name_surface_delta",
         "grouped_surface_delta",
+    )
+    filtered_report_path_free_surface_group_string_counts = {
+        group_name: sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in expected_filtered_report_path_free_surface_names
+            if filtered_report_surface_group_by_name[name] == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_path_free_surface_group_string_counts == (
+        filtered_report_surface_group_string_counts
+    )
+    assert tuple(filtered_report_path_free_surface_group_string_counts) == tuple(
+        filtered_report_surface_groups
     )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
