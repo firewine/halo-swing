@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.276 P1 Repository SQLite Latest Report Filtered Hermes Preview Minimal Shape Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.275에서 SQLite repository-backed filtered latest report의 Telegram delivery preview body text가 Hermes delivery preview
+metadata와 Hermes delivery guard reference에 인라인되지 않는지 고정했다. 이번 slice는 filtered repository selection 이후
+Hermes delivery preview 자체가 format, network_call, numeric_authority, payload_ref만 포함하는 minimal ref-only shape로
+유지되는지 검증한다. Hermes preview는 structured payload reference 표면이어야 하고 Telegram body/chunk/source metadata를
+직접 포함하면 안 된다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered Hermes preview equals the expected minimal ref-only dict
+  - assert timeframe-filtered Hermes preview key order remains format, network_call, numeric_authority, payload_ref
+  - assert timeframe-filtered Hermes preview omits Telegram and repository metadata keys
+  - assert underlying-filtered Hermes preview equals the expected minimal ref-only dict
+  - assert underlying-filtered Hermes preview omits Telegram and repository metadata keys
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.06s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 50.59s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.275 P1 Repository SQLite Latest Report Filtered Telegram Body Hermes Preview Boundary Coverage Gate Record - 2026-05-22
 
 ### A. 목적

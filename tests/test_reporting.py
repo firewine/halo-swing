@@ -2262,6 +2262,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert delivery_preview_guard_checks[
         "hermes_numeric_authority_matches_payload_ref"
     ]["actual"] == hermes_preview["numeric_authority"]
+    expected_hermes_preview = {
+        "format": delivery_channels["hermes"]["format"],
+        "network_call": False,
+        "numeric_authority": "latest_signal_report",
+        "payload_ref": "latest_signal_report",
+    }
+    assert hermes_preview == expected_hermes_preview
+    assert list(hermes_preview) == [
+        "format",
+        "network_call",
+        "numeric_authority",
+        "payload_ref",
+    ]
+    assert set(hermes_preview).isdisjoint(
+        {
+            "chunks",
+            "message_count",
+            "text",
+            "send_call",
+            "schema_version",
+            "source_repository_ref",
+        }
+    )
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
@@ -6634,6 +6657,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert delivery_preview_guard_checks[
         "hermes_numeric_authority_matches_payload_ref"
     ]["actual"] == hermes_preview["numeric_authority"]
+    expected_hermes_preview = {
+        "format": delivery_channels["hermes"]["format"],
+        "network_call": False,
+        "numeric_authority": "latest_signal_report",
+        "payload_ref": "latest_signal_report",
+    }
+    assert hermes_preview == expected_hermes_preview
+    assert list(hermes_preview) == [
+        "format",
+        "network_call",
+        "numeric_authority",
+        "payload_ref",
+    ]
+    assert set(hermes_preview).isdisjoint(
+        {
+            "chunks",
+            "message_count",
+            "text",
+            "send_call",
+            "schema_version",
+            "source_repository_ref",
+        }
+    )
     assert telegram_preview["schema_version"] == "telegram_report_format.v1"
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
