@@ -5076,6 +5076,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    filtered_report_shared_summary_value_domains = {
+        "string_counts": all(
+            type(count) is int and count > 0
+            for count in filtered_report_path_free_surface_string_counts.values()
+        ),
+        "path_free": all(
+            value is True for value in filtered_report_path_free_summary.values()
+        ),
+        "sqlite_name_free": all(
+            value is True
+            for value in filtered_report_sqlite_name_free_summary.values()
+        ),
+        "storage_marker_free": all(
+            value is True
+            for value in filtered_report_storage_marker_free_summary.values()
+        ),
+        "path_component_free": all(
+            value is True
+            for value in filtered_report_path_component_free_summary.values()
+        ),
+        "excluded_record_free": all(
+            value is True
+            for value in filtered_report_excluded_record_free_summary.values()
+        ),
+        "excluded_record_identity_free": all(
+            value is True
+            for value in filtered_report_excluded_record_identity_free_summary.values()
+        ),
+        "latest_matching_record_excludes_older": all(
+            value is True
+            for value in latest_matching_record_excludes_older_summary.values()
+        ),
+    }
+    assert filtered_report_shared_summary_value_domains == {
+        name: True for name in filtered_report_shared_summary_value_domains
+    }
     filtered_report_shared_summary_keysets = {
         "string_counts": tuple(filtered_report_path_free_surface_string_counts),
         "path_free": tuple(filtered_report_path_free_summary),
@@ -11217,6 +11253,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_shared_summary_value_domains = {
+        "string_counts": all(
+            type(count) is int and count > 0
+            for count in filtered_report_path_free_surface_string_counts.values()
+        ),
+        "path_free": all(
+            value is True for value in filtered_report_path_free_summary.values()
+        ),
+        "sqlite_name_free": all(
+            value is True
+            for value in filtered_report_sqlite_name_free_summary.values()
+        ),
+        "storage_marker_free": all(
+            value is True
+            for value in filtered_report_storage_marker_free_summary.values()
+        ),
+        "path_component_free": all(
+            value is True
+            for value in filtered_report_path_component_free_summary.values()
+        ),
+        "excluded_record_free": all(
+            value is True
+            for value in filtered_report_excluded_record_free_summary.values()
+        ),
+        "excluded_record_identity_free": all(
+            value is True
+            for value in filtered_report_excluded_record_identity_free_summary.values()
+        ),
+        "latest_matching_record_excludes_older": all(
+            value is True
+            for value in latest_matching_record_excludes_older_summary.values()
+        ),
+    }
+    assert filtered_report_shared_summary_value_domains == {
+        name: True for name in filtered_report_shared_summary_value_domains
     }
     filtered_report_shared_summary_keysets = {
         "string_counts": tuple(filtered_report_path_free_surface_string_counts),

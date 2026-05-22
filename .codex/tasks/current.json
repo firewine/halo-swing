@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SHARED_SUMMARY_KEYSET_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SHARED_SUMMARY_VALUE_DOMAIN_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SHARED_SUMMARY_KEYSET_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SHARED_SUMMARY_VALUE_DOMAIN_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.340",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving shared summary maps expose identical ordered surface keysets after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.341",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving shared summary maps expose strict value domains after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.339",
+    "docs/halo-swing-development-plan.md#4.340",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe shared summary maps expose the same ordered filtered surface keyset after repository selection",
-    "SQLite repository-backed latest report underlying shared summary maps expose the same ordered filtered surface keyset after repository selection",
-    "string-count, path-free, sqlite-name, storage-marker, path-component, filtered-record, filtered-record-identity, and older-record exclusion summaries share the expected surface key order",
+    "SQLite repository-backed latest report timeframe shared summary maps expose strict value domains after repository selection",
+    "SQLite repository-backed latest report underlying shared summary maps expose strict value domains after repository selection",
+    "string-count summaries contain positive non-bool ints while path-free, sqlite-name, storage-marker, path-component, filtered-record, filtered-record-identity, and older-record exclusion summaries contain strict True values",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
