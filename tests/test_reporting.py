@@ -2429,6 +2429,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "source_repository_ref",
         }
     )
+    expected_telegram_chunks = [
+        {
+            "index": index,
+            "chars": len(str(chunk["text"])),
+            "text": chunk["text"],
+        }
+        for index, chunk in enumerate(telegram_preview["chunks"], start=1)
+    ]
+    assert telegram_preview["chunks"] == expected_telegram_chunks
+    assert [list(chunk) for chunk in telegram_preview["chunks"]] == [
+        ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
+    ]
+    assert [chunk["index"] for chunk in telegram_preview["chunks"]] == list(
+        range(1, len(telegram_preview["chunks"]) + 1)
+    )
+    assert all(chunk["chars"] > 0 for chunk in telegram_preview["chunks"])
+    assert all(
+        chunk["chars"] <= telegram_preview["max_chars"]
+        for chunk in telegram_preview["chunks"]
+    )
     assert (
         telegram_preview["section_separator"].join(
             chunk["text"] for chunk in telegram_preview["chunks"]
@@ -6963,6 +6983,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "required_sections",
             "source_repository_ref",
         }
+    )
+    expected_telegram_chunks = [
+        {
+            "index": index,
+            "chars": len(str(chunk["text"])),
+            "text": chunk["text"],
+        }
+        for index, chunk in enumerate(telegram_preview["chunks"], start=1)
+    ]
+    assert telegram_preview["chunks"] == expected_telegram_chunks
+    assert [list(chunk) for chunk in telegram_preview["chunks"]] == [
+        ["index", "chars", "text"] for _chunk in telegram_preview["chunks"]
+    ]
+    assert [chunk["index"] for chunk in telegram_preview["chunks"]] == list(
+        range(1, len(telegram_preview["chunks"]) + 1)
+    )
+    assert all(chunk["chars"] > 0 for chunk in telegram_preview["chunks"])
+    assert all(
+        chunk["chars"] <= telegram_preview["max_chars"]
+        for chunk in telegram_preview["chunks"]
     )
     assert (
         telegram_preview["section_separator"].join(
