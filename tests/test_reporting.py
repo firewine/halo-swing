@@ -7329,6 +7329,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_summary_guard_summary == {
         name: True for name in selected_source_summary_guard_targets
     }
+    assert tuple(selected_source_summary_guard_summary) == tuple(
+        selected_source_summary_guard_targets
+    )
     excluded_source_summary = (
         "Repository source: sqlite_signal_repository; "
         "db_required=true; "
@@ -15029,6 +15032,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_summary_guard_summary == {
         name: True for name in selected_source_summary_guard_targets
     }
+    assert tuple(selected_source_summary_guard_summary) == tuple(
+        selected_source_summary_guard_targets
+    )
     excluded_source_summary = (
         "Repository source: sqlite_signal_repository; "
         "db_required=true; "
