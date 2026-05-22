@@ -4099,6 +4099,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_default_check_keys,
         "actual": expected_payload_check_keys,
     }
+    report_payload_guard_check_keys = report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]
+    assert report_payload_guard_check_keys["actual"] == actual_payload_check_keys
+    assert all(
+        check_keys == report_payload_guard_check_keys["expected"]
+        for check_keys in report_payload_guard_check_keys["actual"].values()
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_payload_guard_check_keys)
+    )
     assert report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
     ]["passed"] == (
@@ -9493,6 +9511,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_default_check_keys,
         "actual": expected_payload_check_keys,
     }
+    report_payload_guard_check_keys = report_payload_guard_checks[
+        "report_payload_guard_check_keys_match_expected_schema"
+    ]
+    assert report_payload_guard_check_keys["actual"] == actual_payload_check_keys
+    assert all(
+        check_keys == report_payload_guard_check_keys["expected"]
+        for check_keys in report_payload_guard_check_keys["actual"].values()
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_payload_guard_check_keys)
+    )
     assert report_payload_guard_checks[
         "report_payload_guard_check_keys_match_expected_schema"
     ]["passed"] == (
