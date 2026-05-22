@@ -6925,6 +6925,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_signal_ref_traceability_summary == {
         name: True for name in selected_source_signal_ref_traceability_targets
     }
+    assert tuple(selected_source_signal_ref_traceability_summary) == tuple(
+        selected_source_signal_ref_traceability_targets
+    )
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (
             label_status,
@@ -14604,6 +14607,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_signal_ref_traceability_summary == {
         name: True for name in selected_source_signal_ref_traceability_targets
     }
+    assert tuple(selected_source_signal_ref_traceability_summary) == tuple(
+        selected_source_signal_ref_traceability_targets
+    )
     selected_label_presence_targets = {
         "latest_signal_report_label_status": (
             label_status,
