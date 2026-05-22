@@ -7501,6 +7501,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert source_summary_hermes_boundary_summary == {
         name: True for name in source_summary_hermes_boundary_targets
     }
+    assert tuple(source_summary_hermes_boundary_summary) == tuple(
+        source_summary_hermes_boundary_targets
+    )
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
             payload["source_repository_ref"] == source_repository_ref,
@@ -15195,6 +15198,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert source_summary_hermes_boundary_summary == {
         name: True for name in source_summary_hermes_boundary_targets
     }
+    assert tuple(source_summary_hermes_boundary_summary) == tuple(
+        source_summary_hermes_boundary_targets
+    )
     selected_source_repository_ref_propagation_targets = {
         "top_level_source_repository_ref": [
             payload["source_repository_ref"] == source_repository_ref,
