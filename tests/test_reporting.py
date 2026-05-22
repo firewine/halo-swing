@@ -2253,6 +2253,28 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert delivery_preview["guard"]["status"] == (
         "ok" if all(delivery_preview_guard_passes) else "conflict"
     )
+    expected_hermes_delivery_contract = {
+        "format": "structured_json_plus_text",
+        "network_call": False,
+        "numeric_authority": "latest_signal_report",
+    }
+    assert delivery_channels["hermes"] == expected_hermes_delivery_contract
+    assert list(delivery_channels["hermes"]) == [
+        "format",
+        "network_call",
+        "numeric_authority",
+    ]
+    assert set(delivery_channels["hermes"]).isdisjoint(
+        {
+            "chunks",
+            "message_count",
+            "payload_ref",
+            "schema_version",
+            "send_call",
+            "source_repository_ref",
+            "text",
+        }
+    )
     assert delivery_preview_guard_checks[
         "hermes_payload_ref_matches_structured_payload"
     ]["actual"] == hermes_preview["payload_ref"]
@@ -6689,6 +6711,28 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]
     assert delivery_preview["guard"]["status"] == (
         "ok" if all(delivery_preview_guard_passes) else "conflict"
+    )
+    expected_hermes_delivery_contract = {
+        "format": "structured_json_plus_text",
+        "network_call": False,
+        "numeric_authority": "latest_signal_report",
+    }
+    assert delivery_channels["hermes"] == expected_hermes_delivery_contract
+    assert list(delivery_channels["hermes"]) == [
+        "format",
+        "network_call",
+        "numeric_authority",
+    ]
+    assert set(delivery_channels["hermes"]).isdisjoint(
+        {
+            "chunks",
+            "message_count",
+            "payload_ref",
+            "schema_version",
+            "send_call",
+            "source_repository_ref",
+            "text",
+        }
     )
     assert delivery_preview_guard_checks[
         "hermes_payload_ref_matches_structured_payload"
