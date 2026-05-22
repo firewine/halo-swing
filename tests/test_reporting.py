@@ -7765,6 +7765,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in selected_source_repository_storage_metadata_exclusion_targets
     }
+    assert tuple(selected_source_repository_storage_metadata_exclusion_summary) == (
+        tuple(selected_source_repository_storage_metadata_exclusion_targets)
+    )
     selected_source_repository_guard_pass_targets = {
         "latest_record_source_repository_ref_guards": [
             latest_record_guard["status"] == "ok",
@@ -15480,6 +15483,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True
         for name in selected_source_repository_storage_metadata_exclusion_targets
     }
+    assert tuple(selected_source_repository_storage_metadata_exclusion_summary) == (
+        tuple(selected_source_repository_storage_metadata_exclusion_targets)
+    )
     selected_source_repository_guard_pass_targets = {
         "latest_record_source_repository_ref_guards": [
             latest_record_guard["status"] == "ok",
