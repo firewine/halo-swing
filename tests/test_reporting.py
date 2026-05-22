@@ -5660,6 +5660,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
     )
+    filtered_report_boolean_shared_keyset_surface_total_consistency = {
+        summary_name: (
+            len(filtered_report_shared_summary_keysets[summary_name]),
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "surfaces"
+            ],
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "passed_surfaces"
+            ],
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "failed_surfaces"
+            ],
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
+    assert filtered_report_boolean_shared_keyset_surface_total_consistency == {
+        summary_name: (
+            len(expected_filtered_report_path_free_surface_names),
+            len(expected_filtered_report_path_free_surface_names),
+            len(expected_filtered_report_path_free_surface_names),
+            0,
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12428,6 +12452,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
     )
+    filtered_report_boolean_shared_keyset_surface_total_consistency = {
+        summary_name: (
+            len(filtered_report_shared_summary_keysets[summary_name]),
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "surfaces"
+            ],
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "passed_surfaces"
+            ],
+            filtered_report_surface_group_boolean_surface_totals[summary_name][
+                "failed_surfaces"
+            ],
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
+    assert filtered_report_boolean_shared_keyset_surface_total_consistency == {
+        summary_name: (
+            len(expected_filtered_report_path_free_surface_names),
+            len(expected_filtered_report_path_free_surface_names),
+            len(expected_filtered_report_path_free_surface_names),
+            0,
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
