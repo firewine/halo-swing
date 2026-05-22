@@ -3486,6 +3486,35 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
+    report_payload_guard_keys = iter_nested_keys(payload["report_payload_guard"])
+    report_payload_guard_strings = iter_nested_strings(
+        payload["report_payload_guard"]
+    )
+    expected_report_payload_guard_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_report_payload_guard_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in report_payload_guard_keys,
+        "omits_ledger_path": "ledger_path" not in report_payload_guard_keys,
+        "omits_database_path": "database_path" not in report_payload_guard_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value
+            for value in report_payload_guard_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in report_payload_guard_strings
+        ),
+    }
     assert payload["report_payload_guard"]["status"] == "ok"
     expected_report_payload_guard_status = (
         "ok"
@@ -8123,6 +8152,35 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
+    report_payload_guard_keys = iter_nested_keys(payload["report_payload_guard"])
+    report_payload_guard_strings = iter_nested_strings(
+        payload["report_payload_guard"]
+    )
+    expected_report_payload_guard_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_report_payload_guard_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in report_payload_guard_keys,
+        "omits_ledger_path": "ledger_path" not in report_payload_guard_keys,
+        "omits_database_path": "database_path" not in report_payload_guard_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value
+            for value in report_payload_guard_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in report_payload_guard_strings
+        ),
+    }
     assert payload["report_payload_guard"]["status"] == "ok"
     expected_report_payload_guard_status = (
         "ok"
