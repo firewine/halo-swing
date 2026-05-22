@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.284 P1 Repository SQLite Latest Report Filtered Delivery Preview Guard Path-Free Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.283에서 SQLite repository-backed filtered latest report의 Telegram preview chunks가 path-free인지 고정했다. 이번 slice는
+같은 repository selection 이후 `delivery_preview.guard` 자체도 ledger/database keys, explicit `database_path` value, absolute
+paths, `file://`, sqlite URI/path marker를 노출하지 않는지 검증한다. Guard는 Telegram chunk validation evidence를 제공하지만
+local storage detail을 사용자 전달 표면에 싣지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered delivery preview guard omits ledger/database keys
+  - assert timeframe-filtered delivery preview guard omits explicit database_path value and sqlite path markers
+  - assert timeframe-filtered delivery preview guard omits absolute paths and file URLs
+  - assert underlying-filtered delivery preview guard omits ledger/database keys
+  - assert underlying-filtered delivery preview guard omits explicit database_path value and sqlite path markers
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.96s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.00s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.283 P1 Repository SQLite Latest Report Filtered Telegram Chunk Path-Free Coverage Gate Record - 2026-05-22
 
 ### A. 목적

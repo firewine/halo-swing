@@ -2565,6 +2565,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for chunk in telegram_preview["chunks"][1:]
         ],
     }
+    delivery_preview_guard_keys = iter_nested_keys(delivery_preview["guard"])
+    delivery_preview_guard_strings = iter_nested_strings(delivery_preview["guard"])
+    expected_delivery_preview_guard_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_delivery_preview_guard_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in delivery_preview_guard_keys,
+        "omits_ledger_path": "ledger_path" not in delivery_preview_guard_keys,
+        "omits_database_path": "database_path" not in delivery_preview_guard_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value
+            for value in delivery_preview_guard_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in delivery_preview_guard_strings
+        ),
+    }
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
     ] == {
@@ -7145,6 +7172,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             else ""
             for chunk in telegram_preview["chunks"][1:]
         ],
+    }
+    delivery_preview_guard_keys = iter_nested_keys(delivery_preview["guard"])
+    delivery_preview_guard_strings = iter_nested_strings(delivery_preview["guard"])
+    expected_delivery_preview_guard_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_delivery_preview_guard_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in delivery_preview_guard_keys,
+        "omits_ledger_path": "ledger_path" not in delivery_preview_guard_keys,
+        "omits_database_path": "database_path" not in delivery_preview_guard_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value
+            for value in delivery_preview_guard_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in delivery_preview_guard_strings
+        ),
     }
     assert delivery_preview_guard_checks[
         "delivery_preview_has_no_network_side_effect"
