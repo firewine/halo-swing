@@ -2449,6 +2449,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         chunk["chars"] <= telegram_preview["max_chars"]
         for chunk in telegram_preview["chunks"]
     )
+    telegram_chunk_keys = iter_nested_keys(telegram_preview["chunks"])
+    telegram_chunk_strings = iter_nested_strings(telegram_preview["chunks"])
+    expected_telegram_chunk_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_telegram_chunk_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in telegram_chunk_keys,
+        "omits_ledger_path": "ledger_path" not in telegram_chunk_keys,
+        "omits_database_path": "database_path" not in telegram_chunk_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value for value in telegram_chunk_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in telegram_chunk_strings
+        ),
+    }
     assert (
         telegram_preview["section_separator"].join(
             chunk["text"] for chunk in telegram_preview["chunks"]
@@ -7004,6 +7030,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         chunk["chars"] <= telegram_preview["max_chars"]
         for chunk in telegram_preview["chunks"]
     )
+    telegram_chunk_keys = iter_nested_keys(telegram_preview["chunks"])
+    telegram_chunk_strings = iter_nested_strings(telegram_preview["chunks"])
+    expected_telegram_chunk_path_free = {
+        "omits_ledger_ref": True,
+        "omits_ledger_path": True,
+        "omits_database_path": True,
+        "omits_database_path_value": True,
+        "omits_absolute_or_sqlite_paths": True,
+    }
+    assert expected_telegram_chunk_path_free == {
+        "omits_ledger_ref": "ledger_ref" not in telegram_chunk_keys,
+        "omits_ledger_path": "ledger_path" not in telegram_chunk_keys,
+        "omits_database_path": "database_path" not in telegram_chunk_keys,
+        "omits_database_path_value": all(
+            str(database_path) not in value for value in telegram_chunk_strings
+        ),
+        "omits_absolute_or_sqlite_paths": all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in telegram_chunk_strings
+        ),
+    }
     assert (
         telegram_preview["section_separator"].join(
             chunk["text"] for chunk in telegram_preview["chunks"]

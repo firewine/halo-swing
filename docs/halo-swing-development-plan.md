@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.283 P1 Repository SQLite Latest Report Filtered Telegram Chunk Path-Free Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.282에서 SQLite repository-backed filtered latest report의 Telegram preview `chunks` payload shape를 고정했다. 이번 slice는
+같은 repository selection 이후 chunk text surface가 SQLite database path, ledger refs, absolute paths, `file://`, sqlite URI/path
+marker를 노출하지 않는지 검증한다. Telegram chunk는 사용자에게 전달될 수 있는 표면이므로 repository provenance는 portable
+summary로만 남고 local storage 세부정보는 빠져야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered Telegram chunks omit ledger/database keys
+  - assert timeframe-filtered Telegram chunks omit the explicit database_path value and sqlite path markers
+  - assert timeframe-filtered Telegram chunks omit absolute paths and file URLs
+  - assert underlying-filtered Telegram chunks omit ledger/database keys
+  - assert underlying-filtered Telegram chunks omit the explicit database_path value and sqlite path markers
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.04s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.21s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.282 P1 Repository SQLite Latest Report Filtered Telegram Chunk Payload Shape Coverage Gate Record - 2026-05-22
 
 ### A. 목적

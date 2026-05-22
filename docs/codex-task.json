@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CHUNK_PAYLOAD_SHAPE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CHUNK_PATH_FREE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CHUNK_PAYLOAD_SHAPE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_CHUNK_PATH_FREE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.282",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving Telegram delivery preview chunks keep deterministic index chars text shape after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.283",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving Telegram delivery preview chunks remain path-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.281",
+    "docs/halo-swing-development-plan.md#4.282",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates Telegram preview chunks keep index, chars, text keys only with 1-based sequential indexes after repository selection",
-    "SQLite repository-backed latest report underlying filter validates Telegram preview chunks keep index, chars, text keys only with 1-based sequential indexes after repository selection",
-    "Telegram delivery preview chunk chars match text length, are nonempty, and stay within max_chars",
+    "SQLite repository-backed latest report timeframe filter validates Telegram preview chunks omit ledger/database keys, explicit database_path values, absolute paths, file URLs, and sqlite URI/path markers after repository selection",
+    "SQLite repository-backed latest report underlying filter validates Telegram preview chunks omit ledger/database keys, explicit database_path values, absolute paths, file URLs, and sqlite URI/path markers after repository selection",
+    "Telegram delivery preview chunks still preserve deterministic index/chars/text shape while remaining path-free",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
