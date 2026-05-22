@@ -5555,6 +5555,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_surface_group_boolean_surface_total_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_surface_totals
+        ),
+        "metric_names_by_summary": {
+            summary_name: tuple(surface_totals)
+            for summary_name, surface_totals in (
+                filtered_report_surface_group_boolean_surface_totals.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_surface_total_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "metric_names_by_summary": {
+            summary_name: ("surfaces", "passed_surfaces", "failed_surfaces")
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12217,6 +12235,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "failed_surfaces": 0,
         }
         for summary_name in filtered_report_boolean_summary_by_name
+    }
+    filtered_report_surface_group_boolean_surface_total_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_surface_totals
+        ),
+        "metric_names_by_summary": {
+            summary_name: tuple(surface_totals)
+            for summary_name, surface_totals in (
+                filtered_report_surface_group_boolean_surface_totals.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_surface_total_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "metric_names_by_summary": {
+            summary_name: ("surfaces", "passed_surfaces", "failed_surfaces")
+            for summary_name in filtered_report_boolean_summary_by_name
+        },
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
