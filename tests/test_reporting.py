@@ -8578,6 +8578,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_component_extreme_presence_summary == {
         name: True for name in selected_component_extreme_presence_targets
     }
+    assert tuple(selected_component_extreme_presence_summary) == tuple(
+        selected_component_extreme_presence_targets
+    )
     component_extreme_hermes_boundary_tokens = selected_component_extreme_tokens + [
         swing_signal["signal_id"],
         alternate_signal["signal_id"],
@@ -16356,6 +16359,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_component_extreme_presence_summary == {
         name: True for name in selected_component_extreme_presence_targets
     }
+    assert tuple(selected_component_extreme_presence_summary) == tuple(
+        selected_component_extreme_presence_targets
+    )
     component_extreme_hermes_boundary_tokens = selected_component_extreme_tokens + [
         qqq_signal["signal_id"],
         ndx_signal["signal_id"],
