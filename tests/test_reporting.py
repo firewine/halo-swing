@@ -7832,6 +7832,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_guard_pass_summary == {
         name: True for name in selected_source_repository_guard_pass_targets
     }
+    assert tuple(selected_source_repository_guard_pass_summary) == tuple(
+        selected_source_repository_guard_pass_targets
+    )
     selected_source_repository_guard_expected_targets = {
         "latest_record_source_repository_ref_key_guard": [
             latest_record_guard_checks[
@@ -15550,6 +15553,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_guard_pass_summary == {
         name: True for name in selected_source_repository_guard_pass_targets
     }
+    assert tuple(selected_source_repository_guard_pass_summary) == tuple(
+        selected_source_repository_guard_pass_targets
+    )
     selected_source_repository_guard_expected_targets = {
         "latest_record_source_repository_ref_key_guard": [
             latest_record_guard_checks[
