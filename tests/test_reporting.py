@@ -4448,6 +4448,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
+    report_payload_context_guard_schema_targets = {
+        guard_name: [
+            guard_name in payload_check_names["expected"],
+            guard_name in payload_check_names["actual"],
+            payload_check_keys[guard_name] == expected_default_check_keys,
+        ]
+        for guard_name in (
+            "report_payload_nested_guard_statuses_are_ok",
+            "report_payload_optional_context_statuses_are_ok",
+            "report_payload_optional_context_guards_are_ok",
+        )
+    }
+    report_payload_context_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_context_guard_schema_targets.items()
+    }
+    assert report_payload_context_guard_schema_summary == {
+        name: True for name in report_payload_context_guard_schema_targets
+    }
     report_payload_guard_keys = iter_nested_keys(payload["report_payload_guard"])
     report_payload_guard_strings = iter_nested_strings(
         payload["report_payload_guard"]
@@ -10190,6 +10209,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert "latest_record_guard" in report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"]
+    report_payload_context_guard_schema_targets = {
+        guard_name: [
+            guard_name in payload_check_names["expected"],
+            guard_name in payload_check_names["actual"],
+            payload_check_keys[guard_name] == expected_default_check_keys,
+        ]
+        for guard_name in (
+            "report_payload_nested_guard_statuses_are_ok",
+            "report_payload_optional_context_statuses_are_ok",
+            "report_payload_optional_context_guards_are_ok",
+        )
+    }
+    report_payload_context_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_context_guard_schema_targets.items()
+    }
+    assert report_payload_context_guard_schema_summary == {
+        name: True for name in report_payload_context_guard_schema_targets
+    }
     report_payload_guard_keys = iter_nested_keys(payload["report_payload_guard"])
     report_payload_guard_strings = iter_nested_strings(
         payload["report_payload_guard"]
