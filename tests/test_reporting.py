@@ -8272,6 +8272,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_timestamp_exclusion_summary == {
         name: True for name in selected_timestamp_exclusion_targets
     }
+    assert tuple(selected_timestamp_exclusion_summary) == tuple(
+        selected_timestamp_exclusion_targets
+    )
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
             evidence_context["risk_warnings"],
@@ -16026,6 +16029,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_timestamp_exclusion_summary == {
         name: True for name in selected_timestamp_exclusion_targets
     }
+    assert tuple(selected_timestamp_exclusion_summary) == tuple(
+        selected_timestamp_exclusion_targets
+    )
     selected_risk_warning_presence_targets = {
         "evidence_context_risk_warnings": (
             evidence_context["risk_warnings"],
