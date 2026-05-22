@@ -5038,6 +5038,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "narrative",
         "narrative",
     )
+    filtered_report_path_free_surface_group_counts = {
+        group_name: sum(
+            1
+            for name in expected_filtered_report_path_free_surface_names
+            if filtered_report_surface_group_by_name[name] == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_path_free_surface_group_counts == {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert tuple(filtered_report_path_free_surface_group_counts) == tuple(
+        filtered_report_surface_groups
+    )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -12057,6 +12072,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "guard",
         "narrative",
         "narrative",
+    )
+    filtered_report_path_free_surface_group_counts = {
+        group_name: sum(
+            1
+            for name in expected_filtered_report_path_free_surface_names
+            if filtered_report_surface_group_by_name[name] == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_path_free_surface_group_counts == {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert tuple(filtered_report_path_free_surface_group_counts) == tuple(
+        filtered_report_surface_groups
     )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
