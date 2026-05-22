@@ -2049,6 +2049,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ]["actual"] == [
         check["name"] for check in payload["evidence_guard"]["checks"]
     ]
+    evidence_guard_check_names = evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]
+    emitted_evidence_guard_check_names = [
+        check["name"] for check in payload["evidence_guard"]["checks"]
+    ]
+    assert evidence_guard_check_names["expected"] == emitted_evidence_guard_check_names
+    assert evidence_guard_check_names["actual"] == emitted_evidence_guard_check_names
+    assert evidence_guard_check_names["expected"] == evidence_guard_check_names[
+        "actual"
+    ]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_check_names)
+    )
     emitted_evidence_guard_check_keys = {
         check["name"]: list(check)
         for check in payload["evidence_guard"]["checks"]
@@ -7196,6 +7217,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]["actual"] == [
         check["name"] for check in payload["evidence_guard"]["checks"]
     ]
+    evidence_guard_check_names = evidence_guard_checks[
+        "evidence_guard_check_names_match_expected_schema"
+    ]
+    emitted_evidence_guard_check_names = [
+        check["name"] for check in payload["evidence_guard"]["checks"]
+    ]
+    assert evidence_guard_check_names["expected"] == emitted_evidence_guard_check_names
+    assert evidence_guard_check_names["actual"] == emitted_evidence_guard_check_names
+    assert evidence_guard_check_names["expected"] == evidence_guard_check_names[
+        "actual"
+    ]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_check_names)
+    )
     emitted_evidence_guard_check_keys = {
         check["name"]: list(check)
         for check in payload["evidence_guard"]["checks"]
