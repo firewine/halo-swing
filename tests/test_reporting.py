@@ -3645,6 +3645,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ),
         },
     }
+    report_contract_guard_check_keys = report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]
+    assert (
+        report_contract_guard_check_keys["expected"]
+        == report_contract_guard_check_keys["actual"]
+    )
+    assert report_contract_guard_check_keys["actual"]["special_check_keys"] == {
+        "telegram_text_fits_single_message": (
+            emitted_report_contract_guard_check_keys[
+                "telegram_text_fits_single_message"
+            ]
+        ),
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_contract_guard_check_keys)
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["passed"] == (
@@ -8980,6 +9004,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ),
         },
     }
+    report_contract_guard_check_keys = report_contract_guard_checks[
+        "report_contract_guard_check_keys_match_expected_schema"
+    ]
+    assert (
+        report_contract_guard_check_keys["expected"]
+        == report_contract_guard_check_keys["actual"]
+    )
+    assert report_contract_guard_check_keys["actual"]["special_check_keys"] == {
+        "telegram_text_fits_single_message": (
+            emitted_report_contract_guard_check_keys[
+                "telegram_text_fits_single_message"
+            ]
+        ),
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_contract_guard_check_keys)
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_check_keys_match_expected_schema"
     ]["passed"] == (
