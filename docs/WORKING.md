@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_GROUP_SURFACE_TOTAL_AXIS_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_GROUP_SURFACE_TOTAL_AXIS_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_GROUP_SURFACE_TOTAL_CONSISTENCY_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_GROUP_SURFACE_TOTAL_CONSISTENCY_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: extend SQLite filtered latest report coverage proving semantic group-level boolean surface total axes after repository selection
+next_atomic_step: extend SQLite filtered latest report coverage proving semantic group-to-summary boolean surface total consistency after repository selection
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,10 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe semantic group-level boolean surface total axes are verified after repository selection
-  - SQLite repository-backed latest report underlying semantic group-level boolean surface total axes are verified after repository selection
-  - group surface total summary names preserve filtered boolean summary order after repository selection
-  - each summary preserves delivery, intent, evidence, source, narrative, envelope, and guard group order with surfaces, passed_surfaces, and failed_surfaces metric ordering after repository selection
+  - SQLite repository-backed latest report timeframe semantic group-to-summary boolean surface total consistency is verified after repository selection
+  - SQLite repository-backed latest report underlying semantic group-to-summary boolean surface total consistency is verified after repository selection
+  - summing semantic group-level surfaces, passed_surfaces, and failed_surfaces reproduces each summary-level boolean surface total after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
@@ -91,6 +90,48 @@ next_state_after_success: continue with next explicit repository or report read-
 ```
 
 Latest verification result:
+
+```text
+status: passed
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_GROUP_SURFACE_TOTAL_CONSISTENCY_COVERAGE_GATE
+scope: SQLite repository-backed filtered semantic group-to-summary boolean surface total consistency coverage
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 2.34s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.13s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+files_changed:
+  - .codex/tasks/current.json
+  - docs/WORKING.md
+  - docs/codex-task.json
+  - docs/halo-swing-development-plan.md
+  - tests/test_reporting.py
+next_state: continue with next explicit repository or report read-model slice
+notes:
+  - SQLite timeframe-filtered latest report semantic group-to-summary boolean surface total consistency is verified after repository selection
+  - SQLite underlying-filtered latest report semantic group-to-summary boolean surface total consistency is verified after repository selection
+  - summing semantic group-level surfaces, passed_surfaces, and failed_surfaces reproduces each summary-level boolean surface total after repository selection
+  - database_path marker remains absent from report and delivery surfaces
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added
+```
+
+Previous verification result:
 
 ```text
 status: passed

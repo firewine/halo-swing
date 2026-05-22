@@ -5639,6 +5639,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    filtered_report_surface_group_boolean_surface_total_consistency = {
+        summary_name: {
+            "surfaces": sum(
+                group_total["surfaces"] for group_total in group_totals.values()
+            ),
+            "passed_surfaces": sum(
+                group_total["passed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+            "failed_surfaces": sum(
+                group_total["failed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+        }
+        for summary_name, group_totals in (
+            filtered_report_surface_group_boolean_surface_totals_by_group.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_surface_total_consistency == (
+        filtered_report_surface_group_boolean_surface_totals
+    )
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12386,6 +12407,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    filtered_report_surface_group_boolean_surface_total_consistency = {
+        summary_name: {
+            "surfaces": sum(
+                group_total["surfaces"] for group_total in group_totals.values()
+            ),
+            "passed_surfaces": sum(
+                group_total["passed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+            "failed_surfaces": sum(
+                group_total["failed_surfaces"]
+                for group_total in group_totals.values()
+            ),
+        }
+        for summary_name, group_totals in (
+            filtered_report_surface_group_boolean_surface_totals_by_group.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_surface_total_consistency == (
+        filtered_report_surface_group_boolean_surface_totals
+    )
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
