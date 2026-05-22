@@ -7717,6 +7717,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
     }
+    assert tuple(selected_source_repository_storage_metadata_summary) == tuple(
+        selected_source_repository_storage_metadata_targets
+    )
     selected_source_repository_storage_metadata_exclusion_targets = {
         "top_level_source_repository_storage_metadata": [
             payload["source_repository_ref"]["storage"] != "latest_signal_record",
@@ -15429,6 +15432,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_storage_metadata_summary == {
         name: True for name in selected_source_repository_storage_metadata_targets
     }
+    assert tuple(selected_source_repository_storage_metadata_summary) == tuple(
+        selected_source_repository_storage_metadata_targets
+    )
     selected_source_repository_storage_metadata_exclusion_targets = {
         "top_level_source_repository_storage_metadata": [
             payload["source_repository_ref"]["storage"] != "latest_signal_record",
