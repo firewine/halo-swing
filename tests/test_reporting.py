@@ -6033,6 +6033,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_pass_failure_consistency = {
+        summary_name: {
+            group_name: (
+                filtered_report_path_free_surface_group_boolean_summary_coverage[
+                    summary_name
+                ][group_name],
+                len(
+                    filtered_report_path_free_surface_group_boolean_summary_failures[
+                        summary_name
+                    ][group_name]
+                ),
+            )
+            for group_name in filtered_report_surface_groups
+        }
+        for summary_name in (
+            filtered_report_path_free_surface_group_boolean_summary_coverage
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_pass_failure_consistency
+    ) == filtered_report_surface_group_boolean_pass_failure_consistency
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_pass_failure_consistency
+    ) == tuple(filtered_report_surface_group_boolean_pass_failure_consistency)
     filtered_report_surface_group_boolean_pass_failure_totals = {
         summary_name: {
             "groups": len(group_consistency),
@@ -13385,6 +13409,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_pass_failure_consistency = {
+        summary_name: {
+            group_name: (
+                filtered_report_path_free_surface_group_boolean_summary_coverage[
+                    summary_name
+                ][group_name],
+                len(
+                    filtered_report_path_free_surface_group_boolean_summary_failures[
+                        summary_name
+                    ][group_name]
+                ),
+            )
+            for group_name in filtered_report_surface_groups
+        }
+        for summary_name in (
+            filtered_report_path_free_surface_group_boolean_summary_coverage
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_pass_failure_consistency
+    ) == filtered_report_surface_group_boolean_pass_failure_consistency
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_pass_failure_consistency
+    ) == tuple(filtered_report_surface_group_boolean_pass_failure_consistency)
     filtered_report_surface_group_boolean_pass_failure_totals = {
         summary_name: {
             "groups": len(group_consistency),
