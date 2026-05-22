@@ -1837,6 +1837,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         len(evidence_context["evidence_summary"])
         <= evidence_contract["max_evidence_summary_chars"]
     )
+    evidence_summary_surface = {
+        "reason_summary": evidence_context["reason_summary"],
+        "evidence_summary": evidence_context["evidence_summary"],
+    }
+    assert evidence_summary_surface == {
+        "reason_summary": latest_report["reason_summary"],
+        "evidence_summary": latest_report["evidence_summary"],
+    }
+    assert all(
+        isinstance(value, str)
+        for value in evidence_summary_surface.values()
+    )
+    assert len(evidence_summary_surface["reason_summary"]) <= evidence_contract[
+        "max_reason_summary_chars"
+    ]
+    assert len(evidence_summary_surface["evidence_summary"]) <= evidence_contract[
+        "max_evidence_summary_chars"
+    ]
+    assert all(
+        excluded_summary not in value
+        for value in evidence_summary_surface.values()
+        for excluded_summary in (
+            alternate_signal["reason_summary"],
+            older_matching_signal["reason_summary"],
+        )
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_summary_surface)
+    )
     assert (
         len(evidence_context["conflict_flags"])
         <= evidence_contract["max_conflict_flags"]
@@ -6905,6 +6941,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         len(evidence_context["evidence_summary"])
         <= evidence_contract["max_evidence_summary_chars"]
+    )
+    evidence_summary_surface = {
+        "reason_summary": evidence_context["reason_summary"],
+        "evidence_summary": evidence_context["evidence_summary"],
+    }
+    assert evidence_summary_surface == {
+        "reason_summary": latest_report["reason_summary"],
+        "evidence_summary": latest_report["evidence_summary"],
+    }
+    assert all(
+        isinstance(value, str)
+        for value in evidence_summary_surface.values()
+    )
+    assert len(evidence_summary_surface["reason_summary"]) <= evidence_contract[
+        "max_reason_summary_chars"
+    ]
+    assert len(evidence_summary_surface["evidence_summary"]) <= evidence_contract[
+        "max_evidence_summary_chars"
+    ]
+    assert all(
+        excluded_summary not in value
+        for value in evidence_summary_surface.values()
+        for excluded_summary in (
+            ndx_signal["reason_summary"],
+            older_matching_signal["reason_summary"],
+        )
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_summary_surface)
     )
     assert (
         len(evidence_context["conflict_flags"])
