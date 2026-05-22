@@ -6079,6 +6079,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_pass_failure_totals = {
+        summary_name: {
+            "groups": len(group_consistency),
+            "passed_groups": sum(
+                1 for pass_state, _ in group_consistency.values() if pass_state is True
+            ),
+            "failed_surfaces": sum(
+                failure_count for _, failure_count in group_consistency.values()
+            ),
+        }
+        for summary_name, group_consistency in (
+            filtered_report_path_free_surface_group_boolean_pass_failure_consistency.items()
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_pass_failure_totals
+    ) == filtered_report_surface_group_boolean_pass_failure_totals
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_pass_failure_totals
+    ) == tuple(filtered_report_surface_group_boolean_pass_failure_totals)
     filtered_report_boolean_summary_by_name = {
         "path_free": filtered_report_path_free_summary,
         "sqlite_name_free": filtered_report_sqlite_name_free_summary,
@@ -13455,6 +13475,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_pass_failure_totals = {
+        summary_name: {
+            "groups": len(group_consistency),
+            "passed_groups": sum(
+                1 for pass_state, _ in group_consistency.values() if pass_state is True
+            ),
+            "failed_surfaces": sum(
+                failure_count for _, failure_count in group_consistency.values()
+            ),
+        }
+        for summary_name, group_consistency in (
+            filtered_report_path_free_surface_group_boolean_pass_failure_consistency.items()
+        )
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_pass_failure_totals
+    ) == filtered_report_surface_group_boolean_pass_failure_totals
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_pass_failure_totals
+    ) == tuple(filtered_report_surface_group_boolean_pass_failure_totals)
     filtered_report_boolean_summary_by_name = {
         "path_free": filtered_report_path_free_summary,
         "sqlite_name_free": filtered_report_sqlite_name_free_summary,
