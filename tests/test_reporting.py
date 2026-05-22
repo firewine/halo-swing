@@ -4000,6 +4000,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["actual"] == list(payload["report_payload_guard"])
+    report_payload_guard_key_schema = report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]
+    assert report_payload_guard_key_schema["expected"] == list(
+        payload["report_payload_guard"]
+    )
+    assert report_payload_guard_key_schema["actual"] == list(
+        payload["report_payload_guard"]
+    )
+    assert (
+        report_payload_guard_key_schema["expected"]
+        == report_payload_guard_key_schema["actual"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_payload_guard_key_schema)
+    )
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["passed"] == (
@@ -9359,6 +9382,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["actual"] == list(payload["report_payload_guard"])
+    report_payload_guard_key_schema = report_payload_guard_checks[
+        "report_payload_guard_keys_match_expected_schema"
+    ]
+    assert report_payload_guard_key_schema["expected"] == list(
+        payload["report_payload_guard"]
+    )
+    assert report_payload_guard_key_schema["actual"] == list(
+        payload["report_payload_guard"]
+    )
+    assert (
+        report_payload_guard_key_schema["expected"]
+        == report_payload_guard_key_schema["actual"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_payload_guard_key_schema)
+    )
     assert report_payload_guard_checks[
         "report_payload_guard_keys_match_expected_schema"
     ]["passed"] == (
