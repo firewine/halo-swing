@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_LABEL_LATEST_MATCHING_EXCLUSION_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RECORD_IDENTITY_PRESENCE_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_LABEL_LATEST_MATCHING_EXCLUSION_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SELECTED_RECORD_IDENTITY_PRESENCE_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.398",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected label latest-matching exclusion coverage after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.399",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected record identity presence coverage after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.397",
+    "docs/halo-swing-development-plan.md#4.398",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe selected label latest-matching exclusion coverage is verified after repository selection",
-    "SQLite repository-backed latest report underlying selected label latest-matching exclusion coverage is verified after repository selection",
-    "selected label latest-matching exclusion coverage preserves label status surface order after repository selection",
+    "SQLite repository-backed latest report timeframe selected record identity presence coverage is verified after repository selection",
+    "SQLite repository-backed latest report underlying selected record identity presence coverage is verified after repository selection",
+    "selected record identity presence coverage preserves identity surface order after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

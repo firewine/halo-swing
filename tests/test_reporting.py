@@ -6715,6 +6715,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
     }
+    assert tuple(selected_record_identity_presence_summary) == tuple(
+        selected_record_identity_presence_targets
+    )
     selected_source_signal_ref_propagation_targets = {
         "source_signal_ref_values": [
             payload["source_signal_ref"]["signal_id"] == swing_signal["signal_id"],
@@ -14385,6 +14388,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_record_identity_presence_summary == {
         name: True for name in selected_record_identity_presence_targets
     }
+    assert tuple(selected_record_identity_presence_summary) == tuple(
+        selected_record_identity_presence_targets
+    )
     selected_source_signal_ref_propagation_targets = {
         "source_signal_ref_values": [
             payload["source_signal_ref"]["signal_id"] == qqq_signal["signal_id"],

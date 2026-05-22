@@ -28,6 +28,59 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.399 P1 Repository SQLite Latest Report Filtered Selected Record Identity Presence Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.398에서 SQLite repository-backed filtered latest report의 selected label latest-matching exclusion coverage를 고정했다.
+이번 slice는 repository selection 이후 `source_signal_ref`, `latest_signal_report`,
+`report_payload_source_signal_ref_identity_guard`, `report_payload_guard`가 selected record identity token을
+포함하는지 coverage 객체와 순서 assertion으로 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - asserted timeframe-filtered selected record identity presence coverage passes for source_signal_ref
+  - asserted timeframe-filtered selected record identity presence coverage passes for latest_signal_report
+  - asserted timeframe-filtered selected record identity presence coverage passes for report_payload_source_signal_ref_identity_guard
+  - asserted timeframe-filtered selected record identity presence coverage passes for report_payload_guard
+  - asserted underlying-filtered selected record identity presence coverage passes for the same identity surfaces
+  - asserted selected record identity presence coverage preserves identity surface order
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.86s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 57.42s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.398 P1 Repository SQLite Latest Report Filtered Selected Label Latest-Matching Exclusion Coverage Gate Record - 2026-05-22
 
 ### A. 목적
