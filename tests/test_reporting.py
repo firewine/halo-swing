@@ -7975,6 +7975,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_raw_marker_free_summary == {
         name: True for name in selected_filter_raw_marker_free_targets
     }
+    assert tuple(selected_filter_raw_marker_free_summary) == tuple(
+        selected_filter_raw_marker_free_targets
+    )
     selected_filter_guard_raw_marker_free_targets = {
         "evidence_guard_checks": evidence_guard_checks,
         "report_contract_guard_checks": report_contract_guard_checks,
@@ -15701,6 +15704,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_filter_raw_marker_free_summary == {
         name: True for name in selected_filter_raw_marker_free_targets
     }
+    assert tuple(selected_filter_raw_marker_free_summary) == tuple(
+        selected_filter_raw_marker_free_targets
+    )
     selected_filter_guard_raw_marker_free_targets = {
         "evidence_guard_checks": evidence_guard_checks,
         "report_contract_guard_checks": report_contract_guard_checks,
