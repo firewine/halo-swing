@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.277 P1 Repository SQLite Latest Report Filtered Hermes Guard Ref Scalar Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.276에서 SQLite repository-backed filtered latest report의 Hermes delivery preview가 minimal ref-only shape로 유지되는지
+고정했다. 이번 slice는 Hermes delivery preview guard의 expected/actual reference 값도 structured payload, Telegram body,
+repository metadata가 아니라 `"latest_signal_report"` scalar string으로만 유지되는지 검증한다. Guard는 Hermes preview와
+같은 ref-only boundary를 따라야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered Hermes payload-ref guard expected/actual are scalar latest_signal_report values
+  - assert timeframe-filtered Hermes numeric-authority guard expected/actual are scalar latest_signal_report values
+  - assert timeframe-filtered Hermes guard refs match the Hermes preview payload_ref
+  - assert underlying-filtered Hermes payload-ref guard expected/actual are scalar latest_signal_report values
+  - assert underlying-filtered Hermes numeric-authority guard expected/actual are scalar latest_signal_report values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.10s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 49.44s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.276 P1 Repository SQLite Latest Report Filtered Hermes Preview Minimal Shape Coverage Gate Record - 2026-05-22
 
 ### A. 목적

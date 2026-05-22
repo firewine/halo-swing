@@ -2262,6 +2262,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert delivery_preview_guard_checks[
         "hermes_numeric_authority_matches_payload_ref"
     ]["actual"] == hermes_preview["numeric_authority"]
+    hermes_guard_ref_values = [
+        delivery_preview_guard_checks[
+            "hermes_payload_ref_matches_structured_payload"
+        ]["expected"],
+        delivery_preview_guard_checks[
+            "hermes_payload_ref_matches_structured_payload"
+        ]["actual"],
+        delivery_preview_guard_checks[
+            "hermes_numeric_authority_matches_payload_ref"
+        ]["expected"],
+        delivery_preview_guard_checks[
+            "hermes_numeric_authority_matches_payload_ref"
+        ]["actual"],
+    ]
+    assert hermes_guard_ref_values == ["latest_signal_report"] * 4
+    assert all(isinstance(value, str) for value in hermes_guard_ref_values)
+    assert all(value == hermes_preview["payload_ref"] for value in hermes_guard_ref_values)
     expected_hermes_preview = {
         "format": delivery_channels["hermes"]["format"],
         "network_call": False,
@@ -6657,6 +6674,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert delivery_preview_guard_checks[
         "hermes_numeric_authority_matches_payload_ref"
     ]["actual"] == hermes_preview["numeric_authority"]
+    hermes_guard_ref_values = [
+        delivery_preview_guard_checks[
+            "hermes_payload_ref_matches_structured_payload"
+        ]["expected"],
+        delivery_preview_guard_checks[
+            "hermes_payload_ref_matches_structured_payload"
+        ]["actual"],
+        delivery_preview_guard_checks[
+            "hermes_numeric_authority_matches_payload_ref"
+        ]["expected"],
+        delivery_preview_guard_checks[
+            "hermes_numeric_authority_matches_payload_ref"
+        ]["actual"],
+    ]
+    assert hermes_guard_ref_values == ["latest_signal_report"] * 4
+    assert all(isinstance(value, str) for value in hermes_guard_ref_values)
+    assert all(value == hermes_preview["payload_ref"] for value in hermes_guard_ref_values)
     expected_hermes_preview = {
         "format": delivery_channels["hermes"]["format"],
         "network_call": False,
