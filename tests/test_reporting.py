@@ -8019,6 +8019,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_contract_raw_marker_free_summary == {
         name: True for name in selected_filter_contract_raw_marker_free_targets
     }
+    assert tuple(selected_filter_contract_raw_marker_free_summary) == tuple(
+        selected_filter_contract_raw_marker_free_targets
+    )
     selected_filter_section_raw_marker_free_targets = {
         "top_level_identity": actual_top_level_identity,
         "latest_signal_report": payload["latest_signal_report"],
@@ -15751,6 +15754,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_filter_contract_raw_marker_free_summary == {
         name: True for name in selected_filter_contract_raw_marker_free_targets
     }
+    assert tuple(selected_filter_contract_raw_marker_free_summary) == tuple(
+        selected_filter_contract_raw_marker_free_targets
+    )
     selected_filter_section_raw_marker_free_targets = {
         "top_level_identity": actual_top_level_identity,
         "latest_signal_report": payload["latest_signal_report"],
