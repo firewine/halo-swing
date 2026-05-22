@@ -6407,6 +6407,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         )
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_path_free_shared_keyset_surface_total_consistency = {
+        summary_name: (
+            len(
+                tuple(
+                    name
+                    for name in filtered_report_shared_summary_keysets[summary_name]
+                    if name in expected_filtered_report_path_free_surface_names
+                )
+            ),
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["surfaces"],
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["passed_surfaces"],
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["failed_surfaces"],
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
+    assert filtered_report_path_free_shared_keyset_surface_total_consistency == (
+        filtered_report_boolean_shared_keyset_surface_total_consistency
+    )
+    assert tuple(
+        filtered_report_path_free_shared_keyset_surface_total_consistency
+    ) == tuple(filtered_report_boolean_shared_keyset_surface_total_consistency)
     filtered_report_boolean_shared_keyset_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_boolean_shared_keyset_surface_total_consistency
@@ -13939,6 +13966,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         )
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_path_free_shared_keyset_surface_total_consistency = {
+        summary_name: (
+            len(
+                tuple(
+                    name
+                    for name in filtered_report_shared_summary_keysets[summary_name]
+                    if name in expected_filtered_report_path_free_surface_names
+                )
+            ),
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["surfaces"],
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["passed_surfaces"],
+            filtered_report_path_free_surface_group_boolean_surface_total_consistency[
+                summary_name
+            ]["failed_surfaces"],
+        )
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
+    assert filtered_report_path_free_shared_keyset_surface_total_consistency == (
+        filtered_report_boolean_shared_keyset_surface_total_consistency
+    )
+    assert tuple(
+        filtered_report_path_free_shared_keyset_surface_total_consistency
+    ) == tuple(filtered_report_boolean_shared_keyset_surface_total_consistency)
     filtered_report_boolean_shared_keyset_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_boolean_shared_keyset_surface_total_consistency
