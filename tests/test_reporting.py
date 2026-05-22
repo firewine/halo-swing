@@ -6967,6 +6967,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
     }
+    assert tuple(selected_label_presence_summary) == tuple(
+        selected_label_presence_targets
+    )
     selected_label_summary_guard_targets = {
         "report_contract_label_summary_guard_pass": [
             report_contract_guard_checks[
@@ -14649,6 +14652,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_label_presence_summary == {
         name: True for name in selected_label_presence_targets
     }
+    assert tuple(selected_label_presence_summary) == tuple(
+        selected_label_presence_targets
+    )
     selected_label_summary_guard_targets = {
         "report_contract_label_summary_guard_pass": [
             report_contract_guard_checks[
