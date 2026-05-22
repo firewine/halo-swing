@@ -8110,6 +8110,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
     }
+    assert tuple(selected_decision_identity_presence_summary) == tuple(
+        selected_decision_identity_presence_targets
+    )
     excluded_decision_tokens = [
         token
         for excluded_signal in (alternate_signal, older_matching_signal)
@@ -15848,6 +15851,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_decision_identity_presence_summary == {
         name: True for name in selected_decision_identity_presence_targets
     }
+    assert tuple(selected_decision_identity_presence_summary) == tuple(
+        selected_decision_identity_presence_targets
+    )
     excluded_decision_tokens = [
         token
         for excluded_signal in (ndx_signal, older_matching_signal)
