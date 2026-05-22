@@ -5375,6 +5375,73 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_surface_group_boolean_summary_failures = {
+        "path_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_path_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "sqlite_name_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_sqlite_name_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "storage_marker_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_storage_marker_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "path_component_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_path_component_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "excluded_record_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_excluded_record_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "excluded_record_identity_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if (
+                    filtered_report_excluded_record_identity_free_summary[name]
+                    is not True
+                )
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "latest_matching_record_excludes_older": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if latest_matching_record_excludes_older_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+    }
+    assert filtered_report_surface_group_boolean_summary_failures == {
+        summary_name: {
+            group_name: () for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_failures
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -11857,6 +11924,73 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             group_name: True for group_name in filtered_report_surface_groups
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
+    filtered_report_surface_group_boolean_summary_failures = {
+        "path_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_path_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "sqlite_name_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_sqlite_name_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "storage_marker_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_storage_marker_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "path_component_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_path_component_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "excluded_record_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if filtered_report_excluded_record_free_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "excluded_record_identity_free": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if (
+                    filtered_report_excluded_record_identity_free_summary[name]
+                    is not True
+                )
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+        "latest_matching_record_excludes_older": {
+            group_name: tuple(
+                name
+                for name in group_names
+                if latest_matching_record_excludes_older_summary[name] is not True
+            )
+            for group_name, group_names in filtered_report_surface_groups.items()
+        },
+    }
+    assert filtered_report_surface_group_boolean_summary_failures == {
+        summary_name: {
+            group_name: () for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_failures
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {

@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.350 P1 Repository SQLite Latest Report Filtered Surface Group Boolean Failure Catalog Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.349에서 SQLite repository-backed filtered latest report의 semantic group boolean summary pass-state aggregation을
+고정했다. 이번 slice는 각 boolean shared-summary별 semantic group failure catalog가 빈 tuple로 유지되는지 고정해,
+future regression 발생 시 어떤 group과 surface가 실패했는지 바로 식별할 수 있게 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered semantic group boolean failure catalog is empty across path/sqlite/storage/path-component guards
+  - assert timeframe-filtered semantic group boolean failure catalog is empty across filtered-record and older-record exclusion guards
+  - assert underlying-filtered semantic group boolean failure catalog is empty across path/sqlite/storage/path-component guards
+  - assert underlying-filtered semantic group boolean failure catalog is empty across filtered-record and older-record exclusion guards
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.17s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 44.55s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.349 P1 Repository SQLite Latest Report Filtered Surface Group Boolean Summary Coverage Gate Record - 2026-05-22
 
 ### A. 목적
