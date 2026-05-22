@@ -8698,6 +8698,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_trade_plan_exclusion_summary == {
         name: True for name in selected_trade_plan_exclusion_targets
     }
+    assert tuple(selected_trade_plan_exclusion_summary) == tuple(
+        selected_trade_plan_exclusion_targets
+    )
     trade_plan_hermes_boundary_tokens = (
         selected_latest_report_trade_plan_tokens
         + selected_text_trade_plan_tokens
@@ -16485,6 +16488,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_trade_plan_exclusion_summary == {
         name: True for name in selected_trade_plan_exclusion_targets
     }
+    assert tuple(selected_trade_plan_exclusion_summary) == tuple(
+        selected_trade_plan_exclusion_targets
+    )
     trade_plan_hermes_boundary_tokens = (
         selected_latest_report_trade_plan_tokens
         + selected_text_trade_plan_tokens
