@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.288 P1 Repository SQLite Latest Report Filtered Sections Path-Free Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.287에서 SQLite repository-backed filtered latest report의 `latest_signal_report` body가 path-free surface set에 포함되도록
+고정했다. 이번 slice는 사용자에게 직접 노출되는 구조화 report `sections`도 같은 path-free aggregation에 포함한다. Repository
+selection 이후 sections는 explicit `database_path` value, sqlite path marker, local path component, excluded repository record를
+노출하지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered sections omit explicit database_path value
+  - include timeframe-filtered sections in path-free surface aggregation
+  - include timeframe-filtered sections in excluded-record-free aggregation
+  - assert underlying-filtered sections omit explicit database_path value
+  - include underlying-filtered sections in path-free surface aggregation
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.99s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 71.04s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.287 P1 Repository SQLite Latest Report Filtered Latest Signal Report Path-Free Coverage Gate Record - 2026-05-22
 
 ### A. 목적
