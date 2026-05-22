@@ -4504,6 +4504,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        filtered_report_excluded_record_free_summary["report_payload_guard"] is True
+    )
     excluded_record_identity_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4522,6 +4525,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_excluded_record_identity_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard"
+        ]
+        is True
+    )
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
@@ -10023,6 +10032,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_excluded_record_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        filtered_report_excluded_record_free_summary["report_payload_guard"] is True
+    )
     excluded_record_identity_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10041,6 +10053,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_excluded_record_identity_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard"
+        ]
+        is True
+    )
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
