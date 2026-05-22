@@ -6525,6 +6525,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in filtered_report_guard_surface_shared_summary_coverage
     }
+    filtered_report_path_free_guard_surface_shared_summary_coverage = {
+        coverage_name: coverage_value
+        for coverage_name, coverage_value in (
+            filtered_report_guard_surface_shared_summary_coverage.items()
+        )
+        if all(
+            surface_name in expected_filtered_report_path_free_surface_names
+            for surface_name in filtered_report_guard_surface_names
+        )
+    }
+    assert filtered_report_path_free_guard_surface_shared_summary_coverage == (
+        filtered_report_guard_surface_shared_summary_coverage
+    )
+    assert tuple(
+        filtered_report_path_free_guard_surface_shared_summary_coverage
+    ) == tuple(filtered_report_guard_surface_shared_summary_coverage)
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
         is True
@@ -14098,6 +14114,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True
         for name in filtered_report_guard_surface_shared_summary_coverage
     }
+    filtered_report_path_free_guard_surface_shared_summary_coverage = {
+        coverage_name: coverage_value
+        for coverage_name, coverage_value in (
+            filtered_report_guard_surface_shared_summary_coverage.items()
+        )
+        if all(
+            surface_name in expected_filtered_report_path_free_surface_names
+            for surface_name in filtered_report_guard_surface_names
+        )
+    }
+    assert filtered_report_path_free_guard_surface_shared_summary_coverage == (
+        filtered_report_guard_surface_shared_summary_coverage
+    )
+    assert tuple(
+        filtered_report_path_free_guard_surface_shared_summary_coverage
+    ) == tuple(filtered_report_guard_surface_shared_summary_coverage)
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
         is True
