@@ -4940,6 +4940,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "missing_path_free_surfaces_from_by_name",
         "extra_by_name_surfaces_not_path_free",
     )
+    filtered_report_surface_group_by_name_group_counts = {
+        group_name: sum(
+            1
+            for indexed_group_name in filtered_report_surface_group_by_name.values()
+            if indexed_group_name == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_surface_group_by_name_group_counts == {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert tuple(filtered_report_surface_group_by_name_group_counts) == tuple(
+        filtered_report_surface_groups
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11886,6 +11901,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "extra_by_name_surfaces_not_grouped",
         "missing_path_free_surfaces_from_by_name",
         "extra_by_name_surfaces_not_path_free",
+    )
+    filtered_report_surface_group_by_name_group_counts = {
+        group_name: sum(
+            1
+            for indexed_group_name in filtered_report_surface_group_by_name.values()
+            if indexed_group_name == group_name
+        )
+        for group_name in filtered_report_surface_groups
+    }
+    assert filtered_report_surface_group_by_name_group_counts == {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert tuple(filtered_report_surface_group_by_name_group_counts) == tuple(
+        filtered_report_surface_groups
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
