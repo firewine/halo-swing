@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_NAME_SCHEMA_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_NAME_SCHEMA_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_KEY_SCHEMA_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_KEY_SCHEMA_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: extend SQLite filtered latest report coverage proving delivery_preview.guard check-name schema expected and actual names remain exact and path-free after repository selection
+next_atomic_step: extend SQLite filtered latest report coverage proving delivery_preview.guard check-key schema expected and actual keys remain exact and path-free after repository selection
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,9 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe delivery_preview.guard check-name schema expected and actual names match emitted guard check order after repository selection
-  - SQLite repository-backed latest report underlying delivery_preview.guard check-name schema expected and actual names match emitted guard check order after repository selection
-  - delivery_preview.guard check-name schema values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata
+  - SQLite repository-backed latest report timeframe delivery_preview.guard check-key schema expected and actual keys match emitted guard check object key order after repository selection
+  - SQLite repository-backed latest report underlying delivery_preview.guard check-key schema expected and actual keys match emitted guard check object key order after repository selection
+  - delivery_preview.guard check-key schema values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_NAME_SCHEMA_COVERAGE_GATE
-scope: SQLite repository-backed filtered delivery_preview.guard check-name schema/path-free coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_DELIVERY_PREVIEW_GUARD_CHECK_KEY_SCHEMA_COVERAGE_GATE
+scope: SQLite repository-backed filtered delivery_preview.guard check-key schema/path-free coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.98s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 47.44s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.13s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.78s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,9 +123,9 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report delivery_preview.guard check-name schema expected and actual values match emitted guard check order after repository selection
-  - SQLite underlying-filtered latest report delivery_preview.guard check-name schema expected and actual values match emitted guard check order after repository selection
-  - delivery_preview.guard check-name schema expected/actual values remain path-free
+  - SQLite timeframe-filtered latest report delivery_preview.guard check-key schema expected and actual values match emitted guard check object key order after repository selection
+  - SQLite underlying-filtered latest report delivery_preview.guard check-key schema expected and actual values match emitted guard check object key order after repository selection
+  - delivery_preview.guard check-key schema expected/actual values remain path-free
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added

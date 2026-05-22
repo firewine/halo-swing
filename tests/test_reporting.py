@@ -3229,6 +3229,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ),
         },
     }
+    delivery_preview_guard_check_keys = delivery_preview_guard_checks[
+        "delivery_preview_guard_check_keys_match_expected_schema"
+    ]
+    assert (
+        delivery_preview_guard_check_keys["expected"]
+        == delivery_preview_guard_check_keys["actual"]
+    )
+    assert delivery_preview_guard_check_keys["actual"]["special_check_keys"] == {
+        "telegram_unrequested_sections_absent_from_preview": (
+            emitted_delivery_preview_guard_check_keys[
+                "telegram_unrequested_sections_absent_from_preview"
+            ]
+        ),
+        "telegram_chunks_fit_max_chars": emitted_delivery_preview_guard_check_keys[
+            "telegram_chunks_fit_max_chars"
+        ],
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(delivery_preview_guard_check_keys)
+    )
     assert delivery_preview_guard_checks[
         "delivery_preview_payload_keys_match_expected_schema"
     ]["actual"]["telegram_chunk_keys"] == [
@@ -8459,6 +8486,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ),
         },
     }
+    delivery_preview_guard_check_keys = delivery_preview_guard_checks[
+        "delivery_preview_guard_check_keys_match_expected_schema"
+    ]
+    assert (
+        delivery_preview_guard_check_keys["expected"]
+        == delivery_preview_guard_check_keys["actual"]
+    )
+    assert delivery_preview_guard_check_keys["actual"]["special_check_keys"] == {
+        "telegram_unrequested_sections_absent_from_preview": (
+            emitted_delivery_preview_guard_check_keys[
+                "telegram_unrequested_sections_absent_from_preview"
+            ]
+        ),
+        "telegram_chunks_fit_max_chars": emitted_delivery_preview_guard_check_keys[
+            "telegram_chunks_fit_max_chars"
+        ],
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(delivery_preview_guard_check_keys)
+    )
     assert delivery_preview_guard_checks[
         "delivery_preview_payload_keys_match_expected_schema"
     ]["actual"]["telegram_chunk_keys"] == [
