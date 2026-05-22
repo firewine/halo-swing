@@ -5746,6 +5746,70 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_summary_coverage = {
+        "path_free": {
+            group_name: all(
+                filtered_report_path_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "sqlite_name_free": {
+            group_name: all(
+                filtered_report_sqlite_name_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "storage_marker_free": {
+            group_name: all(
+                filtered_report_storage_marker_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "path_component_free": {
+            group_name: all(
+                filtered_report_path_component_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "excluded_record_free": {
+            group_name: all(
+                filtered_report_excluded_record_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "excluded_record_identity_free": {
+            group_name: all(
+                filtered_report_excluded_record_identity_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "latest_matching_record_excludes_older": {
+            group_name: all(
+                latest_matching_record_excludes_older_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+    }
+    assert filtered_report_path_free_surface_group_boolean_summary_coverage == (
+        filtered_report_surface_group_boolean_summary_coverage
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_summary_coverage
+    ) == tuple(filtered_report_surface_group_boolean_summary_coverage)
     filtered_report_surface_group_boolean_summary_failures = {
         "path_free": {
             group_name: tuple(
@@ -12926,6 +12990,70 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_path_free_surface_group_boolean_summary_coverage = {
+        "path_free": {
+            group_name: all(
+                filtered_report_path_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "sqlite_name_free": {
+            group_name: all(
+                filtered_report_sqlite_name_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "storage_marker_free": {
+            group_name: all(
+                filtered_report_storage_marker_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "path_component_free": {
+            group_name: all(
+                filtered_report_path_component_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "excluded_record_free": {
+            group_name: all(
+                filtered_report_excluded_record_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "excluded_record_identity_free": {
+            group_name: all(
+                filtered_report_excluded_record_identity_free_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+        "latest_matching_record_excludes_older": {
+            group_name: all(
+                latest_matching_record_excludes_older_summary[name] is True
+                for name in expected_filtered_report_path_free_surface_names
+                if filtered_report_surface_group_by_name[name] == group_name
+            )
+            for group_name in filtered_report_surface_groups
+        },
+    }
+    assert filtered_report_path_free_surface_group_boolean_summary_coverage == (
+        filtered_report_surface_group_boolean_summary_coverage
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_summary_coverage
+    ) == tuple(filtered_report_surface_group_boolean_summary_coverage)
     filtered_report_surface_group_boolean_summary_failures = {
         "path_free": {
             group_name: tuple(
