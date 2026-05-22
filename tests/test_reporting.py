@@ -1861,6 +1861,58 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "config_hash": swing_signal["config_hash"],
     }
     assert payload["source_repository_ref"] == source_repository_ref
+    source_repository_filter_surfaces = {
+        "top_level_source_repository_ref_filters": payload["source_repository_ref"][
+            "filters"
+        ],
+        "evidence_context_source_repository_ref_filters": evidence_context[
+            "source_repository_ref"
+        ]["filters"],
+        "latest_record_guard_expected_filters": latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]["filters"],
+        "latest_record_guard_actual_filters": latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]["filters"],
+    }
+    expected_source_repository_filter_keys = ["asset", "underlying", "timeframe"]
+    expected_source_repository_filters = source_repository_ref["filters"]
+    assert source_repository_filter_surfaces == {
+        name: expected_source_repository_filters
+        for name in source_repository_filter_surfaces
+    }
+    assert {
+        name: list(filters)
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {
+        name: expected_source_repository_filter_keys
+        for name in source_repository_filter_surfaces
+    }
+    assert {
+        name: all(value is None or isinstance(value, str) for value in filters.values())
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
+    assert {
+        name: set(filters).isdisjoint(
+            {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+        )
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
+    assert {
+        name: all(
+            value is None
+            or (
+                not value.startswith("/")
+                and "/users/" not in value.lower()
+                and "file://" not in value.lower()
+                and ".sqlite" not in value.lower()
+                and ".sqlite3" not in value.lower()
+                and not value.lower().startswith("sqlite:")
+            )
+            for value in filters.values()
+        )
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert list(latest_record_guard) == ["status", "checks"]
     assert latest_record_guard["status"] == "ok"
@@ -6533,6 +6585,58 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "config_hash": qqq_signal["config_hash"],
     }
     assert payload["source_repository_ref"] == source_repository_ref
+    source_repository_filter_surfaces = {
+        "top_level_source_repository_ref_filters": payload["source_repository_ref"][
+            "filters"
+        ],
+        "evidence_context_source_repository_ref_filters": evidence_context[
+            "source_repository_ref"
+        ]["filters"],
+        "latest_record_guard_expected_filters": latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]["filters"],
+        "latest_record_guard_actual_filters": latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]["filters"],
+    }
+    expected_source_repository_filter_keys = ["asset", "underlying", "timeframe"]
+    expected_source_repository_filters = source_repository_ref["filters"]
+    assert source_repository_filter_surfaces == {
+        name: expected_source_repository_filters
+        for name in source_repository_filter_surfaces
+    }
+    assert {
+        name: list(filters)
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {
+        name: expected_source_repository_filter_keys
+        for name in source_repository_filter_surfaces
+    }
+    assert {
+        name: all(value is None or isinstance(value, str) for value in filters.values())
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
+    assert {
+        name: set(filters).isdisjoint(
+            {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+        )
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
+    assert {
+        name: all(
+            value is None
+            or (
+                not value.startswith("/")
+                and "/users/" not in value.lower()
+                and "file://" not in value.lower()
+                and ".sqlite" not in value.lower()
+                and ".sqlite3" not in value.lower()
+                and not value.lower().startswith("sqlite:")
+            )
+            for value in filters.values()
+        )
+        for name, filters in source_repository_filter_surfaces.items()
+    } == {name: True for name in source_repository_filter_surfaces}
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert list(latest_record_guard) == ["status", "checks"]
     assert latest_record_guard["status"] == "ok"

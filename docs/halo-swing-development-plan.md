@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.289 P1 Repository SQLite Latest Report Filtered Source Filter Scalar Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.288에서 SQLite repository-backed filtered latest report의 structured `sections`까지 path-free surface set에 포함했다. 이번
+slice는 `source_repository_ref.filters` 자체가 repository selection 이후에도 정확한 scalar filter criteria만 담는지 고정한다.
+Timeframe/underlying filter 경로 모두 `asset`, `underlying`, `timeframe`만 보존하고 ledger/database/path/sqlite metadata를 노출하지
+않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered source_repository_ref filters match exact asset/underlying/timeframe scalar criteria
+  - assert timeframe-filtered filters omit ledger/database/path/sqlite metadata keys and path-like values
+  - assert underlying-filtered source_repository_ref filters match exact asset/underlying/timeframe scalar criteria
+  - assert underlying-filtered filters omit ledger/database/path/sqlite metadata keys and path-like values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 0.99s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.80s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.288 P1 Repository SQLite Latest Report Filtered Sections Path-Free Coverage Gate Record - 2026-05-22
 
 ### A. 목적
