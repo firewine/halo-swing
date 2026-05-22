@@ -4236,12 +4236,40 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": expected_nested_guard_statuses,
         "actual": expected_nested_guard_statuses,
     }
+    nested_guard_statuses = report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["expected"] == actual_nested_guard_statuses
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["expected"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["actual"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["expected"] == nested_guard_statuses["actual"]
+    assert nested_guard_statuses["actual"]["delivery_preview.guard"] == (
+        delivery_preview["guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["evidence_guard"] == (
+        payload["evidence_guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["report_contract_guard"] == (
+        payload["report_contract_guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["latest_record_guard"] == (
+        latest_record_guard["status"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(nested_guard_statuses)
+    )
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["passed"] == (
@@ -9680,12 +9708,40 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": expected_nested_guard_statuses,
         "actual": expected_nested_guard_statuses,
     }
+    nested_guard_statuses = report_payload_guard_checks[
+        "report_payload_nested_guard_statuses_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["expected"] == actual_nested_guard_statuses
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["actual"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["expected"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["actual"] == actual_nested_guard_statuses
+    assert nested_guard_statuses["expected"] == nested_guard_statuses["actual"]
+    assert nested_guard_statuses["actual"]["delivery_preview.guard"] == (
+        delivery_preview["guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["evidence_guard"] == (
+        payload["evidence_guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["report_contract_guard"] == (
+        payload["report_contract_guard"]["status"]
+    )
+    assert nested_guard_statuses["actual"]["latest_record_guard"] == (
+        latest_record_guard["status"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(nested_guard_statuses)
+    )
     assert report_payload_guard_checks[
         "report_payload_nested_guard_statuses_are_ok"
     ]["passed"] == (

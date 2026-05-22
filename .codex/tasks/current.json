@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_OPTIONAL_CONTEXT_GUARD_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_NESTED_GUARD_STATUS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_OPTIONAL_CONTEXT_GUARD_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_NESTED_GUARD_STATUS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.315",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload optional context status and guard checks match actual payload state and remain path-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.316",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload nested guard status check matches actual nested guard state and remains path-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.314",
+    "docs/halo-swing-development-plan.md#4.315",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe report_payload optional context status and guard checks match actual payload state after repository selection",
-    "SQLite repository-backed latest report underlying report_payload optional context status and guard checks match actual payload state after repository selection",
-    "report_payload optional context status and guard check values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
+    "SQLite repository-backed latest report timeframe report_payload nested guard status check matches actual nested guard state after repository selection",
+    "SQLite repository-backed latest report underlying report_payload nested guard status check matches actual nested guard state after repository selection",
+    "report_payload nested guard status check values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
