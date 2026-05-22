@@ -4867,6 +4867,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "guard",
         "guard",
     )
+    filtered_report_surface_group_by_name_count_consistency = {
+        "grouped_surfaces": len(filtered_report_grouped_surface_names),
+        "by_name_surfaces": len(filtered_report_surface_group_by_name),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert filtered_report_surface_group_by_name_count_consistency == {
+        "grouped_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "by_name_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert tuple(filtered_report_surface_group_by_name_count_consistency) == (
+        "grouped_surfaces",
+        "by_name_surfaces",
+        "path_free_surfaces",
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11740,6 +11755,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "guard",
         "guard",
         "guard",
+    )
+    filtered_report_surface_group_by_name_count_consistency = {
+        "grouped_surfaces": len(filtered_report_grouped_surface_names),
+        "by_name_surfaces": len(filtered_report_surface_group_by_name),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert filtered_report_surface_group_by_name_count_consistency == {
+        "grouped_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "by_name_surfaces": len(expected_filtered_report_path_free_surface_names),
+        "path_free_surfaces": len(expected_filtered_report_path_free_surface_names),
+    }
+    assert tuple(filtered_report_surface_group_by_name_count_consistency) == (
+        "grouped_surfaces",
+        "by_name_surfaces",
+        "path_free_surfaces",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
