@@ -5684,6 +5684,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         )
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_boolean_shared_keyset_surface_total_axes = {
+        "summary_names": tuple(
+            filtered_report_boolean_shared_keyset_surface_total_consistency
+        ),
+        "tuple_lengths_by_summary": {
+            summary_name: len(summary_total_consistency)
+            for summary_name, summary_total_consistency in (
+                filtered_report_boolean_shared_keyset_surface_total_consistency.items()
+            )
+        },
+    }
+    assert filtered_report_boolean_shared_keyset_surface_total_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "tuple_lengths_by_summary": {
+            summary_name: 4 for summary_name in filtered_report_boolean_summary_by_name
+        },
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12475,6 +12492,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             0,
         )
         for summary_name in filtered_report_boolean_summary_by_name
+    }
+    filtered_report_boolean_shared_keyset_surface_total_axes = {
+        "summary_names": tuple(
+            filtered_report_boolean_shared_keyset_surface_total_consistency
+        ),
+        "tuple_lengths_by_summary": {
+            summary_name: len(summary_total_consistency)
+            for summary_name, summary_total_consistency in (
+                filtered_report_boolean_shared_keyset_surface_total_consistency.items()
+            )
+        },
+    }
+    assert filtered_report_boolean_shared_keyset_surface_total_axes == {
+        "summary_names": tuple(filtered_report_boolean_summary_by_name),
+        "tuple_lengths_by_summary": {
+            summary_name: 4 for summary_name in filtered_report_boolean_summary_by_name
+        },
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
