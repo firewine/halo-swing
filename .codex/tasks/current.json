@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_FAILURE_TOTALS_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_SURFACE_TOTALS_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_FAILURE_TOTALS_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_BOOLEAN_SURFACE_TOTALS_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.353",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving semantic surface group boolean pass and failure totals after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.354",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving semantic surface group boolean surface totals after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.352",
+    "docs/halo-swing-development-plan.md#4.353",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe semantic surface group boolean pass and failure totals are verified after repository selection",
-    "SQLite repository-backed latest report underlying semantic surface group boolean pass and failure totals are verified after repository selection",
-    "each boolean summary aggregates to seven groups, seven passed groups, and zero failed surfaces after repository selection",
+    "SQLite repository-backed latest report timeframe semantic surface group boolean surface totals are verified after repository selection",
+    "SQLite repository-backed latest report underlying semantic surface group boolean surface totals are verified after repository selection",
+    "each boolean summary aggregates to twenty surfaces, twenty passed surfaces, and zero failed surfaces after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

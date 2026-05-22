@@ -5512,6 +5512,49 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    filtered_report_boolean_summary_by_name = {
+        "path_free": filtered_report_path_free_summary,
+        "sqlite_name_free": filtered_report_sqlite_name_free_summary,
+        "storage_marker_free": filtered_report_storage_marker_free_summary,
+        "path_component_free": filtered_report_path_component_free_summary,
+        "excluded_record_free": filtered_report_excluded_record_free_summary,
+        "excluded_record_identity_free": (
+            filtered_report_excluded_record_identity_free_summary
+        ),
+        "latest_matching_record_excludes_older": (
+            latest_matching_record_excludes_older_summary
+        ),
+    }
+    filtered_report_surface_group_boolean_surface_totals = {
+        summary_name: {
+            "surfaces": sum(
+                len(group_names)
+                for group_names in filtered_report_surface_groups.values()
+            ),
+            "passed_surfaces": sum(
+                1
+                for group_names in filtered_report_surface_groups.values()
+                for name in group_names
+                if summary_by_surface[name] is True
+            ),
+            "failed_surfaces": (
+                filtered_report_surface_group_boolean_pass_failure_totals[
+                    summary_name
+                ]["failed_surfaces"]
+            ),
+        }
+        for summary_name, summary_by_surface in (
+            filtered_report_boolean_summary_by_name.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_surface_totals == {
+        summary_name: {
+            "surfaces": len(expected_filtered_report_path_free_surface_names),
+            "passed_surfaces": len(expected_filtered_report_path_free_surface_names),
+            "failed_surfaces": 0,
+        }
+        for summary_name in filtered_report_boolean_summary_by_name
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12131,6 +12174,49 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "failed_surfaces": 0,
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
+    filtered_report_boolean_summary_by_name = {
+        "path_free": filtered_report_path_free_summary,
+        "sqlite_name_free": filtered_report_sqlite_name_free_summary,
+        "storage_marker_free": filtered_report_storage_marker_free_summary,
+        "path_component_free": filtered_report_path_component_free_summary,
+        "excluded_record_free": filtered_report_excluded_record_free_summary,
+        "excluded_record_identity_free": (
+            filtered_report_excluded_record_identity_free_summary
+        ),
+        "latest_matching_record_excludes_older": (
+            latest_matching_record_excludes_older_summary
+        ),
+    }
+    filtered_report_surface_group_boolean_surface_totals = {
+        summary_name: {
+            "surfaces": sum(
+                len(group_names)
+                for group_names in filtered_report_surface_groups.values()
+            ),
+            "passed_surfaces": sum(
+                1
+                for group_names in filtered_report_surface_groups.values()
+                for name in group_names
+                if summary_by_surface[name] is True
+            ),
+            "failed_surfaces": (
+                filtered_report_surface_group_boolean_pass_failure_totals[
+                    summary_name
+                ]["failed_surfaces"]
+            ),
+        }
+        for summary_name, summary_by_surface in (
+            filtered_report_boolean_summary_by_name.items()
+        )
+    }
+    assert filtered_report_surface_group_boolean_surface_totals == {
+        summary_name: {
+            "surfaces": len(expected_filtered_report_path_free_surface_names),
+            "passed_surfaces": len(expected_filtered_report_path_free_surface_names),
+            "failed_surfaces": 0,
+        }
+        for summary_name in filtered_report_boolean_summary_by_name
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
