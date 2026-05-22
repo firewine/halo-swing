@@ -3541,9 +3541,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
+    assert str(database_path) not in iter_nested_strings(latest_report)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
     filtered_report_path_free_targets = {
+        "latest_signal_report": latest_report,
         "label_status": label_status,
         "evidence_contract": evidence_contract,
         "evidence_context": evidence_context,
@@ -3562,6 +3564,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "payload_text": [payload["text"]],
     }
     expected_filtered_report_path_free_surface_names = [
+        "latest_signal_report",
         "label_status",
         "evidence_contract",
         "evidence_context",
@@ -8207,9 +8210,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert str(database_path) not in iter_nested_strings(delivery_preview)
     assert str(database_path) not in iter_nested_strings(report_contract_guard_checks)
     assert str(database_path) not in iter_nested_strings(report_payload_guard_checks)
+    assert str(database_path) not in iter_nested_strings(latest_report)
     assert str(database_path) not in iter_nested_strings(reasons)
     assert str(database_path) not in payload["text"]
     filtered_report_path_free_targets = {
+        "latest_signal_report": latest_report,
         "label_status": label_status,
         "evidence_contract": evidence_contract,
         "evidence_context": evidence_context,
@@ -8228,6 +8233,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "payload_text": [payload["text"]],
     }
     expected_filtered_report_path_free_surface_names = [
+        "latest_signal_report",
         "label_status",
         "evidence_contract",
         "evidence_context",
