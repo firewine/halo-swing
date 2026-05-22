@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_PATH_FREE_SURFACE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_PATH_FREE_SUMMARY_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_PATH_FREE_SURFACE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_REPORT_PAYLOAD_GUARD_PATH_FREE_SUMMARY_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.318",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload_guard is included in the path-free surface registry after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.319",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_payload_guard is represented in path-free summary/count maps after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.317",
+    "docs/halo-swing-development-plan.md#4.318",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe path-free surface registry includes report_payload_guard after repository selection",
-    "SQLite repository-backed latest report underlying path-free surface registry includes report_payload_guard after repository selection",
-    "report_payload_guard surface values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
+    "SQLite repository-backed latest report timeframe path-free summary/count maps include report_payload_guard after repository selection",
+    "SQLite repository-backed latest report underlying path-free summary/count maps include report_payload_guard after repository selection",
+    "report_payload_guard summary values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
