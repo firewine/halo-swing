@@ -5991,6 +5991,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for summary_name in filtered_report_surface_group_boolean_summary_failures
         },
     }
+    filtered_report_path_free_surface_group_boolean_failure_axes = {
+        "summary_names": tuple(
+            filtered_report_path_free_surface_group_boolean_summary_failures
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_failures)
+            for summary_name, group_failures in (
+                filtered_report_path_free_surface_group_boolean_summary_failures.items()
+            )
+        },
+    }
+    assert filtered_report_path_free_surface_group_boolean_failure_axes == (
+        filtered_report_surface_group_boolean_failure_axes
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_failure_axes
+    ) == (
+        "summary_names",
+        "group_names_by_summary",
+    )
     filtered_report_surface_group_boolean_pass_failure_consistency = {
         summary_name: {
             group_name: (
@@ -13323,6 +13343,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for summary_name in filtered_report_surface_group_boolean_summary_failures
         },
     }
+    filtered_report_path_free_surface_group_boolean_failure_axes = {
+        "summary_names": tuple(
+            filtered_report_path_free_surface_group_boolean_summary_failures
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_failures)
+            for summary_name, group_failures in (
+                filtered_report_path_free_surface_group_boolean_summary_failures.items()
+            )
+        },
+    }
+    assert filtered_report_path_free_surface_group_boolean_failure_axes == (
+        filtered_report_surface_group_boolean_failure_axes
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_failure_axes
+    ) == (
+        "summary_names",
+        "group_names_by_summary",
+    )
     filtered_report_surface_group_boolean_pass_failure_consistency = {
         summary_name: {
             group_name: (
