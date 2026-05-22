@@ -4568,6 +4568,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        latest_matching_record_excludes_older_summary["report_payload_guard"]
+        is True
+    )
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
@@ -10096,6 +10100,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert (
+        latest_matching_record_excludes_older_summary["report_payload_guard"]
+        is True
+    )
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
