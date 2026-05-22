@@ -2275,6 +2275,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "text",
         }
     )
+    expected_telegram_delivery_contract = {
+        "schema_version": "telegram_report_format.v1",
+        "format": "plain_text",
+        "network_call": False,
+        "max_chars": 3900,
+        "required_sections": expected_report_sections,
+        "overflow_policy": "split_on_section_boundary",
+        "section_separator": "\n\n",
+        "chunk_indexing": "1_based",
+        "send_call": False,
+    }
+    assert telegram_contract == expected_telegram_delivery_contract
+    assert list(telegram_contract) == [
+        "schema_version",
+        "format",
+        "network_call",
+        "max_chars",
+        "required_sections",
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+        "send_call",
+    ]
+    assert telegram_contract["required_sections"] == (
+        report_intent_contract["required_sections"]
+    )
+    assert set(telegram_contract).isdisjoint(
+        {
+            "database_path",
+            "ledger_path",
+            "ledger_ref",
+            "numeric_authority",
+            "payload_ref",
+            "source_repository_ref",
+        }
+    )
     assert delivery_preview_guard_checks[
         "hermes_payload_ref_matches_structured_payload"
     ]["actual"] == hermes_preview["payload_ref"]
@@ -6732,6 +6768,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "send_call",
             "source_repository_ref",
             "text",
+        }
+    )
+    expected_telegram_delivery_contract = {
+        "schema_version": "telegram_report_format.v1",
+        "format": "plain_text",
+        "network_call": False,
+        "max_chars": 3900,
+        "required_sections": expected_report_sections,
+        "overflow_policy": "split_on_section_boundary",
+        "section_separator": "\n\n",
+        "chunk_indexing": "1_based",
+        "send_call": False,
+    }
+    assert telegram_contract == expected_telegram_delivery_contract
+    assert list(telegram_contract) == [
+        "schema_version",
+        "format",
+        "network_call",
+        "max_chars",
+        "required_sections",
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+        "send_call",
+    ]
+    assert telegram_contract["required_sections"] == (
+        report_intent_contract["required_sections"]
+    )
+    assert set(telegram_contract).isdisjoint(
+        {
+            "database_path",
+            "ledger_path",
+            "ledger_ref",
+            "numeric_authority",
+            "payload_ref",
+            "source_repository_ref",
         }
     )
     assert delivery_preview_guard_checks[
