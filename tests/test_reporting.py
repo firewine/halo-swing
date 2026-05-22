@@ -8542,6 +8542,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert conflict_flag_hermes_boundary_summary == {
         name: True for name in conflict_flag_hermes_boundary_targets
     }
+    assert tuple(conflict_flag_hermes_boundary_summary) == tuple(
+        conflict_flag_hermes_boundary_targets
+    )
     selected_component_extreme_tokens = [
         expected_component_extremes["strongest"]["name"],
         expected_component_extremes["weakest"]["name"],
@@ -16317,6 +16320,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert conflict_flag_hermes_boundary_summary == {
         name: True for name in conflict_flag_hermes_boundary_targets
     }
+    assert tuple(conflict_flag_hermes_boundary_summary) == tuple(
+        conflict_flag_hermes_boundary_targets
+    )
     selected_component_extreme_tokens = [
         expected_component_extremes["strongest"]["name"],
         expected_component_extremes["weakest"]["name"],
