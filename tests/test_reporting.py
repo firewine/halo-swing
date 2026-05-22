@@ -3975,6 +3975,45 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    report_payload_identity_guard_schema_targets = {
+        "intent_guard_schema": [
+            "report_payload_intent_matches_contract"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_intent_matches_contract"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_intent_matches_contract"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "top_level_identity_guard_schema": [
+            "report_payload_top_level_identity_matches_latest_signal_report"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_top_level_identity_matches_latest_signal_report"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]
+            == ["name", "passed", "expected", "actual"],
+        ],
+    }
+    report_payload_identity_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_identity_guard_schema_targets.items()
+    }
+    assert report_payload_identity_guard_schema_summary == {
+        name: True for name in report_payload_identity_guard_schema_targets
+    }
     assert payload["schema_version"] == "hermes_report.v1"
     assert report_payload_guard_checks[
         "report_payload_schema_version_matches_expected"
@@ -9631,6 +9670,45 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_guard_check_names_match_expected_schema"
         ]["expected"]
     )
+    report_payload_identity_guard_schema_targets = {
+        "intent_guard_schema": [
+            "report_payload_intent_matches_contract"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_intent_matches_contract"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"]["report_payload_intent_matches_contract"]
+            == ["name", "passed", "expected", "actual"],
+        ],
+        "top_level_identity_guard_schema": [
+            "report_payload_top_level_identity_matches_latest_signal_report"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["expected"],
+            "report_payload_top_level_identity_matches_latest_signal_report"
+            in report_payload_guard_checks[
+                "report_payload_guard_check_names_match_expected_schema"
+            ]["actual"],
+            report_payload_guard_checks[
+                "report_payload_guard_check_keys_match_expected_schema"
+            ]["actual"][
+                "report_payload_top_level_identity_matches_latest_signal_report"
+            ]
+            == ["name", "passed", "expected", "actual"],
+        ],
+    }
+    report_payload_identity_guard_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_identity_guard_schema_targets.items()
+    }
+    assert report_payload_identity_guard_schema_summary == {
+        name: True for name in report_payload_identity_guard_schema_targets
+    }
     assert payload["schema_version"] == "hermes_report.v1"
     assert report_payload_guard_checks[
         "report_payload_schema_version_matches_expected"
