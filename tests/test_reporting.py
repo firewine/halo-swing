@@ -3273,6 +3273,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ],
         "guard_keys": list(delivery_preview["guard"]),
     }
+    delivery_preview_payload_key_schema = delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]
+    assert (
+        delivery_preview_payload_key_schema["expected"]
+        == delivery_preview_payload_key_schema["actual"]
+    )
+    assert delivery_preview_payload_key_schema["actual"] == {
+        "preview_keys": list(delivery_preview),
+        "channel_names": list(delivery_preview["channels"]),
+        "hermes_channel_keys": list(hermes_preview),
+        "telegram_channel_keys": list(telegram_preview),
+        "telegram_chunk_keys": [
+            list(chunk) for chunk in telegram_preview["chunks"]
+        ],
+        "guard_keys": list(delivery_preview["guard"]),
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(delivery_preview_payload_key_schema)
+    )
     assert delivery_contract["cron_intents"] == [
         "pre_market_swing_report",
         "intraday_risk_watch",
@@ -8530,6 +8557,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ],
         "guard_keys": list(delivery_preview["guard"]),
     }
+    delivery_preview_payload_key_schema = delivery_preview_guard_checks[
+        "delivery_preview_payload_keys_match_expected_schema"
+    ]
+    assert (
+        delivery_preview_payload_key_schema["expected"]
+        == delivery_preview_payload_key_schema["actual"]
+    )
+    assert delivery_preview_payload_key_schema["actual"] == {
+        "preview_keys": list(delivery_preview),
+        "channel_names": list(delivery_preview["channels"]),
+        "hermes_channel_keys": list(hermes_preview),
+        "telegram_channel_keys": list(telegram_preview),
+        "telegram_chunk_keys": [
+            list(chunk) for chunk in telegram_preview["chunks"]
+        ],
+        "guard_keys": list(delivery_preview["guard"]),
+    }
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(delivery_preview_payload_key_schema)
+    )
     assert delivery_contract["cron_intents"] == [
         "pre_market_swing_report",
         "intraday_risk_watch",
