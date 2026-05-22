@@ -3581,6 +3581,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     ]["actual"] == [
         check["name"] for check in payload["report_contract_guard"]["checks"]
     ]
+    report_contract_guard_check_names = report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]
+    emitted_report_contract_guard_check_names = [
+        check["name"] for check in payload["report_contract_guard"]["checks"]
+    ]
+    assert (
+        report_contract_guard_check_names["expected"]
+        == emitted_report_contract_guard_check_names
+    )
+    assert (
+        report_contract_guard_check_names["actual"]
+        == emitted_report_contract_guard_check_names
+    )
+    assert (
+        report_contract_guard_check_names["expected"]
+        == report_contract_guard_check_names["actual"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_contract_guard_check_names)
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["passed"] == (
@@ -8888,6 +8916,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     ]["actual"] == [
         check["name"] for check in payload["report_contract_guard"]["checks"]
     ]
+    report_contract_guard_check_names = report_contract_guard_checks[
+        "report_contract_guard_check_names_match_expected_schema"
+    ]
+    emitted_report_contract_guard_check_names = [
+        check["name"] for check in payload["report_contract_guard"]["checks"]
+    ]
+    assert (
+        report_contract_guard_check_names["expected"]
+        == emitted_report_contract_guard_check_names
+    )
+    assert (
+        report_contract_guard_check_names["actual"]
+        == emitted_report_contract_guard_check_names
+    )
+    assert (
+        report_contract_guard_check_names["expected"]
+        == report_contract_guard_check_names["actual"]
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(report_contract_guard_check_names)
+    )
     assert report_contract_guard_checks[
         "report_contract_guard_check_names_match_expected_schema"
     ]["passed"] == (
