@@ -4844,6 +4844,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
+        for name in filtered_report_grouped_surface_names
+    ) == (
+        "delivery",
+        "delivery",
+        "intent",
+        "intent",
+        "evidence",
+        "evidence",
+        "evidence",
+        "source",
+        "source",
+        "source",
+        "narrative",
+        "narrative",
+        "narrative",
+        "envelope",
+        "envelope",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+    )
+    assert tuple(
+        filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
     ) == (
         "envelope",
@@ -11690,6 +11715,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(filtered_report_surface_group_by_name) == (
         filtered_report_grouped_surface_names
+    )
+    assert tuple(
+        filtered_report_surface_group_by_name[name]
+        for name in filtered_report_grouped_surface_names
+    ) == (
+        "delivery",
+        "delivery",
+        "intent",
+        "intent",
+        "evidence",
+        "evidence",
+        "evidence",
+        "source",
+        "source",
+        "source",
+        "narrative",
+        "narrative",
+        "narrative",
+        "envelope",
+        "envelope",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
