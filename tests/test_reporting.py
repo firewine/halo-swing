@@ -6671,13 +6671,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             != older_matching_label["time_barrier_days"],
         ],
     }
-    assert {
+    selected_label_latest_matching_exclusion_coverage = {
         name: all(checks)
         for name, checks in selected_label_excludes_older_matching_label_summary.items()
-    } == {
+    }
+    assert selected_label_latest_matching_exclusion_coverage == {
         name: True
         for name in selected_label_excludes_older_matching_label_summary
     }
+    assert tuple(selected_label_latest_matching_exclusion_coverage) == tuple(
+        selected_label_excludes_older_matching_label_summary
+    )
     selected_record_identity_presence_targets = {
         "source_signal_ref": (
             payload["source_signal_ref"],
@@ -14337,13 +14341,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             != older_matching_label["time_barrier_days"],
         ],
     }
-    assert {
+    selected_label_latest_matching_exclusion_coverage = {
         name: all(checks)
         for name, checks in selected_label_excludes_older_matching_label_summary.items()
-    } == {
+    }
+    assert selected_label_latest_matching_exclusion_coverage == {
         name: True
         for name in selected_label_excludes_older_matching_label_summary
     }
+    assert tuple(selected_label_latest_matching_exclusion_coverage) == tuple(
+        selected_label_excludes_older_matching_label_summary
+    )
     selected_record_identity_presence_targets = {
         "source_signal_ref": (
             payload["source_signal_ref"],
