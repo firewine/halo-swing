@@ -4533,6 +4533,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert report_payload_guard_status_aggregation["passed_check_names"] == [
         check["name"] for check in payload["report_payload_guard"]["checks"]
     ]
+    report_payload_guard_status_aggregation_summary = {
+        "status_matches_check_passes": (
+            report_payload_guard_status_aggregation["actual_status"]
+            == report_payload_guard_status_aggregation["expected_status"]
+        ),
+        "failed_check_names_empty": (
+            report_payload_guard_status_aggregation["failed_check_names"] == []
+        ),
+        "passed_check_names_match_emitted_checks": (
+            report_payload_guard_status_aggregation["passed_check_names"]
+            == [
+                check["name"]
+                for check in payload["report_payload_guard"]["checks"]
+            ]
+        ),
+        "passed_check_names_cover_schema_guards": all(
+            guard_name
+            in report_payload_guard_status_aggregation["passed_check_names"]
+            for guard_name in (
+                "report_payload_guard_keys_match_expected_schema",
+                "report_payload_guard_check_names_match_expected_schema",
+                "report_payload_guard_check_keys_match_expected_schema",
+            )
+        ),
+    }
+    assert report_payload_guard_status_aggregation_summary == {
+        name: True for name in report_payload_guard_status_aggregation_summary
+    }
     assert all(
         str(database_path) not in value
         and not value.startswith("/")
@@ -10294,6 +10322,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert report_payload_guard_status_aggregation["passed_check_names"] == [
         check["name"] for check in payload["report_payload_guard"]["checks"]
     ]
+    report_payload_guard_status_aggregation_summary = {
+        "status_matches_check_passes": (
+            report_payload_guard_status_aggregation["actual_status"]
+            == report_payload_guard_status_aggregation["expected_status"]
+        ),
+        "failed_check_names_empty": (
+            report_payload_guard_status_aggregation["failed_check_names"] == []
+        ),
+        "passed_check_names_match_emitted_checks": (
+            report_payload_guard_status_aggregation["passed_check_names"]
+            == [
+                check["name"]
+                for check in payload["report_payload_guard"]["checks"]
+            ]
+        ),
+        "passed_check_names_cover_schema_guards": all(
+            guard_name
+            in report_payload_guard_status_aggregation["passed_check_names"]
+            for guard_name in (
+                "report_payload_guard_keys_match_expected_schema",
+                "report_payload_guard_check_names_match_expected_schema",
+                "report_payload_guard_check_keys_match_expected_schema",
+            )
+        ),
+    }
+    assert report_payload_guard_status_aggregation_summary == {
+        name: True for name in report_payload_guard_status_aggregation_summary
+    }
     assert all(
         str(database_path) not in value
         and not value.startswith("/")
