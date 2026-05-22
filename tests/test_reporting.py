@@ -4153,9 +4153,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         for key in ("chart_code_guard", "multimodal_context")
         if key in payload
     }
+    optional_context_statuses = report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ]["actual"] == actual_optional_context_statuses
+    assert optional_context_statuses["expected"] == actual_optional_context_statuses
+    assert optional_context_statuses["actual"] == actual_optional_context_statuses
+    assert optional_context_statuses["expected"] == optional_context_statuses["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(optional_context_statuses)
+    )
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ]["passed"] == (
@@ -4183,9 +4199,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         actual_optional_context_guard_statuses["multimodal_context.guard"] = payload[
             "multimodal_context"
         ]["guard"]["status"]
+    optional_context_guards = report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ]["actual"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["expected"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["actual"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["expected"] == optional_context_guards["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(optional_context_guards)
+    )
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ]["passed"] == (
@@ -9565,9 +9597,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         for key in ("chart_code_guard", "multimodal_context")
         if key in payload
     }
+    optional_context_statuses = report_payload_guard_checks[
+        "report_payload_optional_context_statuses_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ]["actual"] == actual_optional_context_statuses
+    assert optional_context_statuses["expected"] == actual_optional_context_statuses
+    assert optional_context_statuses["actual"] == actual_optional_context_statuses
+    assert optional_context_statuses["expected"] == optional_context_statuses["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(optional_context_statuses)
+    )
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ]["passed"] == (
@@ -9595,9 +9643,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         actual_optional_context_guard_statuses["multimodal_context.guard"] = payload[
             "multimodal_context"
         ]["guard"]["status"]
+    optional_context_guards = report_payload_guard_checks[
+        "report_payload_optional_context_guards_are_ok"
+    ]
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ]["actual"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["expected"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["actual"] == actual_optional_context_guard_statuses
+    assert optional_context_guards["expected"] == optional_context_guards["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(optional_context_guards)
+    )
     assert report_payload_guard_checks[
         "report_payload_optional_context_guards_are_ok"
     ]["passed"] == (
