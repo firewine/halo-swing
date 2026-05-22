@@ -7575,6 +7575,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_ref_propagation_summary == {
         name: True for name in selected_source_repository_ref_propagation_targets
     }
+    assert tuple(selected_source_repository_ref_propagation_summary) == tuple(
+        selected_source_repository_ref_propagation_targets
+    )
     selected_source_repository_filter_field_targets = {
         "top_level_source_repository_filters": [
             payload["source_repository_ref"]["filters"]["asset"] == "TQQQ",
@@ -15278,6 +15281,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_ref_propagation_summary == {
         name: True for name in selected_source_repository_ref_propagation_targets
     }
+    assert tuple(selected_source_repository_ref_propagation_summary) == tuple(
+        selected_source_repository_ref_propagation_targets
+    )
     selected_source_repository_filter_field_targets = {
         "top_level_source_repository_filters": [
             payload["source_repository_ref"]["filters"]["asset"] == "TQQQ",
