@@ -7904,6 +7904,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_guard_expected_summary == {
         name: True for name in selected_source_repository_guard_expected_targets
     }
+    assert tuple(selected_source_repository_guard_expected_summary) == tuple(
+        selected_source_repository_guard_expected_targets
+    )
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
@@ -15625,6 +15628,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_guard_expected_summary == {
         name: True for name in selected_source_repository_guard_expected_targets
     }
+    assert tuple(selected_source_repository_guard_expected_summary) == tuple(
+        selected_source_repository_guard_expected_targets
+    )
     selected_filter_canonicalization_targets = {
         "top_level_identity": [
             payload["asset"] == "TQQQ",
