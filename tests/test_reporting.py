@@ -4283,6 +4283,25 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert payload_check_keys[
         "report_payload_guard_check_keys_match_expected_schema"
     ] == expected_default_check_keys
+    report_payload_guard_self_schema_targets = {
+        guard_name: [
+            guard_name in payload_check_names["expected"],
+            guard_name in payload_check_names["actual"],
+            payload_check_keys[guard_name] == expected_default_check_keys,
+        ]
+        for guard_name in (
+            "report_payload_guard_keys_match_expected_schema",
+            "report_payload_guard_check_names_match_expected_schema",
+            "report_payload_guard_check_keys_match_expected_schema",
+        )
+    }
+    report_payload_guard_self_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_guard_self_schema_targets.items()
+    }
+    assert report_payload_guard_self_schema_summary == {
+        name: True for name in report_payload_guard_self_schema_targets
+    }
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ] == {
@@ -10006,6 +10025,25 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert payload_check_keys[
         "report_payload_guard_check_keys_match_expected_schema"
     ] == expected_default_check_keys
+    report_payload_guard_self_schema_targets = {
+        guard_name: [
+            guard_name in payload_check_names["expected"],
+            guard_name in payload_check_names["actual"],
+            payload_check_keys[guard_name] == expected_default_check_keys,
+        ]
+        for guard_name in (
+            "report_payload_guard_keys_match_expected_schema",
+            "report_payload_guard_check_names_match_expected_schema",
+            "report_payload_guard_check_keys_match_expected_schema",
+        )
+    }
+    report_payload_guard_self_schema_summary = {
+        name: all(checks)
+        for name, checks in report_payload_guard_self_schema_targets.items()
+    }
+    assert report_payload_guard_self_schema_summary == {
+        name: True for name in report_payload_guard_self_schema_targets
+    }
     assert report_payload_guard_checks[
         "report_payload_optional_context_statuses_are_ok"
     ] == {
