@@ -5442,6 +5442,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_failures
     }
+    filtered_report_surface_group_boolean_failure_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_summary_failures
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_failures)
+            for summary_name, group_failures in (
+                filtered_report_surface_group_boolean_summary_failures.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_failure_axes == {
+        "summary_names": (
+            "path_free",
+            "sqlite_name_free",
+            "storage_marker_free",
+            "path_component_free",
+            "excluded_record_free",
+            "excluded_record_identity_free",
+            "latest_matching_record_excludes_older",
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(filtered_report_surface_groups)
+            for summary_name in filtered_report_surface_group_boolean_summary_failures
+        },
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -11991,6 +12017,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             group_name: () for group_name in filtered_report_surface_groups
         }
         for summary_name in filtered_report_surface_group_boolean_summary_failures
+    }
+    filtered_report_surface_group_boolean_failure_axes = {
+        "summary_names": tuple(
+            filtered_report_surface_group_boolean_summary_failures
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_failures)
+            for summary_name, group_failures in (
+                filtered_report_surface_group_boolean_summary_failures.items()
+            )
+        },
+    }
+    assert filtered_report_surface_group_boolean_failure_axes == {
+        "summary_names": (
+            "path_free",
+            "sqlite_name_free",
+            "storage_marker_free",
+            "path_component_free",
+            "excluded_record_free",
+            "excluded_record_identity_free",
+            "latest_matching_record_excludes_older",
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(filtered_report_surface_groups)
+            for summary_name in filtered_report_surface_group_boolean_summary_failures
+        },
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
