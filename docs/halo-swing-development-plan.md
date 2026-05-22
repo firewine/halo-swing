@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.377 P1 Repository SQLite Latest Report Filtered Path-Free Surface Group String Count Total Delta Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.376에서 SQLite repository-backed filtered latest report의 path-free surface group string count totals를 고정했다.
+이번 slice는 path-free group string total과 path-free, grouped, semantic group string totals 사이의 deltas를 0으로
+고정해, repository selection 이후 string-count group total drift가 발생하면 비교축별 차이를 바로 드러나도록 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered path-free group string total deltas are zero
+  - assert timeframe-filtered string total delta axis covers path-free, grouped, and semantic group strings
+  - assert underlying-filtered path-free group string total deltas are zero
+  - assert underlying-filtered string total delta axis covers path-free, grouped, and semantic group strings
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.23s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.80s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.376 P1 Repository SQLite Latest Report Filtered Path-Free Surface Group String Count Total Coverage Gate Record - 2026-05-22
 
 ### A. 목적
