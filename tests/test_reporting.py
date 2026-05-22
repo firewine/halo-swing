@@ -4797,6 +4797,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             + len(iter_nested_strings(report_payload_guard_checks))
         ),
     }
+    assert tuple(filtered_report_surface_group_string_counts) == tuple(
+        filtered_report_surface_groups
+    )
     assert {
         group_name: len(group_names)
         for group_name, group_names in filtered_report_surface_groups.items()
@@ -11640,6 +11643,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             + len(iter_nested_strings(report_payload_guard_checks))
         ),
     }
+    assert tuple(filtered_report_surface_group_string_counts) == tuple(
+        filtered_report_surface_groups
+    )
     assert {
         group_name: len(group_names)
         for group_name, group_names in filtered_report_surface_groups.items()
