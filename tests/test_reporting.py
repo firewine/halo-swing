@@ -5468,6 +5468,28 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for summary_name in filtered_report_surface_group_boolean_summary_failures
         },
     }
+    filtered_report_surface_group_boolean_pass_failure_consistency = {
+        summary_name: {
+            group_name: (
+                filtered_report_surface_group_boolean_summary_coverage[
+                    summary_name
+                ][group_name],
+                len(
+                    filtered_report_surface_group_boolean_summary_failures[
+                        summary_name
+                    ][group_name]
+                ),
+            )
+            for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
+    assert filtered_report_surface_group_boolean_pass_failure_consistency == {
+        summary_name: {
+            group_name: (True, 0) for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
             name: filtered_report_path_free_surface_string_counts[name]
@@ -12043,6 +12065,28 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             summary_name: tuple(filtered_report_surface_groups)
             for summary_name in filtered_report_surface_group_boolean_summary_failures
         },
+    }
+    filtered_report_surface_group_boolean_pass_failure_consistency = {
+        summary_name: {
+            group_name: (
+                filtered_report_surface_group_boolean_summary_coverage[
+                    summary_name
+                ][group_name],
+                len(
+                    filtered_report_surface_group_boolean_summary_failures[
+                        summary_name
+                    ][group_name]
+                ),
+            )
+            for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
+    }
+    assert filtered_report_surface_group_boolean_pass_failure_consistency == {
+        summary_name: {
+            group_name: (True, 0) for group_name in filtered_report_surface_groups
+        }
+        for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
     filtered_report_guard_surface_shared_summary_coverage = {
         "string_counts": {
