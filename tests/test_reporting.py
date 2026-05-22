@@ -4607,6 +4607,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ]["actual"],
             [swing_signal["signal_id"]],
         ),
+        "report_payload_guard": (
+            payload["report_payload_guard"],
+            [swing_signal["signal_id"], swing_signal["config_hash"]],
+        ),
     }
     selected_record_identity_presence_summary = {
         name: all(
@@ -4704,6 +4708,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["actual"]["config_hash"]
             != excluded_signal["config_hash"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_guard": [
+            all(
+                token not in value
+                for value in iter_nested_strings(payload["report_payload_guard"])
+                for token in (
+                    excluded_signal["signal_id"],
+                    excluded_signal["run_id"],
+                    excluded_signal["config_hash"],
+                )
+            )
             for excluded_signal in excluded_source_signals
         ],
     }
@@ -10139,6 +10155,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ]["actual"],
             [qqq_signal["signal_id"]],
         ),
+        "report_payload_guard": (
+            payload["report_payload_guard"],
+            [qqq_signal["signal_id"], qqq_signal["config_hash"]],
+        ),
     }
     selected_record_identity_presence_summary = {
         name: all(
@@ -10236,6 +10256,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "report_payload_source_signal_ref_matches_report_identity"
             ]["actual"]["config_hash"]
             != excluded_signal["config_hash"]
+            for excluded_signal in excluded_source_signals
+        ],
+        "report_payload_guard": [
+            all(
+                token not in value
+                for value in iter_nested_strings(payload["report_payload_guard"])
+                for token in (
+                    excluded_signal["signal_id"],
+                    excluded_signal["run_id"],
+                    excluded_signal["config_hash"],
+                )
+            )
             for excluded_signal in excluded_source_signals
         ],
     }
