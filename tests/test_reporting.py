@@ -4048,6 +4048,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "actual": expected_payload_check_names,
     }
     assert payload_check_names["actual"] == actual_payload_check_names
+    assert payload_check_names["expected"] == actual_payload_check_names
+    assert payload_check_names["expected"] == payload_check_names["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(payload_check_names)
+    )
     assert payload_check_names["passed"] == (
         payload_check_names["actual"] == payload_check_names["expected"]
     )
@@ -9430,6 +9442,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "actual": expected_payload_check_names,
     }
     assert payload_check_names["actual"] == actual_payload_check_names
+    assert payload_check_names["expected"] == actual_payload_check_names
+    assert payload_check_names["expected"] == payload_check_names["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(payload_check_names)
+    )
     assert payload_check_names["passed"] == (
         payload_check_names["actual"] == payload_check_names["expected"]
     )
