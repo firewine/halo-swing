@@ -4712,6 +4712,33 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "envelope": 2,
         "guard": 5,
     }
+    filtered_report_surface_group_by_name = {
+        surface_name: group_name
+        for group_name, group_names in filtered_report_surface_groups.items()
+        for surface_name in group_names
+    }
+    assert filtered_report_surface_group_by_name == {
+        "latest_signal_report": "envelope",
+        "sections": "narrative",
+        "label_status": "envelope",
+        "evidence_contract": "evidence",
+        "evidence_context": "evidence",
+        "evidence_label_status": "evidence",
+        "source_signal_ref": "source",
+        "source_repository_ref": "source",
+        "latest_record_guard": "source",
+        "evidence_guard_checks": "guard",
+        "prompt_contract": "intent",
+        "report_intent_contract": "intent",
+        "delivery_contract": "delivery",
+        "delivery_preview": "delivery",
+        "report_contract_guard_checks": "guard",
+        "report_payload_guard": "guard",
+        "report_payload_guard_status_aggregation": "guard",
+        "report_payload_guard_checks": "guard",
+        "reasons": "narrative",
+        "payload_text": "narrative",
+    }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -10988,6 +11015,33 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "narrative": 3,
         "envelope": 2,
         "guard": 5,
+    }
+    filtered_report_surface_group_by_name = {
+        surface_name: group_name
+        for group_name, group_names in filtered_report_surface_groups.items()
+        for surface_name in group_names
+    }
+    assert filtered_report_surface_group_by_name == {
+        "latest_signal_report": "envelope",
+        "sections": "narrative",
+        "label_status": "envelope",
+        "evidence_contract": "evidence",
+        "evidence_context": "evidence",
+        "evidence_label_status": "evidence",
+        "source_signal_ref": "source",
+        "source_repository_ref": "source",
+        "latest_record_guard": "source",
+        "evidence_guard_checks": "guard",
+        "prompt_contract": "intent",
+        "report_intent_contract": "intent",
+        "delivery_contract": "delivery",
+        "delivery_preview": "delivery",
+        "report_contract_guard_checks": "guard",
+        "report_payload_guard": "guard",
+        "report_payload_guard_status_aggregation": "guard",
+        "report_payload_guard_checks": "guard",
+        "reasons": "narrative",
+        "payload_text": "narrative",
     }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
