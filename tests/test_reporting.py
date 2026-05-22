@@ -5318,6 +5318,32 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
     }
+    filtered_report_string_count_shared_keyset_total_consistency = {
+        "shared_keyset_surfaces": len(
+            filtered_report_shared_summary_keysets["string_counts"]
+        ),
+        "surface_count_entries": len(
+            filtered_report_path_free_surface_string_counts
+        ),
+        "surface_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "group_total_strings": sum(filtered_report_surface_group_string_counts.values()),
+    }
+    assert filtered_report_string_count_shared_keyset_total_consistency == {
+        "shared_keyset_surfaces": len(
+            expected_filtered_report_path_free_surface_names
+        ),
+        "surface_count_entries": len(
+            expected_filtered_report_path_free_surface_names
+        ),
+        "surface_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "group_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+    }
     filtered_report_surface_group_boolean_summary_coverage = {
         "path_free": {
             group_name: all(
@@ -12126,6 +12152,32 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_shared_summary_keysets == {
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
+    }
+    filtered_report_string_count_shared_keyset_total_consistency = {
+        "shared_keyset_surfaces": len(
+            filtered_report_shared_summary_keysets["string_counts"]
+        ),
+        "surface_count_entries": len(
+            filtered_report_path_free_surface_string_counts
+        ),
+        "surface_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "group_total_strings": sum(filtered_report_surface_group_string_counts.values()),
+    }
+    assert filtered_report_string_count_shared_keyset_total_consistency == {
+        "shared_keyset_surfaces": len(
+            expected_filtered_report_path_free_surface_names
+        ),
+        "surface_count_entries": len(
+            expected_filtered_report_path_free_surface_names
+        ),
+        "surface_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
+        "group_total_strings": sum(
+            filtered_report_path_free_surface_string_counts.values()
+        ),
     }
     filtered_report_surface_group_boolean_summary_coverage = {
         "path_free": {
