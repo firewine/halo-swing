@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.345 P1 Repository SQLite Latest Report Filtered Surface Group Order Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.344에서 SQLite repository-backed filtered latest report의 expected surfaces가 stable semantic group label에 매핑되는지
+고정했다. 이번 slice는 expected filtered surface order를 따라 group label sequence도 고정해, future surface 순서 변경이나
+중간 삽입 시 semantic group order drift가 명확히 드러나도록 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered expected surface order maps to the expected semantic group label sequence
+  - assert timeframe-filtered ordered group labels cover envelope/narrative/evidence/source/guard/intent/delivery positions
+  - assert underlying-filtered expected surface order maps to the expected semantic group label sequence
+  - assert underlying-filtered ordered group labels cover envelope/narrative/evidence/source/guard/intent/delivery positions
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.84s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 47.25s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.344 P1 Repository SQLite Latest Report Filtered Surface Group Membership Coverage Gate Record - 2026-05-22
 
 ### A. 목적

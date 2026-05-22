@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_MEMBERSHIP_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_ORDER_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_MEMBERSHIP_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SURFACE_GROUP_ORDER_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.344",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving each filtered surface maps to one expected semantic group after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.345",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving expected surface order maps to stable semantic group order after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.343",
+    "docs/halo-swing-development-plan.md#4.344",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filtered surfaces map to one expected semantic group after repository selection",
-    "SQLite repository-backed latest report underlying filtered surfaces map to one expected semantic group after repository selection",
-    "delivery, intent, evidence, source, narrative, envelope, and guard group membership labels are stable for every expected filtered surface",
+    "SQLite repository-backed latest report timeframe expected surface order maps to stable semantic group order after repository selection",
+    "SQLite repository-backed latest report underlying expected surface order maps to stable semantic group order after repository selection",
+    "ordered delivery, intent, evidence, source, narrative, envelope, and guard labels remain stable across the expected filtered surface list",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

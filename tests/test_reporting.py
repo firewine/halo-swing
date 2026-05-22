@@ -4739,6 +4739,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons": "narrative",
         "payload_text": "narrative",
     }
+    assert tuple(
+        filtered_report_surface_group_by_name[name]
+        for name in expected_filtered_report_path_free_surface_names
+    ) == (
+        "envelope",
+        "narrative",
+        "envelope",
+        "evidence",
+        "evidence",
+        "evidence",
+        "source",
+        "source",
+        "source",
+        "guard",
+        "intent",
+        "intent",
+        "delivery",
+        "delivery",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+        "narrative",
+        "narrative",
+    )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -11043,6 +11068,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons": "narrative",
         "payload_text": "narrative",
     }
+    assert tuple(
+        filtered_report_surface_group_by_name[name]
+        for name in expected_filtered_report_path_free_surface_names
+    ) == (
+        "envelope",
+        "narrative",
+        "envelope",
+        "evidence",
+        "evidence",
+        "evidence",
+        "source",
+        "source",
+        "source",
+        "guard",
+        "intent",
+        "intent",
+        "delivery",
+        "delivery",
+        "guard",
+        "guard",
+        "guard",
+        "guard",
+        "narrative",
+        "narrative",
+    )
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
