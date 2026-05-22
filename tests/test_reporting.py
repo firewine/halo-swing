@@ -5344,6 +5344,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             filtered_report_path_free_surface_string_counts.values()
         ),
     }
+    assert tuple(
+        filtered_report_string_count_shared_keyset_total_consistency
+    ) == (
+        "shared_keyset_surfaces",
+        "surface_count_entries",
+        "surface_total_strings",
+        "group_total_strings",
+    )
     filtered_report_surface_group_boolean_summary_coverage = {
         "path_free": {
             group_name: all(
@@ -12179,6 +12187,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             filtered_report_path_free_surface_string_counts.values()
         ),
     }
+    assert tuple(
+        filtered_report_string_count_shared_keyset_total_consistency
+    ) == (
+        "shared_keyset_surfaces",
+        "surface_count_entries",
+        "surface_total_strings",
+        "group_total_strings",
+    )
     filtered_report_surface_group_boolean_summary_coverage = {
         "path_free": {
             group_name: all(
