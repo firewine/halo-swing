@@ -4754,6 +4754,49 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert len(filtered_report_grouped_surface_names) == len(
         expected_filtered_report_path_free_surface_names
     )
+    filtered_report_surface_group_string_counts = {
+        group_name: sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in group_names
+        )
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert filtered_report_surface_group_string_counts == {
+        "delivery": (
+            len(iter_nested_strings(delivery_contract))
+            + len(iter_nested_strings(delivery_preview))
+        ),
+        "intent": (
+            len(iter_nested_strings(prompt_contract))
+            + len(iter_nested_strings(report_intent_contract))
+        ),
+        "evidence": (
+            len(iter_nested_strings(evidence_contract))
+            + len(iter_nested_strings(evidence_context))
+            + len(iter_nested_strings(evidence_label_status))
+        ),
+        "source": (
+            len(iter_nested_strings(payload["source_signal_ref"]))
+            + len(iter_nested_strings(payload["source_repository_ref"]))
+            + len(iter_nested_strings(latest_record_guard))
+        ),
+        "narrative": (
+            len(iter_nested_strings(payload["sections"]))
+            + len(iter_nested_strings(reasons))
+            + len(iter_nested_strings([payload["text"]]))
+        ),
+        "envelope": (
+            len(iter_nested_strings(latest_report))
+            + len(iter_nested_strings(label_status))
+        ),
+        "guard": (
+            len(iter_nested_strings(evidence_guard_checks))
+            + len(iter_nested_strings(report_contract_guard_checks))
+            + len(iter_nested_strings(payload["report_payload_guard"]))
+            + len(iter_nested_strings(report_payload_guard_status_aggregation))
+            + len(iter_nested_strings(report_payload_guard_checks))
+        ),
+    }
     assert {
         group_name: len(group_names)
         for group_name, group_names in filtered_report_surface_groups.items()
@@ -11137,6 +11180,49 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert len(filtered_report_grouped_surface_names) == len(
         expected_filtered_report_path_free_surface_names
     )
+    filtered_report_surface_group_string_counts = {
+        group_name: sum(
+            filtered_report_path_free_surface_string_counts[name]
+            for name in group_names
+        )
+        for group_name, group_names in filtered_report_surface_groups.items()
+    }
+    assert filtered_report_surface_group_string_counts == {
+        "delivery": (
+            len(iter_nested_strings(delivery_contract))
+            + len(iter_nested_strings(delivery_preview))
+        ),
+        "intent": (
+            len(iter_nested_strings(prompt_contract))
+            + len(iter_nested_strings(report_intent_contract))
+        ),
+        "evidence": (
+            len(iter_nested_strings(evidence_contract))
+            + len(iter_nested_strings(evidence_context))
+            + len(iter_nested_strings(evidence_label_status))
+        ),
+        "source": (
+            len(iter_nested_strings(payload["source_signal_ref"]))
+            + len(iter_nested_strings(payload["source_repository_ref"]))
+            + len(iter_nested_strings(latest_record_guard))
+        ),
+        "narrative": (
+            len(iter_nested_strings(payload["sections"]))
+            + len(iter_nested_strings(reasons))
+            + len(iter_nested_strings([payload["text"]]))
+        ),
+        "envelope": (
+            len(iter_nested_strings(latest_report))
+            + len(iter_nested_strings(label_status))
+        ),
+        "guard": (
+            len(iter_nested_strings(evidence_guard_checks))
+            + len(iter_nested_strings(report_contract_guard_checks))
+            + len(iter_nested_strings(payload["report_payload_guard"]))
+            + len(iter_nested_strings(report_payload_guard_status_aggregation))
+            + len(iter_nested_strings(report_payload_guard_checks))
+        ),
+    }
     assert {
         group_name: len(group_names)
         for group_name, group_names in filtered_report_surface_groups.items()
