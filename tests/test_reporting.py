@@ -8404,6 +8404,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_degradation_exclusion_summary == {
         name: True for name in selected_degradation_exclusion_targets
     }
+    assert tuple(selected_degradation_exclusion_summary) == tuple(
+        selected_degradation_exclusion_targets
+    )
     degradation_hermes_boundary_tokens = (
         [
             swing_signal["data_freshness_status"],
@@ -16170,6 +16173,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_degradation_exclusion_summary == {
         name: True for name in selected_degradation_exclusion_targets
     }
+    assert tuple(selected_degradation_exclusion_summary) == tuple(
+        selected_degradation_exclusion_targets
+    )
     degradation_hermes_boundary_tokens = (
         [
             qqq_signal["data_freshness_status"],
