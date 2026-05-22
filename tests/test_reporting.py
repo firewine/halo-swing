@@ -8043,6 +8043,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_filter_section_raw_marker_free_summary == {
         name: True for name in selected_filter_section_raw_marker_free_targets
     }
+    assert tuple(selected_filter_section_raw_marker_free_summary) == tuple(
+        selected_filter_section_raw_marker_free_targets
+    )
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
             actual_top_level_identity,
@@ -15778,6 +15781,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_filter_section_raw_marker_free_summary == {
         name: True for name in selected_filter_section_raw_marker_free_targets
     }
+    assert tuple(selected_filter_section_raw_marker_free_summary) == tuple(
+        selected_filter_section_raw_marker_free_targets
+    )
     selected_decision_identity_presence_targets = {
         "top_level_identity": (
             actual_top_level_identity,
