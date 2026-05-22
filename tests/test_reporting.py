@@ -1801,16 +1801,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
 
     assert evidence_contract == expected_evidence_contract
     assert evidence_context["source_repository_ref"] == source_repository_ref
-    assert evidence_context["component_extremes"] == expected_component_extremes
-    assert evidence_context["component_extremes"]["spread"] > 0
-    assert evidence_context["component_extremes"]["strongest"]["name"] in (
-        selected_component_scores
+    component_extremes = evidence_context["component_extremes"]
+    assert component_extremes == expected_component_extremes
+    assert list(component_extremes) == ["strongest", "weakest", "spread"]
+    assert list(component_extremes["strongest"]) == ["name", "score"]
+    assert list(component_extremes["weakest"]) == ["name", "score"]
+    assert isinstance(component_extremes["strongest"]["name"], str)
+    assert isinstance(component_extremes["weakest"]["name"], str)
+    assert isinstance(component_extremes["strongest"]["score"], float)
+    assert isinstance(component_extremes["weakest"]["score"], float)
+    assert isinstance(component_extremes["spread"], float)
+    assert set(component_extremes).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
     )
-    assert evidence_context["component_extremes"]["weakest"]["name"] in (
-        selected_component_scores
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(component_extremes)
     )
-    assert evidence_context["component_extremes"]["strongest"]["name"] != "event_risk"
-    assert evidence_context["component_extremes"]["weakest"]["name"] != "event_risk"
+    assert component_extremes["spread"] > 0
+    assert component_extremes["strongest"]["name"] in selected_component_scores
+    assert component_extremes["weakest"]["name"] in selected_component_scores
+    assert component_extremes["strongest"]["name"] != "event_risk"
+    assert component_extremes["weakest"]["name"] != "event_risk"
     assert (
         len(evidence_context["reason_summary"])
         <= evidence_contract["max_reason_summary_chars"]
@@ -6809,16 +6827,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
 
     assert evidence_contract == expected_evidence_contract
     assert evidence_context["source_repository_ref"] == source_repository_ref
-    assert evidence_context["component_extremes"] == expected_component_extremes
-    assert evidence_context["component_extremes"]["spread"] > 0
-    assert evidence_context["component_extremes"]["strongest"]["name"] in (
-        selected_component_scores
+    component_extremes = evidence_context["component_extremes"]
+    assert component_extremes == expected_component_extremes
+    assert list(component_extremes) == ["strongest", "weakest", "spread"]
+    assert list(component_extremes["strongest"]) == ["name", "score"]
+    assert list(component_extremes["weakest"]) == ["name", "score"]
+    assert isinstance(component_extremes["strongest"]["name"], str)
+    assert isinstance(component_extremes["weakest"]["name"], str)
+    assert isinstance(component_extremes["strongest"]["score"], float)
+    assert isinstance(component_extremes["weakest"]["score"], float)
+    assert isinstance(component_extremes["spread"], float)
+    assert set(component_extremes).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
     )
-    assert evidence_context["component_extremes"]["weakest"]["name"] in (
-        selected_component_scores
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(component_extremes)
     )
-    assert evidence_context["component_extremes"]["strongest"]["name"] != "event_risk"
-    assert evidence_context["component_extremes"]["weakest"]["name"] != "event_risk"
+    assert component_extremes["spread"] > 0
+    assert component_extremes["strongest"]["name"] in selected_component_scores
+    assert component_extremes["weakest"]["name"] in selected_component_scores
+    assert component_extremes["strongest"]["name"] != "event_risk"
+    assert component_extremes["weakest"]["name"] != "event_risk"
     assert (
         len(evidence_context["reason_summary"])
         <= evidence_contract["max_reason_summary_chars"]

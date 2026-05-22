@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_LABEL_STATUS_SCHEMA_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_COMPONENT_EXTREMES_SCHEMA_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_LABEL_STATUS_SCHEMA_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_COMPONENT_EXTREMES_SCHEMA_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.296",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving evidence_context label_status remains schema-exact, typed, and path-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.297",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving evidence_context component_extremes remains schema-exact, typed, and path-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.295",
+    "docs/halo-swing-development-plan.md#4.296",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe evidence_context label_status keeps exact schema_version/signal_id/outcome/realized_r/first_barrier_hit/labeled_at/time_barrier_days/live_data_required schema after repository selection",
-    "SQLite repository-backed latest report underlying evidence_context label_status keeps exact schema_version/signal_id/outcome/realized_r/first_barrier_hit/labeled_at/time_barrier_days/live_data_required schema after repository selection",
-    "evidence_context label_status values remain typed and omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
+    "SQLite repository-backed latest report timeframe evidence_context component_extremes keeps exact strongest/weakest/spread schema after repository selection",
+    "SQLite repository-backed latest report underlying evidence_context component_extremes keeps exact strongest/weakest/spread schema after repository selection",
+    "evidence_context component_extremes values remain typed and omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
