@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.291 P1 Repository SQLite Latest Report Filtered Source Signal Ref Schema Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.290에서 SQLite repository-backed filtered latest report의 repository metadata가 scalar/path-free로 유지되도록 고정했다.
+이번 slice는 선택된 record identity 표면인 `source_signal_ref` 자체가 repository selection 이후에도 `signal_id`, `run_id`,
+`config_hash` 세 문자열 필드만 담는지 고정한다. 이 표면은 ledger/database/path/sqlite URI/file URL/absolute local path 성격의
+값을 노출하지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered source_signal_ref keeps exact signal_id/run_id/config_hash key order
+  - assert timeframe-filtered source_signal_ref values remain strings and path-free
+  - assert underlying-filtered source_signal_ref keeps exact signal_id/run_id/config_hash key order
+  - assert underlying-filtered source_signal_ref values remain strings and path-free
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.02s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 51.90s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.290 P1 Repository SQLite Latest Report Filtered Source Metadata Scalar Coverage Gate Record - 2026-05-22
 
 ### A. 목적

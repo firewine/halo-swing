@@ -1860,6 +1860,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "run_id": swing_signal["run_id"],
         "config_hash": swing_signal["config_hash"],
     }
+    source_signal_ref = payload["source_signal_ref"]
+    assert list(source_signal_ref) == ["signal_id", "run_id", "config_hash"]
+    assert all(isinstance(value, str) for value in source_signal_ref.values())
+    assert set(source_signal_ref).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in source_signal_ref.values()
+    )
     assert payload["source_repository_ref"] == source_repository_ref
     source_repository_filter_surfaces = {
         "top_level_source_repository_ref_filters": payload["source_repository_ref"][
@@ -6647,6 +6663,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "run_id": qqq_signal["run_id"],
         "config_hash": qqq_signal["config_hash"],
     }
+    source_signal_ref = payload["source_signal_ref"]
+    assert list(source_signal_ref) == ["signal_id", "run_id", "config_hash"]
+    assert all(isinstance(value, str) for value in source_signal_ref.values())
+    assert set(source_signal_ref).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in source_signal_ref.values()
+    )
     assert payload["source_repository_ref"] == source_repository_ref
     source_repository_filter_surfaces = {
         "top_level_source_repository_ref_filters": payload["source_repository_ref"][
