@@ -4975,6 +4975,44 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "grouped_surfaces",
         "path_free_surfaces",
     )
+    filtered_report_surface_group_by_name_group_count_total_deltas = {
+        "by_name_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "by_name_surfaces"
+            ]
+        ),
+        "grouped_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "grouped_surfaces"
+            ]
+        ),
+        "path_free_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "path_free_surfaces"
+            ]
+        ),
+    }
+    assert filtered_report_surface_group_by_name_group_count_total_deltas == {
+        "by_name_surface_delta": 0,
+        "grouped_surface_delta": 0,
+        "path_free_surface_delta": 0,
+    }
+    assert tuple(
+        filtered_report_surface_group_by_name_group_count_total_deltas
+    ) == (
+        "by_name_surface_delta",
+        "grouped_surface_delta",
+        "path_free_surface_delta",
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11956,6 +11994,44 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "by_name_surfaces",
         "grouped_surfaces",
         "path_free_surfaces",
+    )
+    filtered_report_surface_group_by_name_group_count_total_deltas = {
+        "by_name_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "by_name_surfaces"
+            ]
+        ),
+        "grouped_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "grouped_surfaces"
+            ]
+        ),
+        "path_free_surface_delta": (
+            filtered_report_surface_group_by_name_group_count_totals[
+                "group_count_total"
+            ]
+            - filtered_report_surface_group_by_name_group_count_totals[
+                "path_free_surfaces"
+            ]
+        ),
+    }
+    assert filtered_report_surface_group_by_name_group_count_total_deltas == {
+        "by_name_surface_delta": 0,
+        "grouped_surface_delta": 0,
+        "path_free_surface_delta": 0,
+    }
+    assert tuple(
+        filtered_report_surface_group_by_name_group_count_total_deltas
+    ) == (
+        "by_name_surface_delta",
+        "grouped_surface_delta",
+        "path_free_surface_delta",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
