@@ -1719,6 +1719,52 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         for value in latest_report_identity_decision_surface.values()
         if isinstance(value, str)
     )
+    latest_report_context_surface = {
+        key: latest_report[key]
+        for key in (
+            "entry_summary",
+            "stop_summary",
+            "take_profit_summary",
+            "invalidation_summary",
+            "risk_summary",
+            "data_freshness_status",
+            "data_warnings",
+            "reason_summary",
+            "evidence_summary",
+        )
+    }
+    assert list(latest_report_context_surface) == [
+        "entry_summary",
+        "stop_summary",
+        "take_profit_summary",
+        "invalidation_summary",
+        "risk_summary",
+        "data_freshness_status",
+        "data_warnings",
+        "reason_summary",
+        "evidence_summary",
+    ]
+    assert all(
+        value is None or isinstance(value, str | list)
+        for value in latest_report_context_surface.values()
+    )
+    assert all(
+        isinstance(value, str)
+        for value in latest_report_context_surface["data_warnings"]
+    )
+    assert set(latest_report_context_surface).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(latest_report_context_surface)
+    )
     expected_numeric_field_presence = {
         "decision_line_present": True,
         "confidence_line_present": True,
@@ -6594,6 +6640,52 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         and not value.lower().startswith("sqlite:")
         for value in latest_report_identity_decision_surface.values()
         if isinstance(value, str)
+    )
+    latest_report_context_surface = {
+        key: latest_report[key]
+        for key in (
+            "entry_summary",
+            "stop_summary",
+            "take_profit_summary",
+            "invalidation_summary",
+            "risk_summary",
+            "data_freshness_status",
+            "data_warnings",
+            "reason_summary",
+            "evidence_summary",
+        )
+    }
+    assert list(latest_report_context_surface) == [
+        "entry_summary",
+        "stop_summary",
+        "take_profit_summary",
+        "invalidation_summary",
+        "risk_summary",
+        "data_freshness_status",
+        "data_warnings",
+        "reason_summary",
+        "evidence_summary",
+    ]
+    assert all(
+        value is None or isinstance(value, str | list)
+        for value in latest_report_context_surface.values()
+    )
+    assert all(
+        isinstance(value, str)
+        for value in latest_report_context_surface["data_warnings"]
+    )
+    assert set(latest_report_context_surface).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(latest_report_context_surface)
     )
     expected_numeric_field_presence = {
         "decision_line_present": True,
