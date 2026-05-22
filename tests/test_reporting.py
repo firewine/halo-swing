@@ -8243,6 +8243,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_timestamp_propagation_summary == {
         name: True for name in selected_timestamp_propagation_targets
     }
+    assert tuple(selected_timestamp_propagation_summary) == tuple(
+        selected_timestamp_propagation_targets
+    )
     excluded_timestamp_tokens = [
         alternate_signal["created_at"],
         older_matching_signal["created_at"],
@@ -15994,6 +15997,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_timestamp_propagation_summary == {
         name: True for name in selected_timestamp_propagation_targets
     }
+    assert tuple(selected_timestamp_propagation_summary) == tuple(
+        selected_timestamp_propagation_targets
+    )
     excluded_timestamp_tokens = [
         ndx_signal["created_at"],
         older_matching_signal["created_at"],
