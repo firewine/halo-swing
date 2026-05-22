@@ -8187,6 +8187,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in selected_decision_identity_hermes_boundary_targets
     }
+    assert tuple(selected_decision_identity_hermes_boundary_summary) == tuple(
+        selected_decision_identity_hermes_boundary_targets
+    )
     excluded_decision_identity_hermes_boundary_tokens = excluded_decision_tokens + [
         token
         for excluded_signal in (alternate_signal, older_matching_signal)
@@ -15931,6 +15934,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True
         for name in selected_decision_identity_hermes_boundary_targets
     }
+    assert tuple(selected_decision_identity_hermes_boundary_summary) == tuple(
+        selected_decision_identity_hermes_boundary_targets
+    )
     excluded_decision_identity_hermes_boundary_tokens = excluded_decision_tokens + [
         token
         for excluded_signal in (ndx_signal, older_matching_signal)
