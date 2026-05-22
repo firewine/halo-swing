@@ -5076,6 +5076,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    filtered_report_shared_summary_keysets = {
+        "string_counts": tuple(filtered_report_path_free_surface_string_counts),
+        "path_free": tuple(filtered_report_path_free_summary),
+        "sqlite_name_free": tuple(filtered_report_sqlite_name_free_summary),
+        "storage_marker_free": tuple(filtered_report_storage_marker_free_summary),
+        "path_component_free": tuple(filtered_report_path_component_free_summary),
+        "excluded_record_free": tuple(filtered_report_excluded_record_free_summary),
+        "excluded_record_identity_free": tuple(
+            filtered_report_excluded_record_identity_free_summary
+        ),
+        "latest_matching_record_excludes_older": tuple(
+            latest_matching_record_excludes_older_summary
+        ),
+    }
+    assert filtered_report_shared_summary_keysets == {
+        name: tuple(expected_filtered_report_path_free_surface_names)
+        for name in filtered_report_shared_summary_keysets
+    }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
         is True
@@ -11199,6 +11217,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
+    }
+    filtered_report_shared_summary_keysets = {
+        "string_counts": tuple(filtered_report_path_free_surface_string_counts),
+        "path_free": tuple(filtered_report_path_free_summary),
+        "sqlite_name_free": tuple(filtered_report_sqlite_name_free_summary),
+        "storage_marker_free": tuple(filtered_report_storage_marker_free_summary),
+        "path_component_free": tuple(filtered_report_path_component_free_summary),
+        "excluded_record_free": tuple(filtered_report_excluded_record_free_summary),
+        "excluded_record_identity_free": tuple(
+            filtered_report_excluded_record_identity_free_summary
+        ),
+        "latest_matching_record_excludes_older": tuple(
+            latest_matching_record_excludes_older_summary
+        ),
+    }
+    assert filtered_report_shared_summary_keysets == {
+        name: tuple(expected_filtered_report_path_free_surface_names)
+        for name in filtered_report_shared_summary_keysets
     }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
