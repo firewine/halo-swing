@@ -1841,6 +1841,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         len(evidence_context["conflict_flags"])
         <= evidence_contract["max_conflict_flags"]
     )
+    conflict_flags = evidence_context["conflict_flags"]
+    assert conflict_flags
+    assert isinstance(conflict_flags, list)
+    assert len(conflict_flags) <= evidence_contract["max_conflict_flags"]
+    assert all(
+        list(flag) == evidence_contract["required_conflict_fields"]
+        for flag in conflict_flags
+    )
+    assert all(
+        all(isinstance(value, str) for value in flag.values())
+        for flag in conflict_flags
+    )
+    assert all(flag["status"] == "acknowledged" for flag in conflict_flags)
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(conflict_flags)
+    )
     assert all(
         all(
             field in flag
@@ -6886,6 +6909,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         len(evidence_context["conflict_flags"])
         <= evidence_contract["max_conflict_flags"]
+    )
+    conflict_flags = evidence_context["conflict_flags"]
+    assert conflict_flags
+    assert isinstance(conflict_flags, list)
+    assert len(conflict_flags) <= evidence_contract["max_conflict_flags"]
+    assert all(
+        list(flag) == evidence_contract["required_conflict_fields"]
+        for flag in conflict_flags
+    )
+    assert all(
+        all(isinstance(value, str) for value in flag.values())
+        for flag in conflict_flags
+    )
+    assert all(flag["status"] == "acknowledged" for flag in conflict_flags)
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(conflict_flags)
     )
     assert all(
         all(
