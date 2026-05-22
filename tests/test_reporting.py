@@ -6315,6 +6315,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    filtered_report_path_free_surface_group_boolean_surface_totals_by_group_axes = {
+        "summary_names": tuple(
+            filtered_report_path_free_surface_group_boolean_surface_totals_by_group
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_totals)
+            for summary_name, group_totals in (
+                filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: tuple(group_total)
+                for group_name, group_total in group_totals.items()
+            }
+            for summary_name, group_totals in (
+                filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_surface_totals_by_group_axes
+    ) == filtered_report_surface_group_boolean_surface_totals_by_group_axes
     filtered_report_surface_group_boolean_surface_total_consistency = {
         summary_name: {
             "surfaces": sum(
@@ -13800,6 +13823,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    filtered_report_path_free_surface_group_boolean_surface_totals_by_group_axes = {
+        "summary_names": tuple(
+            filtered_report_path_free_surface_group_boolean_surface_totals_by_group
+        ),
+        "group_names_by_summary": {
+            summary_name: tuple(group_totals)
+            for summary_name, group_totals in (
+                filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+        "metric_names_by_summary_group": {
+            summary_name: {
+                group_name: tuple(group_total)
+                for group_name, group_total in group_totals.items()
+            }
+            for summary_name, group_totals in (
+                filtered_report_path_free_surface_group_boolean_surface_totals_by_group.items()
+            )
+        },
+    }
+    assert (
+        filtered_report_path_free_surface_group_boolean_surface_totals_by_group_axes
+    ) == filtered_report_surface_group_boolean_surface_totals_by_group_axes
     filtered_report_surface_group_boolean_surface_total_consistency = {
         summary_name: {
             "surfaces": sum(
