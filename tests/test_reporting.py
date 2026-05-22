@@ -2279,6 +2279,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert hermes_guard_ref_values == ["latest_signal_report"] * 4
     assert all(isinstance(value, str) for value in hermes_guard_ref_values)
     assert all(value == hermes_preview["payload_ref"] for value in hermes_guard_ref_values)
+    hermes_guard_ref_check_names = [
+        "hermes_payload_ref_matches_structured_payload",
+        "hermes_numeric_authority_matches_payload_ref",
+    ]
+    assert {
+        name: list(delivery_preview_guard_checks[name])
+        for name in hermes_guard_ref_check_names
+    } == {
+        name: ["name", "passed", "expected", "actual"]
+        for name in hermes_guard_ref_check_names
+    }
+    assert all(
+        set(delivery_preview_guard_checks[name]).isdisjoint(
+            {
+                "actual_chars",
+                "actual_present",
+                "chunks",
+                "expected_absent",
+                "expected_max_chars",
+                "source_repository_ref",
+                "text",
+            }
+        )
+        for name in hermes_guard_ref_check_names
+    )
     expected_hermes_preview = {
         "format": delivery_channels["hermes"]["format"],
         "network_call": False,
@@ -6691,6 +6716,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert hermes_guard_ref_values == ["latest_signal_report"] * 4
     assert all(isinstance(value, str) for value in hermes_guard_ref_values)
     assert all(value == hermes_preview["payload_ref"] for value in hermes_guard_ref_values)
+    hermes_guard_ref_check_names = [
+        "hermes_payload_ref_matches_structured_payload",
+        "hermes_numeric_authority_matches_payload_ref",
+    ]
+    assert {
+        name: list(delivery_preview_guard_checks[name])
+        for name in hermes_guard_ref_check_names
+    } == {
+        name: ["name", "passed", "expected", "actual"]
+        for name in hermes_guard_ref_check_names
+    }
+    assert all(
+        set(delivery_preview_guard_checks[name]).isdisjoint(
+            {
+                "actual_chars",
+                "actual_present",
+                "chunks",
+                "expected_absent",
+                "expected_max_chars",
+                "source_repository_ref",
+                "text",
+            }
+        )
+        for name in hermes_guard_ref_check_names
+    )
     expected_hermes_preview = {
         "format": delivery_channels["hermes"]["format"],
         "network_call": False,
