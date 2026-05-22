@@ -4906,6 +4906,40 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "matches_path_free_surfaces",
         "grouped_matches_path_free_surfaces",
     )
+    filtered_report_surface_group_by_name_set_deltas = {
+        "missing_grouped_surfaces_from_by_name": tuple(
+            name
+            for name in filtered_report_grouped_surface_names
+            if name not in filtered_report_surface_group_by_name
+        ),
+        "extra_by_name_surfaces_not_grouped": tuple(
+            name
+            for name in filtered_report_surface_group_by_name
+            if name not in filtered_report_grouped_surface_names
+        ),
+        "missing_path_free_surfaces_from_by_name": tuple(
+            name
+            for name in expected_filtered_report_path_free_surface_names
+            if name not in filtered_report_surface_group_by_name
+        ),
+        "extra_by_name_surfaces_not_path_free": tuple(
+            name
+            for name in filtered_report_surface_group_by_name
+            if name not in expected_filtered_report_path_free_surface_names
+        ),
+    }
+    assert filtered_report_surface_group_by_name_set_deltas == {
+        "missing_grouped_surfaces_from_by_name": (),
+        "extra_by_name_surfaces_not_grouped": (),
+        "missing_path_free_surfaces_from_by_name": (),
+        "extra_by_name_surfaces_not_path_free": (),
+    }
+    assert tuple(filtered_report_surface_group_by_name_set_deltas) == (
+        "missing_grouped_surfaces_from_by_name",
+        "extra_by_name_surfaces_not_grouped",
+        "missing_path_free_surfaces_from_by_name",
+        "extra_by_name_surfaces_not_path_free",
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11818,6 +11852,40 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "matches_grouped_surfaces",
         "matches_path_free_surfaces",
         "grouped_matches_path_free_surfaces",
+    )
+    filtered_report_surface_group_by_name_set_deltas = {
+        "missing_grouped_surfaces_from_by_name": tuple(
+            name
+            for name in filtered_report_grouped_surface_names
+            if name not in filtered_report_surface_group_by_name
+        ),
+        "extra_by_name_surfaces_not_grouped": tuple(
+            name
+            for name in filtered_report_surface_group_by_name
+            if name not in filtered_report_grouped_surface_names
+        ),
+        "missing_path_free_surfaces_from_by_name": tuple(
+            name
+            for name in expected_filtered_report_path_free_surface_names
+            if name not in filtered_report_surface_group_by_name
+        ),
+        "extra_by_name_surfaces_not_path_free": tuple(
+            name
+            for name in filtered_report_surface_group_by_name
+            if name not in expected_filtered_report_path_free_surface_names
+        ),
+    }
+    assert filtered_report_surface_group_by_name_set_deltas == {
+        "missing_grouped_surfaces_from_by_name": (),
+        "extra_by_name_surfaces_not_grouped": (),
+        "missing_path_free_surfaces_from_by_name": (),
+        "extra_by_name_surfaces_not_path_free": (),
+    }
+    assert tuple(filtered_report_surface_group_by_name_set_deltas) == (
+        "missing_grouped_surfaces_from_by_name",
+        "extra_by_name_surfaces_not_grouped",
+        "missing_path_free_surfaces_from_by_name",
+        "extra_by_name_surfaces_not_path_free",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
