@@ -1913,6 +1913,69 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         )
         for name, filters in source_repository_filter_surfaces.items()
     } == {name: True for name in source_repository_filter_surfaces}
+    source_repository_metadata_surfaces = {
+        "top_level_source_repository_metadata": {
+            key: payload["source_repository_ref"][key]
+            for key in ("storage", "db_required")
+        },
+        "evidence_context_source_repository_metadata": {
+            key: evidence_context["source_repository_ref"][key]
+            for key in ("storage", "db_required")
+        },
+        "latest_record_guard_expected_metadata": {
+            key: latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"][key]
+            for key in ("storage", "db_required")
+        },
+        "latest_record_guard_actual_metadata": {
+            key: latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"][key]
+            for key in ("storage", "db_required")
+        },
+    }
+    expected_source_repository_metadata = {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+    }
+    assert source_repository_metadata_surfaces == {
+        name: expected_source_repository_metadata
+        for name in source_repository_metadata_surfaces
+    }
+    assert {
+        name: list(metadata)
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {
+        name: ["storage", "db_required"]
+        for name in source_repository_metadata_surfaces
+    }
+    assert {
+        name: (
+            isinstance(metadata["storage"], str)
+            and isinstance(metadata["db_required"], bool)
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
+    assert {
+        name: set(metadata).isdisjoint(
+            {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
+    assert {
+        name: all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in metadata.values()
+            if isinstance(value, str)
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert list(latest_record_guard) == ["status", "checks"]
     assert latest_record_guard["status"] == "ok"
@@ -6637,6 +6700,69 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         )
         for name, filters in source_repository_filter_surfaces.items()
     } == {name: True for name in source_repository_filter_surfaces}
+    source_repository_metadata_surfaces = {
+        "top_level_source_repository_metadata": {
+            key: payload["source_repository_ref"][key]
+            for key in ("storage", "db_required")
+        },
+        "evidence_context_source_repository_metadata": {
+            key: evidence_context["source_repository_ref"][key]
+            for key in ("storage", "db_required")
+        },
+        "latest_record_guard_expected_metadata": {
+            key: latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"][key]
+            for key in ("storage", "db_required")
+        },
+        "latest_record_guard_actual_metadata": {
+            key: latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"][key]
+            for key in ("storage", "db_required")
+        },
+    }
+    expected_source_repository_metadata = {
+        "storage": "sqlite_signal_repository",
+        "db_required": True,
+    }
+    assert source_repository_metadata_surfaces == {
+        name: expected_source_repository_metadata
+        for name in source_repository_metadata_surfaces
+    }
+    assert {
+        name: list(metadata)
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {
+        name: ["storage", "db_required"]
+        for name in source_repository_metadata_surfaces
+    }
+    assert {
+        name: (
+            isinstance(metadata["storage"], str)
+            and isinstance(metadata["db_required"], bool)
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
+    assert {
+        name: set(metadata).isdisjoint(
+            {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
+    assert {
+        name: all(
+            not value.startswith("/")
+            and "/users/" not in value.lower()
+            and "file://" not in value.lower()
+            and ".sqlite" not in value.lower()
+            and ".sqlite3" not in value.lower()
+            and not value.lower().startswith("sqlite:")
+            for value in metadata.values()
+            if isinstance(value, str)
+        )
+        for name, metadata in source_repository_metadata_surfaces.items()
+    } == {name: True for name in source_repository_metadata_surfaces}
     assert payload["evidence_context"]["latest_record_guard"] == latest_record_guard
     assert list(latest_record_guard) == ["status", "checks"]
     assert latest_record_guard["status"] == "ok"

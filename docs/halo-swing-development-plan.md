@@ -28,6 +28,57 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.290 P1 Repository SQLite Latest Report Filtered Source Metadata Scalar Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.289에서 SQLite repository-backed filtered latest report의 `source_repository_ref.filters`가 scalar criteria만 담도록 고정했다.
+이번 slice는 같은 source reference의 repository metadata인 `storage`와 `db_required`가 정확한 scalar 값으로만 전파되는지 고정한다.
+Timeframe/underlying filter 경로 모두 metadata 표면에 ledger/database/path/sqlite URI/file URL/absolute local path 성격의 값이
+섞이지 않아야 한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered source_repository_ref storage metadata matches exact storage/db_required scalar criteria
+  - assert timeframe-filtered storage metadata omits ledger/database/path/sqlite URI/file URL/local path values
+  - assert underlying-filtered source_repository_ref storage metadata matches exact storage/db_required scalar criteria
+  - assert underlying-filtered storage metadata omits ledger/database/path/sqlite URI/file URL/local path values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.07s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 47.88s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.289 P1 Repository SQLite Latest Report Filtered Source Filter Scalar Coverage Gate Record - 2026-05-22
 
 ### A. 목적

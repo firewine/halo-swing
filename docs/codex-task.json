@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_FILTER_SCALAR_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_METADATA_SCALAR_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_FILTER_SCALAR_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_METADATA_SCALAR_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.289",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving source_repository_ref filters remain scalar and path-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.290",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving source_repository_ref storage metadata remains scalar and path-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.288",
+    "docs/halo-swing-development-plan.md#4.289",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe source_repository_ref filters keep exact scalar asset/underlying/timeframe values after repository selection",
-    "SQLite repository-backed latest report underlying source_repository_ref filters keep exact scalar asset/underlying/timeframe values after repository selection",
-    "source_repository_ref filters omit ledger, database, path, sqlite, file URL, and absolute local path metadata",
+    "SQLite repository-backed latest report timeframe source_repository_ref storage metadata keeps exact scalar storage/db_required values after repository selection",
+    "SQLite repository-backed latest report underlying source_repository_ref storage metadata keeps exact scalar storage/db_required values after repository selection",
+    "source_repository_ref storage metadata omits ledger, database, path, sqlite URI, file URL, and absolute local path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
