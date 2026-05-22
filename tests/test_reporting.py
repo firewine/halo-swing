@@ -5169,6 +5169,66 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
     }
+    filtered_report_guard_surface_shared_summary_coverage = {
+        "string_counts": {
+            name: filtered_report_path_free_surface_string_counts[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {
+            "evidence_guard_checks": len(iter_nested_strings(evidence_guard_checks)),
+            "report_contract_guard_checks": len(
+                iter_nested_strings(report_contract_guard_checks)
+            ),
+            "report_payload_guard": len(
+                iter_nested_strings(payload["report_payload_guard"])
+            ),
+            "report_payload_guard_status_aggregation": len(
+                iter_nested_strings(report_payload_guard_status_aggregation)
+            ),
+            "report_payload_guard_checks": len(
+                iter_nested_strings(report_payload_guard_checks)
+            ),
+        },
+        "path_free": {
+            name: filtered_report_path_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "sqlite_name_free": {
+            name: filtered_report_sqlite_name_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "storage_marker_free": {
+            name: filtered_report_storage_marker_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "path_component_free": {
+            name: filtered_report_path_component_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "excluded_record_free": {
+            name: filtered_report_excluded_record_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "excluded_record_identity_free": {
+            name: filtered_report_excluded_record_identity_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "latest_matching_record_excludes_older": {
+            name: latest_matching_record_excludes_older_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+    }
+    assert filtered_report_guard_surface_shared_summary_coverage == {
+        name: True
+        for name in filtered_report_guard_surface_shared_summary_coverage
+    }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
         is True
@@ -11385,6 +11445,66 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_shared_summary_keysets == {
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
+    }
+    filtered_report_guard_surface_shared_summary_coverage = {
+        "string_counts": {
+            name: filtered_report_path_free_surface_string_counts[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {
+            "evidence_guard_checks": len(iter_nested_strings(evidence_guard_checks)),
+            "report_contract_guard_checks": len(
+                iter_nested_strings(report_contract_guard_checks)
+            ),
+            "report_payload_guard": len(
+                iter_nested_strings(payload["report_payload_guard"])
+            ),
+            "report_payload_guard_status_aggregation": len(
+                iter_nested_strings(report_payload_guard_status_aggregation)
+            ),
+            "report_payload_guard_checks": len(
+                iter_nested_strings(report_payload_guard_checks)
+            ),
+        },
+        "path_free": {
+            name: filtered_report_path_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "sqlite_name_free": {
+            name: filtered_report_sqlite_name_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "storage_marker_free": {
+            name: filtered_report_storage_marker_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "path_component_free": {
+            name: filtered_report_path_component_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "excluded_record_free": {
+            name: filtered_report_excluded_record_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "excluded_record_identity_free": {
+            name: filtered_report_excluded_record_identity_free_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+        "latest_matching_record_excludes_older": {
+            name: latest_matching_record_excludes_older_summary[name]
+            for name in filtered_report_guard_surface_names
+        }
+        == {name: True for name in filtered_report_guard_surface_names},
+    }
+    assert filtered_report_guard_surface_shared_summary_coverage == {
+        name: True
+        for name in filtered_report_guard_surface_shared_summary_coverage
     }
     assert (
         latest_matching_record_excludes_older_summary["report_payload_guard"]
