@@ -1674,6 +1674,51 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "positions": expected_text_section_positions,
     }
     latest_report = payload["latest_signal_report"]
+    latest_report_identity_decision_surface = {
+        key: latest_report[key]
+        for key in (
+            "signal_id",
+            "created_at",
+            "asset",
+            "underlying",
+            "timeframe",
+            "action",
+            "action_label",
+            "final_score",
+            "confidence",
+            "config_hash",
+        )
+    }
+    assert list(latest_report_identity_decision_surface) == [
+        "signal_id",
+        "created_at",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "action_label",
+        "final_score",
+        "confidence",
+        "config_hash",
+    ]
+    assert all(
+        isinstance(value, str | float)
+        for value in latest_report_identity_decision_surface.values()
+    )
+    assert set(latest_report_identity_decision_surface).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in latest_report_identity_decision_surface.values()
+        if isinstance(value, str)
+    )
     expected_numeric_field_presence = {
         "decision_line_present": True,
         "confidence_line_present": True,
@@ -6505,6 +6550,51 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "positions": expected_text_section_positions,
     }
     latest_report = payload["latest_signal_report"]
+    latest_report_identity_decision_surface = {
+        key: latest_report[key]
+        for key in (
+            "signal_id",
+            "created_at",
+            "asset",
+            "underlying",
+            "timeframe",
+            "action",
+            "action_label",
+            "final_score",
+            "confidence",
+            "config_hash",
+        )
+    }
+    assert list(latest_report_identity_decision_surface) == [
+        "signal_id",
+        "created_at",
+        "asset",
+        "underlying",
+        "timeframe",
+        "action",
+        "action_label",
+        "final_score",
+        "confidence",
+        "config_hash",
+    ]
+    assert all(
+        isinstance(value, str | float)
+        for value in latest_report_identity_decision_surface.values()
+    )
+    assert set(latest_report_identity_decision_surface).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in latest_report_identity_decision_surface.values()
+        if isinstance(value, str)
+    )
     expected_numeric_field_presence = {
         "decision_line_present": True,
         "confidence_line_present": True,
