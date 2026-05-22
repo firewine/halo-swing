@@ -4646,6 +4646,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         count > 0
         for count in filtered_report_path_free_surface_string_counts.values()
     )
+    filtered_report_delivery_surface_names = (
+        "delivery_contract",
+        "delivery_preview",
+    )
+    assert {
+        name: filtered_report_path_free_surface_string_counts[name]
+        for name in filtered_report_delivery_surface_names
+    } == {
+        "delivery_contract": len(iter_nested_strings(delivery_contract)),
+        "delivery_preview": len(iter_nested_strings(delivery_preview)),
+    }
     assert filtered_report_path_free_surface_string_counts[
         "report_payload_guard"
     ] == len(iter_nested_strings(payload["report_payload_guard"]))
@@ -4682,6 +4693,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         is True
     )
     assert filtered_report_path_free_summary["report_payload_guard_checks"] is True
+    assert {
+        name: filtered_report_path_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4703,6 +4718,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         filtered_report_sqlite_name_free_summary["report_payload_guard_checks"]
         is True
     )
+    assert {
+        name: filtered_report_sqlite_name_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4728,6 +4747,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert {
+        name: filtered_report_storage_marker_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -4753,6 +4776,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert {
+        name: filtered_report_path_component_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4785,6 +4812,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert {
+        name: filtered_report_excluded_record_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     excluded_record_identity_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -4821,6 +4852,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert {
+        name: filtered_report_excluded_record_identity_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
@@ -4874,6 +4909,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
@@ -10528,6 +10567,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         count > 0
         for count in filtered_report_path_free_surface_string_counts.values()
     )
+    filtered_report_delivery_surface_names = (
+        "delivery_contract",
+        "delivery_preview",
+    )
+    assert {
+        name: filtered_report_path_free_surface_string_counts[name]
+        for name in filtered_report_delivery_surface_names
+    } == {
+        "delivery_contract": len(iter_nested_strings(delivery_contract)),
+        "delivery_preview": len(iter_nested_strings(delivery_preview)),
+    }
     assert filtered_report_path_free_surface_string_counts[
         "report_payload_guard"
     ] == len(iter_nested_strings(payload["report_payload_guard"]))
@@ -10564,6 +10614,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         is True
     )
     assert filtered_report_path_free_summary["report_payload_guard_checks"] is True
+    assert {
+        name: filtered_report_path_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10585,6 +10639,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         filtered_report_sqlite_name_free_summary["report_payload_guard_checks"]
         is True
     )
+    assert {
+        name: filtered_report_sqlite_name_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_storage_marker_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10610,6 +10668,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert {
+        name: filtered_report_storage_marker_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -10635,6 +10697,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert {
+        name: filtered_report_path_component_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10667,6 +10733,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert {
+        name: filtered_report_excluded_record_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     excluded_record_identity_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
@@ -10703,6 +10773,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert {
+        name: filtered_report_excluded_record_identity_free_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     selected_label_excludes_filtered_out_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != alternate_label["signal_id"],
@@ -10756,6 +10830,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert {
+        name: latest_matching_record_excludes_older_summary[name]
+        for name in filtered_report_delivery_surface_names
+    } == {name: True for name in filtered_report_delivery_surface_names}
     selected_label_excludes_older_matching_label_summary = {
         "latest_signal_report_label_status": [
             label_status["signal_id"] != older_matching_label["signal_id"],
