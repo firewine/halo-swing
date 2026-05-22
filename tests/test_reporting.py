@@ -8447,6 +8447,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert degradation_hermes_boundary_summary == {
         name: True for name in degradation_hermes_boundary_targets
     }
+    assert tuple(degradation_hermes_boundary_summary) == tuple(
+        degradation_hermes_boundary_targets
+    )
     selected_degradation_field_targets = {
         "latest_signal_report_data_freshness": [
             payload["latest_signal_report"]["data_freshness_status"]
@@ -16216,6 +16219,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert degradation_hermes_boundary_summary == {
         name: True for name in degradation_hermes_boundary_targets
     }
+    assert tuple(degradation_hermes_boundary_summary) == tuple(
+        degradation_hermes_boundary_targets
+    )
     selected_degradation_field_targets = {
         "latest_signal_report_data_freshness": [
             payload["latest_signal_report"]["data_freshness_status"]

@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_EXCLUSION_ORDER_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_HERMES_BOUNDARY_ORDER_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_EXCLUSION_ORDER_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_HERMES_BOUNDARY_ORDER_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.431",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected degradation exclusion surface order after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.432",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving degradation Hermes boundary surface order after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.430",
+    "docs/halo-swing-development-plan.md#4.431",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe selected degradation exclusion surface order is verified after repository selection",
-    "SQLite repository-backed latest report underlying selected degradation exclusion surface order is verified after repository selection",
-    "selected degradation exclusion coverage preserves degradation exclusion surface order after repository selection",
+    "SQLite repository-backed latest report timeframe degradation Hermes boundary surface order is verified after repository selection",
+    "SQLite repository-backed latest report underlying degradation Hermes boundary surface order is verified after repository selection",
+    "degradation Hermes boundary coverage preserves Hermes boundary surface order after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
