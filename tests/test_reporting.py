@@ -2115,6 +2115,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"][
         "actual"
     ] == list(payload["evidence_guard"])
+    evidence_guard_key_schema = evidence_guard_checks[
+        "evidence_guard_keys_match_expected_schema"
+    ]
+    assert evidence_guard_key_schema["expected"] == list(payload["evidence_guard"])
+    assert evidence_guard_key_schema["actual"] == list(payload["evidence_guard"])
+    assert evidence_guard_key_schema["expected"] == evidence_guard_key_schema["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_key_schema)
+    )
     assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
@@ -7301,6 +7317,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert evidence_guard_checks["evidence_guard_keys_match_expected_schema"][
         "actual"
     ] == list(payload["evidence_guard"])
+    evidence_guard_key_schema = evidence_guard_checks[
+        "evidence_guard_keys_match_expected_schema"
+    ]
+    assert evidence_guard_key_schema["expected"] == list(payload["evidence_guard"])
+    assert evidence_guard_key_schema["actual"] == list(payload["evidence_guard"])
+    assert evidence_guard_key_schema["expected"] == evidence_guard_key_schema["actual"]
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_guard_key_schema)
+    )
     assert "evidence_source_repository_ref_is_path_free" in evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["expected"]
