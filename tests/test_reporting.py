@@ -4712,10 +4712,41 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_guard_checks",
         ),
     }
+    assert tuple(filtered_report_surface_groups) == (
+        "delivery",
+        "intent",
+        "evidence",
+        "source",
+        "narrative",
+        "envelope",
+        "guard",
+    )
     filtered_report_grouped_surface_names = tuple(
         name
         for group_names in filtered_report_surface_groups.values()
         for name in group_names
+    )
+    assert filtered_report_grouped_surface_names == (
+        "delivery_contract",
+        "delivery_preview",
+        "prompt_contract",
+        "report_intent_contract",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "sections",
+        "reasons",
+        "payload_text",
+        "latest_signal_report",
+        "label_status",
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "report_payload_guard",
+        "report_payload_guard_status_aggregation",
+        "report_payload_guard_checks",
     )
     assert set(filtered_report_grouped_surface_names) == set(
         expected_filtered_report_path_free_surface_names
@@ -11064,10 +11095,41 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_guard_checks",
         ),
     }
+    assert tuple(filtered_report_surface_groups) == (
+        "delivery",
+        "intent",
+        "evidence",
+        "source",
+        "narrative",
+        "envelope",
+        "guard",
+    )
     filtered_report_grouped_surface_names = tuple(
         name
         for group_names in filtered_report_surface_groups.values()
         for name in group_names
+    )
+    assert filtered_report_grouped_surface_names == (
+        "delivery_contract",
+        "delivery_preview",
+        "prompt_contract",
+        "report_intent_contract",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "sections",
+        "reasons",
+        "payload_text",
+        "latest_signal_report",
+        "label_status",
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "report_payload_guard",
+        "report_payload_guard_status_aggregation",
+        "report_payload_guard_checks",
     )
     assert set(filtered_report_grouped_surface_names) == set(
         expected_filtered_report_path_free_surface_names
