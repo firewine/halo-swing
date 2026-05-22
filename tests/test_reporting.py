@@ -4658,6 +4658,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_path_free_surface_string_counts[
         "report_payload_guard_status_aggregation"
     ] > 0
+    assert filtered_report_path_free_surface_string_counts[
+        "report_payload_guard_checks"
+    ] == len(iter_nested_strings(report_payload_guard_checks))
+    assert filtered_report_path_free_surface_string_counts[
+        "report_payload_guard_checks"
+    ] > 0
     filtered_report_path_free_summary = {
         name: all(
             str(database_path) not in value
@@ -4675,6 +4681,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert filtered_report_path_free_summary["report_payload_guard_checks"] is True
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -4690,6 +4697,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         filtered_report_sqlite_name_free_summary[
             "report_payload_guard_status_aggregation"
         ]
+        is True
+    )
+    assert (
+        filtered_report_sqlite_name_free_summary["report_payload_guard_checks"]
         is True
     )
     filtered_report_storage_marker_free_summary = {
@@ -4711,6 +4722,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         is True
     )
+    assert (
+        filtered_report_storage_marker_free_summary[
+            "report_payload_guard_checks"
+        ]
+        is True
+    )
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -4727,6 +4744,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert (
         filtered_report_path_component_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_path_component_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -4753,6 +4776,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert (
         filtered_report_excluded_record_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -4783,6 +4812,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert (
         filtered_report_excluded_record_identity_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -4830,6 +4865,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert (
         latest_matching_record_excludes_older_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        latest_matching_record_excludes_older_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -10499,6 +10540,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_path_free_surface_string_counts[
         "report_payload_guard_status_aggregation"
     ] > 0
+    assert filtered_report_path_free_surface_string_counts[
+        "report_payload_guard_checks"
+    ] == len(iter_nested_strings(report_payload_guard_checks))
+    assert filtered_report_path_free_surface_string_counts[
+        "report_payload_guard_checks"
+    ] > 0
     filtered_report_path_free_summary = {
         name: all(
             str(database_path) not in value
@@ -10516,6 +10563,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert filtered_report_path_free_summary["report_payload_guard_checks"] is True
     filtered_report_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -10531,6 +10579,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         filtered_report_sqlite_name_free_summary[
             "report_payload_guard_status_aggregation"
         ]
+        is True
+    )
+    assert (
+        filtered_report_sqlite_name_free_summary["report_payload_guard_checks"]
         is True
     )
     filtered_report_storage_marker_free_summary = {
@@ -10552,6 +10604,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         is True
     )
+    assert (
+        filtered_report_storage_marker_free_summary[
+            "report_payload_guard_checks"
+        ]
+        is True
+    )
     filtered_report_path_component_free_summary = {
         name: all(
             database_path.name not in value
@@ -10568,6 +10626,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         filtered_report_path_component_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_path_component_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -10594,6 +10658,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         filtered_report_excluded_record_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -10624,6 +10694,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         filtered_report_excluded_record_identity_free_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        filtered_report_excluded_record_identity_free_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
@@ -10671,6 +10747,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert (
         latest_matching_record_excludes_older_summary[
             "report_payload_guard_status_aggregation"
+        ]
+        is True
+    )
+    assert (
+        latest_matching_record_excludes_older_summary[
+            "report_payload_guard_checks"
         ]
         is True
     )
