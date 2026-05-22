@@ -7015,6 +7015,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_summary_guard_summary == {
         name: True for name in selected_label_summary_guard_targets
     }
+    assert tuple(selected_label_summary_guard_summary) == tuple(
+        selected_label_summary_guard_targets
+    )
     excluded_label_summaries = [
         (
             f"Stored label: outcome={alternate_label['outcome']}; "
@@ -14700,6 +14703,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_label_summary_guard_summary == {
         name: True for name in selected_label_summary_guard_targets
     }
+    assert tuple(selected_label_summary_guard_summary) == tuple(
+        selected_label_summary_guard_targets
+    )
     excluded_label_summaries = [
         (
             f"Stored label: outcome={alternate_label['outcome']}; "
