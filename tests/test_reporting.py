@@ -4673,6 +4673,45 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "latest_signal_report",
         "label_status",
     )
+    filtered_report_guard_surface_names = (
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "report_payload_guard",
+        "report_payload_guard_status_aggregation",
+        "report_payload_guard_checks",
+    )
+    filtered_report_surface_groups = {
+        "delivery": filtered_report_delivery_surface_names,
+        "intent": filtered_report_intent_surface_names,
+        "evidence": filtered_report_evidence_surface_names,
+        "source": filtered_report_source_surface_names,
+        "narrative": filtered_report_narrative_surface_names,
+        "envelope": filtered_report_envelope_surface_names,
+        "guard": filtered_report_guard_surface_names,
+    }
+    filtered_report_grouped_surface_names = tuple(
+        name
+        for group_names in filtered_report_surface_groups.values()
+        for name in group_names
+    )
+    assert set(filtered_report_grouped_surface_names) == set(
+        expected_filtered_report_path_free_surface_names
+    )
+    assert len(filtered_report_grouped_surface_names) == len(
+        expected_filtered_report_path_free_surface_names
+    )
+    assert {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    } == {
+        "delivery": 2,
+        "intent": 2,
+        "evidence": 3,
+        "source": 3,
+        "narrative": 3,
+        "envelope": 2,
+        "guard": 5,
+    }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
@@ -10851,6 +10890,45 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "latest_signal_report",
         "label_status",
     )
+    filtered_report_guard_surface_names = (
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "report_payload_guard",
+        "report_payload_guard_status_aggregation",
+        "report_payload_guard_checks",
+    )
+    filtered_report_surface_groups = {
+        "delivery": filtered_report_delivery_surface_names,
+        "intent": filtered_report_intent_surface_names,
+        "evidence": filtered_report_evidence_surface_names,
+        "source": filtered_report_source_surface_names,
+        "narrative": filtered_report_narrative_surface_names,
+        "envelope": filtered_report_envelope_surface_names,
+        "guard": filtered_report_guard_surface_names,
+    }
+    filtered_report_grouped_surface_names = tuple(
+        name
+        for group_names in filtered_report_surface_groups.values()
+        for name in group_names
+    )
+    assert set(filtered_report_grouped_surface_names) == set(
+        expected_filtered_report_path_free_surface_names
+    )
+    assert len(filtered_report_grouped_surface_names) == len(
+        expected_filtered_report_path_free_surface_names
+    )
+    assert {
+        group_name: len(group_names)
+        for group_name, group_names in filtered_report_surface_groups.items()
+    } == {
+        "delivery": 2,
+        "intent": 2,
+        "evidence": 3,
+        "source": 3,
+        "narrative": 3,
+        "envelope": 2,
+        "guard": 5,
+    }
     assert {
         name: filtered_report_path_free_surface_string_counts[name]
         for name in filtered_report_envelope_surface_names
