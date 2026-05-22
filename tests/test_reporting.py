@@ -4882,6 +4882,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "by_name_surfaces",
         "path_free_surfaces",
     )
+    filtered_report_surface_group_by_name_set_consistency = {
+        "matches_grouped_surfaces": (
+            set(filtered_report_surface_group_by_name)
+            == set(filtered_report_grouped_surface_names)
+        ),
+        "matches_path_free_surfaces": (
+            set(filtered_report_surface_group_by_name)
+            == set(expected_filtered_report_path_free_surface_names)
+        ),
+        "grouped_matches_path_free_surfaces": (
+            set(filtered_report_grouped_surface_names)
+            == set(expected_filtered_report_path_free_surface_names)
+        ),
+    }
+    assert filtered_report_surface_group_by_name_set_consistency == {
+        "matches_grouped_surfaces": True,
+        "matches_path_free_surfaces": True,
+        "grouped_matches_path_free_surfaces": True,
+    }
+    assert tuple(filtered_report_surface_group_by_name_set_consistency) == (
+        "matches_grouped_surfaces",
+        "matches_path_free_surfaces",
+        "grouped_matches_path_free_surfaces",
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11770,6 +11794,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "grouped_surfaces",
         "by_name_surfaces",
         "path_free_surfaces",
+    )
+    filtered_report_surface_group_by_name_set_consistency = {
+        "matches_grouped_surfaces": (
+            set(filtered_report_surface_group_by_name)
+            == set(filtered_report_grouped_surface_names)
+        ),
+        "matches_path_free_surfaces": (
+            set(filtered_report_surface_group_by_name)
+            == set(expected_filtered_report_path_free_surface_names)
+        ),
+        "grouped_matches_path_free_surfaces": (
+            set(filtered_report_grouped_surface_names)
+            == set(expected_filtered_report_path_free_surface_names)
+        ),
+    }
+    assert filtered_report_surface_group_by_name_set_consistency == {
+        "matches_grouped_surfaces": True,
+        "matches_path_free_surfaces": True,
+        "grouped_matches_path_free_surfaces": True,
+    }
+    assert tuple(filtered_report_surface_group_by_name_set_consistency) == (
+        "matches_grouped_surfaces",
+        "matches_path_free_surfaces",
+        "grouped_matches_path_free_surfaces",
     )
     assert tuple(
         filtered_report_surface_group_by_name[name]
