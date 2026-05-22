@@ -1876,6 +1876,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ],
     }
     assert evidence_context["risk_warnings"]
+    risk_warnings = evidence_context["risk_warnings"]
+    assert risk_warnings == swing_signal["risk_warnings"]
+    assert isinstance(risk_warnings, list)
+    assert all(isinstance(warning, str) for warning in risk_warnings)
+    assert set(risk_warnings).isdisjoint(
+        {
+            *alternate_signal["risk_warnings"],
+            *older_matching_signal["risk_warnings"],
+        }
+    )
+    assert all(
+        str(database_path) not in warning
+        and not warning.startswith("/")
+        and "/users/" not in warning.lower()
+        and "file://" not in warning.lower()
+        and ".sqlite" not in warning.lower()
+        and ".sqlite3" not in warning.lower()
+        and not warning.lower().startswith("sqlite:")
+        for warning in risk_warnings
+    )
     assert set(evidence_context["risk_warnings"]).issubset(cautions)
     assert all(
         flag["status"] == "acknowledged"
@@ -6902,6 +6922,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ],
     }
     assert evidence_context["risk_warnings"]
+    risk_warnings = evidence_context["risk_warnings"]
+    assert risk_warnings == qqq_signal["risk_warnings"]
+    assert isinstance(risk_warnings, list)
+    assert all(isinstance(warning, str) for warning in risk_warnings)
+    assert set(risk_warnings).isdisjoint(
+        {
+            *ndx_signal["risk_warnings"],
+            *older_matching_signal["risk_warnings"],
+        }
+    )
+    assert all(
+        str(database_path) not in warning
+        and not warning.startswith("/")
+        and "/users/" not in warning.lower()
+        and "file://" not in warning.lower()
+        and ".sqlite" not in warning.lower()
+        and ".sqlite3" not in warning.lower()
+        and not warning.lower().startswith("sqlite:")
+        for warning in risk_warnings
+    )
     assert set(evidence_context["risk_warnings"]).issubset(cautions)
     assert all(
         flag["status"] == "acknowledged"
