@@ -1800,6 +1800,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     }
 
     assert evidence_contract == expected_evidence_contract
+    expected_evidence_context_keys = [
+        "reason_summary",
+        "evidence_summary",
+        "risk_warnings",
+        "component_extremes",
+        "conflict_flags",
+        "source_repository_ref",
+        "latest_record_guard",
+        "label_status",
+    ]
+    assert list(evidence_context) == expected_evidence_context_keys
+    assert set(evidence_context).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_context)
+    )
     assert evidence_context["source_repository_ref"] == source_repository_ref
     component_extremes = evidence_context["component_extremes"]
     assert component_extremes == expected_component_extremes
@@ -6905,6 +6929,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
 
     assert evidence_contract == expected_evidence_contract
+    expected_evidence_context_keys = [
+        "reason_summary",
+        "evidence_summary",
+        "risk_warnings",
+        "component_extremes",
+        "conflict_flags",
+        "source_repository_ref",
+        "latest_record_guard",
+        "label_status",
+    ]
+    assert list(evidence_context) == expected_evidence_context_keys
+    assert set(evidence_context).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_context)
+    )
     assert evidence_context["source_repository_ref"] == source_repository_ref
     component_extremes = evidence_context["component_extremes"]
     assert component_extremes == expected_component_extremes

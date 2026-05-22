@@ -42,11 +42,11 @@ Archived review sections are historical context only. Do not execute archived
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_SUMMARY_SCHEMA_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_SUMMARY_SCHEMA_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_CONTEXT_SCHEMA_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_CONTEXT_SCHEMA_COVERAGE_GATE
 review_tier: S1_small
 
-next_atomic_step: extend SQLite filtered latest report coverage proving evidence_context reason_summary and evidence_summary remain typed, selected-record, and path-free after repository selection
+next_atomic_step: extend SQLite filtered latest report coverage proving evidence_context top-level schema remains exact and path-free after repository selection
 
 allowed_edit_paths:
   - .codex/tasks/current.json
@@ -77,9 +77,9 @@ required_verification:
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 
 done_means:
-  - SQLite repository-backed latest report timeframe evidence_context reason_summary and evidence_summary remain strings within contract limits after repository selection
-  - SQLite repository-backed latest report underlying evidence_context reason_summary and evidence_summary remain strings within contract limits after repository selection
-  - evidence_context reason_summary and evidence_summary values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata
+  - SQLite repository-backed latest report timeframe evidence_context keeps exact top-level schema after repository selection
+  - SQLite repository-backed latest report underlying evidence_context keeps exact top-level schema after repository selection
+  - evidence_context top-level and nested values omit ledger, database, path, sqlite URI, file URL, and absolute local path metadata
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added
@@ -93,8 +93,8 @@ Latest verification result:
 
 ```text
 status: passed
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_SUMMARY_SCHEMA_COVERAGE_GATE
-scope: SQLite repository-backed filtered evidence_context reason_summary and evidence_summary type/path-free coverage
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_EVIDENCE_CONTEXT_SCHEMA_COVERAGE_GATE
+scope: SQLite repository-backed filtered evidence_context top-level schema/path-free coverage
 commands:
   - diff -u .codex/tasks/current.json docs/codex-task.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
@@ -111,8 +111,8 @@ results:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
   - git diff --check: passed
   - git status --short --branch: modified expected docs/task/test files only
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.98s
-  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.70s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.30s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 50.89s
   - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
   - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
 files_changed:
@@ -123,10 +123,9 @@ files_changed:
   - tests/test_reporting.py
 next_state: continue with next explicit repository or report read-model slice
 notes:
-  - SQLite timeframe-filtered latest report evidence_context reason_summary and evidence_summary remain strings within evidence contract limits after repository selection
-  - SQLite underlying-filtered latest report evidence_context reason_summary and evidence_summary remain strings within evidence contract limits after repository selection
-  - evidence_context summary strings mirror latest_signal_report summaries
-  - evidence_context summary strings omit excluded repository record summaries and ledger/database/path/sqlite URI/file URL/local path values
+  - SQLite timeframe-filtered latest report evidence_context keeps exact reason_summary/evidence_summary/risk_warnings/component_extremes/conflict_flags/source_repository_ref/latest_record_guard/label_status top-level schema after repository selection
+  - SQLite underlying-filtered latest report evidence_context keeps the same exact top-level schema after repository selection
+  - evidence_context top-level and nested values omit ledger/database/path/sqlite URI/file URL/local path values
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live adapters, broker/order, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files were added

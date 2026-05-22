@@ -28,6 +28,67 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.301 P1 Repository SQLite Latest Report Filtered Evidence Context Schema Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.300에서 SQLite repository-backed filtered latest report의 `evidence_context.reason_summary`와
+`evidence_context.evidence_summary`를 typed, selected-record, path-free로 고정했다. 이번 slice는
+`evidence_context` top-level schema 자체가 repository selection 이후 exact key order와 path-free 상태를 유지하는지
+고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered evidence_context keeps exact reason_summary/evidence_summary/risk_warnings/component_extremes/conflict_flags/source_repository_ref/latest_record_guard/label_status top-level key order
+  - assert timeframe-filtered evidence_context is path-free across nested values
+  - assert underlying-filtered evidence_context keeps exact reason_summary/evidence_summary/risk_warnings/component_extremes/conflict_flags/source_repository_ref/latest_record_guard/label_status top-level key order
+  - assert underlying-filtered evidence_context is path-free across nested values
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.30s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 50.89s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+```
+
 ## 4.300 P1 Repository SQLite Latest Report Filtered Evidence Summary Schema Coverage Gate Record - 2026-05-22
 
 ### A. 목적
