@@ -8144,6 +8144,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_decision_exclusion_summary == {
         name: True for name in selected_decision_exclusion_targets
     }
+    assert tuple(selected_decision_exclusion_summary) == tuple(
+        selected_decision_exclusion_targets
+    )
     selected_decision_identity_hermes_boundary_tokens = [
         swing_signal["signal_id"],
         swing_signal["asset"],
@@ -15885,6 +15888,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_decision_exclusion_summary == {
         name: True for name in selected_decision_exclusion_targets
     }
+    assert tuple(selected_decision_exclusion_summary) == tuple(
+        selected_decision_exclusion_targets
+    )
     selected_decision_identity_hermes_boundary_tokens = [
         qqq_signal["signal_id"],
         qqq_signal["asset"],
