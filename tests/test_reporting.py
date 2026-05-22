@@ -4689,6 +4689,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "envelope": filtered_report_envelope_surface_names,
         "guard": filtered_report_guard_surface_names,
     }
+    assert filtered_report_surface_groups == {
+        "delivery": ("delivery_contract", "delivery_preview"),
+        "intent": ("prompt_contract", "report_intent_contract"),
+        "evidence": (
+            "evidence_contract",
+            "evidence_context",
+            "evidence_label_status",
+        ),
+        "source": (
+            "source_signal_ref",
+            "source_repository_ref",
+            "latest_record_guard",
+        ),
+        "narrative": ("sections", "reasons", "payload_text"),
+        "envelope": ("latest_signal_report", "label_status"),
+        "guard": (
+            "evidence_guard_checks",
+            "report_contract_guard_checks",
+            "report_payload_guard",
+            "report_payload_guard_status_aggregation",
+            "report_payload_guard_checks",
+        ),
+    }
     filtered_report_grouped_surface_names = tuple(
         name
         for group_names in filtered_report_surface_groups.values()
@@ -11017,6 +11040,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "narrative": filtered_report_narrative_surface_names,
         "envelope": filtered_report_envelope_surface_names,
         "guard": filtered_report_guard_surface_names,
+    }
+    assert filtered_report_surface_groups == {
+        "delivery": ("delivery_contract", "delivery_preview"),
+        "intent": ("prompt_contract", "report_intent_contract"),
+        "evidence": (
+            "evidence_contract",
+            "evidence_context",
+            "evidence_label_status",
+        ),
+        "source": (
+            "source_signal_ref",
+            "source_repository_ref",
+            "latest_record_guard",
+        ),
+        "narrative": ("sections", "reasons", "payload_text"),
+        "envelope": ("latest_signal_report", "label_status"),
+        "guard": (
+            "evidence_guard_checks",
+            "report_contract_guard_checks",
+            "report_payload_guard",
+            "report_payload_guard_status_aggregation",
+            "report_payload_guard_checks",
+        ),
     }
     filtered_report_grouped_surface_names = tuple(
         name
