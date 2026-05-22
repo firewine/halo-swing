@@ -8616,6 +8616,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert component_extreme_hermes_boundary_summary == {
         name: True for name in component_extreme_hermes_boundary_targets
     }
+    assert tuple(component_extreme_hermes_boundary_summary) == tuple(
+        component_extreme_hermes_boundary_targets
+    )
     selected_latest_report_trade_plan_tokens = [
         swing_signal["entry_summary"],
         swing_signal["stop_summary"],
@@ -16397,6 +16400,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert component_extreme_hermes_boundary_summary == {
         name: True for name in component_extreme_hermes_boundary_targets
     }
+    assert tuple(component_extreme_hermes_boundary_summary) == tuple(
+        component_extreme_hermes_boundary_targets
+    )
     selected_latest_report_trade_plan_tokens = [
         qqq_signal["entry_summary"],
         qqq_signal["stop_summary"],
