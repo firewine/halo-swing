@@ -6142,6 +6142,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_path_free_surface_group_boolean_surface_totals = {
+        summary_name: {
+            "surfaces": len(expected_filtered_report_path_free_surface_names),
+            "passed_surfaces": sum(
+                1
+                for name in expected_filtered_report_path_free_surface_names
+                if summary_by_surface[name] is True
+            ),
+            "failed_surfaces": (
+                filtered_report_path_free_surface_group_boolean_pass_failure_totals[
+                    summary_name
+                ]["failed_surfaces"]
+            ),
+        }
+        for summary_name, summary_by_surface in (
+            filtered_report_boolean_summary_by_name.items()
+        )
+    }
+    assert filtered_report_path_free_surface_group_boolean_surface_totals == (
+        filtered_report_surface_group_boolean_surface_totals
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_surface_totals
+    ) == tuple(filtered_report_surface_group_boolean_surface_totals)
     filtered_report_surface_group_boolean_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_surface_group_boolean_surface_totals
@@ -13538,6 +13562,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for summary_name in filtered_report_boolean_summary_by_name
     }
+    filtered_report_path_free_surface_group_boolean_surface_totals = {
+        summary_name: {
+            "surfaces": len(expected_filtered_report_path_free_surface_names),
+            "passed_surfaces": sum(
+                1
+                for name in expected_filtered_report_path_free_surface_names
+                if summary_by_surface[name] is True
+            ),
+            "failed_surfaces": (
+                filtered_report_path_free_surface_group_boolean_pass_failure_totals[
+                    summary_name
+                ]["failed_surfaces"]
+            ),
+        }
+        for summary_name, summary_by_surface in (
+            filtered_report_boolean_summary_by_name.items()
+        )
+    }
+    assert filtered_report_path_free_surface_group_boolean_surface_totals == (
+        filtered_report_surface_group_boolean_surface_totals
+    )
+    assert tuple(
+        filtered_report_path_free_surface_group_boolean_surface_totals
+    ) == tuple(filtered_report_surface_group_boolean_surface_totals)
     filtered_report_surface_group_boolean_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_surface_group_boolean_surface_totals
