@@ -28,6 +28,58 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.281 P1 Repository SQLite Latest Report Filtered Telegram Preview Contract Mirror Coverage Gate Record - 2026-05-22
+
+### A. 목적
+
+4.280에서 SQLite repository-backed filtered latest report의 Telegram delivery contract shape를 고정했다. 이번 slice는
+같은 repository selection 이후 Telegram delivery preview의 scalar metadata가 delivery contract에서 선언한 schema, format,
+max_chars, overflow policy, section separator, chunk indexing, no-network, no-send 값을 그대로 mirror하는지 검증한다. Preview는
+전송 본문과 chunk만 포함해야 하며 report intent, Hermes numeric authority, repository path metadata를 직접 들고 나가면 안 된다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered Telegram preview scalar metadata mirrors its delivery contract
+  - assert timeframe-filtered Telegram preview key order remains stable
+  - assert timeframe-filtered Telegram preview omits report intent, Hermes authority, and repository path metadata keys
+  - assert underlying-filtered Telegram preview scalar metadata mirrors its delivery contract
+  - assert underlying-filtered Telegram preview key order remains stable
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - focused pytest for timeframe filter, underlying filter, and default required sections: 3 passed in 1.03s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.59s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.280 P1 Repository SQLite Latest Report Filtered Telegram Delivery Contract Shape Coverage Gate Record - 2026-05-22
 
 ### A. 목적

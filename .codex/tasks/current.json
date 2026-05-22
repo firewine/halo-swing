@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_DELIVERY_CONTRACT_SHAPE_COVERAGE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_CONTRACT_MIRROR_COVERAGE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_DELIVERY_CONTRACT_SHAPE_COVERAGE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_TELEGRAM_PREVIEW_CONTRACT_MIRROR_COVERAGE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.280",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving Telegram delivery contract retains full plain-text chunking shape after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.281",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving Telegram delivery preview scalar metadata mirrors its delivery contract after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -15,7 +15,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.279",
+    "docs/halo-swing-development-plan.md#4.280",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -49,9 +49,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe filter validates Telegram delivery contract retains schema, max_chars, required_sections, overflow, chunk_indexing, and no-send/no-network shape after repository selection",
-    "SQLite repository-backed latest report underlying filter validates Telegram delivery contract retains schema, max_chars, required_sections, overflow, chunk_indexing, and no-send/no-network shape after repository selection",
-    "Telegram delivery contract remains tied to report_intent required_sections without Hermes numeric authority or repository path metadata",
+    "SQLite repository-backed latest report timeframe filter validates Telegram preview scalar metadata mirrors delivery contract schema, format, max_chars, overflow, chunking, no-send, and no-network values after repository selection",
+    "SQLite repository-backed latest report underlying filter validates Telegram preview scalar metadata mirrors delivery contract schema, format, max_chars, overflow, chunking, no-send, and no-network values after repository selection",
+    "Telegram delivery preview key order remains stable and excludes report intent, Hermes authority, and repository path metadata",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

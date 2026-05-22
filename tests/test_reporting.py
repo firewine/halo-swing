@@ -2389,6 +2389,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
     assert telegram_preview["message_count"] == len(telegram_preview["chunks"])
+    expected_telegram_preview_scalar_metadata = {
+        "schema_version": telegram_contract["schema_version"],
+        "format": telegram_contract["format"],
+        "network_call": telegram_contract["network_call"],
+        "max_chars": telegram_contract["max_chars"],
+        "overflow_policy": telegram_contract["overflow_policy"],
+        "section_separator": telegram_contract["section_separator"],
+        "chunk_indexing": telegram_contract["chunk_indexing"],
+        "send_call": telegram_contract["send_call"],
+        "message_count": len(telegram_preview["chunks"]),
+        "fits_single_message": len(telegram_preview["chunks"]) == 1,
+    }
+    assert {
+        key: telegram_preview[key]
+        for key in expected_telegram_preview_scalar_metadata
+    } == expected_telegram_preview_scalar_metadata
+    assert list(telegram_preview) == [
+        "schema_version",
+        "format",
+        "network_call",
+        "max_chars",
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+        "send_call",
+        "message_count",
+        "fits_single_message",
+        "chunks",
+    ]
+    assert set(telegram_preview).isdisjoint(
+        {
+            "database_path",
+            "ledger_path",
+            "ledger_ref",
+            "numeric_authority",
+            "payload_ref",
+            "required_sections",
+            "source_repository_ref",
+        }
+    )
     assert (
         telegram_preview["section_separator"].join(
             chunk["text"] for chunk in telegram_preview["chunks"]
@@ -6884,6 +6924,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert telegram_preview["network_call"] is False
     assert telegram_preview["send_call"] is False
     assert telegram_preview["message_count"] == len(telegram_preview["chunks"])
+    expected_telegram_preview_scalar_metadata = {
+        "schema_version": telegram_contract["schema_version"],
+        "format": telegram_contract["format"],
+        "network_call": telegram_contract["network_call"],
+        "max_chars": telegram_contract["max_chars"],
+        "overflow_policy": telegram_contract["overflow_policy"],
+        "section_separator": telegram_contract["section_separator"],
+        "chunk_indexing": telegram_contract["chunk_indexing"],
+        "send_call": telegram_contract["send_call"],
+        "message_count": len(telegram_preview["chunks"]),
+        "fits_single_message": len(telegram_preview["chunks"]) == 1,
+    }
+    assert {
+        key: telegram_preview[key]
+        for key in expected_telegram_preview_scalar_metadata
+    } == expected_telegram_preview_scalar_metadata
+    assert list(telegram_preview) == [
+        "schema_version",
+        "format",
+        "network_call",
+        "max_chars",
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+        "send_call",
+        "message_count",
+        "fits_single_message",
+        "chunks",
+    ]
+    assert set(telegram_preview).isdisjoint(
+        {
+            "database_path",
+            "ledger_path",
+            "ledger_ref",
+            "numeric_authority",
+            "payload_ref",
+            "required_sections",
+            "source_repository_ref",
+        }
+    )
     assert (
         telegram_preview["section_separator"].join(
             chunk["text"] for chunk in telegram_preview["chunks"]
