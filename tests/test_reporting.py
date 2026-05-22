@@ -2010,6 +2010,44 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     )
     evidence_label_status = payload["evidence_context"]["label_status"]
     assert evidence_label_status == label_status
+    assert list(evidence_label_status) == expected_label_status_keys
+    assert {
+        "string_fields": all(
+            isinstance(evidence_label_status[field], str)
+            for field in (
+                "schema_version",
+                "signal_id",
+                "outcome",
+                "first_barrier_hit",
+                "labeled_at",
+            )
+        ),
+        "realized_r_float": isinstance(evidence_label_status["realized_r"], float),
+        "time_barrier_days_int": isinstance(
+            evidence_label_status["time_barrier_days"], int
+        ),
+        "live_data_required_bool": isinstance(
+            evidence_label_status["live_data_required"], bool
+        ),
+    } == {
+        "string_fields": True,
+        "realized_r_float": True,
+        "time_barrier_days_int": True,
+        "live_data_required_bool": True,
+    }
+    assert set(evidence_label_status).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_label_status)
+    )
     assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
         "name": "label_status_reflected_in_evidence_context",
         "passed": True,
@@ -6980,6 +7018,44 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     )
     evidence_label_status = payload["evidence_context"]["label_status"]
     assert evidence_label_status == label_status
+    assert list(evidence_label_status) == expected_label_status_keys
+    assert {
+        "string_fields": all(
+            isinstance(evidence_label_status[field], str)
+            for field in (
+                "schema_version",
+                "signal_id",
+                "outcome",
+                "first_barrier_hit",
+                "labeled_at",
+            )
+        ),
+        "realized_r_float": isinstance(evidence_label_status["realized_r"], float),
+        "time_barrier_days_int": isinstance(
+            evidence_label_status["time_barrier_days"], int
+        ),
+        "live_data_required_bool": isinstance(
+            evidence_label_status["live_data_required"], bool
+        ),
+    } == {
+        "string_fields": True,
+        "realized_r_float": True,
+        "time_barrier_days_int": True,
+        "live_data_required_bool": True,
+    }
+    assert set(evidence_label_status).isdisjoint(
+        {"database_path", "ledger_path", "ledger_ref", "path", "sqlite_path"}
+    )
+    assert all(
+        str(database_path) not in value
+        and not value.startswith("/")
+        and "/users/" not in value.lower()
+        and "file://" not in value.lower()
+        and ".sqlite" not in value.lower()
+        and ".sqlite3" not in value.lower()
+        and not value.lower().startswith("sqlite:")
+        for value in iter_nested_strings(evidence_label_status)
+    )
     assert evidence_guard_checks["label_status_reflected_in_evidence_context"] == {
         "name": "label_status_reflected_in_evidence_context",
         "passed": True,
