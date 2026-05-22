@@ -4839,6 +4839,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons": "narrative",
         "payload_text": "narrative",
     }
+    assert tuple(filtered_report_surface_group_by_name) == (
+        filtered_report_grouped_surface_names
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
@@ -11685,6 +11688,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons": "narrative",
         "payload_text": "narrative",
     }
+    assert tuple(filtered_report_surface_group_by_name) == (
+        filtered_report_grouped_surface_names
+    )
     assert tuple(
         filtered_report_surface_group_by_name[name]
         for name in expected_filtered_report_path_free_surface_names
