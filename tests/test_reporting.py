@@ -9006,6 +9006,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_offline_live_data_boundary_summary == {
         name: True for name in selected_offline_live_data_boundary_targets
     }
+    assert tuple(selected_offline_live_data_boundary_summary) == tuple(
+        selected_offline_live_data_boundary_targets
+    )
     live_activation_markers = [
         "HALO_SWING_DATABASE_URL",
         "database_url",
@@ -16811,6 +16814,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_offline_live_data_boundary_summary == {
         name: True for name in selected_offline_live_data_boundary_targets
     }
+    assert tuple(selected_offline_live_data_boundary_summary) == tuple(
+        selected_offline_live_data_boundary_targets
+    )
     live_activation_markers = [
         "HALO_SWING_DATABASE_URL",
         "database_url",

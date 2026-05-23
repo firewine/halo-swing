@@ -17,6 +17,20 @@ full_evidence_sources:
 ```yaml
 - date: 2026-05-23
   commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered offline live-data boundary order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OFFLINE_LIVE_DATA_BOUNDARY_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.29s
+    full_pytest: 935 passed in 45.14s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered offline live-data boundary surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.444
+
+- date: 2026-05-23
+  commit: recorded_in_commit_containing_this_entry
   title: Cover sqlite filtered delivery side effect order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_SIDE_EFFECT_ORDER_COVERAGE_GATE
   status: verified_pending_push
