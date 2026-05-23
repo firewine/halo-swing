@@ -17,6 +17,20 @@ full_evidence_sources:
 ```yaml
 - date: 2026-05-23
   commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered delivery contract profile order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_PROFILE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.20s
+    full_pytest: 935 passed in 46.61s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered delivery contract profile surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.441
+
+- date: 2026-05-23
+  commit: recorded_in_commit_containing_this_entry
   title: Cover sqlite filtered delivery preview presence order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_PRESENCE_ORDER_COVERAGE_GATE
   status: verified_pending_push

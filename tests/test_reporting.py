@@ -8860,6 +8860,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_contract_profile_summary == {
         name: True for name in selected_delivery_contract_profile_targets
     }
+    assert tuple(selected_delivery_contract_profile_summary) == tuple(
+        selected_delivery_contract_profile_targets
+    )
     selected_cron_intent_tokens = [
         "pre_market_swing_report",
         "intraday_risk_watch",
@@ -16656,6 +16659,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_delivery_contract_profile_summary == {
         name: True for name in selected_delivery_contract_profile_targets
     }
+    assert tuple(selected_delivery_contract_profile_summary) == tuple(
+        selected_delivery_contract_profile_targets
+    )
     selected_cron_intent_tokens = [
         "pre_market_swing_report",
         "intraday_risk_watch",
