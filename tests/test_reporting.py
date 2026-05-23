@@ -8741,6 +8741,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert trade_plan_hermes_boundary_summary == {
         name: True for name in trade_plan_hermes_boundary_targets
     }
+    assert tuple(trade_plan_hermes_boundary_summary) == tuple(
+        trade_plan_hermes_boundary_targets
+    )
     selected_delivery_preview_tokens = (
         [
             swing_signal["asset"],
@@ -16531,6 +16534,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert trade_plan_hermes_boundary_summary == {
         name: True for name in trade_plan_hermes_boundary_targets
     }
+    assert tuple(trade_plan_hermes_boundary_summary) == tuple(
+        trade_plan_hermes_boundary_targets
+    )
     selected_delivery_preview_tokens = (
         [
             qqq_signal["asset"],

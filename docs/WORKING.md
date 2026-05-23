@@ -12,34 +12,35 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: WORKING_LEDGER_COMPACTION_VERIFIED
-gate_id: WORKING_LEDGER_COMPACTION_2026_05_22
-review_tier: S0_trivial
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_GATE
+review_tier: S1_small
 
-objective: redefine handoff docs so WORKING.md tracks current and next work only
+objective: extend SQLite filtered latest report coverage proving trade plan Hermes boundary surface order after repository selection
 
 edits:
   allowed:
     - .codex/tasks/current.json
-    - AGENTS.md
     - docs/WORKING.md
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
-    - docs/archive/working-ledger-compaction.md
+    - docs/halo-swing-development-plan.md
+    - tests/test_reporting.py
   blocked_prefixes:
-    - src/
-    - tests/
+    - src/halo_swing_mcp/broker/
+    - src/halo_swing_mcp/live_adapters/
     - migrations/
     - data/
     - artifacts/
     - state/
 
 done_when:
-  - WORKING.md is LLM-friendly and contains only current_work and next_work
-  - completed work has a separate ledger document
-  - full pre-compaction WORKING.md ledger is preserved in docs/archive/working-ledger-compaction.md
-  - AGENTS.md defines the split between WORKING.md and completed work ledger
-  - task mirror files are identical and valid JSON
+  - SQLite repository-backed latest report timeframe trade plan Hermes boundary surface order is verified after repository selection
+  - SQLite repository-backed latest report underlying trade plan Hermes boundary surface order is verified after repository selection
+  - trade plan Hermes boundary coverage preserves Hermes boundary surface order after repository selection
+  - database_path marker remains absent from report and delivery surfaces
+  - default no-repository latest report payload and golden snapshot remain unchanged
+  - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 ```
 
@@ -52,16 +53,21 @@ required_commands:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
-  - wc -l docs/WORKING.md docs/COMPLETED_WORK.md docs/archive/working-ledger-compaction.md
   - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
 results:
   - task mirror diff passed
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - docs/WORKING.md reduced to compact current/next handoff
-  - docs/COMPLETED_WORK.md created as compact completed work ledger
-  - full pre-compaction WORKING.md ledger preserved in docs/archive/working-ledger-compaction.md
+  - git status showed expected modified task/docs/test files only
+  - focused pytest passed: 3 passed in 1.32s
+  - full pytest passed: 935 passed in 53.90s
+  - ruff passed
+  - health_check passed with status ok
 ```
 
 ## current_gate_state
@@ -90,13 +96,4 @@ immediate:
   - choose the next explicit repository_or_report_read_model_slice from SSOT
   - update .codex/tasks/current.json and docs/codex-task.json for that slice
   - replace this current_work block with the new active task
-  - append completed slice summary to docs/COMPLETED_WORK.md
-
-product_backlog_later_gate:
-  - Telegram actual send
-  - Hermes runtime connection_start
-  - scheduler_cron automated execution
-  - live adapter expansion
-  - env_based_database_activation
-  - ETF_order_or_general_broker_automation
 ```

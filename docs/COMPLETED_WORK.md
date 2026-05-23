@@ -15,6 +15,20 @@ full_evidence_sources:
 ## ledger
 
 ```yaml
+- date: 2026-05-23
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered trade plan Hermes boundary order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.32s
+    full_pytest: 935 passed in 53.90s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered trade plan Hermes boundary surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.439
+
 - date: 2026-05-22
   commit: 53a2fd1
   title: Cover sqlite filtered trade plan exclusion order
