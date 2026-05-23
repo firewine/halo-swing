@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_INTENT_PRESENCE_ORDER_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_INTENT_PRESENCE_ORDER_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_SIDE_EFFECT_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_SIDE_EFFECT_ORDER_COVERAGE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving cron intent presence surface order after repository selection
+objective: extend SQLite filtered latest report coverage proving delivery side effect surface order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe cron intent presence surface order is verified after repository selection
-  - SQLite repository-backed latest report underlying cron intent presence surface order is verified after repository selection
-  - cron intent presence coverage preserves cron intent presence surface order after repository selection
+  - SQLite repository-backed latest report timeframe delivery side effect surface order is verified after repository selection
+  - SQLite repository-backed latest report underlying delivery side effect surface order is verified after repository selection
+  - delivery side effect coverage preserves delivery side effect surface order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.27s
-  - full pytest passed: 935 passed in 46.21s
+  - focused pytest passed: 3 passed in 1.30s
+  - full pytest passed: 935 passed in 46.98s
   - ruff passed
   - health_check passed with status ok
 ```

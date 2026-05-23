@@ -8963,6 +8963,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_side_effect_summary == {
         name: True for name in selected_delivery_side_effect_targets
     }
+    assert tuple(selected_delivery_side_effect_summary) == tuple(
+        selected_delivery_side_effect_targets
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             payload["live_data_required"] is False,
@@ -16765,6 +16768,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_delivery_side_effect_summary == {
         name: True for name in selected_delivery_side_effect_targets
     }
+    assert tuple(selected_delivery_side_effect_summary) == tuple(
+        selected_delivery_side_effect_targets
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             payload["live_data_required"] is False,

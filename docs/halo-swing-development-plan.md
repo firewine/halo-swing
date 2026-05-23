@@ -28,6 +28,56 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.443 P1 Repository SQLite Latest Report Filtered Source Delivery Side Effect Order Coverage Gate Record - 2026-05-23
+
+### A. 목적
+
+4.442에서 SQLite repository-backed filtered latest report의 selected cron intent presence surface order를 고정했다.
+이번 slice는 repository selection 이후 selected delivery side effect coverage가 delivery contract no-network,
+delivery contract no-send, delivery preview no-network, delivery preview no-send, delivery preview no-network guard,
+and delivery preview no-send guard 표면 순서를 timeframe/underlying 필터 경로에서 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - asserted timeframe-filtered selected delivery side effect coverage preserves delivery side effect surface order
+  - asserted underlying-filtered selected delivery side effect coverage preserves delivery side effect surface order
+  - kept delivery side effect checks limited to repository-selected delivery contract, preview, and guard surfaces
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.30s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 46.98s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.442 P1 Repository SQLite Latest Report Filtered Source Cron Intent Presence Order Coverage Gate Record - 2026-05-23
 
 ### A. 목적
