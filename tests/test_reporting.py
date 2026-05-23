@@ -8923,6 +8923,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_cron_intent_presence_summary == {
         name: True for name in selected_cron_intent_presence_targets
     }
+    assert tuple(selected_cron_intent_presence_summary) == tuple(
+        selected_cron_intent_presence_targets
+    )
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
@@ -16722,6 +16725,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_cron_intent_presence_summary == {
         name: True for name in selected_cron_intent_presence_targets
     }
+    assert tuple(selected_cron_intent_presence_summary) == tuple(
+        selected_cron_intent_presence_targets
+    )
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
