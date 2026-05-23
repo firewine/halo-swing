@@ -8786,6 +8786,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_delivery_preview_presence_summary == {
         name: True for name in selected_delivery_preview_presence_targets
     }
+    assert tuple(selected_delivery_preview_presence_summary) == tuple(
+        selected_delivery_preview_presence_targets
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -16579,6 +16582,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_delivery_preview_presence_summary == {
         name: True for name in selected_delivery_preview_presence_targets
     }
+    assert tuple(selected_delivery_preview_presence_summary) == tuple(
+        selected_delivery_preview_presence_targets
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,

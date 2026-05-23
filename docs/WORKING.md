@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_PRESENCE_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_PRESENCE_ORDER_COVERAGE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving trade plan Hermes boundary surface order after repository selection
+objective: extend SQLite filtered latest report coverage proving delivery preview presence surface order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe trade plan Hermes boundary surface order is verified after repository selection
-  - SQLite repository-backed latest report underlying trade plan Hermes boundary surface order is verified after repository selection
-  - trade plan Hermes boundary coverage preserves Hermes boundary surface order after repository selection
+  - SQLite repository-backed latest report timeframe delivery preview presence surface order is verified after repository selection
+  - SQLite repository-backed latest report underlying delivery preview presence surface order is verified after repository selection
+  - delivery preview presence coverage preserves delivery preview presence surface order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.32s
-  - full pytest passed: 935 passed in 53.90s
+  - focused pytest passed: 3 passed in 1.52s
+  - full pytest passed: 935 passed in 46.42s
   - ruff passed
   - health_check passed with status ok
 ```
