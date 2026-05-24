@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_EXCLUDED_LABEL_STATUS_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_EXCLUDED_LABEL_STATUS_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_DETAIL_FIELD_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_DETAIL_FIELD_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected excluded label status order after repository selection
+objective: extend SQLite filtered latest report coverage proving label status detail field order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected excluded label status order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected excluded label status order is verified after repository selection
-  - selected excluded label statuses preserve filtered report label status order after repository selection
+  - SQLite repository-backed latest report timeframe label status detail field order is verified after repository selection
+  - SQLite repository-backed latest report underlying label status detail field order is verified after repository selection
+  - label status detail fields preserve filtered report field order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.30s
-  - full pytest passed: 935 passed in 43.34s
+  - focused pytest passed: 3 passed in 1.32s
+  - full pytest passed: 935 passed in 43.39s
   - ruff passed
   - health_check passed with status ok
 ```

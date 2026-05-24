@@ -7384,6 +7384,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "labeled_at",
         "time_barrier_days",
     )
+    assert tuple(label_status_detail_fields) == (
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+    )
     selected_label_status_guard_exclusion_targets = {
         "evidence_guard_label_status_expected": [
             label_status_guard_check["expected"]["signal_id"]
@@ -15807,6 +15814,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     excluded_label_statuses = [alternate_label, older_matching_label]
     assert tuple(excluded_label_statuses) == (alternate_label, older_matching_label)
     label_status_detail_fields = (
+        "outcome",
+        "realized_r",
+        "first_barrier_hit",
+        "labeled_at",
+        "time_barrier_days",
+    )
+    assert tuple(label_status_detail_fields) == (
         "outcome",
         "realized_r",
         "first_barrier_hit",
