@@ -5,6 +5,10 @@ doc_type: completed_work_ledger
 audience: llm_agents_and_humans
 purpose: track completed slices separately from docs/WORKING.md
 detail_policy: compact_summary_plus_pointers
+compaction_policy:
+  - full pre-compaction WORKING ledger remains preserved in docs/archive/working-ledger-compaction.md
+  - this file tracks compact completed-slice entries after compaction
+  - docs/WORKING.md stays current_work and next_work only
 full_evidence_sources:
   - docs/halo-swing-development-plan.md
   - docs/archive/working-ledger-compaction.md
@@ -17,9 +21,23 @@ full_evidence_sources:
 ```yaml
 - date: 2026-05-23
   commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered offline live activation-free order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OFFLINE_LIVE_ACTIVATION_FREE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 0.19s
+    full_pytest: 935 passed in 59.48s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered offline live activation-free surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.445
+
+- date: 2026-05-23
+  commit: 73793b4
   title: Cover sqlite filtered offline live-data boundary order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OFFLINE_LIVE_DATA_BOUNDARY_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.29s
     full_pytest: 935 passed in 45.14s
@@ -30,10 +48,10 @@ full_evidence_sources:
     - durable gate details remain in docs/halo-swing-development-plan.md#4.444
 
 - date: 2026-05-23
-  commit: recorded_in_commit_containing_this_entry
+  commit: dbf5a53
   title: Cover sqlite filtered delivery side effect order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_SIDE_EFFECT_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.30s
     full_pytest: 935 passed in 46.98s
@@ -44,10 +62,10 @@ full_evidence_sources:
     - durable gate details remain in docs/halo-swing-development-plan.md#4.443
 
 - date: 2026-05-23
-  commit: recorded_in_commit_containing_this_entry
+  commit: f269bcc
   title: Cover sqlite filtered cron intent order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_INTENT_PRESENCE_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.27s
     full_pytest: 935 passed in 46.21s
@@ -58,10 +76,10 @@ full_evidence_sources:
     - durable gate details remain in docs/halo-swing-development-plan.md#4.442
 
 - date: 2026-05-23
-  commit: recorded_in_commit_containing_this_entry
+  commit: c63c582
   title: Cover sqlite filtered delivery contract profile order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_PROFILE_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.20s
     full_pytest: 935 passed in 46.61s
@@ -72,10 +90,10 @@ full_evidence_sources:
     - durable gate details remain in docs/halo-swing-development-plan.md#4.441
 
 - date: 2026-05-23
-  commit: recorded_in_commit_containing_this_entry
+  commit: e95b032
   title: Cover sqlite filtered delivery preview presence order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_PRESENCE_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.52s
     full_pytest: 935 passed in 46.42s
@@ -86,10 +104,10 @@ full_evidence_sources:
     - durable gate details remain in docs/halo-swing-development-plan.md#4.440
 
 - date: 2026-05-23
-  commit: recorded_in_commit_containing_this_entry
+  commit: fa6902f
   title: Cover sqlite filtered trade plan Hermes boundary order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.32s
     full_pytest: 935 passed in 53.90s
