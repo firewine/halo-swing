@@ -10481,6 +10481,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_source_repository_evidence_filters == (
         selected_source_repository_filter_values
     )
+    selected_delivery_contract_no_live_activation_values = [
+        channel["network_call"] for channel in delivery_contract["channels"].values()
+    ]
+    assert tuple(selected_delivery_contract_no_live_activation_values) == (
+        False,
+        False,
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -10533,8 +10540,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == selected_source_repository_filter_values,
         ],
         "delivery_contract_no_live_activation": [
-            channel["network_call"] is False
-            for channel in delivery_contract["channels"].values()
+            value is False
+            for value in selected_delivery_contract_no_live_activation_values
+        ],
+        "delivery_contract_no_live_activation_values_guard": [
+            selected_delivery_contract_no_live_activation_values == [False, False],
         ],
         "delivery_preview_no_live_activation": [
             channel["network_call"] is False
@@ -10557,6 +10567,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "source_repository_ref_payload_filter_values_guard",
         "source_repository_ref_evidence_filter_values_guard",
         "delivery_contract_no_live_activation",
+        "delivery_contract_no_live_activation_values_guard",
         "delivery_preview_no_live_activation",
     )
     selected_offline_live_data_boundary_summary = {
@@ -20021,6 +20032,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_source_repository_evidence_filters == (
         selected_source_repository_filter_values
     )
+    selected_delivery_contract_no_live_activation_values = [
+        channel["network_call"] for channel in delivery_contract["channels"].values()
+    ]
+    assert tuple(selected_delivery_contract_no_live_activation_values) == (
+        False,
+        False,
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -20073,8 +20091,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == selected_source_repository_filter_values,
         ],
         "delivery_contract_no_live_activation": [
-            channel["network_call"] is False
-            for channel in delivery_contract["channels"].values()
+            value is False
+            for value in selected_delivery_contract_no_live_activation_values
+        ],
+        "delivery_contract_no_live_activation_values_guard": [
+            selected_delivery_contract_no_live_activation_values == [False, False],
         ],
         "delivery_preview_no_live_activation": [
             channel["network_call"] is False
@@ -20097,6 +20118,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "source_repository_ref_payload_filter_values_guard",
         "source_repository_ref_evidence_filter_values_guard",
         "delivery_contract_no_live_activation",
+        "delivery_contract_no_live_activation_values_guard",
         "delivery_preview_no_live_activation",
     )
     selected_offline_live_data_boundary_summary = {
