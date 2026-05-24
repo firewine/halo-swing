@@ -10669,12 +10669,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons",
     )
     selected_sqlite_name_free_summary = {
-        name: all(
+        name: [
             ".sqlite" not in value.lower()
             for value in iter_nested_strings(target)
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_sqlite_name_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_sqlite_name_free_status = {
+        name: all(checks)
+        for name, checks in selected_sqlite_name_free_summary.items()
+    }
+    assert selected_sqlite_name_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_sqlite_name_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_sqlite_name_free_summary = selected_sqlite_name_free_status
     assert selected_sqlite_name_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }
@@ -20238,12 +20252,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons",
     )
     selected_sqlite_name_free_summary = {
-        name: all(
+        name: [
             ".sqlite" not in value.lower()
             for value in iter_nested_strings(target)
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_sqlite_name_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_sqlite_name_free_status = {
+        name: all(checks)
+        for name, checks in selected_sqlite_name_free_summary.items()
+    }
+    assert selected_sqlite_name_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_sqlite_name_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_sqlite_name_free_summary = selected_sqlite_name_free_status
     assert selected_sqlite_name_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }
