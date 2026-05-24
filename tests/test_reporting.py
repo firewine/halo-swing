@@ -8725,6 +8725,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             f"{excluded_signal['confidence']}",
         )
     ]
+    assert tuple(excluded_decision_tokens) == (
+        alternate_signal["action_label"],
+        f"{alternate_signal['final_score']}",
+        f"{alternate_signal['confidence']}",
+        older_matching_signal["action_label"],
+        f"{older_matching_signal['final_score']}",
+        f"{older_matching_signal['confidence']}",
+    )
     selected_decision_exclusion_targets = {
         "top_level_identity": actual_top_level_identity,
         "latest_signal_report": payload["latest_signal_report"],
@@ -17450,6 +17458,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             f"{excluded_signal['confidence']}",
         )
     ]
+    assert tuple(excluded_decision_tokens) == (
+        ndx_signal["action_label"],
+        f"{ndx_signal['final_score']}",
+        f"{ndx_signal['confidence']}",
+        older_matching_signal["action_label"],
+        f"{older_matching_signal['final_score']}",
+        f"{older_matching_signal['confidence']}",
+    )
     selected_decision_exclusion_targets = {
         "top_level_identity": actual_top_level_identity,
         "latest_signal_report": payload["latest_signal_report"],
