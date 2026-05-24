@@ -7290,6 +7290,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             )
         ],
     }
+    assert tuple(selected_label_status_propagation_targets) == (
+        "latest_signal_report_label_status",
+        "evidence_context_label_status",
+        "evidence_guard_label_status",
+    )
     selected_label_status_propagation_summary = {
         name: all(checks)
         for name, checks in selected_label_status_propagation_targets.items()
@@ -15367,6 +15372,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             )
         ],
     }
+    assert tuple(selected_label_status_propagation_targets) == (
+        "latest_signal_report_label_status",
+        "evidence_context_label_status",
+        "evidence_guard_label_status",
+    )
     selected_label_status_propagation_summary = {
         name: all(checks)
         for name, checks in selected_label_status_propagation_targets.items()
