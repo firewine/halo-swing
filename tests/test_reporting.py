@@ -9796,6 +9796,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "weekday_pre_market",
         "new_swing_entry_and_watchlist",
     ]
+    assert tuple(selected_cron_intent_tokens) == (
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    )
+    assert tuple(selected_cron_schedule_tokens) == (
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -18718,6 +18728,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "weekday_pre_market",
         "new_swing_entry_and_watchlist",
     ]
+    assert tuple(selected_cron_intent_tokens) == (
+        "pre_market_swing_report",
+        "intraday_risk_watch",
+        "post_market_review",
+    )
+    assert tuple(selected_cron_schedule_tokens) == (
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
