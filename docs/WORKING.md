@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CRON_INTENT_PRESENCE_TOKEN_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CRON_INTENT_PRESENCE_TOKEN_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_SIDE_EFFECT_CHANNEL_GUARD_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_SIDE_EFFECT_CHANNEL_GUARD_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected cron intent presence token order after repository selection
+objective: extend SQLite filtered latest report coverage proving selected delivery side effect channel and guard order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected cron intent presence token order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected cron intent presence token order is verified after repository selection
-  - selected cron intent checks preserve report intent, report intent contract, delivery cron intent, supported intent guard, cron registry guard, and intent registry match guard token order after repository selection
+  - SQLite repository-backed latest report timeframe selected delivery side effect channel and guard order is verified after repository selection
+  - SQLite repository-backed latest report underlying selected delivery side effect channel and guard order is verified after repository selection
+  - selected delivery side effect checks preserve delivery contract channel, delivery preview channel, preview no-network guard actual, and preview no-send guard actual order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,8 +69,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.41s
-  - full pytest passed: 935 passed in 43.01s
+  - focused pytest passed: 3 passed in 1.38s
+  - full pytest passed: 935 passed in 42.99s
   - ruff passed
   - health_check passed with status ok
 ```

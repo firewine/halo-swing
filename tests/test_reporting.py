@@ -9867,6 +9867,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_cron_intent_presence_summary) == tuple(
         selected_cron_intent_presence_targets
     )
+    selected_delivery_side_effect_channel_order = ("hermes", "telegram")
+    assert tuple(delivery_channels) == selected_delivery_side_effect_channel_order
+    assert tuple(delivery_preview["channels"]) == (
+        selected_delivery_side_effect_channel_order
+    )
+    assert tuple(
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_network_side_effect"
+        ]["actual"]
+    ) == selected_delivery_side_effect_channel_order
+    assert tuple(
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_send_side_effect"
+        ]["actual"]
+    ) == selected_delivery_side_effect_channel_order
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
@@ -18799,6 +18814,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_cron_intent_presence_summary) == tuple(
         selected_cron_intent_presence_targets
     )
+    selected_delivery_side_effect_channel_order = ("hermes", "telegram")
+    assert tuple(delivery_channels) == selected_delivery_side_effect_channel_order
+    assert tuple(delivery_preview["channels"]) == (
+        selected_delivery_side_effect_channel_order
+    )
+    assert tuple(
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_network_side_effect"
+        ]["actual"]
+    ) == selected_delivery_side_effect_channel_order
+    assert tuple(
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_send_side_effect"
+        ]["actual"]
+    ) == selected_delivery_side_effect_channel_order
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
