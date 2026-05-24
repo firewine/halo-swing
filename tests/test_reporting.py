@@ -6598,6 +6598,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: True
         for name in filtered_report_guard_surface_shared_summary_coverage
     }
+    assert tuple(filtered_report_guard_surface_shared_summary_coverage) == (
+        "string_counts",
+        "path_free",
+        "sqlite_name_free",
+        "storage_marker_free",
+        "path_component_free",
+        "excluded_record_free",
+        "excluded_record_identity_free",
+        "latest_matching_record_excludes_older",
+    )
     filtered_report_path_free_guard_surface_shared_summary_coverage = {
         coverage_name: coverage_value
         for coverage_name, coverage_value in (
@@ -14612,6 +14622,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True
         for name in filtered_report_guard_surface_shared_summary_coverage
     }
+    assert tuple(filtered_report_guard_surface_shared_summary_coverage) == (
+        "string_counts",
+        "path_free",
+        "sqlite_name_free",
+        "storage_marker_free",
+        "path_component_free",
+        "excluded_record_free",
+        "excluded_record_identity_free",
+        "latest_matching_record_excludes_older",
+    )
     filtered_report_path_free_guard_surface_shared_summary_coverage = {
         coverage_name: coverage_value
         for coverage_name, coverage_value in (
