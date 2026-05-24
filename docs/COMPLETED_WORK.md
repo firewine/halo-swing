@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected timestamp exclusion target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TIMESTAMP_EXCLUSION_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.15s
+    full_pytest: 935 passed in 39.74s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected timestamp exclusion target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.510
+
+- date: 2026-05-24
   commit: ec877dc
   title: Cover sqlite filtered selected timestamp propagation target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TIMESTAMP_PROPAGATION_TARGET_ORDER_GATE
