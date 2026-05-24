@@ -10434,19 +10434,36 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_payload_source_repository_ref_keys_match_expected_schema"
         ]["actual"]
     ) == selected_source_repository_ref_keys
+    selected_live_data_required_actual = payload["live_data_required"]
+    assert selected_live_data_required_actual is False
+    selected_report_payload_live_data_required_actual = (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["actual"]
+    )
+    assert selected_report_payload_live_data_required_actual is False
+    selected_report_payload_live_data_required_expected = (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["expected"]
+    )
+    assert selected_report_payload_live_data_required_expected is False
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
-            payload["live_data_required"] is False,
+            selected_live_data_required_actual is False,
         ],
         "report_payload_live_data_guard": [
-            report_payload_guard_checks[
-                "report_payload_live_data_required_matches_expected"
-            ]["actual"]
-            is False,
-            report_payload_guard_checks[
-                "report_payload_live_data_required_matches_expected"
-            ]["expected"]
-            is False,
+            selected_report_payload_live_data_required_actual is False,
+            selected_report_payload_live_data_required_expected is False,
+        ],
+        "payload_live_data_required_value_guard": [
+            selected_live_data_required_actual is False,
+        ],
+        "report_payload_live_data_actual_guard": [
+            selected_report_payload_live_data_required_actual is False,
+        ],
+        "report_payload_live_data_expected_guard": [
+            selected_report_payload_live_data_required_expected is False,
         ],
         "source_repository_ref_db_required": [
             payload["source_repository_ref"]["db_required"] is True,
@@ -10470,6 +10487,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_offline_live_data_boundary_targets) == (
         "payload_live_data_required",
         "report_payload_live_data_guard",
+        "payload_live_data_required_value_guard",
+        "report_payload_live_data_actual_guard",
+        "report_payload_live_data_expected_guard",
         "source_repository_ref_db_required",
         "source_repository_ref_storage",
         "delivery_contract_no_live_activation",
@@ -19890,19 +19910,36 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_payload_source_repository_ref_keys_match_expected_schema"
         ]["actual"]
     ) == selected_source_repository_ref_keys
+    selected_live_data_required_actual = payload["live_data_required"]
+    assert selected_live_data_required_actual is False
+    selected_report_payload_live_data_required_actual = (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["actual"]
+    )
+    assert selected_report_payload_live_data_required_actual is False
+    selected_report_payload_live_data_required_expected = (
+        report_payload_guard_checks[
+            "report_payload_live_data_required_matches_expected"
+        ]["expected"]
+    )
+    assert selected_report_payload_live_data_required_expected is False
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
-            payload["live_data_required"] is False,
+            selected_live_data_required_actual is False,
         ],
         "report_payload_live_data_guard": [
-            report_payload_guard_checks[
-                "report_payload_live_data_required_matches_expected"
-            ]["actual"]
-            is False,
-            report_payload_guard_checks[
-                "report_payload_live_data_required_matches_expected"
-            ]["expected"]
-            is False,
+            selected_report_payload_live_data_required_actual is False,
+            selected_report_payload_live_data_required_expected is False,
+        ],
+        "payload_live_data_required_value_guard": [
+            selected_live_data_required_actual is False,
+        ],
+        "report_payload_live_data_actual_guard": [
+            selected_report_payload_live_data_required_actual is False,
+        ],
+        "report_payload_live_data_expected_guard": [
+            selected_report_payload_live_data_required_expected is False,
         ],
         "source_repository_ref_db_required": [
             payload["source_repository_ref"]["db_required"] is True,
@@ -19926,6 +19963,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_offline_live_data_boundary_targets) == (
         "payload_live_data_required",
         "report_payload_live_data_guard",
+        "payload_live_data_required_value_guard",
+        "report_payload_live_data_actual_guard",
+        "report_payload_live_data_expected_guard",
         "source_repository_ref_db_required",
         "source_repository_ref_storage",
         "delivery_contract_no_live_activation",

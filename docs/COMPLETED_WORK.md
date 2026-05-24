@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered live_data_required expected actual values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LIVE_DATA_REQUIRED_EXPECTED_ACTUAL_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.38s
+    full_pytest: 935 passed in 40.47s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying live_data_required payload and guard expected/actual false values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.611
+
+- date: 2026-05-25
   commit: e405ef3
   title: Cover sqlite filtered delivery preview no-send expected value
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_NO_SEND_EXPECTED_VALUE_GATE
