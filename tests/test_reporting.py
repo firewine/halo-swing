@@ -8653,6 +8653,53 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "payload_text",
         "report_payload_top_level_identity_guard",
     )
+    selected_decision_identity_presence_token_order_targets = {
+        name: tuple(tokens)
+        for name, (
+            _target,
+            tokens,
+        ) in selected_decision_identity_presence_targets.items()
+    }
+    assert tuple(selected_decision_identity_presence_token_order_targets) == tuple(
+        selected_decision_identity_presence_targets
+    )
+    assert selected_decision_identity_presence_token_order_targets == {
+        "top_level_identity": (
+            swing_signal["asset"],
+            swing_signal["underlying"],
+            "swing_3d_10d",
+            swing_signal["action"],
+            payload["confidence_label"],
+        ),
+        "latest_signal_report": (
+            swing_signal["asset"],
+            swing_signal["underlying"],
+            "swing_3d_10d",
+            swing_signal["action"],
+        ),
+        "target_section": (
+            swing_signal["asset"],
+            swing_signal["underlying"],
+        ),
+        "decision_section": (
+            swing_signal["action"],
+            payload["confidence_label"],
+        ),
+        "payload_text": (
+            swing_signal["asset"],
+            swing_signal["underlying"],
+            "swing_3d_10d",
+            swing_signal["action"],
+            payload["confidence_label"],
+        ),
+        "report_payload_top_level_identity_guard": (
+            swing_signal["asset"],
+            swing_signal["underlying"],
+            "swing_3d_10d",
+            swing_signal["action"],
+            payload["confidence_label"],
+        ),
+    }
     selected_decision_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17331,6 +17378,53 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "payload_text",
         "report_payload_top_level_identity_guard",
     )
+    selected_decision_identity_presence_token_order_targets = {
+        name: tuple(tokens)
+        for name, (
+            _target,
+            tokens,
+        ) in selected_decision_identity_presence_targets.items()
+    }
+    assert tuple(selected_decision_identity_presence_token_order_targets) == tuple(
+        selected_decision_identity_presence_targets
+    )
+    assert selected_decision_identity_presence_token_order_targets == {
+        "top_level_identity": (
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+            qqq_signal["timeframe"],
+            qqq_signal["action"],
+            payload["confidence_label"],
+        ),
+        "latest_signal_report": (
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+            qqq_signal["timeframe"],
+            qqq_signal["action"],
+        ),
+        "target_section": (
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+        ),
+        "decision_section": (
+            qqq_signal["action"],
+            payload["confidence_label"],
+        ),
+        "payload_text": (
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+            qqq_signal["timeframe"],
+            qqq_signal["action"],
+            payload["confidence_label"],
+        ),
+        "report_payload_top_level_identity_guard": (
+            qqq_signal["asset"],
+            qqq_signal["underlying"],
+            qqq_signal["timeframe"],
+            qqq_signal["action"],
+            payload["confidence_label"],
+        ),
+    }
     selected_decision_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
