@@ -7698,6 +7698,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         swing_signal["signal_id"],
         alternate_signal["signal_id"],
     ]
+    assert tuple(source_summary_hermes_boundary_tokens[:8]) == (
+        source_summary,
+        excluded_source_summary,
+        "sqlite_signal_repository",
+        "db_required=true",
+        "filters asset=TQQQ",
+        "underlying=<any>",
+        "timeframe=swing_3d_10d",
+        "timeframe=swing_5d_20d",
+    )
     source_summary_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -16145,6 +16155,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         qqq_signal["signal_id"],
         ndx_signal["signal_id"],
     ]
+    assert tuple(source_summary_hermes_boundary_tokens[:8]) == (
+        source_summary,
+        excluded_source_summary,
+        "sqlite_signal_repository",
+        "db_required=true",
+        "filters asset=TQQQ",
+        "underlying=QQQ",
+        "underlying=SOXX",
+        "timeframe=swing_3d_10d",
+    )
     source_summary_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
