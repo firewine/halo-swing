@@ -8834,6 +8834,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             excluded_signal["created_at"],
         )
     ]
+    assert tuple(excluded_decision_identity_hermes_boundary_tokens) == (
+        alternate_signal["action_label"],
+        f"{alternate_signal['final_score']}",
+        f"{alternate_signal['confidence']}",
+        older_matching_signal["action_label"],
+        f"{older_matching_signal['final_score']}",
+        f"{older_matching_signal['confidence']}",
+        alternate_signal["signal_id"],
+        alternate_signal["action"],
+        alternate_signal["timeframe"],
+        alternate_signal["created_at"],
+        older_matching_signal["signal_id"],
+        older_matching_signal["action"],
+        older_matching_signal["timeframe"],
+        older_matching_signal["created_at"],
+    )
     excluded_decision_identity_hermes_boundary_summary = {
         name: all(
             token not in value
@@ -17577,6 +17593,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             excluded_signal["created_at"],
         )
     ]
+    assert tuple(excluded_decision_identity_hermes_boundary_tokens) == (
+        ndx_signal["action_label"],
+        f"{ndx_signal['final_score']}",
+        f"{ndx_signal['confidence']}",
+        older_matching_signal["action_label"],
+        f"{older_matching_signal['final_score']}",
+        f"{older_matching_signal['confidence']}",
+        ndx_signal["signal_id"],
+        ndx_signal["underlying"],
+        ndx_signal["action"],
+        ndx_signal["timeframe"],
+        ndx_signal["created_at"],
+        older_matching_signal["signal_id"],
+        older_matching_signal["underlying"],
+        older_matching_signal["action"],
+        older_matching_signal["timeframe"],
+        older_matching_signal["created_at"],
+    )
     excluded_decision_identity_hermes_boundary_summary = {
         name: all(
             token not in value
