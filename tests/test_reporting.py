@@ -9858,6 +9858,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "numeric_authority",
         "llm_role",
     )
+    selected_report_prompt_contract_identity_actual_values = list(
+        selected_report_prompt_contract_identity_actual.values()
+    )
+    assert tuple(selected_report_prompt_contract_identity_actual_values) == (
+        *expected_prompt_identity.values(),
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9895,6 +9901,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_prompt_contract_identity_actual,
             list(expected_prompt_identity.values()),
         ),
+        "report_prompt_contract_identity_value_guard": (
+            selected_report_prompt_contract_identity_actual_values,
+            list(expected_prompt_identity.values()),
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9906,6 +9916,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_prompt_must_include_guards",
         "report_prompt_contract_key_guard",
         "report_prompt_contract_identity_guard",
+        "report_prompt_contract_identity_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -18993,6 +19004,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "numeric_authority",
         "llm_role",
     )
+    selected_report_prompt_contract_identity_actual_values = list(
+        selected_report_prompt_contract_identity_actual.values()
+    )
+    assert tuple(selected_report_prompt_contract_identity_actual_values) == (
+        *expected_prompt_identity.values(),
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19030,6 +19047,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_prompt_contract_identity_actual,
             list(expected_prompt_identity.values()),
         ),
+        "report_prompt_contract_identity_value_guard": (
+            selected_report_prompt_contract_identity_actual_values,
+            list(expected_prompt_identity.values()),
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19041,6 +19062,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_prompt_must_include_guards",
         "report_prompt_contract_key_guard",
         "report_prompt_contract_identity_guard",
+        "report_prompt_contract_identity_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
