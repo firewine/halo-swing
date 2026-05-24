@@ -9899,6 +9899,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "weekday_pre_market",
         "new_swing_entry_and_watchlist",
     )
+    selected_report_contract_supported_intent_actuals = [
+        report_contract_guard_checks["report_intent_is_supported"][
+            "expected"
+        ],
+        report_contract_guard_checks["report_intent_is_supported"][
+            "actual"
+        ],
+    ]
+    assert tuple(selected_report_contract_supported_intent_actuals) == (
+        report_contract_guard_checks["report_intent_is_supported"][
+            "expected"
+        ],
+        report_contract_guard_checks["report_intent_is_supported"][
+            "actual"
+        ],
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -9913,14 +9929,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_cron_intent_tokens,
         ),
         "report_contract_supported_intent_guard": (
-            [
-                report_contract_guard_checks["report_intent_is_supported"][
-                    "expected"
-                ],
-                report_contract_guard_checks["report_intent_is_supported"][
-                    "actual"
-                ],
-            ],
+            selected_report_contract_supported_intent_actuals,
             selected_cron_intent_tokens,
         ),
         "report_contract_cron_registry_guard": (
@@ -18966,6 +18975,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "weekday_pre_market",
         "new_swing_entry_and_watchlist",
     )
+    selected_report_contract_supported_intent_actuals = [
+        report_contract_guard_checks["report_intent_is_supported"][
+            "expected"
+        ],
+        report_contract_guard_checks["report_intent_is_supported"][
+            "actual"
+        ],
+    ]
+    assert tuple(selected_report_contract_supported_intent_actuals) == (
+        report_contract_guard_checks["report_intent_is_supported"][
+            "expected"
+        ],
+        report_contract_guard_checks["report_intent_is_supported"][
+            "actual"
+        ],
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -18980,14 +19005,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_cron_intent_tokens,
         ),
         "report_contract_supported_intent_guard": (
-            [
-                report_contract_guard_checks["report_intent_is_supported"][
-                    "expected"
-                ],
-                report_contract_guard_checks["report_intent_is_supported"][
-                    "actual"
-                ],
-            ],
+            selected_report_contract_supported_intent_actuals,
             selected_cron_intent_tokens,
         ),
         "report_contract_cron_registry_guard": (
