@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.634 P1 Repository SQLite Latest Report Filtered Source Delivery Contract SQLite Name-Free Value Gate Record - 2026-05-25
+
+### A. 목적
+
+4.633에서 SQLite repository-backed filtered latest report의 direct `report_intent_contract` sqlite filename marker-free 값을 고정했다.
+이번 slice는 repository selection 이후 direct `delivery_contract` surface가 `.sqlite` filename marker를 포함하지 않는지
+timeframe/underlying 필터 경로에서 직접 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+completed:
+  - asserted timeframe-filtered delivery_contract sqlite filename marker-free values after repository selection
+  - asserted underlying-filtered delivery_contract sqlite filename marker-free values after repository selection
+  - kept direct checks limited to delivery_contract surface
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.38s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 40.80s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.633 P1 Repository SQLite Latest Report Filtered Source Report Intent Contract SQLite Name-Free Value Gate Record - 2026-05-25
 
 ### A. 목적

@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered delivery contract sqlite name-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_SQLITE_NAME_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.38s
+    full_pytest: 935 passed in 40.80s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying delivery_contract sqlite filename marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.634
+
+- date: 2026-05-25
   commit: fc7b04b
   title: Cover sqlite filtered report intent contract sqlite name-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_CONTRACT_SQLITE_NAME_FREE_VALUE_GATE
