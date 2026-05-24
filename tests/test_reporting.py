@@ -9915,6 +9915,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "actual"
         ],
     )
+    selected_report_contract_cron_registry_actual = (
+        report_contract_guard_checks[
+            "delivery_cron_intents_match_report_intent_registry"
+        ]["actual"]
+    )
+    assert tuple(selected_report_contract_cron_registry_actual) == tuple(
+        selected_cron_intent_tokens
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -9933,9 +9941,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_cron_intent_tokens,
         ),
         "report_contract_cron_registry_guard": (
-            report_contract_guard_checks[
-                "delivery_cron_intents_match_report_intent_registry"
-            ]["actual"],
+            selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
         ),
         "report_contract_intent_registry_match_guard": (
@@ -18991,6 +18997,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "actual"
         ],
     )
+    selected_report_contract_cron_registry_actual = (
+        report_contract_guard_checks[
+            "delivery_cron_intents_match_report_intent_registry"
+        ]["actual"]
+    )
+    assert tuple(selected_report_contract_cron_registry_actual) == tuple(
+        selected_cron_intent_tokens
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -19009,9 +19023,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_cron_intent_tokens,
         ),
         "report_contract_cron_registry_guard": (
-            report_contract_guard_checks[
-                "delivery_cron_intents_match_report_intent_registry"
-            ]["actual"],
+            selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
         ),
         "report_contract_intent_registry_match_guard": (

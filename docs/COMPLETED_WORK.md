@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report contract cron registry actual order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_CRON_REGISTRY_ACTUAL_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.35s
+    full_pytest: 935 passed in 40.03s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying report contract cron registry actual order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.584
+
+- date: 2026-05-25
   commit: acd1f28
   title: Cover sqlite filtered report contract supported intent actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_SUPPORTED_INTENT_ACTUAL_ORDER_GATE
