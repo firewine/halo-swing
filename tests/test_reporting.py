@@ -9070,6 +9070,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_chunks": telegram_preview["chunks"],
         "reconstructed_telegram_text": [reconstructed_telegram_text],
     }
+    assert tuple(selected_trade_plan_exclusion_targets) == (
+        "latest_signal_report",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "payload_text",
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+    )
     selected_trade_plan_exclusion_summary = {
         name: all(
             token not in value
@@ -17379,6 +17388,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_chunks": telegram_preview["chunks"],
         "reconstructed_telegram_text": [reconstructed_telegram_text],
     }
+    assert tuple(selected_trade_plan_exclusion_targets) == (
+        "latest_signal_report",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "payload_text",
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+    )
     selected_trade_plan_exclusion_summary = {
         name: all(
             token not in value
