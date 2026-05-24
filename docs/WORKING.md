@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SQLITE_NAME_FREE_ORDER_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SQLITE_NAME_FREE_ORDER_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_STORAGE_MARKER_FREE_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_STORAGE_MARKER_FREE_ORDER_COVERAGE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving sqlite-name-free surface order after repository selection
+objective: extend SQLite filtered latest report coverage proving storage-marker-free surface order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe sqlite-name-free surface order is verified after repository selection
-  - SQLite repository-backed latest report underlying sqlite-name-free surface order is verified after repository selection
-  - sqlite-name-free coverage preserves filtered report surface order after repository selection
+  - SQLite repository-backed latest report timeframe storage-marker-free surface order is verified after repository selection
+  - SQLite repository-backed latest report underlying storage-marker-free surface order is verified after repository selection
+  - storage-marker-free coverage preserves filtered report surface order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.12s
-  - full pytest passed: 935 passed in 39.54s
+  - focused pytest passed: 3 passed in 1.26s
+  - full pytest passed: 935 passed in 38.75s
   - ruff passed
   - health_check passed with status ok
 ```
