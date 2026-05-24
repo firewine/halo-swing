@@ -9170,6 +9170,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ["latest_signal_report"],
         ),
     }
+    assert tuple(selected_delivery_preview_presence_targets) == (
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+        "telegram_required_section_headers",
+        "hermes_preview_payload_ref",
+    )
     selected_delivery_preview_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17493,6 +17499,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ["latest_signal_report"],
         ),
     }
+    assert tuple(selected_delivery_preview_presence_targets) == (
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+        "telegram_required_section_headers",
+        "hermes_preview_payload_ref",
+    )
     selected_delivery_preview_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
