@@ -2072,6 +2072,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "omits_absolute_or_sqlite_paths": True,
         },
     }
+    evidence_source_repository_ref_path_free = evidence_guard_checks[
+        "evidence_source_repository_ref_is_path_free"
+    ]
+    assert tuple(evidence_source_repository_ref_path_free) == (
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    )
+    assert tuple(evidence_source_repository_ref_path_free["expected"]) == (
+        "omits_ledger_ref",
+        "omits_ledger_path",
+        "omits_database_path",
+        "omits_absolute_or_sqlite_paths",
+    )
+    assert tuple(evidence_source_repository_ref_path_free["actual"]) == tuple(
+        evidence_source_repository_ref_path_free["expected"]
+    )
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
@@ -11087,6 +11105,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "omits_absolute_or_sqlite_paths": True,
         },
     }
+    evidence_source_repository_ref_path_free = evidence_guard_checks[
+        "evidence_source_repository_ref_is_path_free"
+    ]
+    assert tuple(evidence_source_repository_ref_path_free) == (
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    )
+    assert tuple(evidence_source_repository_ref_path_free["expected"]) == (
+        "omits_ledger_ref",
+        "omits_ledger_path",
+        "omits_database_path",
+        "omits_absolute_or_sqlite_paths",
+    )
+    assert tuple(evidence_source_repository_ref_path_free["actual"]) == tuple(
+        evidence_source_repository_ref_path_free["expected"]
+    )
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
