@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 4c2c8b9
   title: Cover sqlite filtered conflict flag acknowledgement actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_ACKNOWLEDGEMENT_ACTUAL_ORDER_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.43s
     full_pytest: 935 passed in 43.84s
