@@ -9937,6 +9937,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "True",
         "True",
     )
+    selected_source_repository_summary_actual = report_contract_guard_checks[
+        "report_text_reflects_source_repository_summary"
+    ]["actual"]
+    assert selected_source_repository_summary_actual == source_summary
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -10027,6 +10031,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_numeric_field_reflection_actual_value_labels,
             ["True", "True", "True"],
         ),
+        "source_repository_summary_guard": (
+            [selected_source_repository_summary_actual],
+            [source_summary],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10048,6 +10056,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_numeric_authority_guard",
         "numeric_field_reflection_key_guard",
         "numeric_field_reflection_value_guard",
+        "source_repository_summary_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19214,6 +19223,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "True",
         "True",
     )
+    selected_source_repository_summary_actual = report_contract_guard_checks[
+        "report_text_reflects_source_repository_summary"
+    ]["actual"]
+    assert selected_source_repository_summary_actual == source_summary
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19304,6 +19317,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_numeric_field_reflection_actual_value_labels,
             ["True", "True", "True"],
         ),
+        "source_repository_summary_guard": (
+            [selected_source_repository_summary_actual],
+            [source_summary],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19325,6 +19342,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_numeric_authority_guard",
         "numeric_field_reflection_key_guard",
         "numeric_field_reflection_value_guard",
+        "source_repository_summary_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
