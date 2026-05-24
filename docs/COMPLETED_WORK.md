@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending_commit
+  title: Cover sqlite filtered selected offline live activation-free marker order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_ACTIVATION_FREE_MARKER_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.43s
+    full_pytest: 935 passed in 43.02s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected offline live activation-free marker order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.573
+
+- date: 2026-05-25
   commit: 00bd01f
   title: Cover sqlite filtered selected offline live-data boundary source ref guard order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_DATA_BOUNDARY_SOURCE_REF_GUARD_ORDER_GATE

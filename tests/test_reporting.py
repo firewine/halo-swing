@@ -10008,6 +10008,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "database_url",
         "sqlite://",
     ]
+    assert tuple(live_activation_markers) == (
+        "HALO_SWING_DATABASE_URL",
+        "database_url",
+        "sqlite://",
+    )
     selected_offline_live_activation_free_targets = {
         "source_repository_ref": payload["source_repository_ref"],
         "evidence_context": evidence_context,
@@ -18977,6 +18982,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "database_url",
         "sqlite://",
     ]
+    assert tuple(live_activation_markers) == (
+        "HALO_SWING_DATABASE_URL",
+        "database_url",
+        "sqlite://",
+    )
     selected_offline_live_activation_free_targets = {
         "source_repository_ref": payload["source_repository_ref"],
         "evidence_context": evidence_context,
