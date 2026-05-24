@@ -10212,6 +10212,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_report_contract_cron_registry_actual) == tuple(
         selected_cron_intent_tokens
     )
+    selected_report_contract_cron_registry_expected = (
+        report_contract_guard_checks[
+            "delivery_cron_intents_match_report_intent_registry"
+        ]["expected"]
+    )
+    assert tuple(selected_report_contract_cron_registry_expected) == tuple(
+        selected_cron_intent_tokens
+    )
     selected_report_contract_intent_registry_actual = (
         report_contract_guard_checks[
             "report_intent_contract_matches_registry"
@@ -10252,6 +10260,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
         ),
+        "report_contract_cron_registry_expected_guard": (
+            selected_report_contract_cron_registry_expected,
+            selected_cron_intent_tokens,
+        ),
         "report_contract_intent_registry_match_guard": (
             selected_report_contract_intent_registry_actual,
             selected_cron_schedule_tokens,
@@ -10265,6 +10277,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_contract_supported_intent_expected_guard",
         "report_contract_supported_intent_actual_guard",
         "report_contract_cron_registry_guard",
+        "report_contract_cron_registry_expected_guard",
         "report_contract_intent_registry_match_guard",
     )
     selected_cron_intent_presence_summary = {
@@ -19602,6 +19615,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_report_contract_cron_registry_actual) == tuple(
         selected_cron_intent_tokens
     )
+    selected_report_contract_cron_registry_expected = (
+        report_contract_guard_checks[
+            "delivery_cron_intents_match_report_intent_registry"
+        ]["expected"]
+    )
+    assert tuple(selected_report_contract_cron_registry_expected) == tuple(
+        selected_cron_intent_tokens
+    )
     selected_report_contract_intent_registry_actual = (
         report_contract_guard_checks[
             "report_intent_contract_matches_registry"
@@ -19642,6 +19663,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
         ),
+        "report_contract_cron_registry_expected_guard": (
+            selected_report_contract_cron_registry_expected,
+            selected_cron_intent_tokens,
+        ),
         "report_contract_intent_registry_match_guard": (
             selected_report_contract_intent_registry_actual,
             selected_cron_schedule_tokens,
@@ -19655,6 +19680,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_contract_supported_intent_expected_guard",
         "report_contract_supported_intent_actual_guard",
         "report_contract_cron_registry_guard",
+        "report_contract_cron_registry_expected_guard",
         "report_contract_intent_registry_match_guard",
     )
     selected_cron_intent_presence_summary = {

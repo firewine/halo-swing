@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_SUPPORTED_EXPECTED_VALUE_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_SUPPORTED_EXPECTED_VALUE_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_REGISTRY_EXPECTED_VALUE_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_REGISTRY_EXPECTED_VALUE_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving report intent supported expected value order after repository selection
+objective: extend SQLite filtered latest report coverage proving cron registry expected value order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe report intent supported expected value order is verified after repository selection
-  - SQLite repository-backed latest report underlying report intent supported expected value order is verified after repository selection
-  - report_intent_is_supported expected preserves supported intent registry order
+  - SQLite repository-backed latest report timeframe cron registry expected value order is verified after repository selection
+  - SQLite repository-backed latest report underlying cron registry expected value order is verified after repository selection
+  - delivery_cron_intents_match_report_intent_registry expected preserves supported intent registry order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.38s
-  - full pytest passed: 935 passed in 40.53s
+  - focused pytest passed: 3 passed in 1.36s
+  - full pytest passed: 935 passed in 40.31s
   - ruff passed
   - health_check passed with status ok
 ```

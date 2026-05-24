@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered cron registry expected value order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CRON_REGISTRY_EXPECTED_VALUE_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.36s
+    full_pytest: 935 passed in 40.31s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying cron registry expected value order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.606
+
+- date: 2026-05-25
   commit: 31d4e50
   title: Cover sqlite filtered report intent supported expected value order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_SUPPORTED_EXPECTED_VALUE_ORDER_GATE
