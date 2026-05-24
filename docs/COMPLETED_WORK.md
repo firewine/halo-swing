@@ -21,10 +21,10 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
-  commit: recorded_in_commit_containing_this_entry
+  commit: 38ff1b2
   title: Cover sqlite filtered surface total consistency order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTAL_CONSISTENCY_ORDER_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.15s
     full_pytest: 935 passed in 39.90s
