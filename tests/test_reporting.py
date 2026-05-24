@@ -8929,6 +8929,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons": (reasons, selected_component_extreme_tokens),
         "payload_text": ([payload["text"]], selected_component_extreme_tokens),
     }
+    assert tuple(selected_component_extreme_presence_targets) == (
+        "evidence_context_component_extremes",
+        "evidence_context_reason_summary",
+        "latest_signal_report_reason_summary",
+        "reasons",
+        "payload_text",
+    )
     selected_component_extreme_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17219,6 +17226,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons": (reasons, selected_component_extreme_tokens),
         "payload_text": ([payload["text"]], selected_component_extreme_tokens),
     }
+    assert tuple(selected_component_extreme_presence_targets) == (
+        "evidence_context_component_extremes",
+        "evidence_context_reason_summary",
+        "latest_signal_report_reason_summary",
+        "reasons",
+        "payload_text",
+    )
     selected_component_extreme_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
