@@ -9025,6 +9025,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ),
         "payload_text": ([payload["text"]], selected_text_trade_plan_tokens),
     }
+    assert tuple(selected_trade_plan_presence_targets) == (
+        "latest_signal_report",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "payload_text",
+    )
     selected_trade_plan_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17327,6 +17334,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ),
         "payload_text": ([payload["text"]], selected_text_trade_plan_tokens),
     }
+    assert tuple(selected_trade_plan_presence_targets) == (
+        "latest_signal_report",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "payload_text",
+    )
     selected_trade_plan_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
