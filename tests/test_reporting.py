@@ -5689,6 +5689,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
     }
+    assert tuple(filtered_report_shared_summary_keysets) == (
+        expected_filtered_report_shared_summary_names
+    )
     filtered_report_string_count_shared_keyset_total_consistency = {
         "shared_keyset_surfaces": len(
             filtered_report_shared_summary_keysets["string_counts"]
@@ -13664,6 +13667,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: tuple(expected_filtered_report_path_free_surface_names)
         for name in filtered_report_shared_summary_keysets
     }
+    assert tuple(filtered_report_shared_summary_keysets) == (
+        expected_filtered_report_shared_summary_names
+    )
     filtered_report_string_count_shared_keyset_total_consistency = {
         "shared_keyset_surfaces": len(
             filtered_report_shared_summary_keysets["string_counts"]

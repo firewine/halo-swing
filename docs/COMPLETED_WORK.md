@@ -21,6 +21,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered shared keyset order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_SUMMARY_KEYSET_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.17s
+    full_pytest: 935 passed in 41.69s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered shared summary keyset order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.465
+
+- date: 2026-05-24
   commit: b007b0d
   title: Cover sqlite filtered shared value-domain order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_SUMMARY_VALUE_DOMAIN_ORDER_COVERAGE_GATE
