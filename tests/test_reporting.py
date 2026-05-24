@@ -9909,6 +9909,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "\n\n",
         "1_based",
     )
+    selected_delivery_numeric_authority_actual = report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ]["actual"]
+    assert selected_delivery_numeric_authority_actual == "latest_signal_report"
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9983,6 +9987,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_telegram_chunking_contract_actual_values,
             ["split_on_section_boundary", "\n\n", "1_based"],
         ),
+        "delivery_numeric_authority_guard": (
+            [selected_delivery_numeric_authority_actual],
+            ["latest_signal_report"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10001,6 +10009,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_channel_format_value_guard",
         "telegram_chunking_contract_key_guard",
         "telegram_chunking_contract_value_guard",
+        "delivery_numeric_authority_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19139,6 +19148,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "\n\n",
         "1_based",
     )
+    selected_delivery_numeric_authority_actual = report_contract_guard_checks[
+        "delivery_numeric_authority_is_latest_signal_report"
+    ]["actual"]
+    assert selected_delivery_numeric_authority_actual == "latest_signal_report"
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19213,6 +19226,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_telegram_chunking_contract_actual_values,
             ["split_on_section_boundary", "\n\n", "1_based"],
         ),
+        "delivery_numeric_authority_guard": (
+            [selected_delivery_numeric_authority_actual],
+            ["latest_signal_report"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19231,6 +19248,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_channel_format_value_guard",
         "telegram_chunking_contract_key_guard",
         "telegram_chunking_contract_value_guard",
+        "delivery_numeric_authority_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
