@@ -9841,6 +9841,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         expected_prompt_terms,
         expected_prompt_terms,
     )
+    selected_report_prompt_contract_key_actual = report_contract_guard_checks[
+        "report_prompt_contract_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_report_prompt_contract_key_actual) == (
+        "numeric_authority",
+        "llm_role",
+        "must_include",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9870,6 +9878,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_prompt_must_include_actuals,
             expected_prompt_terms,
         ),
+        "report_prompt_contract_key_guard": (
+            selected_report_prompt_contract_key_actual,
+            ["numeric_authority", "llm_role", "must_include"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9879,6 +9891,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_preview_profile",
         "report_contract_guard_delivery_profile",
         "report_prompt_must_include_guards",
+        "report_prompt_contract_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -18949,6 +18962,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         expected_prompt_terms,
         expected_prompt_terms,
     )
+    selected_report_prompt_contract_key_actual = report_contract_guard_checks[
+        "report_prompt_contract_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_report_prompt_contract_key_actual) == (
+        "numeric_authority",
+        "llm_role",
+        "must_include",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -18978,6 +18999,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_prompt_must_include_actuals,
             expected_prompt_terms,
         ),
+        "report_prompt_contract_key_guard": (
+            selected_report_prompt_contract_key_actual,
+            ["numeric_authority", "llm_role", "must_include"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -18987,6 +19012,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_preview_profile",
         "report_contract_guard_delivery_profile",
         "report_prompt_must_include_guards",
+        "report_prompt_contract_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
