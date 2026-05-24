@@ -39,10 +39,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 13b78bc
   title: Cover sqlite filtered source summary Hermes boundary prefix token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SUMMARY_HERMES_BOUNDARY_PREFIX_TOKEN_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.34s
     full_pytest: 935 passed in 43.45s
