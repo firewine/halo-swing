@@ -7339,6 +7339,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             )
         ],
     }
+    assert tuple(selected_label_status_guard_pass_targets) == (
+        "evidence_guard_label_status_pass",
+        "evidence_guard_label_status_expected_actual",
+        "latest_and_evidence_label_status_selected",
+    )
     selected_label_status_guard_pass_summary = {
         name: all(checks)
         for name, checks in selected_label_status_guard_pass_targets.items()
@@ -15421,6 +15426,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             )
         ],
     }
+    assert tuple(selected_label_status_guard_pass_targets) == (
+        "evidence_guard_label_status_pass",
+        "evidence_guard_label_status_expected_actual",
+        "latest_and_evidence_label_status_selected",
+    )
     selected_label_status_guard_pass_summary = {
         name: all(checks)
         for name, checks in selected_label_status_guard_pass_targets.items()
