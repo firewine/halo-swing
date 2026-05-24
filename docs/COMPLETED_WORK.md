@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending_commit
+  commit: 9cd63e9
   title: Cover sqlite filtered selected cron intent presence token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CRON_INTENT_PRESENCE_TOKEN_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.41s
     full_pytest: 935 passed in 43.01s
