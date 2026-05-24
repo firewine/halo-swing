@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_GUARD_ACTUAL_FIELD_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_GUARD_ACTUAL_FIELD_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_ACKNOWLEDGEMENT_ACTUAL_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_ACKNOWLEDGEMENT_ACTUAL_ORDER_GATE
 review_tier: S1_small
 
-objective: align SQLite filtered latest report conflict flag guard actual field order with the required conflict field contract after repository selection
+objective: extend SQLite filtered latest report coverage proving conflict flag acknowledgement guard actual order after repository selection
 
 edits:
   allowed:
@@ -30,7 +30,6 @@ edits:
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
     - docs/halo-swing-development-plan.md
-    - src/halo_swing_mcp/tools/reporting.py
     - tests/test_reporting.py
   blocked_prefixes:
     - src/halo_swing_mcp/broker/
@@ -41,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe conflict flag guard actual field order follows the required conflict field contract after repository selection
-  - SQLite repository-backed latest report underlying conflict flag guard actual field order follows the required conflict field contract after repository selection
-  - conflict_flags_have_required_fields actual values preserve name, severity, status, and details order instead of sorted alphabetical order
+  - SQLite repository-backed latest report timeframe conflict flag acknowledgement guard actual order follows selected conflict flag order after repository selection
+  - SQLite repository-backed latest report underlying conflict flag acknowledgement guard actual order follows selected conflict flag order after repository selection
+  - flagged_conflicts_are_acknowledged actual values preserve selected conflict flag acknowledgement status order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,14 +68,9 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - task mirror diff passed
-  - current task JSON parsed
-  - docs task JSON parsed
-  - git diff --check passed
-  - git status showed expected modified task/docs/source/test files only
-  - focused pytest passed: 3 passed in 1.51s
-  - regression focused pytest passed: 5 passed in 0.28s
-  - full pytest passed: 935 passed in 44.12s
+  - git status showed expected modified task/docs/test files only
+  - focused pytest passed: 3 passed in 1.43s
+  - full pytest passed: 935 passed in 43.84s
   - ruff passed
   - health_check passed with status ok
 ```

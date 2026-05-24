@@ -9239,6 +9239,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         for flag in evidence_context["conflict_flags"]
         for field in selected_conflict_flag_field_order
     )
+    selected_conflict_acknowledgement_actual_order = tuple(
+        flag["status"] for flag in evidence_context["conflict_flags"]
+    )
+    assert tuple(
+        evidence_guard_checks["flagged_conflicts_are_acknowledged"]["actual"]
+    ) == selected_conflict_acknowledgement_actual_order
+    assert selected_conflict_acknowledgement_actual_order == tuple(
+        "acknowledged" for _flag in evidence_context["conflict_flags"]
+    )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (
             evidence_context["conflict_flags"],
@@ -18215,6 +18224,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         flag[field]
         for flag in evidence_context["conflict_flags"]
         for field in selected_conflict_flag_field_order
+    )
+    selected_conflict_acknowledgement_actual_order = tuple(
+        flag["status"] for flag in evidence_context["conflict_flags"]
+    )
+    assert tuple(
+        evidence_guard_checks["flagged_conflicts_are_acknowledged"]["actual"]
+    ) == selected_conflict_acknowledgement_actual_order
+    assert selected_conflict_acknowledgement_actual_order == tuple(
+        "acknowledged" for _flag in evidence_context["conflict_flags"]
     )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (
