@@ -39,10 +39,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 1953b5c
   title: Cover sqlite filtered selected filter raw marker token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_RAW_MARKER_TOKEN_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.35s
     full_pytest: 935 passed in 43.48s
