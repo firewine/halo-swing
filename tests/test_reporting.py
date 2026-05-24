@@ -9829,6 +9829,18 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "report_telegram_chunking_contract_matches_expected"
         ]["actual"],
     )
+    selected_report_prompt_must_include_actuals = [
+        report_contract_guard_checks["prompt_must_include_is_covered"][
+            "actual"
+        ],
+        report_contract_guard_checks[
+            "report_prompt_must_include_matches_intent_terms"
+        ]["actual"],
+    ]
+    assert tuple(selected_report_prompt_must_include_actuals) == (
+        expected_prompt_terms,
+        expected_prompt_terms,
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9854,6 +9866,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_contract_guard_delivery_profile_actuals,
             selected_report_contract_guard_delivery_profile_tokens,
         ),
+        "report_prompt_must_include_guards": (
+            selected_report_prompt_must_include_actuals,
+            expected_prompt_terms,
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9862,6 +9878,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_delivery_contract",
         "telegram_preview_profile",
         "report_contract_guard_delivery_profile",
+        "report_prompt_must_include_guards",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -18920,6 +18937,18 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "report_telegram_chunking_contract_matches_expected"
         ]["actual"],
     )
+    selected_report_prompt_must_include_actuals = [
+        report_contract_guard_checks["prompt_must_include_is_covered"][
+            "actual"
+        ],
+        report_contract_guard_checks[
+            "report_prompt_must_include_matches_intent_terms"
+        ]["actual"],
+    ]
+    assert tuple(selected_report_prompt_must_include_actuals) == (
+        expected_prompt_terms,
+        expected_prompt_terms,
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -18945,6 +18974,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_contract_guard_delivery_profile_actuals,
             selected_report_contract_guard_delivery_profile_tokens,
         ),
+        "report_prompt_must_include_guards": (
+            selected_report_prompt_must_include_actuals,
+            expected_prompt_terms,
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -18953,6 +18986,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_delivery_contract",
         "telegram_preview_profile",
         "report_contract_guard_delivery_profile",
+        "report_prompt_must_include_guards",
     )
     selected_delivery_contract_profile_summary = {
         name: all(

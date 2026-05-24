@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_INTENT_REGISTRY_ACTUAL_KEY_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_INTENT_REGISTRY_ACTUAL_KEY_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_MUST_INCLUDE_ACTUAL_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_MUST_INCLUDE_ACTUAL_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving report contract intent registry actual key order after repository selection
+objective: extend SQLite filtered latest report coverage proving report prompt must-include guard actual order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe report contract intent registry actual key order is verified after repository selection
-  - SQLite repository-backed latest report underlying report contract intent registry actual key order is verified after repository selection
-  - report_intent_contract_matches_registry actual preserves name, schedule_hint, decision_focus, required_sections key order
+  - SQLite repository-backed latest report timeframe report prompt must-include guard actual order is verified after repository selection
+  - SQLite repository-backed latest report underlying report prompt must-include guard actual order is verified after repository selection
+  - prompt_must_include_is_covered and report_prompt_must_include_matches_intent_terms actual values preserve expected prompt term order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed after correcting assertion target: 3 passed in 1.34s
-  - full pytest passed: 935 passed in 39.37s
+  - focused pytest passed: 3 passed in 0.11s
+  - full pytest passed: 935 passed in 39.71s
   - ruff passed
   - health_check passed with status ok
 ```
@@ -97,7 +97,6 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - run required verification for current report contract intent registry actual key order slice
-  - commit and push this verified slice
-  - choose the next explicit repository_or_report_read_model_slice from SSOT
+  - commit and push current report prompt must-include actual order slice
+  - after push, choose the next explicit repository_or_report_read_model_slice from SSOT
 ```
