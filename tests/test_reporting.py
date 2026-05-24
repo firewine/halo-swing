@@ -9553,6 +9553,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             older_matching_signal["signal_id"],
         ]
     )
+    assert tuple(trade_plan_hermes_boundary_tokens) == (
+        *selected_latest_report_trade_plan_tokens,
+        *selected_text_trade_plan_tokens,
+        *excluded_trade_plan_tokens,
+        swing_signal["signal_id"],
+        alternate_signal["signal_id"],
+        older_matching_signal["signal_id"],
+    )
     trade_plan_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -18412,6 +18420,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ndx_signal["signal_id"],
             older_matching_signal["signal_id"],
         ]
+    )
+    assert tuple(trade_plan_hermes_boundary_tokens) == (
+        *selected_latest_report_trade_plan_tokens,
+        *selected_text_trade_plan_tokens,
+        *excluded_trade_plan_tokens,
+        qqq_signal["signal_id"],
+        ndx_signal["signal_id"],
+        older_matching_signal["signal_id"],
     )
     trade_plan_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
