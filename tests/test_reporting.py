@@ -7156,6 +7156,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "time_barrier_days=4"
         ),
     ]
+    assert tuple(excluded_label_summaries) == (
+        (
+            f"Stored label: outcome={alternate_label['outcome']}; "
+            f"realized_r={alternate_label['realized_r']}; "
+            f"first_barrier_hit={alternate_label['first_barrier_hit']}; "
+            "time_barrier_days=3"
+        ),
+        (
+            f"Stored label: outcome={older_matching_label['outcome']}; "
+            f"realized_r={older_matching_label['realized_r']}; "
+            f"first_barrier_hit={older_matching_label['first_barrier_hit']}; "
+            "time_barrier_days=4"
+        ),
+    )
     selected_label_summary_exclusion_targets = {
         "report_contract_label_summary_guard": (
             [
@@ -15563,6 +15577,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "time_barrier_days=4"
         ),
     ]
+    assert tuple(excluded_label_summaries) == (
+        (
+            f"Stored label: outcome={alternate_label['outcome']}; "
+            f"realized_r={alternate_label['realized_r']}; "
+            f"first_barrier_hit={alternate_label['first_barrier_hit']}; "
+            "time_barrier_days=3"
+        ),
+        (
+            f"Stored label: outcome={older_matching_label['outcome']}; "
+            f"realized_r={older_matching_label['realized_r']}; "
+            f"first_barrier_hit={older_matching_label['first_barrier_hit']}; "
+            "time_barrier_days=4"
+        ),
+    )
     selected_label_summary_exclusion_targets = {
         "report_contract_label_summary_guard": (
             [
