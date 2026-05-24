@@ -7264,6 +7264,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_status_guard_exclusion_summary == {
         name: True for name in selected_label_status_guard_exclusion_targets
     }
+    assert tuple(selected_label_status_guard_exclusion_summary) == tuple(
+        selected_label_status_guard_exclusion_targets
+    )
     selected_source_summary_presence_targets = {
         "source_repository_ref": (
             payload["source_repository_ref"],
@@ -15196,6 +15199,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_label_status_guard_exclusion_summary == {
         name: True for name in selected_label_status_guard_exclusion_targets
     }
+    assert tuple(selected_label_status_guard_exclusion_summary) == tuple(
+        selected_label_status_guard_exclusion_targets
+    )
     selected_source_summary_presence_targets = {
         "source_repository_ref": (
             payload["source_repository_ref"],
