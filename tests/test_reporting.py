@@ -9930,6 +9930,28 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_delivery_side_effect_summary) == tuple(
         selected_delivery_side_effect_targets
     )
+    selected_source_repository_ref_keys = ("storage", "db_required", "filters")
+    selected_source_repository_filter_keys = ("asset", "underlying", "timeframe")
+    assert tuple(payload["source_repository_ref"]) == selected_source_repository_ref_keys
+    assert tuple(evidence_context["source_repository_ref"]) == (
+        selected_source_repository_ref_keys
+    )
+    assert tuple(payload["source_repository_ref"]["filters"]) == (
+        selected_source_repository_filter_keys
+    )
+    assert tuple(evidence_context["source_repository_ref"]["filters"]) == (
+        selected_source_repository_filter_keys
+    )
+    assert tuple(
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["expected"]
+    ) == selected_source_repository_ref_keys
+    assert tuple(
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["actual"]
+    ) == selected_source_repository_ref_keys
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             payload["live_data_required"] is False,
@@ -18877,6 +18899,28 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_delivery_side_effect_summary) == tuple(
         selected_delivery_side_effect_targets
     )
+    selected_source_repository_ref_keys = ("storage", "db_required", "filters")
+    selected_source_repository_filter_keys = ("asset", "underlying", "timeframe")
+    assert tuple(payload["source_repository_ref"]) == selected_source_repository_ref_keys
+    assert tuple(evidence_context["source_repository_ref"]) == (
+        selected_source_repository_ref_keys
+    )
+    assert tuple(payload["source_repository_ref"]["filters"]) == (
+        selected_source_repository_filter_keys
+    )
+    assert tuple(evidence_context["source_repository_ref"]["filters"]) == (
+        selected_source_repository_filter_keys
+    )
+    assert tuple(
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["expected"]
+    ) == selected_source_repository_ref_keys
+    assert tuple(
+        report_payload_guard_checks[
+            "report_payload_source_repository_ref_keys_match_expected_schema"
+        ]["actual"]
+    ) == selected_source_repository_ref_keys
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             payload["live_data_required"] is False,
