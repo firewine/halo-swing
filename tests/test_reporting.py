@@ -8126,6 +8126,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_guard_expected_targets) == (
+        "latest_record_source_repository_ref_key_guard",
+        "latest_record_source_repository_ref_path_guard",
+        "report_payload_source_repository_ref_key_guard",
+        "report_payload_source_repository_ref_path_guard",
+        "evidence_source_repository_ref_key_guard",
+        "evidence_source_repository_ref_path_guard",
+    )
     selected_source_repository_guard_expected_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_guard_expected_targets.items()
@@ -16284,6 +16292,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_guard_expected_targets) == (
+        "latest_record_source_repository_ref_key_guard",
+        "latest_record_source_repository_ref_path_guard",
+        "report_payload_source_repository_ref_key_guard",
+        "report_payload_source_repository_ref_path_guard",
+        "evidence_source_repository_ref_key_guard",
+        "evidence_source_repository_ref_path_guard",
+    )
     selected_source_repository_guard_expected_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_guard_expected_targets.items()
