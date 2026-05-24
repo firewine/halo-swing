@@ -9993,6 +9993,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "default_check_names",
         "special_check_keys",
     )
+    selected_report_contract_guard_key_actual = report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_report_contract_guard_key_actual) == (
+        "status",
+        "checks",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -10099,6 +10106,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [list(selected_report_contract_guard_check_key_schema_actual)],
             ["default_keys", "default_check_names", "special_check_keys"],
         ),
+        "report_contract_guard_key_order_guard": (
+            selected_report_contract_guard_key_actual,
+            ["status", "checks"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10124,6 +10135,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "label_status_summary_guard",
         "report_contract_guard_check_name_order_guard",
         "report_contract_guard_check_key_schema_key_guard",
+        "report_contract_guard_key_order_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19346,6 +19358,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "default_check_names",
         "special_check_keys",
     )
+    selected_report_contract_guard_key_actual = report_contract_guard_checks[
+        "report_contract_guard_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_report_contract_guard_key_actual) == (
+        "status",
+        "checks",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19452,6 +19471,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [list(selected_report_contract_guard_check_key_schema_actual)],
             ["default_keys", "default_check_names", "special_check_keys"],
         ),
+        "report_contract_guard_key_order_guard": (
+            selected_report_contract_guard_key_actual,
+            ["status", "checks"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19477,6 +19500,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "label_status_summary_guard",
         "report_contract_guard_check_name_order_guard",
         "report_contract_guard_check_key_schema_key_guard",
+        "report_contract_guard_key_order_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
