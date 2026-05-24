@@ -46,7 +46,7 @@ post_compaction_policy:
   commit: cf1576e
   title: Clarify WORKING ledger compaction archive routing
   gate_id: DOCS_WORKING_LEDGER_COMPACTION_ARCHIVE_INVENTORY_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     task_mirror_diff: passed
     task_json: parsed
