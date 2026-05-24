@@ -9423,6 +9423,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         swing_signal["take_profit_summary"],
         swing_signal["invalidation_summary"],
     ]
+    assert tuple(selected_latest_report_trade_plan_tokens) == (
+        swing_signal["entry_summary"],
+        swing_signal["stop_summary"],
+        swing_signal["take_profit_summary"],
+        swing_signal["invalidation_summary"],
+    )
     selected_entry_section_tokens = [
         swing_signal["entry_summary"],
         swing_signal["entry"]["trigger"],
@@ -9433,6 +9439,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         selected_entry_section_tokens
         + selected_stop_section_tokens
         + selected_take_profit_section_tokens
+    )
+    assert tuple(selected_text_trade_plan_tokens) == (
+        swing_signal["entry_summary"],
+        swing_signal["entry"]["trigger"],
+        *swing_signal["stop"],
+        *swing_signal["take_profit"],
     )
     selected_trade_plan_presence_targets = {
         "latest_signal_report": (
@@ -18255,6 +18267,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         qqq_signal["take_profit_summary"],
         qqq_signal["invalidation_summary"],
     ]
+    assert tuple(selected_latest_report_trade_plan_tokens) == (
+        qqq_signal["entry_summary"],
+        qqq_signal["stop_summary"],
+        qqq_signal["take_profit_summary"],
+        qqq_signal["invalidation_summary"],
+    )
     selected_entry_section_tokens = [
         qqq_signal["entry_summary"],
         qqq_signal["entry"]["trigger"],
@@ -18265,6 +18283,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         selected_entry_section_tokens
         + selected_stop_section_tokens
         + selected_take_profit_section_tokens
+    )
+    assert tuple(selected_text_trade_plan_tokens) == (
+        qqq_signal["entry_summary"],
+        qqq_signal["entry"]["trigger"],
+        *qqq_signal["stop"],
+        *qqq_signal["take_profit"],
     )
     selected_trade_plan_presence_targets = {
         "latest_signal_report": (

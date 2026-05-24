@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_COMPONENT_EXTREME_HERMES_BOUNDARY_TOKEN_ORDER_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TRADE_PLAN_PRESENCE_TOKEN_ORDER_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_COMPONENT_EXTREME_HERMES_BOUNDARY_TOKEN_ORDER_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TRADE_PLAN_PRESENCE_TOKEN_ORDER_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.564",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving component extreme Hermes boundary token order after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.565",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected trade plan presence token order after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.563",
+    "docs/halo-swing-development-plan.md#4.564",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe component extreme Hermes boundary token order is verified after repository selection",
-    "SQLite repository-backed latest report underlying component extreme Hermes boundary token order is verified after repository selection",
-    "component extreme Hermes boundary checks preserve strongest component, weakest component, then selected and excluded signal identity token order after repository selection",
+    "SQLite repository-backed latest report timeframe selected trade plan presence token order is verified after repository selection",
+    "SQLite repository-backed latest report underlying selected trade plan presence token order is verified after repository selection",
+    "selected trade plan presence checks preserve latest report entry, stop, take_profit, invalidation and rendered entry, stop, take_profit token order after repository selection",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
