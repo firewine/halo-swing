@@ -20,6 +20,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered excluded record identity-free order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_IDENTITY_FREE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.21s
+    full_pytest: 935 passed in 42.61s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered excluded record identity-free surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.457
+
+- date: 2026-05-24
   commit: e3022c6
   title: Cover sqlite filtered label summary Hermes boundary order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_SUMMARY_HERMES_BOUNDARY_ORDER_COVERAGE_GATE
