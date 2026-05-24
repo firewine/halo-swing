@@ -8179,6 +8179,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == source_repository_ref,
         ],
     }
+    assert tuple(selected_filter_canonicalization_targets) == (
+        "top_level_identity",
+        "latest_signal_report_identity",
+        "source_repository_ref_filters",
+        "evidence_source_repository_ref_filters",
+        "latest_record_guard_source_ref_match",
+    )
     selected_filter_canonicalization_summary = {
         name: all(checks)
         for name, checks in selected_filter_canonicalization_targets.items()
@@ -16344,6 +16351,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == source_repository_ref,
         ],
     }
+    assert tuple(selected_filter_canonicalization_targets) == (
+        "top_level_identity",
+        "latest_signal_report_identity",
+        "source_repository_ref_filters",
+        "evidence_source_repository_ref_filters",
+        "latest_record_guard_source_ref_match",
+    )
     selected_filter_canonicalization_summary = {
         name: all(checks)
         for name, checks in selected_filter_canonicalization_targets.items()
