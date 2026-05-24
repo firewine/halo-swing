@@ -7066,6 +7066,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [selected_label_summary],
         ),
     }
+    assert tuple(selected_label_presence_targets) == (
+        "latest_signal_report_label_status",
+        "evidence_label_status",
+        "reasons",
+        "payload_text",
+        "report_contract_label_guard",
+    )
     selected_label_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -15119,6 +15126,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [selected_label_summary],
         ),
     }
+    assert tuple(selected_label_presence_targets) == (
+        "latest_signal_report_label_status",
+        "evidence_label_status",
+        "reasons",
+        "payload_text",
+        "report_contract_label_guard",
+    )
     selected_label_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
