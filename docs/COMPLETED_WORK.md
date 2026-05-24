@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered older matching record token-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OLDER_MATCHING_RECORD_TOKEN_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.39s
+    full_pytest: 935 passed in 40.87s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying older matching record token-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.622
+
+- date: 2026-05-25
   commit: fedc1c1
   title: Cover sqlite filtered excluded record token-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_TOKEN_FREE_VALUE_GATE
