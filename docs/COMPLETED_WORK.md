@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected label status guard exclusion target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_LABEL_STATUS_GUARD_EXCLUSION_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.12s
+    full_pytest: 935 passed in 39.89s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected label status guard exclusion target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.489
+
+- date: 2026-05-24
   commit: 2cb3f77
   title: Cover sqlite filtered selected label status guard pass target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_LABEL_STATUS_GUARD_PASS_TARGET_ORDER_GATE

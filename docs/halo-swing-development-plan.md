@@ -28,6 +28,55 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.489 P1 Repository SQLite Latest Report Filtered Source Selected Label Status Guard Exclusion Target Order Gate Record - 2026-05-24
+
+### A. 목적
+
+4.488에서 SQLite repository-backed filtered latest report의 selected label status guard pass target order를 고정했다.
+이번 slice는 repository selection 이후 selected label status guard exclusion target이 label status guard exclusion 순서를
+timeframe/underlying 필터 경로에서 직접 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered selected label status guard exclusion target order after repository selection
+  - assert underlying-filtered selected label status guard exclusion target order after repository selection
+  - keep selected label status guard exclusion target checks limited to repository-selected filtered report summaries
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.12s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 39.89s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.488 P1 Repository SQLite Latest Report Filtered Source Selected Label Status Guard Pass Target Order Gate Record - 2026-05-24
 
 ### A. 목적

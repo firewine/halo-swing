@@ -7406,6 +7406,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for excluded_label in excluded_label_statuses
         ],
     }
+    assert tuple(selected_label_status_guard_exclusion_targets) == (
+        "evidence_guard_label_status_expected",
+        "evidence_guard_label_status_actual",
+        "latest_signal_report_label_status",
+        "evidence_context_label_status",
+    )
     selected_label_status_guard_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_label_status_guard_exclusion_targets.items()
@@ -15493,6 +15499,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for excluded_label in excluded_label_statuses
         ],
     }
+    assert tuple(selected_label_status_guard_exclusion_targets) == (
+        "evidence_guard_label_status_expected",
+        "evidence_guard_label_status_actual",
+        "latest_signal_report_label_status",
+        "evidence_context_label_status",
+    )
     selected_label_status_guard_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_label_status_guard_exclusion_targets.items()
