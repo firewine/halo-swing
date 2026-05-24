@@ -9523,6 +9523,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         selected_sqlite_name_free_targets
     )
     storage_markers = [".sqlite", ".sqlite3", "sqlite:"]
+    assert tuple(storage_markers) == (".sqlite", ".sqlite3", "sqlite:")
     selected_storage_marker_free_summary = {
         name: all(
             marker not in value.lower()
@@ -17907,6 +17908,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         selected_sqlite_name_free_targets
     )
     storage_markers = [".sqlite", ".sqlite3", "sqlite:"]
+    assert tuple(storage_markers) == (".sqlite", ".sqlite3", "sqlite:")
     selected_storage_marker_free_summary = {
         name: all(
             marker not in value.lower()
