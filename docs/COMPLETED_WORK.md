@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected evidence exclusion target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_EVIDENCE_EXCLUSION_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.16s
+    full_pytest: 935 passed in 40.23s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected evidence exclusion target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.512
+
+- date: 2026-05-24
   commit: 47b5d41
   title: Cover sqlite filtered selected risk warning presence target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_RISK_WARNING_PRESENCE_TARGET_ORDER_GATE
