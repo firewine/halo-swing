@@ -38,10 +38,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
-  commit: pending
+  commit: a8ffdda
   title: Cover sqlite filtered selected label summary guard target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_LABEL_SUMMARY_GUARD_TARGET_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.15s
     full_pytest: 935 passed in 39.84s
