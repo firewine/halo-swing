@@ -7109,6 +7109,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert label_summary_hermes_boundary_summary == {
         name: True for name in label_summary_hermes_boundary_targets
     }
+    assert tuple(label_summary_hermes_boundary_summary) == tuple(
+        label_summary_hermes_boundary_targets
+    )
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
             label_status[field] == selected_label[field]
@@ -15047,6 +15050,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert label_summary_hermes_boundary_summary == {
         name: True for name in label_summary_hermes_boundary_targets
     }
+    assert tuple(label_summary_hermes_boundary_summary) == tuple(
+        label_summary_hermes_boundary_targets
+    )
     selected_label_status_propagation_targets = {
         "latest_signal_report_label_status": [
             label_status[field] == selected_label[field]
