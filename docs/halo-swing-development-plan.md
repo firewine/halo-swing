@@ -28,6 +28,66 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.527 P1 Repository SQLite Latest Report Filtered Source Selected Delivery Side Effect Target Order Gate Record - 2026-05-25
+
+### A. 목적
+
+4.526에서 SQLite repository-backed filtered latest report의 selected cron intent presence target order를 고정했다.
+이번 slice는 repository selection 이후 selected delivery side effect target이 delivery contract no-network,
+delivery contract no-send, delivery preview no-network, delivery preview no-send, delivery preview no-network guard,
+delivery preview no-send guard 순서를 timeframe/underlying 필터 경로에서 직접 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered selected delivery side effect target order after repository selection
+  - assert underlying-filtered selected delivery side effect target order after repository selection
+  - keep selected delivery side effect checks limited to repository-selected delivery contract, preview, and guard surfaces
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected task/docs/test files only
+  - focused pytest: 3 passed in 1.26s
+  - full pytest: 935 passed in 42.60s
+  - ruff check: passed
+  - health_check: status ok
+```
+
 ## 4.526 P1 Repository SQLite Latest Report Filtered Source Selected Cron Intent Presence Target Order Gate Record - 2026-05-25
 
 ### A. 목적

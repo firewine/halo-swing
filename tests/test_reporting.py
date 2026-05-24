@@ -9375,6 +9375,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ]["actual"].values()
         ],
     }
+    assert tuple(selected_delivery_side_effect_targets) == (
+        "delivery_contract_no_network",
+        "delivery_contract_no_send",
+        "delivery_preview_no_network",
+        "delivery_preview_no_send",
+        "delivery_preview_no_network_guard",
+        "delivery_preview_no_send_guard",
+    )
     selected_delivery_side_effect_summary = {
         name: all(checks)
         for name, checks in selected_delivery_side_effect_targets.items()
@@ -17720,6 +17728,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ]["actual"].values()
         ],
     }
+    assert tuple(selected_delivery_side_effect_targets) == (
+        "delivery_contract_no_network",
+        "delivery_contract_no_send",
+        "delivery_preview_no_network",
+        "delivery_preview_no_send",
+        "delivery_preview_no_network_guard",
+        "delivery_preview_no_send_guard",
+    )
     selected_delivery_side_effect_summary = {
         name: all(checks)
         for name, checks in selected_delivery_side_effect_targets.items()
