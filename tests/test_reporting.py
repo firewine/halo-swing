@@ -8989,6 +8989,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             *excluded_signal["risk_warnings"],
         )
     ]
+    assert tuple(excluded_evidence_tokens) == (
+        alternate_signal["reason_summary"],
+        *alternate_signal["risk_warnings"],
+        older_matching_signal["reason_summary"],
+        *older_matching_signal["risk_warnings"],
+    )
     selected_evidence_exclusion_targets = {
         "evidence_context": evidence_context,
         "latest_signal_report": payload["latest_signal_report"],
@@ -17757,6 +17763,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             *excluded_signal["risk_warnings"],
         )
     ]
+    assert tuple(excluded_evidence_tokens) == (
+        ndx_signal["reason_summary"],
+        *ndx_signal["risk_warnings"],
+        older_matching_signal["reason_summary"],
+        *older_matching_signal["risk_warnings"],
+    )
     selected_evidence_exclusion_targets = {
         "evidence_context": evidence_context,
         "latest_signal_report": payload["latest_signal_report"],
