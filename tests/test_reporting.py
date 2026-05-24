@@ -10956,10 +10956,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         prompt_contract_sqlite_name_free_values
     )
     assert prompt_contract_sqlite_name_free is True
-    assert all(
+    report_intent_contract_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(report_intent_contract)
+    ]
+    assert tuple(report_intent_contract_sqlite_name_free_values)
+    report_intent_contract_sqlite_name_free = all(
+        report_intent_contract_sqlite_name_free_values
     )
+    assert report_intent_contract_sqlite_name_free is True
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(delivery_contract)
@@ -20656,10 +20661,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         prompt_contract_sqlite_name_free_values
     )
     assert prompt_contract_sqlite_name_free is True
-    assert all(
+    report_intent_contract_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(report_intent_contract)
+    ]
+    assert tuple(report_intent_contract_sqlite_name_free_values)
+    report_intent_contract_sqlite_name_free = all(
+        report_intent_contract_sqlite_name_free_values
     )
+    assert report_intent_contract_sqlite_name_free is True
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(delivery_contract)

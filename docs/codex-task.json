@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_PROMPT_CONTRACT_SQLITE_NAME_FREE_VALUE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_CONTRACT_SQLITE_NAME_FREE_VALUE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_PROMPT_CONTRACT_SQLITE_NAME_FREE_VALUE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_CONTRACT_SQLITE_NAME_FREE_VALUE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.632",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving prompt_contract remains sqlite filename marker-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.633",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving report_intent_contract remains sqlite filename marker-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.631",
+    "docs/halo-swing-development-plan.md#4.632",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe prompt_contract sqlite filename marker-free values are verified after repository selection",
-    "SQLite repository-backed latest report underlying prompt_contract sqlite filename marker-free values are verified after repository selection",
-    "prompt_contract remains free of .sqlite filename markers outside the selected target summary",
+    "SQLite repository-backed latest report timeframe report_intent_contract sqlite filename marker-free values are verified after repository selection",
+    "SQLite repository-backed latest report underlying report_intent_contract sqlite filename marker-free values are verified after repository selection",
+    "report_intent_contract remains free of .sqlite filename markers outside the selected target summary",
     "database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
