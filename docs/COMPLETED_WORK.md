@@ -21,6 +21,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered surface-group boolean order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_BOOLEAN_COVERAGE_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.24s
+    full_pytest: 935 passed in 41.14s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered surface-group boolean coverage order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.466
+
+- date: 2026-05-24
   commit: 988bb0c
   title: Cover sqlite filtered shared keyset order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_SUMMARY_KEYSET_ORDER_COVERAGE_GATE

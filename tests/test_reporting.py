@@ -5783,6 +5783,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    assert tuple(filtered_report_surface_group_boolean_summary_coverage) == (
+        expected_filtered_report_shared_summary_names[1:]
+    )
     filtered_report_path_free_surface_group_boolean_summary_coverage = {
         "path_free": {
             group_name: all(
@@ -13761,6 +13764,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         }
         for summary_name in filtered_report_surface_group_boolean_summary_coverage
     }
+    assert tuple(filtered_report_surface_group_boolean_summary_coverage) == (
+        expected_filtered_report_shared_summary_names[1:]
+    )
     filtered_report_path_free_surface_group_boolean_summary_coverage = {
         "path_free": {
             group_name: all(
