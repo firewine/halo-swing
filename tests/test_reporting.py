@@ -8049,6 +8049,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_guard_pass_targets) == (
+        "latest_record_source_repository_ref_guards",
+        "report_payload_source_repository_ref_guards",
+        "evidence_source_repository_ref_guards",
+    )
     selected_source_repository_guard_pass_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_guard_pass_targets.items()
@@ -16202,6 +16207,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_guard_pass_targets) == (
+        "latest_record_source_repository_ref_guards",
+        "report_payload_source_repository_ref_guards",
+        "evidence_source_repository_ref_guards",
+    )
     selected_source_repository_guard_pass_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_guard_pass_targets.items()
