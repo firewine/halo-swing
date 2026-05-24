@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected filter section raw marker free target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_SECTION_RAW_MARKER_FREE_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.18s
+    full_pytest: 935 passed in 39.65s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected filter section raw marker free target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.505
+
+- date: 2026-05-24
   commit: cc8551a
   title: Cover sqlite filtered selected filter contract raw marker free target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_CONTRACT_RAW_MARKER_FREE_TARGET_ORDER_GATE

@@ -8299,6 +8299,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "take_profit_section": take_profit_section,
         "cautions": cautions,
     }
+    assert tuple(selected_filter_section_raw_marker_free_targets) == (
+        "top_level_identity",
+        "latest_signal_report",
+        "target_section",
+        "decision_section",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "cautions",
+    )
     selected_filter_section_raw_marker_free_summary = {
         name: all(
             marker not in value
@@ -16494,6 +16504,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "take_profit_section": take_profit_section,
         "cautions": cautions,
     }
+    assert tuple(selected_filter_section_raw_marker_free_targets) == (
+        "top_level_identity",
+        "latest_signal_report",
+        "target_section",
+        "decision_section",
+        "entry_section",
+        "stop_section",
+        "take_profit_section",
+        "cautions",
+    )
     selected_filter_section_raw_marker_free_summary = {
         name: all(
             marker not in value
