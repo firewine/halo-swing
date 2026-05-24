@@ -8190,6 +8190,43 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    selected_source_repository_guard_pass_check_order_targets = {
+        "latest_record_source_repository_ref_guards": [
+            name
+            for name in latest_record_guard_checks
+            if name.startswith("latest_record_source_repository_ref_")
+        ],
+        "report_payload_source_repository_ref_guards": [
+            name
+            for name in report_payload_guard_checks
+            if name.startswith("report_payload_source_repository_ref_")
+        ],
+        "evidence_source_repository_ref_guards": [
+            name
+            for name in evidence_guard_checks
+            if name.startswith("evidence_source_repository_ref_")
+        ],
+    }
+    assert tuple(selected_source_repository_guard_pass_check_order_targets) == (
+        "latest_record_source_repository_ref_guards",
+        "report_payload_source_repository_ref_guards",
+        "evidence_source_repository_ref_guards",
+    )
+    assert selected_source_repository_guard_pass_check_order_targets == {
+        "latest_record_source_repository_ref_guards": [
+            "latest_record_source_repository_ref_keys_match_expected_schema",
+            "latest_record_source_repository_ref_is_path_free",
+            "latest_record_source_repository_ref_matches_top_level_source",
+        ],
+        "report_payload_source_repository_ref_guards": [
+            "report_payload_source_repository_ref_keys_match_expected_schema",
+            "report_payload_source_repository_ref_is_path_free",
+        ],
+        "evidence_source_repository_ref_guards": [
+            "evidence_source_repository_ref_keys_match_expected_schema",
+            "evidence_source_repository_ref_is_path_free",
+        ],
+    }
     assert tuple(selected_source_repository_guard_pass_targets) == (
         "latest_record_source_repository_ref_guards",
         "report_payload_source_repository_ref_guards",
@@ -16737,6 +16774,43 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "actual"
             ]
             == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_pass_check_order_targets = {
+        "latest_record_source_repository_ref_guards": [
+            name
+            for name in latest_record_guard_checks
+            if name.startswith("latest_record_source_repository_ref_")
+        ],
+        "report_payload_source_repository_ref_guards": [
+            name
+            for name in report_payload_guard_checks
+            if name.startswith("report_payload_source_repository_ref_")
+        ],
+        "evidence_source_repository_ref_guards": [
+            name
+            for name in evidence_guard_checks
+            if name.startswith("evidence_source_repository_ref_")
+        ],
+    }
+    assert tuple(selected_source_repository_guard_pass_check_order_targets) == (
+        "latest_record_source_repository_ref_guards",
+        "report_payload_source_repository_ref_guards",
+        "evidence_source_repository_ref_guards",
+    )
+    assert selected_source_repository_guard_pass_check_order_targets == {
+        "latest_record_source_repository_ref_guards": [
+            "latest_record_source_repository_ref_keys_match_expected_schema",
+            "latest_record_source_repository_ref_is_path_free",
+            "latest_record_source_repository_ref_matches_top_level_source",
+        ],
+        "report_payload_source_repository_ref_guards": [
+            "report_payload_source_repository_ref_keys_match_expected_schema",
+            "report_payload_source_repository_ref_is_path_free",
+        ],
+        "evidence_source_repository_ref_guards": [
+            "evidence_source_repository_ref_keys_match_expected_schema",
+            "evidence_source_repository_ref_is_path_free",
         ],
     }
     assert tuple(selected_source_repository_guard_pass_targets) == (

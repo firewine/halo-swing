@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_STORAGE_METADATA_EXCLUSION_FIELD_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_STORAGE_METADATA_EXCLUSION_FIELD_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_GUARD_PASS_CHECK_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_GUARD_PASS_CHECK_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving source repository ref storage metadata exclusion field order after repository selection
+objective: extend SQLite filtered latest report coverage proving source repository ref guard pass check order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe source repository ref storage metadata exclusion field order is verified after repository selection
-  - SQLite repository-backed latest report underlying source repository ref storage metadata exclusion field order is verified after repository selection
-  - source repository ref storage metadata exclusion fields preserve filtered report field order after repository selection
+  - SQLite repository-backed latest report timeframe source repository ref guard pass check order is verified after repository selection
+  - SQLite repository-backed latest report underlying source repository ref guard pass check order is verified after repository selection
+  - source repository ref guard pass checks preserve filtered report check order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.31s
-  - full pytest passed: 935 passed in 43.19s
+  - focused pytest passed: 3 passed in 1.35s
+  - full pytest passed: 935 passed in 43.03s
   - ruff passed
   - health_check passed with status ok
 ```
