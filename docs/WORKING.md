@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_SQLITE_NAME_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_SQLITE_NAME_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_SQLITE_NAME_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_SQLITE_NAME_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving source_signal_ref remains sqlite filename marker-free after repository selection
+objective: extend SQLite filtered latest report coverage proving source_repository_ref remains sqlite filename marker-free after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe source_signal_ref sqlite filename marker-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying source_signal_ref sqlite filename marker-free values are verified after repository selection
-  - source_signal_ref remains free of .sqlite filename markers outside the selected target summary
+  - SQLite repository-backed latest report timeframe source_repository_ref sqlite filename marker-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying source_repository_ref sqlite filename marker-free values are verified after repository selection
+  - source_repository_ref remains free of .sqlite filename markers outside the selected target summary
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.37s
-  - full pytest passed: 935 passed in 40.16s
+  - focused pytest passed: 3 passed in 1.39s
+  - full pytest passed: 935 passed in 41.09s
   - ruff passed
   - health_check passed with status ok
 ```
