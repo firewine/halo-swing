@@ -8405,6 +8405,46 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == source_repository_ref,
         ],
     }
+    selected_filter_canonicalization_identity_order_targets = {
+        "top_level_identity": [
+            key for key in payload if key in {"asset", "underlying", "timeframe"}
+        ],
+        "latest_signal_report_identity": [
+            key
+            for key in payload["latest_signal_report"]
+            if key in {"asset", "underlying", "timeframe"}
+        ],
+        "source_repository_ref_filters": [
+            key for key in payload["source_repository_ref"]["filters"]
+        ],
+        "evidence_source_repository_ref_filters": [
+            key for key in evidence_context["source_repository_ref"]["filters"]
+        ],
+        "latest_record_guard_expected_filters": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]
+        ],
+        "latest_record_guard_actual_filters": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]
+        ],
+    }
+    assert tuple(selected_filter_canonicalization_identity_order_targets) == (
+        "top_level_identity",
+        "latest_signal_report_identity",
+        "source_repository_ref_filters",
+        "evidence_source_repository_ref_filters",
+        "latest_record_guard_expected_filters",
+        "latest_record_guard_actual_filters",
+    )
+    assert selected_filter_canonicalization_identity_order_targets == {
+        name: ["asset", "underlying", "timeframe"]
+        for name in selected_filter_canonicalization_identity_order_targets
+    }
     assert tuple(selected_filter_canonicalization_targets) == (
         "top_level_identity",
         "latest_signal_report_identity",
@@ -17037,6 +17077,46 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ]["actual"]
             == source_repository_ref,
         ],
+    }
+    selected_filter_canonicalization_identity_order_targets = {
+        "top_level_identity": [
+            key for key in payload if key in {"asset", "underlying", "timeframe"}
+        ],
+        "latest_signal_report_identity": [
+            key
+            for key in payload["latest_signal_report"]
+            if key in {"asset", "underlying", "timeframe"}
+        ],
+        "source_repository_ref_filters": [
+            key for key in payload["source_repository_ref"]["filters"]
+        ],
+        "evidence_source_repository_ref_filters": [
+            key for key in evidence_context["source_repository_ref"]["filters"]
+        ],
+        "latest_record_guard_expected_filters": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]["filters"]
+        ],
+        "latest_record_guard_actual_filters": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]["filters"]
+        ],
+    }
+    assert tuple(selected_filter_canonicalization_identity_order_targets) == (
+        "top_level_identity",
+        "latest_signal_report_identity",
+        "source_repository_ref_filters",
+        "evidence_source_repository_ref_filters",
+        "latest_record_guard_expected_filters",
+        "latest_record_guard_actual_filters",
+    )
+    assert selected_filter_canonicalization_identity_order_targets == {
+        name: ["asset", "underlying", "timeframe"]
+        for name in selected_filter_canonicalization_identity_order_targets
     }
     assert tuple(selected_filter_canonicalization_targets) == (
         "top_level_identity",
