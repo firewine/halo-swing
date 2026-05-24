@@ -9873,6 +9873,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "hermes_channel_keys",
         "telegram_channel_keys",
     )
+    selected_delivery_contract_schema_actual_values = list(
+        selected_delivery_contract_schema_actual.values()
+    )
+    assert tuple(selected_delivery_contract_schema_actual_values) == tuple(
+        expected_delivery_contract_schema.values()
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9923,6 +9929,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "telegram_channel_keys",
             ],
         ),
+        "delivery_contract_schema_value_guard": (
+            selected_delivery_contract_schema_actual_values,
+            [
+                token
+                for expected_values in expected_delivery_contract_schema.values()
+                for token in expected_values
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9936,6 +9950,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_prompt_contract_identity_guard",
         "report_prompt_contract_identity_value_guard",
         "delivery_contract_schema_guard",
+        "delivery_contract_schema_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19038,6 +19053,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "hermes_channel_keys",
         "telegram_channel_keys",
     )
+    selected_delivery_contract_schema_actual_values = list(
+        selected_delivery_contract_schema_actual.values()
+    )
+    assert tuple(selected_delivery_contract_schema_actual_values) == tuple(
+        expected_delivery_contract_schema.values()
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19088,6 +19109,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "telegram_channel_keys",
             ],
         ),
+        "delivery_contract_schema_value_guard": (
+            selected_delivery_contract_schema_actual_values,
+            [
+                token
+                for expected_values in expected_delivery_contract_schema.values()
+                for token in expected_values
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19101,6 +19130,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_prompt_contract_identity_guard",
         "report_prompt_contract_identity_value_guard",
         "delivery_contract_schema_guard",
+        "delivery_contract_schema_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
