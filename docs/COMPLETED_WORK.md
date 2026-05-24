@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered evidence summary surface order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_SUMMARY_SURFACE_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.43s
+    full_pytest: 935 passed in 43.86s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted evidence summary surface order preserves reason_summary before evidence_summary
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.578
+
+- date: 2026-05-25
   commit: 6b14046
   title: Cover sqlite filtered risk warning guard actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_RISK_WARNING_GUARD_ACTUAL_ORDER_GATE

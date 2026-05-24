@@ -1887,6 +1887,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reason_summary": latest_report["reason_summary"],
         "evidence_summary": latest_report["evidence_summary"],
     }
+    assert tuple(evidence_summary_surface) == (
+        "reason_summary",
+        "evidence_summary",
+    )
     assert all(
         isinstance(value, str)
         for value in evidence_summary_surface.values()
@@ -10878,6 +10882,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reason_summary": latest_report["reason_summary"],
         "evidence_summary": latest_report["evidence_summary"],
     }
+    assert tuple(evidence_summary_surface) == (
+        "reason_summary",
+        "evidence_summary",
+    )
     assert all(
         isinstance(value, str)
         for value in evidence_summary_surface.values()
