@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered evidence source repository ref schema key order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_SOURCE_REPOSITORY_REF_SCHEMA_KEY_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.48s
+    full_pytest: 935 passed in 44.24s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying evidence source_repository_ref schema guard key order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.581
+
+- date: 2026-05-25
   commit: c063dc3
   title: Cover sqlite filtered evidence source repository ref path-free key order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_SOURCE_REPOSITORY_REF_PATH_FREE_KEY_ORDER_GATE

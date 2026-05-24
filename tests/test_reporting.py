@@ -2056,6 +2056,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected": ["storage", "db_required", "filters"],
         "actual": ["storage", "db_required", "filters"],
     }
+    evidence_source_repository_ref_key_schema = evidence_guard_checks[
+        "evidence_source_repository_ref_keys_match_expected_schema"
+    ]
+    assert tuple(evidence_source_repository_ref_key_schema) == (
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    )
+    assert tuple(evidence_source_repository_ref_key_schema["expected"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
+    assert tuple(evidence_source_repository_ref_key_schema["actual"]) == tuple(
+        evidence_source_repository_ref_key_schema["expected"]
+    )
     assert evidence_guard_checks["evidence_source_repository_ref_is_path_free"] == {
         "name": "evidence_source_repository_ref_is_path_free",
         "passed": True,
@@ -11089,6 +11106,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected": ["storage", "db_required", "filters"],
         "actual": ["storage", "db_required", "filters"],
     }
+    evidence_source_repository_ref_key_schema = evidence_guard_checks[
+        "evidence_source_repository_ref_keys_match_expected_schema"
+    ]
+    assert tuple(evidence_source_repository_ref_key_schema) == (
+        "name",
+        "passed",
+        "expected",
+        "actual",
+    )
+    assert tuple(evidence_source_repository_ref_key_schema["expected"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
+    assert tuple(evidence_source_repository_ref_key_schema["actual"]) == tuple(
+        evidence_source_repository_ref_key_schema["expected"]
+    )
     assert evidence_guard_checks["evidence_source_repository_ref_is_path_free"] == {
         "name": "evidence_source_repository_ref_is_path_free",
         "passed": True,
