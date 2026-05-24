@@ -8374,6 +8374,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ],
         ),
     }
+    assert tuple(selected_decision_identity_presence_targets) == (
+        "top_level_identity",
+        "latest_signal_report",
+        "target_section",
+        "decision_section",
+        "payload_text",
+        "report_payload_top_level_identity_guard",
+    )
     selected_decision_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -16579,6 +16587,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ],
         ),
     }
+    assert tuple(selected_decision_identity_presence_targets) == (
+        "top_level_identity",
+        "latest_signal_report",
+        "target_section",
+        "decision_section",
+        "payload_text",
+        "report_payload_top_level_identity_guard",
+    )
     selected_decision_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
