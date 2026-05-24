@@ -8304,6 +8304,54 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    selected_source_repository_guard_expected_check_order_targets = {
+        "latest_record_source_repository_ref_expected_guards": [
+            name
+            for name in latest_record_guard_checks
+            if name
+            in {
+                "latest_record_source_repository_ref_keys_match_expected_schema",
+                "latest_record_source_repository_ref_is_path_free",
+            }
+        ],
+        "report_payload_source_repository_ref_expected_guards": [
+            name
+            for name in report_payload_guard_checks
+            if name
+            in {
+                "report_payload_source_repository_ref_keys_match_expected_schema",
+                "report_payload_source_repository_ref_is_path_free",
+            }
+        ],
+        "evidence_source_repository_ref_expected_guards": [
+            name
+            for name in evidence_guard_checks
+            if name
+            in {
+                "evidence_source_repository_ref_keys_match_expected_schema",
+                "evidence_source_repository_ref_is_path_free",
+            }
+        ],
+    }
+    assert tuple(selected_source_repository_guard_expected_check_order_targets) == (
+        "latest_record_source_repository_ref_expected_guards",
+        "report_payload_source_repository_ref_expected_guards",
+        "evidence_source_repository_ref_expected_guards",
+    )
+    assert selected_source_repository_guard_expected_check_order_targets == {
+        "latest_record_source_repository_ref_expected_guards": [
+            "latest_record_source_repository_ref_keys_match_expected_schema",
+            "latest_record_source_repository_ref_is_path_free",
+        ],
+        "report_payload_source_repository_ref_expected_guards": [
+            "report_payload_source_repository_ref_keys_match_expected_schema",
+            "report_payload_source_repository_ref_is_path_free",
+        ],
+        "evidence_source_repository_ref_expected_guards": [
+            "evidence_source_repository_ref_keys_match_expected_schema",
+            "evidence_source_repository_ref_is_path_free",
+        ],
+    }
     assert tuple(selected_source_repository_guard_expected_targets) == (
         "latest_record_source_repository_ref_key_guard",
         "latest_record_source_repository_ref_path_guard",
@@ -16888,6 +16936,54 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "actual"
             ]
             == expected_source_repository_ref_path_free,
+        ],
+    }
+    selected_source_repository_guard_expected_check_order_targets = {
+        "latest_record_source_repository_ref_expected_guards": [
+            name
+            for name in latest_record_guard_checks
+            if name
+            in {
+                "latest_record_source_repository_ref_keys_match_expected_schema",
+                "latest_record_source_repository_ref_is_path_free",
+            }
+        ],
+        "report_payload_source_repository_ref_expected_guards": [
+            name
+            for name in report_payload_guard_checks
+            if name
+            in {
+                "report_payload_source_repository_ref_keys_match_expected_schema",
+                "report_payload_source_repository_ref_is_path_free",
+            }
+        ],
+        "evidence_source_repository_ref_expected_guards": [
+            name
+            for name in evidence_guard_checks
+            if name
+            in {
+                "evidence_source_repository_ref_keys_match_expected_schema",
+                "evidence_source_repository_ref_is_path_free",
+            }
+        ],
+    }
+    assert tuple(selected_source_repository_guard_expected_check_order_targets) == (
+        "latest_record_source_repository_ref_expected_guards",
+        "report_payload_source_repository_ref_expected_guards",
+        "evidence_source_repository_ref_expected_guards",
+    )
+    assert selected_source_repository_guard_expected_check_order_targets == {
+        "latest_record_source_repository_ref_expected_guards": [
+            "latest_record_source_repository_ref_keys_match_expected_schema",
+            "latest_record_source_repository_ref_is_path_free",
+        ],
+        "report_payload_source_repository_ref_expected_guards": [
+            "report_payload_source_repository_ref_keys_match_expected_schema",
+            "report_payload_source_repository_ref_is_path_free",
+        ],
+        "evidence_source_repository_ref_expected_guards": [
+            "evidence_source_repository_ref_keys_match_expected_schema",
+            "evidence_source_repository_ref_is_path_free",
         ],
     }
     assert tuple(selected_source_repository_guard_expected_targets) == (
