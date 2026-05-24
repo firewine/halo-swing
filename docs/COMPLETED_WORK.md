@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report intent supported actual value
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_SUPPORTED_ACTUAL_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.39s
+    full_pytest: 935 passed in 40.83s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying report intent supported actual value
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.604
+
+- date: 2026-05-25
   commit: 4e3d369
   title: Cover sqlite filtered report contract guard keys actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_KEYS_ACTUAL_ORDER_GATE

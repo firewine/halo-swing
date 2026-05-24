@@ -10189,6 +10189,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "actual"
         ],
     )
+    selected_report_contract_supported_intent_actual = (
+        report_contract_guard_checks["report_intent_is_supported"]["actual"]
+    )
+    assert selected_report_contract_supported_intent_actual == (
+        payload["report_intent"]
+    )
+    assert selected_report_contract_supported_intent_actual == (
+        "pre_market_swing_report"
+    )
     selected_report_contract_cron_registry_actual = (
         report_contract_guard_checks[
             "delivery_cron_intents_match_report_intent_registry"
@@ -10225,6 +10234,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_contract_supported_intent_actuals,
             selected_cron_intent_tokens,
         ),
+        "report_contract_supported_intent_actual_guard": (
+            [selected_report_contract_supported_intent_actual],
+            ["pre_market_swing_report"],
+        ),
         "report_contract_cron_registry_guard": (
             selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
@@ -10239,6 +10252,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_intent_contract",
         "delivery_contract_cron_intents",
         "report_contract_supported_intent_guard",
+        "report_contract_supported_intent_actual_guard",
         "report_contract_cron_registry_guard",
         "report_contract_intent_registry_match_guard",
     )
@@ -19554,6 +19568,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "actual"
         ],
     )
+    selected_report_contract_supported_intent_actual = (
+        report_contract_guard_checks["report_intent_is_supported"]["actual"]
+    )
+    assert selected_report_contract_supported_intent_actual == (
+        payload["report_intent"]
+    )
+    assert selected_report_contract_supported_intent_actual == (
+        "pre_market_swing_report"
+    )
     selected_report_contract_cron_registry_actual = (
         report_contract_guard_checks[
             "delivery_cron_intents_match_report_intent_registry"
@@ -19590,6 +19613,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_contract_supported_intent_actuals,
             selected_cron_intent_tokens,
         ),
+        "report_contract_supported_intent_actual_guard": (
+            [selected_report_contract_supported_intent_actual],
+            ["pre_market_swing_report"],
+        ),
         "report_contract_cron_registry_guard": (
             selected_report_contract_cron_registry_actual,
             selected_cron_intent_tokens,
@@ -19604,6 +19631,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_intent_contract",
         "delivery_contract_cron_intents",
         "report_contract_supported_intent_guard",
+        "report_contract_supported_intent_actual_guard",
         "report_contract_cron_registry_guard",
         "report_contract_intent_registry_match_guard",
     )
