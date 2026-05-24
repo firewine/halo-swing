@@ -28,6 +28,68 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.598 P1 Repository SQLite Latest Report Filtered Source Numeric Field Reflection Actual Value Order Gate Record - 2026-05-25
+
+### A. 목적
+
+4.597에서 SQLite repository-backed filtered latest report의 numeric field reflection guard actual key order를 고정했다.
+이번 slice는 selected delivery contract profile coverage 안에서
+`report_text_reflects_latest_signal_numeric_fields.actual` 값들이 `true`, `true`, `true`
+순서를 그대로 보존하는지 timeframe/underlying 필터 경로에서 직접 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+completed:
+  - asserted timeframe-filtered numeric field reflection guard actual value order after repository selection
+  - asserted underlying-filtered numeric field reflection guard actual value order after repository selection
+  - kept selected numeric field reflection value checks limited to repository-selected report contract guard actual surfaces
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - initial focused pytest failed before profile label fix: 2 failed, 1 passed in 2.07s
+  - initial full pytest failed before profile label fix: 2 failed, 933 passed in 42.44s
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.47s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 41.56s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.597 P1 Repository SQLite Latest Report Filtered Source Numeric Field Reflection Actual Key Order Gate Record - 2026-05-25
 
 ### A. 목적

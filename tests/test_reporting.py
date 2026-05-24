@@ -9921,6 +9921,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "confidence_line_present",
         "score_line_present",
     )
+    selected_numeric_field_reflection_actual_values = list(
+        selected_numeric_field_reflection_actual.values()
+    )
+    assert tuple(selected_numeric_field_reflection_actual_values) == (
+        True,
+        True,
+        True,
+    )
+    selected_numeric_field_reflection_actual_value_labels = [
+        str(value) for value in selected_numeric_field_reflection_actual_values
+    ]
+    assert tuple(selected_numeric_field_reflection_actual_value_labels) == (
+        "True",
+        "True",
+        "True",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -10007,6 +10023,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "score_line_present",
             ],
         ),
+        "numeric_field_reflection_value_guard": (
+            selected_numeric_field_reflection_actual_value_labels,
+            ["True", "True", "True"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10027,6 +10047,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_chunking_contract_value_guard",
         "delivery_numeric_authority_guard",
         "numeric_field_reflection_key_guard",
+        "numeric_field_reflection_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19177,6 +19198,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "confidence_line_present",
         "score_line_present",
     )
+    selected_numeric_field_reflection_actual_values = list(
+        selected_numeric_field_reflection_actual.values()
+    )
+    assert tuple(selected_numeric_field_reflection_actual_values) == (
+        True,
+        True,
+        True,
+    )
+    selected_numeric_field_reflection_actual_value_labels = [
+        str(value) for value in selected_numeric_field_reflection_actual_values
+    ]
+    assert tuple(selected_numeric_field_reflection_actual_value_labels) == (
+        "True",
+        "True",
+        "True",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19263,6 +19300,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "score_line_present",
             ],
         ),
+        "numeric_field_reflection_value_guard": (
+            selected_numeric_field_reflection_actual_value_labels,
+            ["True", "True", "True"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19283,6 +19324,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_chunking_contract_value_guard",
         "delivery_numeric_authority_guard",
         "numeric_field_reflection_key_guard",
+        "numeric_field_reflection_value_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(

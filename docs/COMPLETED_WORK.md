@@ -43,6 +43,21 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered numeric field reflection actual value order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_NUMERIC_FIELD_REFLECTION_ACTUAL_VALUE_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.47s
+    full_pytest: 935 passed in 41.56s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying numeric field reflection guard actual value order
+    - recorded and fixed profile label mismatch before final verification
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.598
+
+- date: 2026-05-25
   commit: 68161ed
   title: Cover sqlite filtered numeric field reflection actual key order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_NUMERIC_FIELD_REFLECTION_ACTUAL_KEY_ORDER_GATE
