@@ -19,6 +19,20 @@ full_evidence_sources:
 ## ledger
 
 ```yaml
+- date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered sqlite name-free order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SQLITE_NAME_FREE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.28s
+    full_pytest: 935 passed in 45.37s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered sqlite name-free surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.446
+
 - date: 2026-05-23
   commit: e67f924
   title: Cover sqlite filtered offline live activation-free order

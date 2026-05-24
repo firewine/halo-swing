@@ -9034,6 +9034,36 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_offline_live_activation_free_summary) == tuple(
         selected_offline_live_activation_free_targets
     )
+    selected_sqlite_name_free_targets = {
+        "label_status": label_status,
+        "evidence_contract": evidence_contract,
+        "evidence_context": evidence_context,
+        "evidence_label_status": evidence_label_status,
+        "source_signal_ref": payload["source_signal_ref"],
+        "source_repository_ref": payload["source_repository_ref"],
+        "latest_record_guard": latest_record_guard,
+        "evidence_guard_checks": evidence_guard_checks,
+        "prompt_contract": prompt_contract,
+        "report_intent_contract": report_intent_contract,
+        "delivery_contract": delivery_contract,
+        "delivery_preview": delivery_preview,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "reasons": reasons,
+    }
+    selected_sqlite_name_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_sqlite_name_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_sqlite_name_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -16844,6 +16874,36 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(selected_offline_live_activation_free_summary) == tuple(
         selected_offline_live_activation_free_targets
+    )
+    selected_sqlite_name_free_targets = {
+        "label_status": label_status,
+        "evidence_contract": evidence_contract,
+        "evidence_context": evidence_context,
+        "evidence_label_status": evidence_label_status,
+        "source_signal_ref": payload["source_signal_ref"],
+        "source_repository_ref": payload["source_repository_ref"],
+        "latest_record_guard": latest_record_guard,
+        "evidence_guard_checks": evidence_guard_checks,
+        "prompt_contract": prompt_contract,
+        "report_intent_contract": report_intent_contract,
+        "delivery_contract": delivery_contract,
+        "delivery_preview": delivery_preview,
+        "report_contract_guard_checks": report_contract_guard_checks,
+        "report_payload_guard_checks": report_payload_guard_checks,
+        "reasons": reasons,
+    }
+    selected_sqlite_name_free_summary = {
+        name: all(
+            ".sqlite" not in value.lower()
+            for value in iter_nested_strings(target)
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_sqlite_name_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_sqlite_name_free_summary) == tuple(
+        selected_sqlite_name_free_targets
     )
     assert all(
         ".sqlite" not in value.lower()
