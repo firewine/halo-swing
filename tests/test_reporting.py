@@ -9864,6 +9864,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_report_prompt_contract_identity_actual_values) == (
         *expected_prompt_identity.values(),
     )
+    selected_delivery_contract_schema_actual = report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_delivery_contract_schema_actual) == (
+        "contract_keys",
+        "channel_names",
+        "hermes_channel_keys",
+        "telegram_channel_keys",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9905,6 +9914,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_prompt_contract_identity_actual_values,
             list(expected_prompt_identity.values()),
         ),
+        "delivery_contract_schema_guard": (
+            [list(selected_delivery_contract_schema_actual)],
+            [
+                "contract_keys",
+                "channel_names",
+                "hermes_channel_keys",
+                "telegram_channel_keys",
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9917,6 +9935,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_prompt_contract_key_guard",
         "report_prompt_contract_identity_guard",
         "report_prompt_contract_identity_value_guard",
+        "delivery_contract_schema_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19010,6 +19029,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_report_prompt_contract_identity_actual_values) == (
         *expected_prompt_identity.values(),
     )
+    selected_delivery_contract_schema_actual = report_contract_guard_checks[
+        "delivery_contract_keys_match_expected_schema"
+    ]["actual"]
+    assert tuple(selected_delivery_contract_schema_actual) == (
+        "contract_keys",
+        "channel_names",
+        "hermes_channel_keys",
+        "telegram_channel_keys",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19051,6 +19079,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_prompt_contract_identity_actual_values,
             list(expected_prompt_identity.values()),
         ),
+        "delivery_contract_schema_guard": (
+            [list(selected_delivery_contract_schema_actual)],
+            [
+                "contract_keys",
+                "channel_names",
+                "hermes_channel_keys",
+                "telegram_channel_keys",
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19063,6 +19100,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_prompt_contract_key_guard",
         "report_prompt_contract_identity_guard",
         "report_prompt_contract_identity_value_guard",
+        "delivery_contract_schema_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(

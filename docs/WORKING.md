@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_IDENTITY_ACTUAL_VALUE_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_IDENTITY_ACTUAL_VALUE_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_SCHEMA_ACTUAL_KEY_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_SCHEMA_ACTUAL_KEY_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving report prompt contract identity guard actual value order after repository selection
+objective: extend SQLite filtered latest report coverage proving delivery contract schema guard actual key order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe report prompt contract identity guard actual value order is verified after repository selection
-  - SQLite repository-backed latest report underlying report prompt contract identity guard actual value order is verified after repository selection
-  - report_prompt_contract_identity_matches_expected actual values preserve latest_signal_report before LLM role order
+  - SQLite repository-backed latest report timeframe delivery contract schema guard actual key order is verified after repository selection
+  - SQLite repository-backed latest report underlying delivery contract schema guard actual key order is verified after repository selection
+  - delivery_contract_keys_match_expected_schema actual preserves contract_keys, channel_names, hermes_channel_keys, telegram_channel_keys order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,7 +69,7 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - focused pytest passed: 3 passed in 1.38s
-  - full pytest passed: 935 passed in 40.34s
+  - full pytest passed: 935 passed in 40.05s
   - ruff passed
   - health_check passed with status ok
 ```
@@ -97,5 +97,6 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - choose the next explicit repository_or_report_read_model_slice from SSOT
+  - commit and push current delivery contract schema actual key order slice
+  - after push, choose the next explicit repository_or_report_read_model_slice from SSOT
 ```
