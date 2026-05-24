@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected source repository ref propagation target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_REPOSITORY_REF_PROPAGATION_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.17s
+    full_pytest: 935 passed in 40.88s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected source repository ref propagation target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.494
+
+- date: 2026-05-24
   commit: 4ce7084
   title: Cover sqlite filtered source summary Hermes boundary target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SUMMARY_HERMES_BOUNDARY_TARGET_ORDER_GATE

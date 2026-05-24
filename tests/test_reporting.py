@@ -7755,6 +7755,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_ref_propagation_targets) == (
+        "top_level_source_repository_ref",
+        "evidence_context_source_repository_ref",
+        "latest_record_guard_source_repository_ref",
+        "report_payload_source_repository_ref_schema_guard",
+        "report_payload_source_repository_ref_path_guard",
+        "evidence_guard_source_repository_ref_schema_guard",
+        "evidence_guard_source_repository_ref_path_guard",
+    )
     selected_source_repository_ref_propagation_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_ref_propagation_targets.items()
@@ -15871,6 +15880,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(selected_source_repository_ref_propagation_targets) == (
+        "top_level_source_repository_ref",
+        "evidence_context_source_repository_ref",
+        "latest_record_guard_source_repository_ref",
+        "report_payload_source_repository_ref_schema_guard",
+        "report_payload_source_repository_ref_path_guard",
+        "evidence_guard_source_repository_ref_schema_guard",
+        "evidence_guard_source_repository_ref_path_guard",
+    )
     selected_source_repository_ref_propagation_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_ref_propagation_targets.items()
