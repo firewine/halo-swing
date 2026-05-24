@@ -9321,6 +9321,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_cron_schedule_tokens,
         ),
     }
+    assert tuple(selected_cron_intent_presence_targets) == (
+        "payload_report_intent",
+        "report_intent_contract",
+        "delivery_contract_cron_intents",
+        "report_contract_supported_intent_guard",
+        "report_contract_cron_registry_guard",
+        "report_contract_intent_registry_match_guard",
+    )
     selected_cron_intent_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17658,6 +17666,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_cron_schedule_tokens,
         ),
     }
+    assert tuple(selected_cron_intent_presence_targets) == (
+        "payload_report_intent",
+        "report_intent_contract",
+        "delivery_contract_cron_intents",
+        "report_contract_supported_intent_guard",
+        "report_contract_cron_registry_guard",
+        "report_contract_intent_registry_match_guard",
+    )
     selected_cron_intent_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
