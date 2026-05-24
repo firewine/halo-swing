@@ -26,6 +26,7 @@ pre_compaction_source: docs/archive/working-ledger-compaction.md
 pre_compaction_policy:
   - this archive is the moved original WORKING.md ledger, not disposable scratch
   - it contains the long completed-work and verification history that was removed from active WORKING.md
+  - if active WORKING.md is compacted again, preserve removed completed work in the archive before deleting it from active handoff
   - do not delete or overwrite it during normal implementation
   - use it for historical audit, regression tracing, and stale-context recovery only
 post_compaction_policy:
@@ -37,6 +38,21 @@ post_compaction_policy:
 ## ledger
 
 ```yaml
+- date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered degradation Hermes boundary target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_HERMES_BOUNDARY_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.20s
+    full_pytest: 935 passed in 39.34s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered degradation Hermes boundary target order
+    - clarified docs/archive/working-ledger-compaction.md as the preserved pre-compaction completed-work ledger
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.515
+
 - date: 2026-05-24
   commit: 5b7b80e
   title: Cover sqlite filtered selected degradation exclusion target order

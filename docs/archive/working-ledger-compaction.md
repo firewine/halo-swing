@@ -1,3 +1,21 @@
+# WORKING Ledger Compaction Archive
+
+```yaml
+doc_type: pre_compaction_working_ledger_archive
+source_file: docs/WORKING.md
+purpose:
+  - preserve completed work removed from the active LLM handoff during compaction
+  - preserve prior verification history and completed directive context
+  - provide stale-context recovery evidence without bloating active docs/WORKING.md
+active_handoff: docs/WORKING.md
+compact_completed_ledger: docs/COMPLETED_WORK.md
+rule:
+  - do not delete completed work from active WORKING.md unless it is preserved here or in docs/COMPLETED_WORK.md first
+  - treat the archived snapshot below as historical evidence, not executable current work
+```
+
+## Archived WORKING.md Snapshot
+
 # WORKING
 
 > LLM-only operational state ledger.

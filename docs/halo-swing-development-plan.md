@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.515 P1 Repository SQLite Latest Report Filtered Source Degradation Hermes Boundary Target Order Gate Record - 2026-05-24
+
+### A. 목적
+
+4.514에서 SQLite repository-backed filtered latest report의 selected degradation exclusion target order를 고정했다.
+이번 slice는 repository selection 이후 degradation Hermes boundary target이 Hermes-boundary 순서를
+timeframe/underlying 필터 경로에서 직접 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+implemented:
+  - assert timeframe-filtered degradation Hermes boundary target order after repository selection
+  - assert underlying-filtered degradation Hermes boundary target order after repository selection
+  - keep degradation Hermes boundary checks limited to repository-selected filtered report summaries
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - task mirror diff passed
+  - current task JSON parsed
+  - docs task JSON parsed
+  - git diff --check passed
+  - git status showed expected modified task/docs/archive/test files only
+  - focused pytest passed: 3 passed in 1.20s
+  - full pytest passed: 935 passed in 39.34s
+  - ruff passed
+  - health_check passed with status ok
+```
+
 ## 4.514 P1 Repository SQLite Latest Report Filtered Source Selected Degradation Exclusion Target Order Gate Record - 2026-05-24
 
 ### A. 목적
