@@ -7224,6 +7224,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         alternate_label["signal_id"],
         older_matching_label["signal_id"],
     ]
+    assert tuple(label_summary_hermes_boundary_tokens) == (
+        selected_label_summary,
+        *excluded_label_summaries,
+        selected_label["signal_id"],
+        alternate_label["signal_id"],
+        older_matching_label["signal_id"],
+    )
     label_summary_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -15645,6 +15652,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         alternate_label["signal_id"],
         older_matching_label["signal_id"],
     ]
+    assert tuple(label_summary_hermes_boundary_tokens) == (
+        selected_label_summary,
+        *excluded_label_summaries,
+        selected_label["signal_id"],
+        alternate_label["signal_id"],
+        older_matching_label["signal_id"],
+    )
     label_summary_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
