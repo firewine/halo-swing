@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending_commit
+  commit: cf1576e
   title: Clarify WORKING ledger compaction archive routing
   gate_id: DOCS_WORKING_LEDGER_COMPACTION_ARCHIVE_INVENTORY_GATE
-  status: verified_pending_commit
+  status: verified_pending_push
   verification:
     task_mirror_diff: passed
     task_json: parsed
