@@ -7492,6 +7492,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ]["actual"],
         ],
     }
+    assert tuple(selected_source_summary_guard_targets) == (
+        "report_contract_source_summary_guard_pass",
+        "report_text_source_summary_rendering",
+        "report_contract_source_summary_schema_presence",
+    )
     selected_source_summary_guard_summary = {
         name: all(checks)
         for name, checks in selected_source_summary_guard_targets.items()
@@ -15591,6 +15596,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ]["actual"],
         ],
     }
+    assert tuple(selected_source_summary_guard_targets) == (
+        "report_contract_source_summary_guard_pass",
+        "report_text_source_summary_rendering",
+        "report_contract_source_summary_schema_presence",
+    )
     selected_source_summary_guard_summary = {
         name: all(checks)
         for name, checks in selected_source_summary_guard_targets.items()

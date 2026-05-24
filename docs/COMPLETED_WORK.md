@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected source summary guard target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_SUMMARY_GUARD_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.15s
+    full_pytest: 935 passed in 39.41s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected source summary guard target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.491
+
+- date: 2026-05-24
   commit: a30abee
   title: Cover sqlite filtered selected source summary presence target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_SUMMARY_PRESENCE_TARGET_ORDER_GATE
