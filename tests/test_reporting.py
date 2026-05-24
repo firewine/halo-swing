@@ -9538,12 +9538,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_storage_marker_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    selected_path_component_markers = [
+        database_path.name,
+        database_path.stem,
+        database_path.parent.name,
+    ]
+    assert tuple(selected_path_component_markers) == (
+        database_path.name,
+        database_path.stem,
+        database_path.parent.name,
+    )
     selected_path_component_free_summary = {
         name: all(
-            database_path.name not in value
-            and database_path.stem not in value
-            and database_path.parent.name not in value
+            marker not in value
             for value in iter_nested_strings(target)
+            for marker in selected_path_component_markers
         )
         for name, target in selected_sqlite_name_free_targets.items()
     }
@@ -17923,12 +17932,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_storage_marker_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    selected_path_component_markers = [
+        database_path.name,
+        database_path.stem,
+        database_path.parent.name,
+    ]
+    assert tuple(selected_path_component_markers) == (
+        database_path.name,
+        database_path.stem,
+        database_path.parent.name,
+    )
     selected_path_component_free_summary = {
         name: all(
-            database_path.name not in value
-            and database_path.stem not in value
-            and database_path.parent.name not in value
+            marker not in value
             for value in iter_nested_strings(target)
+            for marker in selected_path_component_markers
         )
         for name, target in selected_sqlite_name_free_targets.items()
     }
