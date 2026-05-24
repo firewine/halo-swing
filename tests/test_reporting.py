@@ -9324,6 +9324,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         expected_component_extremes["strongest"]["name"],
         expected_component_extremes["weakest"]["name"],
     ]
+    assert tuple(selected_component_extreme_tokens) == (
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+    )
     selected_component_extreme_presence_targets = {
         "evidence_context_component_extremes": (
             evidence_context["component_extremes"],
@@ -18145,6 +18149,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         expected_component_extremes["strongest"]["name"],
         expected_component_extremes["weakest"]["name"],
     ]
+    assert tuple(selected_component_extreme_tokens) == (
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+    )
     selected_component_extreme_presence_targets = {
         "evidence_context_component_extremes": (
             evidence_context["component_extremes"],
