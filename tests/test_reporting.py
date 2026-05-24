@@ -5619,6 +5619,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert tuple(latest_matching_record_excludes_older_summary) == tuple(
+        filtered_report_path_free_targets
+    )
     filtered_report_shared_summary_value_domains = {
         "string_counts": all(
             type(count) is int and count > 0
@@ -13578,6 +13581,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert latest_matching_record_excludes_older_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert tuple(latest_matching_record_excludes_older_summary) == tuple(
+        filtered_report_path_free_targets
+    )
     filtered_report_shared_summary_value_domains = {
         "string_counts": all(
             type(count) is int and count > 0
