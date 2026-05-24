@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.543 P1 Repository SQLite Latest Report Filtered Source Source Repository Ref Filter Field Order Gate Record - 2026-05-25
+
+### A. 목적
+
+4.542에서 SQLite repository-backed filtered latest report의 source_repository_ref schema field order를 고정했다.
+이번 slice는 repository selection 이후 source_repository_ref.filters field 순서가 asset, underlying, timeframe 순서를
+timeframe/underlying 필터 경로의 top-level payload, evidence context, latest record guard expected/actual에서 직접 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+completed:
+  - asserted timeframe-filtered source_repository_ref filter field order after repository selection
+  - asserted underlying-filtered source_repository_ref filter field order after repository selection
+  - kept source_repository_ref filter field checks limited to repository-selected payload, evidence context, and latest record guard surfaces
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected docs/task/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 0.12s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 43.46s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.542 P1 Repository SQLite Latest Report Filtered Source Source Repository Ref Schema Field Order Gate Record - 2026-05-25
 
 ### A. 목적

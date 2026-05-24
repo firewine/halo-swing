@@ -7881,6 +7881,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(payload["source_repository_ref"]["filters"]) == (
+        "asset",
+        "underlying",
+        "timeframe",
+    )
+    assert tuple(evidence_context["source_repository_ref"]["filters"]) == (
+        "asset",
+        "underlying",
+        "timeframe",
+    )
+    assert tuple(
+        latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]["filters"]
+    ) == ("asset", "underlying", "timeframe")
+    assert tuple(
+        latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]["filters"]
+    ) == ("asset", "underlying", "timeframe")
     assert tuple(selected_source_repository_filter_field_targets) == (
         "top_level_source_repository_filters",
         "evidence_context_source_repository_filters",
@@ -16348,6 +16368,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(payload["source_repository_ref"]["filters"]) == (
+        "asset",
+        "underlying",
+        "timeframe",
+    )
+    assert tuple(evidence_context["source_repository_ref"]["filters"]) == (
+        "asset",
+        "underlying",
+        "timeframe",
+    )
+    assert tuple(
+        latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]["filters"]
+    ) == ("asset", "underlying", "timeframe")
+    assert tuple(
+        latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]["filters"]
+    ) == ("asset", "underlying", "timeframe")
     assert tuple(selected_source_repository_filter_field_targets) == (
         "top_level_source_repository_filters",
         "evidence_context_source_repository_filters",
