@@ -9945,6 +9945,44 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_text_reflects_label_status_summary"
     ]["actual"]
     assert selected_label_status_summary_actual == selected_label_summary
+    selected_report_contract_guard_check_names_actual = (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["actual"]
+    )
+    selected_report_contract_guard_check_name_order = (
+        "required_sections_present",
+        "intent_required_sections_present",
+        "report_sections_match_intent_order",
+        "report_text_sections_match_intent_order",
+        "report_intent_is_supported",
+        "report_intent_contract_keys_match_expected_schema",
+        "report_intent_contract_matches_registry",
+        "delivery_cron_intents_match_report_intent_registry",
+        "telegram_required_sections_match_intent",
+        "prompt_must_include_is_covered",
+        "report_prompt_must_include_matches_intent_terms",
+        "report_prompt_contract_keys_match_expected_schema",
+        "report_prompt_contract_identity_matches_expected",
+        "telegram_text_fits_single_message",
+        "delivery_contract_has_no_network_side_effect",
+        "delivery_contract_has_no_send_side_effect",
+        "delivery_contract_keys_match_expected_schema",
+        "delivery_channel_formats_match_expected",
+        "report_telegram_max_chars_matches_expected",
+        "report_telegram_schema_version_matches_expected",
+        "report_telegram_chunking_contract_matches_expected",
+        "delivery_numeric_authority_is_latest_signal_report",
+        "report_text_reflects_latest_signal_numeric_fields",
+        "report_text_reflects_source_repository_summary",
+        "report_text_reflects_label_status_summary",
+        "report_contract_guard_check_names_match_expected_schema",
+        "report_contract_guard_check_keys_match_expected_schema",
+        "report_contract_guard_keys_match_expected_schema",
+    )
+    assert tuple(selected_report_contract_guard_check_names_actual) == (
+        selected_report_contract_guard_check_name_order
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -10043,6 +10081,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [selected_label_status_summary_actual],
             [selected_label_summary],
         ),
+        "report_contract_guard_check_name_order_guard": (
+            selected_report_contract_guard_check_names_actual,
+            list(selected_report_contract_guard_check_name_order),
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10066,6 +10108,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "numeric_field_reflection_value_guard",
         "source_repository_summary_guard",
         "label_status_summary_guard",
+        "report_contract_guard_check_name_order_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19240,6 +19283,44 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_text_reflects_label_status_summary"
     ]["actual"]
     assert selected_label_status_summary_actual == selected_label_summary
+    selected_report_contract_guard_check_names_actual = (
+        report_contract_guard_checks[
+            "report_contract_guard_check_names_match_expected_schema"
+        ]["actual"]
+    )
+    selected_report_contract_guard_check_name_order = (
+        "required_sections_present",
+        "intent_required_sections_present",
+        "report_sections_match_intent_order",
+        "report_text_sections_match_intent_order",
+        "report_intent_is_supported",
+        "report_intent_contract_keys_match_expected_schema",
+        "report_intent_contract_matches_registry",
+        "delivery_cron_intents_match_report_intent_registry",
+        "telegram_required_sections_match_intent",
+        "prompt_must_include_is_covered",
+        "report_prompt_must_include_matches_intent_terms",
+        "report_prompt_contract_keys_match_expected_schema",
+        "report_prompt_contract_identity_matches_expected",
+        "telegram_text_fits_single_message",
+        "delivery_contract_has_no_network_side_effect",
+        "delivery_contract_has_no_send_side_effect",
+        "delivery_contract_keys_match_expected_schema",
+        "delivery_channel_formats_match_expected",
+        "report_telegram_max_chars_matches_expected",
+        "report_telegram_schema_version_matches_expected",
+        "report_telegram_chunking_contract_matches_expected",
+        "delivery_numeric_authority_is_latest_signal_report",
+        "report_text_reflects_latest_signal_numeric_fields",
+        "report_text_reflects_source_repository_summary",
+        "report_text_reflects_label_status_summary",
+        "report_contract_guard_check_names_match_expected_schema",
+        "report_contract_guard_check_keys_match_expected_schema",
+        "report_contract_guard_keys_match_expected_schema",
+    )
+    assert tuple(selected_report_contract_guard_check_names_actual) == (
+        selected_report_contract_guard_check_name_order
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19338,6 +19419,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [selected_label_status_summary_actual],
             [selected_label_summary],
         ),
+        "report_contract_guard_check_name_order_guard": (
+            selected_report_contract_guard_check_names_actual,
+            list(selected_report_contract_guard_check_name_order),
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19361,6 +19446,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "numeric_field_reflection_value_guard",
         "source_repository_summary_guard",
         "label_status_summary_guard",
+        "report_contract_guard_check_name_order_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
