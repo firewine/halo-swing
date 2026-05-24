@@ -2002,6 +2002,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         for warning in risk_warnings
     )
     assert set(evidence_context["risk_warnings"]).issubset(cautions)
+    selected_risk_warning_guard_actual_order = tuple(
+        evidence_guard_checks["risk_warnings_reflected_in_cautions"]["actual"][
+            : len(evidence_context["risk_warnings"])
+        ]
+    )
+    assert selected_risk_warning_guard_actual_order == tuple(
+        evidence_context["risk_warnings"]
+    )
     assert all(
         flag["status"] == "acknowledged"
         for flag in evidence_context["conflict_flags"]
@@ -10985,6 +10993,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         for warning in risk_warnings
     )
     assert set(evidence_context["risk_warnings"]).issubset(cautions)
+    selected_risk_warning_guard_actual_order = tuple(
+        evidence_guard_checks["risk_warnings_reflected_in_cautions"]["actual"][
+            : len(evidence_context["risk_warnings"])
+        ]
+    )
+    assert selected_risk_warning_guard_actual_order == tuple(
+        evidence_context["risk_warnings"]
+    )
     assert all(
         flag["status"] == "acknowledged"
         for flag in evidence_context["conflict_flags"]

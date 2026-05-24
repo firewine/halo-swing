@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_ACKNOWLEDGEMENT_ACTUAL_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_ACKNOWLEDGEMENT_ACTUAL_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_RISK_WARNING_GUARD_ACTUAL_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_RISK_WARNING_GUARD_ACTUAL_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving conflict flag acknowledgement guard actual order after repository selection
+objective: extend SQLite filtered latest report coverage proving selected risk warning guard actual order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe conflict flag acknowledgement guard actual order follows selected conflict flag order after repository selection
-  - SQLite repository-backed latest report underlying conflict flag acknowledgement guard actual order follows selected conflict flag order after repository selection
-  - flagged_conflicts_are_acknowledged actual values preserve selected conflict flag acknowledgement status order
+  - SQLite repository-backed latest report timeframe risk_warnings_reflected_in_cautions actual order follows selected risk warning order after repository selection
+  - SQLite repository-backed latest report underlying risk_warnings_reflected_in_cautions actual order follows selected risk warning order after repository selection
+  - risk_warnings_reflected_in_cautions actual values preserve selected risk warning order before any additional caution items
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -70,7 +70,7 @@ results:
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
   - focused pytest passed: 3 passed in 1.43s
-  - full pytest passed: 935 passed in 43.84s
+  - full pytest passed: 935 passed in 43.51s
   - ruff passed
   - health_check passed with status ok
 ```
