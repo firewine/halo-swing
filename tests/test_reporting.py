@@ -9595,6 +9595,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         older_matching_signal["config_hash"],
         older_matching_signal["config_hash"].removeprefix("sha256:"),
     ]
+    assert tuple(selected_older_matching_record_tokens) == (
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
+        older_matching_signal["config_hash"].removeprefix("sha256:"),
+    )
     selected_older_matching_record_free_summary = {
         name: all(
             token not in value
@@ -17995,6 +18002,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         older_matching_signal["config_hash"],
         older_matching_signal["config_hash"].removeprefix("sha256:"),
     ]
+    assert tuple(selected_older_matching_record_tokens) == (
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
+        older_matching_signal["config_hash"].removeprefix("sha256:"),
+    )
     selected_older_matching_record_free_summary = {
         name: all(
             token not in value
