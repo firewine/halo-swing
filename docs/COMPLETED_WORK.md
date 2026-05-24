@@ -20,10 +20,10 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
-  commit: recorded_in_commit_containing_this_entry
+  commit: af35798
   title: Cover sqlite filtered label status guard exclusion order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_GUARD_EXCLUSION_ORDER_COVERAGE_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.20s
     full_pytest: 935 passed in 44.78s
