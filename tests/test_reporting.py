@@ -8906,6 +8906,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         alternate_signal["created_at"],
         older_matching_signal["created_at"],
     ]
+    assert tuple(excluded_timestamp_tokens) == (
+        alternate_signal["created_at"],
+        older_matching_signal["created_at"],
+    )
     selected_timestamp_exclusion_targets = {
         "top_level_as_of": [payload["as_of"]],
         "top_level_identity": actual_top_level_identity,
@@ -17667,6 +17671,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ndx_signal["created_at"],
         older_matching_signal["created_at"],
     ]
+    assert tuple(excluded_timestamp_tokens) == (
+        ndx_signal["created_at"],
+        older_matching_signal["created_at"],
+    )
     selected_timestamp_exclusion_targets = {
         "top_level_as_of": [payload["as_of"]],
         "top_level_identity": actual_top_level_identity,
