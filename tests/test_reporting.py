@@ -10736,13 +10736,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         database_path.parent.name,
     )
     selected_path_component_free_summary = {
-        name: all(
+        name: [
             marker not in value
             for value in iter_nested_strings(target)
             for marker in selected_path_component_markers
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_path_component_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_path_component_free_status = {
+        name: all(checks)
+        for name, checks in selected_path_component_free_summary.items()
+    }
+    assert selected_path_component_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_path_component_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_path_component_free_summary = selected_path_component_free_status
     assert selected_path_component_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }
@@ -20333,13 +20347,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         database_path.parent.name,
     )
     selected_path_component_free_summary = {
-        name: all(
+        name: [
             marker not in value
             for value in iter_nested_strings(target)
             for marker in selected_path_component_markers
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_path_component_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_path_component_free_status = {
+        name: all(checks)
+        for name, checks in selected_path_component_free_summary.items()
+    }
+    assert selected_path_component_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_path_component_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_path_component_free_summary = selected_path_component_free_status
     assert selected_path_component_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }
