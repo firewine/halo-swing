@@ -38,10 +38,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
-  commit: pending
+  commit: cc007a6
   title: Cover sqlite filtered selected source repository filter field target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_REPOSITORY_FILTER_FIELD_TARGET_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.16s
     full_pytest: 935 passed in 42.08s
