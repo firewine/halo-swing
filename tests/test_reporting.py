@@ -10464,6 +10464,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_context["source_repository_ref"]["storage"]
     )
     assert selected_source_repository_evidence_storage == "sqlite_signal_repository"
+    selected_source_repository_filter_values = {
+        "asset": "TQQQ",
+        "underlying": None,
+        "timeframe": "swing_3d_10d",
+    }
+    selected_source_repository_payload_filters = (
+        payload["source_repository_ref"]["filters"]
+    )
+    assert selected_source_repository_payload_filters == (
+        selected_source_repository_filter_values
+    )
+    selected_source_repository_evidence_filters = (
+        evidence_context["source_repository_ref"]["filters"]
+    )
+    assert selected_source_repository_evidence_filters == (
+        selected_source_repository_filter_values
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -10501,6 +10518,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "source_repository_ref_evidence_storage_guard": [
             selected_source_repository_evidence_storage == "sqlite_signal_repository",
         ],
+        "source_repository_ref_filter_values": [
+            selected_source_repository_payload_filters
+            == selected_source_repository_filter_values,
+            selected_source_repository_evidence_filters
+            == selected_source_repository_filter_values,
+        ],
+        "source_repository_ref_payload_filter_values_guard": [
+            selected_source_repository_payload_filters
+            == selected_source_repository_filter_values,
+        ],
+        "source_repository_ref_evidence_filter_values_guard": [
+            selected_source_repository_evidence_filters
+            == selected_source_repository_filter_values,
+        ],
         "delivery_contract_no_live_activation": [
             channel["network_call"] is False
             for channel in delivery_contract["channels"].values()
@@ -10522,6 +10553,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "source_repository_ref_storage",
         "source_repository_ref_payload_storage_guard",
         "source_repository_ref_evidence_storage_guard",
+        "source_repository_ref_filter_values",
+        "source_repository_ref_payload_filter_values_guard",
+        "source_repository_ref_evidence_filter_values_guard",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",
     )
@@ -19970,6 +20004,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_context["source_repository_ref"]["storage"]
     )
     assert selected_source_repository_evidence_storage == "sqlite_signal_repository"
+    selected_source_repository_filter_values = {
+        "asset": "TQQQ",
+        "underlying": "QQQ",
+        "timeframe": "swing_3d_10d",
+    }
+    selected_source_repository_payload_filters = (
+        payload["source_repository_ref"]["filters"]
+    )
+    assert selected_source_repository_payload_filters == (
+        selected_source_repository_filter_values
+    )
+    selected_source_repository_evidence_filters = (
+        evidence_context["source_repository_ref"]["filters"]
+    )
+    assert selected_source_repository_evidence_filters == (
+        selected_source_repository_filter_values
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -20007,6 +20058,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "source_repository_ref_evidence_storage_guard": [
             selected_source_repository_evidence_storage == "sqlite_signal_repository",
         ],
+        "source_repository_ref_filter_values": [
+            selected_source_repository_payload_filters
+            == selected_source_repository_filter_values,
+            selected_source_repository_evidence_filters
+            == selected_source_repository_filter_values,
+        ],
+        "source_repository_ref_payload_filter_values_guard": [
+            selected_source_repository_payload_filters
+            == selected_source_repository_filter_values,
+        ],
+        "source_repository_ref_evidence_filter_values_guard": [
+            selected_source_repository_evidence_filters
+            == selected_source_repository_filter_values,
+        ],
         "delivery_contract_no_live_activation": [
             channel["network_call"] is False
             for channel in delivery_contract["channels"].values()
@@ -20028,6 +20093,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "source_repository_ref_storage",
         "source_repository_ref_payload_storage_guard",
         "source_repository_ref_evidence_storage_guard",
+        "source_repository_ref_filter_values",
+        "source_repository_ref_payload_filter_values_guard",
+        "source_repository_ref_evidence_filter_values_guard",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",
     )
