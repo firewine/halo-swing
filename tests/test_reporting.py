@@ -10350,6 +10350,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "delivery_preview_has_no_send_side_effect"
         ]["actual"]
     ) == selected_delivery_side_effect_channel_order
+    selected_delivery_preview_no_send_expected = (
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_send_side_effect"
+        ]["expected"]
+    )
+    assert selected_delivery_preview_no_send_expected is False
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
@@ -10382,6 +10388,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 "delivery_preview_has_no_send_side_effect"
             ]["actual"].values()
         ],
+        "delivery_preview_no_send_expected_guard": [
+            selected_delivery_preview_no_send_expected is False,
+        ],
     }
     assert tuple(selected_delivery_side_effect_targets) == (
         "delivery_contract_no_network",
@@ -10391,6 +10400,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_preview_no_network_guard",
         "delivery_preview_no_network_expected_guard",
         "delivery_preview_no_send_guard",
+        "delivery_preview_no_send_expected_guard",
     )
     selected_delivery_side_effect_summary = {
         name: all(checks)
@@ -19796,6 +19806,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "delivery_preview_has_no_send_side_effect"
         ]["actual"]
     ) == selected_delivery_side_effect_channel_order
+    selected_delivery_preview_no_send_expected = (
+        delivery_preview_guard_checks[
+            "delivery_preview_has_no_send_side_effect"
+        ]["expected"]
+    )
+    assert selected_delivery_preview_no_send_expected is False
     selected_delivery_side_effect_targets = {
         "delivery_contract_no_network": [
             channel["network_call"] is False
@@ -19828,6 +19844,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 "delivery_preview_has_no_send_side_effect"
             ]["actual"].values()
         ],
+        "delivery_preview_no_send_expected_guard": [
+            selected_delivery_preview_no_send_expected is False,
+        ],
     }
     assert tuple(selected_delivery_side_effect_targets) == (
         "delivery_contract_no_network",
@@ -19837,6 +19856,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_preview_no_network_guard",
         "delivery_preview_no_network_expected_guard",
         "delivery_preview_no_send_guard",
+        "delivery_preview_no_send_expected_guard",
     )
     selected_delivery_side_effect_summary = {
         name: all(checks)
