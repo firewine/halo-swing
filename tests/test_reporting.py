@@ -7158,6 +7158,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_status_propagation_summary == {
         name: True for name in selected_label_status_propagation_targets
     }
+    assert tuple(selected_label_status_propagation_summary) == tuple(
+        selected_label_status_propagation_targets
+    )
     label_status_guard_check = evidence_guard_checks[
         "label_status_reflected_in_evidence_context"
     ]
@@ -15084,6 +15087,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_label_status_propagation_summary == {
         name: True for name in selected_label_status_propagation_targets
     }
+    assert tuple(selected_label_status_propagation_summary) == tuple(
+        selected_label_status_propagation_targets
+    )
     label_status_guard_check = evidence_guard_checks[
         "label_status_reflected_in_evidence_context"
     ]
