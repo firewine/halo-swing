@@ -10848,13 +10848,29 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         selected_sqlite_name_free_targets
     )
     selected_excluded_label_summary_free_summary = {
-        name: all(
+        name: [
             excluded_summary not in value
             for value in iter_nested_strings(target)
             for excluded_summary in excluded_label_summaries
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_excluded_label_summary_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_label_summary_free_status = {
+        name: all(checks)
+        for name, checks in selected_excluded_label_summary_free_summary.items()
+    }
+    assert selected_excluded_label_summary_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_label_summary_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_label_summary_free_summary = (
+        selected_excluded_label_summary_free_status
+    )
     assert selected_excluded_label_summary_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }
@@ -20489,13 +20505,29 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         selected_sqlite_name_free_targets
     )
     selected_excluded_label_summary_free_summary = {
-        name: all(
+        name: [
             excluded_summary not in value
             for value in iter_nested_strings(target)
             for excluded_summary in excluded_label_summaries
-        )
+        ]
         for name, target in selected_sqlite_name_free_targets.items()
     }
+    assert tuple(selected_excluded_label_summary_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_label_summary_free_status = {
+        name: all(checks)
+        for name, checks in selected_excluded_label_summary_free_summary.items()
+    }
+    assert selected_excluded_label_summary_free_status == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_label_summary_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_label_summary_free_summary = (
+        selected_excluded_label_summary_free_status
+    )
     assert selected_excluded_label_summary_free_summary == {
         name: True for name in selected_sqlite_name_free_targets
     }

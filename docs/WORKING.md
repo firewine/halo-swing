@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OLDER_MATCHING_RECORD_TOKEN_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OLDER_MATCHING_RECORD_TOKEN_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving older matching record tokens remain absent after repository selection
+objective: extend SQLite filtered latest report coverage proving excluded label summaries remain absent after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe older matching record token-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying older matching record token-free values are verified after repository selection
-  - selected report, evidence, delivery, guard, and reasons surfaces remain free of older matching signal_id, run_id, created_at, config_hash, and config_hash digest tokens
+  - SQLite repository-backed latest report timeframe excluded label summary-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying excluded label summary-free values are verified after repository selection
+  - selected report, evidence, delivery, guard, and reasons surfaces remain free of excluded label summary text
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,7 +69,7 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - focused pytest passed: 3 passed in 1.39s
-  - full pytest passed: 935 passed in 40.87s
+  - full pytest passed: 935 passed in 40.56s
   - ruff passed
   - health_check passed with status ok
 ```
