@@ -5273,6 +5273,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_path_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert tuple(filtered_report_path_free_summary) == tuple(
+        filtered_report_path_free_targets
+    )
     assert filtered_report_path_free_summary["report_payload_guard"] is True
     assert (
         filtered_report_path_free_summary[
@@ -13217,6 +13220,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_path_free_summary == {
         name: True for name in filtered_report_path_free_targets
     }
+    assert tuple(filtered_report_path_free_summary) == tuple(
+        filtered_report_path_free_targets
+    )
     assert filtered_report_path_free_summary["report_payload_guard"] is True
     assert (
         filtered_report_path_free_summary[
