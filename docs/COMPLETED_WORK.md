@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Align sqlite filtered conflict flag guard actual field order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_GUARD_ACTUAL_FIELD_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.51s
+    full_pytest: 935 passed in 44.12s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - aligned conflict_flags_have_required_fields actual order with required_conflict_fields
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.575
+
+- date: 2026-05-25
   commit: eac228b
   title: Cover sqlite filtered selected conflict flag explicit field token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_EXPLICIT_FIELD_TOKEN_ORDER_GATE

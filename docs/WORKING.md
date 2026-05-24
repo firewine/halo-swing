@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_EXPLICIT_FIELD_TOKEN_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_EXPLICIT_FIELD_TOKEN_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_GUARD_ACTUAL_FIELD_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_GUARD_ACTUAL_FIELD_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected conflict flag explicit field token order after repository selection
+objective: align SQLite filtered latest report conflict flag guard actual field order with the required conflict field contract after repository selection
 
 edits:
   allowed:
@@ -30,6 +30,7 @@ edits:
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
     - docs/halo-swing-development-plan.md
+    - src/halo_swing_mcp/tools/reporting.py
     - tests/test_reporting.py
   blocked_prefixes:
     - src/halo_swing_mcp/broker/
@@ -40,9 +41,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected conflict flag explicit field token order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected conflict flag explicit field token order is verified after repository selection
-  - selected conflict flag checks preserve name, severity, status, and details field token order after repository selection
+  - SQLite repository-backed latest report timeframe conflict flag guard actual field order follows the required conflict field contract after repository selection
+  - SQLite repository-backed latest report underlying conflict flag guard actual field order follows the required conflict field contract after repository selection
+  - conflict_flags_have_required_fields actual values preserve name, severity, status, and details order instead of sorted alphabetical order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,9 +69,14 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.40s
-  - full pytest passed: 935 passed in 45.03s
+  - task mirror diff passed
+  - current task JSON parsed
+  - docs task JSON parsed
+  - git diff --check passed
+  - git status showed expected modified task/docs/source/test files only
+  - focused pytest passed: 3 passed in 1.51s
+  - regression focused pytest passed: 5 passed in 0.28s
+  - full pytest passed: 935 passed in 44.12s
   - ruff passed
   - health_check passed with status ok
 ```
@@ -98,8 +104,7 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
+  - run required verification for current slice
   - commit and push this verified slice
   - choose the next explicit repository_or_report_read_model_slice from SSOT
-  - update .codex/tasks/current.json and docs/codex-task.json for that slice
-  - replace this current_work block with the new active task
 ```

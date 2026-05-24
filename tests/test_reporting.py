@@ -1972,7 +1972,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "passed": True,
         "expected": evidence_contract["required_conflict_fields"],
         "actual": [
-            sorted(flag)
+            [
+                field
+                for field in evidence_contract["required_conflict_fields"]
+                if field in flag
+            ]
             for flag in evidence_context["conflict_flags"]
         ],
     }
@@ -10942,7 +10946,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "passed": True,
         "expected": evidence_contract["required_conflict_fields"],
         "actual": [
-            sorted(flag)
+            [
+                field
+                for field in evidence_contract["required_conflict_fields"]
+                if field in flag
+            ]
             for flag in evidence_context["conflict_flags"]
         ],
     }

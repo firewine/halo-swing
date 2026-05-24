@@ -5716,7 +5716,13 @@ def _evidence_guard(
             ),
             "expected": required_fields,
             "actual": [
-                sorted(flag)
+                [
+                    field
+                    for field in required_fields
+                    if field in flag
+                ]
+                if source_repository_ref is not None
+                else sorted(flag)
                 for flag in conflict_flags
             ],
         },
