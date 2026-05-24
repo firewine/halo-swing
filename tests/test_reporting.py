@@ -9495,6 +9495,22 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             *excluded_signal["take_profit"],
         )
     ]
+    assert tuple(excluded_trade_plan_tokens) == (
+        alternate_signal["entry_summary"],
+        alternate_signal["stop_summary"],
+        alternate_signal["take_profit_summary"],
+        alternate_signal["invalidation_summary"],
+        alternate_signal["entry"]["trigger"],
+        *alternate_signal["stop"],
+        *alternate_signal["take_profit"],
+        older_matching_signal["entry_summary"],
+        older_matching_signal["stop_summary"],
+        older_matching_signal["take_profit_summary"],
+        older_matching_signal["invalidation_summary"],
+        older_matching_signal["entry"]["trigger"],
+        *older_matching_signal["stop"],
+        *older_matching_signal["take_profit"],
+    )
     selected_trade_plan_exclusion_targets = {
         "latest_signal_report": payload["latest_signal_report"],
         "entry_section": entry_section,
@@ -18339,6 +18355,22 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             *excluded_signal["take_profit"],
         )
     ]
+    assert tuple(excluded_trade_plan_tokens) == (
+        ndx_signal["entry_summary"],
+        ndx_signal["stop_summary"],
+        ndx_signal["take_profit_summary"],
+        ndx_signal["invalidation_summary"],
+        ndx_signal["entry"]["trigger"],
+        *ndx_signal["stop"],
+        *ndx_signal["take_profit"],
+        older_matching_signal["entry_summary"],
+        older_matching_signal["stop_summary"],
+        older_matching_signal["take_profit_summary"],
+        older_matching_signal["invalidation_summary"],
+        older_matching_signal["entry"]["trigger"],
+        *older_matching_signal["stop"],
+        *older_matching_signal["take_profit"],
+    )
     selected_trade_plan_exclusion_targets = {
         "latest_signal_report": payload["latest_signal_report"],
         "entry_section": entry_section,
