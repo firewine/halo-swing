@@ -9216,25 +9216,24 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_degradation_field_summary) == tuple(
         selected_degradation_field_targets
     )
+    selected_conflict_flag_field_order = tuple(
+        expected_evidence_contract["required_conflict_fields"]
+    )
+    assert selected_conflict_flag_field_order == (
+        "name",
+        "severity",
+        "status",
+        "details",
+    )
     selected_conflict_flag_tokens = [
-        token
+        flag[field]
         for flag in evidence_context["conflict_flags"]
-        for token in (
-            flag["name"],
-            flag["severity"],
-            flag["status"],
-            flag["details"],
-        )
+        for field in selected_conflict_flag_field_order
     ]
     assert tuple(selected_conflict_flag_tokens) == tuple(
-        token
+        flag[field]
         for flag in evidence_context["conflict_flags"]
-        for token in (
-            flag["name"],
-            flag["severity"],
-            flag["status"],
-            flag["details"],
-        )
+        for field in selected_conflict_flag_field_order
     )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (
@@ -18190,25 +18189,24 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_degradation_field_summary) == tuple(
         selected_degradation_field_targets
     )
+    selected_conflict_flag_field_order = tuple(
+        expected_evidence_contract["required_conflict_fields"]
+    )
+    assert selected_conflict_flag_field_order == (
+        "name",
+        "severity",
+        "status",
+        "details",
+    )
     selected_conflict_flag_tokens = [
-        token
+        flag[field]
         for flag in evidence_context["conflict_flags"]
-        for token in (
-            flag["name"],
-            flag["severity"],
-            flag["status"],
-            flag["details"],
-        )
+        for field in selected_conflict_flag_field_order
     ]
     assert tuple(selected_conflict_flag_tokens) == tuple(
-        token
+        flag[field]
         for flag in evidence_context["conflict_flags"]
-        for token in (
-            flag["name"],
-            flag["severity"],
-            flag["status"],
-            flag["details"],
-        )
+        for field in selected_conflict_flag_field_order
     )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (

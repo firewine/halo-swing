@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_ACTIVATION_FREE_MARKER_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_ACTIVATION_FREE_MARKER_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_EXPLICIT_FIELD_TOKEN_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_EXPLICIT_FIELD_TOKEN_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected offline live activation-free marker order after repository selection
+objective: extend SQLite filtered latest report coverage proving selected conflict flag explicit field token order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected offline live activation-free marker order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected offline live activation-free marker order is verified after repository selection
-  - selected offline live activation-free checks preserve HALO_SWING_DATABASE_URL, database_url, and sqlite:// marker order after repository selection
+  - SQLite repository-backed latest report timeframe selected conflict flag explicit field token order is verified after repository selection
+  - SQLite repository-backed latest report underlying selected conflict flag explicit field token order is verified after repository selection
+  - selected conflict flag checks preserve name, severity, status, and details field token order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,8 +69,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.43s
-  - full pytest passed: 935 passed in 43.02s
+  - focused pytest passed: 3 passed in 1.40s
+  - full pytest passed: 935 passed in 45.03s
   - ruff passed
   - health_check passed with status ok
 ```

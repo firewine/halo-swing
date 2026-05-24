@@ -28,6 +28,65 @@ STOP         진입 논리 무효화
 BLOCK        신규 롱 금지
 ```
 
+## 4.574 P1 Repository SQLite Latest Report Filtered Source Selected Conflict Flag Explicit Field Token Order Gate Record - 2026-05-25
+
+### A. 목적
+
+4.573에서 SQLite repository-backed filtered latest report의 selected offline live activation-free marker order를 고정했다.
+이번 slice는 repository selection 이후 selected conflict flag 검사가 `name`, `severity`, `status`, `details`
+field token 순서를 timeframe/underlying 필터 경로에서 contract 기반으로 직접 보존하는지 고정한다.
+
+### B. 구현 계획
+
+```text
+status: verified
+completed:
+  - asserted timeframe-filtered selected conflict flag explicit field token order after repository selection
+  - asserted underlying-filtered selected conflict flag explicit field token order after repository selection
+  - kept selected conflict flag checks limited to repository-selected evidence context and evidence guard surfaces
+```
+
+### C. 경계 조건
+
+```text
+not_allowed:
+  - schema migration or DDL change
+  - automatic HALO_SWING_DATABASE_URL activation
+  - repo data/state/artifact SQLite files
+  - live_adapters path
+  - broker/order expansion
+  - Telegram send call
+  - Hermes runtime call
+  - scheduler or cron execution
+  - secret value output
+```
+
+### D. 검증 계획
+
+```text
+status: passed
+commands:
+  - diff -u .codex/tasks/current.json docs/codex-task.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
+  - git diff --check
+  - git status --short --branch
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
+  - PYTHONPATH=src ./.venv/bin/python -m pytest
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+results:
+  - diff -u .codex/tasks/current.json docs/codex-task.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool .codex/tasks/current.json: passed
+  - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json: passed
+  - git diff --check: passed
+  - git status --short --branch: modified expected task/docs/test files only
+  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q: 3 passed in 1.40s
+  - PYTHONPATH=src ./.venv/bin/python -m pytest: 935 passed in 45.03s
+  - PYTHONPATH=src ./.venv/bin/python -m ruff check .: passed
+  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check: status ok
+```
+
 ## 4.564 P1 Repository SQLite Latest Report Filtered Source Component Extreme Hermes Boundary Token Order Gate Record - 2026-05-25
 
 ### A. 목적
