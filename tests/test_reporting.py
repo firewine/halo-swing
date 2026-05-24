@@ -10456,6 +10456,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_context["source_repository_ref"]["db_required"]
     )
     assert selected_source_repository_evidence_db_required is True
+    selected_source_repository_payload_storage = (
+        payload["source_repository_ref"]["storage"]
+    )
+    assert selected_source_repository_payload_storage == "sqlite_signal_repository"
+    selected_source_repository_evidence_storage = (
+        evidence_context["source_repository_ref"]["storage"]
+    )
+    assert selected_source_repository_evidence_storage == "sqlite_signal_repository"
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -10484,10 +10492,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_source_repository_evidence_db_required is True,
         ],
         "source_repository_ref_storage": [
-            payload["source_repository_ref"]["storage"]
-            == "sqlite_signal_repository",
-            evidence_context["source_repository_ref"]["storage"]
-            == "sqlite_signal_repository",
+            selected_source_repository_payload_storage == "sqlite_signal_repository",
+            selected_source_repository_evidence_storage == "sqlite_signal_repository",
+        ],
+        "source_repository_ref_payload_storage_guard": [
+            selected_source_repository_payload_storage == "sqlite_signal_repository",
+        ],
+        "source_repository_ref_evidence_storage_guard": [
+            selected_source_repository_evidence_storage == "sqlite_signal_repository",
         ],
         "delivery_contract_no_live_activation": [
             channel["network_call"] is False
@@ -10508,6 +10520,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "source_repository_ref_payload_db_required_guard",
         "source_repository_ref_evidence_db_required_guard",
         "source_repository_ref_storage",
+        "source_repository_ref_payload_storage_guard",
+        "source_repository_ref_evidence_storage_guard",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",
     )
@@ -19948,6 +19962,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_context["source_repository_ref"]["db_required"]
     )
     assert selected_source_repository_evidence_db_required is True
+    selected_source_repository_payload_storage = (
+        payload["source_repository_ref"]["storage"]
+    )
+    assert selected_source_repository_payload_storage == "sqlite_signal_repository"
+    selected_source_repository_evidence_storage = (
+        evidence_context["source_repository_ref"]["storage"]
+    )
+    assert selected_source_repository_evidence_storage == "sqlite_signal_repository"
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -19976,10 +19998,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_source_repository_evidence_db_required is True,
         ],
         "source_repository_ref_storage": [
-            payload["source_repository_ref"]["storage"]
-            == "sqlite_signal_repository",
-            evidence_context["source_repository_ref"]["storage"]
-            == "sqlite_signal_repository",
+            selected_source_repository_payload_storage == "sqlite_signal_repository",
+            selected_source_repository_evidence_storage == "sqlite_signal_repository",
+        ],
+        "source_repository_ref_payload_storage_guard": [
+            selected_source_repository_payload_storage == "sqlite_signal_repository",
+        ],
+        "source_repository_ref_evidence_storage_guard": [
+            selected_source_repository_evidence_storage == "sqlite_signal_repository",
         ],
         "delivery_contract_no_live_activation": [
             channel["network_call"] is False
@@ -20000,6 +20026,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "source_repository_ref_payload_db_required_guard",
         "source_repository_ref_evidence_db_required_guard",
         "source_repository_ref_storage",
+        "source_repository_ref_payload_storage_guard",
+        "source_repository_ref_evidence_storage_guard",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",
     )
