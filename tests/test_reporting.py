@@ -7465,6 +7465,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [source_summary],
         ),
     }
+    assert tuple(selected_source_summary_presence_targets["source_repository_ref"][1]) == (
+        "sqlite_signal_repository",
+        "TQQQ",
+        "swing_3d_10d",
+    )
     assert tuple(selected_source_summary_presence_targets) == (
         "source_repository_ref",
         "reasons",
@@ -15901,6 +15906,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [source_summary],
         ),
     }
+    assert tuple(selected_source_summary_presence_targets["source_repository_ref"][1]) == (
+        "sqlite_signal_repository",
+        "TQQQ",
+        "QQQ",
+        "swing_3d_10d",
+    )
     assert tuple(selected_source_summary_presence_targets) == (
         "source_repository_ref",
         "reasons",
