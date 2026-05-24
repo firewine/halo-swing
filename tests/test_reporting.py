@@ -7972,6 +7972,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "db_required=false" not in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_storage_metadata_exclusion_targets) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+        "source_summary_storage_metadata_text",
+    )
     selected_source_repository_storage_metadata_exclusion_summary = {
         name: all(checks)
         for name, checks in (
@@ -16118,6 +16125,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "db_required=false" not in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_storage_metadata_exclusion_targets) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+        "source_summary_storage_metadata_text",
+    )
     selected_source_repository_storage_metadata_exclusion_summary = {
         name: all(checks)
         for name, checks in (
