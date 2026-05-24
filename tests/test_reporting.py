@@ -7179,6 +7179,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             excluded_label_summaries,
         ),
     }
+    assert tuple(selected_label_summary_exclusion_targets) == (
+        "report_contract_label_summary_guard",
+        "reasons_label_summary",
+        "payload_text_label_summary",
+        "telegram_chunks_label_summary",
+        "reconstructed_telegram_text_label_summary",
+    )
     selected_label_summary_exclusion_summary = {
         name: all(
             excluded_summary not in value
@@ -15244,6 +15251,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             excluded_label_summaries,
         ),
     }
+    assert tuple(selected_label_summary_exclusion_targets) == (
+        "report_contract_label_summary_guard",
+        "reasons_label_summary",
+        "payload_text_label_summary",
+        "telegram_chunks_label_summary",
+        "reconstructed_telegram_text_label_summary",
+    )
     selected_label_summary_exclusion_summary = {
         name: all(
             excluded_summary not in value
