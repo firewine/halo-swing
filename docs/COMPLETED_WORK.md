@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered trade plan Hermes boundary target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.39s
+    full_pytest: 935 passed in 46.63s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered trade plan Hermes boundary target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.523
+
+- date: 2026-05-24
   commit: 42c19f2
   title: Cover sqlite filtered selected trade plan exclusion target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TRADE_PLAN_EXCLUSION_TARGET_ORDER_GATE
