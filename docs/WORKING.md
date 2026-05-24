@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_HERMES_BOUNDARY_TARGET_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_HERMES_BOUNDARY_TARGET_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DEGRADATION_FIELD_TARGET_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DEGRADATION_FIELD_TARGET_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving degradation Hermes boundary target order after repository selection
+objective: extend SQLite filtered latest report coverage proving selected degradation field target order after repository selection
 
 edits:
   allowed:
@@ -24,7 +24,6 @@ edits:
     - docs/WORKING.md
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
-    - docs/archive/working-ledger-compaction.md
     - docs/halo-swing-development-plan.md
     - tests/test_reporting.py
   blocked_prefixes:
@@ -36,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe degradation Hermes boundary target order is verified after repository selection
-  - SQLite repository-backed latest report underlying degradation Hermes boundary target order is verified after repository selection
-  - degradation Hermes boundary targets preserve filtered report target order after repository selection
+  - SQLite repository-backed latest report timeframe selected degradation field target order is verified after repository selection
+  - SQLite repository-backed latest report underlying selected degradation field target order is verified after repository selection
+  - selected degradation field targets preserve filtered report target order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,9 +63,9 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - git status showed expected modified task/docs/archive/test files only
-  - focused pytest passed: 3 passed in 1.20s
-  - full pytest passed: 935 passed in 39.34s
+  - git status showed expected modified task/docs/test files only
+  - focused pytest passed: 3 passed in 1.24s
+  - full pytest passed: 935 passed in 40.98s
   - ruff passed
   - health_check passed with status ok
 ```

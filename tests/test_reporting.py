@@ -8808,6 +8808,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == swing_signal["data_warnings"],
         ],
     }
+    assert tuple(selected_degradation_field_targets) == (
+        "latest_signal_report_data_freshness",
+    )
     selected_degradation_field_summary = {
         name: all(checks)
         for name, checks in selected_degradation_field_targets.items()
@@ -17085,6 +17088,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == qqq_signal["data_warnings"],
         ],
     }
+    assert tuple(selected_degradation_field_targets) == (
+        "latest_signal_report_data_freshness",
+    )
     selected_degradation_field_summary = {
         name: all(checks)
         for name, checks in selected_degradation_field_targets.items()
