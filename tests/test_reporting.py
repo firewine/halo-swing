@@ -6161,6 +6161,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             latest_matching_record_excludes_older_summary
         ),
     }
+    assert tuple(filtered_report_boolean_summary_by_name) == (
+        expected_filtered_report_shared_summary_names[1:]
+    )
     filtered_report_surface_group_boolean_surface_totals = {
         summary_name: {
             "surfaces": sum(
@@ -14151,6 +14154,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             latest_matching_record_excludes_older_summary
         ),
     }
+    assert tuple(filtered_report_boolean_summary_by_name) == (
+        expected_filtered_report_shared_summary_names[1:]
+    )
     filtered_report_surface_group_boolean_surface_totals = {
         summary_name: {
             "surfaces": sum(
