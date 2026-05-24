@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report contract guard check-key schema actual key order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECK_KEY_SCHEMA_ACTUAL_KEY_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.50s
+    full_pytest: 935 passed in 41.72s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying report contract guard check-key schema actual key order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.602
+
+- date: 2026-05-25
   commit: c56f4ba
   title: Cover sqlite filtered report contract guard check-name actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECK_NAME_ACTUAL_ORDER_GATE
