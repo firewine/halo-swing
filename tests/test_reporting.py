@@ -8535,6 +8535,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == swing_signal["created_at"],
         ],
     }
+    assert tuple(selected_timestamp_propagation_targets) == (
+        "top_level_as_of",
+        "latest_signal_report_created_at",
+        "report_payload_identity_guard_expected",
+        "report_payload_identity_guard_actual",
+    )
     selected_timestamp_propagation_summary = {
         name: all(checks)
         for name, checks in selected_timestamp_propagation_targets.items()
@@ -16763,6 +16769,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == qqq_signal["created_at"],
         ],
     }
+    assert tuple(selected_timestamp_propagation_targets) == (
+        "top_level_as_of",
+        "latest_signal_report_created_at",
+        "report_payload_identity_guard_expected",
+        "report_payload_identity_guard_actual",
+    )
     selected_timestamp_propagation_summary = {
         name: all(checks)
         for name, checks in selected_timestamp_propagation_targets.items()
