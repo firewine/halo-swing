@@ -9,6 +9,7 @@ compaction_policy:
   - full pre-compaction WORKING ledger remains preserved in docs/archive/working-ledger-compaction.md
   - this file tracks compact completed-slice entries after compaction
   - docs/WORKING.md stays current_work and next_work only
+  - never remove completed work from docs/WORKING.md unless the original is preserved in docs/archive/ and the compact entry is recorded here
 full_evidence_sources:
   - docs/halo-swing-development-plan.md
   - docs/archive/working-ledger-compaction.md
@@ -19,6 +20,20 @@ full_evidence_sources:
 ## ledger
 
 ```yaml
+- date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered excluded-record-free order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_FREE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.13s
+    full_pytest: 935 passed in 40.62s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered excluded-record-free surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.462
+
 - date: 2026-05-24
   commit: cb9d26d
   title: Cover sqlite filtered path-component-free order

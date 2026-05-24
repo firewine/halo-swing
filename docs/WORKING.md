@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_PATH_COMPONENT_FREE_ORDER_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_PATH_COMPONENT_FREE_ORDER_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_FREE_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_FREE_ORDER_COVERAGE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving path-component-free surface order after repository selection
+objective: extend SQLite filtered latest report coverage proving excluded-record-free surface order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe path-component-free surface order is verified after repository selection
-  - SQLite repository-backed latest report underlying path-component-free surface order is verified after repository selection
-  - path-component-free coverage preserves filtered report surface order after repository selection
+  - SQLite repository-backed latest report timeframe excluded-record-free surface order is verified after repository selection
+  - SQLite repository-backed latest report underlying excluded-record-free surface order is verified after repository selection
+  - excluded-record-free coverage preserves filtered report surface order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.21s
-  - full pytest passed: 935 passed in 41.98s
+  - focused pytest passed: 3 passed in 1.13s
+  - full pytest passed: 935 passed in 40.62s
   - ruff passed
   - health_check passed with status ok
 ```
