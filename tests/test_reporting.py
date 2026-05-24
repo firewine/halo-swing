@@ -9372,6 +9372,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         alternate_signal["signal_id"],
         older_matching_signal["signal_id"],
     ]
+    assert tuple(component_extreme_hermes_boundary_tokens) == (
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+        swing_signal["signal_id"],
+        alternate_signal["signal_id"],
+        older_matching_signal["signal_id"],
+    )
     component_extreme_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -18197,6 +18204,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ndx_signal["signal_id"],
         older_matching_signal["signal_id"],
     ]
+    assert tuple(component_extreme_hermes_boundary_tokens) == (
+        expected_component_extremes["strongest"]["name"],
+        expected_component_extremes["weakest"]["name"],
+        qqq_signal["signal_id"],
+        ndx_signal["signal_id"],
+        older_matching_signal["signal_id"],
+    )
     component_extreme_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
