@@ -9879,6 +9879,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_delivery_contract_schema_actual_values) == tuple(
         expected_delivery_contract_schema.values()
     )
+    selected_delivery_channel_format_actual = report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ]["actual"]
+    assert tuple(selected_delivery_channel_format_actual) == (
+        "hermes",
+        "telegram",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9937,6 +9944,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                 for token in expected_values
             ],
         ),
+        "delivery_channel_format_key_guard": (
+            [list(selected_delivery_channel_format_actual)],
+            ["hermes", "telegram"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9951,6 +9962,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_prompt_contract_identity_value_guard",
         "delivery_contract_schema_guard",
         "delivery_contract_schema_value_guard",
+        "delivery_channel_format_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19059,6 +19071,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_delivery_contract_schema_actual_values) == tuple(
         expected_delivery_contract_schema.values()
     )
+    selected_delivery_channel_format_actual = report_contract_guard_checks[
+        "delivery_channel_formats_match_expected"
+    ]["actual"]
+    assert tuple(selected_delivery_channel_format_actual) == (
+        "hermes",
+        "telegram",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19117,6 +19136,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                 for token in expected_values
             ],
         ),
+        "delivery_channel_format_key_guard": (
+            [list(selected_delivery_channel_format_actual)],
+            ["hermes", "telegram"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19131,6 +19154,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_prompt_contract_identity_value_guard",
         "delivery_contract_schema_guard",
         "delivery_contract_schema_value_guard",
+        "delivery_channel_format_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
