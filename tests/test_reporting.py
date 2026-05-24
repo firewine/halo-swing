@@ -6917,6 +6917,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for excluded_signal in excluded_source_signals
         ],
     }
+    assert tuple(selected_source_signal_ref_exclusion_targets) == (
+        "source_signal_ref",
+        "latest_signal_report",
+        "report_payload_source_signal_ref_identity_guard_expected",
+        "report_payload_source_signal_ref_identity_guard_actual",
+        "report_payload_guard",
+    )
     selected_source_signal_ref_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_exclusion_targets.items()
@@ -14956,6 +14963,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for excluded_signal in excluded_source_signals
         ],
     }
+    assert tuple(selected_source_signal_ref_exclusion_targets) == (
+        "source_signal_ref",
+        "latest_signal_report",
+        "report_payload_source_signal_ref_identity_guard_expected",
+        "report_payload_source_signal_ref_identity_guard_actual",
+        "report_payload_guard",
+    )
     selected_source_signal_ref_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_exclusion_targets.items()
