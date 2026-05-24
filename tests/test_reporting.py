@@ -9923,6 +9923,17 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_report_contract_cron_registry_actual) == tuple(
         selected_cron_intent_tokens
     )
+    selected_report_contract_intent_registry_actual = (
+        report_contract_guard_checks[
+            "report_intent_contract_matches_registry"
+        ]["actual"]
+    )
+    assert tuple(selected_report_contract_intent_registry_actual) == (
+        "name",
+        "schedule_hint",
+        "decision_focus",
+        "required_sections",
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -9945,9 +9956,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_cron_intent_tokens,
         ),
         "report_contract_intent_registry_match_guard": (
-            report_contract_guard_checks[
-                "report_intent_contract_matches_registry"
-            ]["actual"],
+            selected_report_contract_intent_registry_actual,
             selected_cron_schedule_tokens,
         ),
     }
@@ -19005,6 +19014,17 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_report_contract_cron_registry_actual) == tuple(
         selected_cron_intent_tokens
     )
+    selected_report_contract_intent_registry_actual = (
+        report_contract_guard_checks[
+            "report_intent_contract_matches_registry"
+        ]["actual"]
+    )
+    assert tuple(selected_report_contract_intent_registry_actual) == (
+        "name",
+        "schedule_hint",
+        "decision_focus",
+        "required_sections",
+    )
     selected_cron_intent_presence_targets = {
         "payload_report_intent": (
             [payload["report_intent"]],
@@ -19027,9 +19047,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_cron_intent_tokens,
         ),
         "report_contract_intent_registry_match_guard": (
-            report_contract_guard_checks[
-                "report_intent_contract_matches_registry"
-            ]["actual"],
+            selected_report_contract_intent_registry_actual,
             selected_cron_schedule_tokens,
         ),
     }
