@@ -10488,6 +10488,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         False,
         False,
     )
+    selected_delivery_preview_no_live_activation_values = [
+        channel["network_call"] for channel in delivery_preview["channels"].values()
+    ]
+    assert tuple(selected_delivery_preview_no_live_activation_values) == (
+        False,
+        False,
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -10547,8 +10554,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_delivery_contract_no_live_activation_values == [False, False],
         ],
         "delivery_preview_no_live_activation": [
-            channel["network_call"] is False
-            for channel in delivery_preview["channels"].values()
+            value is False
+            for value in selected_delivery_preview_no_live_activation_values
+        ],
+        "delivery_preview_no_live_activation_values_guard": [
+            selected_delivery_preview_no_live_activation_values == [False, False],
         ],
     }
     assert tuple(selected_offline_live_data_boundary_targets) == (
@@ -10569,6 +10579,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_contract_no_live_activation",
         "delivery_contract_no_live_activation_values_guard",
         "delivery_preview_no_live_activation",
+        "delivery_preview_no_live_activation_values_guard",
     )
     selected_offline_live_data_boundary_summary = {
         name: all(checks)
@@ -20039,6 +20050,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         False,
         False,
     )
+    selected_delivery_preview_no_live_activation_values = [
+        channel["network_call"] for channel in delivery_preview["channels"].values()
+    ]
+    assert tuple(selected_delivery_preview_no_live_activation_values) == (
+        False,
+        False,
+    )
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -20098,8 +20116,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_delivery_contract_no_live_activation_values == [False, False],
         ],
         "delivery_preview_no_live_activation": [
-            channel["network_call"] is False
-            for channel in delivery_preview["channels"].values()
+            value is False
+            for value in selected_delivery_preview_no_live_activation_values
+        ],
+        "delivery_preview_no_live_activation_values_guard": [
+            selected_delivery_preview_no_live_activation_values == [False, False],
         ],
     }
     assert tuple(selected_offline_live_data_boundary_targets) == (
@@ -20120,6 +20141,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_contract_no_live_activation",
         "delivery_contract_no_live_activation_values_guard",
         "delivery_preview_no_live_activation",
+        "delivery_preview_no_live_activation_values_guard",
     )
     selected_offline_live_data_boundary_summary = {
         name: all(checks)

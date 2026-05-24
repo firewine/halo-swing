@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_NO_LIVE_ACTIVATION_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_NO_LIVE_ACTIVATION_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_NO_LIVE_ACTIVATION_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_NO_LIVE_ACTIVATION_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving delivery contract no-live-activation values after repository selection
+objective: extend SQLite filtered latest report coverage proving delivery preview no-live-activation values after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe delivery contract no-live-activation values are verified after repository selection
-  - SQLite repository-backed latest report underlying delivery contract no-live-activation values are verified after repository selection
-  - delivery_contract channels preserve network_call false values without live activation
+  - SQLite repository-backed latest report timeframe delivery preview no-live-activation values are verified after repository selection
+  - SQLite repository-backed latest report underlying delivery preview no-live-activation values are verified after repository selection
+  - delivery_preview channels preserve network_call false values without live activation
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,7 +69,7 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - focused pytest passed: 3 passed in 1.36s
-  - full pytest passed: 935 passed in 40.55s
+  - full pytest passed: 935 passed in 40.58s
   - ruff passed
   - health_check passed with status ok
 ```
