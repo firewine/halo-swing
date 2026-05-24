@@ -21,6 +21,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered surface-group failure order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_BOOLEAN_FAILURE_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.16s
+    full_pytest: 935 passed in 40.65s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered surface-group boolean failure order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.467
+
+- date: 2026-05-24
   commit: e602d3e
   title: Cover sqlite filtered surface-group boolean order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_BOOLEAN_COVERAGE_ORDER_GATE
