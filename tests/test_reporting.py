@@ -9568,6 +9568,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         alternate_signal["config_hash"],
         alternate_signal["config_hash"].removeprefix("sha256:"),
     ]
+    assert tuple(selected_excluded_record_tokens) == (
+        alternate_signal["signal_id"],
+        alternate_signal["run_id"],
+        alternate_signal["config_hash"],
+        alternate_signal["config_hash"].removeprefix("sha256:"),
+    )
     selected_excluded_record_free_summary = {
         name: all(
             token not in value
@@ -17962,6 +17968,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ndx_signal["config_hash"],
         ndx_signal["config_hash"].removeprefix("sha256:"),
     ]
+    assert tuple(selected_excluded_record_tokens) == (
+        ndx_signal["signal_id"],
+        ndx_signal["run_id"],
+        ndx_signal["config_hash"],
+        ndx_signal["config_hash"].removeprefix("sha256:"),
+    )
     selected_excluded_record_free_summary = {
         name: all(
             token not in value
