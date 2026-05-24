@@ -9064,6 +9064,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_sqlite_name_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    storage_markers = [".sqlite", ".sqlite3", "sqlite:"]
+    selected_storage_marker_free_summary = {
+        name: all(
+            marker not in value.lower()
+            for value in iter_nested_strings(target)
+            for marker in storage_markers
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_storage_marker_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_storage_marker_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -16903,6 +16918,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in selected_sqlite_name_free_targets
     }
     assert tuple(selected_sqlite_name_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    storage_markers = [".sqlite", ".sqlite3", "sqlite:"]
+    selected_storage_marker_free_summary = {
+        name: all(
+            marker not in value.lower()
+            for value in iter_nested_strings(target)
+            for marker in storage_markers
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_storage_marker_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_storage_marker_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
     assert all(
