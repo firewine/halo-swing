@@ -9426,6 +9426,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             for channel in delivery_preview["channels"].values()
         ],
     }
+    assert tuple(selected_offline_live_data_boundary_targets) == (
+        "payload_live_data_required",
+        "report_payload_live_data_guard",
+        "source_repository_ref_db_required",
+        "source_repository_ref_storage",
+        "delivery_contract_no_live_activation",
+        "delivery_preview_no_live_activation",
+    )
     selected_offline_live_data_boundary_summary = {
         name: all(checks)
         for name, checks in selected_offline_live_data_boundary_targets.items()
@@ -17779,6 +17787,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             for channel in delivery_preview["channels"].values()
         ],
     }
+    assert tuple(selected_offline_live_data_boundary_targets) == (
+        "payload_live_data_required",
+        "report_payload_live_data_guard",
+        "source_repository_ref_db_required",
+        "source_repository_ref_storage",
+        "delivery_contract_no_live_activation",
+        "delivery_preview_no_live_activation",
+    )
     selected_offline_live_data_boundary_summary = {
         name: all(checks)
         for name, checks in selected_offline_live_data_boundary_targets.items()

@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered selected offline live-data boundary target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_DATA_BOUNDARY_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.27s
+    full_pytest: 935 passed in 42.70s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected offline live-data boundary target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.528
+
+- date: 2026-05-25
   commit: 60541ce
   title: Cover sqlite filtered selected delivery side effect target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_SIDE_EFFECT_TARGET_ORDER_GATE
