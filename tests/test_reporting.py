@@ -7202,6 +7202,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_label_status_guard_pass_summary == {
         name: True for name in selected_label_status_guard_pass_targets
     }
+    assert tuple(selected_label_status_guard_pass_summary) == tuple(
+        selected_label_status_guard_pass_targets
+    )
     excluded_label_statuses = [alternate_label, older_matching_label]
     label_status_detail_fields = (
         "outcome",
@@ -15131,6 +15134,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_label_status_guard_pass_summary == {
         name: True for name in selected_label_status_guard_pass_targets
     }
+    assert tuple(selected_label_status_guard_pass_summary) == tuple(
+        selected_label_status_guard_pass_targets
+    )
     excluded_label_statuses = [alternate_label, older_matching_label]
     label_status_detail_fields = (
         "outcome",

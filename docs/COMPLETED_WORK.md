@@ -20,6 +20,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered label status guard pass order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_GUARD_PASS_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 0.11s
+    full_pytest: 935 passed in 45.44s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered label status guard pass surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.453
+
+- date: 2026-05-24
   commit: 4202914
   title: Cover sqlite filtered label status propagation order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_PROPAGATION_ORDER_COVERAGE_GATE
