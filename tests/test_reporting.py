@@ -7865,6 +7865,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             f"timeframe={alternate_signal['timeframe']}" not in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_filter_exclusion_targets) == (
+        "top_level_source_repository_filters",
+        "evidence_context_source_repository_filters",
+        "latest_record_guard_expected_filters",
+        "latest_record_guard_actual_filters",
+        "source_summary_filter_text",
+    )
     selected_source_repository_filter_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_filter_exclusion_targets.items()
@@ -15997,6 +16004,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             f"underlying={ndx_signal['underlying']}" not in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_filter_exclusion_targets) == (
+        "top_level_source_repository_filters",
+        "evidence_context_source_repository_filters",
+        "latest_record_guard_expected_filters",
+        "latest_record_guard_actual_filters",
+        "source_summary_filter_text",
+    )
     selected_source_repository_filter_exclusion_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_filter_exclusion_targets.items()
