@@ -38,10 +38,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
-  commit: pending
+  commit: 2178820
   title: Cover sqlite filtered selected decision identity presence target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DECISION_IDENTITY_PRESENCE_TARGET_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.16s
     full_pytest: 935 passed in 40.30s
