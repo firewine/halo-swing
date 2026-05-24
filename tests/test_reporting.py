@@ -7804,6 +7804,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(payload["source_repository_ref"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
+    assert tuple(evidence_context["source_repository_ref"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
     assert tuple(selected_source_repository_ref_propagation_targets) == (
         "top_level_source_repository_ref",
         "evidence_context_source_repository_ref",
@@ -16261,6 +16271,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == expected_source_repository_ref_path_free,
         ],
     }
+    assert tuple(payload["source_repository_ref"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
+    assert tuple(evidence_context["source_repository_ref"]) == (
+        "storage",
+        "db_required",
+        "filters",
+    )
     assert tuple(selected_source_repository_ref_propagation_targets) == (
         "top_level_source_repository_ref",
         "evidence_context_source_repository_ref",
