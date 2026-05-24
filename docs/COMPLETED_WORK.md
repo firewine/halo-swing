@@ -39,10 +39,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
-  commit: pending
+  commit: 42c19f2
   title: Cover sqlite filtered selected trade plan exclusion target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_TRADE_PLAN_EXCLUSION_TARGET_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.21s
     full_pytest: 935 passed in 40.52s
