@@ -9135,6 +9135,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_older_matching_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    selected_excluded_label_summary_free_summary = {
+        name: all(
+            excluded_summary not in value
+            for value in iter_nested_strings(target)
+            for excluded_summary in excluded_label_summaries
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_excluded_label_summary_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_label_summary_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -17045,6 +17059,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in selected_sqlite_name_free_targets
     }
     assert tuple(selected_older_matching_record_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_label_summary_free_summary = {
+        name: all(
+            excluded_summary not in value
+            for value in iter_nested_strings(target)
+            for excluded_summary in excluded_label_summaries
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_excluded_label_summary_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_label_summary_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
     assert all(
