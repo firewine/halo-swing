@@ -7436,6 +7436,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [source_summary],
         ),
     }
+    assert tuple(selected_source_summary_presence_targets) == (
+        "source_repository_ref",
+        "reasons",
+        "payload_text",
+        "report_contract_source_guard",
+    )
     selected_source_summary_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -15529,6 +15535,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [source_summary],
         ),
     }
+    assert tuple(selected_source_summary_presence_targets) == (
+        "source_repository_ref",
+        "reasons",
+        "payload_text",
+        "report_contract_source_guard",
+    )
     selected_source_summary_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
