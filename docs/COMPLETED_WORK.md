@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered selected sqlite name-free target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SQLITE_NAME_FREE_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.34s
+    full_pytest: 935 passed in 43.41s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected sqlite name-free target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.530
+
+- date: 2026-05-25
   commit: 5a7bb6f
   title: Cover sqlite filtered selected offline live activation-free target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_OFFLINE_LIVE_ACTIVATION_FREE_TARGET_ORDER_GATE

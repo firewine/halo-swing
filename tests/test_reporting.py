@@ -9492,6 +9492,23 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_guard_checks": report_payload_guard_checks,
         "reasons": reasons,
     }
+    assert tuple(selected_sqlite_name_free_targets) == (
+        "label_status",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "evidence_guard_checks",
+        "prompt_contract",
+        "report_intent_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "report_contract_guard_checks",
+        "report_payload_guard_checks",
+        "reasons",
+    )
     selected_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
@@ -17859,6 +17876,23 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_guard_checks": report_payload_guard_checks,
         "reasons": reasons,
     }
+    assert tuple(selected_sqlite_name_free_targets) == (
+        "label_status",
+        "evidence_contract",
+        "evidence_context",
+        "evidence_label_status",
+        "source_signal_ref",
+        "source_repository_ref",
+        "latest_record_guard",
+        "evidence_guard_checks",
+        "prompt_contract",
+        "report_intent_contract",
+        "delivery_contract",
+        "delivery_preview",
+        "report_contract_guard_checks",
+        "report_payload_guard_checks",
+        "reasons",
+    )
     selected_sqlite_name_free_summary = {
         name: all(
             ".sqlite" not in value.lower()
