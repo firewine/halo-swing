@@ -5,16 +5,33 @@ doc_type: completed_work_ledger
 audience: llm_agents_and_humans
 purpose: track completed slices separately from docs/WORKING.md
 detail_policy: compact_summary_plus_pointers
+pre_compaction_completed_ledger: docs/archive/working-ledger-compaction.md
+post_compaction_ledger_start: docs/halo-swing-development-plan.md#4.438
 compaction_policy:
-  - full pre-compaction WORKING ledger remains preserved in docs/archive/working-ledger-compaction.md
-  - this file tracks compact completed-slice entries after compaction
+  - full pre-compaction WORKING ledger, including completed work and verification history, remains preserved in docs/archive/working-ledger-compaction.md
+  - this file tracks compact completed-slice entries from the compaction checkpoint forward
   - docs/WORKING.md stays current_work and next_work only
-  - never remove completed work from docs/WORKING.md unless the original is preserved in docs/archive/ and the compact entry is recorded here
+  - never remove completed work from docs/WORKING.md unless the original is preserved in docs/archive/working-ledger-compaction.md and the compact entry is recorded here for post-compaction work
 full_evidence_sources:
   - docs/halo-swing-development-plan.md
   - docs/archive/working-ledger-compaction.md
   - git log
   - committed test output summaries
+```
+
+## historical_baseline
+
+```yaml
+pre_compaction_source: docs/archive/working-ledger-compaction.md
+pre_compaction_policy:
+  - this archive is the moved original WORKING.md ledger, not disposable scratch
+  - it contains the long completed-work and verification history that was removed from active WORKING.md
+  - do not delete or overwrite it during normal implementation
+  - use it for historical audit, regression tracing, and stale-context recovery only
+post_compaction_policy:
+  - add new completed slices to the compact ledger below
+  - keep detailed gate evidence in docs/halo-swing-development-plan.md
+  - keep active docs/WORKING.md limited to current work and next work
 ```
 
 ## ledger
