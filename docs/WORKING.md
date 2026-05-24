@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_SOURCE_REPOSITORY_REF_SCHEMA_KEY_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_SOURCE_REPOSITORY_REF_SCHEMA_KEY_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_DELIVERY_PROFILE_ACTUAL_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_DELIVERY_PROFILE_ACTUAL_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving evidence source repository ref schema key order after repository selection
+objective: extend SQLite filtered latest report coverage proving report contract guard delivery profile actual order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe evidence source_repository_ref schema guard key order is verified after repository selection
-  - SQLite repository-backed latest report underlying evidence source_repository_ref schema guard key order is verified after repository selection
-  - evidence source_repository_ref schema guard preserves name, passed, expected, actual order and storage, db_required, filters order
+  - SQLite repository-backed latest report timeframe report contract guard delivery profile actual order is verified after repository selection
+  - SQLite repository-backed latest report underlying report contract guard delivery profile actual order is verified after repository selection
+  - report contract guard delivery profile actuals preserve delivery format, Telegram schema version, and Telegram chunking order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -69,8 +69,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.48s
-  - full pytest passed: 935 passed in 44.24s
+  - focused pytest passed: 3 passed in 1.51s
+  - full pytest passed: 935 passed in 43.98s
   - ruff passed
   - health_check passed with status ok
 ```
@@ -98,7 +98,7 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - run required verification for current evidence source repository ref schema key order slice
+  - run required verification for current report contract guard delivery profile actual order slice
   - commit and push this verified slice
   - choose the next explicit repository_or_report_read_model_slice from SSOT
 ```

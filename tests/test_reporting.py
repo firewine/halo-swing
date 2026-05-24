@@ -9805,6 +9805,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "split_on_section_boundary",
         "1_based",
     )
+    selected_report_contract_guard_delivery_profile_actuals = [
+        report_contract_guard_checks[
+            "delivery_channel_formats_match_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"],
+    ]
+    assert tuple(
+        selected_report_contract_guard_delivery_profile_actuals
+    ) == (
+        report_contract_guard_checks[
+            "delivery_channel_formats_match_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"],
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9827,17 +9851,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_telegram_preview_profile_tokens,
         ),
         "report_contract_guard_delivery_profile": (
-            [
-                report_contract_guard_checks[
-                    "delivery_channel_formats_match_expected"
-                ]["actual"],
-                report_contract_guard_checks[
-                    "report_telegram_schema_version_matches_expected"
-                ]["actual"],
-                report_contract_guard_checks[
-                    "report_telegram_chunking_contract_matches_expected"
-                ]["actual"],
-            ],
+            selected_report_contract_guard_delivery_profile_actuals,
             selected_report_contract_guard_delivery_profile_tokens,
         ),
     }
@@ -18858,6 +18872,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "split_on_section_boundary",
         "1_based",
     )
+    selected_report_contract_guard_delivery_profile_actuals = [
+        report_contract_guard_checks[
+            "delivery_channel_formats_match_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"],
+    ]
+    assert tuple(
+        selected_report_contract_guard_delivery_profile_actuals
+    ) == (
+        report_contract_guard_checks[
+            "delivery_channel_formats_match_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_schema_version_matches_expected"
+        ]["actual"],
+        report_contract_guard_checks[
+            "report_telegram_chunking_contract_matches_expected"
+        ]["actual"],
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -18880,17 +18918,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_telegram_preview_profile_tokens,
         ),
         "report_contract_guard_delivery_profile": (
-            [
-                report_contract_guard_checks[
-                    "delivery_channel_formats_match_expected"
-                ]["actual"],
-                report_contract_guard_checks[
-                    "report_telegram_schema_version_matches_expected"
-                ]["actual"],
-                report_contract_guard_checks[
-                    "report_telegram_chunking_contract_matches_expected"
-                ]["actual"],
-            ],
+            selected_report_contract_guard_delivery_profile_actuals,
             selected_report_contract_guard_delivery_profile_tokens,
         ),
     }
