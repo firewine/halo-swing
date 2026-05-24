@@ -8236,6 +8236,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "reasons": reasons,
         "source_summary": [source_summary],
     }
+    assert tuple(selected_filter_guard_raw_marker_free_targets) == (
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "delivery_preview",
+        "reasons",
+        "source_summary",
+    )
     selected_filter_guard_raw_marker_free_summary = {
         name: all(
             marker not in value
@@ -16415,6 +16422,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "reasons": reasons,
         "source_summary": [source_summary],
     }
+    assert tuple(selected_filter_guard_raw_marker_free_targets) == (
+        "evidence_guard_checks",
+        "report_contract_guard_checks",
+        "delivery_preview",
+        "reasons",
+        "source_summary",
+    )
     selected_filter_guard_raw_marker_free_summary = {
         name: all(
             marker not in value
