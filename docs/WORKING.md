@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_COMPONENT_EXTREME_PRESENCE_TARGET_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_COMPONENT_EXTREME_PRESENCE_TARGET_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_COMPONENT_EXTREME_HERMES_BOUNDARY_TARGET_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_COMPONENT_EXTREME_HERMES_BOUNDARY_TARGET_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected component extreme presence target order after repository selection
+objective: extend SQLite filtered latest report coverage proving component extreme Hermes boundary target order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected component extreme presence target order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected component extreme presence target order is verified after repository selection
-  - selected component extreme presence targets preserve filtered report target order after repository selection
+  - SQLite repository-backed latest report timeframe component extreme Hermes boundary target order is verified after repository selection
+  - SQLite repository-backed latest report underlying component extreme Hermes boundary target order is verified after repository selection
+  - component extreme Hermes boundary targets preserve filtered report target order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.23s
-  - full pytest passed: 935 passed in 41.12s
+  - focused pytest passed: 3 passed in 1.22s
+  - full pytest passed: 935 passed in 40.78s
   - ruff passed
   - health_check passed with status ok
 ```
