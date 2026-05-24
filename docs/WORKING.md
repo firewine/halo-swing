@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_AXES_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_AXES_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving surface-group surface totals-by-group order after repository selection
+objective: extend SQLite filtered latest report coverage proving surface-group surface totals-by-group axes order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe surface-group surface totals-by-group order is verified after repository selection
-  - SQLite repository-backed latest report underlying surface-group surface totals-by-group order is verified after repository selection
-  - surface-group surface totals-by-group preserve filtered report summary order after repository selection
+  - SQLite repository-backed latest report timeframe surface-group surface totals-by-group axes order is verified after repository selection
+  - SQLite repository-backed latest report underlying surface-group surface totals-by-group axes order is verified after repository selection
+  - surface-group surface totals-by-group axes preserve filtered report summary order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.16s
-  - full pytest passed: 935 passed in 40.05s
+  - focused pytest passed: 3 passed in 1.13s
+  - full pytest passed: 935 passed in 39.88s
   - ruff passed
   - health_check passed with status ok
 ```

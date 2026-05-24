@@ -21,6 +21,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered surface totals-by-group axes order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_AXES_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.13s
+    full_pytest: 935 passed in 39.88s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered surface-group surface totals-by-group axes order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.473
+
+- date: 2026-05-24
   commit: e5d092c
   title: Cover sqlite filtered surface totals-by-group order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTALS_BY_GROUP_ORDER_GATE
