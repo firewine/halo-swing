@@ -21,10 +21,10 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
-  commit: recorded_in_commit_containing_this_entry
+  commit: 4e1d950
   title: Cover sqlite filtered selected source signal ref traceability target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_SIGNAL_REF_TRACEABILITY_TARGET_ORDER_GATE
-  status: verified_pending_push
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.20s
     full_pytest: 935 passed in 39.49s
