@@ -9659,42 +9659,93 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_delivery_preview_presence_summary) == tuple(
         selected_delivery_preview_presence_targets
     )
+    selected_report_intent_contract_profile_tokens = [
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+        *expected_report_sections,
+    ]
+    selected_prompt_contract_profile_tokens = (
+        expected_prompt_terms + list(expected_prompt_identity.values())
+    )
+    selected_hermes_delivery_contract_profile_tokens = [
+        "structured_json_plus_text",
+        "latest_signal_report",
+    ]
+    selected_telegram_delivery_contract_profile_tokens = [
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+        *expected_report_sections,
+    ]
+    selected_telegram_preview_profile_tokens = [
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+    ]
+    selected_report_contract_guard_delivery_profile_tokens = [
+        "structured_json_plus_text",
+        "plain_text",
+        "telegram_report_format.v1",
+        "split_on_section_boundary",
+        "1_based",
+    ]
+    assert tuple(selected_report_intent_contract_profile_tokens) == (
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+        *expected_report_sections,
+    )
+    assert tuple(selected_prompt_contract_profile_tokens) == (
+        *expected_prompt_terms,
+        *list(expected_prompt_identity.values()),
+    )
+    assert tuple(selected_hermes_delivery_contract_profile_tokens) == (
+        "structured_json_plus_text",
+        "latest_signal_report",
+    )
+    assert tuple(selected_telegram_delivery_contract_profile_tokens) == (
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+        *expected_report_sections,
+    )
+    assert tuple(selected_telegram_preview_profile_tokens) == (
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+    )
+    assert tuple(selected_report_contract_guard_delivery_profile_tokens) == (
+        "structured_json_plus_text",
+        "plain_text",
+        "telegram_report_format.v1",
+        "split_on_section_boundary",
+        "1_based",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
-            [
-                "pre_market_swing_report",
-                "weekday_pre_market",
-                "new_swing_entry_and_watchlist",
-            ]
-            + expected_report_sections,
+            selected_report_intent_contract_profile_tokens,
         ),
         "prompt_contract": (
             prompt_contract,
-            expected_prompt_terms + list(expected_prompt_identity.values()),
+            selected_prompt_contract_profile_tokens,
         ),
         "hermes_delivery_contract": (
             delivery_channels["hermes"],
-            ["structured_json_plus_text", "latest_signal_report"],
+            selected_hermes_delivery_contract_profile_tokens,
         ),
         "telegram_delivery_contract": (
             telegram_contract,
-            [
-                "telegram_report_format.v1",
-                "plain_text",
-                "split_on_section_boundary",
-                "1_based",
-            ]
-            + expected_report_sections,
+            selected_telegram_delivery_contract_profile_tokens,
         ),
         "telegram_preview_profile": (
             telegram_preview,
-            [
-                "telegram_report_format.v1",
-                "plain_text",
-                "split_on_section_boundary",
-                "1_based",
-            ],
+            selected_telegram_preview_profile_tokens,
         ),
         "report_contract_guard_delivery_profile": (
             [
@@ -9708,13 +9759,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
                     "report_telegram_chunking_contract_matches_expected"
                 ]["actual"],
             ],
-            [
-                "structured_json_plus_text",
-                "plain_text",
-                "telegram_report_format.v1",
-                "split_on_section_boundary",
-                "1_based",
-            ],
+            selected_report_contract_guard_delivery_profile_tokens,
         ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
@@ -18536,42 +18581,93 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_delivery_preview_presence_summary) == tuple(
         selected_delivery_preview_presence_targets
     )
+    selected_report_intent_contract_profile_tokens = [
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+        *expected_report_sections,
+    ]
+    selected_prompt_contract_profile_tokens = (
+        expected_prompt_terms + list(expected_prompt_identity.values())
+    )
+    selected_hermes_delivery_contract_profile_tokens = [
+        "structured_json_plus_text",
+        "latest_signal_report",
+    ]
+    selected_telegram_delivery_contract_profile_tokens = [
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+        *expected_report_sections,
+    ]
+    selected_telegram_preview_profile_tokens = [
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+    ]
+    selected_report_contract_guard_delivery_profile_tokens = [
+        "structured_json_plus_text",
+        "plain_text",
+        "telegram_report_format.v1",
+        "split_on_section_boundary",
+        "1_based",
+    ]
+    assert tuple(selected_report_intent_contract_profile_tokens) == (
+        "pre_market_swing_report",
+        "weekday_pre_market",
+        "new_swing_entry_and_watchlist",
+        *expected_report_sections,
+    )
+    assert tuple(selected_prompt_contract_profile_tokens) == (
+        *expected_prompt_terms,
+        *list(expected_prompt_identity.values()),
+    )
+    assert tuple(selected_hermes_delivery_contract_profile_tokens) == (
+        "structured_json_plus_text",
+        "latest_signal_report",
+    )
+    assert tuple(selected_telegram_delivery_contract_profile_tokens) == (
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+        *expected_report_sections,
+    )
+    assert tuple(selected_telegram_preview_profile_tokens) == (
+        "telegram_report_format.v1",
+        "plain_text",
+        "split_on_section_boundary",
+        "1_based",
+    )
+    assert tuple(selected_report_contract_guard_delivery_profile_tokens) == (
+        "structured_json_plus_text",
+        "plain_text",
+        "telegram_report_format.v1",
+        "split_on_section_boundary",
+        "1_based",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
-            [
-                "pre_market_swing_report",
-                "weekday_pre_market",
-                "new_swing_entry_and_watchlist",
-            ]
-            + expected_report_sections,
+            selected_report_intent_contract_profile_tokens,
         ),
         "prompt_contract": (
             prompt_contract,
-            expected_prompt_terms + list(expected_prompt_identity.values()),
+            selected_prompt_contract_profile_tokens,
         ),
         "hermes_delivery_contract": (
             delivery_channels["hermes"],
-            ["structured_json_plus_text", "latest_signal_report"],
+            selected_hermes_delivery_contract_profile_tokens,
         ),
         "telegram_delivery_contract": (
             telegram_contract,
-            [
-                "telegram_report_format.v1",
-                "plain_text",
-                "split_on_section_boundary",
-                "1_based",
-            ]
-            + expected_report_sections,
+            selected_telegram_delivery_contract_profile_tokens,
         ),
         "telegram_preview_profile": (
             telegram_preview,
-            [
-                "telegram_report_format.v1",
-                "plain_text",
-                "split_on_section_boundary",
-                "1_based",
-            ],
+            selected_telegram_preview_profile_tokens,
         ),
         "report_contract_guard_delivery_profile": (
             [
@@ -18585,13 +18681,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
                     "report_telegram_chunking_contract_matches_expected"
                 ]["actual"],
             ],
-            [
-                "structured_json_plus_text",
-                "plain_text",
-                "telegram_report_format.v1",
-                "split_on_section_boundary",
-                "1_based",
-            ],
+            selected_report_contract_guard_delivery_profile_tokens,
         ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
