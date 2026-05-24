@@ -6851,6 +6851,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             is True,
         ],
     }
+    assert tuple(selected_source_signal_ref_propagation_targets) == (
+        "source_signal_ref_values",
+        "latest_signal_report_values",
+        "report_payload_source_signal_ref_identity_guard",
+    )
     selected_source_signal_ref_propagation_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_propagation_targets.items()
@@ -14885,6 +14890,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             is True,
         ],
     }
+    assert tuple(selected_source_signal_ref_propagation_targets) == (
+        "source_signal_ref_values",
+        "latest_signal_report_values",
+        "report_payload_source_signal_ref_identity_guard",
+    )
     selected_source_signal_ref_propagation_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_propagation_targets.items()
