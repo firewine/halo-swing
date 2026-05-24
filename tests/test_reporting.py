@@ -10448,6 +10448,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]["expected"]
     )
     assert selected_report_payload_live_data_required_expected is False
+    selected_source_repository_payload_db_required = (
+        payload["source_repository_ref"]["db_required"]
+    )
+    assert selected_source_repository_payload_db_required is True
+    selected_source_repository_evidence_db_required = (
+        evidence_context["source_repository_ref"]["db_required"]
+    )
+    assert selected_source_repository_evidence_db_required is True
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -10466,8 +10474,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_report_payload_live_data_required_expected is False,
         ],
         "source_repository_ref_db_required": [
-            payload["source_repository_ref"]["db_required"] is True,
-            evidence_context["source_repository_ref"]["db_required"] is True,
+            selected_source_repository_payload_db_required is True,
+            selected_source_repository_evidence_db_required is True,
+        ],
+        "source_repository_ref_payload_db_required_guard": [
+            selected_source_repository_payload_db_required is True,
+        ],
+        "source_repository_ref_evidence_db_required_guard": [
+            selected_source_repository_evidence_db_required is True,
         ],
         "source_repository_ref_storage": [
             payload["source_repository_ref"]["storage"]
@@ -10491,6 +10505,8 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_live_data_actual_guard",
         "report_payload_live_data_expected_guard",
         "source_repository_ref_db_required",
+        "source_repository_ref_payload_db_required_guard",
+        "source_repository_ref_evidence_db_required_guard",
         "source_repository_ref_storage",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",
@@ -19924,6 +19940,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]["expected"]
     )
     assert selected_report_payload_live_data_required_expected is False
+    selected_source_repository_payload_db_required = (
+        payload["source_repository_ref"]["db_required"]
+    )
+    assert selected_source_repository_payload_db_required is True
+    selected_source_repository_evidence_db_required = (
+        evidence_context["source_repository_ref"]["db_required"]
+    )
+    assert selected_source_repository_evidence_db_required is True
     selected_offline_live_data_boundary_targets = {
         "payload_live_data_required": [
             selected_live_data_required_actual is False,
@@ -19942,8 +19966,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_report_payload_live_data_required_expected is False,
         ],
         "source_repository_ref_db_required": [
-            payload["source_repository_ref"]["db_required"] is True,
-            evidence_context["source_repository_ref"]["db_required"] is True,
+            selected_source_repository_payload_db_required is True,
+            selected_source_repository_evidence_db_required is True,
+        ],
+        "source_repository_ref_payload_db_required_guard": [
+            selected_source_repository_payload_db_required is True,
+        ],
+        "source_repository_ref_evidence_db_required_guard": [
+            selected_source_repository_evidence_db_required is True,
         ],
         "source_repository_ref_storage": [
             payload["source_repository_ref"]["storage"]
@@ -19967,6 +19997,8 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_live_data_actual_guard",
         "report_payload_live_data_expected_guard",
         "source_repository_ref_db_required",
+        "source_repository_ref_payload_db_required_guard",
+        "source_repository_ref_evidence_db_required_guard",
         "source_repository_ref_storage",
         "delivery_contract_no_live_activation",
         "delivery_preview_no_live_activation",

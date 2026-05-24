@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LIVE_DATA_REQUIRED_EXPECTED_ACTUAL_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LIVE_DATA_REQUIRED_EXPECTED_ACTUAL_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_DB_REQUIRED_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_DB_REQUIRED_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving live_data_required expected and actual false values after repository selection
+objective: extend SQLite filtered latest report coverage proving source_repository_ref db_required true values after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe live_data_required payload and guard expected/actual false values are verified after repository selection
-  - SQLite repository-backed latest report underlying live_data_required payload and guard expected/actual false values are verified after repository selection
-  - report_payload_live_data_required_matches_expected preserves false expected and actual contract values
+  - SQLite repository-backed latest report timeframe source_repository_ref db_required true values are verified after repository selection
+  - SQLite repository-backed latest report underlying source_repository_ref db_required true values are verified after repository selection
+  - payload and evidence_context source_repository_ref db_required values preserve explicit SQLite repository requirement
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.38s
-  - full pytest passed: 935 passed in 40.47s
+  - focused pytest passed: 3 passed in 1.39s
+  - full pytest passed: 935 passed in 40.87s
   - ruff passed
   - health_check passed with status ok
 ```
