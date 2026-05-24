@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered selected conflict flag presence token order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_PRESENCE_TOKEN_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.33s
+    full_pytest: 935 passed in 43.31s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected conflict flag presence token order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.561
+
+- date: 2026-05-25
   commit: 01ca2bd
   title: Cover sqlite filtered selected degradation field token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DEGRADATION_FIELD_TOKEN_ORDER_GATE

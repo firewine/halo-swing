@@ -9226,6 +9226,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             flag["details"],
         )
     ]
+    assert tuple(selected_conflict_flag_tokens) == tuple(
+        token
+        for flag in evidence_context["conflict_flags"]
+        for token in (
+            flag["name"],
+            flag["severity"],
+            flag["status"],
+            flag["details"],
+        )
+    )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (
             evidence_context["conflict_flags"],
@@ -18031,6 +18041,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             flag["details"],
         )
     ]
+    assert tuple(selected_conflict_flag_tokens) == tuple(
+        token
+        for flag in evidence_context["conflict_flags"]
+        for token in (
+            flag["name"],
+            flag["severity"],
+            flag["status"],
+            flag["details"],
+        )
+    )
     selected_conflict_flag_presence_targets = {
         "evidence_context_conflict_flags": (
             evidence_context["conflict_flags"],
