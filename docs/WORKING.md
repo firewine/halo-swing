@@ -97,6 +97,5 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - commit and push current delivery channel format actual key order slice
-  - after push, choose the next explicit repository_or_report_read_model_slice from SSOT
+  - choose the next explicit repository_or_report_read_model_slice from SSOT
 ```
