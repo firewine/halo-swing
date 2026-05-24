@@ -8208,6 +8208,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_guard_checks": report_payload_guard_checks,
         "payload_text": [payload["text"]],
     }
+    assert tuple(selected_filter_raw_marker_free_targets) == (
+        "source_repository_ref",
+        "evidence_context",
+        "latest_record_guard",
+        "report_payload_guard_checks",
+        "payload_text",
+    )
     selected_filter_raw_marker_free_summary = {
         name: all(
             marker not in value
@@ -16380,6 +16387,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_guard_checks": report_payload_guard_checks,
         "payload_text": [payload["text"]],
     }
+    assert tuple(selected_filter_raw_marker_free_targets) == (
+        "source_repository_ref",
+        "evidence_context",
+        "latest_record_guard",
+        "report_payload_guard_checks",
+        "payload_text",
+    )
     selected_filter_raw_marker_free_summary = {
         name: all(
             marker not in value
