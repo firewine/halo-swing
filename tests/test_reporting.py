@@ -6422,6 +6422,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
     )
+    assert tuple(filtered_report_surface_group_boolean_surface_total_consistency) == (
+        tuple(filtered_report_boolean_summary_by_name)
+    )
     filtered_report_path_free_surface_group_boolean_surface_total_consistency = {
         summary_name: {
             "surfaces": sum(
@@ -14425,6 +14428,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert filtered_report_surface_group_boolean_surface_total_consistency == (
         filtered_report_surface_group_boolean_surface_totals
+    )
+    assert tuple(filtered_report_surface_group_boolean_surface_total_consistency) == (
+        tuple(filtered_report_boolean_summary_by_name)
     )
     filtered_report_path_free_surface_group_boolean_surface_total_consistency = {
         summary_name: {
