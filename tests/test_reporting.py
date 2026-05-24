@@ -7999,6 +7999,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(
+        key
+        for key in payload["source_repository_ref"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in evidence_context["source_repository_ref"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
     assert tuple(selected_source_repository_storage_metadata_targets) == (
         "top_level_source_repository_storage_metadata",
         "evidence_context_source_repository_storage_metadata",
@@ -16486,6 +16510,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(
+        key
+        for key in payload["source_repository_ref"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in evidence_context["source_repository_ref"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["expected"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
+    assert tuple(
+        key
+        for key in latest_record_guard_checks[
+            "latest_record_source_repository_ref_matches_top_level_source"
+        ]["actual"]
+        if key in {"storage", "db_required"}
+    ) == ("storage", "db_required")
     assert tuple(selected_source_repository_storage_metadata_targets) == (
         "top_level_source_repository_storage_metadata",
         "evidence_context_source_repository_storage_metadata",
