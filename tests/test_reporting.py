@@ -1971,6 +1971,21 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "expected_max": evidence_contract["max_conflict_flags"],
         "actual_count": len(evidence_context["conflict_flags"]),
     }
+    assert tuple(
+        evidence_guard_checks["reason_summary_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["reason_summary_within_limit"]
+    )
+    assert tuple(
+        evidence_guard_checks["evidence_summary_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["evidence_summary_within_limit"]
+    )
+    assert tuple(
+        evidence_guard_checks["conflict_flags_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["conflict_flags_within_limit"]
+    )
     assert evidence_guard_checks["conflict_flags_have_required_fields"] == {
         "name": "conflict_flags_have_required_fields",
         "passed": True,
@@ -2060,6 +2075,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert tuple(
+        evidence_guard_checks[
+            "evidence_guard_check_keys_match_expected_schema"
+        ]["actual"]["special_check_keys"]
+    ) == tuple(expected_evidence_special_check_keys)
     assert evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["actual"] == [
@@ -10966,6 +10986,21 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "expected_max": evidence_contract["max_conflict_flags"],
         "actual_count": len(evidence_context["conflict_flags"]),
     }
+    assert tuple(
+        evidence_guard_checks["reason_summary_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["reason_summary_within_limit"]
+    )
+    assert tuple(
+        evidence_guard_checks["evidence_summary_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["evidence_summary_within_limit"]
+    )
+    assert tuple(
+        evidence_guard_checks["conflict_flags_within_limit"]
+    ) == tuple(
+        expected_evidence_special_check_keys["conflict_flags_within_limit"]
+    )
     assert evidence_guard_checks["conflict_flags_have_required_fields"] == {
         "name": "conflict_flags_have_required_fields",
         "passed": True,
@@ -11055,6 +11090,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert evidence_guard_checks[
         "evidence_guard_check_keys_match_expected_schema"
     ]["actual"]["special_check_keys"] == expected_evidence_special_check_keys
+    assert tuple(
+        evidence_guard_checks[
+            "evidence_guard_check_keys_match_expected_schema"
+        ]["actual"]["special_check_keys"]
+    ) == tuple(expected_evidence_special_check_keys)
     assert evidence_guard_checks[
         "evidence_guard_check_names_match_expected_schema"
     ]["actual"] == [
