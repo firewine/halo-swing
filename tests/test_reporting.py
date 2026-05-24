@@ -9250,6 +9250,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ],
         ),
     }
+    assert tuple(selected_delivery_contract_profile_targets) == (
+        "report_intent_contract",
+        "prompt_contract",
+        "hermes_delivery_contract",
+        "telegram_delivery_contract",
+        "telegram_preview_profile",
+        "report_contract_guard_delivery_profile",
+    )
     selected_delivery_contract_profile_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17579,6 +17587,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ],
         ),
     }
+    assert tuple(selected_delivery_contract_profile_targets) == (
+        "report_intent_contract",
+        "prompt_contract",
+        "hermes_delivery_contract",
+        "telegram_delivery_contract",
+        "telegram_preview_profile",
+        "report_contract_guard_delivery_profile",
+    )
     selected_delivery_contract_profile_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
