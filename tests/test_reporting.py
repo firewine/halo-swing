@@ -7023,6 +7023,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ),
         ],
     }
+    assert tuple(selected_source_signal_ref_traceability_targets) == (
+        "traceable_format_guard",
+        "config_hash_digest_guard",
+        "traceable_format_guard_schema",
+        "config_hash_digest_guard_schema",
+        "emitted_config_hash_digest",
+    )
     selected_source_signal_ref_traceability_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_traceability_targets.items()
@@ -15069,6 +15076,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ),
         ],
     }
+    assert tuple(selected_source_signal_ref_traceability_targets) == (
+        "traceable_format_guard",
+        "config_hash_digest_guard",
+        "traceable_format_guard_schema",
+        "config_hash_digest_guard_schema",
+        "emitted_config_hash_digest",
+    )
     selected_source_signal_ref_traceability_summary = {
         name: all(checks)
         for name, checks in selected_source_signal_ref_traceability_targets.items()
