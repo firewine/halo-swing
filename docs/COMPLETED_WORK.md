@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered conflict flag Hermes boundary target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_CONFLICT_FLAG_HERMES_BOUNDARY_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.23s
+    full_pytest: 935 passed in 41.01s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered conflict flag Hermes boundary target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.518
+
+- date: 2026-05-24
   commit: 75a2df3
   title: Cover sqlite filtered selected conflict flag presence target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_CONFLICT_FLAG_PRESENCE_TARGET_ORDER_GATE

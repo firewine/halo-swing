@@ -8890,6 +8890,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ]["actual"],
         ],
     }
+    assert tuple(conflict_flag_hermes_boundary_targets) == (
+        "hermes_preview_metadata",
+        "hermes_payload_ref_guard",
+        "hermes_numeric_authority_guard",
+    )
     conflict_flag_hermes_boundary_summary = {
         name: all(
             token not in value
@@ -17175,6 +17180,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ]["actual"],
         ],
     }
+    assert tuple(conflict_flag_hermes_boundary_targets) == (
+        "hermes_preview_metadata",
+        "hermes_payload_ref_guard",
+        "hermes_numeric_authority_guard",
+    )
     conflict_flag_hermes_boundary_summary = {
         name: all(
             token not in value
