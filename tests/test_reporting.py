@@ -8266,6 +8266,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "hermes_preview": hermes_preview,
         "telegram_preview": telegram_preview,
     }
+    assert tuple(selected_filter_contract_raw_marker_free_targets) == (
+        "delivery_contract",
+        "prompt_contract",
+        "report_intent_contract",
+        "evidence_contract",
+        "telegram_contract",
+        "hermes_preview",
+        "telegram_preview",
+    )
     selected_filter_contract_raw_marker_free_summary = {
         name: all(
             marker not in value
@@ -16452,6 +16461,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "hermes_preview": hermes_preview,
         "telegram_preview": telegram_preview,
     }
+    assert tuple(selected_filter_contract_raw_marker_free_targets) == (
+        "delivery_contract",
+        "prompt_contract",
+        "report_intent_contract",
+        "evidence_contract",
+        "telegram_contract",
+        "hermes_preview",
+        "telegram_preview",
+    )
     selected_filter_contract_raw_marker_free_summary = {
         name: all(
             marker not in value
