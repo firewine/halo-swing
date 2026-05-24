@@ -8845,6 +8845,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             ["acknowledged"],
         ),
     }
+    assert tuple(selected_conflict_flag_presence_targets) == (
+        "evidence_context_conflict_flags",
+        "evidence_guard_conflict_field_schema",
+        "evidence_guard_conflict_acknowledgements",
+    )
     selected_conflict_flag_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -17125,6 +17130,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             ["acknowledged"],
         ),
     }
+    assert tuple(selected_conflict_flag_presence_targets) == (
+        "evidence_context_conflict_flags",
+        "evidence_guard_conflict_field_schema",
+        "evidence_guard_conflict_acknowledgements",
+    )
     selected_conflict_flag_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
