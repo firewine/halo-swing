@@ -20,6 +20,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered older matching record-free order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_OLDER_MATCHING_RECORD_FREE_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.35s
+    full_pytest: 935 passed in 44.14s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered older matching record-free surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.450
+
+- date: 2026-05-24
   commit: 2ceec8f
   title: Cover sqlite filtered excluded record-free order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_FREE_ORDER_COVERAGE_GATE

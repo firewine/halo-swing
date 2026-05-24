@@ -9114,6 +9114,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_excluded_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    selected_older_matching_record_tokens = [
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
+        older_matching_signal["config_hash"].removeprefix("sha256:"),
+    ]
+    selected_older_matching_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_older_matching_record_tokens
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_older_matching_record_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_older_matching_record_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -17003,6 +17024,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in selected_sqlite_name_free_targets
     }
     assert tuple(selected_excluded_record_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_older_matching_record_tokens = [
+        older_matching_signal["signal_id"],
+        older_matching_signal["run_id"],
+        older_matching_signal["created_at"],
+        older_matching_signal["config_hash"],
+        older_matching_signal["config_hash"].removeprefix("sha256:"),
+    ]
+    selected_older_matching_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_older_matching_record_tokens
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_older_matching_record_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_older_matching_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
     assert all(
