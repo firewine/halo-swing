@@ -7575,6 +7575,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [excluded_source_summary, alternate_signal["signal_id"]],
         ),
     }
+    assert tuple(
+        selected_source_summary_exclusion_targets[
+            "report_contract_source_summary_guard"
+        ][1]
+    ) == (excluded_source_summary, alternate_signal["signal_id"])
     assert tuple(selected_source_summary_exclusion_targets) == (
         "report_contract_source_summary_guard",
         "reasons_source_summary",
@@ -16017,6 +16022,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [excluded_source_summary, ndx_signal["signal_id"]],
         ),
     }
+    assert tuple(
+        selected_source_summary_exclusion_targets[
+            "report_contract_source_summary_guard"
+        ][1]
+    ) == (excluded_source_summary, ndx_signal["signal_id"])
     assert tuple(selected_source_summary_exclusion_targets) == (
         "report_contract_source_summary_guard",
         "reasons_source_summary",
