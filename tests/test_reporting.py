@@ -8776,6 +8776,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         payload["confidence_label"],
         swing_signal["created_at"],
     ]
+    assert tuple(selected_decision_identity_hermes_boundary_tokens) == (
+        swing_signal["signal_id"],
+        swing_signal["asset"],
+        swing_signal["underlying"],
+        "swing_3d_10d",
+        swing_signal["action"],
+        payload["confidence_label"],
+        swing_signal["created_at"],
+    )
     selected_decision_identity_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -17509,6 +17518,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         payload["confidence_label"],
         qqq_signal["created_at"],
     ]
+    assert tuple(selected_decision_identity_hermes_boundary_tokens) == (
+        qqq_signal["signal_id"],
+        qqq_signal["asset"],
+        qqq_signal["underlying"],
+        qqq_signal["timeframe"],
+        qqq_signal["action"],
+        payload["confidence_label"],
+        qqq_signal["created_at"],
+    )
     selected_decision_identity_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
