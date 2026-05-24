@@ -6789,6 +6789,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [swing_signal["signal_id"], swing_signal["config_hash"]],
         ),
     }
+    assert tuple(selected_record_identity_presence_targets) == (
+        "source_signal_ref",
+        "latest_signal_report",
+        "report_payload_source_signal_ref_identity_guard",
+        "report_payload_guard",
+    )
     selected_record_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -14817,6 +14823,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [qqq_signal["signal_id"], qqq_signal["config_hash"]],
         ),
     }
+    assert tuple(selected_record_identity_presence_targets) == (
+        "source_signal_ref",
+        "latest_signal_report",
+        "report_payload_source_signal_ref_identity_guard",
+        "report_payload_guard",
+    )
     selected_record_identity_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
