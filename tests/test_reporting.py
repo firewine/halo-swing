@@ -9137,6 +9137,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         + list(swing_signal["data_warnings"])
         + excluded_degradation_tokens
     )
+    assert tuple(degradation_hermes_boundary_tokens) == (
+        swing_signal["data_freshness_status"],
+        swing_signal["signal_id"],
+        alternate_signal["signal_id"],
+        older_matching_signal["signal_id"],
+        *swing_signal["data_warnings"],
+        *excluded_degradation_tokens,
+    )
     degradation_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
         "hermes_payload_ref_guard": [
@@ -17923,6 +17931,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         ]
         + list(qqq_signal["data_warnings"])
         + excluded_degradation_tokens
+    )
+    assert tuple(degradation_hermes_boundary_tokens) == (
+        qqq_signal["data_freshness_status"],
+        qqq_signal["signal_id"],
+        ndx_signal["signal_id"],
+        older_matching_signal["signal_id"],
+        *qqq_signal["data_warnings"],
+        *excluded_degradation_tokens,
     )
     degradation_hermes_boundary_targets = {
         "hermes_preview_metadata": hermes_preview,
