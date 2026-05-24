@@ -6517,6 +6517,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             summary_name: 4 for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    assert tuple(filtered_report_boolean_shared_keyset_surface_total_axes) == (
+        "summary_names",
+        "tuple_lengths_by_summary",
+    )
     filtered_report_path_free_shared_keyset_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_path_free_shared_keyset_surface_total_consistency
@@ -14524,6 +14528,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             summary_name: 4 for summary_name in filtered_report_boolean_summary_by_name
         },
     }
+    assert tuple(filtered_report_boolean_shared_keyset_surface_total_axes) == (
+        "summary_names",
+        "tuple_lengths_by_summary",
+    )
     filtered_report_path_free_shared_keyset_surface_total_axes = {
         "summary_names": tuple(
             filtered_report_path_free_shared_keyset_surface_total_consistency

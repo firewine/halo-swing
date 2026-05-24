@@ -21,6 +21,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered shared keyset surface total axes order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_KEYSET_SURFACE_TOTAL_AXES_ORDER_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.14s
+    full_pytest: 935 passed in 39.97s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered shared keyset surface total axes order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.475
+
+- date: 2026-05-24
   commit: 38ff1b2
   title: Cover sqlite filtered surface total consistency order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SURFACE_GROUP_SURFACE_TOTAL_CONSISTENCY_ORDER_GATE
