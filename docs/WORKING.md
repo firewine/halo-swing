@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_KEY_ACTUAL_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_KEY_ACTUAL_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_IDENTITY_ACTUAL_KEY_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PROMPT_CONTRACT_IDENTITY_ACTUAL_KEY_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving report prompt contract key guard actual order after repository selection
+objective: extend SQLite filtered latest report coverage proving report prompt contract identity guard actual key order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe report prompt contract key guard actual order is verified after repository selection
-  - SQLite repository-backed latest report underlying report prompt contract key guard actual order is verified after repository selection
-  - report_prompt_contract_keys_match_expected_schema actual preserves numeric_authority, llm_role, must_include key order
+  - SQLite repository-backed latest report timeframe report prompt contract identity guard actual key order is verified after repository selection
+  - SQLite repository-backed latest report underlying report prompt contract identity guard actual key order is verified after repository selection
+  - report_prompt_contract_identity_matches_expected actual preserves numeric_authority, llm_role key order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.77s
-  - full pytest passed: 935 passed in 40.41s
+  - focused pytest passed: 3 passed in 1.79s
+  - full pytest passed: 935 passed in 40.55s
   - ruff passed
   - health_check passed with status ok
 ```
@@ -97,5 +97,6 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - choose the next explicit repository_or_report_read_model_slice from SSOT
+  - commit and push current report prompt contract identity actual key order slice
+  - after push, choose the next explicit repository_or_report_read_model_slice from SSOT
 ```
