@@ -9094,6 +9094,26 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_path_component_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    selected_excluded_record_tokens = [
+        alternate_signal["signal_id"],
+        alternate_signal["run_id"],
+        alternate_signal["config_hash"],
+        alternate_signal["config_hash"].removeprefix("sha256:"),
+    ]
+    selected_excluded_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_excluded_record_tokens
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_excluded_record_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_record_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(label_status)
@@ -16963,6 +16983,26 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         name: True for name in selected_sqlite_name_free_targets
     }
     assert tuple(selected_path_component_free_summary) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    selected_excluded_record_tokens = [
+        ndx_signal["signal_id"],
+        ndx_signal["run_id"],
+        ndx_signal["config_hash"],
+        ndx_signal["config_hash"].removeprefix("sha256:"),
+    ]
+    selected_excluded_record_free_summary = {
+        name: all(
+            token not in value
+            for value in iter_nested_strings(target)
+            for token in selected_excluded_record_tokens
+        )
+        for name, target in selected_sqlite_name_free_targets.items()
+    }
+    assert selected_excluded_record_free_summary == {
+        name: True for name in selected_sqlite_name_free_targets
+    }
+    assert tuple(selected_excluded_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
     assert all(
