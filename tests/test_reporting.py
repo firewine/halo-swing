@@ -8467,6 +8467,11 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "timeframe= swing_3d_10d",
         "database_path=",
     ]
+    assert tuple(raw_filter_markers) == (
+        " swing_3d_10d ",
+        "timeframe= swing_3d_10d",
+        "database_path=",
+    )
     selected_filter_raw_marker_free_targets = {
         "source_repository_ref": payload["source_repository_ref"],
         "evidence_context": evidence_context,
@@ -17140,6 +17145,11 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "underlying= qqq",
         "database_path=",
     ]
+    assert tuple(raw_filter_markers) == (
+        " qqq ",
+        "underlying= qqq",
+        "database_path=",
+    )
     selected_filter_raw_marker_free_targets = {
         "source_repository_ref": payload["source_repository_ref"],
         "evidence_context": evidence_context,

@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_CANONICALIZATION_IDENTITY_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_CANONICALIZATION_IDENTITY_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_RAW_MARKER_TOKEN_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_FILTER_RAW_MARKER_TOKEN_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected filter canonicalization identity order after repository selection
+objective: extend SQLite filtered latest report coverage proving selected filter raw marker token order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected filter canonicalization identity order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected filter canonicalization identity order is verified after repository selection
-  - selected filter canonicalization identity fields preserve filtered report order after repository selection
+  - SQLite repository-backed latest report timeframe selected filter raw marker token order is verified after repository selection
+  - SQLite repository-backed latest report underlying selected filter raw marker token order is verified after repository selection
+  - selected filter raw marker checks preserve filtered report token order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -65,7 +65,7 @@ results:
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
   - focused pytest passed: 3 passed in 1.35s
-  - full pytest passed: 935 passed in 43.28s
+  - full pytest passed: 935 passed in 43.48s
   - ruff passed
   - health_check passed with status ok
 ```
