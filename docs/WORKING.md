@@ -12,11 +12,11 @@ ssot: docs/halo-swing-development-plan.md
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LATEST_MATCHING_RECORD_EXCLUDES_OLDER_ORDER_COVERAGE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LATEST_MATCHING_RECORD_EXCLUDES_OLDER_ORDER_COVERAGE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_SUMMARY_VALUE_DOMAIN_ORDER_COVERAGE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SHARED_SUMMARY_VALUE_DOMAIN_ORDER_COVERAGE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving latest-matching-record-excludes-older surface order after repository selection
+objective: extend SQLite filtered latest report coverage proving shared summary value-domain order after repository selection
 
 edits:
   allowed:
@@ -35,9 +35,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe latest-matching-record-excludes-older surface order is verified after repository selection
-  - SQLite repository-backed latest report underlying latest-matching-record-excludes-older surface order is verified after repository selection
-  - latest-matching-record-excludes-older coverage preserves filtered report surface order after repository selection
+  - SQLite repository-backed latest report timeframe shared summary value-domain order is verified after repository selection
+  - SQLite repository-backed latest report underlying shared summary value-domain order is verified after repository selection
+  - shared summary value-domain coverage preserves filtered report summary order after repository selection
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -64,8 +64,8 @@ results:
   - docs task JSON parsed
   - git diff --check passed
   - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.20s
-  - full pytest passed: 935 passed in 55.92s
+  - focused pytest passed: 3 passed in 1.19s
+  - full pytest passed: 935 passed in 41.81s
   - ruff passed
   - health_check passed with status ok
 ```

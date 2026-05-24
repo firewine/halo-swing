@@ -5622,6 +5622,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(latest_matching_record_excludes_older_summary) == tuple(
         filtered_report_path_free_targets
     )
+    expected_filtered_report_shared_summary_names = (
+        "string_counts",
+        "path_free",
+        "sqlite_name_free",
+        "storage_marker_free",
+        "path_component_free",
+        "excluded_record_free",
+        "excluded_record_identity_free",
+        "latest_matching_record_excludes_older",
+    )
     filtered_report_shared_summary_value_domains = {
         "string_counts": all(
             type(count) is int and count > 0
@@ -5658,6 +5668,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert filtered_report_shared_summary_value_domains == {
         name: True for name in filtered_report_shared_summary_value_domains
     }
+    assert tuple(filtered_report_shared_summary_value_domains) == (
+        expected_filtered_report_shared_summary_names
+    )
     filtered_report_shared_summary_keysets = {
         "string_counts": tuple(filtered_report_path_free_surface_string_counts),
         "path_free": tuple(filtered_report_path_free_summary),
@@ -13584,6 +13597,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(latest_matching_record_excludes_older_summary) == tuple(
         filtered_report_path_free_targets
     )
+    expected_filtered_report_shared_summary_names = (
+        "string_counts",
+        "path_free",
+        "sqlite_name_free",
+        "storage_marker_free",
+        "path_component_free",
+        "excluded_record_free",
+        "excluded_record_identity_free",
+        "latest_matching_record_excludes_older",
+    )
     filtered_report_shared_summary_value_domains = {
         "string_counts": all(
             type(count) is int and count > 0
@@ -13620,6 +13643,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert filtered_report_shared_summary_value_domains == {
         name: True for name in filtered_report_shared_summary_value_domains
     }
+    assert tuple(filtered_report_shared_summary_value_domains) == (
+        expected_filtered_report_shared_summary_names
+    )
     filtered_report_shared_summary_keysets = {
         "string_counts": tuple(filtered_report_path_free_surface_string_counts),
         "path_free": tuple(filtered_report_path_free_summary),
