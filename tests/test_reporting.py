@@ -8728,6 +8728,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_chunks": telegram_preview["chunks"],
         "reconstructed_telegram_text": [reconstructed_telegram_text],
     }
+    assert tuple(selected_degradation_exclusion_targets) == (
+        "latest_signal_report",
+        "cautions",
+        "payload_text",
+        "evidence_guard_checks",
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+    )
     selected_degradation_exclusion_summary = {
         name: all(
             token not in value
@@ -16992,6 +17000,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_chunks": telegram_preview["chunks"],
         "reconstructed_telegram_text": [reconstructed_telegram_text],
     }
+    assert tuple(selected_degradation_exclusion_targets) == (
+        "latest_signal_report",
+        "cautions",
+        "payload_text",
+        "evidence_guard_checks",
+        "telegram_chunks",
+        "reconstructed_telegram_text",
+    )
     selected_degradation_exclusion_summary = {
         name: all(
             token not in value
