@@ -8476,6 +8476,9 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert selected_degradation_field_summary == {
         name: True for name in selected_degradation_field_targets
     }
+    assert tuple(selected_degradation_field_summary) == tuple(
+        selected_degradation_field_targets
+    )
     selected_conflict_flag_tokens = [
         token
         for flag in evidence_context["conflict_flags"]
@@ -16411,6 +16414,9 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert selected_degradation_field_summary == {
         name: True for name in selected_degradation_field_targets
     }
+    assert tuple(selected_degradation_field_summary) == tuple(
+        selected_degradation_field_targets
+    )
     selected_conflict_flag_tokens = [
         token
         for flag in evidence_context["conflict_flags"]

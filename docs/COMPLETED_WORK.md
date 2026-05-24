@@ -20,6 +20,20 @@ full_evidence_sources:
 
 ```yaml
 - date: 2026-05-24
+  commit: recorded_in_commit_containing_this_entry
+  title: Cover sqlite filtered degradation field order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DEGRADATION_FIELD_ORDER_COVERAGE_GATE
+  status: verified_pending_push
+  verification:
+    focused_pytest: 3 passed in 1.25s
+    full_pytest: 935 passed in 44.54s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered degradation field surface order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.455
+
+- date: 2026-05-24
   commit: af35798
   title: Cover sqlite filtered label status guard exclusion order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_GUARD_EXCLUSION_ORDER_COVERAGE_GATE
