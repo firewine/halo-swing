@@ -9091,6 +9091,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             *excluded_signal["data_warnings"],
         )
     ]
+    assert tuple(excluded_degradation_tokens) == (
+        alternate_signal["data_freshness_status"],
+        *alternate_signal["data_warnings"],
+        older_matching_signal["data_freshness_status"],
+        *older_matching_signal["data_warnings"],
+    )
     selected_degradation_exclusion_targets = {
         "latest_signal_report": payload["latest_signal_report"],
         "cautions": cautions,
@@ -17872,6 +17878,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             *excluded_signal["data_warnings"],
         )
     ]
+    assert tuple(excluded_degradation_tokens) == (
+        ndx_signal["data_freshness_status"],
+        *ndx_signal["data_warnings"],
+        older_matching_signal["data_freshness_status"],
+        *older_matching_signal["data_warnings"],
+    )
     selected_degradation_exclusion_targets = {
         "latest_signal_report": payload["latest_signal_report"],
         "cautions": cautions,
