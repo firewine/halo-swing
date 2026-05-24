@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_NO_LIVE_ACTIVATION_VALUE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LIVE_ACTIVATION_MARKER_FREE_VALUE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_NO_LIVE_ACTIVATION_VALUE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LIVE_ACTIVATION_MARKER_FREE_VALUE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.616",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving delivery preview no-live-activation values after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.617",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving live activation markers remain absent after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.615",
+    "docs/halo-swing-development-plan.md#4.616",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe delivery preview no-live-activation values are verified after repository selection",
-    "SQLite repository-backed latest report underlying delivery preview no-live-activation values are verified after repository selection",
-    "delivery_preview channels preserve network_call false values without live activation",
+    "SQLite repository-backed latest report timeframe live activation marker-free values are verified after repository selection",
+    "SQLite repository-backed latest report underlying live activation marker-free values are verified after repository selection",
+    "source_repository_ref, evidence_context, report payload guard checks, and payload text remain free of live activation markers",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

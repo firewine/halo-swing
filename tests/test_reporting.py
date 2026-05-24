@@ -10613,13 +10613,20 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "report_payload_guard_checks",
         "payload_text",
     )
-    selected_offline_live_activation_free_summary = {
-        name: all(
+    selected_live_activation_marker_absence_values = {
+        name: [
             marker not in value
             for value in iter_nested_strings(target)
             for marker in live_activation_markers
-        )
+        ]
         for name, target in selected_offline_live_activation_free_targets.items()
+    }
+    assert tuple(selected_live_activation_marker_absence_values) == tuple(
+        selected_offline_live_activation_free_targets
+    )
+    selected_offline_live_activation_free_summary = {
+        name: all(checks)
+        for name, checks in selected_live_activation_marker_absence_values.items()
     }
     assert selected_offline_live_activation_free_summary == {
         name: True for name in selected_offline_live_activation_free_targets
@@ -20175,13 +20182,20 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "report_payload_guard_checks",
         "payload_text",
     )
-    selected_offline_live_activation_free_summary = {
-        name: all(
+    selected_live_activation_marker_absence_values = {
+        name: [
             marker not in value
             for value in iter_nested_strings(target)
             for marker in live_activation_markers
-        )
+        ]
         for name, target in selected_offline_live_activation_free_targets.items()
+    }
+    assert tuple(selected_live_activation_marker_absence_values) == tuple(
+        selected_offline_live_activation_free_targets
+    )
+    selected_offline_live_activation_free_summary = {
+        name: all(checks)
+        for name, checks in selected_live_activation_marker_absence_values.items()
     }
     assert selected_offline_live_activation_free_summary == {
         name: True for name in selected_offline_live_activation_free_targets
