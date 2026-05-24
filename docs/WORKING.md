@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_NUMERIC_AUTHORITY_ACTUAL_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_NUMERIC_AUTHORITY_ACTUAL_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_NUMERIC_FIELD_REFLECTION_ACTUAL_KEY_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_NUMERIC_FIELD_REFLECTION_ACTUAL_KEY_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving delivery numeric authority guard actual value after repository selection
+objective: extend SQLite filtered latest report coverage proving numeric field reflection guard actual key order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe delivery numeric authority guard actual value is verified after repository selection
-  - SQLite repository-backed latest report underlying delivery numeric authority guard actual value is verified after repository selection
-  - delivery_numeric_authority_is_latest_signal_report actual preserves latest_signal_report
+  - SQLite repository-backed latest report timeframe numeric field reflection guard actual key order is verified after repository selection
+  - SQLite repository-backed latest report underlying numeric field reflection guard actual key order is verified after repository selection
+  - report_text_reflects_latest_signal_numeric_fields actual preserves decision_line_present, confidence_line_present, score_line_present key order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.48s
-  - full pytest passed: 935 passed in 41.97s
+  - focused pytest passed: 3 passed in 1.45s
+  - full pytest passed: 935 passed in 42.23s
   - ruff passed
   - health_check passed with status ok
 ```

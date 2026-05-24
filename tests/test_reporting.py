@@ -9913,6 +9913,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_numeric_authority_is_latest_signal_report"
     ]["actual"]
     assert selected_delivery_numeric_authority_actual == "latest_signal_report"
+    selected_numeric_field_reflection_actual = report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ]["actual"]
+    assert tuple(selected_numeric_field_reflection_actual) == (
+        "decision_line_present",
+        "confidence_line_present",
+        "score_line_present",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9991,6 +9999,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [selected_delivery_numeric_authority_actual],
             ["latest_signal_report"],
         ),
+        "numeric_field_reflection_key_guard": (
+            [list(selected_numeric_field_reflection_actual)],
+            [
+                "decision_line_present",
+                "confidence_line_present",
+                "score_line_present",
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -10010,6 +10026,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "telegram_chunking_contract_key_guard",
         "telegram_chunking_contract_value_guard",
         "delivery_numeric_authority_guard",
+        "numeric_field_reflection_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19152,6 +19169,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_numeric_authority_is_latest_signal_report"
     ]["actual"]
     assert selected_delivery_numeric_authority_actual == "latest_signal_report"
+    selected_numeric_field_reflection_actual = report_contract_guard_checks[
+        "report_text_reflects_latest_signal_numeric_fields"
+    ]["actual"]
+    assert tuple(selected_numeric_field_reflection_actual) == (
+        "decision_line_present",
+        "confidence_line_present",
+        "score_line_present",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19230,6 +19255,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [selected_delivery_numeric_authority_actual],
             ["latest_signal_report"],
         ),
+        "numeric_field_reflection_key_guard": (
+            [list(selected_numeric_field_reflection_actual)],
+            [
+                "decision_line_present",
+                "confidence_line_present",
+                "score_line_present",
+            ],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19249,6 +19282,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "telegram_chunking_contract_key_guard",
         "telegram_chunking_contract_value_guard",
         "delivery_numeric_authority_guard",
+        "numeric_field_reflection_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
