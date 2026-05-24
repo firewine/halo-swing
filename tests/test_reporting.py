@@ -8601,6 +8601,12 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             evidence_context["risk_warnings"],
         ),
     }
+    assert tuple(selected_risk_warning_presence_targets) == (
+        "evidence_context_risk_warnings",
+        "cautions",
+        "payload_text",
+        "evidence_guard_risk_warnings",
+    )
     selected_risk_warning_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
@@ -16844,6 +16850,12 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             evidence_context["risk_warnings"],
         ),
     }
+    assert tuple(selected_risk_warning_presence_targets) == (
+        "evidence_context_risk_warnings",
+        "cautions",
+        "payload_text",
+        "evidence_guard_risk_warnings",
+    )
     selected_risk_warning_presence_summary = {
         name: all(
             any(token in value for value in iter_nested_strings(target))
