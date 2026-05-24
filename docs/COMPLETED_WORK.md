@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: fedc1c1
   title: Cover sqlite filtered excluded record token-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EXCLUDED_RECORD_TOKEN_FREE_VALUE_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.61s
     full_pytest: 935 passed in 40.83s
