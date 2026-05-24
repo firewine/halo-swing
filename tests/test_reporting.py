@@ -6754,6 +6754,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             != older_matching_label["time_barrier_days"],
         ],
     }
+    assert tuple(selected_label_excludes_older_matching_label_summary) == (
+        "latest_signal_report_label_status",
+        "evidence_label_status",
+    )
     selected_label_latest_matching_exclusion_coverage = {
         name: all(checks)
         for name, checks in selected_label_excludes_older_matching_label_summary.items()
@@ -14778,6 +14782,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             != older_matching_label["time_barrier_days"],
         ],
     }
+    assert tuple(selected_label_excludes_older_matching_label_summary) == (
+        "latest_signal_report_label_status",
+        "evidence_label_status",
+    )
     selected_label_latest_matching_exclusion_coverage = {
         name: all(checks)
         for name, checks in selected_label_excludes_older_matching_label_summary.items()
