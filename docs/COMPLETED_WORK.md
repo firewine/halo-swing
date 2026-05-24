@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered risk warning Hermes boundary token order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_RISK_WARNING_HERMES_BOUNDARY_TOKEN_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.34s
+    full_pytest: 935 passed in 43.70s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered risk warning Hermes boundary token order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.557
+
+- date: 2026-05-25
   commit: fc6b7f8
   title: Cover sqlite filtered selected evidence exclusion token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_EVIDENCE_EXCLUSION_TOKEN_ORDER_GATE
