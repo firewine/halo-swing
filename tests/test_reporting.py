@@ -8075,6 +8075,44 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             "db_required=false" not in payload["text"],
         ],
     }
+    selected_source_repository_storage_metadata_exclusion_field_order_targets = {
+        "top_level_source_repository_storage_metadata": [
+            key
+            for key in payload["source_repository_ref"]
+            if key in {"storage", "db_required"}
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            key
+            for key in evidence_context["source_repository_ref"]
+            if key in {"storage", "db_required"}
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]
+            if key in {"storage", "db_required"}
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            if key in {"storage", "db_required"}
+        ],
+    }
+    assert tuple(
+        selected_source_repository_storage_metadata_exclusion_field_order_targets
+    ) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+    )
+    assert selected_source_repository_storage_metadata_exclusion_field_order_targets == {
+        name: ["storage", "db_required"]
+        for name in selected_source_repository_storage_metadata_exclusion_field_order_targets
+    }
     assert tuple(selected_source_repository_storage_metadata_exclusion_targets) == (
         "top_level_source_repository_storage_metadata",
         "evidence_context_source_repository_storage_metadata",
@@ -16585,6 +16623,44 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             "db_required=false" not in source_summary,
             "db_required=false" not in payload["text"],
         ],
+    }
+    selected_source_repository_storage_metadata_exclusion_field_order_targets = {
+        "top_level_source_repository_storage_metadata": [
+            key
+            for key in payload["source_repository_ref"]
+            if key in {"storage", "db_required"}
+        ],
+        "evidence_context_source_repository_storage_metadata": [
+            key
+            for key in evidence_context["source_repository_ref"]
+            if key in {"storage", "db_required"}
+        ],
+        "latest_record_guard_expected_storage_metadata": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["expected"]
+            if key in {"storage", "db_required"}
+        ],
+        "latest_record_guard_actual_storage_metadata": [
+            key
+            for key in latest_record_guard_checks[
+                "latest_record_source_repository_ref_matches_top_level_source"
+            ]["actual"]
+            if key in {"storage", "db_required"}
+        ],
+    }
+    assert tuple(
+        selected_source_repository_storage_metadata_exclusion_field_order_targets
+    ) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+    )
+    assert selected_source_repository_storage_metadata_exclusion_field_order_targets == {
+        name: ["storage", "db_required"]
+        for name in selected_source_repository_storage_metadata_exclusion_field_order_targets
     }
     assert tuple(selected_source_repository_storage_metadata_exclusion_targets) == (
         "top_level_source_repository_storage_metadata",
