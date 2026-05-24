@@ -9193,6 +9193,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             == swing_signal["data_warnings"],
         ],
     }
+    selected_degradation_field_tokens = tuple(
+        key
+        for key in payload["latest_signal_report"]
+        if key in {"data_freshness_status", "degraded_mode", "data_warnings"}
+    )
+    assert selected_degradation_field_tokens == (
+        "data_freshness_status",
+        "degraded_mode",
+        "data_warnings",
+    )
     assert tuple(selected_degradation_field_targets) == (
         "latest_signal_report_data_freshness",
     )
@@ -17988,6 +17998,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             == qqq_signal["data_warnings"],
         ],
     }
+    selected_degradation_field_tokens = tuple(
+        key
+        for key in payload["latest_signal_report"]
+        if key in {"data_freshness_status", "degraded_mode", "data_warnings"}
+    )
+    assert selected_degradation_field_tokens == (
+        "data_freshness_status",
+        "degraded_mode",
+        "data_warnings",
+    )
     assert tuple(selected_degradation_field_targets) == (
         "latest_signal_report_data_freshness",
     )
