@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_SUMMARY_ACTUAL_VALUE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_SUMMARY_ACTUAL_VALUE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_SUMMARY_ACTUAL_VALUE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_SUMMARY_ACTUAL_VALUE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.599",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving source repository summary guard actual value after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.600",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving label status summary guard actual value after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.598",
+    "docs/halo-swing-development-plan.md#4.599",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe source repository summary guard actual value is verified after repository selection",
-    "SQLite repository-backed latest report underlying source repository summary guard actual value is verified after repository selection",
-    "report_text_reflects_source_repository_summary actual preserves the selected repository source summary",
+    "SQLite repository-backed latest report timeframe label status summary guard actual value is verified after repository selection",
+    "SQLite repository-backed latest report underlying label status summary guard actual value is verified after repository selection",
+    "report_text_reflects_label_status_summary actual preserves the selected stored label summary",
     "database_path marker remains absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

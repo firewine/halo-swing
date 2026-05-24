@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered label status summary actual value
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_SUMMARY_ACTUAL_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.50s
+    full_pytest: 935 passed in 42.11s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying label status summary guard actual value
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.600
+
+- date: 2026-05-25
   commit: 562e4a2
   title: Cover sqlite filtered source repository summary actual value
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_SUMMARY_ACTUAL_VALUE_GATE

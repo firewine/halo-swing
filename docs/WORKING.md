@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_SUMMARY_ACTUAL_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_SUMMARY_ACTUAL_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_SUMMARY_ACTUAL_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_SUMMARY_ACTUAL_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving source repository summary guard actual value after repository selection
+objective: extend SQLite filtered latest report coverage proving label status summary guard actual value after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe source repository summary guard actual value is verified after repository selection
-  - SQLite repository-backed latest report underlying source repository summary guard actual value is verified after repository selection
-  - report_text_reflects_source_repository_summary actual preserves the selected repository source summary
+  - SQLite repository-backed latest report timeframe label status summary guard actual value is verified after repository selection
+  - SQLite repository-backed latest report underlying label status summary guard actual value is verified after repository selection
+  - report_text_reflects_label_status_summary actual preserves the selected stored label summary
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.49s
-  - full pytest passed: 935 passed in 41.76s
+  - focused pytest passed: 3 passed in 1.50s
+  - full pytest passed: 935 passed in 42.11s
   - ruff passed
   - health_check passed with status ok
 ```
