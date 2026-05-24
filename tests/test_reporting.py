@@ -9610,6 +9610,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         ]
         + selected_text_trade_plan_tokens
     )
+    assert tuple(selected_delivery_preview_tokens) == (
+        swing_signal["asset"],
+        swing_signal["underlying"],
+        "swing_3d_10d",
+        swing_signal["action"],
+        source_summary,
+        selected_label_summary,
+        *selected_text_trade_plan_tokens,
+    )
     selected_delivery_preview_presence_targets = {
         "telegram_chunks": (
             telegram_preview["chunks"],
@@ -18477,6 +18486,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_label_summary,
         ]
         + selected_text_trade_plan_tokens
+    )
+    assert tuple(selected_delivery_preview_tokens) == (
+        qqq_signal["asset"],
+        qqq_signal["underlying"],
+        qqq_signal["timeframe"],
+        qqq_signal["action"],
+        source_summary,
+        selected_label_summary,
+        *selected_text_trade_plan_tokens,
     )
     selected_delivery_preview_presence_targets = {
         "telegram_chunks": (

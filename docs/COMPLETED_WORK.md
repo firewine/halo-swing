@@ -39,6 +39,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending_commit
+  title: Cover sqlite filtered selected delivery preview presence token order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_PREVIEW_PRESENCE_TOKEN_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.71s
+    full_pytest: 935 passed in 43.33s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected delivery preview presence token order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.568
+
+- date: 2026-05-25
   commit: 5769af5
   title: Cover sqlite filtered trade plan Hermes boundary token order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TRADE_PLAN_HERMES_BOUNDARY_TOKEN_ORDER_GATE
