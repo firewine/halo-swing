@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CHANNEL_FORMAT_ACTUAL_VALUE_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CHANNEL_FORMAT_ACTUAL_VALUE_ORDER_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TELEGRAM_CHUNKING_CONTRACT_ACTUAL_KEY_ORDER_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_TELEGRAM_CHUNKING_CONTRACT_ACTUAL_KEY_ORDER_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving delivery channel format guard actual value order after repository selection
+objective: extend SQLite filtered latest report coverage proving Telegram chunking contract guard actual key order after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe delivery channel format guard actual value order is verified after repository selection
-  - SQLite repository-backed latest report underlying delivery channel format guard actual value order is verified after repository selection
-  - delivery_channel_formats_match_expected actual values preserve structured_json_plus_text before plain_text order
+  - SQLite repository-backed latest report timeframe Telegram chunking contract guard actual key order is verified after repository selection
+  - SQLite repository-backed latest report underlying Telegram chunking contract guard actual key order is verified after repository selection
+  - report_telegram_chunking_contract_matches_expected actual preserves overflow_policy, section_separator, chunk_indexing key order
   - database_path marker remains absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.91s
-  - full pytest passed: 935 passed in 40.70s
+  - focused pytest passed: 3 passed in 0.17s
+  - full pytest passed: 935 passed in 46.02s
   - ruff passed
   - health_check passed with status ok
 ```

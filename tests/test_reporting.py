@@ -9893,6 +9893,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "structured_json_plus_text",
         "plain_text",
     )
+    selected_telegram_chunking_contract_actual = report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["actual"]
+    assert tuple(selected_telegram_chunking_contract_actual) == (
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -9959,6 +9967,10 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             selected_delivery_channel_format_actual_values,
             ["structured_json_plus_text", "plain_text"],
         ),
+        "telegram_chunking_contract_key_guard": (
+            [list(selected_telegram_chunking_contract_actual)],
+            ["overflow_policy", "section_separator", "chunk_indexing"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -9975,6 +9987,7 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         "delivery_contract_schema_value_guard",
         "delivery_channel_format_key_guard",
         "delivery_channel_format_value_guard",
+        "telegram_chunking_contract_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
@@ -19097,6 +19110,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "structured_json_plus_text",
         "plain_text",
     )
+    selected_telegram_chunking_contract_actual = report_contract_guard_checks[
+        "report_telegram_chunking_contract_matches_expected"
+    ]["actual"]
+    assert tuple(selected_telegram_chunking_contract_actual) == (
+        "overflow_policy",
+        "section_separator",
+        "chunk_indexing",
+    )
     selected_delivery_contract_profile_targets = {
         "report_intent_contract": (
             report_intent_contract,
@@ -19163,6 +19184,10 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             selected_delivery_channel_format_actual_values,
             ["structured_json_plus_text", "plain_text"],
         ),
+        "telegram_chunking_contract_key_guard": (
+            [list(selected_telegram_chunking_contract_actual)],
+            ["overflow_policy", "section_separator", "chunk_indexing"],
+        ),
     }
     assert tuple(selected_delivery_contract_profile_targets) == (
         "report_intent_contract",
@@ -19179,6 +19204,7 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         "delivery_contract_schema_value_guard",
         "delivery_channel_format_key_guard",
         "delivery_channel_format_value_guard",
+        "telegram_chunking_contract_key_guard",
     )
     selected_delivery_contract_profile_summary = {
         name: all(
