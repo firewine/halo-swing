@@ -38,6 +38,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-24
+  commit: pending
+  title: Cover sqlite filtered selected source repository storage metadata target order
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_REPOSITORY_STORAGE_METADATA_TARGET_ORDER_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.13s
+    full_pytest: 935 passed in 39.03s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - asserted timeframe and underlying filtered selected source repository storage metadata target order
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.497
+
+- date: 2026-05-24
   commit: c63401c
   title: Cover sqlite filtered selected source repository filter exclusion target order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SOURCE_REPOSITORY_FILTER_EXCLUSION_TARGET_ORDER_GATE

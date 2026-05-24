@@ -7920,6 +7920,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_storage_metadata_targets) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+        "source_summary_storage_metadata_text",
+    )
     selected_source_repository_storage_metadata_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_storage_metadata_targets.items()
@@ -16059,6 +16066,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             source_summary in payload["text"],
         ],
     }
+    assert tuple(selected_source_repository_storage_metadata_targets) == (
+        "top_level_source_repository_storage_metadata",
+        "evidence_context_source_repository_storage_metadata",
+        "latest_record_guard_expected_storage_metadata",
+        "latest_record_guard_actual_storage_metadata",
+        "source_summary_storage_metadata_text",
+    )
     selected_source_repository_storage_metadata_summary = {
         name: all(checks)
         for name, checks in selected_source_repository_storage_metadata_targets.items()
