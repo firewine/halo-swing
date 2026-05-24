@@ -7541,6 +7541,13 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
             [excluded_source_summary, alternate_signal["signal_id"]],
         ),
     }
+    assert tuple(selected_source_summary_exclusion_targets) == (
+        "report_contract_source_summary_guard",
+        "reasons_source_summary",
+        "payload_text_source_summary",
+        "telegram_chunks_source_summary",
+        "reconstructed_telegram_text_source_summary",
+    )
     selected_source_summary_exclusion_summary = {
         name: all(
             token not in value
@@ -15645,6 +15652,13 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
             [excluded_source_summary, ndx_signal["signal_id"]],
         ),
     }
+    assert tuple(selected_source_summary_exclusion_targets) == (
+        "report_contract_source_summary_guard",
+        "reasons_source_summary",
+        "payload_text_source_summary",
+        "telegram_chunks_source_summary",
+        "reconstructed_telegram_text_source_summary",
+    )
     selected_source_summary_exclusion_summary = {
         name: all(
             token not in value
