@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: acd1f28
   title: Cover sqlite filtered report contract supported intent actual order
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_SUPPORTED_INTENT_ACTUAL_ORDER_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 1.35s
     full_pytest: 935 passed in 40.16s
