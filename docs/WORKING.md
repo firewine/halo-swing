@@ -5,18 +5,23 @@ doc_type: llm_operational_handoff
 audience: llm_agents_only
 rule: keep_only_current_work_and_next_work
 completed_work_ledger: docs/COMPLETED_WORK.md
+pre_compaction_completed_ledger: docs/archive/working-ledger-compaction.md
 ssot: docs/halo-swing-development-plan.md
+ledger_rule:
+  - pre-compaction completed work was moved to docs/archive/working-ledger-compaction.md
+  - post-compaction completed work is appended to docs/COMPLETED_WORK.md
+  - this file keeps only active work, verification, gate state, and next work
 ```
 
 ## current_work
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_CONTRACT_PROFILE_TOKEN_ORDER_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_DELIVERY_CONTRACT_PROFILE_TOKEN_ORDER_GATE
-review_tier: S1_small
+status: DOCS_WORKING_LEDGER_COMPACTION_ARCHIVE_INVENTORY_VERIFIED
+gate_id: DOCS_WORKING_LEDGER_COMPACTION_ARCHIVE_INVENTORY_GATE
+review_tier: S0_trivial
 
-objective: extend SQLite filtered latest report coverage proving selected delivery contract profile token order after repository selection
+objective: clarify that completed WORKING.md ledger content is preserved in docs/archive/working-ledger-compaction.md and that post-compaction completed slices are tracked in docs/COMPLETED_WORK.md
 
 edits:
   allowed:
@@ -24,8 +29,7 @@ edits:
     - docs/WORKING.md
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
-    - docs/halo-swing-development-plan.md
-    - tests/test_reporting.py
+    - docs/archive/working-ledger-compaction.md
   blocked_prefixes:
     - src/halo_swing_mcp/broker/
     - src/halo_swing_mcp/live_adapters/
@@ -35,12 +39,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected delivery contract profile token order is verified after repository selection
-  - SQLite repository-backed latest report underlying selected delivery contract profile token order is verified after repository selection
-  - selected delivery contract profile checks preserve report intent, prompt, Hermes, Telegram, preview, and guard profile token order after repository selection
-  - database_path marker remains absent from report and delivery surfaces
-  - default no-repository latest report payload and golden snapshot remain unchanged
-  - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
+  - docs/archive/working-ledger-compaction.md explicitly states completed WORKING.md ledger content was moved there
+  - docs/COMPLETED_WORK.md explicitly remains the post-compaction completed-slice ledger
+  - docs/WORKING.md explicitly remains current work and next work only
   - verification passes
 ```
 
@@ -54,20 +55,18 @@ required_commands:
   - PYTHONPATH=src ./.venv/bin/python -m json.tool docs/codex-task.json
   - git diff --check
   - git status --short --branch
-  - PYTHONPATH=src ./.venv/bin/python -m pytest tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_timeframe tests/test_reporting.py::test_latest_signal_report_repository_source_filters_by_underlying tests/test_reporting.py::test_latest_signal_report_contains_required_report_sections -q
-  - PYTHONPATH=src ./.venv/bin/python -m pytest
-  - PYTHONPATH=src ./.venv/bin/python -m ruff check .
-  - PYTHONPATH=src ./.venv/bin/python -m halo_swing_mcp.harness health_check
+  - rg -c "Previous completed directive|Earlier completed directive" docs/archive/working-ledger-compaction.md
+  - rg -c "Previous verification result|Latest verification result" docs/archive/working-ledger-compaction.md
+  - rg -n "Moved Completed Work Ledger|post-compaction completed slices" docs/archive/working-ledger-compaction.md docs/COMPLETED_WORK.md docs/WORKING.md
 results:
   - task mirror diff passed
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - git status showed expected modified task/docs/test files only
-  - focused pytest passed: 3 passed in 1.45s
-  - full pytest passed: 935 passed in 43.63s
-  - ruff passed
-  - health_check passed with status ok
+  - git status showed expected docs/task files only
+  - archive completed directive markers preserved: 416
+  - archive verification result markers preserved: 258
+  - archive and compact ledger routing markers found
 ```
 
 ## current_gate_state
@@ -93,7 +92,6 @@ still_requires_later_gate:
 
 ```yaml
 immediate:
-  - choose the next explicit repository_or_report_read_model_slice from SSOT
-  - update .codex/tasks/current.json and docs/codex-task.json for that slice
-  - replace this current_work block with the new active task
+  - commit and push the docs correction
+  - resume the next explicit repository_or_report_read_model_slice from SSOT
 ```

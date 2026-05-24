@@ -7,6 +7,10 @@ purpose: track completed slices separately from docs/WORKING.md
 detail_policy: compact_summary_plus_pointers
 pre_compaction_completed_ledger: docs/archive/working-ledger-compaction.md
 post_compaction_ledger_start: docs/halo-swing-development-plan.md#4.438
+ledger_routing:
+  - pre-compaction completed WORKING.md history stays in docs/archive/working-ledger-compaction.md
+  - post-compaction completed slices are appended to this file as compact entries
+  - active docs/WORKING.md carries pointers only, not cumulative completed lists
 compaction_policy:
   - full pre-compaction WORKING ledger, including completed work and verification history, remains preserved in docs/archive/working-ledger-compaction.md
   - this file tracks compact completed-slice entries from the compaction checkpoint forward
@@ -38,6 +42,22 @@ post_compaction_policy:
 ## ledger
 
 ```yaml
+- date: 2026-05-25
+  commit: pending_commit
+  title: Clarify WORKING ledger compaction archive routing
+  gate_id: DOCS_WORKING_LEDGER_COMPACTION_ARCHIVE_INVENTORY_GATE
+  status: verified_pending_commit
+  verification:
+    task_mirror_diff: passed
+    task_json: parsed
+    docs_task_json: parsed
+    git_diff_check: passed
+    completed_directive_markers: 416
+    verification_result_markers: 258
+  notes:
+    - documented that pre-compaction completed WORKING.md history is preserved in docs/archive/working-ledger-compaction.md
+    - documented that post-compaction completed slices are appended to docs/COMPLETED_WORK.md
+
 - date: 2026-05-25
   commit: 77b863c
   title: Cover sqlite filtered selected delivery contract profile token order

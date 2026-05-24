@@ -14,6 +14,26 @@ rule:
   - treat the archived snapshot below as historical evidence, not executable current work
 ```
 
+## Moved Completed Work Ledger
+
+```yaml
+ledger_status: preserved_from_docs_WORKING_md
+what_was_moved_here:
+  - pre-compaction completed directive history
+  - pre-compaction verification history
+  - prior current directive context captured at compaction time
+inventory_at_last_check:
+  completed_directive_markers: 416
+  verification_result_markers: 258
+post_compaction_completed_slices: docs/COMPLETED_WORK.md
+active_handoff_after_compaction: docs/WORKING.md
+rule:
+  - this archive is the moved original ledger, not disposable scratch
+  - do not overwrite, truncate, or summarize this file during normal implementation
+  - if docs/WORKING.md is compacted again, move removed completed ledger content here before deleting it from the active handoff
+  - append-only maintenance notes are allowed when they clarify preservation policy
+```
+
 ## Archived WORKING.md Snapshot
 
 # WORKING
