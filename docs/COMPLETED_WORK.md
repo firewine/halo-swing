@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered source repository ref path component-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_REPOSITORY_REF_PATH_COMPONENT_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.59s
+    full_pytest: 935 passed in 44.70s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying source_repository_ref local path component marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.659
+
+- date: 2026-05-25
   commit: d5665c9
   title: Cover sqlite filtered source signal ref path component-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_PATH_COMPONENT_FREE_VALUE_GATE

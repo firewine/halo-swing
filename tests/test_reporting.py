@@ -10961,6 +10961,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         source_signal_ref_path_component_free_values
     )
     assert source_signal_ref_path_component_free is True
+    source_repository_ref_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(payload["source_repository_ref"])
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(source_repository_ref_path_component_free_values)
+    source_repository_ref_path_component_free = all(
+        source_repository_ref_path_component_free_values
+    )
+    assert source_repository_ref_path_component_free is True
     selected_excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -20889,6 +20899,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         source_signal_ref_path_component_free_values
     )
     assert source_signal_ref_path_component_free is True
+    source_repository_ref_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(payload["source_repository_ref"])
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(source_repository_ref_path_component_free_values)
+    source_repository_ref_path_component_free = all(
+        source_repository_ref_path_component_free_values
+    )
+    assert source_repository_ref_path_component_free is True
     selected_excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
