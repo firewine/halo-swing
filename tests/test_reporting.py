@@ -10785,6 +10785,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         source_repository_ref_storage_marker_free_values
     )
     assert source_repository_ref_storage_marker_free is True
+    latest_record_guard_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(latest_record_guard)
+        for marker in storage_markers
+    ]
+    assert tuple(latest_record_guard_storage_marker_free_values)
+    latest_record_guard_storage_marker_free = all(
+        latest_record_guard_storage_marker_free_values
+    )
+    assert latest_record_guard_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -20575,6 +20585,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         source_repository_ref_storage_marker_free_values
     )
     assert source_repository_ref_storage_marker_free is True
+    latest_record_guard_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(latest_record_guard)
+        for marker in storage_markers
+    ]
+    assert tuple(latest_record_guard_storage_marker_free_values)
+    latest_record_guard_storage_marker_free = all(
+        latest_record_guard_storage_marker_free_values
+    )
+    assert latest_record_guard_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
