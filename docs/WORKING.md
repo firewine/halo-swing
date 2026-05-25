@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTRACT_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTRACT_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving label_status remains excluded label summary-free after repository selection
+objective: extend SQLite filtered latest report coverage proving evidence_contract remains excluded label summary-free after repository selection
 
 edits:
   allowed:
@@ -29,7 +29,6 @@ edits:
     - docs/WORKING.md
     - docs/codex-task.json
     - docs/COMPLETED_WORK.md
-    - docs/archive/working-ledger-compaction.md
     - docs/halo-swing-development-plan.md
     - tests/test_reporting.py
   blocked_prefixes:
@@ -41,12 +40,11 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe label_status excluded label summary-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying label_status excluded label summary-free values are verified after repository selection
-  - label_status remains free of excluded label summaries outside the selected target summary
+  - SQLite repository-backed latest report timeframe evidence_contract excluded label summary-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying evidence_contract excluded label summary-free values are verified after repository selection
+  - evidence_contract remains free of excluded label summaries outside the selected target summary
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
-  - pre-compaction completed work remains preserved in docs/archive/working-ledger-compaction.md
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
   - verification passes
 ```
@@ -70,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 0.11s
-  - full pytest passed: 935 passed in 41.97s
+  - focused pytest passed: 3 passed in 3.64s
+  - full pytest passed: 935 passed in 52.59s
   - ruff passed
   - health_check passed with status ok
 ```

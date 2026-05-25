@@ -11451,6 +11451,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         label_status_excluded_label_summary_free_values
     )
     assert label_status_excluded_label_summary_free is True
+    evidence_contract_excluded_label_summary_free_values = [
+        excluded_summary not in value
+        for value in iter_nested_strings(evidence_contract)
+        for excluded_summary in excluded_label_summaries
+    ]
+    assert tuple(evidence_contract_excluded_label_summary_free_values)
+    evidence_contract_excluded_label_summary_free = all(
+        evidence_contract_excluded_label_summary_free_values
+    )
+    assert evidence_contract_excluded_label_summary_free is True
     selected_excluded_label_summary_free_summary = {
         name: [
             excluded_summary not in value
@@ -21785,6 +21795,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         label_status_excluded_label_summary_free_values
     )
     assert label_status_excluded_label_summary_free is True
+    evidence_contract_excluded_label_summary_free_values = [
+        excluded_summary not in value
+        for value in iter_nested_strings(evidence_contract)
+        for excluded_summary in excluded_label_summaries
+    ]
+    assert tuple(evidence_contract_excluded_label_summary_free_values)
+    evidence_contract_excluded_label_summary_free = all(
+        evidence_contract_excluded_label_summary_free_values
+    )
+    assert evidence_contract_excluded_label_summary_free is True
     selected_excluded_label_summary_free_summary = {
         name: [
             excluded_summary not in value
