@@ -10805,6 +10805,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_guard_checks_storage_marker_free_values
     )
     assert evidence_guard_checks_storage_marker_free is True
+    prompt_contract_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(prompt_contract)
+        for marker in storage_markers
+    ]
+    assert tuple(prompt_contract_storage_marker_free_values)
+    prompt_contract_storage_marker_free = all(
+        prompt_contract_storage_marker_free_values
+    )
+    assert prompt_contract_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -20615,6 +20625,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_guard_checks_storage_marker_free_values
     )
     assert evidence_guard_checks_storage_marker_free is True
+    prompt_contract_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(prompt_contract)
+        for marker in storage_markers
+    ]
+    assert tuple(prompt_contract_storage_marker_free_values)
+    prompt_contract_storage_marker_free = all(
+        prompt_contract_storage_marker_free_values
+    )
+    assert prompt_contract_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
