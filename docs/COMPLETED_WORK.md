@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered evidence guard checks path component-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.73s
+    full_pytest: 935 passed in 63.38s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying evidence_guard_checks local path component marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.661
+
+- date: 2026-05-25
   commit: 6b81832
   title: Cover sqlite filtered latest record guard path component-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LATEST_RECORD_GUARD_PATH_COMPONENT_FREE_VALUE_GATE
