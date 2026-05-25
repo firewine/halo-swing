@@ -11271,6 +11271,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         label_status_older_matching_record_free_values
     )
     assert label_status_older_matching_record_free is True
+    evidence_contract_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(evidence_contract)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(evidence_contract_older_matching_record_free_values)
+    evidence_contract_older_matching_record_free = all(
+        evidence_contract_older_matching_record_free_values
+    )
+    assert evidence_contract_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
@@ -21455,6 +21465,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         label_status_older_matching_record_free_values
     )
     assert label_status_older_matching_record_free is True
+    evidence_contract_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(evidence_contract)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(evidence_contract_older_matching_record_free_values)
+    evidence_contract_older_matching_record_free = all(
+        evidence_contract_older_matching_record_free_values
+    )
+    assert evidence_contract_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value

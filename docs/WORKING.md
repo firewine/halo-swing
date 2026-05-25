@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_OLDER_MATCHING_RECORD_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LABEL_STATUS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTRACT_OLDER_MATCHING_RECORD_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTRACT_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving label_status remains older matching repository record token-free after repository selection
+objective: extend SQLite filtered latest report coverage proving evidence_contract remains older matching repository record token-free after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe label_status older matching repository record token-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying label_status older matching repository record token-free values are verified after repository selection
-  - label_status remains free of older matching repository record tokens outside the selected target summary
+  - SQLite repository-backed latest report timeframe evidence_contract older matching repository record token-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying evidence_contract older matching repository record token-free values are verified after repository selection
+  - evidence_contract remains free of older matching repository record tokens outside the selected target summary
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 3.81s
-  - full pytest passed: 935 passed in 97.43s
+  - focused pytest passed: 3 passed in 4.09s
+  - full pytest passed: 935 passed in 100.94s
   - ruff passed
   - health_check passed with status ok
 ```
