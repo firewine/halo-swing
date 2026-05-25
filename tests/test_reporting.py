@@ -11293,6 +11293,34 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(reasons_excluded_record_free_values)
     reasons_excluded_record_free = all(reasons_excluded_record_free_values)
     assert reasons_excluded_record_free is True
+    direct_excluded_record_free_status = {
+        "label_status": label_status_excluded_record_free,
+        "evidence_contract": evidence_contract_excluded_record_free,
+        "evidence_context": evidence_context_excluded_record_free,
+        "evidence_label_status": evidence_label_status_excluded_record_free,
+        "source_signal_ref": source_signal_ref_excluded_record_free,
+        "source_repository_ref": source_repository_ref_excluded_record_free,
+        "latest_record_guard": latest_record_guard_excluded_record_free,
+        "evidence_guard_checks": evidence_guard_checks_excluded_record_free,
+        "prompt_contract": prompt_contract_excluded_record_free,
+        "report_intent_contract": report_intent_contract_excluded_record_free,
+        "delivery_contract": delivery_contract_excluded_record_free,
+        "delivery_preview": delivery_preview_excluded_record_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_excluded_record_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_excluded_record_free
+        ),
+        "reasons": reasons_excluded_record_free,
+    }
+    assert tuple(direct_excluded_record_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert (
+        selected_excluded_record_free_status
+        == direct_excluded_record_free_status
+    )
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21862,6 +21890,34 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(reasons_excluded_record_free_values)
     reasons_excluded_record_free = all(reasons_excluded_record_free_values)
     assert reasons_excluded_record_free is True
+    direct_excluded_record_free_status = {
+        "label_status": label_status_excluded_record_free,
+        "evidence_contract": evidence_contract_excluded_record_free,
+        "evidence_context": evidence_context_excluded_record_free,
+        "evidence_label_status": evidence_label_status_excluded_record_free,
+        "source_signal_ref": source_signal_ref_excluded_record_free,
+        "source_repository_ref": source_repository_ref_excluded_record_free,
+        "latest_record_guard": latest_record_guard_excluded_record_free,
+        "evidence_guard_checks": evidence_guard_checks_excluded_record_free,
+        "prompt_contract": prompt_contract_excluded_record_free,
+        "report_intent_contract": report_intent_contract_excluded_record_free,
+        "delivery_contract": delivery_contract_excluded_record_free,
+        "delivery_preview": delivery_preview_excluded_record_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_excluded_record_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_excluded_record_free
+        ),
+        "reasons": reasons_excluded_record_free,
+    }
+    assert tuple(direct_excluded_record_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert (
+        selected_excluded_record_free_status
+        == direct_excluded_record_free_status
+    )
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
