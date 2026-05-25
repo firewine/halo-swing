@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered evidence label status excluded record-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_LABEL_STATUS_EXCLUDED_RECORD_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 4.00s
+    full_pytest: 935 passed in 76.22s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying evidence_label_status excluded repository record token-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.672
+
+- date: 2026-05-25
   commit: cf92a9c
   title: Cover sqlite filtered evidence context excluded record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTEXT_EXCLUDED_RECORD_FREE_VALUE_GATE

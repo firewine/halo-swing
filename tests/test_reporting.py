@@ -11129,6 +11129,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_context_excluded_record_free_values
     )
     assert evidence_context_excluded_record_free is True
+    evidence_label_status_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(evidence_label_status)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(evidence_label_status_excluded_record_free_values)
+    evidence_label_status_excluded_record_free = all(
+        evidence_label_status_excluded_record_free_values
+    )
+    assert evidence_label_status_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21185,6 +21195,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_context_excluded_record_free_values
     )
     assert evidence_context_excluded_record_free is True
+    evidence_label_status_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(evidence_label_status)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(evidence_label_status_excluded_record_free_values)
+    evidence_label_status_excluded_record_free = all(
+        evidence_label_status_excluded_record_free_values
+    )
+    assert evidence_label_status_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
