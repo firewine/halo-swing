@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report payload guard checks older matching record-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PAYLOAD_GUARD_CHECKS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.76s
+    full_pytest: 935 passed in 68.50s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying report_payload_guard_checks older matching repository record token-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.697
+
+- date: 2026-05-25
   commit: 66343e3
   title: Cover sqlite filtered report contract guard checks older matching record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECKS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
