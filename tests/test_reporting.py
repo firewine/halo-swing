@@ -10873,6 +10873,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(reasons_storage_marker_free_values)
     reasons_storage_marker_free = all(reasons_storage_marker_free_values)
     assert reasons_storage_marker_free is True
+    direct_storage_marker_free_status = {
+        "label_status": label_status_storage_marker_free,
+        "evidence_contract": evidence_contract_storage_marker_free,
+        "evidence_context": evidence_context_storage_marker_free,
+        "evidence_label_status": evidence_label_status_storage_marker_free,
+        "source_signal_ref": source_signal_ref_storage_marker_free,
+        "source_repository_ref": source_repository_ref_storage_marker_free,
+        "latest_record_guard": latest_record_guard_storage_marker_free,
+        "evidence_guard_checks": evidence_guard_checks_storage_marker_free,
+        "prompt_contract": prompt_contract_storage_marker_free,
+        "report_intent_contract": report_intent_contract_storage_marker_free,
+        "delivery_contract": delivery_contract_storage_marker_free,
+        "delivery_preview": delivery_preview_storage_marker_free,
+        "report_contract_guard_checks": report_contract_guard_checks_storage_marker_free,
+        "report_payload_guard_checks": report_payload_guard_checks_storage_marker_free,
+        "reasons": reasons_storage_marker_free,
+    }
+    assert tuple(direct_storage_marker_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_storage_marker_free_status == direct_storage_marker_free_status
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -21396,6 +21417,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(reasons_storage_marker_free_values)
     reasons_storage_marker_free = all(reasons_storage_marker_free_values)
     assert reasons_storage_marker_free is True
+    direct_storage_marker_free_status = {
+        "label_status": label_status_storage_marker_free,
+        "evidence_contract": evidence_contract_storage_marker_free,
+        "evidence_context": evidence_context_storage_marker_free,
+        "evidence_label_status": evidence_label_status_storage_marker_free,
+        "source_signal_ref": source_signal_ref_storage_marker_free,
+        "source_repository_ref": source_repository_ref_storage_marker_free,
+        "latest_record_guard": latest_record_guard_storage_marker_free,
+        "evidence_guard_checks": evidence_guard_checks_storage_marker_free,
+        "prompt_contract": prompt_contract_storage_marker_free,
+        "report_intent_contract": report_intent_contract_storage_marker_free,
+        "delivery_contract": delivery_contract_storage_marker_free,
+        "delivery_preview": delivery_preview_storage_marker_free,
+        "report_contract_guard_checks": report_contract_guard_checks_storage_marker_free,
+        "report_payload_guard_checks": report_payload_guard_checks_storage_marker_free,
+        "reasons": reasons_storage_marker_free,
+    }
+    assert tuple(direct_storage_marker_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_storage_marker_free_status == direct_storage_marker_free_status
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,

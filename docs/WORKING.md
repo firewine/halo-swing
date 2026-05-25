@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SQLITE_NAME_FREE_DIRECT_STATUS_MIRROR_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_SQLITE_NAME_FREE_DIRECT_STATUS_MIRROR_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_STORAGE_MARKER_FREE_DIRECT_STATUS_MIRROR_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_STORAGE_MARKER_FREE_DIRECT_STATUS_MIRROR_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving selected sqlite name-free status mirrors direct surface status after repository selection
+objective: extend SQLite filtered latest report coverage proving selected storage marker-free status mirrors direct surface status after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe selected sqlite name-free status mirrors direct surface status after repository selection
-  - SQLite repository-backed latest report underlying selected sqlite name-free status mirrors direct surface status after repository selection
-  - selected sqlite name-free aggregate remains aligned with direct per-surface booleans
+  - SQLite repository-backed latest report timeframe selected storage marker-free status mirrors direct surface status after repository selection
+  - SQLite repository-backed latest report underlying selected storage marker-free status mirrors direct surface status after repository selection
+  - selected storage marker-free aggregate remains aligned with direct per-surface booleans
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 1.52s
-  - full pytest passed: 935 passed in 42.09s
+  - focused pytest passed: 3 passed in 1.57s
+  - full pytest passed: 935 passed in 42.12s
   - ruff passed
   - health_check passed with status ok
 ```
