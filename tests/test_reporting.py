@@ -10765,6 +10765,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_label_status_storage_marker_free_values
     )
     assert evidence_label_status_storage_marker_free is True
+    source_signal_ref_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(payload["source_signal_ref"])
+        for marker in storage_markers
+    ]
+    assert tuple(source_signal_ref_storage_marker_free_values)
+    source_signal_ref_storage_marker_free = all(
+        source_signal_ref_storage_marker_free_values
+    )
+    assert source_signal_ref_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -20535,6 +20545,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_label_status_storage_marker_free_values
     )
     assert evidence_label_status_storage_marker_free is True
+    source_signal_ref_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(payload["source_signal_ref"])
+        for marker in storage_markers
+    ]
+    assert tuple(source_signal_ref_storage_marker_free_values)
+    source_signal_ref_storage_marker_free = all(
+        source_signal_ref_storage_marker_free_values
+    )
+    assert source_signal_ref_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,

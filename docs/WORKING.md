@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_LABEL_STATUS_STORAGE_MARKER_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_LABEL_STATUS_STORAGE_MARKER_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_STORAGE_MARKER_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_STORAGE_MARKER_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving evidence_label_status remains storage marker-free after repository selection
+objective: extend SQLite filtered latest report coverage proving source_signal_ref remains storage marker-free after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe evidence_label_status storage marker-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying evidence_label_status storage marker-free values are verified after repository selection
-  - evidence_label_status remains free of storage markers outside the selected target summary
+  - SQLite repository-backed latest report timeframe source_signal_ref storage marker-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying source_signal_ref storage marker-free values are verified after repository selection
+  - source_signal_ref remains free of storage markers outside the selected target summary
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 3.39s
-  - full pytest passed: 935 passed in 65.03s
+  - focused pytest passed: 3 passed in 2.98s
+  - full pytest passed: 935 passed in 56.85s
   - ruff passed
   - health_check passed with status ok
 ```
