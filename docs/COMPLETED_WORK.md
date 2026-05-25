@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered delivery preview older matching record-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 1.97s
+    full_pytest: 935 passed in 65.96s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying delivery_preview older matching repository record token-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.695
+
+- date: 2026-05-25
   commit: e85396f
   title: Cover sqlite filtered delivery contract older matching record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
