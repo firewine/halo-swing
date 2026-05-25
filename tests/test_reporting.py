@@ -7397,6 +7397,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_label_status_propagation_summary) == tuple(
         selected_label_status_propagation_targets
     )
+    direct_label_status_propagation_status = {
+        "latest_signal_report_label_status": all(
+            selected_label_status_propagation_targets[
+                "latest_signal_report_label_status"
+            ]
+        ),
+        "evidence_context_label_status": all(
+            selected_label_status_propagation_targets[
+                "evidence_context_label_status"
+            ]
+        ),
+        "evidence_guard_label_status": all(
+            selected_label_status_propagation_targets[
+                "evidence_guard_label_status"
+            ]
+        ),
+    }
+    assert tuple(direct_label_status_propagation_status) == tuple(
+        selected_label_status_propagation_targets
+    )
+    assert (
+        selected_label_status_propagation_summary
+        == direct_label_status_propagation_status
+    )
     label_status_guard_check = evidence_guard_checks[
         "label_status_reflected_in_evidence_context"
     ]
@@ -18026,6 +18050,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(selected_label_status_propagation_summary) == tuple(
         selected_label_status_propagation_targets
+    )
+    direct_label_status_propagation_status = {
+        "latest_signal_report_label_status": all(
+            selected_label_status_propagation_targets[
+                "latest_signal_report_label_status"
+            ]
+        ),
+        "evidence_context_label_status": all(
+            selected_label_status_propagation_targets[
+                "evidence_context_label_status"
+            ]
+        ),
+        "evidence_guard_label_status": all(
+            selected_label_status_propagation_targets[
+                "evidence_guard_label_status"
+            ]
+        ),
+    }
+    assert tuple(direct_label_status_propagation_status) == tuple(
+        selected_label_status_propagation_targets
+    )
+    assert (
+        selected_label_status_propagation_summary
+        == direct_label_status_propagation_status
     )
     label_status_guard_check = evidence_guard_checks[
         "label_status_reflected_in_evidence_context"
