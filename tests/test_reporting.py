@@ -11179,6 +11179,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         evidence_guard_checks_excluded_record_free_values
     )
     assert evidence_guard_checks_excluded_record_free is True
+    prompt_contract_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(prompt_contract)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(prompt_contract_excluded_record_free_values)
+    prompt_contract_excluded_record_free = all(
+        prompt_contract_excluded_record_free_values
+    )
+    assert prompt_contract_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21285,6 +21295,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         evidence_guard_checks_excluded_record_free_values
     )
     assert evidence_guard_checks_excluded_record_free is True
+    prompt_contract_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(prompt_contract)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(prompt_contract_excluded_record_free_values)
+    prompt_contract_excluded_record_free = all(
+        prompt_contract_excluded_record_free_values
+    )
+    assert prompt_contract_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
