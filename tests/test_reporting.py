@@ -11515,6 +11515,42 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_older_matching_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    direct_older_matching_record_free_status = {
+        "label_status": label_status_older_matching_record_free,
+        "evidence_contract": evidence_contract_older_matching_record_free,
+        "evidence_context": evidence_context_older_matching_record_free,
+        "evidence_label_status": (
+            evidence_label_status_older_matching_record_free
+        ),
+        "source_signal_ref": source_signal_ref_older_matching_record_free,
+        "source_repository_ref": (
+            source_repository_ref_older_matching_record_free
+        ),
+        "latest_record_guard": latest_record_guard_older_matching_record_free,
+        "evidence_guard_checks": (
+            evidence_guard_checks_older_matching_record_free
+        ),
+        "prompt_contract": prompt_contract_older_matching_record_free,
+        "report_intent_contract": (
+            report_intent_contract_older_matching_record_free
+        ),
+        "delivery_contract": delivery_contract_older_matching_record_free,
+        "delivery_preview": delivery_preview_older_matching_record_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_older_matching_record_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_older_matching_record_free
+        ),
+        "reasons": reasons_older_matching_record_free,
+    }
+    assert tuple(direct_older_matching_record_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert (
+        selected_older_matching_record_free_status
+        == direct_older_matching_record_free_status
+    )
     label_status_excluded_label_summary_free_values = [
         excluded_summary not in value
         for value in iter_nested_strings(label_status)
@@ -22111,6 +22147,42 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(selected_older_matching_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
+    )
+    direct_older_matching_record_free_status = {
+        "label_status": label_status_older_matching_record_free,
+        "evidence_contract": evidence_contract_older_matching_record_free,
+        "evidence_context": evidence_context_older_matching_record_free,
+        "evidence_label_status": (
+            evidence_label_status_older_matching_record_free
+        ),
+        "source_signal_ref": source_signal_ref_older_matching_record_free,
+        "source_repository_ref": (
+            source_repository_ref_older_matching_record_free
+        ),
+        "latest_record_guard": latest_record_guard_older_matching_record_free,
+        "evidence_guard_checks": (
+            evidence_guard_checks_older_matching_record_free
+        ),
+        "prompt_contract": prompt_contract_older_matching_record_free,
+        "report_intent_contract": (
+            report_intent_contract_older_matching_record_free
+        ),
+        "delivery_contract": delivery_contract_older_matching_record_free,
+        "delivery_preview": delivery_preview_older_matching_record_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_older_matching_record_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_older_matching_record_free
+        ),
+        "reasons": reasons_older_matching_record_free,
+    }
+    assert tuple(direct_older_matching_record_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert (
+        selected_older_matching_record_free_status
+        == direct_older_matching_record_free_status
     )
     label_status_excluded_label_summary_free_values = [
         excluded_summary not in value
