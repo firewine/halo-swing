@@ -11261,6 +11261,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         older_matching_signal["config_hash"],
         older_matching_signal["config_hash"].removeprefix("sha256:"),
     )
+    label_status_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(label_status)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(label_status_older_matching_record_free_values)
+    label_status_older_matching_record_free = all(
+        label_status_older_matching_record_free_values
+    )
+    assert label_status_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
@@ -21435,6 +21445,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         older_matching_signal["config_hash"],
         older_matching_signal["config_hash"].removeprefix("sha256:"),
     )
+    label_status_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(label_status)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(label_status_older_matching_record_free_values)
+    label_status_older_matching_record_free = all(
+        label_status_older_matching_record_free_values
+    )
+    assert label_status_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
