@@ -11239,6 +11239,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_payload_guard_checks_excluded_record_free_values
     )
     assert report_payload_guard_checks_excluded_record_free is True
+    reasons_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(reasons)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(reasons_excluded_record_free_values)
+    reasons_excluded_record_free = all(reasons_excluded_record_free_values)
+    assert reasons_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21405,6 +21413,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_payload_guard_checks_excluded_record_free_values
     )
     assert report_payload_guard_checks_excluded_record_free is True
+    reasons_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(reasons)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(reasons_excluded_record_free_values)
+    reasons_excluded_record_free = all(reasons_excluded_record_free_values)
+    assert reasons_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
