@@ -11001,10 +11001,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_payload_guard_checks_sqlite_name_free_values
     )
     assert report_payload_guard_checks_sqlite_name_free is True
-    assert all(
+    reasons_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(reasons)
+    ]
+    assert tuple(reasons_sqlite_name_free_values)
+    reasons_sqlite_name_free = all(
+        reasons_sqlite_name_free_values
     )
+    assert reasons_sqlite_name_free is True
 
 
 def test_latest_signal_report_repository_source_filters_by_underlying(
@@ -20726,10 +20731,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_payload_guard_checks_sqlite_name_free_values
     )
     assert report_payload_guard_checks_sqlite_name_free is True
-    assert all(
+    reasons_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(reasons)
+    ]
+    assert tuple(reasons_sqlite_name_free_values)
+    reasons_sqlite_name_free = all(
+        reasons_sqlite_name_free_values
     )
+    assert reasons_sqlite_name_free is True
 
 
 def test_latest_signal_report_repository_source_includes_jsonl_label_status(
