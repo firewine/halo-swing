@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: bb20df6
   title: Cover sqlite filtered report payload guard checks older matching record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PAYLOAD_GUARD_CHECKS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 2.76s
     full_pytest: 935 passed in 68.50s
