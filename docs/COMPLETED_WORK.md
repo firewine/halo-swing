@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered evidence context path component-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTEXT_PATH_COMPONENT_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.59s
+    full_pytest: 935 passed in 45.04s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying evidence_context local path component marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.656
+
+- date: 2026-05-25
   commit: 59d5f8e
   title: Cover sqlite filtered evidence contract path component-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTRACT_PATH_COMPONENT_FREE_VALUE_GATE
