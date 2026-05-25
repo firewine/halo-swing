@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LATEST_RECORD_GUARD_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_GUARD_CHECKS_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_LATEST_RECORD_GUARD_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_GUARD_CHECKS_EXCLUDED_LABEL_SUMMARY_FREE_VALUE_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.705",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving latest_record_guard remains excluded label summary-free after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.706",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving evidence_guard_checks remains excluded label summary-free after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.704",
+    "docs/halo-swing-development-plan.md#4.705",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe latest_record_guard excluded label summary-free values are verified after repository selection",
-    "SQLite repository-backed latest report underlying latest_record_guard excluded label summary-free values are verified after repository selection",
-    "latest_record_guard remains free of excluded label summaries outside the selected target summary",
+    "SQLite repository-backed latest report timeframe evidence_guard_checks excluded label summary-free values are verified after repository selection",
+    "SQLite repository-backed latest report underlying evidence_guard_checks excluded label summary-free values are verified after repository selection",
+    "evidence_guard_checks remains free of excluded label summaries outside the selected target summary",
     "database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",
