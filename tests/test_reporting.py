@@ -11351,6 +11351,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         prompt_contract_older_matching_record_free_values
     )
     assert prompt_contract_older_matching_record_free is True
+    report_intent_contract_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(report_intent_contract)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(report_intent_contract_older_matching_record_free_values)
+    report_intent_contract_older_matching_record_free = all(
+        report_intent_contract_older_matching_record_free_values
+    )
+    assert report_intent_contract_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
@@ -21615,6 +21625,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         prompt_contract_older_matching_record_free_values
     )
     assert prompt_contract_older_matching_record_free is True
+    report_intent_contract_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(report_intent_contract)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(report_intent_contract_older_matching_record_free_values)
+    report_intent_contract_older_matching_record_free = all(
+        report_intent_contract_older_matching_record_free_values
+    )
+    assert report_intent_contract_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
