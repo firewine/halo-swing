@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered delivery preview storage marker-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_STORAGE_MARKER_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.98s
+    full_pytest: 935 passed in 45.06s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying delivery_preview storage marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.650
+
+- date: 2026-05-25
   commit: 2c00d4d
   title: Cover sqlite filtered delivery contract storage marker-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_CONTRACT_STORAGE_MARKER_FREE_VALUE_GATE
