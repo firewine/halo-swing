@@ -11099,6 +11099,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_excluded_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    label_status_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(label_status)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(label_status_excluded_record_free_values)
+    label_status_excluded_record_free = all(
+        label_status_excluded_record_free_values
+    )
+    assert label_status_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21125,6 +21135,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_excluded_record_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    label_status_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(label_status)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(label_status_excluded_record_free_values)
+    label_status_excluded_record_free = all(
+        label_status_excluded_record_free_values
+    )
+    assert label_status_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
