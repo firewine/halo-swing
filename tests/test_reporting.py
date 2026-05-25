@@ -11491,6 +11491,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         source_signal_ref_excluded_label_summary_free_values
     )
     assert source_signal_ref_excluded_label_summary_free is True
+    source_repository_ref_excluded_label_summary_free_values = [
+        excluded_summary not in value
+        for value in iter_nested_strings(payload["source_repository_ref"])
+        for excluded_summary in excluded_label_summaries
+    ]
+    assert tuple(source_repository_ref_excluded_label_summary_free_values)
+    source_repository_ref_excluded_label_summary_free = all(
+        source_repository_ref_excluded_label_summary_free_values
+    )
+    assert source_repository_ref_excluded_label_summary_free is True
     selected_excluded_label_summary_free_summary = {
         name: [
             excluded_summary not in value
@@ -21865,6 +21875,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         source_signal_ref_excluded_label_summary_free_values
     )
     assert source_signal_ref_excluded_label_summary_free is True
+    source_repository_ref_excluded_label_summary_free_values = [
+        excluded_summary not in value
+        for value in iter_nested_strings(payload["source_repository_ref"])
+        for excluded_summary in excluded_label_summaries
+    ]
+    assert tuple(source_repository_ref_excluded_label_summary_free_values)
+    source_repository_ref_excluded_label_summary_free = all(
+        source_repository_ref_excluded_label_summary_free_values
+    )
+    assert source_repository_ref_excluded_label_summary_free is True
     selected_excluded_label_summary_free_summary = {
         name: [
             excluded_summary not in value
