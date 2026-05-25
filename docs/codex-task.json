@@ -1,10 +1,10 @@
 {
-  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_STORAGE_MARKER_FREE_DIRECT_STATUS_MIRROR_GATE",
+  "gate_id": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_PATH_COMPONENT_FREE_DIRECT_STATUS_MIRROR_GATE",
   "mode": "implement",
-  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_STORAGE_MARKER_FREE_DIRECT_STATUS_MIRROR_VERIFIED",
+  "status": "P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_PATH_COMPONENT_FREE_DIRECT_STATUS_MIRROR_VERIFIED",
   "review_tier": "S1_small",
-  "source_gate_packet": "docs/halo-swing-development-plan.md#4.716",
-  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected storage marker-free status mirrors direct surface status after repository selection",
+  "source_gate_packet": "docs/halo-swing-development-plan.md#4.717",
+  "next_atomic_step": "extend SQLite filtered latest report coverage proving selected path component-free status mirrors direct surface status after repository selection",
   "allowed_edit_paths": [
     ".codex/tasks/current.json",
     "docs/WORKING.md",
@@ -16,7 +16,7 @@
   "read_only_context": [
     "AGENTS.md",
     "docs/WORKING.md",
-    "docs/halo-swing-development-plan.md#4.715",
+    "docs/halo-swing-development-plan.md#4.716",
     "tests/test_reporting.py",
     "src/halo_swing_mcp/tools/reporting.py"
   ],
@@ -50,9 +50,9 @@
     "read_only": true
   },
   "done_means": [
-    "SQLite repository-backed latest report timeframe selected storage marker-free status mirrors direct surface status after repository selection",
-    "SQLite repository-backed latest report underlying selected storage marker-free status mirrors direct surface status after repository selection",
-    "selected storage marker-free aggregate remains aligned with direct per-surface booleans",
+    "SQLite repository-backed latest report timeframe selected path component-free status mirrors direct surface status after repository selection",
+    "SQLite repository-backed latest report underlying selected path component-free status mirrors direct surface status after repository selection",
+    "selected path component-free aggregate remains aligned with direct per-surface booleans",
     "database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces",
     "default no-repository latest report payload and golden snapshot remain unchanged",
     "no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic .env DB activation, secret output, or repo data/state/artifact files are added",

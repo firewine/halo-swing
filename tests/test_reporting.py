@@ -11080,6 +11080,31 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(reasons_path_component_free_values)
     reasons_path_component_free = all(reasons_path_component_free_values)
     assert reasons_path_component_free is True
+    direct_path_component_free_status = {
+        "label_status": label_status_path_component_free,
+        "evidence_contract": evidence_contract_path_component_free,
+        "evidence_context": evidence_context_path_component_free,
+        "evidence_label_status": evidence_label_status_path_component_free,
+        "source_signal_ref": source_signal_ref_path_component_free,
+        "source_repository_ref": source_repository_ref_path_component_free,
+        "latest_record_guard": latest_record_guard_path_component_free,
+        "evidence_guard_checks": evidence_guard_checks_path_component_free,
+        "prompt_contract": prompt_contract_path_component_free,
+        "report_intent_contract": report_intent_contract_path_component_free,
+        "delivery_contract": delivery_contract_path_component_free,
+        "delivery_preview": delivery_preview_path_component_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_path_component_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_path_component_free
+        ),
+        "reasons": reasons_path_component_free,
+    }
+    assert tuple(direct_path_component_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_path_component_free_status == direct_path_component_free_status
     selected_excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -21624,6 +21649,31 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(reasons_path_component_free_values)
     reasons_path_component_free = all(reasons_path_component_free_values)
     assert reasons_path_component_free is True
+    direct_path_component_free_status = {
+        "label_status": label_status_path_component_free,
+        "evidence_contract": evidence_contract_path_component_free,
+        "evidence_context": evidence_context_path_component_free,
+        "evidence_label_status": evidence_label_status_path_component_free,
+        "source_signal_ref": source_signal_ref_path_component_free,
+        "source_repository_ref": source_repository_ref_path_component_free,
+        "latest_record_guard": latest_record_guard_path_component_free,
+        "evidence_guard_checks": evidence_guard_checks_path_component_free,
+        "prompt_contract": prompt_contract_path_component_free,
+        "report_intent_contract": report_intent_contract_path_component_free,
+        "delivery_contract": delivery_contract_path_component_free,
+        "delivery_preview": delivery_preview_path_component_free,
+        "report_contract_guard_checks": (
+            report_contract_guard_checks_path_component_free
+        ),
+        "report_payload_guard_checks": (
+            report_payload_guard_checks_path_component_free
+        ),
+        "reasons": reasons_path_component_free,
+    }
+    assert tuple(direct_path_component_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_path_component_free_status == direct_path_component_free_status
     selected_excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],

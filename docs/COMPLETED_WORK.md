@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered selected path component-free direct status mirror
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_PATH_COMPONENT_FREE_DIRECT_STATUS_MIRROR_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 3.44s
+    full_pytest: 935 passed in 42.32s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying selected path component-free status mirrors direct per-surface booleans
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.717
+
+- date: 2026-05-25
   commit: fb4ffee
   title: Cover sqlite filtered selected storage marker-free direct status mirror
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_STORAGE_MARKER_FREE_DIRECT_STATUS_MIRROR_GATE
