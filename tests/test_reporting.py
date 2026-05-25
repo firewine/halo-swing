@@ -11782,6 +11782,27 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         reasons_sqlite_name_free_values
     )
     assert reasons_sqlite_name_free is True
+    direct_sqlite_name_free_status = {
+        "label_status": label_status_sqlite_name_free,
+        "evidence_contract": evidence_contract_sqlite_name_free,
+        "evidence_context": evidence_context_sqlite_name_free,
+        "evidence_label_status": evidence_label_status_sqlite_name_free,
+        "source_signal_ref": source_signal_ref_sqlite_name_free,
+        "source_repository_ref": source_repository_ref_sqlite_name_free,
+        "latest_record_guard": latest_record_guard_sqlite_name_free,
+        "evidence_guard_checks": evidence_guard_checks_sqlite_name_free,
+        "prompt_contract": prompt_contract_sqlite_name_free,
+        "report_intent_contract": report_intent_contract_sqlite_name_free,
+        "delivery_contract": delivery_contract_sqlite_name_free,
+        "delivery_preview": delivery_preview_sqlite_name_free,
+        "report_contract_guard_checks": report_contract_guard_checks_sqlite_name_free,
+        "report_payload_guard_checks": report_payload_guard_checks_sqlite_name_free,
+        "reasons": reasons_sqlite_name_free,
+    }
+    assert tuple(direct_sqlite_name_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_sqlite_name_free_status == direct_sqlite_name_free_status
 
 
 def test_latest_signal_report_repository_source_filters_by_underlying(
@@ -22284,6 +22305,27 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         reasons_sqlite_name_free_values
     )
     assert reasons_sqlite_name_free is True
+    direct_sqlite_name_free_status = {
+        "label_status": label_status_sqlite_name_free,
+        "evidence_contract": evidence_contract_sqlite_name_free,
+        "evidence_context": evidence_context_sqlite_name_free,
+        "evidence_label_status": evidence_label_status_sqlite_name_free,
+        "source_signal_ref": source_signal_ref_sqlite_name_free,
+        "source_repository_ref": source_repository_ref_sqlite_name_free,
+        "latest_record_guard": latest_record_guard_sqlite_name_free,
+        "evidence_guard_checks": evidence_guard_checks_sqlite_name_free,
+        "prompt_contract": prompt_contract_sqlite_name_free,
+        "report_intent_contract": report_intent_contract_sqlite_name_free,
+        "delivery_contract": delivery_contract_sqlite_name_free,
+        "delivery_preview": delivery_preview_sqlite_name_free,
+        "report_contract_guard_checks": report_contract_guard_checks_sqlite_name_free,
+        "report_payload_guard_checks": report_payload_guard_checks_sqlite_name_free,
+        "reasons": reasons_sqlite_name_free,
+    }
+    assert tuple(direct_sqlite_name_free_status) == tuple(
+        selected_sqlite_name_free_targets
+    )
+    assert selected_sqlite_name_free_status == direct_sqlite_name_free_status
 
 
 def test_latest_signal_report_repository_source_includes_jsonl_label_status(
