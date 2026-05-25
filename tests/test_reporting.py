@@ -10992,10 +10992,15 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_contract_guard_checks_sqlite_name_free_values
     )
     assert report_contract_guard_checks_sqlite_name_free is True
-    assert all(
+    report_payload_guard_checks_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(report_payload_guard_checks)
+    ]
+    assert tuple(report_payload_guard_checks_sqlite_name_free_values)
+    report_payload_guard_checks_sqlite_name_free = all(
+        report_payload_guard_checks_sqlite_name_free_values
     )
+    assert report_payload_guard_checks_sqlite_name_free is True
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(reasons)
@@ -20712,10 +20717,15 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_contract_guard_checks_sqlite_name_free_values
     )
     assert report_contract_guard_checks_sqlite_name_free is True
-    assert all(
+    report_payload_guard_checks_sqlite_name_free_values = [
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(report_payload_guard_checks)
+    ]
+    assert tuple(report_payload_guard_checks_sqlite_name_free_values)
+    report_payload_guard_checks_sqlite_name_free = all(
+        report_payload_guard_checks_sqlite_name_free_values
     )
+    assert report_payload_guard_checks_sqlite_name_free is True
     assert all(
         ".sqlite" not in value.lower()
         for value in iter_nested_strings(reasons)
