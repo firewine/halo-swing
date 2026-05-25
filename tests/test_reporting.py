@@ -11401,6 +11401,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_payload_guard_checks_older_matching_record_free_values
     )
     assert report_payload_guard_checks_older_matching_record_free is True
+    reasons_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(reasons)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(reasons_older_matching_record_free_values)
+    reasons_older_matching_record_free = all(
+        reasons_older_matching_record_free_values
+    )
+    assert reasons_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
@@ -21715,6 +21725,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_payload_guard_checks_older_matching_record_free_values
     )
     assert report_payload_guard_checks_older_matching_record_free is True
+    reasons_older_matching_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(reasons)
+        for token in selected_older_matching_record_tokens
+    ]
+    assert tuple(reasons_older_matching_record_free_values)
+    reasons_older_matching_record_free = all(
+        reasons_older_matching_record_free_values
+    )
+    assert reasons_older_matching_record_free is True
     selected_older_matching_record_free_summary = {
         name: [
             token not in value
