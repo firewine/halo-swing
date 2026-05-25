@@ -10725,6 +10725,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_storage_marker_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    label_status_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(label_status)
+        for marker in storage_markers
+    ]
+    assert tuple(label_status_storage_marker_free_values)
+    label_status_storage_marker_free = all(
+        label_status_storage_marker_free_values
+    )
+    assert label_status_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -20455,6 +20465,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     assert tuple(selected_storage_marker_free_summary) == tuple(
         selected_sqlite_name_free_targets
     )
+    label_status_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(label_status)
+        for marker in storage_markers
+    ]
+    assert tuple(label_status_storage_marker_free_values)
+    label_status_storage_marker_free = all(
+        label_status_storage_marker_free_values
+    )
+    assert label_status_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
