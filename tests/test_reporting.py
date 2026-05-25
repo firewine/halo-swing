@@ -11041,6 +11041,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_contract_guard_checks_path_component_free_values
     )
     assert report_contract_guard_checks_path_component_free is True
+    report_payload_guard_checks_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(report_payload_guard_checks)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(report_payload_guard_checks_path_component_free_values)
+    report_payload_guard_checks_path_component_free = all(
+        report_payload_guard_checks_path_component_free_values
+    )
+    assert report_payload_guard_checks_path_component_free is True
     selected_excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -21049,6 +21059,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_contract_guard_checks_path_component_free_values
     )
     assert report_contract_guard_checks_path_component_free is True
+    report_payload_guard_checks_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(report_payload_guard_checks)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(report_payload_guard_checks_path_component_free_values)
+    report_payload_guard_checks_path_component_free = all(
+        report_payload_guard_checks_path_component_free_values
+    )
+    assert report_payload_guard_checks_path_component_free is True
     selected_excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],

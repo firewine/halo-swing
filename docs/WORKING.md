@@ -17,11 +17,11 @@ ledger_rule:
 
 ```yaml
 mode: implement
-status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_VERIFIED
-gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_GATE
+status: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PAYLOAD_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_VERIFIED
+gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_PAYLOAD_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_GATE
 review_tier: S1_small
 
-objective: extend SQLite filtered latest report coverage proving report_contract_guard_checks remains local path component marker-free after repository selection
+objective: extend SQLite filtered latest report coverage proving report_payload_guard_checks remains local path component marker-free after repository selection
 
 edits:
   allowed:
@@ -40,9 +40,9 @@ edits:
     - state/
 
 done_when:
-  - SQLite repository-backed latest report timeframe report_contract_guard_checks local path component marker-free values are verified after repository selection
-  - SQLite repository-backed latest report underlying report_contract_guard_checks local path component marker-free values are verified after repository selection
-  - report_contract_guard_checks remains free of local path component markers outside the selected target summary
+  - SQLite repository-backed latest report timeframe report_payload_guard_checks local path component marker-free values are verified after repository selection
+  - SQLite repository-backed latest report underlying report_payload_guard_checks local path component marker-free values are verified after repository selection
+  - report_payload_guard_checks remains free of local path component markers outside the selected target summary
   - database_path marker, storage markers, and local path component markers remain absent from report and delivery surfaces
   - default no-repository latest report payload and golden snapshot remain unchanged
   - no migrations, live_adapters, broker, Telegram send, Hermes runtime, scheduler, automatic env DB activation, secret output, or repo data/state/artifact files are added
@@ -68,8 +68,8 @@ results:
   - current task JSON parsed
   - docs task JSON parsed
   - git diff --check passed
-  - focused pytest passed: 3 passed in 3.17s
-  - full pytest passed: 935 passed in 65.83s
+  - focused pytest passed: 3 passed in 2.34s
+  - full pytest passed: 935 passed in 68.73s
   - ruff passed
   - health_check passed with status ok
 ```
