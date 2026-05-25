@@ -18,6 +18,12 @@ rule:
 
 ```yaml
 ledger_status: preserved_from_docs_WORKING_md
+preservation_check:
+  status: complete
+  archived_file_lines: 52779
+  completed_directive_markers: 416
+  verification_result_markers: 258
+  note: the moved completed-work list is preserved in the full archived WORKING.md snapshot below, not discarded
 what_was_moved_here:
   - pre-compaction completed directive history
   - pre-compaction verification history
