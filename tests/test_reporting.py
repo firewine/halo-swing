@@ -11229,6 +11229,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_contract_guard_checks_excluded_record_free_values
     )
     assert report_contract_guard_checks_excluded_record_free is True
+    report_payload_guard_checks_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(report_payload_guard_checks)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(report_payload_guard_checks_excluded_record_free_values)
+    report_payload_guard_checks_excluded_record_free = all(
+        report_payload_guard_checks_excluded_record_free_values
+    )
+    assert report_payload_guard_checks_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
@@ -21385,6 +21395,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_contract_guard_checks_excluded_record_free_values
     )
     assert report_contract_guard_checks_excluded_record_free is True
+    report_payload_guard_checks_excluded_record_free_values = [
+        token not in value
+        for value in iter_nested_strings(report_payload_guard_checks)
+        for token in selected_excluded_record_tokens
+    ]
+    assert tuple(report_payload_guard_checks_excluded_record_free_values)
+    report_payload_guard_checks_excluded_record_free = all(
+        report_payload_guard_checks_excluded_record_free_values
+    )
+    assert report_payload_guard_checks_excluded_record_free is True
     selected_older_matching_record_tokens = [
         older_matching_signal["signal_id"],
         older_matching_signal["run_id"],
