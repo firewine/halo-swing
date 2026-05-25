@@ -10971,6 +10971,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         source_repository_ref_path_component_free_values
     )
     assert source_repository_ref_path_component_free is True
+    latest_record_guard_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(latest_record_guard)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(latest_record_guard_path_component_free_values)
+    latest_record_guard_path_component_free = all(
+        latest_record_guard_path_component_free_values
+    )
+    assert latest_record_guard_path_component_free is True
     selected_excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -20909,6 +20919,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         source_repository_ref_path_component_free_values
     )
     assert source_repository_ref_path_component_free is True
+    latest_record_guard_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(latest_record_guard)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(latest_record_guard_path_component_free_values)
+    latest_record_guard_path_component_free = all(
+        latest_record_guard_path_component_free_values
+    )
+    assert latest_record_guard_path_component_free is True
     selected_excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
