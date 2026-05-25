@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report intent contract storage marker-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_INTENT_CONTRACT_STORAGE_MARKER_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.53s
+    full_pytest: 935 passed in 44.69s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying report_intent_contract storage marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.648
+
+- date: 2026-05-25
   commit: 23056ca
   title: Cover sqlite filtered prompt contract storage marker-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_PROMPT_CONTRACT_STORAGE_MARKER_FREE_VALUE_GATE
