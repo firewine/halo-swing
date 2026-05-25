@@ -10921,6 +10921,16 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         label_status_path_component_free_values
     )
     assert label_status_path_component_free is True
+    evidence_contract_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(evidence_contract)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(evidence_contract_path_component_free_values)
+    evidence_contract_path_component_free = all(
+        evidence_contract_path_component_free_values
+    )
+    assert evidence_contract_path_component_free is True
     selected_excluded_record_tokens = [
         alternate_signal["signal_id"],
         alternate_signal["run_id"],
@@ -20809,6 +20819,16 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         label_status_path_component_free_values
     )
     assert label_status_path_component_free is True
+    evidence_contract_path_component_free_values = [
+        marker not in value
+        for value in iter_nested_strings(evidence_contract)
+        for marker in selected_path_component_markers
+    ]
+    assert tuple(evidence_contract_path_component_free_values)
+    evidence_contract_path_component_free = all(
+        evidence_contract_path_component_free_values
+    )
+    assert evidence_contract_path_component_free is True
     selected_excluded_record_tokens = [
         ndx_signal["signal_id"],
         ndx_signal["run_id"],
