@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered report contract guard checks path component-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_REPORT_CONTRACT_GUARD_CHECKS_PATH_COMPONENT_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 3.17s
+    full_pytest: 935 passed in 65.83s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying report_contract_guard_checks local path component marker-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.666
+
+- date: 2026-05-25
   commit: 4cb36c4
   title: Cover sqlite filtered delivery preview path component-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_DELIVERY_PREVIEW_PATH_COMPONENT_FREE_VALUE_GATE
