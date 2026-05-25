@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 9fcf7f4
   title: Cover sqlite filtered selected path component-free direct status mirror
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SELECTED_PATH_COMPONENT_FREE_DIRECT_STATUS_MIRROR_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 3.44s
     full_pytest: 935 passed in 42.32s
