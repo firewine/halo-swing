@@ -43,6 +43,20 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
+  commit: pending
+  title: Cover sqlite filtered source signal ref older matching record-free values
+  gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_SOURCE_SIGNAL_REF_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
+  status: verified_pending_commit
+  verification:
+    focused_pytest: 3 passed in 2.82s
+    full_pytest: 935 passed in 92.07s
+    ruff: passed
+    health_check: status ok
+  notes:
+    - assert timeframe and underlying source_signal_ref older matching repository record token-free values
+    - durable gate details remain in docs/halo-swing-development-plan.md#4.688
+
+- date: 2026-05-25
   commit: 3e01e19
   title: Cover sqlite filtered evidence label status older matching record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_LABEL_STATUS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
