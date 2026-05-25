@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 4399af1
   title: Cover sqlite filtered evidence context path component-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_CONTEXT_PATH_COMPONENT_FREE_VALUE_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 2.59s
     full_pytest: 935 passed in 45.04s
