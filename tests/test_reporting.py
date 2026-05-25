@@ -10865,6 +10865,14 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
         report_payload_guard_checks_storage_marker_free_values
     )
     assert report_payload_guard_checks_storage_marker_free is True
+    reasons_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(reasons)
+        for marker in storage_markers
+    ]
+    assert tuple(reasons_storage_marker_free_values)
+    reasons_storage_marker_free = all(reasons_storage_marker_free_values)
+    assert reasons_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
@@ -20735,6 +20743,14 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
         report_payload_guard_checks_storage_marker_free_values
     )
     assert report_payload_guard_checks_storage_marker_free is True
+    reasons_storage_marker_free_values = [
+        marker not in value.lower()
+        for value in iter_nested_strings(reasons)
+        for marker in storage_markers
+    ]
+    assert tuple(reasons_storage_marker_free_values)
+    reasons_storage_marker_free = all(reasons_storage_marker_free_values)
+    assert reasons_storage_marker_free is True
     selected_path_component_markers = [
         database_path.name,
         database_path.stem,
