@@ -43,10 +43,10 @@ post_compaction_policy:
 
 ```yaml
 - date: 2026-05-25
-  commit: pending
+  commit: 3e01e19
   title: Cover sqlite filtered evidence label status older matching record-free values
   gate_id: P1_REPOSITORY_SQLITE_LATEST_REPORT_FILTERED_SOURCE_EVIDENCE_LABEL_STATUS_OLDER_MATCHING_RECORD_FREE_VALUE_GATE
-  status: verified_pending_commit
+  status: verified_and_pushed
   verification:
     focused_pytest: 3 passed in 3.63s
     full_pytest: 935 passed in 84.35s
