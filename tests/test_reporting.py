@@ -7470,6 +7470,30 @@ def test_latest_signal_report_repository_source_filters_by_timeframe(
     assert tuple(selected_label_status_guard_pass_summary) == tuple(
         selected_label_status_guard_pass_targets
     )
+    direct_label_status_guard_pass_status = {
+        "evidence_guard_label_status_pass": all(
+            selected_label_status_guard_pass_targets[
+                "evidence_guard_label_status_pass"
+            ]
+        ),
+        "evidence_guard_label_status_expected_actual": all(
+            selected_label_status_guard_pass_targets[
+                "evidence_guard_label_status_expected_actual"
+            ]
+        ),
+        "latest_and_evidence_label_status_selected": all(
+            selected_label_status_guard_pass_targets[
+                "latest_and_evidence_label_status_selected"
+            ]
+        ),
+    }
+    assert tuple(direct_label_status_guard_pass_status) == tuple(
+        selected_label_status_guard_pass_targets
+    )
+    assert (
+        selected_label_status_guard_pass_summary
+        == direct_label_status_guard_pass_status
+    )
     excluded_label_statuses = [alternate_label, older_matching_label]
     assert tuple(excluded_label_statuses) == (alternate_label, older_matching_label)
     label_status_detail_fields = (
@@ -18123,6 +18147,30 @@ def test_latest_signal_report_repository_source_filters_by_underlying(
     }
     assert tuple(selected_label_status_guard_pass_summary) == tuple(
         selected_label_status_guard_pass_targets
+    )
+    direct_label_status_guard_pass_status = {
+        "evidence_guard_label_status_pass": all(
+            selected_label_status_guard_pass_targets[
+                "evidence_guard_label_status_pass"
+            ]
+        ),
+        "evidence_guard_label_status_expected_actual": all(
+            selected_label_status_guard_pass_targets[
+                "evidence_guard_label_status_expected_actual"
+            ]
+        ),
+        "latest_and_evidence_label_status_selected": all(
+            selected_label_status_guard_pass_targets[
+                "latest_and_evidence_label_status_selected"
+            ]
+        ),
+    }
+    assert tuple(direct_label_status_guard_pass_status) == tuple(
+        selected_label_status_guard_pass_targets
+    )
+    assert (
+        selected_label_status_guard_pass_summary
+        == direct_label_status_guard_pass_status
     )
     excluded_label_statuses = [alternate_label, older_matching_label]
     assert tuple(excluded_label_statuses) == (alternate_label, older_matching_label)
